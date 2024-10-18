@@ -197,6 +197,11 @@ void ElasticSearchRecordable::WriteValue(const opentelemetry::common::AttributeV
   }
 }
 
+ElasticSearchRecordable::ElasticSearchRecordable() noexcept : sdk::logs::Recordable()
+{
+  json_["ecs"]["version"] = "8.11.0";
+}
+
 nlohmann::json ElasticSearchRecordable::GetJSON() noexcept
 {
   return json_;
