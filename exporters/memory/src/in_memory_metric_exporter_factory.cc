@@ -78,7 +78,8 @@ private:
 std::unique_ptr<PushMetricExporter> InMemoryMetricExporterFactory::Create(
     const std::shared_ptr<InMemoryMetricData> &data)
 {
-  return Create(data, [](auto) { return AggregationTemporality::kCumulative; });
+  return Create(data,
+                [](sdk::metrics::InstrumentType) { return AggregationTemporality::kCumulative; });
 }
 
 std::unique_ptr<PushMetricExporter> InMemoryMetricExporterFactory::Create(
