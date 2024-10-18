@@ -313,7 +313,7 @@ void ElasticSearchRecordable::SetAttribute(
     nostd::string_view key,
     const opentelemetry::common::AttributeValue &value) noexcept
 {
-  WriteKeyValue(key, value, "attributes");
+  WriteValue(value, key.data());
 }
 
 void ElasticSearchRecordable::SetResource(
