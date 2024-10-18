@@ -324,7 +324,7 @@ void ElasticSearchRecordable::SetInstrumentationScope(
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope
         &instrumentation_scope) noexcept
 {
-  json_["name"] = instrumentation_scope.GetName();
+  json_["log"]["logger"] = instrumentation_scope.GetName();
 }
 
 }  // namespace logs
