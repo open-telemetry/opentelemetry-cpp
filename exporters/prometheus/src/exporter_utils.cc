@@ -500,40 +500,38 @@ std::string PrometheusExporterUtils::MapToPrometheusName(
     bool without_type_suffix)
 {
   auto sanitized_name = SanitizeNames(name);
-  std::string prometheus_equivalent_unit;
-  if (without_units)
+  // append unit suffixes
+  if (!without_units)
   {
-    prometheus_equivalent_unit = "";
-  }
-  else
-  {
-    prometheus_equivalent_unit = GetEquivalentPrometheusUnit(unit);
-  }
-
-  // Append prometheus unit if not null or empty.
-  if (!prometheus_equivalent_unit.empty() &&
-      sanitized_name.find(prometheus_equivalent_unit) == std::string::npos)
-  {
-    sanitized_name += "_" + prometheus_equivalent_unit;
-  }
-
-  // Special case - counter
-  if (prometheus_type == prometheus_client::MetricType::Counter && !without_type_suffix)
-  {
-    auto t_pos           = sanitized_name.rfind("_total");
-    bool ends_with_total = t_pos == sanitized_name.size() - 6;
-    if (!ends_with_total)
+    std::string prometheus_equivalent_unit = GetEquivalentPrometheusUnit(unit);
+    // Append prometheus unit if not null or empty.
+    if (!prometheus_equivalent_unit.empty() &&
+        sanitized_name.find(prometheus_equivalent_unit) == std::string::npos)
     {
-      sanitized_name += "_total";
+      sanitized_name += "_" + prometheus_equivalent_unit;
+    }
+    // Special case - gauge
+    if (unit == "1" && prometheus_type == prometheus_client::MetricType::Gauge &&
+        sanitized_name.find("ratio") == std::string::npos)
+    {
+      // this is replacing the unit name
+      sanitized_name += "_ratio";
     }
   }
 
-  // Special case - gauge
-  if (unit == "1" && prometheus_type == prometheus_client::MetricType::Gauge &&
-      sanitized_name.find("ratio") == std::string::npos && !without_units)
+  // append type suffixes
+  if (!without_type_suffix)
   {
-    // this is replacing the unit name
-    sanitized_name += "_ratio";
+    // Special case - counter
+    if (prometheus_type == prometheus_client::MetricType::Counter)
+    {
+      auto t_pos           = sanitized_name.rfind("_total");
+      bool ends_with_total = t_pos == sanitized_name.size() - 6;
+      if (!ends_with_total)
+      {
+        sanitized_name += "_total";
+      }
+    }
   }
 
   return CleanUpString(SanitizeNames(sanitized_name));
