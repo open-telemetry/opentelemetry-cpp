@@ -28,6 +28,12 @@ struct OPENTELEMETRY_EXPORT PrometheusExporterOptions
 
   // Populating otel_scope_name/otel_scope_labels attributes
   bool without_otel_scope = false;
+
+  // Option to export metrics without the unit suffix
+  bool without_units = false;
+
+  // Option to export metrics without the type suffix
+  bool without_type_suffix = false;
 };
 
 }  // namespace metrics
