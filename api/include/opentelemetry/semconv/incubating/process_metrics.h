@@ -11,6 +11,7 @@
 #pragma once
 
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -29,20 +30,36 @@ static constexpr const char *descrMetricProcessContextSwitches =
     "Number of times the process has been context switched.";
 static constexpr const char *unitMetricProcessContextSwitches = "{count}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricProcessContextSwitches(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricProcessContextSwitches(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricProcessContextSwitches,
                                     descrMetricProcessContextSwitches,
                                     unitMetricProcessContextSwitches);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricProcessContextSwitches(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricProcessContextSwitches(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricProcessContextSwitches,
+                                    descrMetricProcessContextSwitches,
+                                    unitMetricProcessContextSwitches);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricProcessContextSwitches(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricProcessContextSwitches,
                                              descrMetricProcessContextSwitches,
                                              unitMetricProcessContextSwitches);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricProcessContextSwitches(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricProcessContextSwitches,
+                                              descrMetricProcessContextSwitches,
+                                              unitMetricProcessContextSwitches);
 }
 
 /**
@@ -55,18 +72,32 @@ static constexpr const char *descrMetricProcessCpuTime =
     "Total CPU seconds broken down by different states.";
 static constexpr const char *unitMetricProcessCpuTime = "s";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricProcessCpuTime(
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricProcessCpuTime(
     metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricProcessCpuTime, descrMetricProcessCpuTime,
                                     unitMetricProcessCpuTime);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricProcessCpuTime(
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricProcessCpuTime(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricProcessCpuTime, descrMetricProcessCpuTime,
+                                    unitMetricProcessCpuTime);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncInt64MetricProcessCpuTime(
     metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricProcessCpuTime, descrMetricProcessCpuTime,
                                              unitMetricProcessCpuTime);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricProcessCpuTime(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricProcessCpuTime, descrMetricProcessCpuTime,
+                                              unitMetricProcessCpuTime);
 }
 
 /**
@@ -79,19 +110,37 @@ static constexpr const char *descrMetricProcessCpuUtilization =
     "number of CPUs available to the process.";
 static constexpr const char *unitMetricProcessCpuUtilization = "1";
 
-static nostd::unique_ptr<metrics::Gauge<uint64_t>> CreateSyncMetricProcessCpuUtilization(
-    metrics::Meter *meter)
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Sync gauge
+static inline nostd::unique_ptr<metrics::Gauge<uint64_t>>
+CreateSyncInt64MetricProcessCpuUtilization(metrics::Meter *meter)
 {
   return meter->CreateUInt64Gauge(kMetricProcessCpuUtilization, descrMetricProcessCpuUtilization,
                                   unitMetricProcessCpuUtilization);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricProcessCpuUtilization(
+static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricProcessCpuUtilization(
     metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricProcessCpuUtilization, descrMetricProcessCpuUtilization,
+                                  unitMetricProcessCpuUtilization);
+}
+#endif /* OPENTELEMETRY_LATER */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricProcessCpuUtilization(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableGauge(kMetricProcessCpuUtilization,
                                            descrMetricProcessCpuUtilization,
                                            unitMetricProcessCpuUtilization);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricProcessCpuUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(kMetricProcessCpuUtilization,
+                                            descrMetricProcessCpuUtilization,
+                                            unitMetricProcessCpuUtilization);
 }
 
 /**
@@ -103,18 +152,32 @@ static constexpr const char *kMetricProcessDiskIo     = "metric.process.disk.io"
 static constexpr const char *descrMetricProcessDiskIo = "Disk bytes transferred.";
 static constexpr const char *unitMetricProcessDiskIo  = "By";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricProcessDiskIo(
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricProcessDiskIo(
     metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricProcessDiskIo, descrMetricProcessDiskIo,
                                     unitMetricProcessDiskIo);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricProcessDiskIo(
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricProcessDiskIo(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricProcessDiskIo, descrMetricProcessDiskIo,
+                                    unitMetricProcessDiskIo);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncInt64MetricProcessDiskIo(
     metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricProcessDiskIo, descrMetricProcessDiskIo,
                                              unitMetricProcessDiskIo);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDoubleMetricProcessDiskIo(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricProcessDiskIo, descrMetricProcessDiskIo,
+                                              unitMetricProcessDiskIo);
 }
 
 /**
@@ -127,17 +190,31 @@ static constexpr const char *descrMetricProcessMemoryUsage =
     "The amount of physical memory in use.";
 static constexpr const char *unitMetricProcessMemoryUsage = "By";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>> CreateSyncMetricProcessMemoryUsage(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricProcessMemoryUsage(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricProcessMemoryUsage, descrMetricProcessMemoryUsage,
                                          unitMetricProcessMemoryUsage);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricProcessMemoryUsage(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricProcessMemoryUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricProcessMemoryUsage, descrMetricProcessMemoryUsage,
+                                          unitMetricProcessMemoryUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricProcessMemoryUsage(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(
+      kMetricProcessMemoryUsage, descrMetricProcessMemoryUsage, unitMetricProcessMemoryUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricProcessMemoryUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(
       kMetricProcessMemoryUsage, descrMetricProcessMemoryUsage, unitMetricProcessMemoryUsage);
 }
 
@@ -151,17 +228,31 @@ static constexpr const char *descrMetricProcessMemoryVirtual =
     "The amount of committed virtual memory.";
 static constexpr const char *unitMetricProcessMemoryVirtual = "By";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>> CreateSyncMetricProcessMemoryVirtual(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricProcessMemoryVirtual(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(
       kMetricProcessMemoryVirtual, descrMetricProcessMemoryVirtual, unitMetricProcessMemoryVirtual);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricProcessMemoryVirtual(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricProcessMemoryVirtual(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(
+      kMetricProcessMemoryVirtual, descrMetricProcessMemoryVirtual, unitMetricProcessMemoryVirtual);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricProcessMemoryVirtual(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(
+      kMetricProcessMemoryVirtual, descrMetricProcessMemoryVirtual, unitMetricProcessMemoryVirtual);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricProcessMemoryVirtual(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(
       kMetricProcessMemoryVirtual, descrMetricProcessMemoryVirtual, unitMetricProcessMemoryVirtual);
 }
 
@@ -174,18 +265,32 @@ static constexpr const char *kMetricProcessNetworkIo     = "metric.process.netwo
 static constexpr const char *descrMetricProcessNetworkIo = "Network bytes transferred.";
 static constexpr const char *unitMetricProcessNetworkIo  = "By";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricProcessNetworkIo(
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricProcessNetworkIo(
     metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricProcessNetworkIo, descrMetricProcessNetworkIo,
                                     unitMetricProcessNetworkIo);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricProcessNetworkIo(
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricProcessNetworkIo(
     metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricProcessNetworkIo, descrMetricProcessNetworkIo,
+                                    unitMetricProcessNetworkIo);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricProcessNetworkIo(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricProcessNetworkIo, descrMetricProcessNetworkIo,
                                              unitMetricProcessNetworkIo);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricProcessNetworkIo(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricProcessNetworkIo, descrMetricProcessNetworkIo,
+                                              unitMetricProcessNetworkIo);
 }
 
 /**
@@ -199,20 +304,36 @@ static constexpr const char *descrMetricProcessOpenFileDescriptorCount =
     "Number of file descriptors in use by the process.";
 static constexpr const char *unitMetricProcessOpenFileDescriptorCount = "{count}";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>>
-CreateSyncMetricProcessOpenFileDescriptorCount(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricProcessOpenFileDescriptorCount(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricProcessOpenFileDescriptorCount,
                                          descrMetricProcessOpenFileDescriptorCount,
                                          unitMetricProcessOpenFileDescriptorCount);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncMetricProcessOpenFileDescriptorCount(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricProcessOpenFileDescriptorCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricProcessOpenFileDescriptorCount,
+                                          descrMetricProcessOpenFileDescriptorCount,
+                                          unitMetricProcessOpenFileDescriptorCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricProcessOpenFileDescriptorCount(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(kMetricProcessOpenFileDescriptorCount,
                                                    descrMetricProcessOpenFileDescriptorCount,
                                                    unitMetricProcessOpenFileDescriptorCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricProcessOpenFileDescriptorCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricProcessOpenFileDescriptorCount,
+                                                    descrMetricProcessOpenFileDescriptorCount,
+                                                    unitMetricProcessOpenFileDescriptorCount);
 }
 
 /**
@@ -225,17 +346,31 @@ static constexpr const char *descrMetricProcessPagingFaults =
     "Number of page faults the process has made.";
 static constexpr const char *unitMetricProcessPagingFaults = "{fault}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricProcessPagingFaults(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricProcessPagingFaults(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricProcessPagingFaults, descrMetricProcessPagingFaults,
                                     unitMetricProcessPagingFaults);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricProcessPagingFaults(
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricProcessPagingFaults(
     metrics::Meter *meter)
 {
+  return meter->CreateDoubleCounter(kMetricProcessPagingFaults, descrMetricProcessPagingFaults,
+                                    unitMetricProcessPagingFaults);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricProcessPagingFaults(metrics::Meter *meter)
+{
   return meter->CreateInt64ObservableCounter(
+      kMetricProcessPagingFaults, descrMetricProcessPagingFaults, unitMetricProcessPagingFaults);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricProcessPagingFaults(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(
       kMetricProcessPagingFaults, descrMetricProcessPagingFaults, unitMetricProcessPagingFaults);
 }
 
@@ -248,17 +383,31 @@ static constexpr const char *kMetricProcessThreadCount     = "metric.process.thr
 static constexpr const char *descrMetricProcessThreadCount = "Process threads count.";
 static constexpr const char *unitMetricProcessThreadCount  = "{thread}";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>> CreateSyncMetricProcessThreadCount(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricProcessThreadCount(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricProcessThreadCount, descrMetricProcessThreadCount,
                                          unitMetricProcessThreadCount);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricProcessThreadCount(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricProcessThreadCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricProcessThreadCount, descrMetricProcessThreadCount,
+                                          unitMetricProcessThreadCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricProcessThreadCount(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(
+      kMetricProcessThreadCount, descrMetricProcessThreadCount, unitMetricProcessThreadCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricProcessThreadCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(
       kMetricProcessThreadCount, descrMetricProcessThreadCount, unitMetricProcessThreadCount);
 }
 

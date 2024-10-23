@@ -26,6 +26,17 @@
  * buildscripts/semantic-convention/templates/registry/semantic_metrics-h.j2
  */
 {# ========================================================================== #}
+{#
+    DESIGN NOTES:
+    - Use the debug flag to dump the semantic convention data
+      in the generated output, to inspect it.
+    - Some instruments are not supported in the SDK.
+      For these, we still generate the code,
+      protected with OPENTELEMETRY_LATER (which should be undefined).
+    - Using #ifdef OPENTELEMETRY_LATER is prefered to #if 0,
+      so that clang format generates clean code.
+#}
+{# ========================================================================== #}
 
 {% set debug = false %}
 
@@ -56,27 +67,39 @@ unit{{ metric.id | pascal_case }}
 {% endmacro %}
 
 {% macro sync_instrument_support(metric) %}
-{{ metric.instrument | map_text("cpp_sync_support", "FIXME") }}
+{{ metric.instrument | map_text("cpp_sync_support") }}
 {% endmacro %}
 
-{% macro sync_instrument_type(metric) %}
-{{ metric.instrument | map_text("cpp_sync_instrument_to_type", "FIXME") }}
+{% macro sync_instrument_int64_type(metric) %}
+{{ metric.instrument | map_text("cpp_sync_instrument_to_int64_type") | trim }}
 {% endmacro %}
 
-{% macro sync_instrument_factory(metric) %}
-{{ metric.instrument | map_text("cpp_sync_instrument_to_factory", "FIXME") }}
+{% macro sync_instrument_double_type(metric) %}
+{{ metric.instrument | map_text("cpp_sync_instrument_to_double_type") | trim }}
+{% endmacro %}
+
+{% macro sync_instrument_int64_factory(metric) %}
+{{ metric.instrument | map_text("cpp_sync_instrument_to_int64_factory") }}
+{% endmacro %}
+
+{% macro sync_instrument_double_factory(metric) %}
+{{ metric.instrument | map_text("cpp_sync_instrument_to_double_factory") }}
 {% endmacro %}
 
 {% macro async_instrument_support(metric) %}
-{{ metric.instrument | map_text("cpp_async_support", "FIXME") }}
+{{ metric.instrument | map_text("cpp_async_support") | trim }}
 {% endmacro %}
 
 {% macro async_instrument_type(metric) %}
-{{ metric.instrument | map_text("cpp_async_instrument_to_type", "FIXME") }}
+{{ metric.instrument | map_text("cpp_async_instrument_to_type") }}
 {% endmacro %}
 
-{% macro async_instrument_factory(metric) %}
-{{ metric.instrument | map_text("cpp_async_instrument_to_factory", "FIXME") }}
+{% macro async_instrument_int64_factory(metric) %}
+{{ metric.instrument | map_text("cpp_async_instrument_to_int64_factory") }}
+{% endmacro %}
+
+{% macro async_instrument_double_factory(metric) %}
+{{ metric.instrument | map_text("cpp_async_instrument_to_double_factory") }}
 {% endmacro %}
 
 {% set cpp_metric_namespace = metric_namespace(ctx) %}
@@ -86,6 +109,7 @@ unit{{ metric.id | pascal_case }}
 #pragma once
 
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -102,12 +126,15 @@ namespace {{ cpp_metric_namespace -}}
     {% set v_metric_name = var_metric_name(metric) %}
     {% set descr = descr_metric_name(metric) %}
     {% set unit = unit_metric_name(metric) %}
-    {% set sync_support = sync_instrument_support(metric) %}
-    {% set async_support = async_instrument_support(metric) %}
-    {% set sync_type = sync_instrument_type(metric) %}
+    {% set sync_support = (sync_instrument_support(metric) | trim == "true") %}
+    {% set async_support = (async_instrument_support(metric) | trim == "true") %}
+    {% set sync_int64_type = sync_instrument_int64_type(metric) %}
+    {% set sync_double_type = sync_instrument_double_type(metric) %}
     {% set async_type = async_instrument_type(metric) %}
-    {% set sync_factory = sync_instrument_factory(metric) %}
-    {% set async_factory = async_instrument_factory(metric) %}
+    {% set sync_int64_factory = sync_instrument_int64_factory(metric) %}
+    {% set sync_double_factory = sync_instrument_double_factory(metric) %}
+    {% set async_int64_factory = async_instrument_int64_factory(metric) %}
+    {% set async_double_factory = async_instrument_double_factory(metric) %}
     {% set excluded = metric.id in ctx.excluded_attributes %}
     {% if excluded %}
 #if 0
@@ -123,40 +150,58 @@ static constexpr const char *{{v_metric_name}} = "{{metric.id}}";
 static constexpr const char *{{descr}} = "{{metric.brief}}";
 static constexpr const char *{{unit}} = "{{metric.unit}}";
 
-    {% if not sync_support %}
-#if LATER
-// Unsupported:
+    {% if sync_support is false %}
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Sync {{ metric.instrument }}
     {% endif %}
-static nostd::unique_ptr<{{sync_type-}}<uint64_t>>
-CreateSync{{f_metric_name-}}(metrics::Meter *meter)
+static inline nostd::unique_ptr<{{sync_int64_type-}}>
+CreateSyncInt64{{f_metric_name-}}(metrics::Meter *meter)
 {
-  return meter->{{sync_factory}}(
+  return meter->{{sync_int64_factory}}(
     {{v_metric_name}},
     {{descr}},
     {{unit}});
 }
-    {% if not sync_support %}
-#endif
+
+static inline nostd::unique_ptr<{{sync_double_type-}}>
+CreateSyncDouble{{f_metric_name-}}(metrics::Meter *meter)
+{
+  return meter->{{sync_double_factory}}(
+    {{v_metric_name}},
+    {{descr}},
+    {{unit}});
+}
+    {% if sync_support is false %}
+#endif /* OPENTELEMETRY_LATER */
     {% endif %}
 
-    {% if not async_support %}
-#if LATER
-// Unsupported:
+    {% if async_support is false %}
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Async {{ metric.instrument }}
     {% endif %}
-static nostd::shared_ptr<{{async_type-}}>
-CreateAsync{{f_metric_name-}}(metrics::Meter *meter)
+static inline nostd::shared_ptr<{{async_type-}}>
+CreateAsyncInt64{{f_metric_name-}}(metrics::Meter *meter)
 {
-  return meter->{{async_factory}}(
+  return meter->{{async_int64_factory}}(
     {{v_metric_name}},
     {{descr}},
     {{unit}});
 }
-    {% if not async_support %}
-#endif
+
+static inline nostd::shared_ptr<{{async_type-}}>
+CreateAsyncDouble{{f_metric_name-}}(metrics::Meter *meter)
+{
+  return meter->{{async_double_factory}}(
+    {{v_metric_name}},
+    {{descr}},
+    {{unit}});
+}
+    {% if async_support is false %}
+#endif /* OPENTELEMETRY_LATER */
     {% endif %}
 
     {% if excluded %}
-#endif
+#endif /* 0 */
     {% endif %}
 
 {% endfor %}

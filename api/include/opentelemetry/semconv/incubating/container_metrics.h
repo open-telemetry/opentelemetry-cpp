@@ -11,6 +11,7 @@
 #pragma once
 
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -30,18 +31,32 @@ static constexpr const char *kMetricContainerCpuTime     = "metric.container.cpu
 static constexpr const char *descrMetricContainerCpuTime = "Total CPU time consumed";
 static constexpr const char *unitMetricContainerCpuTime  = "s";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricContainerCpuTime(
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricContainerCpuTime(
     metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricContainerCpuTime, descrMetricContainerCpuTime,
                                     unitMetricContainerCpuTime);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricContainerCpuTime(
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricContainerCpuTime(
     metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricContainerCpuTime, descrMetricContainerCpuTime,
+                                    unitMetricContainerCpuTime);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricContainerCpuTime(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricContainerCpuTime, descrMetricContainerCpuTime,
                                              unitMetricContainerCpuTime);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricContainerCpuTime(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricContainerCpuTime, descrMetricContainerCpuTime,
+                                              unitMetricContainerCpuTime);
 }
 
 /**
@@ -55,18 +70,32 @@ static constexpr const char *kMetricContainerDiskIo     = "metric.container.disk
 static constexpr const char *descrMetricContainerDiskIo = "Disk bytes for the container.";
 static constexpr const char *unitMetricContainerDiskIo  = "By";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricContainerDiskIo(
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricContainerDiskIo(
     metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricContainerDiskIo, descrMetricContainerDiskIo,
                                     unitMetricContainerDiskIo);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricContainerDiskIo(
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricContainerDiskIo(
     metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricContainerDiskIo, descrMetricContainerDiskIo,
+                                    unitMetricContainerDiskIo);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricContainerDiskIo(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricContainerDiskIo, descrMetricContainerDiskIo,
                                              unitMetricContainerDiskIo);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricContainerDiskIo(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricContainerDiskIo, descrMetricContainerDiskIo,
+                                              unitMetricContainerDiskIo);
 }
 
 /**
@@ -80,17 +109,31 @@ static constexpr const char *kMetricContainerMemoryUsage     = "metric.container
 static constexpr const char *descrMetricContainerMemoryUsage = "Memory usage of the container.";
 static constexpr const char *unitMetricContainerMemoryUsage  = "By";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricContainerMemoryUsage(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricContainerMemoryUsage(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricContainerMemoryUsage, descrMetricContainerMemoryUsage,
                                     unitMetricContainerMemoryUsage);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricContainerMemoryUsage(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricContainerMemoryUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricContainerMemoryUsage, descrMetricContainerMemoryUsage,
+                                    unitMetricContainerMemoryUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricContainerMemoryUsage(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(
+      kMetricContainerMemoryUsage, descrMetricContainerMemoryUsage, unitMetricContainerMemoryUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricContainerMemoryUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(
       kMetricContainerMemoryUsage, descrMetricContainerMemoryUsage, unitMetricContainerMemoryUsage);
 }
 
@@ -105,17 +148,31 @@ static constexpr const char *kMetricContainerNetworkIo     = "metric.container.n
 static constexpr const char *descrMetricContainerNetworkIo = "Network bytes for the container.";
 static constexpr const char *unitMetricContainerNetworkIo  = "By";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricContainerNetworkIo(
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricContainerNetworkIo(
     metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricContainerNetworkIo, descrMetricContainerNetworkIo,
                                     unitMetricContainerNetworkIo);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricContainerNetworkIo(
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricContainerNetworkIo(
     metrics::Meter *meter)
 {
+  return meter->CreateDoubleCounter(kMetricContainerNetworkIo, descrMetricContainerNetworkIo,
+                                    unitMetricContainerNetworkIo);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricContainerNetworkIo(metrics::Meter *meter)
+{
   return meter->CreateInt64ObservableCounter(
+      kMetricContainerNetworkIo, descrMetricContainerNetworkIo, unitMetricContainerNetworkIo);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricContainerNetworkIo(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(
       kMetricContainerNetworkIo, descrMetricContainerNetworkIo, unitMetricContainerNetworkIo);
 }
 

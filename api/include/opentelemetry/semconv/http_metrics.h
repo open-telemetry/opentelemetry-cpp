@@ -11,6 +11,7 @@
 #pragma once
 
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -30,21 +31,40 @@ static constexpr const char *descrMetricHttpClientRequestDuration =
     "Duration of HTTP client requests.";
 static constexpr const char *unitMetricHttpClientRequestDuration = "s";
 
-static nostd::unique_ptr<metrics::Histogram<uint64_t>> CreateSyncMetricHttpClientRequestDuration(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+CreateSyncInt64MetricHttpClientRequestDuration(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricHttpClientRequestDuration,
                                       descrMetricHttpClientRequestDuration,
                                       unitMetricHttpClientRequestDuration);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricHttpClientRequestDuration(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Histogram<double>>
+CreateSyncDoubleMetricHttpClientRequestDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleHistogram(kMetricHttpClientRequestDuration,
+                                      descrMetricHttpClientRequestDuration,
+                                      unitMetricHttpClientRequestDuration);
+}
+
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Async histogram
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricHttpClientRequestDuration(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableHistogram(kMetricHttpClientRequestDuration,
                                                descrMetricHttpClientRequestDuration,
                                                unitMetricHttpClientRequestDuration);
 }
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricHttpClientRequestDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableHistogram(kMetricHttpClientRequestDuration,
+                                                descrMetricHttpClientRequestDuration,
+                                                unitMetricHttpClientRequestDuration);
+}
+#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Duration of HTTP server requests.
@@ -57,21 +77,40 @@ static constexpr const char *descrMetricHttpServerRequestDuration =
     "Duration of HTTP server requests.";
 static constexpr const char *unitMetricHttpServerRequestDuration = "s";
 
-static nostd::unique_ptr<metrics::Histogram<uint64_t>> CreateSyncMetricHttpServerRequestDuration(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+CreateSyncInt64MetricHttpServerRequestDuration(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricHttpServerRequestDuration,
                                       descrMetricHttpServerRequestDuration,
                                       unitMetricHttpServerRequestDuration);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricHttpServerRequestDuration(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Histogram<double>>
+CreateSyncDoubleMetricHttpServerRequestDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleHistogram(kMetricHttpServerRequestDuration,
+                                      descrMetricHttpServerRequestDuration,
+                                      unitMetricHttpServerRequestDuration);
+}
+
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Async histogram
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricHttpServerRequestDuration(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableHistogram(kMetricHttpServerRequestDuration,
                                                descrMetricHttpServerRequestDuration,
                                                unitMetricHttpServerRequestDuration);
 }
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricHttpServerRequestDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableHistogram(kMetricHttpServerRequestDuration,
+                                                descrMetricHttpServerRequestDuration,
+                                                unitMetricHttpServerRequestDuration);
+}
+#endif /* OPENTELEMETRY_LATER */
 
 }  // namespace http
 }  // namespace semconv

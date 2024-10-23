@@ -11,6 +11,7 @@
 #pragma once
 
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -34,20 +35,36 @@ static constexpr const char *descrMetricMessagingClientConsumedMessages =
     "Number of messages that were delivered to the application.";
 static constexpr const char *unitMetricMessagingClientConsumedMessages = "{message}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>>
-CreateSyncMetricMessagingClientConsumedMessages(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricMessagingClientConsumedMessages(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricMessagingClientConsumedMessages,
                                     descrMetricMessagingClientConsumedMessages,
                                     unitMetricMessagingClientConsumedMessages);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncMetricMessagingClientConsumedMessages(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricMessagingClientConsumedMessages(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricMessagingClientConsumedMessages,
+                                    descrMetricMessagingClientConsumedMessages,
+                                    unitMetricMessagingClientConsumedMessages);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricMessagingClientConsumedMessages(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricMessagingClientConsumedMessages,
                                              descrMetricMessagingClientConsumedMessages,
                                              unitMetricMessagingClientConsumedMessages);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricMessagingClientConsumedMessages(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricMessagingClientConsumedMessages,
+                                              descrMetricMessagingClientConsumedMessages,
+                                              unitMetricMessagingClientConsumedMessages);
 }
 
 /**
@@ -62,21 +79,40 @@ static constexpr const char *descrMetricMessagingClientOperationDuration =
     "Duration of messaging operation initiated by a producer or consumer client.";
 static constexpr const char *unitMetricMessagingClientOperationDuration = "s";
 
-static nostd::unique_ptr<metrics::Histogram<uint64_t>>
-CreateSyncMetricMessagingClientOperationDuration(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+CreateSyncInt64MetricMessagingClientOperationDuration(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricMessagingClientOperationDuration,
                                       descrMetricMessagingClientOperationDuration,
                                       unitMetricMessagingClientOperationDuration);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncMetricMessagingClientOperationDuration(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Histogram<double>>
+CreateSyncDoubleMetricMessagingClientOperationDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleHistogram(kMetricMessagingClientOperationDuration,
+                                      descrMetricMessagingClientOperationDuration,
+                                      unitMetricMessagingClientOperationDuration);
+}
+
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Async histogram
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricMessagingClientOperationDuration(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableHistogram(kMetricMessagingClientOperationDuration,
                                                descrMetricMessagingClientOperationDuration,
                                                unitMetricMessagingClientOperationDuration);
 }
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricMessagingClientOperationDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableHistogram(kMetricMessagingClientOperationDuration,
+                                                descrMetricMessagingClientOperationDuration,
+                                                unitMetricMessagingClientOperationDuration);
+}
+#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Number of messages producer attempted to publish to the broker.
@@ -91,20 +127,36 @@ static constexpr const char *descrMetricMessagingClientPublishedMessages =
     "Number of messages producer attempted to publish to the broker.";
 static constexpr const char *unitMetricMessagingClientPublishedMessages = "{message}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>>
-CreateSyncMetricMessagingClientPublishedMessages(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricMessagingClientPublishedMessages(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricMessagingClientPublishedMessages,
                                     descrMetricMessagingClientPublishedMessages,
                                     unitMetricMessagingClientPublishedMessages);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncMetricMessagingClientPublishedMessages(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricMessagingClientPublishedMessages(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricMessagingClientPublishedMessages,
+                                    descrMetricMessagingClientPublishedMessages,
+                                    unitMetricMessagingClientPublishedMessages);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricMessagingClientPublishedMessages(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricMessagingClientPublishedMessages,
                                              descrMetricMessagingClientPublishedMessages,
                                              unitMetricMessagingClientPublishedMessages);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricMessagingClientPublishedMessages(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricMessagingClientPublishedMessages,
+                                              descrMetricMessagingClientPublishedMessages,
+                                              unitMetricMessagingClientPublishedMessages);
 }
 
 /**
@@ -118,21 +170,40 @@ static constexpr const char *descrMetricMessagingProcessDuration =
     "Duration of processing operation.";
 static constexpr const char *unitMetricMessagingProcessDuration = "s";
 
-static nostd::unique_ptr<metrics::Histogram<uint64_t>> CreateSyncMetricMessagingProcessDuration(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+CreateSyncInt64MetricMessagingProcessDuration(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricMessagingProcessDuration,
                                       descrMetricMessagingProcessDuration,
                                       unitMetricMessagingProcessDuration);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricMessagingProcessDuration(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Histogram<double>>
+CreateSyncDoubleMetricMessagingProcessDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleHistogram(kMetricMessagingProcessDuration,
+                                      descrMetricMessagingProcessDuration,
+                                      unitMetricMessagingProcessDuration);
+}
+
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Async histogram
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricMessagingProcessDuration(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableHistogram(kMetricMessagingProcessDuration,
                                                descrMetricMessagingProcessDuration,
                                                unitMetricMessagingProcessDuration);
 }
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricMessagingProcessDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableHistogram(kMetricMessagingProcessDuration,
+                                                descrMetricMessagingProcessDuration,
+                                                unitMetricMessagingProcessDuration);
+}
+#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Deprecated. Use @code messaging.client.consumed.messages @endcode instead.
@@ -148,20 +219,36 @@ static constexpr const char *descrMetricMessagingProcessMessages =
     "Deprecated. Use `messaging.client.consumed.messages` instead.";
 static constexpr const char *unitMetricMessagingProcessMessages = "{message}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricMessagingProcessMessages(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricMessagingProcessMessages(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricMessagingProcessMessages,
                                     descrMetricMessagingProcessMessages,
                                     unitMetricMessagingProcessMessages);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricMessagingProcessMessages(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricMessagingProcessMessages(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricMessagingProcessMessages,
+                                    descrMetricMessagingProcessMessages,
+                                    unitMetricMessagingProcessMessages);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricMessagingProcessMessages(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricMessagingProcessMessages,
                                              descrMetricMessagingProcessMessages,
                                              unitMetricMessagingProcessMessages);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricMessagingProcessMessages(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricMessagingProcessMessages,
+                                              descrMetricMessagingProcessMessages,
+                                              unitMetricMessagingProcessMessages);
 }
 
 /**
@@ -178,21 +265,40 @@ static constexpr const char *descrMetricMessagingPublishDuration =
     "Deprecated. Use `messaging.client.operation.duration` instead.";
 static constexpr const char *unitMetricMessagingPublishDuration = "s";
 
-static nostd::unique_ptr<metrics::Histogram<uint64_t>> CreateSyncMetricMessagingPublishDuration(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+CreateSyncInt64MetricMessagingPublishDuration(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricMessagingPublishDuration,
                                       descrMetricMessagingPublishDuration,
                                       unitMetricMessagingPublishDuration);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricMessagingPublishDuration(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Histogram<double>>
+CreateSyncDoubleMetricMessagingPublishDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleHistogram(kMetricMessagingPublishDuration,
+                                      descrMetricMessagingPublishDuration,
+                                      unitMetricMessagingPublishDuration);
+}
+
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Async histogram
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricMessagingPublishDuration(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableHistogram(kMetricMessagingPublishDuration,
                                                descrMetricMessagingPublishDuration,
                                                unitMetricMessagingPublishDuration);
 }
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricMessagingPublishDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableHistogram(kMetricMessagingPublishDuration,
+                                                descrMetricMessagingPublishDuration,
+                                                unitMetricMessagingPublishDuration);
+}
+#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Deprecated. Use @code messaging.client.produced.messages @endcode instead.
@@ -208,20 +314,36 @@ static constexpr const char *descrMetricMessagingPublishMessages =
     "Deprecated. Use `messaging.client.produced.messages` instead.";
 static constexpr const char *unitMetricMessagingPublishMessages = "{message}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricMessagingPublishMessages(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricMessagingPublishMessages(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricMessagingPublishMessages,
                                     descrMetricMessagingPublishMessages,
                                     unitMetricMessagingPublishMessages);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricMessagingPublishMessages(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricMessagingPublishMessages(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricMessagingPublishMessages,
+                                    descrMetricMessagingPublishMessages,
+                                    unitMetricMessagingPublishMessages);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricMessagingPublishMessages(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricMessagingPublishMessages,
                                              descrMetricMessagingPublishMessages,
                                              unitMetricMessagingPublishMessages);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricMessagingPublishMessages(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricMessagingPublishMessages,
+                                              descrMetricMessagingPublishMessages,
+                                              unitMetricMessagingPublishMessages);
 }
 
 /**
@@ -238,21 +360,40 @@ static constexpr const char *descrMetricMessagingReceiveDuration =
     "Deprecated. Use `messaging.client.operation.duration` instead.";
 static constexpr const char *unitMetricMessagingReceiveDuration = "s";
 
-static nostd::unique_ptr<metrics::Histogram<uint64_t>> CreateSyncMetricMessagingReceiveDuration(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+CreateSyncInt64MetricMessagingReceiveDuration(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricMessagingReceiveDuration,
                                       descrMetricMessagingReceiveDuration,
                                       unitMetricMessagingReceiveDuration);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricMessagingReceiveDuration(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Histogram<double>>
+CreateSyncDoubleMetricMessagingReceiveDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleHistogram(kMetricMessagingReceiveDuration,
+                                      descrMetricMessagingReceiveDuration,
+                                      unitMetricMessagingReceiveDuration);
+}
+
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Async histogram
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricMessagingReceiveDuration(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableHistogram(kMetricMessagingReceiveDuration,
                                                descrMetricMessagingReceiveDuration,
                                                unitMetricMessagingReceiveDuration);
 }
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricMessagingReceiveDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableHistogram(kMetricMessagingReceiveDuration,
+                                                descrMetricMessagingReceiveDuration,
+                                                unitMetricMessagingReceiveDuration);
+}
+#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Deprecated. Use @code messaging.client.consumed.messages @endcode instead.
@@ -268,20 +409,36 @@ static constexpr const char *descrMetricMessagingReceiveMessages =
     "Deprecated. Use `messaging.client.consumed.messages` instead.";
 static constexpr const char *unitMetricMessagingReceiveMessages = "{message}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricMessagingReceiveMessages(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricMessagingReceiveMessages(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricMessagingReceiveMessages,
                                     descrMetricMessagingReceiveMessages,
                                     unitMetricMessagingReceiveMessages);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricMessagingReceiveMessages(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricMessagingReceiveMessages(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricMessagingReceiveMessages,
+                                    descrMetricMessagingReceiveMessages,
+                                    unitMetricMessagingReceiveMessages);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricMessagingReceiveMessages(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricMessagingReceiveMessages,
                                              descrMetricMessagingReceiveMessages,
                                              unitMetricMessagingReceiveMessages);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricMessagingReceiveMessages(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricMessagingReceiveMessages,
+                                              descrMetricMessagingReceiveMessages,
+                                              unitMetricMessagingReceiveMessages);
 }
 
 }  // namespace messaging

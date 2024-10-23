@@ -11,6 +11,7 @@
 #pragma once
 
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -29,19 +30,36 @@ static constexpr const char *descrMetricDnsLookupDuration =
     "Measures the time taken to perform a DNS lookup.";
 static constexpr const char *unitMetricDnsLookupDuration = "s";
 
-static nostd::unique_ptr<metrics::Histogram<uint64_t>> CreateSyncMetricDnsLookupDuration(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+CreateSyncInt64MetricDnsLookupDuration(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricDnsLookupDuration, descrMetricDnsLookupDuration,
                                       unitMetricDnsLookupDuration);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricDnsLookupDuration(
+static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetricDnsLookupDuration(
     metrics::Meter *meter)
+{
+  return meter->CreateDoubleHistogram(kMetricDnsLookupDuration, descrMetricDnsLookupDuration,
+                                      unitMetricDnsLookupDuration);
+}
+
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Async histogram
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricDnsLookupDuration(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableHistogram(
       kMetricDnsLookupDuration, descrMetricDnsLookupDuration, unitMetricDnsLookupDuration);
 }
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricDnsLookupDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableHistogram(
+      kMetricDnsLookupDuration, descrMetricDnsLookupDuration, unitMetricDnsLookupDuration);
+}
+#endif /* OPENTELEMETRY_LATER */
 
 }  // namespace dns
 }  // namespace semconv

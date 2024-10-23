@@ -11,6 +11,7 @@
 #pragma once
 
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -29,18 +30,35 @@ static constexpr const char *descrMetricSystemCpuFrequency =
     "Reports the current frequency of the CPU in Hz";
 static constexpr const char *unitMetricSystemCpuFrequency = "{Hz}";
 
-static nostd::unique_ptr<metrics::Gauge<uint64_t>> CreateSyncMetricSystemCpuFrequency(
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Sync gauge
+static inline nostd::unique_ptr<metrics::Gauge<uint64_t>> CreateSyncInt64MetricSystemCpuFrequency(
     metrics::Meter *meter)
 {
   return meter->CreateUInt64Gauge(kMetricSystemCpuFrequency, descrMetricSystemCpuFrequency,
                                   unitMetricSystemCpuFrequency);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemCpuFrequency(
+static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricSystemCpuFrequency(
     metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricSystemCpuFrequency, descrMetricSystemCpuFrequency,
+                                  unitMetricSystemCpuFrequency);
+}
+#endif /* OPENTELEMETRY_LATER */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemCpuFrequency(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableGauge(kMetricSystemCpuFrequency, descrMetricSystemCpuFrequency,
                                            unitMetricSystemCpuFrequency);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemCpuFrequency(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(
+      kMetricSystemCpuFrequency, descrMetricSystemCpuFrequency, unitMetricSystemCpuFrequency);
 }
 
 /**
@@ -53,20 +71,36 @@ static constexpr const char *descrMetricSystemCpuLogicalCount =
     "manage multitasking";
 static constexpr const char *unitMetricSystemCpuLogicalCount = "{cpu}";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>> CreateSyncMetricSystemCpuLogicalCount(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemCpuLogicalCount(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricSystemCpuLogicalCount,
                                          descrMetricSystemCpuLogicalCount,
                                          unitMetricSystemCpuLogicalCount);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemCpuLogicalCount(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemCpuLogicalCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemCpuLogicalCount,
+                                          descrMetricSystemCpuLogicalCount,
+                                          unitMetricSystemCpuLogicalCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemCpuLogicalCount(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(kMetricSystemCpuLogicalCount,
                                                    descrMetricSystemCpuLogicalCount,
                                                    unitMetricSystemCpuLogicalCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemCpuLogicalCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricSystemCpuLogicalCount,
+                                                    descrMetricSystemCpuLogicalCount,
+                                                    unitMetricSystemCpuLogicalCount);
 }
 
 /**
@@ -79,20 +113,36 @@ static constexpr const char *descrMetricSystemCpuPhysicalCount =
     "Reports the number of actual physical processor cores on the hardware";
 static constexpr const char *unitMetricSystemCpuPhysicalCount = "{cpu}";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>> CreateSyncMetricSystemCpuPhysicalCount(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemCpuPhysicalCount(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricSystemCpuPhysicalCount,
                                          descrMetricSystemCpuPhysicalCount,
                                          unitMetricSystemCpuPhysicalCount);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemCpuPhysicalCount(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemCpuPhysicalCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemCpuPhysicalCount,
+                                          descrMetricSystemCpuPhysicalCount,
+                                          unitMetricSystemCpuPhysicalCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemCpuPhysicalCount(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(kMetricSystemCpuPhysicalCount,
                                                    descrMetricSystemCpuPhysicalCount,
                                                    unitMetricSystemCpuPhysicalCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemCpuPhysicalCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricSystemCpuPhysicalCount,
+                                                    descrMetricSystemCpuPhysicalCount,
+                                                    unitMetricSystemCpuPhysicalCount);
 }
 
 /**
@@ -105,18 +155,32 @@ static constexpr const char *descrMetricSystemCpuTime =
     "Seconds each logical CPU spent on each mode";
 static constexpr const char *unitMetricSystemCpuTime = "s";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricSystemCpuTime(
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricSystemCpuTime(
     metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemCpuTime, descrMetricSystemCpuTime,
                                     unitMetricSystemCpuTime);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemCpuTime(
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricSystemCpuTime(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricSystemCpuTime, descrMetricSystemCpuTime,
+                                    unitMetricSystemCpuTime);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncInt64MetricSystemCpuTime(
     metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricSystemCpuTime, descrMetricSystemCpuTime,
                                              unitMetricSystemCpuTime);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDoubleMetricSystemCpuTime(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricSystemCpuTime, descrMetricSystemCpuTime,
+                                              unitMetricSystemCpuTime);
 }
 
 /**
@@ -129,17 +193,34 @@ static constexpr const char *descrMetricSystemCpuUtilization =
     "number of logical CPUs";
 static constexpr const char *unitMetricSystemCpuUtilization = "1";
 
-static nostd::unique_ptr<metrics::Gauge<uint64_t>> CreateSyncMetricSystemCpuUtilization(
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Sync gauge
+static inline nostd::unique_ptr<metrics::Gauge<uint64_t>> CreateSyncInt64MetricSystemCpuUtilization(
     metrics::Meter *meter)
 {
   return meter->CreateUInt64Gauge(kMetricSystemCpuUtilization, descrMetricSystemCpuUtilization,
                                   unitMetricSystemCpuUtilization);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemCpuUtilization(
+static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricSystemCpuUtilization(
     metrics::Meter *meter)
 {
+  return meter->CreateDoubleGauge(kMetricSystemCpuUtilization, descrMetricSystemCpuUtilization,
+                                  unitMetricSystemCpuUtilization);
+}
+#endif /* OPENTELEMETRY_LATER */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemCpuUtilization(metrics::Meter *meter)
+{
   return meter->CreateInt64ObservableGauge(
+      kMetricSystemCpuUtilization, descrMetricSystemCpuUtilization, unitMetricSystemCpuUtilization);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemCpuUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(
       kMetricSystemCpuUtilization, descrMetricSystemCpuUtilization, unitMetricSystemCpuUtilization);
 }
 
@@ -150,18 +231,32 @@ static constexpr const char *kMetricSystemDiskIo     = "metric.system.disk.io";
 static constexpr const char *descrMetricSystemDiskIo = "";
 static constexpr const char *unitMetricSystemDiskIo  = "By";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricSystemDiskIo(
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricSystemDiskIo(
     metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemDiskIo, descrMetricSystemDiskIo,
                                     unitMetricSystemDiskIo);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemDiskIo(
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricSystemDiskIo(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricSystemDiskIo, descrMetricSystemDiskIo,
+                                    unitMetricSystemDiskIo);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncInt64MetricSystemDiskIo(
     metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricSystemDiskIo, descrMetricSystemDiskIo,
                                              unitMetricSystemDiskIo);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDoubleMetricSystemDiskIo(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricSystemDiskIo, descrMetricSystemDiskIo,
+                                              unitMetricSystemDiskIo);
 }
 
 /**
@@ -181,18 +276,32 @@ static constexpr const char *kMetricSystemDiskIoTime     = "metric.system.disk.i
 static constexpr const char *descrMetricSystemDiskIoTime = "Time disk spent activated";
 static constexpr const char *unitMetricSystemDiskIoTime  = "s";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricSystemDiskIoTime(
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricSystemDiskIoTime(
     metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemDiskIoTime, descrMetricSystemDiskIoTime,
                                     unitMetricSystemDiskIoTime);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemDiskIoTime(
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricSystemDiskIoTime(
     metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricSystemDiskIoTime, descrMetricSystemDiskIoTime,
+                                    unitMetricSystemDiskIoTime);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemDiskIoTime(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricSystemDiskIoTime, descrMetricSystemDiskIoTime,
                                              unitMetricSystemDiskIoTime);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemDiskIoTime(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricSystemDiskIoTime, descrMetricSystemDiskIoTime,
+                                              unitMetricSystemDiskIoTime);
 }
 
 /**
@@ -202,18 +311,32 @@ static constexpr const char *kMetricSystemDiskMerged     = "metric.system.disk.m
 static constexpr const char *descrMetricSystemDiskMerged = "";
 static constexpr const char *unitMetricSystemDiskMerged  = "{operation}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricSystemDiskMerged(
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricSystemDiskMerged(
     metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemDiskMerged, descrMetricSystemDiskMerged,
                                     unitMetricSystemDiskMerged);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemDiskMerged(
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricSystemDiskMerged(
     metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricSystemDiskMerged, descrMetricSystemDiskMerged,
+                                    unitMetricSystemDiskMerged);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemDiskMerged(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricSystemDiskMerged, descrMetricSystemDiskMerged,
                                              unitMetricSystemDiskMerged);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemDiskMerged(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricSystemDiskMerged, descrMetricSystemDiskMerged,
+                                              unitMetricSystemDiskMerged);
 }
 
 /**
@@ -232,20 +355,36 @@ static constexpr const char *descrMetricSystemDiskOperationTime =
     "Sum of the time each operation took to complete";
 static constexpr const char *unitMetricSystemDiskOperationTime = "s";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricSystemDiskOperationTime(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricSystemDiskOperationTime(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemDiskOperationTime,
                                     descrMetricSystemDiskOperationTime,
                                     unitMetricSystemDiskOperationTime);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemDiskOperationTime(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricSystemDiskOperationTime(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricSystemDiskOperationTime,
+                                    descrMetricSystemDiskOperationTime,
+                                    unitMetricSystemDiskOperationTime);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemDiskOperationTime(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricSystemDiskOperationTime,
                                              descrMetricSystemDiskOperationTime,
                                              unitMetricSystemDiskOperationTime);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemDiskOperationTime(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricSystemDiskOperationTime,
+                                              descrMetricSystemDiskOperationTime,
+                                              unitMetricSystemDiskOperationTime);
 }
 
 /**
@@ -255,17 +394,31 @@ static constexpr const char *kMetricSystemDiskOperations     = "metric.system.di
 static constexpr const char *descrMetricSystemDiskOperations = "";
 static constexpr const char *unitMetricSystemDiskOperations  = "{operation}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricSystemDiskOperations(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricSystemDiskOperations(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemDiskOperations, descrMetricSystemDiskOperations,
                                     unitMetricSystemDiskOperations);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemDiskOperations(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricSystemDiskOperations(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricSystemDiskOperations, descrMetricSystemDiskOperations,
+                                    unitMetricSystemDiskOperations);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemDiskOperations(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(
+      kMetricSystemDiskOperations, descrMetricSystemDiskOperations, unitMetricSystemDiskOperations);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemDiskOperations(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(
       kMetricSystemDiskOperations, descrMetricSystemDiskOperations, unitMetricSystemDiskOperations);
 }
 
@@ -276,20 +429,36 @@ static constexpr const char *kMetricSystemFilesystemUsage     = "metric.system.f
 static constexpr const char *descrMetricSystemFilesystemUsage = "";
 static constexpr const char *unitMetricSystemFilesystemUsage  = "By";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>> CreateSyncMetricSystemFilesystemUsage(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemFilesystemUsage(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricSystemFilesystemUsage,
                                          descrMetricSystemFilesystemUsage,
                                          unitMetricSystemFilesystemUsage);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemFilesystemUsage(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemFilesystemUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemFilesystemUsage,
+                                          descrMetricSystemFilesystemUsage,
+                                          unitMetricSystemFilesystemUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemFilesystemUsage(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(kMetricSystemFilesystemUsage,
                                                    descrMetricSystemFilesystemUsage,
                                                    unitMetricSystemFilesystemUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemFilesystemUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricSystemFilesystemUsage,
+                                                    descrMetricSystemFilesystemUsage,
+                                                    unitMetricSystemFilesystemUsage);
 }
 
 /**
@@ -300,20 +469,39 @@ static constexpr const char *kMetricSystemFilesystemUtilization =
 static constexpr const char *descrMetricSystemFilesystemUtilization = "";
 static constexpr const char *unitMetricSystemFilesystemUtilization  = "1";
 
-static nostd::unique_ptr<metrics::Gauge<uint64_t>> CreateSyncMetricSystemFilesystemUtilization(
-    metrics::Meter *meter)
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Sync gauge
+static inline nostd::unique_ptr<metrics::Gauge<uint64_t>>
+CreateSyncInt64MetricSystemFilesystemUtilization(metrics::Meter *meter)
 {
   return meter->CreateUInt64Gauge(kMetricSystemFilesystemUtilization,
                                   descrMetricSystemFilesystemUtilization,
                                   unitMetricSystemFilesystemUtilization);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncMetricSystemFilesystemUtilization(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Gauge<double>>
+CreateSyncDoubleMetricSystemFilesystemUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricSystemFilesystemUtilization,
+                                  descrMetricSystemFilesystemUtilization,
+                                  unitMetricSystemFilesystemUtilization);
+}
+#endif /* OPENTELEMETRY_LATER */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemFilesystemUtilization(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableGauge(kMetricSystemFilesystemUtilization,
                                            descrMetricSystemFilesystemUtilization,
                                            unitMetricSystemFilesystemUtilization);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemFilesystemUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(kMetricSystemFilesystemUtilization,
+                                            descrMetricSystemFilesystemUtilization,
+                                            unitMetricSystemFilesystemUtilization);
 }
 
 /**
@@ -332,20 +520,36 @@ static constexpr const char *descrMetricSystemLinuxMemoryAvailable =
     "swapping";
 static constexpr const char *unitMetricSystemLinuxMemoryAvailable = "By";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>>
-CreateSyncMetricSystemLinuxMemoryAvailable(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemLinuxMemoryAvailable(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricSystemLinuxMemoryAvailable,
                                          descrMetricSystemLinuxMemoryAvailable,
                                          unitMetricSystemLinuxMemoryAvailable);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemLinuxMemoryAvailable(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemLinuxMemoryAvailable(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemLinuxMemoryAvailable,
+                                          descrMetricSystemLinuxMemoryAvailable,
+                                          unitMetricSystemLinuxMemoryAvailable);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemLinuxMemoryAvailable(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(kMetricSystemLinuxMemoryAvailable,
                                                    descrMetricSystemLinuxMemoryAvailable,
                                                    unitMetricSystemLinuxMemoryAvailable);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemLinuxMemoryAvailable(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricSystemLinuxMemoryAvailable,
+                                                    descrMetricSystemLinuxMemoryAvailable,
+                                                    unitMetricSystemLinuxMemoryAvailable);
 }
 
 /**
@@ -364,20 +568,36 @@ static constexpr const char *descrMetricSystemLinuxMemorySlabUsage =
     "Reports the memory used by the Linux kernel for managing caches of frequently used objects.";
 static constexpr const char *unitMetricSystemLinuxMemorySlabUsage = "By";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>>
-CreateSyncMetricSystemLinuxMemorySlabUsage(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemLinuxMemorySlabUsage(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricSystemLinuxMemorySlabUsage,
                                          descrMetricSystemLinuxMemorySlabUsage,
                                          unitMetricSystemLinuxMemorySlabUsage);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemLinuxMemorySlabUsage(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemLinuxMemorySlabUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemLinuxMemorySlabUsage,
+                                          descrMetricSystemLinuxMemorySlabUsage,
+                                          unitMetricSystemLinuxMemorySlabUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemLinuxMemorySlabUsage(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(kMetricSystemLinuxMemorySlabUsage,
                                                    descrMetricSystemLinuxMemorySlabUsage,
                                                    unitMetricSystemLinuxMemorySlabUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemLinuxMemorySlabUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricSystemLinuxMemorySlabUsage,
+                                                    descrMetricSystemLinuxMemorySlabUsage,
+                                                    unitMetricSystemLinuxMemorySlabUsage);
 }
 
 /**
@@ -391,17 +611,31 @@ static constexpr const char *kMetricSystemMemoryLimit     = "metric.system.memor
 static constexpr const char *descrMetricSystemMemoryLimit = "Total memory available in the system.";
 static constexpr const char *unitMetricSystemMemoryLimit  = "By";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>> CreateSyncMetricSystemMemoryLimit(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemMemoryLimit(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricSystemMemoryLimit, descrMetricSystemMemoryLimit,
                                          unitMetricSystemMemoryLimit);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemMemoryLimit(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemMemoryLimit(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemMemoryLimit, descrMetricSystemMemoryLimit,
+                                          unitMetricSystemMemoryLimit);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemMemoryLimit(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(
+      kMetricSystemMemoryLimit, descrMetricSystemMemoryLimit, unitMetricSystemMemoryLimit);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemMemoryLimit(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(
       kMetricSystemMemoryLimit, descrMetricSystemMemoryLimit, unitMetricSystemMemoryLimit);
 }
 
@@ -418,17 +652,31 @@ static constexpr const char *descrMetricSystemMemoryShared =
     "Shared memory used (mostly by tmpfs).";
 static constexpr const char *unitMetricSystemMemoryShared = "By";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>> CreateSyncMetricSystemMemoryShared(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemMemoryShared(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricSystemMemoryShared, descrMetricSystemMemoryShared,
                                          unitMetricSystemMemoryShared);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemMemoryShared(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemMemoryShared(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemMemoryShared, descrMetricSystemMemoryShared,
+                                          unitMetricSystemMemoryShared);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemMemoryShared(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(
+      kMetricSystemMemoryShared, descrMetricSystemMemoryShared, unitMetricSystemMemoryShared);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemMemoryShared(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(
       kMetricSystemMemoryShared, descrMetricSystemMemoryShared, unitMetricSystemMemoryShared);
 }
 
@@ -444,17 +692,31 @@ static constexpr const char *kMetricSystemMemoryUsage     = "metric.system.memor
 static constexpr const char *descrMetricSystemMemoryUsage = "Reports memory in use by state.";
 static constexpr const char *unitMetricSystemMemoryUsage  = "By";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>> CreateSyncMetricSystemMemoryUsage(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemMemoryUsage(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricSystemMemoryUsage, descrMetricSystemMemoryUsage,
                                          unitMetricSystemMemoryUsage);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemMemoryUsage(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemMemoryUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemMemoryUsage, descrMetricSystemMemoryUsage,
+                                          unitMetricSystemMemoryUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemMemoryUsage(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(
+      kMetricSystemMemoryUsage, descrMetricSystemMemoryUsage, unitMetricSystemMemoryUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemMemoryUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(
       kMetricSystemMemoryUsage, descrMetricSystemMemoryUsage, unitMetricSystemMemoryUsage);
 }
 
@@ -465,20 +727,39 @@ static constexpr const char *kMetricSystemMemoryUtilization = "metric.system.mem
 static constexpr const char *descrMetricSystemMemoryUtilization = "";
 static constexpr const char *unitMetricSystemMemoryUtilization  = "1";
 
-static nostd::unique_ptr<metrics::Gauge<uint64_t>> CreateSyncMetricSystemMemoryUtilization(
-    metrics::Meter *meter)
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Sync gauge
+static inline nostd::unique_ptr<metrics::Gauge<uint64_t>>
+CreateSyncInt64MetricSystemMemoryUtilization(metrics::Meter *meter)
 {
   return meter->CreateUInt64Gauge(kMetricSystemMemoryUtilization,
                                   descrMetricSystemMemoryUtilization,
                                   unitMetricSystemMemoryUtilization);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemMemoryUtilization(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Gauge<double>>
+CreateSyncDoubleMetricSystemMemoryUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricSystemMemoryUtilization,
+                                  descrMetricSystemMemoryUtilization,
+                                  unitMetricSystemMemoryUtilization);
+}
+#endif /* OPENTELEMETRY_LATER */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemMemoryUtilization(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableGauge(kMetricSystemMemoryUtilization,
                                            descrMetricSystemMemoryUtilization,
                                            unitMetricSystemMemoryUtilization);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemMemoryUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(kMetricSystemMemoryUtilization,
+                                            descrMetricSystemMemoryUtilization,
+                                            unitMetricSystemMemoryUtilization);
 }
 
 /**
@@ -488,20 +769,36 @@ static constexpr const char *kMetricSystemNetworkConnections = "metric.system.ne
 static constexpr const char *descrMetricSystemNetworkConnections = "";
 static constexpr const char *unitMetricSystemNetworkConnections  = "{connection}";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>> CreateSyncMetricSystemNetworkConnections(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemNetworkConnections(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricSystemNetworkConnections,
                                          descrMetricSystemNetworkConnections,
                                          unitMetricSystemNetworkConnections);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemNetworkConnections(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemNetworkConnections(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemNetworkConnections,
+                                          descrMetricSystemNetworkConnections,
+                                          unitMetricSystemNetworkConnections);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemNetworkConnections(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(kMetricSystemNetworkConnections,
                                                    descrMetricSystemNetworkConnections,
                                                    unitMetricSystemNetworkConnections);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemNetworkConnections(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricSystemNetworkConnections,
+                                                    descrMetricSystemNetworkConnections,
+                                                    unitMetricSystemNetworkConnections);
 }
 
 /**
@@ -525,17 +822,31 @@ static constexpr const char *descrMetricSystemNetworkDropped =
     "Count of packets that are dropped or discarded even though there was no error";
 static constexpr const char *unitMetricSystemNetworkDropped = "{packet}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricSystemNetworkDropped(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricSystemNetworkDropped(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemNetworkDropped, descrMetricSystemNetworkDropped,
                                     unitMetricSystemNetworkDropped);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemNetworkDropped(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricSystemNetworkDropped(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricSystemNetworkDropped, descrMetricSystemNetworkDropped,
+                                    unitMetricSystemNetworkDropped);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemNetworkDropped(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(
+      kMetricSystemNetworkDropped, descrMetricSystemNetworkDropped, unitMetricSystemNetworkDropped);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemNetworkDropped(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(
       kMetricSystemNetworkDropped, descrMetricSystemNetworkDropped, unitMetricSystemNetworkDropped);
 }
 
@@ -559,17 +870,31 @@ static constexpr const char *kMetricSystemNetworkErrors     = "metric.system.net
 static constexpr const char *descrMetricSystemNetworkErrors = "Count of network errors detected";
 static constexpr const char *unitMetricSystemNetworkErrors  = "{error}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricSystemNetworkErrors(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricSystemNetworkErrors(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemNetworkErrors, descrMetricSystemNetworkErrors,
                                     unitMetricSystemNetworkErrors);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemNetworkErrors(
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricSystemNetworkErrors(
     metrics::Meter *meter)
 {
+  return meter->CreateDoubleCounter(kMetricSystemNetworkErrors, descrMetricSystemNetworkErrors,
+                                    unitMetricSystemNetworkErrors);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemNetworkErrors(metrics::Meter *meter)
+{
   return meter->CreateInt64ObservableCounter(
+      kMetricSystemNetworkErrors, descrMetricSystemNetworkErrors, unitMetricSystemNetworkErrors);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemNetworkErrors(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(
       kMetricSystemNetworkErrors, descrMetricSystemNetworkErrors, unitMetricSystemNetworkErrors);
 }
 
@@ -580,18 +905,32 @@ static constexpr const char *kMetricSystemNetworkIo     = "metric.system.network
 static constexpr const char *descrMetricSystemNetworkIo = "";
 static constexpr const char *unitMetricSystemNetworkIo  = "By";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricSystemNetworkIo(
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricSystemNetworkIo(
     metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemNetworkIo, descrMetricSystemNetworkIo,
                                     unitMetricSystemNetworkIo);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemNetworkIo(
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricSystemNetworkIo(
     metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricSystemNetworkIo, descrMetricSystemNetworkIo,
+                                    unitMetricSystemNetworkIo);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemNetworkIo(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricSystemNetworkIo, descrMetricSystemNetworkIo,
                                              unitMetricSystemNetworkIo);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemNetworkIo(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricSystemNetworkIo, descrMetricSystemNetworkIo,
+                                              unitMetricSystemNetworkIo);
 }
 
 /**
@@ -601,17 +940,31 @@ static constexpr const char *kMetricSystemNetworkPackets     = "metric.system.ne
 static constexpr const char *descrMetricSystemNetworkPackets = "";
 static constexpr const char *unitMetricSystemNetworkPackets  = "{packet}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricSystemNetworkPackets(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricSystemNetworkPackets(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemNetworkPackets, descrMetricSystemNetworkPackets,
                                     unitMetricSystemNetworkPackets);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemNetworkPackets(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricSystemNetworkPackets(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricSystemNetworkPackets, descrMetricSystemNetworkPackets,
+                                    unitMetricSystemNetworkPackets);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemNetworkPackets(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(
+      kMetricSystemNetworkPackets, descrMetricSystemNetworkPackets, unitMetricSystemNetworkPackets);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemNetworkPackets(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(
       kMetricSystemNetworkPackets, descrMetricSystemNetworkPackets, unitMetricSystemNetworkPackets);
 }
 
@@ -622,17 +975,31 @@ static constexpr const char *kMetricSystemPagingFaults     = "metric.system.pagi
 static constexpr const char *descrMetricSystemPagingFaults = "";
 static constexpr const char *unitMetricSystemPagingFaults  = "{fault}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricSystemPagingFaults(
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricSystemPagingFaults(
     metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemPagingFaults, descrMetricSystemPagingFaults,
                                     unitMetricSystemPagingFaults);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemPagingFaults(
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricSystemPagingFaults(
     metrics::Meter *meter)
 {
+  return meter->CreateDoubleCounter(kMetricSystemPagingFaults, descrMetricSystemPagingFaults,
+                                    unitMetricSystemPagingFaults);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemPagingFaults(metrics::Meter *meter)
+{
   return meter->CreateInt64ObservableCounter(
+      kMetricSystemPagingFaults, descrMetricSystemPagingFaults, unitMetricSystemPagingFaults);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemPagingFaults(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(
       kMetricSystemPagingFaults, descrMetricSystemPagingFaults, unitMetricSystemPagingFaults);
 }
 
@@ -643,20 +1010,36 @@ static constexpr const char *kMetricSystemPagingOperations     = "metric.system.
 static constexpr const char *descrMetricSystemPagingOperations = "";
 static constexpr const char *unitMetricSystemPagingOperations  = "{operation}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricSystemPagingOperations(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricSystemPagingOperations(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemPagingOperations,
                                     descrMetricSystemPagingOperations,
                                     unitMetricSystemPagingOperations);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemPagingOperations(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricSystemPagingOperations(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricSystemPagingOperations,
+                                    descrMetricSystemPagingOperations,
+                                    unitMetricSystemPagingOperations);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemPagingOperations(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricSystemPagingOperations,
                                              descrMetricSystemPagingOperations,
                                              unitMetricSystemPagingOperations);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemPagingOperations(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricSystemPagingOperations,
+                                              descrMetricSystemPagingOperations,
+                                              unitMetricSystemPagingOperations);
 }
 
 /**
@@ -668,17 +1051,31 @@ static constexpr const char *kMetricSystemPagingUsage     = "metric.system.pagin
 static constexpr const char *descrMetricSystemPagingUsage = "Unix swap or windows pagefile usage";
 static constexpr const char *unitMetricSystemPagingUsage  = "By";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>> CreateSyncMetricSystemPagingUsage(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemPagingUsage(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricSystemPagingUsage, descrMetricSystemPagingUsage,
                                          unitMetricSystemPagingUsage);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemPagingUsage(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemPagingUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemPagingUsage, descrMetricSystemPagingUsage,
+                                          unitMetricSystemPagingUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemPagingUsage(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(
+      kMetricSystemPagingUsage, descrMetricSystemPagingUsage, unitMetricSystemPagingUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemPagingUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(
       kMetricSystemPagingUsage, descrMetricSystemPagingUsage, unitMetricSystemPagingUsage);
 }
 
@@ -689,20 +1086,39 @@ static constexpr const char *kMetricSystemPagingUtilization = "metric.system.pag
 static constexpr const char *descrMetricSystemPagingUtilization = "";
 static constexpr const char *unitMetricSystemPagingUtilization  = "1";
 
-static nostd::unique_ptr<metrics::Gauge<uint64_t>> CreateSyncMetricSystemPagingUtilization(
-    metrics::Meter *meter)
+#ifdef OPENTELEMETRY_LATER
+// Unsupported: Sync gauge
+static inline nostd::unique_ptr<metrics::Gauge<uint64_t>>
+CreateSyncInt64MetricSystemPagingUtilization(metrics::Meter *meter)
 {
   return meter->CreateUInt64Gauge(kMetricSystemPagingUtilization,
                                   descrMetricSystemPagingUtilization,
                                   unitMetricSystemPagingUtilization);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemPagingUtilization(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Gauge<double>>
+CreateSyncDoubleMetricSystemPagingUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricSystemPagingUtilization,
+                                  descrMetricSystemPagingUtilization,
+                                  unitMetricSystemPagingUtilization);
+}
+#endif /* OPENTELEMETRY_LATER */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemPagingUtilization(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableGauge(kMetricSystemPagingUtilization,
                                            descrMetricSystemPagingUtilization,
                                            unitMetricSystemPagingUtilization);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemPagingUtilization(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(kMetricSystemPagingUtilization,
+                                            descrMetricSystemPagingUtilization,
+                                            unitMetricSystemPagingUtilization);
 }
 
 /**
@@ -715,17 +1131,31 @@ static constexpr const char *descrMetricSystemProcessCount =
     "Total number of processes in each state";
 static constexpr const char *unitMetricSystemProcessCount = "{process}";
 
-static nostd::unique_ptr<metrics::UpDownCounter<uint64_t>> CreateSyncMetricSystemProcessCount(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemProcessCount(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricSystemProcessCount, descrMetricSystemProcessCount,
                                          unitMetricSystemProcessCount);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemProcessCount(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemProcessCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemProcessCount, descrMetricSystemProcessCount,
+                                          unitMetricSystemProcessCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemProcessCount(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(
+      kMetricSystemProcessCount, descrMetricSystemProcessCount, unitMetricSystemProcessCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemProcessCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(
       kMetricSystemProcessCount, descrMetricSystemProcessCount, unitMetricSystemProcessCount);
 }
 
@@ -739,17 +1169,31 @@ static constexpr const char *descrMetricSystemProcessCreated =
     "Total number of processes created over uptime of the host";
 static constexpr const char *unitMetricSystemProcessCreated = "{process}";
 
-static nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncMetricSystemProcessCreated(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricSystemProcessCreated(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemProcessCreated, descrMetricSystemProcessCreated,
                                     unitMetricSystemProcessCreated);
 }
 
-static nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncMetricSystemProcessCreated(
-    metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricSystemProcessCreated(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricSystemProcessCreated, descrMetricSystemProcessCreated,
+                                    unitMetricSystemProcessCreated);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemProcessCreated(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(
+      kMetricSystemProcessCreated, descrMetricSystemProcessCreated, unitMetricSystemProcessCreated);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemProcessCreated(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(
       kMetricSystemProcessCreated, descrMetricSystemProcessCreated, unitMetricSystemProcessCreated);
 }
 

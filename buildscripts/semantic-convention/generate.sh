@@ -13,7 +13,7 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../../"
 
-# freeze the spec & generator tools versions to make SemanticAttributes generation reproducible
+# freeze the spec & generator tools versions to make the generation reproducible
 
 # repository: https://github.com/open-telemetry/semantic-conventions
 SEMCONV_VERSION=1.27.0
@@ -54,12 +54,17 @@ fi
 # DOCKER
 # ======
 #
+# docker is a root container
+#
 # MY_UID=$(id -u)
 # MY_GID=$(id -g)
 # docker --user ${MY_UID}:${MY_GID}
 #
 # PODMAN
 # ======
+#
+# podman is a rootless container
+# docker is an alias to podman
 #
 # docker --user 0:0
 
@@ -70,8 +75,13 @@ if [ -x "$(command -v docker)" ]; then
   PODMANSTATUS=$(docker -v | grep -c podman);
   if [ "${PODMANSTATUS}" -ge "1" ]; then
     echo "Detected PODMAN"
+    # podman is a rootless container.
+    # Execute the docker image as root,
+    # to avoid creating files as weaver:weaver in the container,
+    # so files end up created as the local user:group outside the container.
     MY_UID="0"
     MY_GID="0"
+    # Possible alternate solution: --userns=keep-id
   fi;
 fi
 
