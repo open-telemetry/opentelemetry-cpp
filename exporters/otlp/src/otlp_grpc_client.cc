@@ -218,10 +218,10 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
                  }
                  else
                  {
-                    OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
-                                            << export_data_name << " failed with status_code: \""
-                                            << grpc_status.error_code() << "\" error_message: \""
-                                            << grpc_status.error_message() << "\"");
+                   OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
+                                           << export_data_name << " failed with status_code: \""
+                                           << grpc_status.error_code() << "\" error_message: \""
+                                           << grpc_status.error_message() << "\"");
                  }
 
                  if (call_data->grpc_async_callback)
