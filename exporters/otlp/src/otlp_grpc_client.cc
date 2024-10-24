@@ -215,7 +215,9 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
                  if (call_data->grpc_status.ok())
                  {
                    call_data->export_result = opentelemetry::sdk::common::ExportResult::kSuccess;
-                 } else {
+                 }
+                 else
+                 {
                     OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
                                             << export_data_name << " failed with status_code: \""
                                             << grpc_status.error_code() << "\" error_message: \""
