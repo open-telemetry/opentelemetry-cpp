@@ -42,6 +42,8 @@ private:
   void WriteValue(const opentelemetry::common::AttributeValue &value, const std::string &name);
 
 public:
+  ElasticSearchRecordable() noexcept;
+
   /**
    * Returns a JSON object contain the log information
    */
