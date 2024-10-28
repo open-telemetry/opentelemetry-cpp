@@ -576,18 +576,18 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
                                       size_t size,
                                       void * /* clientp */) noexcept
 {
-  static const auto kTlsInfo    = nostd::string_view("SSL connection using");
-  static const auto kFailureMsg = nostd::string_view("Recv failure:");
-  static const auto kHeaderSent = nostd::string_view("Send header => ");
-  static const auto kHeaderRecv = nostd::string_view("Recv header => ");
+  nostd::string_view text_to_log{data, size};
 
-  if (nostd::string_view text_to_log{data, size};
-      text_to_log.empty() || std::isspace(text_to_log[0]))
+  if (text_to_log.empty() || std::iscntrl(text_to_log[0]))
   {
     return 0;
   }
-  else if (type == CURLINFO_TEXT)
+
+  if (type == CURLINFO_TEXT)
   {
+    static const auto kTlsInfo    = nostd::string_view("SSL connection using");
+    static const auto kFailureMsg = nostd::string_view("Recv failure:");
+
     if (text_to_log.substr(0, kTlsInfo.size()) == kTlsInfo)
     {
       OTEL_INTERNAL_LOG_INFO(text_to_log);
@@ -606,9 +606,13 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
 #ifdef CURL_DEBUG
   else if (type == CURLINFO_HEADER_OUT)
   {
-    while (!text_to_log.empty() && !std::isspace(text_to_log[0]))
+    static const auto kHeaderSent = nostd::string_view("Send header => ");
+
+    while (!text_to_log.empty() && !std::iscntrl(text_to_log[0]))
     {
-      if (const auto pos = text_to_log.find('\n'); pos != nostd::string_view::npos)
+      const auto pos = text_to_log.find('\n');
+
+      if (pos != nostd::string_view::npos)
       {
         OTEL_INTERNAL_LOG_DEBUG(kHeaderSent << text_to_log.substr(0, pos));
         text_to_log = text_to_log.substr(pos + 1);
@@ -617,6 +621,7 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
   }
   else if (type == CURLINFO_HEADER_IN)
   {
+    static const auto kHeaderRecv = nostd::string_view("Recv header => ");
     OTEL_INTERNAL_LOG_DEBUG(kHeaderRecv << text_to_log);
   }
 #endif  // CURL_DEBUG
