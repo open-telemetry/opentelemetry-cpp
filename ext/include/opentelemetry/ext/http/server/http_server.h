@@ -648,7 +648,13 @@ protected:
       {
         ptr++;
       }
-      conn.request.headers[name] = std::string(begin, ptr);
+      if (!conn.request.headers[name].empty() && equalsLowercased(name, "tracestate"))
+      {
+        conn.request.headers[name] = conn.request.headers[name].append(",").append(std::string(begin, ptr));
+      } else
+      {
+        conn.request.headers[name] = std::string(begin, ptr);
+      }
       if (*ptr == '\r')
       {
         ptr++;
