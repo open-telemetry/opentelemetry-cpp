@@ -102,6 +102,12 @@ private:
 
   static size_t ReadMemoryCallback(char *buffer, size_t size, size_t nitems, void *userp);
 
+  static int CurlLoggerCallback(const CURL * /* handle */,
+                                curl_infotype type,
+                                const char *data,
+                                size_t size,
+                                void * /* clientp */) noexcept;
+
 #if LIBCURL_VERSION_NUM >= 0x075000
   static int PreRequestCallback(void *clientp,
                                 char *conn_primary_ip,

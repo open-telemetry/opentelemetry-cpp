@@ -22,6 +22,7 @@
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/version.h"
 
@@ -569,6 +570,60 @@ CURLcode HttpOperation::SetCurlOffOption(CURLoption option, curl_off_t value)
   return rc;
 }
 
+int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
+                                      curl_infotype type,
+                                      const char *data,
+                                      size_t size,
+                                      void * /* clientp */) noexcept
+{
+  static const auto kTlsInfo    = nostd::string_view("SSL connection using");
+  static const auto kFailureMsg = nostd::string_view("Recv failure:");
+  static const auto kHeaderSent = nostd::string_view("Send header => ");
+  static const auto kHeaderRecv = nostd::string_view("Recv header => ");
+
+  if (nostd::string_view text_to_log{data, size};
+      text_to_log.empty() || std::isspace(text_to_log[0]))
+  {
+    return 0;
+  }
+  else if (type == CURLINFO_TEXT)
+  {
+    if (text_to_log.substr(0, kTlsInfo.size()) == kTlsInfo)
+    {
+      OTEL_INTERNAL_LOG_INFO(text_to_log);
+    }
+    else if (text_to_log.substr(0, kFailureMsg.size()) == kFailureMsg)
+    {
+      OTEL_INTERNAL_LOG_ERROR(text_to_log);
+    }
+#ifdef CURL_DEBUG
+    else
+    {
+      OTEL_INTERNAL_LOG_DEBUG(text_to_log);
+    }
+#endif  // CURL_DEBUG
+  }
+#ifdef CURL_DEBUG
+  else if (type == CURLINFO_HEADER_OUT)
+  {
+    while (!text_to_log.empty() && !std::isspace(text_to_log[0]))
+    {
+      if (const auto pos = text_to_log.find('\n'); pos != nostd::string_view::npos)
+      {
+        OTEL_INTERNAL_LOG_DEBUG(kHeaderSent << text_to_log.substr(0, pos));
+        text_to_log = text_to_log.substr(pos + 1);
+      }
+    }
+  }
+  else if (type == CURLINFO_HEADER_IN)
+  {
+    OTEL_INTERNAL_LOG_DEBUG(kHeaderRecv << text_to_log);
+  }
+#endif  // CURL_DEBUG
+
+  return 0;
+}
+
 CURLcode HttpOperation::Setup()
 {
   if (!curl_resource_.easy_handle)
@@ -581,7 +636,14 @@ CURLcode HttpOperation::Setup()
   curl_error_message_[0] = '\0';
   curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_ERRORBUFFER, curl_error_message_);
 
-  rc = SetCurlLongOption(CURLOPT_VERBOSE, 0L);
+  rc = SetCurlLongOption(CURLOPT_VERBOSE, 1L);
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
+
+  rc = SetCurlPtrOption(CURLOPT_DEBUGFUNCTION,
+                        reinterpret_cast<void *>(&HttpOperation::CurlLoggerCallback));
   if (rc != CURLE_OK)
   {
     return rc;
