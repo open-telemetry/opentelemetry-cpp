@@ -51,16 +51,34 @@ public:
   TextMapCarrierTest(std::map<std::string, std::string> &headers) : headers_(headers) {}
   nostd::string_view Get(nostd::string_view key) const noexcept override
   {
-    auto it = headers_.find(std::string(key));
-    if (it != headers_.end())
+    for(const auto& elem : headers_)
     {
-      return nostd::string_view(it->second);
+      if (equalsIgnoreCase(elem.first, std::string(key)))
+      {
+        return nostd::string_view(elem.second);
+      }
     }
     return "";
   }
   void Set(nostd::string_view key, nostd::string_view value) noexcept override
   {
     headers_[std::string(key)] = std::string(value);
+  }
+
+  static bool equalsIgnoreCase(const std::string &str1, const std::string &str2)
+  {
+    if (str1.length() != str2.length())
+    {
+      return false;
+    }
+    for (int i = 0; i < str1.length(); i++)
+    {
+      if (tolower(str1[i]) != tolower(str2[i]))
+      {
+        return false;
+      }
+    }
+    return true;
   }
 
   std::map<std::string, std::string> &headers_;
