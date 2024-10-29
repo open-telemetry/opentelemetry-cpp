@@ -648,7 +648,7 @@ protected:
       {
         ptr++;
       }
-      if (!conn.request.headers[name].empty() && equalsLowercased(name, "tracestate"))
+      if (!conn.request.headers[name].empty())
       {
         conn.request.headers[name] = conn.request.headers[name].append(",").append(std::string(begin, ptr));
       } else
