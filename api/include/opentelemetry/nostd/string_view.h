@@ -12,13 +12,14 @@
 
 #if !defined(OPENTELEMETRY_HAVE_STD_STRING_VIEW)
 #  include <algorithm>
-#  include <cstddef>
 #  include <cstring>
+#  include <functional>
 #  include <ostream>
 #  include <stdexcept>
 #  include <string>
+#  include <type_traits>
+#  include <utility>
 
-#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

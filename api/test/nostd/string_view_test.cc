@@ -1,11 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/nostd/string_view.h"
-
 #include <gtest/gtest.h>
 #include <cstring>
 #include <map>
+#include <stdexcept>
+#include <string>
+#include <utility>
+
+#include "opentelemetry/nostd/string_view.h"
 
 using opentelemetry::nostd::string_view;
 

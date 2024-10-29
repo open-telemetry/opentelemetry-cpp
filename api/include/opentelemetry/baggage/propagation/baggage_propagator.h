@@ -3,9 +3,15 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/baggage/baggage_context.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

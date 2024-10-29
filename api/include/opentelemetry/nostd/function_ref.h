@@ -3,8 +3,10 @@
 
 #pragma once
 
-#include <memory>
+#include <iosfwd>
+#include <memory>  // IWYU pragma: keep
 #include <type_traits>
+#include <utility>
 
 #include "opentelemetry/version.h"
 
@@ -12,7 +14,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
 template <class Sig>
-class function_ref;
+class function_ref;  // IWYU pragma: keep
 
 /**
  * Non-owning function reference that can be used as a more performant

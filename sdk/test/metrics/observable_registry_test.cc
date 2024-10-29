@@ -1,10 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/state/observable_registry.h"
-#include "opentelemetry/metrics/observer_result.h"
-
 #include <gtest/gtest.h>
+
+#include "opentelemetry/sdk/metrics/state/observable_registry.h"
 
 using namespace opentelemetry::sdk::metrics;
 

@@ -77,6 +77,8 @@ else()
     set(ARCH s390x)
   elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(sparc.*|SPARC.*)")
     set(ARCH sparc)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(loongarch.*|LOONGARCH.*)")
+    set(ARCH loongarch)
   else()
     message(
       FATAL_ERROR
@@ -284,6 +286,10 @@ option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
 # Exemplar specs status is experimental, so behind feature flag by default
 option(WITH_METRICS_EXEMPLAR_PREVIEW
        "Whether to enable exemplar within metrics" OFF)
+
+option(OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS
+       "Whether to build test libraries that are always linked as shared libs"
+       OFF)
 
 #
 # Verify options dependencies

@@ -212,19 +212,41 @@ class Tracer : public opentelemetry::trace::Tracer,
     // Add `SpanLinks` attribute if the list is not empty
     if (links.size())
     {
-      size_t idx = 0;
+      bool first = true;
       std::string linksValue;
+
+      // reserve space for all the SpanLinks.
+      // A single SpanLink will be outptut as:
+      // [{"toSpanId":"9a43c801557f26b7","toTraceId":"ac6cd70ac4bb168a99cb7651b048d965"}]
+      // The second and above link output to string are 1 byte less than the first SpanLink.
+      const size_t kSingleSpanLinkSizeInBytes = 80;
+      linksValue.reserve(kSingleSpanLinkSizeInBytes +
+                         (links.size() - 1) * (kSingleSpanLinkSizeInBytes - 1));
+      linksValue += "[";
+
       links.ForEachKeyValue([&](opentelemetry::trace::SpanContext ctx,
                                 const opentelemetry::common::KeyValueIterable &) {
-        if (!linksValue.empty())
+        if (first)
         {
-          linksValue += ',';
-          linksValue += ToLowerBase16(ctx.span_id());
+          first = false;
+          linksValue += "{\"" ETW_FIELD_SPAN_LINKS_TO_SPAN_ID "\":\"";
         }
-        idx++;
+        else
+        {
+          linksValue += ",{\"" ETW_FIELD_SPAN_LINKS_TO_SPAN_ID "\":\"";
+        }
+
+        linksValue += ToLowerBase16(ctx.span_id());
+        linksValue += "\",\"" ETW_FIELD_SPAN_LINKS_TO_TRACE_ID "\":\"";
+        linksValue += ToLowerBase16(ctx.trace_id());
+        linksValue += "\"}";
+
         return true;
       });
-      attributes[ETW_FIELD_SPAN_LINKS] = linksValue;
+
+      linksValue += "]";
+
+      attributes[ETW_FIELD_SPAN_LINKS] = std::move(linksValue);
     }
   }
 

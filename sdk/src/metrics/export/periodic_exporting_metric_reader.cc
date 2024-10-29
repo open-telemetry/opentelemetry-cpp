@@ -9,11 +9,9 @@
 #include <mutex>
 #include <ostream>
 #include <ratio>
-#include <system_error>
 #include <thread>
 #include <utility>
 
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -106,19 +104,22 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
     std::promise<void> sender;
     auto receiver = sender.get_future();
 
-    task_thread.reset(new std::thread([this, &cancel_export_for_timeout] {
-      this->Collect([this, &cancel_export_for_timeout](ResourceMetrics &metric_data) {
-        if (cancel_export_for_timeout.load(std::memory_order_acquire))
-        {
-          OTEL_INTERNAL_LOG_ERROR(
-              "[Periodic Exporting Metric Reader] Collect took longer configured time: "
-              << this->export_timeout_millis_.count() << " ms, and timed out");
-          return false;
-        }
-        this->exporter_->Export(metric_data);
-        return true;
-      });
-    }));
+    task_thread.reset(
+        new std::thread([this, &cancel_export_for_timeout, sender = std::move(sender)] {
+          this->Collect([this, &cancel_export_for_timeout](ResourceMetrics &metric_data) {
+            if (cancel_export_for_timeout.load(std::memory_order_acquire))
+            {
+              OTEL_INTERNAL_LOG_ERROR(
+                  "[Periodic Exporting Metric Reader] Collect took longer configured time: "
+                  << this->export_timeout_millis_.count() << " ms, and timed out");
+              return false;
+            }
+            this->exporter_->Export(metric_data);
+            return true;
+          });
+
+          const_cast<std::promise<void> &>(sender).set_value();
+        }));
 
     std::future_status status;
     do
@@ -215,7 +216,7 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
     // - If original `timeout` is `zero`, use that in exporter::forceflush
     // - Else if remaining `timeout_steady` more than zero, use that in exporter::forceflush
     // - Else don't invoke exporter::forceflush ( as remaining time is zero or less)
-    if (timeout <= std::chrono::steady_clock::duration::zero())
+    if (timeout <= std::chrono::milliseconds::duration::zero())
     {
       result =
           exporter_->ForceFlush(std::chrono::duration_cast<std::chrono::microseconds>(timeout));

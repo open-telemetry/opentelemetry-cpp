@@ -1,11 +1,18 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/common/key_value_iterable_view.h"
-
 #include <gtest/gtest.h>
 #include <map>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/type_traits.h"
+#include "opentelemetry/nostd/utility.h"
 
 using namespace opentelemetry;
 

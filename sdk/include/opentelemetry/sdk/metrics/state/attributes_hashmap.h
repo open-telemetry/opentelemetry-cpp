@@ -3,17 +3,20 @@
 
 #pragma once
 
+#include <stddef.h>
+#include <functional>
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <utility>
+
+#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #include "opentelemetry/version.h"
-
-#include <functional>
-#include <memory>
-#include <unordered_map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -1,15 +1,22 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/sync_instruments.h"
-#include "opentelemetry/context/context.h"
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
-#include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
-
 #include <gtest/gtest.h>
-#include <cmath>
 #include <limits>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
+#include "opentelemetry/sdk/metrics/state/metric_storage.h"
+#include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
+#include "opentelemetry/sdk/metrics/sync_instruments.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;

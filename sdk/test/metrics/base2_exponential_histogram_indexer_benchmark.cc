@@ -1,11 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h"
-
 #include <benchmark/benchmark.h>
+#include <stdint.h>
 #include <array>
 #include <random>
+
+#include "opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h"
 
 using namespace opentelemetry::sdk::metrics;
 namespace

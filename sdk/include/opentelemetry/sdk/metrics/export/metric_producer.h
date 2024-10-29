@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/version.h"
 
@@ -70,27 +71,42 @@ struct ResourceMetrics
 };
 
 /**
- * MetricProducer is the interface that is used to make metric data available to the
- * OpenTelemetry exporters. Implementations should be stateful, in that each call to
- * `Collect` will return any metric generated since the last call was made.
+ * MetricProducer defines the interface which bridges to third-party metric sources MUST implement,
+ * so they can be plugged into an OpenTelemetry MetricReader as a source of aggregated metric data.
  *
- * <p>Implementations must be thread-safe.
+ * Implementations must be thread-safe, and should accept configuration for the
+ * AggregationTemporality of produced metrics.
  */
-
 class MetricProducer
 {
 public:
   MetricProducer()          = default;
   virtual ~MetricProducer() = default;
 
+  MetricProducer(const MetricProducer &)  = delete;
+  MetricProducer(const MetricProducer &&) = delete;
+  void operator=(const MetricProducer &)  = delete;
+  void operator=(const MetricProducer &&) = delete;
+
+  enum class Status
+  {
+    kSuccess,
+    kFailure,
+    kTimeout,
+  };
+
+  struct Result
+  {
+    ResourceMetrics points_;
+    Status status_;
+  };
+
   /**
-   * The callback to be called for each metric exporter. This will only be those
-   * metrics that have been produced since the last time this method was called.
-   *
-   * @return a status of completion of method.
+   * Produce returns a batch of Metric Points, with a single instrumentation scope that identifies
+   * the MetricProducer. Implementations may return successfully collected points even if there is a
+   * partial failure.
    */
-  virtual bool Collect(
-      nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept = 0;
+  virtual Result Produce() noexcept = 0;
 };
 
 }  // namespace metrics

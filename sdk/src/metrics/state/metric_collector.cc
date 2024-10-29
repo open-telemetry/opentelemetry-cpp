@@ -24,6 +24,7 @@ namespace sdk
 {
 namespace metrics
 {
+using opentelemetry::sdk::resource::Resource;
 
 MetricCollector::MetricCollector(opentelemetry::sdk::metrics::MeterContext *context,
                                  std::shared_ptr<MetricReader> metric_reader)
@@ -49,14 +50,13 @@ AggregationTemporality MetricCollector::GetAggregationTemporality(
   return aggregation_temporality;
 }
 
-bool MetricCollector::Collect(
-    nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept
+MetricProducer::Result MetricCollector::Produce() noexcept
 {
   if (!meter_context_)
   {
     OTEL_INTERNAL_LOG_ERROR("[MetricCollector::Collect] - Error during collecting."
                             << "The metric context is invalid");
-    return false;
+    return {{}, MetricProducer::Status::kFailure};
   }
   ResourceMetrics resource_metrics;
   meter_context_->ForEachMeter([&](const std::shared_ptr<Meter> &meter) noexcept {
@@ -72,8 +72,7 @@ bool MetricCollector::Collect(
     return true;
   });
   resource_metrics.resource_ = &meter_context_->GetResource();
-  callback(resource_metrics);
-  return true;
+  return {resource_metrics, MetricProducer::Status::kSuccess};
 }
 
 bool MetricCollector::ForceFlush(std::chrono::microseconds timeout) noexcept
