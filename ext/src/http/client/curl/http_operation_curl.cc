@@ -578,9 +578,9 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
 {
   nostd::string_view text_to_log{data, size};
 
-  if (text_to_log.empty() || std::iscntrl(text_to_log[0]))
+  if (!text_to_log.empty() && text_to_log[size - 1] == '\n')
   {
-    return 0;
+    text_to_log = text_to_log.substr(0, size - 1);
   }
 
   if (type == CURLINFO_TEXT)
@@ -614,7 +614,7 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
 
       if (pos != nostd::string_view::npos)
       {
-        OTEL_INTERNAL_LOG_DEBUG(kHeaderSent << text_to_log.substr(0, pos));
+        OTEL_INTERNAL_LOG_DEBUG(kHeaderSent << text_to_log.substr(0, pos - 1));
         text_to_log = text_to_log.substr(pos + 1);
       }
     }
