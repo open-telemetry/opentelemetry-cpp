@@ -342,7 +342,7 @@ endif()
 if(Protobuf_INCLUDE_DIRS)
   target_include_directories(
     opentelemetry_proto BEFORE
-    PUBLIC "$<BUILD_INTERFACE:${Protobuf_INCLUDE_DIRS}")
+    PUBLIC "$<BUILD_INTERFACE:${Protobuf_INCLUDE_DIRS}>")
 endif()
 
 if(WITH_OTLP_GRPC)
