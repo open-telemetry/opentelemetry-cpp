@@ -297,6 +297,7 @@ sdk::metrics::AggregationTemporality OtlpMetricUtils::DeltaTemporalitySelector(
     case sdk::metrics::InstrumentType::kObservableCounter:
     case sdk::metrics::InstrumentType::kHistogram:
     case sdk::metrics::InstrumentType::kObservableGauge:
+    case sdk::metrics::InstrumentType::kGauge:
       return sdk::metrics::AggregationTemporality::kDelta;
     case sdk::metrics::InstrumentType::kUpDownCounter:
     case sdk::metrics::InstrumentType::kObservableUpDownCounter:
@@ -320,6 +321,7 @@ sdk::metrics::AggregationTemporality OtlpMetricUtils::LowMemoryTemporalitySelect
     case sdk::metrics::InstrumentType::kHistogram:
       return sdk::metrics::AggregationTemporality::kDelta;
     case sdk::metrics::InstrumentType::kObservableCounter:
+    case sdk::metrics::InstrumentType::kGauge:
     case sdk::metrics::InstrumentType::kObservableGauge:
     case sdk::metrics::InstrumentType::kUpDownCounter:
     case sdk::metrics::InstrumentType::kObservableUpDownCounter:
