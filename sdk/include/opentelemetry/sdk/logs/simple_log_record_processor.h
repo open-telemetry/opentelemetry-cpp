@@ -8,7 +8,9 @@
 #include <memory>
 
 #include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -16,9 +18,6 @@ namespace sdk
 {
 namespace logs
 {
-class LogRecordExporter;
-class Recordable;
-
 /**
  * The simple log processor passes all log records
  * in a batch of 1 to the configured

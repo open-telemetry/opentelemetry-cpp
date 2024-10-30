@@ -1,21 +1,28 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/batch_span_processor.h"
+#include <gtest/gtest.h>
+#include <algorithm>
+#include <atomic>
+#include <chrono>
+#include <cstddef>
+#include <string>
+#include <thread>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/trace/batch_span_processor.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/sdk/trace/tracer.h"
-
-#include <gtest/gtest.h>
-
-#include <algorithm>
-#include <chrono>
-#include <list>
-#include <memory>
-#include <thread>
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -32,10 +39,10 @@ public:
       std::shared_ptr<std::atomic<bool>> is_export_completed =
           std::shared_ptr<std::atomic<bool>>(new std::atomic<bool>(false)),
       const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0)) noexcept
-      : spans_received_(spans_received),
-        shut_down_counter_(shut_down_counter),
-        is_shutdown_(is_shutdown),
-        is_export_completed_(is_export_completed),
+      : spans_received_(std::move(spans_received)),
+        shut_down_counter_(std::move(shut_down_counter)),
+        is_shutdown_(std::move(is_shutdown)),
+        is_export_completed_(std::move(is_export_completed)),
         export_delay_(export_delay)
   {}
 
@@ -96,7 +103,7 @@ class BatchSpanProcessorTestPeer : public testing::Test
 {
 public:
   std::unique_ptr<std::vector<std::unique_ptr<sdk::trace::Recordable>>> GetTestSpans(
-      std::shared_ptr<sdk::trace::SpanProcessor> processor,
+      const std::shared_ptr<sdk::trace::SpanProcessor> &processor,
       const int num_spans)
   {
     std::unique_ptr<std::vector<std::unique_ptr<sdk::trace::Recordable>>> test_spans(

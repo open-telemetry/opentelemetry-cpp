@@ -1,22 +1,28 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/ext//http/client/curl/http_client_curl.h"
-#include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/ext/http/server/http_server.h"
-
-#include <assert.h>
+#include <gtest/gtest.h>
+#include <string.h>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <fstream>
+#include <map>
 #include <memory>
-#include <thread>
+#include <mutex>
+#include <string>
+#include <utility>
 #include <vector>
 
-#define HTTP_PORT 19000
+#include "opentelemetry/ext//http/client/curl/http_client_curl.h"
+#include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
+#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/ext/http/client/http_client_factory.h"
+#include "opentelemetry/ext/http/server/http_server.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/string_view.h"
 
-#include <gtest/gtest.h>
+#define HTTP_PORT 19000
 
 namespace curl        = opentelemetry::ext::http::client::curl;
 namespace http_client = opentelemetry::ext::http::client;
@@ -25,12 +31,11 @@ namespace nostd       = opentelemetry::nostd;
 class CustomEventHandler : public http_client::EventHandler
 {
 public:
-  virtual void OnResponse(http_client::Response & /* response */) noexcept override
+  void OnResponse(http_client::Response & /* response */) noexcept override
   {
     got_response_ = true;
   }
-  virtual void OnEvent(http_client::SessionState state,
-                       nostd::string_view /* reason */) noexcept override
+  void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
   {
     switch (state)
     {
@@ -74,7 +79,9 @@ class PostEventHandler : public CustomEventHandler
 class FinishInCallbackHandler : public CustomEventHandler
 {
 public:
-  FinishInCallbackHandler(std::shared_ptr<http_client::Session> session) : session_(session) {}
+  FinishInCallbackHandler(std::shared_ptr<http_client::Session> session)
+      : session_(std::move(session))
+  {}
 
   void OnResponse(http_client::Response &response) noexcept override
   {
@@ -110,7 +117,7 @@ protected:
 public:
   BasicCurlHttpTests() : is_setup_(false), is_running_(false) {}
 
-  virtual void SetUp() override
+  void SetUp() override
   {
     if (is_setup_.exchange(true))
     {
@@ -129,7 +136,7 @@ public:
     is_running_ = true;
   }
 
-  virtual void TearDown() override
+  void TearDown() override
   {
     if (!is_setup_.exchange(false))
       return;
@@ -137,8 +144,8 @@ public:
     is_running_ = false;
   }
 
-  virtual int onHttpRequest(HTTP_SERVER_NS::HttpRequest const &request,
-                            HTTP_SERVER_NS::HttpResponse &response) override
+  int onHttpRequest(HTTP_SERVER_NS::HttpRequest const &request,
+                    HTTP_SERVER_NS::HttpResponse &response) override
   {
     int response_status = 404;
     if (request.uri == "/get/")

@@ -3,16 +3,20 @@
 
 #pragma once
 
+#include <atomic>
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <unordered_map>
+
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
-
-#include <atomic>
-#include <iostream>
-#include <sstream>
-#include <unordered_map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -62,10 +66,10 @@ private:
   bool isShutdown() const noexcept;
   void printAttributes(
       const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &map,
-      const std::string prefix = "\n\t");
+      const std::string &prefix = "\n\t");
   void printAttributes(
       const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &map,
-      const std::string prefix = "\n\t");
+      const std::string &prefix = "\n\t");
 };
 }  // namespace logs
 }  // namespace exporter

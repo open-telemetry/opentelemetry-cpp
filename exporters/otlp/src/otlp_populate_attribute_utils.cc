@@ -1,7 +1,29 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <stdint.h>
+#include <string>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
+
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/common/v1/common.pb.h"
+#include "opentelemetry/proto/resource/v1/resource.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
 
 namespace nostd = opentelemetry::nostd;
 
@@ -50,7 +72,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   }
   else if (nostd::holds_alternative<uint64_t>(value))
   {
-    proto_value->set_int_value(nostd::get<uint64_t>(value));
+    proto_value->set_int_value(
+        nostd::get<uint64_t>(value));  // NOLINT(cppcoreguidelines-narrowing-conversions)
   }
   else if (nostd::holds_alternative<double>(value))
   {
@@ -110,7 +133,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<nostd::span<const uint64_t>>(value))
     {
-      array_value->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(
+          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
     }
   }
   else if (nostd::holds_alternative<nostd::span<const double>>(value))
@@ -164,7 +188,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   }
   else if (nostd::holds_alternative<uint64_t>(value))
   {
-    proto_value->set_int_value(nostd::get<uint64_t>(value));
+    proto_value->set_int_value(
+        nostd::get<uint64_t>(value));  // NOLINT(cppcoreguidelines-narrowing-conversions)
   }
   else if (nostd::holds_alternative<double>(value))
   {
@@ -195,7 +220,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<std::vector<uint32_t>>(value))
     {
-      array_value->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(
+          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
     }
   }
   else if (nostd::holds_alternative<std::vector<int64_t>>(value))
@@ -211,7 +237,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<std::vector<uint64_t>>(value))
     {
-      array_value->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(
+          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
     }
   }
   else if (nostd::holds_alternative<std::vector<double>>(value))

@@ -2,16 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <benchmark/benchmark.h>
-#include "opentelemetry/sdk/common/attributemap_hash.h"
-#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
-#include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
-
+#include <stddef.h>
+#include <stdint.h>
+#include <algorithm>
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
+
+#include "opentelemetry/sdk/common/attributemap_hash.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 using namespace opentelemetry::sdk::metrics;
 constexpr size_t MAX_THREADS = 500;

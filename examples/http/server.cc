@@ -21,8 +21,8 @@ constexpr const char *server_name = "localhost";
 class RequestHandler : public HTTP_SERVER_NS::HttpRequestCallback
 {
 public:
-  virtual int onHttpRequest(HTTP_SERVER_NS::HttpRequest const &request,
-                            HTTP_SERVER_NS::HttpResponse &response) override
+  int onHttpRequest(HTTP_SERVER_NS::HttpRequest const &request,
+                    HTTP_SERVER_NS::HttpResponse &response) override
   {
     StartSpanOptions options;
     options.kind          = SpanKind::kServer;  // server

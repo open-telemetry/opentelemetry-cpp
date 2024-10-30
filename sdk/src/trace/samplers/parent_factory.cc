@@ -1,8 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/samplers/parent_factory.h"
+#include <memory>
+
+#include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/parent.h"
+#include "opentelemetry/sdk/trace/samplers/parent_factory.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -12,7 +15,7 @@ namespace trace
 {
 
 std::unique_ptr<Sampler> ParentBasedSamplerFactory::Create(
-    std::shared_ptr<Sampler> delegate_sampler)
+    const std::shared_ptr<Sampler> &delegate_sampler)
 {
   std::unique_ptr<Sampler> sampler(new ParentBasedSampler(delegate_sampler));
   return sampler;

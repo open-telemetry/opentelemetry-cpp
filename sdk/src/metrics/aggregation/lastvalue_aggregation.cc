@@ -1,11 +1,20 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
-#include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/version.h"
-
+#include <stdint.h>
+#include <chrono>
+#include <memory>
 #include <mutex>
+#include <utility>
+
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -19,9 +28,7 @@ LongLastValueAggregation::LongLastValueAggregation()
   point_data_.value_              = static_cast<int64_t>(0);
 }
 
-LongLastValueAggregation::LongLastValueAggregation(LastValuePointData &&data)
-    : point_data_{std::move(data)}
-{}
+LongLastValueAggregation::LongLastValueAggregation(LastValuePointData &&data) : point_data_{data} {}
 
 LongLastValueAggregation::LongLastValueAggregation(const LastValuePointData &data)
     : point_data_{data}
@@ -42,12 +49,12 @@ std::unique_ptr<Aggregation> LongLastValueAggregation::Merge(
   if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
       nostd::get<LastValuePointData>(delta.ToPoint()).sample_ts_.time_since_epoch())
   {
-    LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(ToPoint()));
+    LastValuePointData merge_data = nostd::get<LastValuePointData>(ToPoint());
     return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(merge_data)));
   }
   else
   {
-    LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(delta.ToPoint()));
+    LastValuePointData merge_data = nostd::get<LastValuePointData>(delta.ToPoint());
     return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(merge_data)));
   }
 }
@@ -57,12 +64,12 @@ std::unique_ptr<Aggregation> LongLastValueAggregation::Diff(const Aggregation &n
   if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
       nostd::get<LastValuePointData>(next.ToPoint()).sample_ts_.time_since_epoch())
   {
-    LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(ToPoint()));
+    LastValuePointData diff_data = nostd::get<LastValuePointData>(ToPoint());
     return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(diff_data)));
   }
   else
   {
-    LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(next.ToPoint()));
+    LastValuePointData diff_data = nostd::get<LastValuePointData>(next.ToPoint());
     return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(diff_data)));
   }
 }
@@ -80,7 +87,7 @@ DoubleLastValueAggregation::DoubleLastValueAggregation()
 }
 
 DoubleLastValueAggregation::DoubleLastValueAggregation(LastValuePointData &&data)
-    : point_data_{std::move(data)}
+    : point_data_{data}
 {}
 
 DoubleLastValueAggregation::DoubleLastValueAggregation(const LastValuePointData &data)
@@ -102,12 +109,12 @@ std::unique_ptr<Aggregation> DoubleLastValueAggregation::Merge(
   if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
       nostd::get<LastValuePointData>(delta.ToPoint()).sample_ts_.time_since_epoch())
   {
-    LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(ToPoint()));
+    LastValuePointData merge_data = nostd::get<LastValuePointData>(ToPoint());
     return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(std::move(merge_data)));
   }
   else
   {
-    LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(delta.ToPoint()));
+    LastValuePointData merge_data = nostd::get<LastValuePointData>(delta.ToPoint());
     return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(std::move(merge_data)));
   }
 }
@@ -118,12 +125,12 @@ std::unique_ptr<Aggregation> DoubleLastValueAggregation::Diff(
   if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
       nostd::get<LastValuePointData>(next.ToPoint()).sample_ts_.time_since_epoch())
   {
-    LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(ToPoint()));
+    LastValuePointData diff_data = nostd::get<LastValuePointData>(ToPoint());
     return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(std::move(diff_data)));
   }
   else
   {
-    LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(next.ToPoint()));
+    LastValuePointData diff_data = nostd::get<LastValuePointData>(next.ToPoint());
     return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(std::move(diff_data)));
   }
 }

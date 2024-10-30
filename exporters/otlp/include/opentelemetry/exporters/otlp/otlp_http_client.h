@@ -3,13 +3,6 @@
 
 #pragma once
 
-#include "opentelemetry/ext/http/client/http_client.h"
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/common/exporter_utils.h"
-
-#include "opentelemetry/exporters/otlp/otlp_environment.h"
-#include "opentelemetry/exporters/otlp/otlp_http.h"
-
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -20,6 +13,14 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
+
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_http.h"
+#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/version.h"
 
 // forward declare google::protobuf::Message
 namespace google
@@ -275,7 +276,7 @@ private:
                  std::shared_ptr<ext::http::client::HttpClient> http_client);
 
   // Stores if this HTTP client had its Shutdown() method called
-  bool is_shutdown_;
+  std::atomic<bool> is_shutdown_;
 
   // The configuration options associated with this HTTP client.
   const OtlpHttpClientOptions options_;
@@ -296,6 +297,8 @@ private:
   // Condition variable and mutex to control the concurrency count of running sessions
   std::mutex session_waker_lock_;
   std::condition_variable session_waker_;
+  std::atomic<size_t> start_session_counter_;
+  std::atomic<size_t> finished_session_counter_;
 };
 }  // namespace otlp
 }  // namespace exporter

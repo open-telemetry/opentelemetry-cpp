@@ -1,13 +1,18 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <memory>
+#include <utility>
+
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
-#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/tracer_provider.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/foo_library/foo_library.h"
@@ -26,23 +31,18 @@ void InitTracer()
   auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create();
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-  std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
-      opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(processor));
-#else
-  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> provider =
-      opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(processor));
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
+  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> sdk_provider =
+      trace_sdk::TracerProviderFactory::Create(std::move(processor));
 
   // Set the global trace provider
-  std::shared_ptr<opentelemetry::trace::TracerProvider> api_provider = provider;
+  const std::shared_ptr<opentelemetry::trace::TracerProvider> &api_provider = sdk_provider;
   trace_api::Provider::SetTracerProvider(api_provider);
 }
 
 void CleanupTracer()
 {
-  std::shared_ptr<opentelemetry::trace::TracerProvider> none;
-  trace_api::Provider::SetTracerProvider(none);
+  std::shared_ptr<opentelemetry::trace::TracerProvider> noop;
+  trace_api::Provider::SetTracerProvider(noop);
 }
 }  // namespace
 

@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+
+#include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 
-using opentelemetry::metrics::Meter;
 using opentelemetry::metrics::MeterProvider;
 using opentelemetry::metrics::NoopMeterProvider;
 using opentelemetry::metrics::Provider;

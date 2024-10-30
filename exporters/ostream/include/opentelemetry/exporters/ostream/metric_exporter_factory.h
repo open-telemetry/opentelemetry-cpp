@@ -7,17 +7,10 @@
 #include <memory>
 
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
-{
-namespace metrics
-{
-class PushMetricExporter;
-}  // namespace metrics
-}  // namespace sdk
-
 namespace exporter
 {
 namespace metrics

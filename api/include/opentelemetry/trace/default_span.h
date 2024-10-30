@@ -66,8 +66,8 @@ public:
   DefaultSpan(SpanContext span_context) noexcept : span_context_(span_context) {}
 
   // movable and copiable
-  DefaultSpan(DefaultSpan &&spn) noexcept : span_context_(spn.GetContext()) {}
-  DefaultSpan(const DefaultSpan &spn) noexcept : span_context_(spn.GetContext()) {}
+  DefaultSpan(DefaultSpan &&spn) noexcept : Span(), span_context_(spn.GetContext()) {}
+  DefaultSpan(const DefaultSpan &spn) noexcept : Span(), span_context_(spn.GetContext()) {}
 
 private:
   SpanContext span_context_;

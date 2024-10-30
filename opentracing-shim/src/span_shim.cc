@@ -111,7 +111,7 @@ void SpanShim::Log(opentracing::SystemTime timestamp,
 void SpanShim::logImpl(nostd::span<const EventEntry> fields,
                        const opentracing::SystemTime *const timestamp) noexcept
 {
-  // The Add Event’s name parameter MUST be the value with the event key
+  // The Add Event's name parameter MUST be the value with the event key
   // in the pair set, or else fallback to use the log literal string.
   const auto &event = std::find_if(fields.begin(), fields.end(),
                                    [](const EventEntry &item) { return item.first == "event"; });

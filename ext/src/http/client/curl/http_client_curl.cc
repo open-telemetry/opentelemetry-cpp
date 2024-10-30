@@ -1,14 +1,34 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <curl/curl.h>
+#include <curl/curlver.h>
+#include <zconf.h>
+#include <atomic>
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <list>
+#include <mutex>
+#include <string>
+#include <thread>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
+#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 #  include <zlib.h>
+#else
+#  include "opentelemetry/sdk/common/global_log_handler.h"
 #endif
-
-#include <list>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -165,13 +185,12 @@ void Session::FinishOperation()
 }
 
 HttpClient::HttpClient()
-    : next_session_id_{0},
+    : multi_handle_(curl_multi_init()),
+      next_session_id_{0},
       max_sessions_per_connection_{8},
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
       curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
-{
-  multi_handle_ = curl_multi_init();
-}
+{}
 
 HttpClient::~HttpClient()
 {
@@ -542,7 +561,7 @@ bool HttpClient::doAbortSessions()
   }
 
   bool has_data = false;
-  for (auto session : pending_to_abort_sessions)
+  for (const auto &session : pending_to_abort_sessions)
   {
     if (!session.second)
     {

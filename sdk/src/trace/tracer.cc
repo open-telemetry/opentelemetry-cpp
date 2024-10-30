@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <chrono>
 #include <map>
-#include <memory>
 #include <new>
 #include <utility>
 
@@ -12,7 +11,6 @@
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
@@ -41,7 +39,7 @@ namespace trace
 
 Tracer::Tracer(std::shared_ptr<TracerContext> context,
                std::unique_ptr<InstrumentationScope> instrumentation_scope) noexcept
-    : instrumentation_scope_{std::move(instrumentation_scope)}, context_{context}
+    : instrumentation_scope_{std::move(instrumentation_scope)}, context_{std::move(context)}
 {}
 
 nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(

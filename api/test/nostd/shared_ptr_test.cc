@@ -1,11 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/nostd/shared_ptr.h"
-
 #include <gtest/gtest.h>
-
+#include <stddef.h>
 #include <algorithm>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/nostd/shared_ptr.h"
 
 using opentelemetry::nostd::shared_ptr;
 
@@ -35,7 +37,7 @@ public:
 class D : public C
 {
 public:
-  virtual ~D() {}
+  ~D() override {}
 };
 
 TEST(SharedPtrTest, DefaultConstruction)
@@ -63,7 +65,7 @@ TEST(SharedPtrTest, MoveConstruction)
   auto value = new int{123};
   shared_ptr<int> ptr1{value};
   shared_ptr<int> ptr2{std::move(ptr1)};
-  EXPECT_EQ(ptr1.get(), nullptr);
+  EXPECT_EQ(ptr1.get(), nullptr);  // NOLINT
   EXPECT_EQ(ptr2.get(), value);
 }
 
@@ -72,7 +74,7 @@ TEST(SharedPtrTest, MoveConstructionFromDifferentType)
   auto value = new int{123};
   shared_ptr<int> ptr1{value};
   shared_ptr<const int> ptr2{std::move(ptr1)};
-  EXPECT_EQ(ptr1.get(), nullptr);
+  EXPECT_EQ(ptr1.get(), nullptr);  // NOLINT
   EXPECT_EQ(ptr2.get(), value);
 }
 
@@ -81,14 +83,14 @@ TEST(SharedPtrTest, MoveConstructionFromStdSharedPtr)
   auto value = new int{123};
   std::shared_ptr<int> ptr1{value};
   shared_ptr<int> ptr2{std::move(ptr1)};
-  EXPECT_EQ(ptr1.get(), nullptr);
+  EXPECT_EQ(ptr1.get(), nullptr);  // NOLINT
   EXPECT_EQ(ptr2.get(), value);
 }
 
 TEST(SharedPtrTest, Destruction)
 {
   bool was_destructed;
-  shared_ptr<A>{new A{was_destructed}};
+  shared_ptr<A>{new A{was_destructed}};  // NOLINT
   EXPECT_TRUE(was_destructed);
 }
 
@@ -173,7 +175,7 @@ static void SharedPtrTest_Sort(size_t size = 10)
   auto nums2 = nums;
 
   std::sort(nums.begin(), nums.end(),
-            [](shared_ptr<const int> a, shared_ptr<const int> b) { return *a < *b; });
+            [](const shared_ptr<const int> &a, const shared_ptr<const int> &b) { return *a < *b; });
 
   EXPECT_NE(nums, nums2);
 

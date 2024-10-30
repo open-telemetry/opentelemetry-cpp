@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <opentelemetry/common/string_util.h>
+#include <string.h>
 
-#include <string>
-#include <utility>
-#include <vector>
+#include <opentelemetry/common/string_util.h>
 
 // ------------------------- StringUtil class tests ---------------------------------
 

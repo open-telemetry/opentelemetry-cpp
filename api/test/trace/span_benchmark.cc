@@ -1,15 +1,24 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/trace/context.h"
-#include "opentelemetry/trace/noop.h"
-#include "opentelemetry/trace/span_id.h"
-#include "opentelemetry/trace/trace_id.h"
-
+#include <benchmark/benchmark.h>
 #include <cstdint>
 
-#include <benchmark/benchmark.h>
+#include "opentelemetry/context/context_value.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/trace/context.h"
+#include "opentelemetry/trace/default_span.h"
+#include "opentelemetry/trace/noop.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_startoptions.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/tracer.h"
 
 using opentelemetry::trace::SpanContext;
 namespace trace_api = opentelemetry::trace;

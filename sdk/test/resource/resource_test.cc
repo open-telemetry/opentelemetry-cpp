@@ -1,17 +1,21 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/common/attribute_utils.h"
-#include "opentelemetry/sdk/resource/resource_detector.h"
-#include "opentelemetry/sdk/resource/semantic_conventions.h"
-#include "opentelemetry/sdk/version/version.h"
-
+#include <gtest/gtest.h>
+#include <stdint.h>
 #include <cstdlib>
 #include <map>
 #include <string>
+#include <unordered_map>
+#include <utility>
 
-#include <gtest/gtest.h>
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/resource/resource_detector.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
+#include "opentelemetry/sdk/version/version.h"
 
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
@@ -25,7 +29,8 @@ namespace nostd = opentelemetry::nostd;
 class TestResource : public Resource
 {
 public:
-  TestResource(ResourceAttributes attributes = ResourceAttributes(), std::string schema_url = {})
+  TestResource(const ResourceAttributes &attributes = ResourceAttributes(),
+               const std::string &schema_url        = {})
       : Resource(attributes, schema_url)
   {}
 };
@@ -122,10 +127,10 @@ TEST(ResourceTest, create_with_emptyatrributes)
 
 TEST(ResourceTest, create_with_schemaurl)
 {
-  const std::string schema_url  = "https://opentelemetry.io/schemas/1.2.0";
-  ResourceAttributes attributes = {};
-  auto resource                 = Resource::Create(attributes, schema_url);
-  auto received_schema_url      = resource.GetSchemaURL();
+  const std::string schema_url    = "https://opentelemetry.io/schemas/1.2.0";
+  ResourceAttributes attributes   = {};
+  auto resource                   = Resource::Create(attributes, schema_url);
+  const auto &received_schema_url = resource.GetSchemaURL();
 
   EXPECT_EQ(received_schema_url, schema_url);
 }

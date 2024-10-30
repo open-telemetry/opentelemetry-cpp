@@ -1,8 +1,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/view/view_factory.h"
+#include <memory>
+#include <string>
+#include <utility>
+
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/sdk/metrics/view/view_factory.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -46,7 +53,7 @@ std::unique_ptr<View> ViewFactory::Create(const std::string &name,
   auto attributes_processor =
       std::unique_ptr<AttributesProcessor>(new DefaultAttributesProcessor());
 
-  return Create(name, description, unit, aggregation_type, aggregation_config,
+  return Create(name, description, unit, aggregation_type, std::move(aggregation_config),
                 std::move(attributes_processor));
 }
 
@@ -57,7 +64,8 @@ std::unique_ptr<View> ViewFactory::Create(const std::string &name,
                                           std::shared_ptr<AggregationConfig> aggregation_config,
                                           std::unique_ptr<AttributesProcessor> attributes_processor)
 {
-  std::unique_ptr<View> view(new View(name, description, unit, aggregation_type, aggregation_config,
+  std::unique_ptr<View> view(new View(name, description, unit, aggregation_type,
+                                      std::move(aggregation_config),
                                       std::move(attributes_processor)));
   return view;
 }

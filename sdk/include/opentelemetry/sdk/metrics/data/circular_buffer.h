@@ -3,11 +3,13 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/variant.h"
-
+#include <stddef.h>
 #include <cstdint>
 #include <limits>
 #include <vector>
+
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

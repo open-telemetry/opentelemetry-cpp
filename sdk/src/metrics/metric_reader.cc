@@ -4,8 +4,7 @@
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
-
-#include <mutex>
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -27,7 +26,7 @@ bool MetricReader::Collect(
   if (!metric_producer_)
   {
     OTEL_INTERNAL_LOG_WARN(
-        "MetricReader::Collect Cannot invoke Collect(). No MetricProducer registered for "
+        "MetricReader::Collect Cannot invoke Produce(). No MetricProducer registered for "
         "collection!")
     return false;
   }
@@ -37,7 +36,15 @@ bool MetricReader::Collect(
     OTEL_INTERNAL_LOG_WARN("MetricReader::Collect invoked while Shutdown in progress!");
   }
 
-  return metric_producer_->Collect(callback);
+  auto result = metric_producer_->Produce();
+
+  // According to the spec,
+  //   When the Produce operation fails, the MetricProducer MAY return successfully collected
+  //   results and a failed reasons list to the caller.
+  // So we invoke the callback with whatever points we get back, even if the overall operation may
+  // have failed.
+  auto success = callback(result.points_);
+  return (result.status_ == MetricProducer::Status::kSuccess) && success;
 }
 
 bool MetricReader::Shutdown(std::chrono::microseconds timeout) noexcept

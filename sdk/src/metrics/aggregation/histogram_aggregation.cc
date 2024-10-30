@@ -1,15 +1,23 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
-#include "opentelemetry/version.h"
-
+#include <stddef.h>
 #include <algorithm>
-#include <iomanip>
+#include <cstdint>
 #include <limits>
 #include <memory>
 #include <mutex>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -20,7 +28,7 @@ namespace metrics
 LongHistogramAggregation::LongHistogramAggregation(const AggregationConfig *aggregation_config)
 {
   auto ac = static_cast<const HistogramAggregationConfig *>(aggregation_config);
-  if (ac && ac->boundaries_.size())
+  if (ac)
   {
     point_data_.boundaries_ = ac->boundaries_;
   }
@@ -101,7 +109,7 @@ PointType LongHistogramAggregation::ToPoint() const noexcept
 DoubleHistogramAggregation::DoubleHistogramAggregation(const AggregationConfig *aggregation_config)
 {
   auto ac = static_cast<const HistogramAggregationConfig *>(aggregation_config);
-  if (ac && ac->boundaries_.size())
+  if (ac)
   {
     point_data_.boundaries_ = ac->boundaries_;
   }

@@ -10,35 +10,46 @@
 #endif
 
 // clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 // clang-format on
 
 #include "google/protobuf/message.h"
-#include "google/protobuf/reflection.h"
-#include "google/protobuf/stubs/common.h"
 #include "nlohmann/json.hpp"
 
 // clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/base64.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/version.h"
 
+#ifdef _MSC_VER
+#  include <string.h>
+#  define strcasecmp _stricmp
+#else
+#  include <strings.h>
+#endif
+
+#include <limits.h>
 #include <atomic>
 #include <condition_variable>
+#include <cstdint>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <fstream>
+#include <functional>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <utility>
 #include <vector>
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#  include <exception>
+#endif
 
 #if !defined(__CYGWIN__) && defined(_WIN32)
 #  ifndef WIN32_LEAN_AND_MEAN
@@ -65,11 +76,8 @@
 
 #else
 
-#  include <dirent.h>
-#  include <errno.h>
 #  include <fcntl.h>
 #  include <sys/stat.h>
-#  include <sys/types.h>
 #  include <unistd.h>
 
 #  define FS_ACCESS(x) access(x, F_OK)
@@ -88,10 +96,6 @@
 
 #ifdef GetMessage
 #  undef GetMessage
-#endif
-
-#ifdef _MSC_VER
-#  define strcasecmp _stricmp
 #endif
 
 #if (defined(_MSC_VER) && _MSC_VER >= 1600) || \
@@ -173,11 +177,11 @@ static std::size_t FormatPath(char *buff,
   {                                     \
     tm_obj_cache = GetLocalTime();      \
     tm_obj_ptr   = &tm_obj_cache;       \
-    VAR          = tm_obj_ptr->EXPRESS; \
+    (VAR)        = tm_obj_ptr->EXPRESS; \
   }                                     \
   else                                  \
   {                                     \
-    VAR = tm_obj_ptr->EXPRESS;          \
+    (VAR) = tm_obj_ptr->EXPRESS;        \
   }
 
   for (size_t i = 0; i < fmt.size() && ret < bufz && running; ++i)
@@ -620,7 +624,7 @@ public:
   }
 
 #if !defined(UTIL_FS_DISABLE_LINK)
-  enum class LinkOption : int32_t
+  enum class LinkOption : uint8_t
   {
     kDefault       = 0x00,  // hard link for default
     kSymbolicLink  = 0x01,  // or soft link
@@ -750,6 +754,7 @@ static void ConvertListFieldToJson(nlohmann::json &value,
                                    const google::protobuf::Message &message,
                                    const google::protobuf::FieldDescriptor *field_descriptor);
 
+// NOLINTBEGIN(misc-no-recursion)
 static void ConvertGenericMessageToJson(nlohmann::json &value,
                                         const google::protobuf::Message &message)
 {
@@ -953,13 +958,15 @@ void ConvertListFieldToJson(nlohmann::json &value,
   }
 }
 
+// NOLINTEND(misc-no-recursion) suppressing for performance as if implemented with stack needs
+// Dynamic memory allocation
 }  // namespace
 
 class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileSystemBackend : public OtlpFileAppender
 {
 public:
   explicit OtlpFileSystemBackend(const OtlpFileClientFileSystemOptions &options)
-      : options_(options), is_initialized_{false}, check_file_path_interval_{0}
+      : options_(options), is_initialized_{false}
   {
     file_ = std::make_shared<FileStats>();
     file_->is_shutdown.store(false);
@@ -1420,71 +1427,90 @@ private:
       return;
     }
 
-    std::lock_guard<std::mutex> lock_guard_caller{file_->background_thread_lock};
-    if (file_->background_flush_thread)
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
     {
-      return;
+#endif
+
+      std::lock_guard<std::mutex> lock_guard_caller{file_->background_thread_lock};
+      if (file_->background_flush_thread)
+      {
+        return;
+      }
+
+      std::shared_ptr<FileStats> concurrency_file = file_;
+      std::chrono::microseconds flush_interval    = options_.flush_interval;
+      file_->background_flush_thread.reset(new std::thread([concurrency_file, flush_interval]() {
+        std::chrono::system_clock::time_point last_free_job_timepoint =
+            std::chrono::system_clock::now();
+        std::size_t last_record_count = 0;
+
+        while (true)
+        {
+          std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+          // Exit flush thread if there is not data to flush more than one minute.
+          if (now - last_free_job_timepoint > std::chrono::minutes{1})
+          {
+            break;
+          }
+
+          if (concurrency_file->is_shutdown.load(std::memory_order_acquire))
+          {
+            break;
+          }
+
+          {
+            std::unique_lock<std::mutex> lk(concurrency_file->background_thread_waker_lock);
+            concurrency_file->background_thread_waker_cv.wait_for(lk, flush_interval);
+          }
+
+          {
+            std::size_t current_record_count =
+                concurrency_file->record_count.load(std::memory_order_acquire);
+            std::lock_guard<std::mutex> lock_guard{concurrency_file->file_lock};
+            if (current_record_count != last_record_count)
+            {
+              last_record_count       = current_record_count;
+              last_free_job_timepoint = std::chrono::system_clock::now();
+            }
+
+            if (concurrency_file->current_file)
+            {
+              fflush(concurrency_file->current_file.get());
+            }
+
+            concurrency_file->flushed_record_count.store(current_record_count,
+                                                         std::memory_order_release);
+          }
+
+          concurrency_file->background_thread_waiter_cv.notify_all();
+        }
+
+        // Detach running thread because it will exit soon
+        std::unique_ptr<std::thread> background_flush_thread;
+        {
+          std::lock_guard<std::mutex> lock_guard_inner{concurrency_file->background_thread_lock};
+          background_flush_thread.swap(concurrency_file->background_flush_thread);
+        }
+        if (background_flush_thread && background_flush_thread->joinable())
+        {
+          background_flush_thread->detach();
+        }
+      }));
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
     }
-
-    std::shared_ptr<FileStats> concurrency_file = file_;
-    std::chrono::microseconds flush_interval    = options_.flush_interval;
-    file_->background_flush_thread.reset(new std::thread([concurrency_file, flush_interval]() {
-      std::chrono::system_clock::time_point last_free_job_timepoint =
-          std::chrono::system_clock::now();
-      std::size_t last_record_count = 0;
-
-      while (true)
-      {
-        std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-        // Exit flush thread if there is not data to flush more than one minute.
-        if (now - last_free_job_timepoint > std::chrono::minutes{1})
-        {
-          break;
-        }
-
-        if (concurrency_file->is_shutdown.load(std::memory_order_acquire))
-        {
-          break;
-        }
-
-        {
-          std::unique_lock<std::mutex> lk(concurrency_file->background_thread_waker_lock);
-          concurrency_file->background_thread_waker_cv.wait_for(lk, flush_interval);
-        }
-
-        {
-          std::size_t current_record_count =
-              concurrency_file->record_count.load(std::memory_order_acquire);
-          std::lock_guard<std::mutex> lock_guard{concurrency_file->file_lock};
-          if (current_record_count != last_record_count)
-          {
-            last_record_count       = current_record_count;
-            last_free_job_timepoint = std::chrono::system_clock::now();
-          }
-
-          if (concurrency_file->current_file)
-          {
-            fflush(concurrency_file->current_file.get());
-          }
-
-          concurrency_file->flushed_record_count.store(current_record_count,
-                                                       std::memory_order_release);
-        }
-
-        concurrency_file->background_thread_waiter_cv.notify_all();
-      }
-
-      // Detach running thread because it will exit soon
-      std::unique_ptr<std::thread> background_flush_thread;
-      {
-        std::lock_guard<std::mutex> lock_guard_inner{concurrency_file->background_thread_lock};
-        background_flush_thread.swap(concurrency_file->background_flush_thread);
-      }
-      if (background_flush_thread && background_flush_thread->joinable())
-      {
-        background_flush_thread->detach();
-      }
-    }));
+    catch (std::exception &e)
+    {
+      OTEL_INTERNAL_LOG_WARN("[OTLP FILE Client] Try to spawn background but got a exception: "
+                             << e.what() << ".Data writing may experience some delays.");
+    }
+    catch (...)
+    {
+      OTEL_INTERNAL_LOG_WARN(
+          "[OTLP FILE Client] Try to spawn background but got a unknown exception.Data writing may "
+          "experience some delays.");
+    }
+#endif
   }
 
 private:
@@ -1513,7 +1539,7 @@ private:
   std::shared_ptr<FileStats> file_;
 
   std::atomic<bool> is_initialized_;
-  std::time_t check_file_path_interval_;
+  std::time_t check_file_path_interval_{0};
 };
 
 class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileOstreamBackend : public OtlpFileAppender
@@ -1542,7 +1568,7 @@ private:
 };
 
 OtlpFileClient::OtlpFileClient(OtlpFileClientOptions &&options)
-    : is_shutdown_(false), options_(options)
+    : is_shutdown_(false), options_(std::move(options))
 {
   if (nostd::holds_alternative<OtlpFileClientFileSystemOptions>(options_.backend_options))
   {

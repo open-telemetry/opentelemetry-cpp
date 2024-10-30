@@ -1,11 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/context/context.h"
-
-#include <map>
-
 #include <gtest/gtest.h>
+#include <stdint.h>
+#include <map>
+#include <string>
+
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context_value.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
 
 using namespace opentelemetry;
 
@@ -105,8 +110,8 @@ TEST(ContextTest, ContextCopyOperator)
       {"foo_key", static_cast<int64_t>(456)},
       {"other_key", static_cast<int64_t>(789)}};
 
-  context::Context test_context   = context::Context(test_map);
-  context::Context copied_context = test_context;
+  context::Context test_context          = context::Context(test_map);
+  const context::Context &copied_context = test_context;
 
   EXPECT_EQ(nostd::get<int64_t>(copied_context.GetValue("test_key")), 123);
   EXPECT_EQ(nostd::get<int64_t>(copied_context.GetValue("foo_key")), 456);
@@ -135,7 +140,7 @@ TEST(ContextTest, ContextCopyCompare)
 {
   std::map<std::string, context::ContextValue> map_test = {{"test_key", static_cast<int64_t>(123)}};
   context::Context context_test                         = context::Context(map_test);
-  context::Context copied_test                          = context_test;
+  const context::Context &copied_test                   = context_test;
   EXPECT_TRUE(context_test == copied_test);
 }
 

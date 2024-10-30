@@ -10,6 +10,7 @@ receivers:
   otlp:
     protocols:
       http:
+        endpoint: 0.0.0.0:4318
         tls:
           ca_file: ../cert/ca.pem
           cert_file: ../cert/server_cert.pem
@@ -28,12 +29,12 @@ processors:
     check_interval: 5s
 
 exporters:
-  logging:
-    loglevel: debug
+  debug:
+    verbosity: detailed
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [logging]
+      exporters: [debug]

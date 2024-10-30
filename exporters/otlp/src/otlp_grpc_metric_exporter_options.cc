@@ -11,6 +11,7 @@ namespace otlp
 {
 
 OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions()
+    : aggregation_temporality(PreferredAggregationTemporality::kCumulative)
 {
   endpoint                    = GetOtlpDefaultGrpcMetricsEndpoint();
   use_ssl_credentials         = !GetOtlpDefaultGrpcMetricsIsInsecure(); /* negation intended. */
@@ -27,8 +28,6 @@ OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions()
   timeout    = GetOtlpDefaultMetricsTimeout();
   metadata   = GetOtlpDefaultMetricsHeaders();
   user_agent = GetOtlpDefaultUserAgent();
-
-  aggregation_temporality = PreferredAggregationTemporality::kCumulative;
 
   max_threads = 0;
 

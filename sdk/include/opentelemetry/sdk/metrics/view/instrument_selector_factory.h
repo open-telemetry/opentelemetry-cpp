@@ -3,17 +3,18 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
-
-class InstrumentSelector;
 
 class OPENTELEMETRY_EXPORT InstrumentSelectorFactory
 {

@@ -1,13 +1,30 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+// NOLINTNEXTLINE
 #define _WINSOCKAPI_  // stops including winsock.h
-#include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
-#include <mutex>
+
+#include <stdint.h>
+#include <atomic>
+#include <chrono>
+#include <memory>
+#include <ostream>
+#include <string>
+#include <utility>
+
+#include "nlohmann/json.hpp"
+
 #include "opentelemetry/exporters/zipkin/recordable.h"
+#include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
+#include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
-#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/version.h"
 
 namespace http_client = opentelemetry::ext::http::client;
 
@@ -34,9 +51,11 @@ ZipkinExporter::ZipkinExporter() : options_(ZipkinExporterOptions()), url_parser
 
 ZipkinExporter::ZipkinExporter(
     std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> http_client)
-    : options_(ZipkinExporterOptions()), url_parser_(options_.endpoint)
+    : options_(ZipkinExporterOptions()),
+      http_client_(std::move(http_client)),
+      url_parser_(options_.endpoint)
 {
-  http_client_ = http_client;
+
   InitializeLocalEndpoint();
 }
 
@@ -78,7 +97,7 @@ sdk::common::ExportResult ZipkinExporter::Export(
   http_client::Body body_v(body_s.begin(), body_s.end());
   auto result = http_client_->PostNoSsl(url_parser_.url_, body_v, options_.headers);
   if (result &&
-      (result.GetResponse().GetStatusCode() == 200 || result.GetResponse().GetStatusCode() == 202))
+      (result.GetResponse().GetStatusCode() >= 200 && result.GetResponse().GetStatusCode() <= 299))
   {
     return sdk::common::ExportResult::kSuccess;
   }
@@ -90,7 +109,6 @@ sdk::common::ExportResult ZipkinExporter::Export(
     }
     return sdk::common::ExportResult::kFailure;
   }
-  return sdk::common::ExportResult::kSuccess;
 }
 
 void ZipkinExporter::InitializeLocalEndpoint()
