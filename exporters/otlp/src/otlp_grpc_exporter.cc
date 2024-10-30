@@ -43,9 +43,9 @@ OtlpGrpcExporter::OtlpGrpcExporter(
 }
 
 OtlpGrpcExporter::OtlpGrpcExporter(const OtlpGrpcExporterOptions &options,
-                                   nostd::shared_ptr<OtlpGrpcClient> client)
+                                   const std::shared_ptr<OtlpGrpcClient> &client)
     : options_(options),
-      client_(std::move(client)),
+      client_(client),
       client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard())
 {
   client_->AddReference(*client_reference_guard_, options_);
@@ -55,9 +55,9 @@ OtlpGrpcExporter::OtlpGrpcExporter(const OtlpGrpcExporterOptions &options,
 
 OtlpGrpcExporter::OtlpGrpcExporter(
     std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub,
-    nostd::shared_ptr<OtlpGrpcClient> client)
+    const std::shared_ptr<OtlpGrpcClient> &client)
     : options_(OtlpGrpcExporterOptions()),
-      client_(std::move(client)),
+      client_(client),
       client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
       trace_service_stub_(std::move(stub))
 {
@@ -82,7 +82,7 @@ std::unique_ptr<sdk::trace::Recordable> OtlpGrpcExporter::MakeRecordable() noexc
 sdk::common::ExportResult OtlpGrpcExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
-  nostd::shared_ptr<OtlpGrpcClient> client = client_;
+  std::shared_ptr<OtlpGrpcClient> client = client_;
   if (isShutdown() || !client)
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP gRPC] Exporting " << spans.size()
@@ -170,7 +170,7 @@ bool OtlpGrpcExporter::ForceFlush(
     OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
   // Maybe already shutdown, we need to keep thread-safety here.
-  nostd::shared_ptr<OtlpGrpcClient> client = client_;
+  std::shared_ptr<OtlpGrpcClient> client = client_;
   if (!client)
   {
     return true;
@@ -183,7 +183,7 @@ bool OtlpGrpcExporter::Shutdown(
 {
   is_shutdown_ = true;
   // Maybe already shutdown, we need to keep thread-safety here.
-  nostd::shared_ptr<OtlpGrpcClient> client;
+  std::shared_ptr<OtlpGrpcClient> client;
   client.swap(client_);
   if (!client)
   {
@@ -197,7 +197,7 @@ bool OtlpGrpcExporter::isShutdown() const noexcept
   return is_shutdown_;
 }
 
-const nostd::shared_ptr<OtlpGrpcClient> &OtlpGrpcExporter::GetClient() const noexcept
+const std::shared_ptr<OtlpGrpcClient> &OtlpGrpcExporter::GetClient() const noexcept
 {
   return client_;
 }

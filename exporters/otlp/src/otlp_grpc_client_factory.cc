@@ -12,15 +12,14 @@ namespace exporter
 namespace otlp
 {
 
-nostd::shared_ptr<OtlpGrpcClient> OtlpGrpcClientFactory::Create(
-    const OtlpGrpcClientOptions &options)
+std::shared_ptr<OtlpGrpcClient> OtlpGrpcClientFactory::Create(const OtlpGrpcClientOptions &options)
 {
-  return nostd::shared_ptr<OtlpGrpcClient>(new OtlpGrpcClient(options));
+  return std::make_shared<OtlpGrpcClient>(options);
 }
 
-nostd::shared_ptr<OtlpGrpcClientReferenceGuard> OtlpGrpcClientFactory::CreateReferenceGuard()
+std::shared_ptr<OtlpGrpcClientReferenceGuard> OtlpGrpcClientFactory::CreateReferenceGuard()
 {
-  return nostd::shared_ptr<OtlpGrpcClientReferenceGuard>(new OtlpGrpcClientReferenceGuard());
+  return std::make_shared<OtlpGrpcClientReferenceGuard>();
 }
 
 }  // namespace otlp

@@ -39,7 +39,7 @@ public:
    */
   static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create(
       const OtlpGrpcExporterOptions &options,
-      nostd::shared_ptr<OtlpGrpcClient> client);
+      const std::shared_ptr<OtlpGrpcClient> &client);
 };
 
 }  // namespace otlp

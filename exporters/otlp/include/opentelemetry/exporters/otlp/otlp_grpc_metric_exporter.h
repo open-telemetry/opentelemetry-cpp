@@ -47,7 +47,7 @@ public:
    * @param client the gRPC client to use
    */
   OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptions &options,
-                         nostd::shared_ptr<OtlpGrpcClient> client);
+                         const std::shared_ptr<OtlpGrpcClient> &client);
 
   /**
    * Create an OtlpGrpcMetricExporter using the given options.
@@ -78,14 +78,14 @@ public:
    *
    * @return return binded gRPC client
    */
-  const nostd::shared_ptr<OtlpGrpcClient> &GetClient() const noexcept;
+  const std::shared_ptr<OtlpGrpcClient> &GetClient() const noexcept;
 
 private:
   // The configuration options associated with this exporter.
   const OtlpGrpcMetricExporterOptions options_;
 
-  nostd::shared_ptr<OtlpGrpcClient> client_;
-  nostd::shared_ptr<OtlpGrpcClientReferenceGuard> client_reference_guard_;
+  std::shared_ptr<OtlpGrpcClient> client_;
+  std::shared_ptr<OtlpGrpcClientReferenceGuard> client_reference_guard_;
 
   // Aggregation Temporality selector
   const sdk::metrics::AggregationTemporalitySelector aggregation_temporality_selector_;
@@ -94,7 +94,7 @@ private:
   friend class OtlpGrpcMetricExporterTestPeer;
 
   // Store service stub internally. Useful for testing.
-  nostd::shared_ptr<proto::collector::metrics::v1::MetricsService::StubInterface>
+  std::shared_ptr<proto::collector::metrics::v1::MetricsService::StubInterface>
       metrics_service_stub_;
 
   /**
@@ -113,7 +113,7 @@ private:
    */
   OtlpGrpcMetricExporter(
       std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub,
-      nostd::shared_ptr<OtlpGrpcClient> client);
+      const std::shared_ptr<OtlpGrpcClient> &client);
 
   std::atomic<bool> is_shutdown_{false};
   bool isShutdown() const noexcept;

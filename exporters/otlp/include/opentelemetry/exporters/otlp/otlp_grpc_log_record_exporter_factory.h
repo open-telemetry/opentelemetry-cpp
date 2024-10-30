@@ -37,7 +37,7 @@ public:
    */
   static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create(
       const OtlpGrpcLogRecordExporterOptions &options,
-      nostd::shared_ptr<OtlpGrpcClient> client);
+      const std::shared_ptr<OtlpGrpcClient> &client);
 };
 
 }  // namespace otlp

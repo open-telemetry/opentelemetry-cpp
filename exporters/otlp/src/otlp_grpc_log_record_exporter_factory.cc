@@ -30,10 +30,10 @@ OtlpGrpcLogRecordExporterFactory::Create(const OtlpGrpcLogRecordExporterOptions 
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
 OtlpGrpcLogRecordExporterFactory::Create(const OtlpGrpcLogRecordExporterOptions &options,
-                                         nostd::shared_ptr<OtlpGrpcClient> client)
+                                         const std::shared_ptr<OtlpGrpcClient> &client)
 {
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> exporter(
-      new OtlpGrpcLogRecordExporter(options, std::move(client)));
+      new OtlpGrpcLogRecordExporter(options, client));
   return exporter;
 }
 

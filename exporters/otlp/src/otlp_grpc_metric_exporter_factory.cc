@@ -30,10 +30,10 @@ OtlpGrpcMetricExporterFactory::Create(const OtlpGrpcMetricExporterOptions &optio
 
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
 OtlpGrpcMetricExporterFactory::Create(const OtlpGrpcMetricExporterOptions &options,
-                                      nostd::shared_ptr<OtlpGrpcClient> client)
+                                      const std::shared_ptr<OtlpGrpcClient> &client)
 {
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter(
-      new OtlpGrpcMetricExporter(options, std::move(client)));
+      new OtlpGrpcMetricExporter(options, client));
   return exporter;
 }
 

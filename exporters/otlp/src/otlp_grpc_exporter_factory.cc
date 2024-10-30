@@ -29,10 +29,10 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcExporterFactory
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcExporterFactory::Create(
     const OtlpGrpcExporterOptions &options,
-    nostd::shared_ptr<OtlpGrpcClient> client)
+    const std::shared_ptr<OtlpGrpcClient> &client)
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter(
-      new OtlpGrpcExporter(options, std::move(client)));
+      new OtlpGrpcExporter(options, client));
   return exporter;
 }
 

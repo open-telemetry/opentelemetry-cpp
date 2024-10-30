@@ -26,9 +26,9 @@ public:
   /**
    * Create an OtlpGrpcClient using all default options.
    */
-  static nostd::shared_ptr<OtlpGrpcClient> Create(const OtlpGrpcClientOptions &options);
+  static std::shared_ptr<OtlpGrpcClient> Create(const OtlpGrpcClientOptions &options);
 
-  static nostd::shared_ptr<OtlpGrpcClientReferenceGuard> CreateReferenceGuard();
+  static std::shared_ptr<OtlpGrpcClientReferenceGuard> CreateReferenceGuard();
 };
 
 }  // namespace otlp

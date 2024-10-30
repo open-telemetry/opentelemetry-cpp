@@ -39,7 +39,7 @@ public:
    */
   static std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Create(
       const OtlpGrpcMetricExporterOptions &options,
-      nostd::shared_ptr<OtlpGrpcClient> client);
+      const std::shared_ptr<OtlpGrpcClient> &client);
 };
 
 }  // namespace otlp

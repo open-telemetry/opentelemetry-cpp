@@ -196,7 +196,7 @@ public:
 
   std::unique_ptr<sdk::logs::LogRecordExporter> GetExporter(
       std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> &stub_interface,
-      nostd::shared_ptr<OtlpGrpcClient> client)
+      const std::shared_ptr<OtlpGrpcClient> &client)
   {
     return std::unique_ptr<sdk::logs::LogRecordExporter>(
         new OtlpGrpcLogRecordExporter(std::move(stub_interface), std::move(client)));
@@ -204,7 +204,7 @@ public:
 
   std::unique_ptr<sdk::trace::SpanExporter> GetExporter(
       std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> &stub_interface,
-      nostd::shared_ptr<OtlpGrpcClient> client)
+      const std::shared_ptr<OtlpGrpcClient> &client)
   {
     return std::unique_ptr<sdk::trace::SpanExporter>(
         new OtlpGrpcExporter(std::move(stub_interface), std::move(client)));
@@ -359,7 +359,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
 // Create spans, let processor call Export() and share client object between trace and logs
 TEST_F(OtlpGrpcLogRecordExporterTestPeer, ShareClientTest)
 {
-  nostd::shared_ptr<OtlpGrpcClient> shared_client =
+  std::shared_ptr<OtlpGrpcClient> shared_client =
       OtlpGrpcClientFactory::Create(OtlpGrpcLogRecordExporterOptions());
 
   auto mock_stub = new OtlpMockLogsServiceStub();

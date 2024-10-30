@@ -48,9 +48,9 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
 }
 
 OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptions &options,
-                                               nostd::shared_ptr<OtlpGrpcClient> client)
+                                               const std::shared_ptr<OtlpGrpcClient> &client)
     : options_(options),
-      client_(std::move(client)),
+      client_(client),
       client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard())
 {
   client_->AddReference(*client_reference_guard_, options_);
@@ -60,9 +60,9 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptio
 
 OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
     std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub,
-    nostd::shared_ptr<OtlpGrpcClient> client)
+    const std::shared_ptr<OtlpGrpcClient> &client)
     : options_(OtlpGrpcMetricExporterOptions()),
-      client_(std::move(client)),
+      client_(client),
       client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
       metrics_service_stub_(std::move(stub))
 {
@@ -88,7 +88,7 @@ sdk::metrics::AggregationTemporality OtlpGrpcMetricExporter::GetAggregationTempo
 opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
     const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept
 {
-  nostd::shared_ptr<OtlpGrpcClient> client = client_;
+  std::shared_ptr<OtlpGrpcClient> client = client_;
   if (isShutdown() || !client)
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP METRICS gRPC] Exporting "
@@ -178,7 +178,7 @@ bool OtlpGrpcMetricExporter::ForceFlush(
     OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
   // Maybe already shutdown, we need to keep thread-safety here.
-  nostd::shared_ptr<OtlpGrpcClient> client = client_;
+  std::shared_ptr<OtlpGrpcClient> client = client_;
   if (!client)
   {
     return true;
@@ -191,7 +191,7 @@ bool OtlpGrpcMetricExporter::Shutdown(
 {
   is_shutdown_ = true;
   // Maybe already shutdown, we need to keep thread-safety here.
-  nostd::shared_ptr<OtlpGrpcClient> client;
+  std::shared_ptr<OtlpGrpcClient> client;
   client.swap(client_);
   if (!client)
   {
@@ -205,7 +205,7 @@ bool OtlpGrpcMetricExporter::isShutdown() const noexcept
   return is_shutdown_;
 }
 
-const nostd::shared_ptr<OtlpGrpcClient> &OtlpGrpcMetricExporter::GetClient() const noexcept
+const std::shared_ptr<OtlpGrpcClient> &OtlpGrpcMetricExporter::GetClient() const noexcept
 {
   return client_;
 }

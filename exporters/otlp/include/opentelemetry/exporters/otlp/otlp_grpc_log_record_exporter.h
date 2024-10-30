@@ -48,7 +48,7 @@ public:
    * @param client the gRPC client to use
    */
   OtlpGrpcLogRecordExporter(const OtlpGrpcLogRecordExporterOptions &options,
-                            nostd::shared_ptr<OtlpGrpcClient> client);
+                            const std::shared_ptr<OtlpGrpcClient> &client);
 
   /**
    * Create an OtlpGrpcLogRecordExporter with user specified options.
@@ -93,20 +93,20 @@ public:
    *
    * @return return binded gRPC client
    */
-  const nostd::shared_ptr<OtlpGrpcClient> &GetClient() const noexcept;
+  const std::shared_ptr<OtlpGrpcClient> &GetClient() const noexcept;
 
 private:
   // Configuration options for the exporter
   const OtlpGrpcLogRecordExporterOptions options_;
 
-  nostd::shared_ptr<OtlpGrpcClient> client_;
-  nostd::shared_ptr<OtlpGrpcClientReferenceGuard> client_reference_guard_;
+  std::shared_ptr<OtlpGrpcClient> client_;
+  std::shared_ptr<OtlpGrpcClientReferenceGuard> client_reference_guard_;
 
   // For testing
   friend class OtlpGrpcLogRecordExporterTestPeer;
 
   // Store service stub internally. Useful for testing.
-  nostd::shared_ptr<proto::collector::logs::v1::LogsService::StubInterface> log_service_stub_;
+  std::shared_ptr<proto::collector::logs::v1::LogsService::StubInterface> log_service_stub_;
 
   /**
    * Create an OtlpGrpcLogRecordExporter using the specified service stub.
@@ -124,7 +124,7 @@ private:
    */
   OtlpGrpcLogRecordExporter(
       std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub,
-      nostd::shared_ptr<OtlpGrpcClient> client);
+      const std::shared_ptr<OtlpGrpcClient> &client);
 
   std::atomic<bool> is_shutdown_{false};
   bool isShutdown() const noexcept;

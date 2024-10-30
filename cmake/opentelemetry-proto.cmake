@@ -331,8 +331,18 @@ set_target_version(opentelemetry_proto)
 set_target_properties(opentelemetry_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE
                                                      "")
 
-if(WITH_ABSEIL OR WITH_OTLP_GRPC)
+if(TARGET absl::bad_variant_access)
   target_link_libraries(opentelemetry_proto PUBLIC absl::bad_variant_access)
+endif()
+
+if(NOT Protobuf_INCLUDE_DIRS AND TARGET protobuf::libprotobuf)
+  get_target_property(Protobuf_INCLUDE_DIRS protobuf::libprotobuf
+                      INTERFACE_INCLUDE_DIRECTORIES)
+endif()
+if(Protobuf_INCLUDE_DIRS)
+  target_include_directories(
+    opentelemetry_proto BEFORE
+    PUBLIC "$<BUILD_INTERFACE:${Protobuf_INCLUDE_DIRS}")
 endif()
 
 if(WITH_OTLP_GRPC)
@@ -356,7 +366,7 @@ if(WITH_OTLP_GRPC)
                       INTERFACE_INCLUDE_DIRECTORIES)
   if(GRPC_INCLUDE_DIRECTORY)
     target_include_directories(
-      opentelemetry_proto_grpc
+      opentelemetry_proto_grpc BEFORE
       PUBLIC "$<BUILD_INTERFACE:${GRPC_INCLUDE_DIRECTORY}>")
   endif()
 endif()
@@ -385,8 +395,6 @@ endif()
 if(TARGET protobuf::libprotobuf)
   target_link_libraries(opentelemetry_proto PUBLIC protobuf::libprotobuf)
 else() # cmake 3.8 or lower
-  target_include_directories(opentelemetry_proto
-                             PUBLIC ${Protobuf_INCLUDE_DIRS})
   target_link_libraries(opentelemetry_proto PUBLIC ${Protobuf_LIBRARIES})
 endif()
 
