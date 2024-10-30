@@ -66,7 +66,6 @@ namespace nostd
 {
 #  ifdef HAVE_ABSEIL
 using absl::bad_variant_access;
-#  endif
 using absl::get;
 using absl::get_if;
 using absl::holds_alternative;
@@ -75,6 +74,16 @@ using absl::variant;
 using absl::variant_alternative_t;
 using absl::variant_size;
 using absl::visit;
+#  else
+using absl::OTABSL_OPTION_NAMESPACE_NAME::get;
+using absl::OTABSL_OPTION_NAMESPACE_NAME::get_if;
+using absl::OTABSL_OPTION_NAMESPACE_NAME::holds_alternative;
+using absl::OTABSL_OPTION_NAMESPACE_NAME::monostate;
+using absl::OTABSL_OPTION_NAMESPACE_NAME::variant;
+using absl::OTABSL_OPTION_NAMESPACE_NAME::variant_alternative_t;
+using absl::OTABSL_OPTION_NAMESPACE_NAME::variant_size;
+using absl::OTABSL_OPTION_NAMESPACE_NAME::visit;
+#  endif
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 

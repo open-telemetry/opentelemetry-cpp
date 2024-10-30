@@ -47,7 +47,7 @@ if(WITH_OTLP_GRPC)
                       INTERFACE_INCLUDE_DIRECTORIES)
   if(GRPC_INCLUDE_DIRECTORY)
     target_include_directories(
-      opentelemetry_exporter_otlp_grpc_client
+      opentelemetry_exporter_otlp_grpc_client BEFORE
       PUBLIC "$<BUILD_INTERFACE:${GRPC_INCLUDE_DIRECTORY}>")
   endif()
   target_include_directories(
