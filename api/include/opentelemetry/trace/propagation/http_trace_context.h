@@ -87,12 +87,20 @@ public:
 
 private:
   static constexpr uint8_t kInvalidVersion = 0xFF;
+  static constexpr uint8_t kDefaultAssumedVersion = 0x00;
 
   static bool IsValidVersion(nostd::string_view version_hex)
   {
     uint8_t version;
     detail::HexToBinary(version_hex, &version, sizeof(version));
     return version != kInvalidVersion;
+  }
+
+  static bool IsHigherVersion(nostd::string_view version_hex)
+  {
+    uint8_t version;
+    detail::HexToBinary(version_hex, &version, sizeof(version));
+    return version > kDefaultAssumedVersion;
   }
 
   static void InjectImpl(context::propagation::TextMapCarrier &carrier,
@@ -122,11 +130,6 @@ private:
   static SpanContext ExtractContextFromTraceHeaders(nostd::string_view trace_parent,
                                                     nostd::string_view trace_state)
   {
-    if (trace_parent.size() != kTraceParentSize)
-    {
-      return SpanContext::GetInvalid();
-    }
-
     std::array<nostd::string_view, 4> fields{};
     if (detail::SplitString(trace_parent, '-', fields.data(), 4) != 4)
     {
@@ -151,6 +154,16 @@ private:
     }
 
     if (!IsValidVersion(version_hex))
+    {
+      return SpanContext::GetInvalid();
+    }
+
+    if (IsHigherVersion(version_hex) && trace_parent.size() < kTraceParentSize)
+    {
+      return SpanContext::GetInvalid();
+    }
+
+    if (!IsHigherVersion(version_hex) && trace_parent.size() != kTraceParentSize)
     {
       return SpanContext::GetInvalid();
     }
