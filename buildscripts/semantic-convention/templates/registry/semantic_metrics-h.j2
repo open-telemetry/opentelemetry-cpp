@@ -33,7 +33,7 @@
     - Some instruments are not supported in the SDK.
       For these, we still generate the code,
       protected with OPENTELEMETRY_LATER (which should be undefined).
-    - Using #ifdef OPENTELEMETRY_LATER is prefered to #if 0,
+    - Using #ifdef OPENTELEMETRY_LATER is preferred to #if 0,
       so that clang format generates clean code.
 #}
 {# ========================================================================== #}
@@ -147,12 +147,21 @@ OPENTELEMETRY_DEPRECATED
 {{ [metric.brief, "\n", metric.note, "\n", metric.instrument] | comment(ident=2) }}
     {% endif %}
 static constexpr const char *{{v_metric_name}} = "{{metric.id}}";
+    {% if metric is deprecated %}
+OPENTELEMETRY_DEPRECATED
+    {% endif %}
 static constexpr const char *{{descr}} = "{{metric.brief}}";
+    {% if metric is deprecated %}
+OPENTELEMETRY_DEPRECATED
+    {% endif %}
 static constexpr const char *{{unit}} = "{{metric.unit}}";
 
     {% if sync_support is false %}
 #ifdef OPENTELEMETRY_LATER
 // Unsupported: Sync {{ metric.instrument }}
+    {% endif %}
+    {% if metric is deprecated %}
+OPENTELEMETRY_DEPRECATED
     {% endif %}
 static inline nostd::unique_ptr<{{sync_int64_type-}}>
 CreateSyncInt64{{f_metric_name-}}(metrics::Meter *meter)
@@ -163,6 +172,9 @@ CreateSyncInt64{{f_metric_name-}}(metrics::Meter *meter)
     {{unit}});
 }
 
+    {% if metric is deprecated %}
+OPENTELEMETRY_DEPRECATED
+    {% endif %}
 static inline nostd::unique_ptr<{{sync_double_type-}}>
 CreateSyncDouble{{f_metric_name-}}(metrics::Meter *meter)
 {
@@ -179,6 +191,9 @@ CreateSyncDouble{{f_metric_name-}}(metrics::Meter *meter)
 #ifdef OPENTELEMETRY_LATER
 // Unsupported: Async {{ metric.instrument }}
     {% endif %}
+    {% if metric is deprecated %}
+OPENTELEMETRY_DEPRECATED
+    {% endif %}
 static inline nostd::shared_ptr<{{async_type-}}>
 CreateAsyncInt64{{f_metric_name-}}(metrics::Meter *meter)
 {
@@ -188,6 +203,9 @@ CreateAsyncInt64{{f_metric_name-}}(metrics::Meter *meter)
     {{unit}});
 }
 
+    {% if metric is deprecated %}
+OPENTELEMETRY_DEPRECATED
+    {% endif %}
 static inline nostd::shared_ptr<{{async_type-}}>
 CreateAsyncDouble{{f_metric_name-}}(metrics::Meter *meter)
 {

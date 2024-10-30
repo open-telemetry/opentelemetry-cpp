@@ -215,10 +215,13 @@ CreateAsyncDoubleMetricMessagingProcessDuration(metrics::Meter *meter)
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kMetricMessagingProcessMessages = "metric.messaging.process.messages";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricMessagingProcessMessages =
     "Deprecated. Use `messaging.client.consumed.messages` instead.";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *unitMetricMessagingProcessMessages = "{message}";
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
 CreateSyncInt64MetricMessagingProcessMessages(metrics::Meter *meter)
 {
@@ -227,6 +230,7 @@ CreateSyncInt64MetricMessagingProcessMessages(metrics::Meter *meter)
                                     unitMetricMessagingProcessMessages);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::Counter<double>>
 CreateSyncDoubleMetricMessagingProcessMessages(metrics::Meter *meter)
 {
@@ -235,6 +239,7 @@ CreateSyncDoubleMetricMessagingProcessMessages(metrics::Meter *meter)
                                     unitMetricMessagingProcessMessages);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricMessagingProcessMessages(metrics::Meter *meter)
 {
@@ -243,6 +248,7 @@ CreateAsyncInt64MetricMessagingProcessMessages(metrics::Meter *meter)
                                              unitMetricMessagingProcessMessages);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricMessagingProcessMessages(metrics::Meter *meter)
 {
@@ -261,10 +267,13 @@ CreateAsyncDoubleMetricMessagingProcessMessages(metrics::Meter *meter)
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kMetricMessagingPublishDuration = "metric.messaging.publish.duration";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricMessagingPublishDuration =
     "Deprecated. Use `messaging.client.operation.duration` instead.";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *unitMetricMessagingPublishDuration = "s";
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
 CreateSyncInt64MetricMessagingPublishDuration(metrics::Meter *meter)
 {
@@ -273,6 +282,7 @@ CreateSyncInt64MetricMessagingPublishDuration(metrics::Meter *meter)
                                       unitMetricMessagingPublishDuration);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::Histogram<double>>
 CreateSyncDoubleMetricMessagingPublishDuration(metrics::Meter *meter)
 {
@@ -283,6 +293,7 @@ CreateSyncDoubleMetricMessagingPublishDuration(metrics::Meter *meter)
 
 #ifdef OPENTELEMETRY_LATER
 // Unsupported: Async histogram
+OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricMessagingPublishDuration(metrics::Meter *meter)
 {
@@ -291,6 +302,7 @@ CreateAsyncInt64MetricMessagingPublishDuration(metrics::Meter *meter)
                                                unitMetricMessagingPublishDuration);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricMessagingPublishDuration(metrics::Meter *meter)
 {
@@ -310,10 +322,13 @@ CreateAsyncDoubleMetricMessagingPublishDuration(metrics::Meter *meter)
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kMetricMessagingPublishMessages = "metric.messaging.publish.messages";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricMessagingPublishMessages =
     "Deprecated. Use `messaging.client.produced.messages` instead.";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *unitMetricMessagingPublishMessages = "{message}";
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
 CreateSyncInt64MetricMessagingPublishMessages(metrics::Meter *meter)
 {
@@ -322,6 +337,7 @@ CreateSyncInt64MetricMessagingPublishMessages(metrics::Meter *meter)
                                     unitMetricMessagingPublishMessages);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::Counter<double>>
 CreateSyncDoubleMetricMessagingPublishMessages(metrics::Meter *meter)
 {
@@ -330,6 +346,7 @@ CreateSyncDoubleMetricMessagingPublishMessages(metrics::Meter *meter)
                                     unitMetricMessagingPublishMessages);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricMessagingPublishMessages(metrics::Meter *meter)
 {
@@ -338,6 +355,7 @@ CreateAsyncInt64MetricMessagingPublishMessages(metrics::Meter *meter)
                                              unitMetricMessagingPublishMessages);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricMessagingPublishMessages(metrics::Meter *meter)
 {
@@ -356,10 +374,13 @@ CreateAsyncDoubleMetricMessagingPublishMessages(metrics::Meter *meter)
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kMetricMessagingReceiveDuration = "metric.messaging.receive.duration";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricMessagingReceiveDuration =
     "Deprecated. Use `messaging.client.operation.duration` instead.";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *unitMetricMessagingReceiveDuration = "s";
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
 CreateSyncInt64MetricMessagingReceiveDuration(metrics::Meter *meter)
 {
@@ -368,6 +389,7 @@ CreateSyncInt64MetricMessagingReceiveDuration(metrics::Meter *meter)
                                       unitMetricMessagingReceiveDuration);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::Histogram<double>>
 CreateSyncDoubleMetricMessagingReceiveDuration(metrics::Meter *meter)
 {
@@ -378,6 +400,7 @@ CreateSyncDoubleMetricMessagingReceiveDuration(metrics::Meter *meter)
 
 #ifdef OPENTELEMETRY_LATER
 // Unsupported: Async histogram
+OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricMessagingReceiveDuration(metrics::Meter *meter)
 {
@@ -386,6 +409,7 @@ CreateAsyncInt64MetricMessagingReceiveDuration(metrics::Meter *meter)
                                                unitMetricMessagingReceiveDuration);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricMessagingReceiveDuration(metrics::Meter *meter)
 {
@@ -405,10 +429,13 @@ CreateAsyncDoubleMetricMessagingReceiveDuration(metrics::Meter *meter)
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kMetricMessagingReceiveMessages = "metric.messaging.receive.messages";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricMessagingReceiveMessages =
     "Deprecated. Use `messaging.client.consumed.messages` instead.";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *unitMetricMessagingReceiveMessages = "{message}";
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
 CreateSyncInt64MetricMessagingReceiveMessages(metrics::Meter *meter)
 {
@@ -417,6 +444,7 @@ CreateSyncInt64MetricMessagingReceiveMessages(metrics::Meter *meter)
                                     unitMetricMessagingReceiveMessages);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::Counter<double>>
 CreateSyncDoubleMetricMessagingReceiveMessages(metrics::Meter *meter)
 {
@@ -425,6 +453,7 @@ CreateSyncDoubleMetricMessagingReceiveMessages(metrics::Meter *meter)
                                     unitMetricMessagingReceiveMessages);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricMessagingReceiveMessages(metrics::Meter *meter)
 {
@@ -433,6 +462,7 @@ CreateAsyncInt64MetricMessagingReceiveMessages(metrics::Meter *meter)
                                              unitMetricMessagingReceiveMessages);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricMessagingReceiveMessages(metrics::Meter *meter)
 {
