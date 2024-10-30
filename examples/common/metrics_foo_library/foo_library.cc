@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <chrono>
+#include <cmath>
 #include <map>
 #include <thread>
 #include <utility>
@@ -168,9 +169,10 @@ void foo_library::semconv_histogram_example()
   for (uint32_t i = 0; i < 20; ++i)
   {
     double val                                = (rand() % 700) + 1.1;
+    uint64_t int_val                          = std::llround(val);
     std::map<std::string, std::string> labels = get_random_attr();
     auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
-    histogram_counter->Record(val, labelkv, context);
+    histogram_counter->Record(int_val, labelkv, context);
     std::this_thread::sleep_for(std::chrono::milliseconds(250));
   }
 }
