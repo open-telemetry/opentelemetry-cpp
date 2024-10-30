@@ -35,20 +35,3 @@
 
 {% endmacro -%}
 
-{%- macro str_or_empty(str) -%}
-{% if str is none %}{{""}}{% else %}{{str}}{% endif %}
-{%- endmacro %}
-
-{%- macro remove_trailing_dots(str) -%}
-{%- if str[-1:] == '.' -%}{{ remove_trailing_dots(str[:-1]) }}{%- else -%}{{ str }}{%- endif -%}
-{%- endmacro -%}
-
-{%- macro comment_with_prefix(str, prefix) -%}
-{{remove_trailing_dots(str | trim(' \n')) | comment_with_prefix(prefix) | replace("\\", "\\\\")}}
-{%- endmacro %}
-
-{%- macro import_deprecated(semconv) -%}
-    {%- if (semconv | select("deprecated") | list | count > 0) or (ctx.filter == "any" and semconv | select("stable") | list | count > 0) -%}
-from deprecated import deprecated
-    {%- endif -%}
-{%- endmacro-%}

@@ -135,8 +135,7 @@ void foo_library::semconv_counter_example()
   auto provider = metrics_api::Provider::GetMeterProvider();
   opentelemetry::nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter("demo", "1.2.0");
   auto double_counter =
-      opentelemetry::semconv::container::CreateSyncDoubleMetricContainerDiskIo(
-          meter.get());
+      opentelemetry::semconv::container::CreateSyncDoubleMetricContainerDiskIo(meter.get());
 
   for (uint32_t i = 0; i < 20; ++i)
   {

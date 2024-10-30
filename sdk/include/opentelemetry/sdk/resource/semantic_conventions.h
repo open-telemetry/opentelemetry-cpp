@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// FIXME, DEBUG
-#error "Die"
-
 /*
   DO NOT EDIT, this is an Auto-generated file
   from buildscripts/semantic-convention/templates/SemanticAttributes.h.j2
