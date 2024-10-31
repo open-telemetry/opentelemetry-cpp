@@ -14,6 +14,21 @@ struct SplitStringTestData
   size_t max_count;
   std::vector<opentelemetry::nostd::string_view> splits;
   size_t expected_number_strings;
+
+  // When googletest registers parameterized tests, it uses this method to format the parameters.
+  // The default implementation prints hex dump of all bytes in the object. If there is any padding
+  // in these bytes, valgrind reports this as a warning - "Use of uninitialized bytes".
+  // See https://github.com/google/googletest/issues/3805.
+  friend void PrintTo(const SplitStringTestData& data, std::ostream* os) {
+    std::stringstream ss;
+    for (auto it = data.splits.begin(); it != data.splits.end(); it++) {
+      if (it != data.splits.begin()) {
+        ss << ",";
+      }
+      ss << *it;
+    }
+    *os << "(" << data.input << "," << data.separator << "," << data.max_count << "," << ss.str() << "," << data.expected_number_strings << ")";
+  }
 };
 
 const SplitStringTestData split_string_test_cases[] = {
