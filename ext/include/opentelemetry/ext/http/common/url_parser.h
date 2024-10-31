@@ -65,7 +65,7 @@ public:
         cpos = pos1 + 1;
       }
     }
-    pos          = url_.find_first_of(":", cpos);
+    pos          = FindPortPosition(url_, cpos);
     bool is_port = false;
     if (pos == std::string::npos)
     {
@@ -129,6 +129,40 @@ public:
     {
       query_ = std::string(url_.begin() + cpos, url_.begin() + url_.length());
     }
+  }
+
+private:
+  static std::string::size_type FindPortPosition(const std::string &url,
+                                                 std::string::size_type offset)
+  {
+    // @see https://www.rfc-editor.org/rfc/rfc3986#page-18
+    size_t sub_expression_counter = 0;
+    for (std::string::size_type i = offset; i < url.size(); ++i)
+    {
+      char c = url[i];
+      if (0 == sub_expression_counter && c == ':')
+      {
+        return i;
+      }
+
+      if (c == '[')
+      {
+        ++sub_expression_counter;
+      }
+      else if (c == ']')
+      {
+        if (sub_expression_counter > 0)
+        {
+          --sub_expression_counter;
+        }
+      }
+      else if (0 == sub_expression_counter && c == '/')
+      {
+        break;
+      }
+    }
+
+    return std::string::npos;
   }
 };
 

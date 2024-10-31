@@ -20,7 +20,7 @@ function install_prometheus_cpp_client
 function run_benchmarks
 {
   docker run -d --rm -it -p 4317:4317 -p 4318:4318 -v \
-    $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.38.0 \
+    $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.109.0 \
     --config=/cfg/opentelemetry-collector-config/config.dev.yaml
 
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
