@@ -56,6 +56,7 @@ inline size_t SplitString(nostd::string_view s,
 
   return filled;
 }
+
 }  // namespace detail
 }  // namespace propagation
 }  // namespace trace
