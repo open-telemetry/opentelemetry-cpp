@@ -86,7 +86,7 @@ public:
   }
 
 private:
-  static constexpr uint8_t kInvalidVersion = 0xFF;
+  static constexpr uint8_t kInvalidVersion        = 0xFF;
   static constexpr uint8_t kDefaultAssumedVersion = 0x00;
 
   static bool IsValidVersion(nostd::string_view version_hex)

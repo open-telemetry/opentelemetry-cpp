@@ -51,7 +51,7 @@ public:
   TextMapCarrierTest(std::map<std::string, std::string> &headers) : headers_(headers) {}
   nostd::string_view Get(nostd::string_view key) const noexcept override
   {
-    for(const auto& elem : headers_)
+    for (const auto &elem : headers_)
     {
       if (equalsIgnoreCase(elem.first, std::string(key)))
       {
