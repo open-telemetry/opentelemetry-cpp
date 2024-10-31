@@ -1,6 +1,17 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+# This file is the main file for weaver,
+# used to generate semantic conventions,
+# for opentelemetry-cpp.
+#
+# For doc on weaver:
+# https://github.com/open-telemetry/weaver
+#
+# For doc on the semantic conventions:
+# https://github.com/open-telemetry/semantic-conventions
+#
+
 params:
   # excluded namespaces will not be generated
   excluded_namespaces: [ios, aspnetcore, signalr, android, dotnet, jvm, kestrel, v8js, veightjs, go, nodejs]

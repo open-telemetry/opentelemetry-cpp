@@ -26,12 +26,17 @@
  * buildscripts/semantic-convention/templates/registry/semantic_attributes-h.j2
  */
 {# ========================================================================== #}
+{#
+    DESIGN NOTES:
+    - Use the debug flag to dump the semantic convention data
+      in the generated output, to inspect it.
+#}
+{# ========================================================================== #}
 
 {% set debug = false %}
 
 {% set file_name = ctx.output + (ctx.root_namespace | snake_case) ~ "_attributes.h" %}
 {{ template.set_file_name(file_name) }}
-{% import 'common.j2' as c %}
 
 {% set attributes = ctx.attributes | list %}
 {% set enum_attributes = attributes | select("enum") | rejectattr("name", "in", ctx.excluded_attributes) | list %}
@@ -45,7 +50,7 @@ k{{ attribute.name | pascal_case }}
 {% endmacro %}
 
 {% macro attribute_type(attribute) %}
-{{ attribute.type | enum_type | map_text("cpp_types", "FIXME") }}
+{{ attribute.type | enum_type | map_text("cpp_types") }}
 {% endmacro %}
 
 {% macro enum_namespace_name(attribute) %}
@@ -54,10 +59,6 @@ k{{ attribute.name | pascal_case }}
 
 {% macro enum_name(member) %}
 k{{ member.id | pascal_case }}
-{% endmacro %}
-
-{% macro stable_class_ref(const_name, separator) %}
-{{ctx.stable_package_name}}.{{ctx.root_namespace}}_attributes{{separator}}{{const_name}}
 {% endmacro %}
 
 {% set cpp_attribute_namespace = attribute_namespace(ctx) %}

@@ -42,7 +42,6 @@
 
 {% set file_name = ctx.output + (ctx.root_namespace | snake_case) ~ "_metrics.h" %}
 {{ template.set_file_name(file_name) }}
-{% import 'common.j2' as c %}
 
 {% set metrics = ctx.metrics | list %}
 
