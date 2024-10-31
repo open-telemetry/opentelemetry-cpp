@@ -9,5 +9,5 @@
 
 TEST(StringTest, SplitString)
 {
-  //TODO(psx95): Add tests
+  // TODO(psx95): Add tests
 }
