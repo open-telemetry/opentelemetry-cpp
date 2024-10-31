@@ -7,7 +7,7 @@
 
 #include "opentelemetry/nostd/string_view.h"
 
-TEST(StringTest, TrimStrings)
+TEST(StringTest, SplitString)
 {
   //TODO(psx95): Add tests
 }

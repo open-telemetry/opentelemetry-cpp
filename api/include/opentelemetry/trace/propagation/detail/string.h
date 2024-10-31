@@ -56,31 +56,6 @@ inline size_t SplitString(nostd::string_view s,
 
   return filled;
 }
-
-inline nostd::string_view TrimString(nostd::string_view s)
-{
-  size_t str_size = s.size();
-  size_t trimmed_str_start_pos = 0;
-  size_t trimmed_str_end_pos = 0;
-  bool start_pos_found = false;
-  for (size_t i = 0; i < str_size; i++)
-  {
-    if (!isspace(s[i]))
-    {
-      if (!start_pos_found)
-      {
-        trimmed_str_start_pos = i;
-        trimmed_str_end_pos = i;
-        start_pos_found = true;
-      } else
-      {
-        trimmed_str_end_pos = i;
-      }
-    }
-  }
-  return s.substr(trimmed_str_start_pos, trimmed_str_end_pos - trimmed_str_start_pos + 1);
-}
-
 }  // namespace detail
 }  // namespace propagation
 }  // namespace trace

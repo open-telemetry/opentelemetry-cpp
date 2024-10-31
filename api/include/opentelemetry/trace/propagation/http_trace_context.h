@@ -183,7 +183,7 @@ private:
   static SpanContext ExtractImpl(const context::propagation::TextMapCarrier &carrier)
   {
     // Get trace_parent after trimming the leading and trailing whitespaces
-    nostd::string_view trace_parent = detail::TrimString(carrier.Get(kTraceParent));
+    nostd::string_view trace_parent = common::StringUtil::Trim(carrier.Get(kTraceParent));
     nostd::string_view trace_state  = carrier.Get(kTraceState);
     if (trace_parent == "")
     {
