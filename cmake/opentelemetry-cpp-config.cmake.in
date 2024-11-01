@@ -69,7 +69,39 @@ set(OPENTELEMETRY_VERSION
 
 # ##############################################################################
 
-find_package(Threads)
+include(CMakeFindDependencyMacro)
+
+find_dependency(Threads)
+
+if(@WITH_ABSEIL@)
+  find_dependency(absl)
+endif()
+
+if(@WITH_OTLP_GRPC@)
+  find_dependency(gRPC)
+endif()
+
+if("@OpenTracing_FOUND@")
+  find_dependency(OpenTracing)
+endif()
+
+if("@prometheus-cpp_FOUND@")
+  find_dependency(prometheus-cpp)
+endif()
+
+if("@Protobuf_FOUND@" OR "@PROTOBUF_FOUND@")
+  find_dependency(Protobuf)
+endif()
+
+if (@WITH_HTTP_CLIENT_CURL@ AND NOT @BUILD_SHARED_LIBS@)
+  if("@CURL_FOUND@")
+    find_dependency(CURL)
+  endif()
+
+  if("@ZLIB_FOUND@")
+    find_dependency(ZLIB)
+  endif()
+endif()
 
 if(@WITH_ABSEIL@ OR @WITH_OTLP_GRPC@)
   find_package(absl CONFIG)
