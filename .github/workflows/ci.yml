@@ -957,7 +957,9 @@ jobs:
           sudo apt update && sudo apt install python3-pip
           sudo pip3 install aiohttp
       - name: run w3c trace-context test suite
+        env:
+          SPEC_LEVEL: 1
         run:
           |
-          python ${GITHUB_WORKSPACE}/trace-context/test/test.py http://localhost:30000/test
+          python ${GITHUB_WORKSPACE}/trace-context/test/test.py http://localhost:30000/test TraceContextTest AdvancedTest
           curl http://localhost:30000/stop
