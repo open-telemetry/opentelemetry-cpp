@@ -179,6 +179,7 @@ int main(int argc, char *argv[])
   constexpr char default_host[]   = "localhost";
   constexpr uint16_t default_port = 30000;
   uint16_t port;
+  std::atomic_bool stop_server(false);
 
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
@@ -225,16 +226,31 @@ int main(int argc, char *argv[])
         return 0;
       }};
 
+  testing::HttpRequestCallback stop_cb{
+      [&](testing::HttpRequest const & /*req*/, testing::HttpResponse &resp) {
+        std::cout << "Received request to stop server \n";
+        stop_server.store(true);
+        resp.code = 200;
+        return 0;
+      }};
+
   server["/test"] = test_cb;
+  server["/stop"] = stop_cb;
 
   // Start server
   server.start();
 
   std::cout << "Listening at http://" << default_host << ":" << port << "/test\n";
 
-  // Wait for console input
-  std::cin.get();
-
-  // Stop server
-  server.stop();
+  // Wait for signal to stop server
+  std::thread server_check([&stop_server, &server]() {
+    while (!stop_server.load())
+    {
+      // keep running the thread
+    }
+    // received signal to stop server
+    std::cout << "stopping server \n";
+    server.stop();
+  });
+  server_check.join();
 }
