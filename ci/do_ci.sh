@@ -393,6 +393,19 @@ elif [[ "$1" == "cmake.exporter.otprotocol.with_async_export.test" ]]; then
   make -j $(nproc)
   cd exporters/otlp && make test
   exit 0
+elif [[ "$1" == "cmake.w3c.trace-context.build-server" ]]; then
+  echo "Building w3c trace context test server"
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}"  \
+          -DBUILD_W3CTRACECONTEXT_TEST=ON \
+          -DCMAKE_CXX_STANDARD=${CXX_STANDARD} \
+          "${SRC_DIR}"
+  eval "$MAKE_COMMAND"
+  echo "currently at $(pwd)"
+  echo "${BUILD_DIR}"
+  ls -lah "${BUILD_DIR}/ext/test/w3c_tracecontext_test"
+  exit 0
 elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *

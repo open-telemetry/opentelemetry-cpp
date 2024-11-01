@@ -923,3 +923,40 @@ jobs:
     - name: run ./ci/docfx.cmd
       shell: cmd
       run: ./ci/docfx.cmd
+
+  w3c_trace_context_compliance_v1:
+    name: W3C Distributed Tracing Validation V1
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout open-telemetry/opentelemetry-cpp
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+      - name: setup
+        env:
+          CC: /usr/bin/gcc-14
+          CXX: /usr/bin/g++-14
+          PROTOBUF_VERSION: 21.12
+        run: |
+          sudo -E ./ci/setup_googletest.sh
+          sudo -E ./ci/setup_ci_environment.sh
+      - name: run w3c trace-context test server (background)
+        env:
+          CXX_STANDARD: '14'
+        run: |
+          ./ci/do_ci.sh cmake.w3c.trace-context.build-server
+          cd $HOME/build/ext/test/w3c_tracecontext_test
+          ./w3c_tracecontext_test &
+      - name: Checkout w3c/trace-context repo
+        uses: actions/checkout@v4
+        with:
+          repository: w3c/trace-context
+          path: trace-context
+      - name: install dependencies
+        run: |
+          sudo apt update && sudo apt install python3-pip
+          sudo pip3 install aiohttp
+      - name: run w3c trace-context test suite
+        run:
+          |
+          python ${GITHUB_WORKSPACE}/trace-context/test/test.py http://localhost:30000/test
