@@ -69,6 +69,8 @@ public:
     compression_ = compression;
   }
 
+  void EnableLogging(bool needs_to_log) noexcept override { needs_to_log_ = needs_to_log; };
+
 public:
   opentelemetry::ext::http::client::Method method_;
   opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
@@ -78,6 +80,7 @@ public:
   std::chrono::milliseconds timeout_ms_{5000};  // ms
   opentelemetry::ext::http::client::Compression compression_{
       opentelemetry::ext::http::client::Compression::kNone};
+  bool needs_to_log_{false};
 };
 
 class Response : public opentelemetry::ext::http::client::Response
