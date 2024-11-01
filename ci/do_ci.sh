@@ -402,9 +402,6 @@ elif [[ "$1" == "cmake.w3c.trace-context.build-server" ]]; then
           -DCMAKE_CXX_STANDARD=${CXX_STANDARD} \
           "${SRC_DIR}"
   eval "$MAKE_COMMAND"
-  echo "currently at $(pwd)"
-  echo "${BUILD_DIR}"
-  ls -lah "${BUILD_DIR}/ext/test/w3c_tracecontext_test"
   exit 0
 elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   cd "${BUILD_DIR}"

@@ -960,3 +960,4 @@ jobs:
         run:
           |
           python ${GITHUB_WORKSPACE}/trace-context/test/test.py http://localhost:30000/test
+          curl http://localhost:30000/stop
