@@ -649,6 +649,15 @@ CURLcode HttpOperation::Setup()
   curl_error_message_[0] = '\0';
   curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_ERRORBUFFER, curl_error_message_);
 
+// Support for custom debug function callback was added in version 7.9.6 so we guard against
+// exposing the default CURL output by keeping verbosity always disabled in lower versions.
+#if LIBCURL_VERSION_NUM < CURL_VERSION_BITS(7, 9, 6)
+  rc = SetCurlLongOption(CURLOPT_VERBOSE, 0L);
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
+#else
   rc = SetCurlLongOption(CURLOPT_VERBOSE, static_cast<long>(needs_to_log_ || kEnableCurlLogging));
   if (rc != CURLE_OK)
   {
@@ -661,6 +670,7 @@ CURLcode HttpOperation::Setup()
   {
     return rc;
   }
+#endif
 
   // Specify target URL
   rc = SetCurlStrOption(CURLOPT_URL, url_.c_str());
