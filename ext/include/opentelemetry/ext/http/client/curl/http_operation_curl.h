@@ -159,7 +159,7 @@ public:
                 bool is_raw_response                        = false,
                 std::chrono::milliseconds http_conn_timeout = default_http_conn_timeout,
                 bool reuse_connection                       = false,
-                bool needs_to_log                           = false);
+                bool is_log_enabled                         = false);
 
   /**
    * Destroy CURL instance
@@ -307,7 +307,7 @@ private:
 
   const opentelemetry::ext::http::client::Compression &compression_;
 
-  const bool needs_to_log_;
+  const bool is_log_enabled_;
 
   // Processed response headers and body
   long response_code_;

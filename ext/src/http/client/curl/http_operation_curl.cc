@@ -263,7 +263,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                              bool is_raw_response,
                              std::chrono::milliseconds http_conn_timeout,
                              bool reuse_connection,
-                             bool needs_to_log)
+                             bool is_log_enabled)
     : is_aborted_(false),
       is_finished_(false),
       is_cleaned_(false),
@@ -283,7 +283,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       request_nwrite_(0),
       session_state_(opentelemetry::ext::http::client::SessionState::Created),
       compression_(compression),
-      needs_to_log_(needs_to_log),
+      is_log_enabled_(is_log_enabled),
       response_code_(0)
 {
   /* get a curl handle */
@@ -658,7 +658,7 @@ CURLcode HttpOperation::Setup()
     return rc;
   }
 #else
-  rc = SetCurlLongOption(CURLOPT_VERBOSE, static_cast<long>(needs_to_log_ || kEnableCurlLogging));
+  rc = SetCurlLongOption(CURLOPT_VERBOSE, static_cast<long>(is_log_enabled_ || kEnableCurlLogging));
   if (rc != CURLE_OK)
   {
     return rc;

@@ -245,7 +245,7 @@ public:
 
   virtual void SetCompression(const Compression &compression) noexcept = 0;
 
-  virtual void EnableLogging(bool needs_to_log) noexcept = 0;
+  virtual void EnableLogging(bool is_log_enabled) noexcept = 0;
 
   virtual ~Request() = default;
 };
