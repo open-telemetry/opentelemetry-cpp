@@ -633,6 +633,12 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
 
 CURLcode HttpOperation::Setup()
 {
+#ifdef ENABLE_CURL_LOGGING
+  static constexpr auto kEnableCurlLogging = true;
+#else
+  static constexpr auto kEnableCurlLogging = false;
+#endif  // ENABLE_CURL_LOGGING
+
   if (!curl_resource_.easy_handle)
   {
     return CURLE_FAILED_INIT;
@@ -643,7 +649,7 @@ CURLcode HttpOperation::Setup()
   curl_error_message_[0] = '\0';
   curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_ERRORBUFFER, curl_error_message_);
 
-  rc = SetCurlLongOption(CURLOPT_VERBOSE, static_cast<long>(needs_to_log_));
+  rc = SetCurlLongOption(CURLOPT_VERBOSE, static_cast<long>(needs_to_log_ || kEnableCurlLogging));
   if (rc != CURLE_OK)
   {
     return rc;
