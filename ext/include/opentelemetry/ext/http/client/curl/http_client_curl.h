@@ -102,7 +102,7 @@ public:
     compression_ = compression;
   }
 
-  void EnableLogging(bool needs_to_log) noexcept override { needs_to_log_ = needs_to_log; };
+  void EnableLogging(bool needs_to_log) noexcept override { needs_to_log_ = needs_to_log; }
 
 public:
   opentelemetry::ext::http::client::Method method_;

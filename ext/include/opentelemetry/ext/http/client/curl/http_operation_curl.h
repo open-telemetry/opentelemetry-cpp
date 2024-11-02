@@ -159,7 +159,7 @@ public:
                 bool is_raw_response                        = false,
                 std::chrono::milliseconds http_conn_timeout = default_http_conn_timeout,
                 bool reuse_connection                       = false,
-                bool needs_to_log_                          = false);
+                bool needs_to_log                           = false);
 
   /**
    * Destroy CURL instance
