@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <algorithm>
-#include <initializer_list>
 #include <iostream>
 #include <map>
 #include <nlohmann/json.hpp>
@@ -12,19 +10,16 @@
 #include <utility>
 #include <vector>
 
-#include "opentelemetry/context/context_value.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/exporters/ostream/span_exporter.h"
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
-#include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
@@ -243,14 +238,11 @@ int main(int argc, char *argv[])
   std::cout << "Listening at http://" << default_host << ":" << port << "/test\n";
 
   // Wait for signal to stop server
-  std::thread server_check([&stop_server, &server]() {
-    while (!stop_server.load())
-    {
-      // keep running the thread
-    }
-    // received signal to stop server
-    std::cout << "stopping server \n";
-    server.stop();
-  });
-  server_check.join();
+  while (!stop_server.load())
+  {
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+  // received signal to stop server
+  std::cout << "Stopping server \n";
+  server.stop();
 }
