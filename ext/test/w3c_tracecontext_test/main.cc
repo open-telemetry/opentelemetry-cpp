@@ -40,6 +40,22 @@ namespace
 {
 static trace_api::propagation::HttpTraceContext propagator_format;
 
+static bool equalsIgnoreCase(const std::string &str1, const std::string &str2)
+{
+  if (str1.length() != str2.length())
+  {
+    return false;
+  }
+  for (size_t i = 0; i < str1.length(); i++)
+  {
+    if (tolower(str1[i]) != tolower(str2[i]))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 class TextMapCarrierTest : public context::propagation::TextMapCarrier
 {
 public:
@@ -58,22 +74,6 @@ public:
   void Set(nostd::string_view key, nostd::string_view value) noexcept override
   {
     headers_[std::string(key)] = std::string(value);
-  }
-
-  static bool equalsIgnoreCase(const std::string &str1, const std::string &str2)
-  {
-    if (str1.length() != str2.length())
-    {
-      return false;
-    }
-    for (size_t i = 0; i < str1.length(); i++)
-    {
-      if (tolower(str1[i]) != tolower(str2[i]))
-      {
-        return false;
-      }
-    }
-    return true;
   }
 
   std::map<std::string, std::string> &headers_;
