@@ -5,16 +5,21 @@ ARG GRPC_VERSION=v1.55.0
 COPY ci/setup_googletest.sh /opt/ci/setup_googletest.sh
 COPY ci/setup_ci_environment.sh /opt/ci/setup_ci_environment.sh
 COPY ci/setup_cmake.sh /opt/ci/setup_cmake.sh
+COPY ci/install_abseil.sh /opt/ci/install_abseil.sh
+COPY ci/install_protobuf.sh /opt/ci/install_protobuf.sh
 COPY ci/setup_grpc.sh /opt/ci/setup_grpc.sh
+COPY ci/fix-abseil-cpp-issue-1536.patch /opt/ci/fix-abseil-cpp-issue-1536.patch
 
 RUN apt update && apt install -y wget \
 	ninja-build \
 	libcurl4-openssl-dev
 
-RUN bash /opt/ci/setup_ci_environment.sh \
-	&& bash /opt/ci/setup_cmake.sh \
-	&& bash /opt/ci/setup_googletest.sh \
-	&& bash /opt/ci/setup_grpc.sh -r ${GRPC_VERSION}
+RUN cd /opt/ci && bash setup_ci_environment.sh
+RUN cd /opt/ci && bash setup_cmake.sh
+RUN cd /opt && bash ci/setup_googletest.sh \
+	&& bash ci/install_abseil.sh \
+	&& bash ci/install_protobuf.sh \
+	&& bash ci/setup_grpc.sh -p protobuf -p abseil-cpp -r ${GRPC_VERSION}
 
 ADD https://github.com/bazelbuild/bazelisk/releases/download/v1.22.1/bazelisk-linux-amd64 /usr/local/bin
 	
