@@ -89,18 +89,14 @@ private:
   static constexpr uint8_t kInvalidVersion        = 0xFF;
   static constexpr uint8_t kDefaultAssumedVersion = 0x00;
 
-  static bool IsValidVersion(nostd::string_view version_hex)
+  static bool IsValidVersion(uint8_t version_binary)
   {
-    uint8_t version;
-    detail::HexToBinary(version_hex, &version, sizeof(version));
-    return version != kInvalidVersion;
+    return version_binary != kInvalidVersion;
   }
 
-  static bool IsHigherVersion(nostd::string_view version_hex)
+  static bool IsHigherVersion(uint8_t version_binary)
   {
-    uint8_t version;
-    detail::HexToBinary(version_hex, &version, sizeof(version));
-    return version > kDefaultAssumedVersion;
+    return version_binary > kDefaultAssumedVersion;
   }
 
   static void InjectImpl(context::propagation::TextMapCarrier &carrier,
@@ -153,17 +149,20 @@ private:
       return SpanContext::GetInvalid();
     }
 
-    if (!IsValidVersion(version_hex))
+    // hex is valid, convert it to binary
+    uint8_t version_binary;
+    detail::HexToBinary(version_hex, &version_binary, sizeof(version_binary));
+    if (!IsValidVersion(version_binary))
     {
       return SpanContext::GetInvalid();
     }
 
-    if (IsHigherVersion(version_hex) && trace_parent.size() < kTraceParentSize)
+    if (IsHigherVersion(version_binary) && trace_parent.size() < kTraceParentSize)
     {
       return SpanContext::GetInvalid();
     }
 
-    if (!IsHigherVersion(version_hex) && trace_parent.size() != kTraceParentSize)
+    if (!IsHigherVersion(version_binary) && trace_parent.size() != kTraceParentSize)
     {
       return SpanContext::GetInvalid();
     }
