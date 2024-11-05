@@ -13,6 +13,19 @@
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/version.h"
 
+/*
+ * Special considerations for HostArchValues
+ *
+ * The sys/systemcfg.h header on AIX is known to define an IA64 macro,
+ * which collides with HostArchValues::IA64.
+ */
+#ifdef _AIX
+#  ifdef IA64
+#    pragma message "Removing define on IA64"
+#    undef IA64
+#  endif
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
