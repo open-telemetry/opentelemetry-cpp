@@ -3,7 +3,7 @@
 This test application is intended to be used as a test service for the [W3C
 Distributed Tracing Validation
 Service](https://github.com/w3c/trace-context/tree/master/test). It is
-implemented according to [this
+implemented according to [these
 instructions](https://github.com/w3c/trace-context/tree/master/test#implement-test-service).
 
 ## Usage
@@ -47,4 +47,9 @@ docker run --network host w3c_driver http://localhost:31339/test
 3: The validation service will run the test suite and print detailed test
 results.
 
-4: Stop the test service by pressing enter.
+4: Stop the test service by invoking `/stop`. Make sure to use the correct port number.
+
+```sh
+# Assuming the service is currently running at port 30000
+curl http://localhost:30000/stop
+```
