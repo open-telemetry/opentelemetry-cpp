@@ -926,7 +926,7 @@ jobs:
 
   w3c_trace_context_compliance_v1:
     name: W3C Distributed Tracing Validation V1
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout open-telemetry/opentelemetry-cpp
         uses: actions/checkout@v4
@@ -934,8 +934,8 @@ jobs:
           submodules: 'recursive'
       - name: setup
         env:
-          CC: /usr/bin/gcc-14
-          CXX: /usr/bin/g++-14
+          CC: /usr/bin/gcc-10
+          CXX: /usr/bin/g++-10
           PROTOBUF_VERSION: 21.12
         run: |
           sudo -E ./ci/setup_googletest.sh
