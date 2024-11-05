@@ -29,6 +29,9 @@ Important changes:
     as the Jaeger propagator can be used without the (now removed)
     Jaeger exporter.
 
+* Upgrade to prometheus 1.3.0
+  [#3122](https://github.com/open-telemetry/opentelemetry-cpp/pull/3122)
+
 ## [1.17 2024-10-07]
 
 * [CI] Add a clang-tidy build
