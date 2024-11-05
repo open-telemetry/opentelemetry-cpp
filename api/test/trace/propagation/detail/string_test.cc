@@ -25,7 +25,6 @@ struct SplitStringTestData
   // See https://github.com/google/googletest/issues/3805.
   friend void PrintTo(const SplitStringTestData &data, std::ostream *os)
   {
-    std::stringstream ss;
     *os << "(" << data.input << "," << data.separator << "," << data.max_count << ","
         << data.expected_number_strings << ")";
   }
@@ -50,8 +49,7 @@ class SplitStringTestFixture : public ::testing::TestWithParam<SplitStringTestDa
 TEST_P(SplitStringTestFixture, SplitsAsExpected)
 {
   const SplitStringTestData test_param = GetParam();
-  std::vector<opentelemetry::nostd::string_view> fields{};
-  fields.reserve(test_param.expected_number_strings);
+  std::vector<opentelemetry::nostd::string_view> fields(test_param.expected_number_strings);
   size_t got_splits_num = opentelemetry::trace::propagation::detail::SplitString(
       test_param.input, test_param.separator, fields.data(), test_param.max_count);
 
