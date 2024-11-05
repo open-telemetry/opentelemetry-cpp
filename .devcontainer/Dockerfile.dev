@@ -1,0 +1,22 @@
+FROM otel/cpp_format_tools
+
+ARG GRPC_VERSION=v1.55.0
+
+COPY ci/setup_googletest.sh /opt/ci/setup_googletest.sh
+COPY ci/setup_ci_environment.sh /opt/ci/setup_ci_environment.sh
+COPY ci/setup_cmake.sh /opt/ci/setup_cmake.sh
+COPY ci/setup_grpc.sh /opt/ci/setup_grpc.sh
+
+RUN apt update && apt install -y wget \
+	ninja-build \
+	libcurl4-openssl-dev
+
+RUN bash /opt/ci/setup_ci_environment.sh \
+	&& bash /opt/ci/setup_cmake.sh \
+	&& bash /opt/ci/setup_googletest.sh \
+	&& bash /opt/ci/setup_grpc.sh -r ${GRPC_VERSION}
+
+ADD https://github.com/bazelbuild/bazelisk/releases/download/v1.22.1/bazelisk-linux-amd64 /usr/local/bin
+	
+RUN git config --global core.autocrlf input \
+	&& chmod +x /usr/local/bin/bazelisk-linux-amd64

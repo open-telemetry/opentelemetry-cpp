@@ -1,0 +1,19 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.162.0/containers/javascript-node
+{
+	"name": "opentelemetry-cpp",
+	"build": {
+		"context": "..",
+		"dockerfile": "Dockerfile.dev",
+		"args": { "GRPC_VERSION": "v1.55.0" }
+	},
+	// Set *default* container specific settings.json values on container create.
+	"settings": {
+		"terminal.integrated.shell.linux": "/bin/sh"
+	},
+	"extensions": [
+		"ms-vscode.cpptools"
+	],
+
+	"remoteUser": "root"
+}
