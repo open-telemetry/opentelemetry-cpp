@@ -5,14 +5,19 @@
 	"build": {
 		"context": "..",
 		"dockerfile": "Dockerfile.dev",
-		"args": { "GRPC_VERSION": "v1.55.0" }
+		"args": {
+			"GRPC_VERSION": "v1.55.0",
+			"PROTOBUF_VERSION": "23.4",
+			"ABSEIL_CPP_VERSION":"20240116.1"
+		}
 	},
-	// Set *default* container specific settings.json values on container create.
 	"settings": {
 		"terminal.integrated.shell.linux": "/bin/sh"
 	},
 	"extensions": [
-		"ms-vscode.cpptools"
+		"ms-vscode.cpptools",
+		"ms-azuretools.vscode-docker",
+		"ms-vscode.cpptools-extension-pack"
 	],
 
 	"remoteUser": "root"
