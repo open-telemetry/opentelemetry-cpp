@@ -89,16 +89,6 @@ private:
   static constexpr uint8_t kInvalidVersion        = 0xFF;
   static constexpr uint8_t kDefaultAssumedVersion = 0x00;
 
-  static bool IsValidVersion(uint8_t version_binary)
-  {
-    return version_binary != kInvalidVersion;
-  }
-
-  static bool IsHigherVersion(uint8_t version_binary)
-  {
-    return version_binary > kDefaultAssumedVersion;
-  }
-
   static void InjectImpl(context::propagation::TextMapCarrier &carrier,
                          const SpanContext &span_context)
   {
@@ -152,19 +142,28 @@ private:
     // hex is valid, convert it to binary
     uint8_t version_binary;
     detail::HexToBinary(version_hex, &version_binary, sizeof(version_binary));
-    if (!IsValidVersion(version_binary))
+    if (version_binary == kInvalidVersion)
     {
+      // invalid version encountered
       return SpanContext::GetInvalid();
     }
 
-    if (IsHigherVersion(version_binary) && trace_parent.size() < kTraceParentSize)
+    // See https://www.w3.org/TR/trace-context/#versioning-of-traceparent
+    if (version_binary > kDefaultAssumedVersion)
     {
-      return SpanContext::GetInvalid();
+      // higher than default version detected
+      if (trace_parent.size() < kTraceParentSize)
+      {
+        return SpanContext::GetInvalid();
+      }
     }
-
-    if (!IsHigherVersion(version_binary) && trace_parent.size() != kTraceParentSize)
+    else
     {
-      return SpanContext::GetInvalid();
+      // version is either lower or same as the default version
+      if (trace_parent.size() != kTraceParentSize)
+      {
+        return SpanContext::GetInvalid();
+      }
     }
 
     TraceId trace_id = TraceIdFromHex(trace_id_hex);
