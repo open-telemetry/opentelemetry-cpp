@@ -3,7 +3,6 @@
 
 #include <curl/curl.h>
 #include <curl/curlver.h>
-#include <zconf.h>
 #include <atomic>
 #include <chrono>
 #include <cstddef>
@@ -25,6 +24,7 @@
 #include "opentelemetry/nostd/string_view.h"
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
+#  include <zconf.h>
 #  include <zlib.h>
 #else
 #  include "opentelemetry/sdk/common/global_log_handler.h"
