@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] Comply with W3C Trace Context [#3115](https://github.com/open-telemetry/opentelemetry-cpp/pull/3115)
+  * Also adds CI check to ensure continued compliance
+
 * [API] Jaeger Propagator should not be deprecated
   [#3086](https://github.com/open-telemetry/opentelemetry-cpp/pull/3086)
 
