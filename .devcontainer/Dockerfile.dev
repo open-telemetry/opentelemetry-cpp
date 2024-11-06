@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 FROM otel/cpp_format_tools
 
 ARG GRPC_VERSION=v1.55.0
