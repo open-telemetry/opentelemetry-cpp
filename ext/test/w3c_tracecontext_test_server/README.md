@@ -11,7 +11,7 @@ instructions](https://github.com/w3c/trace-context/tree/master/test#implement-te
 1: Build and start the test service endpoint:
 
 ```sh
-./w3c_tracecontext_test
+./w3c_tracecontext_test_server
 
 Listening to http://localhost:30000/test
 ```
@@ -19,7 +19,7 @@ Listening to http://localhost:30000/test
 A custom port number for the test service to listen to can be specified:
 
 ```sh
-./w3c_tracecontext_test 31339
+./w3c_tracecontext_test_server 31339
 
 Listening to http://localhost:31339/test
 ```
