@@ -946,8 +946,8 @@ jobs:
           CXX_STANDARD: '14'
         run: |
           ./ci/do_ci.sh cmake.w3c.trace-context.build-server
-          cd $HOME/build/ext/test/w3c_tracecontext_test
-          ./w3c_tracecontext_test &
+          cd $HOME/build/ext/test/w3c_tracecontext_test_server
+          ./w3c_tracecontext_test_server &
       - name: Checkout w3c/trace-context repo
         uses: actions/checkout@v4
         with:
