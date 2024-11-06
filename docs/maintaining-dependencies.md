@@ -442,3 +442,155 @@ Last, in some special case like name collisions for a given symbol,
 the template itself may need to be adjusted for special logic.
 
 See for example how `messaging.client_id` is treated.
+
+## prometheus-cpp
+
+### Comments (prometheus-cpp)
+
+The `prometheus-cpp` library provides a C++ client for Prometheus, facilitating the creation and registration of metrics that Prometheus scrapes. `prometheus-cpp` is used as a git submodule under the `third_party` directory for ease of inclusion in build system.
+
+### Origin (prometheus-cpp)
+
+The repository for `prometheus-cpp` can be found here:
+
+- [repository](https://github.com/jupp0r/prometheus-cpp)
+
+Check release notes at:
+
+- [release-notes](https://github.com/jupp0r/prometheus-cpp/releases)
+
+### Upgrade (prometheus-cpp)
+
+When upgrading `prometheus-cpp` to a newer release, you’ll need to update a few key files in the codebase to reflect the new version.
+
+In this example, we upgrade from `v1.2.3` to `v1.2.4`.
+
+#### Directory `third_party/prometheus-cpp`
+
+`prometheus-cpp` is a `git submodule`, so it needs to be pointed to the new release tag.
+
+```shell
+cd third_party/prometheus-cpp
+git log -1
+```
+
+The current submodule should show something like:
+
+```shell
+commit abcdef1234567890abcdef1234567890abcdef12 (HEAD, tag: v1.2.3)
+Author: John Doe <johndoe@example.com>
+Date:   Fri Apr 25 17:55:35 2024 +0200
+
+    Minor fixes for performance and compatibility
+```
+
+Pull new tags:
+
+```shell
+git pull --tag origin
+```
+
+Upgrade to the new tag:
+
+```shell
+git pull origin v1.2.4
+```
+
+Verify the new commit:
+
+```shell
+git log -1
+commit 1234567890abcdef1234567890abcdef12345678 (HEAD, tag: v1.2.4)
+Author: Jane Doe <janedoe@example.com>
+Date:   Thu Jun 28 08:19:11 2024 -0500
+
+    Improved metrics handling for high concurrency
+```
+
+Return to the root directory:
+
+```shell
+cd ../..
+git status
+```
+
+The status should display:
+
+```shell
+On branch upgrade_prometheus_1.2.4
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   third_party/prometheus-cpp (new commits)
+```
+
+Add the upgraded submodule:
+
+```shell
+git add third_party/prometheus-cpp
+```
+
+File third_party_release
+Update the line referencing the prometheus-cpp version.
+
+```shell
+prometheus-cpp=v1.2.4
+```
+
+Example change:
+
+```shell
+$ git diff third_party_release
+diff --git a/third_party_release b/third_party_release
+index abc1234..def5678 100644
+--- a/third_party_release
++++ b/third_party_release
+@@ -19,7 +19,7 @@ some-dependency=v0.8.3
+ another-dependency=1.14.0
+ prometheus-cpp=v1.2.3
++prometheus-cpp=v1.2.4
+```
+
+In file bazel/repository.bzl locate the entry for prometheus-cpp:
+
+```shell
+# C++ Prometheus Client library.
+maybe(
+    http_archive,
+    name = "com_github_jupp0r_prometheus_cpp",
+    sha256 = "ac6e958405a29fbbea9db70b00fa3c420e16ad32e1baf941ab233ba031dd72ee",
+    strip_prefix = "prometheus-cpp-1.2.3",
+    urls = [
+        "https://github.com/jupp0r/prometheus-cpp/archive/refs/tags/v1.2.3.tar.gz",
+    ],
+)
+```
+
+Update the URL to the new tag:
+
+```shell
+urls = [
+    "https://github.com/jupp0r/prometheus-cpp/archive/v1.2.4.tar.gz",
+],
+```
+
+Update strip_prefix to match the new version:
+
+```shell
+strip_prefix = "prometheus-cpp-1.2.4",
+```
+
+Download the new URL:
+
+```shell
+wget https://github.com/jupp0r/prometheus-cpp/archive/v1.2.4.tar.gz
+```
+
+Calculate the checksum:
+
+```shell
+sha256sum v1.2.4.tar.gz
+abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234  v1.2.4.tar.gz
+```
+
+Update the `sha256`.
