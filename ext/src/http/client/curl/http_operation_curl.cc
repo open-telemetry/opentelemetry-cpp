@@ -598,6 +598,8 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
     {
       OTEL_INTERNAL_LOG_ERROR(text_to_log);
     }
+// This guard serves as a catch-all block for all other less interesting output that should
+// remain available for maintainer internal use and for debugging purposes only.
 #ifdef CURL_DEBUG
     else
     {
@@ -605,6 +607,8 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
     }
 #endif  // CURL_DEBUG
   }
+// Same as above, this guard is meant only for internal use by maintainers, and should not be used
+// in production (information leak).
 #ifdef CURL_DEBUG
   else if (type == CURLINFO_HEADER_OUT)
   {
@@ -658,7 +662,7 @@ CURLcode HttpOperation::Setup()
     return rc;
   }
 #else
-  rc = SetCurlLongOption(CURLOPT_VERBOSE, static_cast<long>(is_log_enabled_ || kEnableCurlLogging));
+  rc = SetCurlLongOption(CURLOPT_VERBOSE, (is_log_enabled_ && kEnableCurlLogging) ? 1L : 0L);
   if (rc != CURLE_OK)
   {
     return rc;
