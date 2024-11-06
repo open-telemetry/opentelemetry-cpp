@@ -271,16 +271,16 @@ the C++ repository.
 
 * [OpenTelemetry
   Specification](https://github.com/open-telemetry/opentelemetry-specification)
-   * The OpenTelemetry Specification describes the requirements and expectations
-     of for all OpenTelemetry implementations.
+  * The OpenTelemetry Specification describes the requirements and expectations
+    of for all OpenTelemetry implementations.
 
 * Read through the OpenTelemetry C++ documentation
-   * The
-     [API](https://opentelemetry-cpp.readthedocs.io/en/latest/api/api.html)
-     and
-     [SDK](https://opentelemetry-cpp.readthedocs.io/en/latest/sdk/sdk.html)
-     documentation provides a lot of information on what the classes and their
-     functions are used for.
+  * The
+    [API](https://opentelemetry-cpp.readthedocs.io/en/latest/api/api.html)
+    and
+    [SDK](https://opentelemetry-cpp.readthedocs.io/en/latest/sdk/sdk.html)
+    documentation provides a lot of information on what the classes and their
+    functions are used for.
 
 Please contribute! You’re welcome to add more information if you come across any
 helpful resources.
