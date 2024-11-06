@@ -447,27 +447,32 @@ See for example how `messaging.client_id` is treated.
 
 ### Comments (prometheus-cpp)
 
-The `prometheus-cpp` library provides a C++ client for Prometheus, facilitating the creation and registration of metrics that Prometheus scrapes. `prometheus-cpp` is used as a git submodule under the `third_party` directory for ease of inclusion in build system.
+The `prometheus-cpp` library provides a C++ client for Prometheus,
+facilitating the creation and registration of metrics that Prometheus scrapes.
+`prometheus-cpp` is used as a git submodule under the `third_party` directory
+for ease of inclusion in build system.
 
 ### Origin (prometheus-cpp)
 
 The repository for `prometheus-cpp` can be found here:
 
-- [repository](https://github.com/jupp0r/prometheus-cpp)
+* [repository](https://github.com/jupp0r/prometheus-cpp)
 
 Check release notes at:
 
-- [release-notes](https://github.com/jupp0r/prometheus-cpp/releases)
+* [release-notes](https://github.com/jupp0r/prometheus-cpp/releases)
 
 ### Upgrade (prometheus-cpp)
 
-When upgrading `prometheus-cpp` to a newer release, you’ll need to update a few key files in the codebase to reflect the new version.
+When upgrading `prometheus-cpp` to a newer release,
+you’ll need to update a few key files in the codebase to reflect the new version.
 
 In this example, we upgrade from `v1.2.3` to `v1.2.4`.
 
 #### Directory `third_party/prometheus-cpp`
 
-`prometheus-cpp` is a `git submodule`, so it needs to be pointed to the new release tag.
+`prometheus-cpp` is a `git submodule`,
+so it needs to be pointed to the new release tag.
 
 ```shell
 cd third_party/prometheus-cpp
