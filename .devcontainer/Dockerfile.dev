@@ -14,7 +14,8 @@ COPY ci /opt/ci
 
 RUN apt update && apt install -y wget \
 	ninja-build \
-	libcurl4-openssl-dev
+	libcurl4-openssl-dev \
+	markdownlint
 
 RUN cd /opt/ci && bash setup_cmake.sh
 RUN cd /opt/ci && bash setup_ci_environment.sh

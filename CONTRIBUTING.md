@@ -62,36 +62,36 @@ bazel-bin/examples/simple/example_simple
 
 ### DevContainer Setup for Project
 
-This guide provides instructions on how to set up and use the development 
-container (`devcontainer`) environment to streamline testing and development 
-for this project. With the DevContainer, you can work in a consistent environment 
+This guide provides instructions on how to set up and use the development
+container (`devcontainer`) environment to streamline testing and development
+for this project. With the DevContainer, you can work in a consistent environment
 configured with all the necessary dependencies and tools.
 
 #### Prerequisites
 
 Before getting started, ensure you have the following installed:
 
-1. **Docker**: DevContainers require Docker for containerization.
-2. **Visual Studio Code (VSCode)** with the **Remote - Containers** extension.
+* **Docker**: DevContainers require Docker for containerization.
+* **Visual Studio Code (VSCode)** with the **Remote - Containers** extension.
 
 #### Getting Started
 
-1. **Open the Project in DevContainer**:
+* **Open the Project in DevContainer**:
 
-   Open the project in VSCode. When prompted to "Reopen in Container," select 
-   this option. If you’re not prompted, you can manually open the container by 
-   selecting **Remote-Containers: Reopen in Container** from the command palette 
+   Open the project in VSCode. When prompted to "Reopen in Container," select
+   this option. If you’re not prompted, you can manually open the container by
+   selecting **Remote-Containers: Reopen in Container** from the command palette
    (`F1` or `Ctrl+Shift+P`).
 
-2. **Container Setup**:
+* **Container Setup**:
 
-   The DevContainer environment will automatically build based on the configuration 
-   files provided (e.g., `.devcontainer/devcontainer.json`). This setup will install 
+   The DevContainer environment will automatically build based on the configuration
+   files provided (e.g., `.devcontainer/devcontainer.json`). This setup will install
    required dependencies, tools, and environment variables needed for the project.
 
 #### Available Commands
 
-Once inside the DevContainer, you can use the following commands to run tests 
+Once inside the DevContainer, you can use the following commands to run tests
 and CI workflows.
 
 ##### 1. Run Tests with Bazelisk
@@ -99,49 +99,51 @@ and CI workflows.
 To run tests with Bazelisk using specific compilation options, use:
 
 ```bash
-bazelisk-linux-amd64 test --copt=-DENABLE_LOGS_PREVIEW --test_output=errors --cache_test_results=no --copt=-DENABLE_TEST //exporters/otlp/...
+bazelisk-linux-amd64 test --copt=-DENABLE_LOGS_PREVIEW
+--test_output=errors --cache_test_results=no --copt=-DENABLE_TEST //exporters/otlp/...
 ```
 
 ###### Command Breakdown
 
-- `--copt=-DENABLE_LOGS_PREVIEW`: Enables preview logs.
-- `--test_output=errors`: Shows only the errors in the test output.
-- `--cache_test_results=no`: Forces Bazel to re-run tests without caching.
-- `--copt=-DENABLE_TEST`: Enables testing capabilities for the target code.
-- `//exporters/otlp/...`: Specifies the test target path.
+* `--copt=-DENABLE_LOGS_PREVIEW`: Enables preview logs.
+* `--test_output=errors`: Shows only the errors in the test output.
+* `--cache_test_results=no`: Forces Bazel to re-run tests without caching.
+* `--copt=-DENABLE_TEST`: Enables testing capabilities for the target code.
+* `//exporters/otlp/...`: Specifies the test target path.
 
 ##### 2. Run CI Script
 
-You can also run the CI script provided to perform testing with the following command as an 
+You can also run the CI script provided to perform testing with the
+following command as an
 example:
 
 ```bash
 bash ci/do_ci.sh cmake.exporter.otprotocol.test
 ```
 
-This command initiates the CI pipeline, executing tests specifically for the 
+This command initiates the CI pipeline, executing tests specifically for the
 **cmake.exporter.otprotocol** module.
 
 #### Troubleshooting
 
 If you encounter issues:
 
-- **Rebuild the DevContainer**: From the command palette, run 
+* **Rebuild the DevContainer**: From the command palette, run
   **Remote-Containers: Rebuild Container** to reinitialize the environment.
-- **Check Bazelisk and CI Script Logs**: Inspect logs for any configuration or 
+* **Check Bazelisk and CI Script Logs**: Inspect logs for any configuration or
   dependency issues.
 
 #### Additional Notes
 
-- You can adjust compiler options (`--copt`) as needed to test additional flags 
+* You can adjust compiler options (`--copt`) as needed to test additional flags
   or enable/disable specific features.
-- The test results will be displayed in the terminal within the DevContainer for 
+* The test results will be displayed in the terminal within the DevContainer for
   easy debugging.
 
 #### Resources
 
-- **Bazelisk Documentation**: [https://github.com/bazelbuild/bazelisk](https://github.com/bazelbuild/bazelisk)
-- **VSCode DevContainer Documentation**: [https://code.visualstudio.com/docs/remote/containers](https://code.visualstudio.com/docs/remote/containers)
+* **Bazelisk Documentation**: [https://github.com/bazelbuild/bazelisk](https://github.com/bazelbuild/bazelisk)
+* **VSCode DevContainer Documentation**: [https://code.visualstudio.com/docs/remote/containers](https://code.visualstudio.com/docs/remote/containers)
 
 ## Pull Requests
 
@@ -269,16 +271,16 @@ the C++ repository.
 
 * [OpenTelemetry
   Specification](https://github.com/open-telemetry/opentelemetry-specification)
-  * The OpenTelemetry Specification describes the requirements and expectations
-    of for all OpenTelemetry implementations.
+   * The OpenTelemetry Specification describes the requirements and expectations
+     of for all OpenTelemetry implementations.
 
 * Read through the OpenTelemetry C++ documentation
-  * The
-    [API](https://opentelemetry-cpp.readthedocs.io/en/latest/api/api.html)
-    and
-    [SDK](https://opentelemetry-cpp.readthedocs.io/en/latest/sdk/sdk.html)
-    documentation provides a lot of information on what the classes and their
-    functions are used for.
+   * The
+     [API](https://opentelemetry-cpp.readthedocs.io/en/latest/api/api.html)
+     and
+     [SDK](https://opentelemetry-cpp.readthedocs.io/en/latest/sdk/sdk.html)
+     documentation provides a lot of information on what the classes and their
+     functions are used for.
 
 Please contribute! You’re welcome to add more information if you come across any
 helpful resources.
