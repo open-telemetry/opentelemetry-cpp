@@ -938,7 +938,6 @@ jobs:
         env:
           CC: /usr/bin/gcc-10
           CXX: /usr/bin/g++-10
-          PROTOBUF_VERSION: 21.12
         run: |
           sudo -E ./ci/setup_googletest.sh
           sudo -E ./ci/setup_ci_environment.sh
