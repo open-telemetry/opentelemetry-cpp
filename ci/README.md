@@ -1,7 +1,7 @@
 # Building and running tests as a developer
 
 CI tests can be run inside
-[devcontainer](../CONTRIBUTING.md###DevContainer-Setup-for-Project)
+[devcontainer](../CONTRIBUTING.md#devcontainer-setup-for-project)
 by invoking the script
 `./ci/do_ci.sh {TARGET}` where the targets are:
 
