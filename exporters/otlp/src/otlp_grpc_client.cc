@@ -672,6 +672,7 @@ bool OtlpGrpcClient::Shutdown(OtlpGrpcClientReferenceGuard &guard,
   bool force_flush_result;
   if (last_reference_removed && false == is_shutdown_.exchange(true, std::memory_order_acq_rel))
   {
+    OTEL_INTERNAL_LOG_DEBUG("[OTLP GRPC Client] DEBUG: OtlpGrpcClient start to shitdown");
     force_flush_result = ForceFlush(timeout);
 
 #ifdef ENABLE_ASYNC_EXPORT
@@ -679,6 +680,12 @@ bool OtlpGrpcClient::Shutdown(OtlpGrpcClientReferenceGuard &guard,
     {
       std::lock_guard<std::mutex> lock(async_data_->running_calls_lock);
       running_calls = async_data_->running_calls;
+    }
+    if (!running_calls.empty())
+    {
+      OTEL_INTERNAL_LOG_WARN(
+          "[OTLP GRPC Client] WARN: OtlpGrpcClient shutdown timeout, try to cancel "
+          << running_calls.size() << " running calls.");
     }
     for (auto &call_data : running_calls)
     {
