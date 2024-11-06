@@ -20,3 +20,19 @@ otel_cc_test(
         "@googletest//:gtest_main",
     ]),
 )
+
+cc_test(
+    name = "string_test",
+    srcs = [
+        "string_test.cc",
+    ],
+    tags = [
+        "api",
+        "test",
+        "trace",
+    ],
+    deps = [
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
