@@ -24,6 +24,11 @@ else()
     PRIVATE ${CURL_LIBRARIES})
 endif()
 
+if(WITH_CURL_LOGGING)
+  target_compile_definitions(opentelemetry_http_client_curl
+                             PRIVATE ENABLE_CURL_LOGGING)
+endif()
+
 if(WITH_OTLP_HTTP_COMPRESSION)
   if(TARGET ZLIB::ZLIB)
     target_link_libraries(
