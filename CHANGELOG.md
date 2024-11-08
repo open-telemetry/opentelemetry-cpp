@@ -18,6 +18,9 @@ Increment the:
 * [EXPORTER] Allow to share gRPC clients between OTLP exporters.
   [#3041](https://github.com/open-telemetry/opentelemetry-cpp/pull/3041)
 
+* [API] Comply with W3C Trace Context [#3115](https://github.com/open-telemetry/opentelemetry-cpp/pull/3115)
+  * Also adds CI check to ensure continued compliance
+
 * [API] Jaeger Propagator should not be deprecated
   [#3086](https://github.com/open-telemetry/opentelemetry-cpp/pull/3086)
 
@@ -31,6 +34,9 @@ Important changes:
   * This deprecation turned out to be not justified,
     as the Jaeger propagator can be used without the (now removed)
     Jaeger exporter.
+
+* Upgrade to prometheus 1.3.0
+  [#3122](https://github.com/open-telemetry/opentelemetry-cpp/pull/3122)
 
 ## [1.17 2024-10-07]
 

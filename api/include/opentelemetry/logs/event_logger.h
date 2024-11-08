@@ -65,9 +65,8 @@ public:
     }
     nostd::unique_ptr<LogRecord> log_record = delegate_logger->CreateLogRecord();
 
-    IgnoreTraitResult(
-        detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set(
-            log_record.get(), std::forward<ArgumentType>(args))...);
+    IgnoreTraitResult(detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
+        log_record.get(), std::forward<ArgumentType>(args))...);
 
     EmitEvent(event_name, std::move(log_record));
   }
