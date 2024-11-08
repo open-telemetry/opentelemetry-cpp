@@ -5,7 +5,7 @@ load("//:dll_deps.bzl", "dll_deps")
 load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
 
 otel_cc_binary(
-    name = "w3c_tracecontext_test",
+    name = "w3c_tracecontext_http_test_server",
     srcs = [
         "main.cc",
     ],
