@@ -217,6 +217,9 @@ option(
   "Whether to include gzip compression for the OTLP http exporter in the SDK"
   OFF)
 
+option(WITH_CURL_LOGGING "Whether to enable select CURL verbosity in OTel logs"
+       OFF)
+
 option(WITH_ZIPKIN "Whether to include the Zipkin exporter in the SDK" OFF)
 
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
