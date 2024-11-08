@@ -14,44 +14,7 @@ namespace exporter
 {
 namespace logs
 {
-void ElasticSearchRecordable::WriteKeyValue(nostd::string_view key,
-                                            const opentelemetry::common::AttributeValue &value,
-                                            const std::string &name)
-{
-  switch (value.index())
-  {
-    case common::AttributeType::kTypeBool:
-      json_[name][key.data()] = opentelemetry::nostd::get<bool>(value) ? true : false;
-      return;
-    case common::AttributeType::kTypeInt:
-      json_[name][key.data()] = opentelemetry::nostd::get<int>(value);
-      return;
-    case common::AttributeType::kTypeInt64:
-      json_[name][key.data()] = opentelemetry::nostd::get<int64_t>(value);
-      return;
-    case common::AttributeType::kTypeUInt:
-      json_[name][key.data()] = opentelemetry::nostd::get<unsigned int>(value);
-      return;
-    case common::AttributeType::kTypeUInt64:
-      json_[name][key.data()] = opentelemetry::nostd::get<uint64_t>(value);
-      return;
-    case common::AttributeType::kTypeDouble:
-      json_[name][key.data()] = opentelemetry::nostd::get<double>(value);
-      return;
-    case common::AttributeType::kTypeCString:
-      json_[name][key.data()] = opentelemetry::nostd::get<const char *>(value);
-      return;
-    case common::AttributeType::kTypeString:
-      json_[name][key.data()] =
-          opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();
-      return;
-    default:
-      return;
-  }
-}
-
-void ElasticSearchRecordable::WriteKeyValue(
-    nostd::string_view key,
+void ElasticSearchRecordable::WriteValue(
     const opentelemetry::sdk::common::OwnedAttributeValue &value,
     const std::string &name)
 {
@@ -59,25 +22,25 @@ void ElasticSearchRecordable::WriteKeyValue(
   switch (value.index())
   {
     case common::kTypeBool:
-      json_[name][key.data()] = opentelemetry::nostd::get<bool>(value) ? true : false;
+      json_[name] = opentelemetry::nostd::get<bool>(value) ? true : false;
       return;
     case common::kTypeInt:
-      json_[name][key.data()] = opentelemetry::nostd::get<int>(value);
+      json_[name] = opentelemetry::nostd::get<int>(value);
       return;
     case common::kTypeInt64:
-      json_[name][key.data()] = opentelemetry::nostd::get<int64_t>(value);
+      json_[name] = opentelemetry::nostd::get<int64_t>(value);
       return;
     case common::kTypeUInt:
-      json_[name][key.data()] = opentelemetry::nostd::get<unsigned int>(value);
+      json_[name] = opentelemetry::nostd::get<unsigned int>(value);
       return;
     case common::kTypeUInt64:
-      json_[name][key.data()] = opentelemetry::nostd::get<uint64_t>(value);
+      json_[name] = opentelemetry::nostd::get<uint64_t>(value);
       return;
     case common::kTypeDouble:
-      json_[name][key.data()] = opentelemetry::nostd::get<double>(value);
+      json_[name] = opentelemetry::nostd::get<double>(value);
       return;
     case common::kTypeString:
-      json_[name][key.data()] = opentelemetry::nostd::get<std::string>(value).data();
+      json_[name] = opentelemetry::nostd::get<std::string>(value).data();
       return;
     default:
       return;
@@ -197,6 +160,11 @@ void ElasticSearchRecordable::WriteValue(const opentelemetry::common::AttributeV
   }
 }
 
+ElasticSearchRecordable::ElasticSearchRecordable() noexcept : sdk::logs::Recordable()
+{
+  json_["ecs"]["version"] = "8.11.0";
+}
+
 nlohmann::json ElasticSearchRecordable::GetJSON() noexcept
 {
   return json_;
@@ -205,7 +173,38 @@ nlohmann::json ElasticSearchRecordable::GetJSON() noexcept
 void ElasticSearchRecordable::SetTimestamp(
     opentelemetry::common::SystemTimestamp timestamp) noexcept
 {
-  json_["timestamp"] = timestamp.time_since_epoch().count();
+  const std::chrono::system_clock::time_point timePoint{timestamp};
+
+  // If built with with at least cpp 20 then use std::format
+  // Otherwise use the old style to format the timestamp in UTC
+#if __cplusplus >= 202002L
+  const std::string dateStr = std::format("{:%FT%T%Ez}", timePoint);
+#else
+  const static int dateToSecondsSize = 19;
+  const static int millisecondsSize  = 8;
+  const static int timeZoneSize      = 1;
+  const static int dateSize          = dateToSecondsSize + millisecondsSize + timeZoneSize;
+
+  std::time_t time = std::chrono::system_clock::to_time_t(timePoint);
+  std::tm tm       = *std::gmtime(&time);
+
+  char bufferDate[dateSize];  // example: 2024-10-18T07:26:00.123456Z
+  std::strftime(bufferDate, sizeof(bufferDate), "%Y-%m-%dT%H:%M:%S", &tm);
+  auto microseconds =
+      std::chrono::duration_cast<std::chrono::microseconds>(timePoint.time_since_epoch()) %
+      std::chrono::seconds(1);
+
+  char bufferMilliseconds[millisecondsSize];
+  std::snprintf(bufferMilliseconds, sizeof(bufferMilliseconds), ".%06ld",
+                static_cast<long>(microseconds.count()));
+
+  std::strcat(bufferDate, bufferMilliseconds);
+  std::strcat(bufferDate, "Z");
+
+  const std::string dateStr(bufferDate);
+#endif
+
+  json_["@timestamp"] = dateStr;
 }
 
 void ElasticSearchRecordable::SetObservedTimestamp(
@@ -216,23 +215,25 @@ void ElasticSearchRecordable::SetObservedTimestamp(
 
 void ElasticSearchRecordable::SetSeverity(opentelemetry::logs::Severity severity) noexcept
 {
+  auto &severityField = json_["log"]["level"];
+
   // Convert the severity enum to a string
   std::uint32_t severity_index = static_cast<std::uint32_t>(severity);
   if (severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
   {
     std::stringstream sout;
     sout << "Invalid severity(" << severity_index << ")";
-    json_["severity"] = sout.str();
+    severityField = sout.str();
   }
   else
   {
-    json_["severity"] = opentelemetry::logs::SeverityNumToText[severity_index];
+    severityField = opentelemetry::logs::SeverityNumToText[severity_index];
   }
 }
 
 void ElasticSearchRecordable::SetBody(const opentelemetry::common::AttributeValue &message) noexcept
 {
-  WriteValue(message, "body");
+  WriteValue(message, "message");
 }
 
 void ElasticSearchRecordable::SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept
@@ -275,7 +276,7 @@ void ElasticSearchRecordable::SetAttribute(
     nostd::string_view key,
     const opentelemetry::common::AttributeValue &value) noexcept
 {
-  WriteKeyValue(key, value, "attributes");
+  WriteValue(value, key.data());
 }
 
 void ElasticSearchRecordable::SetResource(
@@ -283,7 +284,7 @@ void ElasticSearchRecordable::SetResource(
 {
   for (auto &attribute : resource.GetAttributes())
   {
-    WriteKeyValue(attribute.first, attribute.second, "resource");
+    WriteValue(attribute.second, attribute.first);
   }
 }
 
@@ -291,7 +292,7 @@ void ElasticSearchRecordable::SetInstrumentationScope(
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope
         &instrumentation_scope) noexcept
 {
-  json_["name"] = instrumentation_scope.GetName();
+  json_["log"]["logger"] = instrumentation_scope.GetName();
 }
 
 }  // namespace logs

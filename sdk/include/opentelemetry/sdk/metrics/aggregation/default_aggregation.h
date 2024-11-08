@@ -180,6 +180,7 @@ public:
         return AggregationType::kSum;
       case InstrumentType::kHistogram:
         return AggregationType::kHistogram;
+      case InstrumentType::kGauge:
       case InstrumentType::kObservableGauge:
         return AggregationType::kLastValue;
       default:

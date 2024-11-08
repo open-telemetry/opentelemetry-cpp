@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 build --features=parse_headers
-build --features=layering_check
+#build --features=layering_check
 
 # Don't try to build .so and .dylib shared libs (instead of static) libs on Linux/OSX
 # For some reason, with clang-cl, it also tried to do on Windows, where dynamic linking just does not support it.
@@ -45,12 +45,15 @@ build:linux --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
 #build:linux --fission=yes --copt=-g 
 build:linux --copt=-g --strip=never
 
+build:macos --copt=-Wno-missing-template-arg-list-after-template-kw
+build:macos --host_copt=-Wno-missing-template-arg-list-after-template-kw
+
 build:macos --copt=-DCIVETWEB_API= --copt=-DCIVETWEB_CXX_API= --cxxopt=-DCIVETWEB_API= --cxxopt=-DCIVETWEB_CXX_API=
 build:macos --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
-build:macos --fission=yes --copt=-g --action_env=CC=/opt/homebrew/bin/clang --host_action_env=CC=/opt/homebrew/bin/clang 
+build:macos --strip=never --copt=-g --action_env=CC=/opt/homebrew/bin/clang --host_action_env=CC=/opt/homebrew/bin/clang 
 # https://github.com/Homebrew/homebrew-core/issues/178435#issuecomment-2250615995
-build:macos --linkopt=-L/opt/homebrew/opt/llvm/lib/c++ --linkopt=-L/opt/homebrew/opt/llvm/lib --linkopt=-lunwind
-build:macos --host_linkopt=-L/opt/homebrew/opt/llvm/lib/c++ --host_linkopt=-L/opt/homebrew/opt/llvm/lib --host_linkopt=-lunwind
+build:macos --linkopt=-L/opt/homebrew/opt/llvm/lib/c++ --linkopt=-L/opt/homebrew/opt/llvm/lib/unwind --linkopt=-lunwind
+build:macos --host_linkopt=-L/opt/homebrew/opt/llvm/lib/c++ --host_linkopt=-L/opt/homebrew/opt/llvm/lib/unwind --host_linkopt=-lunwind
 
 # --config=asan : Address Sanitizer.
 common:asan --copt -DADDRESS_SANITIZER

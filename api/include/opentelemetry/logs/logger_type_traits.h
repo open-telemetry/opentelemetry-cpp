@@ -166,8 +166,8 @@ struct LogRecordSetterTrait
                 * = nullptr>
   inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {
-    return LogRecordSetterTrait<common::KeyValueIterable>::template Set(
-        log_record, std::forward<ArgumentType>(arg));
+    return LogRecordSetterTrait<common::KeyValueIterable>::Set(log_record,
+                                                               std::forward<ArgumentType>(arg));
   }
 
   template <class ArgumentType,

@@ -207,7 +207,7 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
   stub->experimental_async()
 #  endif
       ->Export(call_data->grpc_context.get(), call_data->request, call_data->response,
-               [call_data, async_data](::grpc::Status grpc_status) {
+               [call_data, async_data, export_data_name](::grpc::Status grpc_status) {
                  --async_data->running_requests;
                  ++async_data->finished_request_counter;
 
@@ -215,6 +215,13 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
                  if (call_data->grpc_status.ok())
                  {
                    call_data->export_result = opentelemetry::sdk::common::ExportResult::kSuccess;
+                 }
+                 else
+                 {
+                   OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
+                                           << export_data_name << " failed with status_code: \""
+                                           << grpc_status.error_code() << "\" error_message: \""
+                                           << grpc_status.error_message() << "\"");
                  }
 
                  if (call_data->grpc_async_callback)

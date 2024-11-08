@@ -13,7 +13,7 @@ local_path_override(
 bazel_dep(name = "curl", version = "8.8.0.bcr.1")
 
 # We need this to match the parent, as it's locally patched there
-bazel_dep(name = "grpc", version = "1.66.0.bcr.2")
+bazel_dep(name = "grpc", version = "1.66.0.bcr.3")
 single_version_override(
     module_name = "grpc",
     patch_strip = 1,

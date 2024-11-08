@@ -186,6 +186,50 @@ opentelemetry::nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDouble
       new DoubleHistogram(instrument_descriptor, std::move(storage))};
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+opentelemetry::nostd::unique_ptr<metrics::Gauge<int64_t>> Meter::CreateInt64Gauge(
+    opentelemetry::nostd::string_view name,
+    opentelemetry::nostd::string_view description,
+    opentelemetry::nostd::string_view unit) noexcept
+{
+  if (!ValidateInstrument(name, description, unit))
+  {
+    OTEL_INTERNAL_LOG_ERROR("Meter::CreateInt64Gauge - failed. Invalid parameters."
+                            << name << " " << description << " " << unit
+                            << ". Measurements won't be recorded.");
+    return opentelemetry::nostd::unique_ptr<metrics::Gauge<int64_t>>(
+        new metrics::NoopGauge<int64_t>(name, description, unit));
+  }
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kGauge, InstrumentValueType::kLong};
+  auto storage = RegisterSyncMetricStorage(instrument_descriptor);
+  return opentelemetry::nostd::unique_ptr<metrics::Gauge<int64_t>>{
+      new LongGauge(instrument_descriptor, std::move(storage))};
+}
+
+opentelemetry::nostd::unique_ptr<metrics::Gauge<double>> Meter::CreateDoubleGauge(
+    opentelemetry::nostd::string_view name,
+    opentelemetry::nostd::string_view description,
+    opentelemetry::nostd::string_view unit) noexcept
+{
+  if (!ValidateInstrument(name, description, unit))
+  {
+    OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleGauge - failed. Invalid parameters."
+                            << name << " " << description << " " << unit
+                            << ". Measurements won't be recorded.");
+    return opentelemetry::nostd::unique_ptr<metrics::Gauge<double>>(
+        new metrics::NoopGauge<double>(name, description, unit));
+  }
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kGauge, InstrumentValueType::kDouble};
+  auto storage = RegisterSyncMetricStorage(instrument_descriptor);
+  return opentelemetry::nostd::unique_ptr<metrics::Gauge<double>>{
+      new DoubleGauge(instrument_descriptor, std::move(storage))};
+}
+#endif
+
 opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
 Meter::CreateInt64ObservableGauge(opentelemetry::nostd::string_view name,
                                   opentelemetry::nostd::string_view description,

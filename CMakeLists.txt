@@ -215,6 +215,9 @@ option(
   "Whether to include gzip compression for the OTLP http exporter in the SDK"
   OFF)
 
+option(WITH_CURL_LOGGING "Whether to enable select CURL verbosity in OTel logs"
+       OFF)
+
 option(WITH_ZIPKIN "Whether to include the Zipkin exporter in the SDK" OFF)
 
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
@@ -286,6 +289,10 @@ option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
 # Exemplar specs status is experimental, so behind feature flag by default
 option(WITH_METRICS_EXEMPLAR_PREVIEW
        "Whether to enable exemplar within metrics" OFF)
+
+option(OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS
+       "Whether to build test libraries that are always linked as shared libs"
+       OFF)
 
 #
 # Verify options dependencies

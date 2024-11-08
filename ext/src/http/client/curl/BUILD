@@ -12,8 +12,9 @@ otel_cc_library(
         "http_client_factory_curl.cc",
         "http_operation_curl.cc",
     ],
-    copts = [
-        "-DWITH_CURL",
+    local_defines = [
+        "WITH_CURL", 
+        "ENABLE_CURL_LOGGING",
     ],
     include_prefix = "src/http/client/curl",
     linkopts = select({

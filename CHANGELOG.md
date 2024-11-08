@@ -15,14 +15,128 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] Comply with W3C Trace Context [#3115](https://github.com/open-telemetry/opentelemetry-cpp/pull/3115)
+  * Also adds CI check to ensure continued compliance
+
+* [API] Jaeger Propagator should not be deprecated
+  [#3086](https://github.com/open-telemetry/opentelemetry-cpp/pull/3086)
+
+Important changes:
+
+* [API] Jaeger Propagator should not be deprecated
+  [#3086](https://github.com/open-telemetry/opentelemetry-cpp/pull/3086)
+
+  * Deprecation of the Jaeger propagator, as announced on 2023-01-31
+    in version 1.8.2, is now reverted.
+  * This deprecation turned out to be not justified,
+    as the Jaeger propagator can be used without the (now removed)
+    Jaeger exporter.
+
+* Upgrade to prometheus 1.3.0
+  [#3122](https://github.com/open-telemetry/opentelemetry-cpp/pull/3122)
+
+* [EXPORTER] Change log resources location for ElasticsearchLogRecordExporter
+  [#3119](https://github.com/open-telemetry/opentelemetry-cpp/pull/3131)
+
+  * Moved from `root/resources` to `root`
+
+## [1.17 2024-10-07]
+
 * [CI] Add a clang-tidy build
   [#3001](https://github.com/open-telemetry/opentelemetry-cpp/pull/3001)
+
+* [BUILD] Upgrade to opentelemetry-proto 1.3.2
+  [#2991](https://github.com/open-telemetry/opentelemetry-cpp/pull/2991)
 
 * [REMOVAL] Remove build option `WITH_DEPRECATED_SDK_FACTORY`
   [#2717](https://github.com/open-telemetry/opentelemetry-cpp/pull/2717)
 
+* [EXPORTER] ForceFlush before canceling the running requests on shutdown
+  [#2727](https://github.com/open-telemetry/opentelemetry-cpp/pull/2727)
+
+* [SDK] Fix crash in PeriodicExportingMetricReader
+  [#2983](https://github.com/open-telemetry/opentelemetry-cpp/pull/2983)
+
+* [SDK] Fix memory leak in TlsRandomNumberGenerator() constructor
+  [#2661](https://github.com/open-telemetry/opentelemetry-cpp/pull/2661)
+
+* [EXPORTER] Ignore exception when create thread in OTLP file exporter
+  [#3012](https://github.com/open-telemetry/opentelemetry-cpp/pull/3012)
+
+* [BUILD] Update the version in MODULE.bazel
+  [#3015](https://github.com/open-telemetry/opentelemetry-cpp/pull/3015)
+
+* [BUILD] Fix build without vcpkg on Windows when gRPC is disabled
+  [#3016](https://github.com/open-telemetry/opentelemetry-cpp/pull/3016)
+
+* [BUILD] Add abi_version_no bazel flag
+  [#3020](https://github.com/open-telemetry/opentelemetry-cpp/pull/3020)
+
+* [Code health] Expand iwyu coverage to include unit tests
+  [#3022](https://github.com/open-telemetry/opentelemetry-cpp/pull/3022)
+
+* [BUILD] Version opentelemetry_proto/proto_grpc shared libraries
+  [#2992](https://github.com/open-telemetry/opentelemetry-cpp/pull/2992)
+
+* [SEMANTIC CONVENTIONS] Upgrade semantic conventions to 1.27.0
+  [#3023](https://github.com/open-telemetry/opentelemetry-cpp/pull/3023)
+
+* [SDK] Support empty histogram buckets
+  [#3027](https://github.com/open-telemetry/opentelemetry-cpp/pull/3027)
+
+* [TEST] Fix sync problems in OTLP File exporter tests
+  [#3031](https://github.com/open-telemetry/opentelemetry-cpp/pull/3031)
+
+* [SDK] PeriodicExportingMetricReader: future is never set, blocks until timeout
+  [#3030](https://github.com/open-telemetry/opentelemetry-cpp/pull/3030)
+
+* [Code Health] Clang Tidy cleanup, Part 2
+  [#3038](https://github.com/open-telemetry/opentelemetry-cpp/pull/3038)
+
+* [Code Health] include-what-you-use cleanup, part 3
+  [#3004](https://github.com/open-telemetry/opentelemetry-cpp/pull/3004)
+
+* [SDK] Fix overflow in timeout logic
+  [#3046](https://github.com/open-telemetry/opentelemetry-cpp/pull/3046)
+
+* [TEST] Add missing tests to Bazel build
+  [#3045](https://github.com/open-telemetry/opentelemetry-cpp/pull/3045)
+
+* [TEST] update collector tests with debug exporter
+  [#3050](https://github.com/open-telemetry/opentelemetry-cpp/pull/3050)
+
+* [EXAMPLE] update collector example with debug exporter
+  [#3049](https://github.com/open-telemetry/opentelemetry-cpp/pull/3049)
+
+* [TEST] update references to logging exporter
+  [#3053](https://github.com/open-telemetry/opentelemetry-cpp/pull/3053)
+
+* [EXAMPLE] Clean the tracer initialization in OStream example
+  [#3051](https://github.com/open-telemetry/opentelemetry-cpp/pull/3051)
+
+* [EXPORTER] Fix the format of SpanLink for ETW
+  [#3054](https://github.com/open-telemetry/opentelemetry-cpp/pull/3054)
+
 * [EXPORTER] Add in-memory metric exporter
   [#3043](https://github.com/open-telemetry/opentelemetry-cpp/pull/3043)
+
+* [Code Health] include-what-you-use cleanup, part 4
+  [#3040](https://github.com/open-telemetry/opentelemetry-cpp/pull/3040)
+
+* [BUILD] add loongarch info
+  [#3052](https://github.com/open-telemetry/opentelemetry-cpp/pull/3052)
+
+* [CI] Update otel-collector version
+  [#3067](https://github.com/open-telemetry/opentelemetry-cpp/pull/3067)
+
+* [SDK] Update MetricProducer interface to match spec
+  [#3044](https://github.com/open-telemetry/opentelemetry-cpp/pull/3044)
+
+* [EXPORTER] Fix URL in ES exporter, fix ipv6 supporting for http client
+  [#3081](https://github.com/open-telemetry/opentelemetry-cpp/pull/3081)
+
+* [EXPORTER] Add HttpHeaders in ElasticsearchLogRecordExporter
+  [#3083](https://github.com/open-telemetry/opentelemetry-cpp/pull/3083)
 
 Breaking changes:
 
