@@ -98,7 +98,7 @@ void initTracer()
 nostd::shared_ptr<trace_api::Tracer> get_tracer()
 {
   auto provider = trace_api::Provider::GetTracerProvider();
-  return provider->GetTracer("w3c_tracecontext_test_server");
+  return provider->GetTracer("w3c_tracecontext_http_test_server");
 }
 
 struct Uri

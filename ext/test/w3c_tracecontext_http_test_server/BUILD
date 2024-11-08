@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 cc_binary(
-    name = "w3c_tracecontext_test_server",
+    name = "w3c_tracecontext_http_test_server",
     srcs = [
         "main.cc",
     ],
