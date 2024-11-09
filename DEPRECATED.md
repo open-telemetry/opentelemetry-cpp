@@ -70,7 +70,7 @@ Deprecation is announced as part of the migration to weaver:
 
 * `Version:` release following opentelemetry-cpp 1.17.0
 * `Date:` Nov 9, 2024
-* `PR:` https://github.com/open-telemetry/opentelemetry-cpp/pull/3105
+* `PR:` [PR 3105](https://github.com/open-telemetry/opentelemetry-cpp/pull/3105)
 
 #### Motivation (semantic_conventions.h)
 
@@ -142,4 +142,3 @@ No date is given now, this can happen at the earliest for release 1.19.0:
 * opentelemetry-cpp v1.19.0 may only contain new header files (removing old)
 
 This allows a full release cycle for applications to adjust.
-

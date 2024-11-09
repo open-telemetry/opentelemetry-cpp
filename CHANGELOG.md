@@ -15,8 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
-* [API] Comply with W3C Trace Context [#3115](https://github.com/open-telemetry/opentelemetry-cpp/pull/3115)
-  * Also adds CI check to ensure continued compliance
+* [API] Comply with W3C Trace Context
+  [#3115](https://github.com/open-telemetry/opentelemetry-cpp/pull/3115)
 
 * [API] Jaeger Propagator should not be deprecated
   [#3086](https://github.com/open-telemetry/opentelemetry-cpp/pull/3086)
@@ -38,6 +38,11 @@ Important changes:
     as the Jaeger propagator can be used without the (now removed)
     Jaeger exporter.
 
+* [EXPORTER] Change log resources location for ElasticsearchLogRecordExporter
+  [#3119](https://github.com/open-telemetry/opentelemetry-cpp/pull/3131)
+
+  * Moved from `root/resources` to `root`
+
 * [SEMANTIC CONVENTIONS] Migration to weaver
   [#3105](https://github.com/open-telemetry/opentelemetry-cpp/pull/3105)
 
@@ -45,11 +50,6 @@ Important changes:
     replaced by `semconv/xxx_attributes.h` header files,
     for each `xxx` semantic attribute group.
   * See file DEPRECATED.md for details.
-
-* [EXPORTER] Change log resources location for ElasticsearchLogRecordExporter
-  [#3119](https://github.com/open-telemetry/opentelemetry-cpp/pull/3131)
-
-  * Moved from `root/resources` to `root`
 
 ## [1.17 2024-10-07]
 
