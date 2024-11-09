@@ -59,3 +59,87 @@ N/A
 ## [Documentation]
 
 N/A
+
+## Semantic conventions
+
+### Header files "semantic_conventions.h"
+
+#### Announcement (semantic_conventions.h)
+
+Deprecation is announced as part of the migration to weaver:
+
+* `Version:` release following opentelemetry-cpp 1.17.0
+* `Date:` Nov 9, 2024
+* `PR:` https://github.com/open-telemetry/opentelemetry-cpp/pull/3105
+
+#### Motivation (semantic_conventions.h)
+
+The header files for semantic conventions are generated automatically.
+The tooling to generate these files is changing:
+
+* before, the build-tool repository was used
+* now, the weaver repository is used
+
+Changes in tooling allows to generate code that is better organized,
+with dedicated header files per group of semantic conventions,
+instead of a single header file for everything.
+
+#### Scope (semantic_conventions.h)
+
+The following files:
+
+* `api/include/opentelemetry/trace/semantic_conventions.h`
+* `sdk/include/opentelemetry/sdk/resource/semantic_conventions.h`
+
+are now deprecated.
+
+They correspond to semantic conventions v1.27.0,
+and will no longer be maintained up to date.
+
+These files will be removed in the future.
+
+#### Mitigation (semantic_conventions.h)
+
+Two things have changed:
+
+* the header file to use
+* the symbol name to use.
+
+Before, the semantic convention for `url.full` was:
+
+* declared in file `semantic_conventions.h`
+* declared as symbol `SemanticConventions::kUrlFull`
+
+Now, the `url.full` convention, which is part or the `url` group, is:
+
+* declared in file `semconv/url_attributes.h`
+* declared as symbol `semconv::url::kUrlFull`
+
+Application code that uses semantic conventions must be adjusted
+accordingly.
+
+In addition, semantic conventions that are not marked as stable
+are generated in a different header file, placed under directory
+`incubating`, to better separate stable and non stable code.
+
+For example, file `semconv/incubating/url_attributes.h`
+defines `semconv::url::kUrlDomain`,
+which is not marked as stable in semconv v1.27.0
+
+#### Planned removal (semantic_conventions.h)
+
+The following files:
+
+* `api/include/opentelemetry/trace/semantic_conventions.h`
+* `sdk/include/opentelemetry/sdk/resource/semantic_conventions.h`
+
+will be eventually removed.
+
+No date is given now, this can happen at the earliest for release 1.19.0:
+
+* opentelemetry-cpp v1.17.0 only contain old header files
+* opentelemetry-cpp v1.18.0 will contain both old and new header files
+* opentelemetry-cpp v1.19.0 may only contain new header files (removing old)
+
+This allows a full release cycle for applications to adjust.
+

@@ -21,6 +21,12 @@ Increment the:
 * [API] Jaeger Propagator should not be deprecated
   [#3086](https://github.com/open-telemetry/opentelemetry-cpp/pull/3086)
 
+* Upgrade to prometheus 1.3.0
+  [#3122](https://github.com/open-telemetry/opentelemetry-cpp/pull/3122)
+
+* [SEMANTIC CONVENTIONS] Migration to weaver
+  [#3105](https://github.com/open-telemetry/opentelemetry-cpp/pull/3105)
+
 Important changes:
 
 * [API] Jaeger Propagator should not be deprecated
@@ -32,8 +38,13 @@ Important changes:
     as the Jaeger propagator can be used without the (now removed)
     Jaeger exporter.
 
-* Upgrade to prometheus 1.3.0
-  [#3122](https://github.com/open-telemetry/opentelemetry-cpp/pull/3122)
+* [SEMANTIC CONVENTIONS] Migration to weaver
+  [#3105](https://github.com/open-telemetry/opentelemetry-cpp/pull/3105)
+
+  * `semantic_convention.h` header files are deprecated,
+    replaced by `semconv/xxx_attributes.h` header files,
+    for each `xxx` semantic attribute group.
+  * See file DEPRECATED.md for details.
 
 * [EXPORTER] Change log resources location for ElasticsearchLogRecordExporter
   [#3119](https://github.com/open-telemetry/opentelemetry-cpp/pull/3131)
