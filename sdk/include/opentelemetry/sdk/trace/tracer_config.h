@@ -13,7 +13,8 @@ namespace trace
 /**
  * TracerConfig defines various configurable aspects of a Tracer's behavior.
  */
-class TracerConfig {
+class TracerConfig
+{
 public:
   /**
    * Returns if the Tracer is enabled or disabled. Tracers are enabled by default.
@@ -31,6 +32,6 @@ private:
   static TracerConfig kDefaultConfig;
   static TracerConfig kDisabledConfig;
 };
-} // namespace trace
-} // namespace sdk
+}  // namespace trace
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

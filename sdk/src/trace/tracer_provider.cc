@@ -1,7 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <algorithm>
 #include <chrono>
 #include <mutex>
 #include <utility>
@@ -19,7 +18,6 @@
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 
@@ -60,7 +58,7 @@ TracerProvider::TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&pro
 TracerProvider::~TracerProvider()
 {
   // Tracer hold the shared pointer to the context. So we can not use destructor of TracerContext to
-  // Shutdown and flush all pending recordables when we have more than one tracers.These recordables
+  // Shutdown and flush all pending recordables when we have more than one tracer.These recordables
   // may use the raw pointer of instrumentation_scope_ in Tracer
   if (context_)
   {

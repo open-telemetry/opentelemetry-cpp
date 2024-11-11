@@ -13,6 +13,7 @@
 #include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context_kv_iterable.h"
@@ -35,7 +36,8 @@ public:
   /** Construct a new Tracer with the given context pipeline. */
   explicit Tracer(std::shared_ptr<TracerContext> context,
                   std::unique_ptr<InstrumentationScope> instrumentation_scope =
-                      InstrumentationScope::Create("")) noexcept;
+                      InstrumentationScope::Create(""),
+                  TracerConfig tracer_config = TracerConfig::Default()) noexcept;
 
   nostd::shared_ptr<opentelemetry::trace::Span> StartSpan(
       nostd::string_view name,
@@ -105,6 +107,7 @@ private:
   // tracer-context.
   std::shared_ptr<InstrumentationScope> instrumentation_scope_;
   std::shared_ptr<TracerContext> context_;
+  TracerConfig tracer_config_;
 };
 }  // namespace trace
 }  // namespace sdk

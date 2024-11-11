@@ -10,14 +10,16 @@ namespace sdk
 namespace trace
 {
 
-TracerConfig TracerConfig::kDefaultConfig = TracerConfig();
+TracerConfig TracerConfig::kDefaultConfig  = TracerConfig();
 TracerConfig TracerConfig::kDisabledConfig = TracerConfig(true);
 
-TracerConfig TracerConfig::Disabled() {
+TracerConfig TracerConfig::Disabled()
+{
   return kDisabledConfig;
 }
 
-TracerConfig TracerConfig::Enabled() {
+TracerConfig TracerConfig::Enabled()
+{
   return kDefaultConfig;
 }
 
@@ -30,6 +32,6 @@ bool TracerConfig::IsEnabled() const noexcept
 {
   return !disabled_;
 }
-}// namespace trace
-}// namespace sdk
+}  // namespace trace
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
