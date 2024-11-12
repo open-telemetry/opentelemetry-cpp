@@ -60,6 +60,13 @@ else()
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
       set(ARCH x86)
     endif()
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "powerpc")
+    # AIX will report the processor as 'powerpc' even if building in 64-bit mode
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(ARCH ppc64)
+    else()
+      set(ARCH ppc32)
+    endif()
   elseif(CMAKE_SYSTEM_PROCESSOR MATCHES
          "^(aarch64.*|AARCH64.*|arm64.*|ARM64.*)")
     set(ARCH arm64)
