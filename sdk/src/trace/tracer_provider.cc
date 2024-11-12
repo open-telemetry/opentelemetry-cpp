@@ -16,6 +16,7 @@
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/tracer.h"
@@ -35,24 +36,30 @@ TracerProvider::TracerProvider(std::unique_ptr<TracerContext> context) noexcept
   OTEL_INTERNAL_LOG_DEBUG("[TracerProvider] TracerProvider created.");
 }
 
-TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
-                               const resource::Resource &resource,
-                               std::unique_ptr<Sampler> sampler,
-                               std::unique_ptr<IdGenerator> id_generator) noexcept
+TracerProvider::TracerProvider(
+    std::unique_ptr<SpanProcessor> processor,
+    const resource::Resource &resource,
+    std::unique_ptr<Sampler> sampler,
+    std::unique_ptr<IdGenerator> id_generator,
+    std::unique_ptr<ScopeConfigurator<TracerConfig>> tracer_configurator) noexcept
 {
   std::vector<std::unique_ptr<SpanProcessor>> processors;
   processors.push_back(std::move(processor));
-  context_ = std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
-                                             std::move(id_generator));
+  context_ =
+      std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
+                                      std::move(id_generator), std::move(tracer_configurator));
 }
 
-TracerProvider::TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
-                               const resource::Resource &resource,
-                               std::unique_ptr<Sampler> sampler,
-                               std::unique_ptr<IdGenerator> id_generator) noexcept
+TracerProvider::TracerProvider(
+    std::vector<std::unique_ptr<SpanProcessor>> &&processors,
+    const resource::Resource &resource,
+    std::unique_ptr<Sampler> sampler,
+    std::unique_ptr<IdGenerator> id_generator,
+    std::unique_ptr<ScopeConfigurator<TracerConfig>> tracer_configurator) noexcept
 {
-  context_ = std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
-                                             std::move(id_generator));
+  context_ =
+      std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
+                                      std::move(id_generator), std::move(tracer_configurator));
 }
 
 TracerProvider::~TracerProvider()
@@ -107,8 +114,11 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
   instrumentationscope::InstrumentationScopeAttributes attrs_map(attributes);
   auto scope =
       instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attrs_map);
+  const instrumentationscope::InstrumentationScope &scope_reference =
+      instrumentationscope::InstrumentationScope(*scope);
+  auto tracer_config = context_->GetTracerConfigurator().ComputeConfig(scope_reference);
 
-  auto tracer = std::shared_ptr<Tracer>(new Tracer(context_, std::move(scope)));
+  auto tracer = std::shared_ptr<Tracer>(new Tracer(context_, std::move(scope), tracer_config));
   tracers_.push_back(tracer);
   return nostd::shared_ptr<trace_api::Tracer>{tracer};
 }
@@ -131,6 +141,12 @@ bool TracerProvider::Shutdown() noexcept
 bool TracerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   return context_->ForceFlush(timeout);
+}
+
+TracerConfig TracerProvider::GetTracerConfig(
+    const InstrumentationScope &instrumentation_scope) const
+{
+  return context_->GetTracerConfigurator().ComputeConfig(instrumentation_scope);
 }
 
 }  // namespace trace

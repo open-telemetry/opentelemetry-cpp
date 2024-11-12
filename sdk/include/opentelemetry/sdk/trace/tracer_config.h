@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -25,12 +26,14 @@ public:
   static TracerConfig Disabled();
   static TracerConfig Enabled();
   static TracerConfig Default();
+  static const instrumentationscope::ScopeConfigurator<TracerConfig> &DefaultConfigurator();
 
 private:
   explicit TracerConfig(const bool disabled = false) : disabled_(disabled) {}
   bool disabled_;
-  static TracerConfig kDefaultConfig;
-  static TracerConfig kDisabledConfig;
+  static const TracerConfig kDefaultConfig;
+  static const TracerConfig kDisabledConfig;
+  static const instrumentationscope::ScopeConfigurator<TracerConfig> kDefaultTracerConfigurator;
 };
 }  // namespace trace
 }  // namespace sdk

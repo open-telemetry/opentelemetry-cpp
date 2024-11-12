@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include <chrono>
-#include <map>
 #include <new>
 #include <utility>
 
@@ -21,7 +20,6 @@
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_startoptions.h"
 #include "opentelemetry/trace/trace_flags.h"
@@ -36,6 +34,8 @@ namespace sdk
 {
 namespace trace
 {
+const std::shared_ptr<opentelemetry::trace::NoopTracer> Tracer::kNoopTracer =
+    std::make_shared<opentelemetry::trace::NoopTracer>();
 
 Tracer::Tracer(std::shared_ptr<TracerContext> context,
                std::unique_ptr<InstrumentationScope> instrumentation_scope,
@@ -54,6 +54,10 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
   opentelemetry::trace::SpanContext parent_context = GetCurrentSpan()->GetContext();
   if (nostd::holds_alternative<opentelemetry::trace::SpanContext>(options.parent))
   {
+    if (!tracer_config_.IsEnabled())
+    {
+      return kNoopTracer->StartSpan(name, attributes, links, options);
+    }
     auto span_context = nostd::get<opentelemetry::trace::SpanContext>(options.parent);
     if (span_context.IsValid())
     {

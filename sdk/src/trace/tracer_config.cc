@@ -1,6 +1,5 @@
-//
-// Created by sharmapranav on 11/8/24.
-//
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/trace/tracer_config.h"
 
@@ -10,8 +9,13 @@ namespace sdk
 namespace trace
 {
 
-TracerConfig TracerConfig::kDefaultConfig  = TracerConfig();
-TracerConfig TracerConfig::kDisabledConfig = TracerConfig(true);
+const TracerConfig TracerConfig::kDefaultConfig  = TracerConfig();
+const TracerConfig TracerConfig::kDisabledConfig = TracerConfig(true);
+
+const instrumentationscope::ScopeConfigurator<TracerConfig>
+    TracerConfig::kDefaultTracerConfigurator =
+        *instrumentationscope::ScopeConfigurator<TracerConfig>::Create(
+            [](const instrumentationscope::InstrumentationScope &) { return Default(); });
 
 TracerConfig TracerConfig::Disabled()
 {
@@ -26,6 +30,11 @@ TracerConfig TracerConfig::Enabled()
 TracerConfig TracerConfig::Default()
 {
   return kDefaultConfig;
+}
+
+const instrumentationscope::ScopeConfigurator<TracerConfig> &TracerConfig::DefaultConfigurator()
+{
+  return kDefaultTracerConfigurator;
 }
 
 bool TracerConfig::IsEnabled() const noexcept
