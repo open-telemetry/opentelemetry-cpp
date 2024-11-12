@@ -133,12 +133,7 @@ The following files:
 * `api/include/opentelemetry/trace/semantic_conventions.h`
 * `sdk/include/opentelemetry/sdk/resource/semantic_conventions.h`
 
-will be eventually removed.
+will be removed.
 
-No date is given now, this can happen at the earliest for release 1.19.0:
-
-* opentelemetry-cpp v1.17.0 only contain old header files
-* opentelemetry-cpp v1.18.0 will contain both old and new header files
-* opentelemetry-cpp v1.19.0 may only contain new header files (removing old)
-
-This allows a full release cycle for applications to adjust.
+The removal date is planned for July 1, 2025.
+This allows more than six months for applications to adjust.
