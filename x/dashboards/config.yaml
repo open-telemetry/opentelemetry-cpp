@@ -1,0 +1,11 @@
+database:
+  file:
+    folder: "./data"
+    extension: "json"
+
+schemas:
+  panels_path: "./dashboards/cue/schemas/panels"
+  queries_path: "./dashboards/cue/schemas/queries"
+  datasources_path: "./dashboards/cue/schemas/datasources"
+  variables_path: "./dashboards/cue/schemas/variables"
+  interval: "6h"
