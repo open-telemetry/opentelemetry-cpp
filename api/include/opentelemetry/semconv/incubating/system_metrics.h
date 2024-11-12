@@ -32,11 +32,11 @@ static constexpr const char *unitMetricSystemCpuFrequency = "{Hz}";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-static inline nostd::unique_ptr<metrics::Gauge<uint64_t>> CreateSyncInt64MetricSystemCpuFrequency(
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>> CreateSyncInt64MetricSystemCpuFrequency(
     metrics::Meter *meter)
 {
-  return meter->CreateUInt64Gauge(kMetricSystemCpuFrequency, descrMetricSystemCpuFrequency,
-                                  unitMetricSystemCpuFrequency);
+  return meter->CreateInt64Gauge(kMetricSystemCpuFrequency, descrMetricSystemCpuFrequency,
+                                 unitMetricSystemCpuFrequency);
 }
 
 static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricSystemCpuFrequency(
@@ -195,11 +195,11 @@ static constexpr const char *unitMetricSystemCpuUtilization = "1";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-static inline nostd::unique_ptr<metrics::Gauge<uint64_t>> CreateSyncInt64MetricSystemCpuUtilization(
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>> CreateSyncInt64MetricSystemCpuUtilization(
     metrics::Meter *meter)
 {
-  return meter->CreateUInt64Gauge(kMetricSystemCpuUtilization, descrMetricSystemCpuUtilization,
-                                  unitMetricSystemCpuUtilization);
+  return meter->CreateInt64Gauge(kMetricSystemCpuUtilization, descrMetricSystemCpuUtilization,
+                                 unitMetricSystemCpuUtilization);
 }
 
 static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricSystemCpuUtilization(
@@ -471,12 +471,12 @@ static constexpr const char *unitMetricSystemFilesystemUtilization  = "1";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-static inline nostd::unique_ptr<metrics::Gauge<uint64_t>>
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
 CreateSyncInt64MetricSystemFilesystemUtilization(metrics::Meter *meter)
 {
-  return meter->CreateUInt64Gauge(kMetricSystemFilesystemUtilization,
-                                  descrMetricSystemFilesystemUtilization,
-                                  unitMetricSystemFilesystemUtilization);
+  return meter->CreateInt64Gauge(kMetricSystemFilesystemUtilization,
+                                 descrMetricSystemFilesystemUtilization,
+                                 unitMetricSystemFilesystemUtilization);
 }
 
 static inline nostd::unique_ptr<metrics::Gauge<double>>
@@ -729,12 +729,11 @@ static constexpr const char *unitMetricSystemMemoryUtilization  = "1";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-static inline nostd::unique_ptr<metrics::Gauge<uint64_t>>
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
 CreateSyncInt64MetricSystemMemoryUtilization(metrics::Meter *meter)
 {
-  return meter->CreateUInt64Gauge(kMetricSystemMemoryUtilization,
-                                  descrMetricSystemMemoryUtilization,
-                                  unitMetricSystemMemoryUtilization);
+  return meter->CreateInt64Gauge(kMetricSystemMemoryUtilization, descrMetricSystemMemoryUtilization,
+                                 unitMetricSystemMemoryUtilization);
 }
 
 static inline nostd::unique_ptr<metrics::Gauge<double>>
@@ -1088,12 +1087,11 @@ static constexpr const char *unitMetricSystemPagingUtilization  = "1";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-static inline nostd::unique_ptr<metrics::Gauge<uint64_t>>
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
 CreateSyncInt64MetricSystemPagingUtilization(metrics::Meter *meter)
 {
-  return meter->CreateUInt64Gauge(kMetricSystemPagingUtilization,
-                                  descrMetricSystemPagingUtilization,
-                                  unitMetricSystemPagingUtilization);
+  return meter->CreateInt64Gauge(kMetricSystemPagingUtilization, descrMetricSystemPagingUtilization,
+                                 unitMetricSystemPagingUtilization);
 }
 
 static inline nostd::unique_ptr<metrics::Gauge<double>>

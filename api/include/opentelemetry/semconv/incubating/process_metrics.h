@@ -112,11 +112,11 @@ static constexpr const char *unitMetricProcessCpuUtilization = "1";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-static inline nostd::unique_ptr<metrics::Gauge<uint64_t>>
-CreateSyncInt64MetricProcessCpuUtilization(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>> CreateSyncInt64MetricProcessCpuUtilization(
+    metrics::Meter *meter)
 {
-  return meter->CreateUInt64Gauge(kMetricProcessCpuUtilization, descrMetricProcessCpuUtilization,
-                                  unitMetricProcessCpuUtilization);
+  return meter->CreateInt64Gauge(kMetricProcessCpuUtilization, descrMetricProcessCpuUtilization,
+                                 unitMetricProcessCpuUtilization);
 }
 
 static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricProcessCpuUtilization(

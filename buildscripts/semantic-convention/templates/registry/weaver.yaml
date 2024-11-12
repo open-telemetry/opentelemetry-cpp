@@ -84,7 +84,7 @@ text_maps:
     counter: metrics::Counter<uint64_t>
     histogram: metrics::Histogram<uint64_t>
     updowncounter: metrics::UpDownCounter<int64_t>
-    gauge: metrics::Gauge<uint64_t>
+    gauge: metrics::Gauge<int64_t>
 
   cpp_sync_instrument_to_double_type:
     counter: metrics::Counter<double>
@@ -96,7 +96,7 @@ text_maps:
     counter: CreateUInt64Counter
     histogram: CreateUInt64Histogram
     updowncounter: CreateInt64UpDownCounter
-    gauge: CreateUInt64Gauge
+    gauge: CreateInt64Gauge
 
   cpp_sync_instrument_to_double_factory:
     counter: CreateDoubleCounter
