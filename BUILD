@@ -3,6 +3,7 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
+load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
 load("@otel_sdk//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files", pkg_strip_prefix = "strip_prefix")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
@@ -465,6 +466,16 @@ write_source_file(
     "non_windows",
     "windows",
 ]]
+
+native_binary(
+    name = "perses",
+    src = "@multitool//tools/perses",
+)
+
+native_binary(
+    name = "percli",
+    src = "@multitool//tools/percli",
+)
 
 platform(
     name = "x64_windows-clang-cl",

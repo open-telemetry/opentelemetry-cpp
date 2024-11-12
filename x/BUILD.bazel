@@ -1,5 +1,23 @@
+package(default_visibility = ["//visibility:public"])
+load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory")
+
 cc_binary(
     name = "x",
     srcs = ["x.cpp"],
     deps = ["@otel_sdk//:dll"]
+)
+
+copy_directory(
+    name = "dashboards_dir",
+    src = "dashboards",
+    out = "dashboards",
+    hardlink = "on",
+)
+
+native_binary(
+    name = "perses",
+    src = "@otel_sdk//:perses",
+    data = ["dashboards_dir"],
+    args = ["-config dashboards/config.yaml"],
 )

@@ -1,0 +1,15 @@
+{
+  "kind": "StaticListVariable",
+  "spec": {
+    "values": [
+      "1m",
+      {
+        "value": "5m"
+      },
+      {
+        "label": "Ten minutes",
+        "value": "10m"
+      }
+    ]
+  }
+}
