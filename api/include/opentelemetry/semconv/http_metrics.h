@@ -47,25 +47,6 @@ CreateSyncDoubleMetricHttpClientRequestDuration(metrics::Meter *meter)
                                       unitMetricHttpClientRequestDuration);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricHttpClientRequestDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricHttpClientRequestDuration,
-                                               descrMetricHttpClientRequestDuration,
-                                               unitMetricHttpClientRequestDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricHttpClientRequestDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricHttpClientRequestDuration,
-                                                descrMetricHttpClientRequestDuration,
-                                                unitMetricHttpClientRequestDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Duration of HTTP server requests.
  * <p>
@@ -92,25 +73,6 @@ CreateSyncDoubleMetricHttpServerRequestDuration(metrics::Meter *meter)
                                       descrMetricHttpServerRequestDuration,
                                       unitMetricHttpServerRequestDuration);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricHttpServerRequestDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricHttpServerRequestDuration,
-                                               descrMetricHttpServerRequestDuration,
-                                               unitMetricHttpServerRequestDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricHttpServerRequestDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricHttpServerRequestDuration,
-                                                descrMetricHttpServerRequestDuration,
-                                                unitMetricHttpServerRequestDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 }  // namespace http
 }  // namespace semconv

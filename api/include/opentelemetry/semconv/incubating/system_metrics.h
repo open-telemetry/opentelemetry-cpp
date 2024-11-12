@@ -30,8 +30,8 @@ static constexpr const char *descrMetricSystemCpuFrequency =
     "Reports the current frequency of the CPU in Hz";
 static constexpr const char *unitMetricSystemCpuFrequency = "{Hz}";
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Sync gauge
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
 static inline nostd::unique_ptr<metrics::Gauge<uint64_t>> CreateSyncInt64MetricSystemCpuFrequency(
     metrics::Meter *meter)
 {
@@ -45,7 +45,7 @@ static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricSy
   return meter->CreateDoubleGauge(kMetricSystemCpuFrequency, descrMetricSystemCpuFrequency,
                                   unitMetricSystemCpuFrequency);
 }
-#endif /* OPENTELEMETRY_LATER */
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricSystemCpuFrequency(metrics::Meter *meter)
@@ -193,8 +193,8 @@ static constexpr const char *descrMetricSystemCpuUtilization =
     "number of logical CPUs";
 static constexpr const char *unitMetricSystemCpuUtilization = "1";
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Sync gauge
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
 static inline nostd::unique_ptr<metrics::Gauge<uint64_t>> CreateSyncInt64MetricSystemCpuUtilization(
     metrics::Meter *meter)
 {
@@ -208,7 +208,7 @@ static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricSy
   return meter->CreateDoubleGauge(kMetricSystemCpuUtilization, descrMetricSystemCpuUtilization,
                                   unitMetricSystemCpuUtilization);
 }
-#endif /* OPENTELEMETRY_LATER */
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricSystemCpuUtilization(metrics::Meter *meter)
@@ -469,8 +469,8 @@ static constexpr const char *kMetricSystemFilesystemUtilization =
 static constexpr const char *descrMetricSystemFilesystemUtilization = "";
 static constexpr const char *unitMetricSystemFilesystemUtilization  = "1";
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Sync gauge
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
 static inline nostd::unique_ptr<metrics::Gauge<uint64_t>>
 CreateSyncInt64MetricSystemFilesystemUtilization(metrics::Meter *meter)
 {
@@ -486,7 +486,7 @@ CreateSyncDoubleMetricSystemFilesystemUtilization(metrics::Meter *meter)
                                   descrMetricSystemFilesystemUtilization,
                                   unitMetricSystemFilesystemUtilization);
 }
-#endif /* OPENTELEMETRY_LATER */
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricSystemFilesystemUtilization(metrics::Meter *meter)
@@ -727,8 +727,8 @@ static constexpr const char *kMetricSystemMemoryUtilization = "metric.system.mem
 static constexpr const char *descrMetricSystemMemoryUtilization = "";
 static constexpr const char *unitMetricSystemMemoryUtilization  = "1";
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Sync gauge
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
 static inline nostd::unique_ptr<metrics::Gauge<uint64_t>>
 CreateSyncInt64MetricSystemMemoryUtilization(metrics::Meter *meter)
 {
@@ -744,7 +744,7 @@ CreateSyncDoubleMetricSystemMemoryUtilization(metrics::Meter *meter)
                                   descrMetricSystemMemoryUtilization,
                                   unitMetricSystemMemoryUtilization);
 }
-#endif /* OPENTELEMETRY_LATER */
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricSystemMemoryUtilization(metrics::Meter *meter)
@@ -1086,8 +1086,8 @@ static constexpr const char *kMetricSystemPagingUtilization = "metric.system.pag
 static constexpr const char *descrMetricSystemPagingUtilization = "";
 static constexpr const char *unitMetricSystemPagingUtilization  = "1";
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Sync gauge
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
 static inline nostd::unique_ptr<metrics::Gauge<uint64_t>>
 CreateSyncInt64MetricSystemPagingUtilization(metrics::Meter *meter)
 {
@@ -1103,7 +1103,7 @@ CreateSyncDoubleMetricSystemPagingUtilization(metrics::Meter *meter)
                                   descrMetricSystemPagingUtilization,
                                   unitMetricSystemPagingUtilization);
 }
-#endif /* OPENTELEMETRY_LATER */
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricSystemPagingUtilization(metrics::Meter *meter)

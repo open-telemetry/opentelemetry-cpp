@@ -80,23 +80,6 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
                                       unitMetricFaasCpuUsage);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncInt64MetricFaasCpuUsage(
-    metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricFaasCpuUsage, descrMetricFaasCpuUsage,
-                                               unitMetricFaasCpuUsage);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDoubleMetricFaasCpuUsage(
-    metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricFaasCpuUsage, descrMetricFaasCpuUsage,
-                                                unitMetricFaasCpuUsage);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Number of invocation errors
  * <p>
@@ -155,23 +138,6 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
   return meter->CreateDoubleHistogram(kMetricFaasInitDuration, descrMetricFaasInitDuration,
                                       unitMetricFaasInitDuration);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricFaasInitDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricFaasInitDuration, descrMetricFaasInitDuration,
-                                               unitMetricFaasInitDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricFaasInitDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(
-      kMetricFaasInitDuration, descrMetricFaasInitDuration, unitMetricFaasInitDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Number of successful invocations
@@ -234,23 +200,6 @@ CreateSyncDoubleMetricFaasInvokeDuration(metrics::Meter *meter)
                                       unitMetricFaasInvokeDuration);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricFaasInvokeDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(
-      kMetricFaasInvokeDuration, descrMetricFaasInvokeDuration, unitMetricFaasInvokeDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricFaasInvokeDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(
-      kMetricFaasInvokeDuration, descrMetricFaasInvokeDuration, unitMetricFaasInvokeDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Distribution of max memory usage per invocation
  * <p>
@@ -275,23 +224,6 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
                                       unitMetricFaasMemUsage);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncInt64MetricFaasMemUsage(
-    metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricFaasMemUsage, descrMetricFaasMemUsage,
-                                               unitMetricFaasMemUsage);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDoubleMetricFaasMemUsage(
-    metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricFaasMemUsage, descrMetricFaasMemUsage,
-                                                unitMetricFaasMemUsage);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Distribution of net I/O usage per invocation
  * <p>
@@ -312,23 +244,6 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
 {
   return meter->CreateDoubleHistogram(kMetricFaasNetIo, descrMetricFaasNetIo, unitMetricFaasNetIo);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncInt64MetricFaasNetIo(
-    metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricFaasNetIo, descrMetricFaasNetIo,
-                                               unitMetricFaasNetIo);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDoubleMetricFaasNetIo(
-    metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricFaasNetIo, descrMetricFaasNetIo,
-                                                unitMetricFaasNetIo);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Number of invocation timeouts

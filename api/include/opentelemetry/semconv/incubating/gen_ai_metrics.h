@@ -46,25 +46,6 @@ CreateSyncDoubleMetricGenAiClientOperationDuration(metrics::Meter *meter)
                                       unitMetricGenAiClientOperationDuration);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricGenAiClientOperationDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricGenAiClientOperationDuration,
-                                               descrMetricGenAiClientOperationDuration,
-                                               unitMetricGenAiClientOperationDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricGenAiClientOperationDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricGenAiClientOperationDuration,
-                                                descrMetricGenAiClientOperationDuration,
-                                                unitMetricGenAiClientOperationDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Measures number of input and output tokens used
  * <p>
@@ -90,25 +71,6 @@ CreateSyncDoubleMetricGenAiClientTokenUsage(metrics::Meter *meter)
                                       descrMetricGenAiClientTokenUsage,
                                       unitMetricGenAiClientTokenUsage);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricGenAiClientTokenUsage(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricGenAiClientTokenUsage,
-                                               descrMetricGenAiClientTokenUsage,
-                                               unitMetricGenAiClientTokenUsage);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricGenAiClientTokenUsage(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricGenAiClientTokenUsage,
-                                                descrMetricGenAiClientTokenUsage,
-                                                unitMetricGenAiClientTokenUsage);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Generative AI server request duration such as time-to-last byte or last output token
@@ -137,25 +99,6 @@ CreateSyncDoubleMetricGenAiServerRequestDuration(metrics::Meter *meter)
                                       unitMetricGenAiServerRequestDuration);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricGenAiServerRequestDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricGenAiServerRequestDuration,
-                                               descrMetricGenAiServerRequestDuration,
-                                               unitMetricGenAiServerRequestDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricGenAiServerRequestDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricGenAiServerRequestDuration,
-                                                descrMetricGenAiServerRequestDuration,
-                                                unitMetricGenAiServerRequestDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Time per output token generated after the first token for successful responses
  * <p>
@@ -183,25 +126,6 @@ CreateSyncDoubleMetricGenAiServerTimePerOutputToken(metrics::Meter *meter)
                                       unitMetricGenAiServerTimePerOutputToken);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricGenAiServerTimePerOutputToken(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricGenAiServerTimePerOutputToken,
-                                               descrMetricGenAiServerTimePerOutputToken,
-                                               unitMetricGenAiServerTimePerOutputToken);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricGenAiServerTimePerOutputToken(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricGenAiServerTimePerOutputToken,
-                                                descrMetricGenAiServerTimePerOutputToken,
-                                                unitMetricGenAiServerTimePerOutputToken);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Time to generate first token for successful responses
  * <p>
@@ -228,25 +152,6 @@ CreateSyncDoubleMetricGenAiServerTimeToFirstToken(metrics::Meter *meter)
                                       descrMetricGenAiServerTimeToFirstToken,
                                       unitMetricGenAiServerTimeToFirstToken);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricGenAiServerTimeToFirstToken(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricGenAiServerTimeToFirstToken,
-                                               descrMetricGenAiServerTimeToFirstToken,
-                                               unitMetricGenAiServerTimeToFirstToken);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricGenAiServerTimeToFirstToken(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricGenAiServerTimeToFirstToken,
-                                                descrMetricGenAiServerTimeToFirstToken,
-                                                unitMetricGenAiServerTimeToFirstToken);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 }  // namespace gen_ai
 }  // namespace semconv

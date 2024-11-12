@@ -88,25 +88,6 @@ CreateSyncDoubleMetricDbClientConnectionCreateTime(metrics::Meter *meter)
                                       unitMetricDbClientConnectionCreateTime);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricDbClientConnectionCreateTime(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricDbClientConnectionCreateTime,
-                                               descrMetricDbClientConnectionCreateTime,
-                                               unitMetricDbClientConnectionCreateTime);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricDbClientConnectionCreateTime(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricDbClientConnectionCreateTime,
-                                                descrMetricDbClientConnectionCreateTime,
-                                                unitMetricDbClientConnectionCreateTime);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * The maximum number of idle open connections allowed
  * <p>
@@ -349,25 +330,6 @@ CreateSyncDoubleMetricDbClientConnectionUseTime(metrics::Meter *meter)
                                       unitMetricDbClientConnectionUseTime);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricDbClientConnectionUseTime(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricDbClientConnectionUseTime,
-                                               descrMetricDbClientConnectionUseTime,
-                                               unitMetricDbClientConnectionUseTime);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricDbClientConnectionUseTime(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricDbClientConnectionUseTime,
-                                                descrMetricDbClientConnectionUseTime,
-                                                unitMetricDbClientConnectionUseTime);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * The time it took to obtain an open connection from the pool
  * <p>
@@ -394,25 +356,6 @@ CreateSyncDoubleMetricDbClientConnectionWaitTime(metrics::Meter *meter)
                                       descrMetricDbClientConnectionWaitTime,
                                       unitMetricDbClientConnectionWaitTime);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricDbClientConnectionWaitTime(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricDbClientConnectionWaitTime,
-                                               descrMetricDbClientConnectionWaitTime,
-                                               unitMetricDbClientConnectionWaitTime);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricDbClientConnectionWaitTime(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricDbClientConnectionWaitTime,
-                                                descrMetricDbClientConnectionWaitTime,
-                                                unitMetricDbClientConnectionWaitTime);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Deprecated, use @code db.client.connection.create_time @endcode instead. Note: the unit also
@@ -448,27 +391,6 @@ CreateSyncDoubleMetricDbClientConnectionsCreateTimeDeprecated(metrics::Meter *me
                                       descrMetricDbClientConnectionsCreateTimeDeprecated,
                                       unitMetricDbClientConnectionsCreateTimeDeprecated);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-OPENTELEMETRY_DEPRECATED
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricDbClientConnectionsCreateTimeDeprecated(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricDbClientConnectionsCreateTimeDeprecated,
-                                               descrMetricDbClientConnectionsCreateTimeDeprecated,
-                                               unitMetricDbClientConnectionsCreateTimeDeprecated);
-}
-
-OPENTELEMETRY_DEPRECATED
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricDbClientConnectionsCreateTimeDeprecated(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricDbClientConnectionsCreateTimeDeprecated,
-                                                descrMetricDbClientConnectionsCreateTimeDeprecated,
-                                                unitMetricDbClientConnectionsCreateTimeDeprecated);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Deprecated, use @code db.client.connection.idle.max @endcode instead.
@@ -825,27 +747,6 @@ CreateSyncDoubleMetricDbClientConnectionsUseTimeDeprecated(metrics::Meter *meter
                                       unitMetricDbClientConnectionsUseTimeDeprecated);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-OPENTELEMETRY_DEPRECATED
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricDbClientConnectionsUseTimeDeprecated(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricDbClientConnectionsUseTimeDeprecated,
-                                               descrMetricDbClientConnectionsUseTimeDeprecated,
-                                               unitMetricDbClientConnectionsUseTimeDeprecated);
-}
-
-OPENTELEMETRY_DEPRECATED
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricDbClientConnectionsUseTimeDeprecated(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricDbClientConnectionsUseTimeDeprecated,
-                                                descrMetricDbClientConnectionsUseTimeDeprecated,
-                                                unitMetricDbClientConnectionsUseTimeDeprecated);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Deprecated, use @code db.client.connection.wait_time @endcode instead. Note: the unit also
  * changed from @code ms @endcode to @code s @endcode. <p>
@@ -881,27 +782,6 @@ CreateSyncDoubleMetricDbClientConnectionsWaitTimeDeprecated(metrics::Meter *mete
                                       unitMetricDbClientConnectionsWaitTimeDeprecated);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-OPENTELEMETRY_DEPRECATED
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricDbClientConnectionsWaitTimeDeprecated(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricDbClientConnectionsWaitTimeDeprecated,
-                                               descrMetricDbClientConnectionsWaitTimeDeprecated,
-                                               unitMetricDbClientConnectionsWaitTimeDeprecated);
-}
-
-OPENTELEMETRY_DEPRECATED
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricDbClientConnectionsWaitTimeDeprecated(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricDbClientConnectionsWaitTimeDeprecated,
-                                                descrMetricDbClientConnectionsWaitTimeDeprecated,
-                                                unitMetricDbClientConnectionsWaitTimeDeprecated);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Duration of database client operations.
  * <p>
@@ -930,25 +810,6 @@ CreateSyncDoubleMetricDbClientOperationDuration(metrics::Meter *meter)
                                       descrMetricDbClientOperationDuration,
                                       unitMetricDbClientOperationDuration);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricDbClientOperationDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricDbClientOperationDuration,
-                                               descrMetricDbClientOperationDuration,
-                                               unitMetricDbClientOperationDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricDbClientOperationDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricDbClientOperationDuration,
-                                                descrMetricDbClientOperationDuration,
-                                                unitMetricDbClientOperationDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 }  // namespace db
 }  // namespace semconv

@@ -89,25 +89,6 @@ CreateSyncDoubleMetricHttpClientConnectionDuration(metrics::Meter *meter)
                                       unitMetricHttpClientConnectionDuration);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricHttpClientConnectionDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricHttpClientConnectionDuration,
-                                               descrMetricHttpClientConnectionDuration,
-                                               unitMetricHttpClientConnectionDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricHttpClientConnectionDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricHttpClientConnectionDuration,
-                                                descrMetricHttpClientConnectionDuration,
-                                                unitMetricHttpClientConnectionDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Number of outbound HTTP connections that are currently active or idle on the client.
  * <p>
@@ -181,25 +162,6 @@ CreateSyncDoubleMetricHttpClientRequestBodySize(metrics::Meter *meter)
                                       unitMetricHttpClientRequestBodySize);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricHttpClientRequestBodySize(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricHttpClientRequestBodySize,
-                                               descrMetricHttpClientRequestBodySize,
-                                               unitMetricHttpClientRequestBodySize);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricHttpClientRequestBodySize(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricHttpClientRequestBodySize,
-                                                descrMetricHttpClientRequestBodySize,
-                                                unitMetricHttpClientRequestBodySize);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Duration of HTTP client requests.
  * <p>
@@ -226,25 +188,6 @@ CreateSyncDoubleMetricHttpClientRequestDuration(metrics::Meter *meter)
                                       descrMetricHttpClientRequestDuration,
                                       unitMetricHttpClientRequestDuration);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricHttpClientRequestDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricHttpClientRequestDuration,
-                                               descrMetricHttpClientRequestDuration,
-                                               unitMetricHttpClientRequestDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricHttpClientRequestDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricHttpClientRequestDuration,
-                                                descrMetricHttpClientRequestDuration,
-                                                unitMetricHttpClientRequestDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Size of HTTP client response bodies.
@@ -275,25 +218,6 @@ CreateSyncDoubleMetricHttpClientResponseBodySize(metrics::Meter *meter)
                                       descrMetricHttpClientResponseBodySize,
                                       unitMetricHttpClientResponseBodySize);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricHttpClientResponseBodySize(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricHttpClientResponseBodySize,
-                                               descrMetricHttpClientResponseBodySize,
-                                               unitMetricHttpClientResponseBodySize);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricHttpClientResponseBodySize(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricHttpClientResponseBodySize,
-                                                descrMetricHttpClientResponseBodySize,
-                                                unitMetricHttpClientResponseBodySize);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Number of active HTTP server requests.
@@ -367,25 +291,6 @@ CreateSyncDoubleMetricHttpServerRequestBodySize(metrics::Meter *meter)
                                       unitMetricHttpServerRequestBodySize);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricHttpServerRequestBodySize(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricHttpServerRequestBodySize,
-                                               descrMetricHttpServerRequestBodySize,
-                                               unitMetricHttpServerRequestBodySize);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricHttpServerRequestBodySize(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricHttpServerRequestBodySize,
-                                                descrMetricHttpServerRequestBodySize,
-                                                unitMetricHttpServerRequestBodySize);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Duration of HTTP server requests.
  * <p>
@@ -412,25 +317,6 @@ CreateSyncDoubleMetricHttpServerRequestDuration(metrics::Meter *meter)
                                       descrMetricHttpServerRequestDuration,
                                       unitMetricHttpServerRequestDuration);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricHttpServerRequestDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricHttpServerRequestDuration,
-                                               descrMetricHttpServerRequestDuration,
-                                               unitMetricHttpServerRequestDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricHttpServerRequestDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricHttpServerRequestDuration,
-                                                descrMetricHttpServerRequestDuration,
-                                                unitMetricHttpServerRequestDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Size of HTTP server response bodies.
@@ -461,25 +347,6 @@ CreateSyncDoubleMetricHttpServerResponseBodySize(metrics::Meter *meter)
                                       descrMetricHttpServerResponseBodySize,
                                       unitMetricHttpServerResponseBodySize);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricHttpServerResponseBodySize(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricHttpServerResponseBodySize,
-                                               descrMetricHttpServerResponseBodySize,
-                                               unitMetricHttpServerResponseBodySize);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricHttpServerResponseBodySize(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricHttpServerResponseBodySize,
-                                                descrMetricHttpServerResponseBodySize,
-                                                unitMetricHttpServerResponseBodySize);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 }  // namespace http
 }  // namespace semconv

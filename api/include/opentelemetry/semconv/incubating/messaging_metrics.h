@@ -95,25 +95,6 @@ CreateSyncDoubleMetricMessagingClientOperationDuration(metrics::Meter *meter)
                                       unitMetricMessagingClientOperationDuration);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricMessagingClientOperationDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricMessagingClientOperationDuration,
-                                               descrMetricMessagingClientOperationDuration,
-                                               unitMetricMessagingClientOperationDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricMessagingClientOperationDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricMessagingClientOperationDuration,
-                                                descrMetricMessagingClientOperationDuration,
-                                                unitMetricMessagingClientOperationDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Number of messages producer attempted to publish to the broker.
  * <p>
@@ -185,25 +166,6 @@ CreateSyncDoubleMetricMessagingProcessDuration(metrics::Meter *meter)
                                       descrMetricMessagingProcessDuration,
                                       unitMetricMessagingProcessDuration);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricMessagingProcessDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricMessagingProcessDuration,
-                                               descrMetricMessagingProcessDuration,
-                                               unitMetricMessagingProcessDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricMessagingProcessDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricMessagingProcessDuration,
-                                                descrMetricMessagingProcessDuration,
-                                                unitMetricMessagingProcessDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Deprecated. Use @code messaging.client.consumed.messages @endcode instead.
@@ -291,27 +253,6 @@ CreateSyncDoubleMetricMessagingPublishDuration(metrics::Meter *meter)
                                       unitMetricMessagingPublishDuration);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-OPENTELEMETRY_DEPRECATED
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricMessagingPublishDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricMessagingPublishDuration,
-                                               descrMetricMessagingPublishDuration,
-                                               unitMetricMessagingPublishDuration);
-}
-
-OPENTELEMETRY_DEPRECATED
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricMessagingPublishDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricMessagingPublishDuration,
-                                                descrMetricMessagingPublishDuration,
-                                                unitMetricMessagingPublishDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Deprecated. Use @code messaging.client.produced.messages @endcode instead.
  * <p>
@@ -397,27 +338,6 @@ CreateSyncDoubleMetricMessagingReceiveDuration(metrics::Meter *meter)
                                       descrMetricMessagingReceiveDuration,
                                       unitMetricMessagingReceiveDuration);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-OPENTELEMETRY_DEPRECATED
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricMessagingReceiveDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricMessagingReceiveDuration,
-                                               descrMetricMessagingReceiveDuration,
-                                               unitMetricMessagingReceiveDuration);
-}
-
-OPENTELEMETRY_DEPRECATED
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricMessagingReceiveDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricMessagingReceiveDuration,
-                                                descrMetricMessagingReceiveDuration,
-                                                unitMetricMessagingReceiveDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Deprecated. Use @code messaging.client.consumed.messages @endcode instead.

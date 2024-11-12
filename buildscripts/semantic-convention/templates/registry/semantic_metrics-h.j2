@@ -31,10 +31,7 @@
     - Use the debug flag to dump the semantic convention data
       in the generated output, to inspect it.
     - Some instruments are not supported in the SDK.
-      For these, we still generate the code,
-      protected with OPENTELEMETRY_LATER (which should be undefined).
-    - Using #ifdef OPENTELEMETRY_LATER is preferred to #if 0,
-      so that clang format generates clean code.
+      For these, we do not generate the code.
 #}
 {# ========================================================================== #}
 
@@ -65,8 +62,8 @@ descr{{ metric.id | pascal_case }}
 unit{{ metric.id | pascal_case }}
 {% endmacro %}
 
-{% macro sync_instrument_support(metric) %}
-{{ metric.instrument | map_text("cpp_sync_support") }}
+{% macro sync_instrument_min_abi_version(metric) %}
+{{ metric.instrument | map_text("cpp_sync_min_abi_version") | trim }}
 {% endmacro %}
 
 {% macro sync_instrument_int64_type(metric) %}
@@ -85,8 +82,8 @@ unit{{ metric.id | pascal_case }}
 {{ metric.instrument | map_text("cpp_sync_instrument_to_double_factory") }}
 {% endmacro %}
 
-{% macro async_instrument_support(metric) %}
-{{ metric.instrument | map_text("cpp_async_support") | trim }}
+{% macro async_instrument_min_abi_version(metric) %}
+{{ metric.instrument | map_text("cpp_async_min_abi_version") | trim }}
 {% endmacro %}
 
 {% macro async_instrument_type(metric) %}
@@ -125,8 +122,8 @@ namespace {{ cpp_metric_namespace -}}
     {% set v_metric_name = var_metric_name(metric) %}
     {% set descr = descr_metric_name(metric) %}
     {% set unit = unit_metric_name(metric) %}
-    {% set sync_support = (sync_instrument_support(metric) | trim == "true") %}
-    {% set async_support = (async_instrument_support(metric) | trim == "true") %}
+    {% set sync_min_abi_version = (sync_instrument_min_abi_version(metric)) %}
+    {% set async_min_abi_version = (async_instrument_min_abi_version(metric)) %}
     {% set sync_int64_type = sync_instrument_int64_type(metric) %}
     {% set sync_double_type = sync_instrument_double_type(metric) %}
     {% set async_type = async_instrument_type(metric) %}
@@ -155,13 +152,13 @@ OPENTELEMETRY_DEPRECATED
     {% endif %}
 static constexpr const char *{{unit}} = "{{metric.unit}}";
 
-    {% if sync_support is false %}
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Sync {{ metric.instrument }}
-    {% endif %}
-    {% if metric is deprecated %}
+    {% if sync_min_abi_version|trim != "0" %}
+        {% if sync_min_abi_version|trim != "1" %}
+#if OPENTELEMETRY_ABI_VERSION_NO >= {{sync_min_abi_version}}
+        {% endif %}
+        {% if metric is deprecated %}
 OPENTELEMETRY_DEPRECATED
-    {% endif %}
+        {% endif %}
 static inline nostd::unique_ptr<{{sync_int64_type-}}>
 CreateSyncInt64{{f_metric_name-}}(metrics::Meter *meter)
 {
@@ -171,9 +168,9 @@ CreateSyncInt64{{f_metric_name-}}(metrics::Meter *meter)
     {{unit}});
 }
 
-    {% if metric is deprecated %}
+        {% if metric is deprecated %}
 OPENTELEMETRY_DEPRECATED
-    {% endif %}
+        {% endif %}
 static inline nostd::unique_ptr<{{sync_double_type-}}>
 CreateSyncDouble{{f_metric_name-}}(metrics::Meter *meter)
 {
@@ -182,17 +179,18 @@ CreateSyncDouble{{f_metric_name-}}(metrics::Meter *meter)
     {{descr}},
     {{unit}});
 }
-    {% if sync_support is false %}
-#endif /* OPENTELEMETRY_LATER */
+        {% if sync_min_abi_version|trim != "1" %}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
+        {% endif %}
     {% endif %}
 
-    {% if async_support is false %}
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async {{ metric.instrument }}
-    {% endif %}
-    {% if metric is deprecated %}
+    {% if async_min_abi_version|trim != "0" %}
+        {% if async_min_abi_version|trim != "1" %}
+#if OPENTELEMETRY_ABI_VERSION_NO >= {{async_min_abi_version}}
+        {% endif %}
+        {% if metric is deprecated %}
 OPENTELEMETRY_DEPRECATED
-    {% endif %}
+        {% endif %}
 static inline nostd::shared_ptr<{{async_type-}}>
 CreateAsyncInt64{{f_metric_name-}}(metrics::Meter *meter)
 {
@@ -202,9 +200,9 @@ CreateAsyncInt64{{f_metric_name-}}(metrics::Meter *meter)
     {{unit}});
 }
 
-    {% if metric is deprecated %}
+        {% if metric is deprecated %}
 OPENTELEMETRY_DEPRECATED
-    {% endif %}
+        {% endif %}
 static inline nostd::shared_ptr<{{async_type-}}>
 CreateAsyncDouble{{f_metric_name-}}(metrics::Meter *meter)
 {
@@ -213,8 +211,9 @@ CreateAsyncDouble{{f_metric_name-}}(metrics::Meter *meter)
     {{descr}},
     {{unit}});
 }
-    {% if async_support is false %}
-#endif /* OPENTELEMETRY_LATER */
+        {% if async_min_abi_version|trim != "1" %}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
+        {% endif %}
     {% endif %}
 
     {% if excluded %}

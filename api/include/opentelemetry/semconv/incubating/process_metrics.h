@@ -110,8 +110,8 @@ static constexpr const char *descrMetricProcessCpuUtilization =
     "number of CPUs available to the process.";
 static constexpr const char *unitMetricProcessCpuUtilization = "1";
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Sync gauge
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
 static inline nostd::unique_ptr<metrics::Gauge<uint64_t>>
 CreateSyncInt64MetricProcessCpuUtilization(metrics::Meter *meter)
 {
@@ -125,7 +125,7 @@ static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricPr
   return meter->CreateDoubleGauge(kMetricProcessCpuUtilization, descrMetricProcessCpuUtilization,
                                   unitMetricProcessCpuUtilization);
 }
-#endif /* OPENTELEMETRY_LATER */
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricProcessCpuUtilization(metrics::Meter *meter)

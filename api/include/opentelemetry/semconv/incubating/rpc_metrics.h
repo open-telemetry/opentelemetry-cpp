@@ -49,23 +49,6 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
                                       unitMetricRpcClientDuration);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricRpcClientDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(
-      kMetricRpcClientDuration, descrMetricRpcClientDuration, unitMetricRpcClientDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricRpcClientDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(
-      kMetricRpcClientDuration, descrMetricRpcClientDuration, unitMetricRpcClientDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Measures the size of RPC request messages (uncompressed).
  * <p>
@@ -91,23 +74,6 @@ CreateSyncDoubleMetricRpcClientRequestSize(metrics::Meter *meter)
   return meter->CreateDoubleHistogram(kMetricRpcClientRequestSize, descrMetricRpcClientRequestSize,
                                       unitMetricRpcClientRequestSize);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricRpcClientRequestSize(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(
-      kMetricRpcClientRequestSize, descrMetricRpcClientRequestSize, unitMetricRpcClientRequestSize);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricRpcClientRequestSize(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(
-      kMetricRpcClientRequestSize, descrMetricRpcClientRequestSize, unitMetricRpcClientRequestSize);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Measures the number of messages received per RPC.
@@ -139,25 +105,6 @@ CreateSyncDoubleMetricRpcClientRequestsPerRpc(metrics::Meter *meter)
                                       unitMetricRpcClientRequestsPerRpc);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricRpcClientRequestsPerRpc(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricRpcClientRequestsPerRpc,
-                                               descrMetricRpcClientRequestsPerRpc,
-                                               unitMetricRpcClientRequestsPerRpc);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricRpcClientRequestsPerRpc(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricRpcClientRequestsPerRpc,
-                                                descrMetricRpcClientRequestsPerRpc,
-                                                unitMetricRpcClientRequestsPerRpc);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Measures the size of RPC response messages (uncompressed).
  * <p>
@@ -185,25 +132,6 @@ CreateSyncDoubleMetricRpcClientResponseSize(metrics::Meter *meter)
                                       descrMetricRpcClientResponseSize,
                                       unitMetricRpcClientResponseSize);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricRpcClientResponseSize(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricRpcClientResponseSize,
-                                               descrMetricRpcClientResponseSize,
-                                               unitMetricRpcClientResponseSize);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricRpcClientResponseSize(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricRpcClientResponseSize,
-                                                descrMetricRpcClientResponseSize,
-                                                unitMetricRpcClientResponseSize);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Measures the number of messages sent per RPC.
@@ -236,25 +164,6 @@ CreateSyncDoubleMetricRpcClientResponsesPerRpc(metrics::Meter *meter)
                                       unitMetricRpcClientResponsesPerRpc);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricRpcClientResponsesPerRpc(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricRpcClientResponsesPerRpc,
-                                               descrMetricRpcClientResponsesPerRpc,
-                                               unitMetricRpcClientResponsesPerRpc);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricRpcClientResponsesPerRpc(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricRpcClientResponsesPerRpc,
-                                                descrMetricRpcClientResponsesPerRpc,
-                                                unitMetricRpcClientResponsesPerRpc);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Measures the duration of inbound RPC.
  * <p>
@@ -283,23 +192,6 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
                                       unitMetricRpcServerDuration);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricRpcServerDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(
-      kMetricRpcServerDuration, descrMetricRpcServerDuration, unitMetricRpcServerDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricRpcServerDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(
-      kMetricRpcServerDuration, descrMetricRpcServerDuration, unitMetricRpcServerDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Measures the size of RPC request messages (uncompressed).
  * <p>
@@ -325,23 +217,6 @@ CreateSyncDoubleMetricRpcServerRequestSize(metrics::Meter *meter)
   return meter->CreateDoubleHistogram(kMetricRpcServerRequestSize, descrMetricRpcServerRequestSize,
                                       unitMetricRpcServerRequestSize);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricRpcServerRequestSize(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(
-      kMetricRpcServerRequestSize, descrMetricRpcServerRequestSize, unitMetricRpcServerRequestSize);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricRpcServerRequestSize(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(
-      kMetricRpcServerRequestSize, descrMetricRpcServerRequestSize, unitMetricRpcServerRequestSize);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Measures the number of messages received per RPC.
@@ -373,25 +248,6 @@ CreateSyncDoubleMetricRpcServerRequestsPerRpc(metrics::Meter *meter)
                                       unitMetricRpcServerRequestsPerRpc);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricRpcServerRequestsPerRpc(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricRpcServerRequestsPerRpc,
-                                               descrMetricRpcServerRequestsPerRpc,
-                                               unitMetricRpcServerRequestsPerRpc);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricRpcServerRequestsPerRpc(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricRpcServerRequestsPerRpc,
-                                                descrMetricRpcServerRequestsPerRpc,
-                                                unitMetricRpcServerRequestsPerRpc);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 /**
  * Measures the size of RPC response messages (uncompressed).
  * <p>
@@ -419,25 +275,6 @@ CreateSyncDoubleMetricRpcServerResponseSize(metrics::Meter *meter)
                                       descrMetricRpcServerResponseSize,
                                       unitMetricRpcServerResponseSize);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricRpcServerResponseSize(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricRpcServerResponseSize,
-                                               descrMetricRpcServerResponseSize,
-                                               unitMetricRpcServerResponseSize);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricRpcServerResponseSize(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricRpcServerResponseSize,
-                                                descrMetricRpcServerResponseSize,
-                                                unitMetricRpcServerResponseSize);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 /**
  * Measures the number of messages sent per RPC.
@@ -469,25 +306,6 @@ CreateSyncDoubleMetricRpcServerResponsesPerRpc(metrics::Meter *meter)
                                       descrMetricRpcServerResponsesPerRpc,
                                       unitMetricRpcServerResponsesPerRpc);
 }
-
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricRpcServerResponsesPerRpc(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(kMetricRpcServerResponsesPerRpc,
-                                               descrMetricRpcServerResponsesPerRpc,
-                                               unitMetricRpcServerResponsesPerRpc);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricRpcServerResponsesPerRpc(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(kMetricRpcServerResponsesPerRpc,
-                                                descrMetricRpcServerResponsesPerRpc,
-                                                unitMetricRpcServerResponsesPerRpc);
-}
-#endif /* OPENTELEMETRY_LATER */
 
 }  // namespace rpc
 }  // namespace semconv

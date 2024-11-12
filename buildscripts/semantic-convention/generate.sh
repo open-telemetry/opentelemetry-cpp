@@ -92,7 +92,7 @@ generate() {
   docker run --rm --user ${MY_UID}:${MY_GID} \
     -v ${SCRIPT_DIR}/semantic-conventions/model:/source${USE_MOUNT_OPTION} \
     -v ${SCRIPT_DIR}/templates:/templates${USE_MOUNT_OPTION} \
-    -v ${ROOT_DIR}/wip/:/output${USE_MOUNT_OPTION} \
+    -v ${ROOT_DIR}/tmpgen/:/output${USE_MOUNT_OPTION} \
     otel/weaver:$WEAVER_VERSION_TAG \
     registry \
     generate \
@@ -106,15 +106,15 @@ generate() {
 }
 
 # stable attributes and metrics
-mkdir -p ${ROOT_DIR}/wip
+mkdir -p ${ROOT_DIR}/tmpgen
 generate "./" "./" "stable"
 
-mkdir -p ${ROOT_DIR}/wip/${INCUBATING_DIR}
+mkdir -p ${ROOT_DIR}/tmpgen/${INCUBATING_DIR}
 generate "./" "./${INCUBATING_DIR}/" "any"
 
-cp -r ${ROOT_DIR}/wip/*.h \
+cp -r ${ROOT_DIR}/tmpgen/*.h \
       ${ROOT_DIR}/api/include/opentelemetry/semconv/
 
-cp -r ${ROOT_DIR}/wip/${INCUBATING_DIR}/*.h \
+cp -r ${ROOT_DIR}/tmpgen/${INCUBATING_DIR}/*.h \
       ${ROOT_DIR}/api/include/opentelemetry/semconv/incubating
 

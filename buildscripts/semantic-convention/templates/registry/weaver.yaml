@@ -70,64 +70,65 @@ text_maps:
     template[string]: const char *
     template[string[]]: const char *[]
 
-  cpp_sync_support:
-    counter: "true"
-    histogram: "true"
-    updowncounter: "true"
-    gauge: "false"
+  # Minimum ABI_VERSION to support the feature:
+  # 0 - not supported
+  # 1 - supported in all versions
+  # 2 - supported in ABI_VERSION >= 2
+  cpp_sync_min_abi_version:
+    counter: 1
+    histogram: 1
+    updowncounter: 1
+    gauge: 2
 
   cpp_sync_instrument_to_int64_type:
     counter: metrics::Counter<uint64_t>
     histogram: metrics::Histogram<uint64_t>
     updowncounter: metrics::UpDownCounter<int64_t>
-    # Not supported yet
     gauge: metrics::Gauge<uint64_t>
 
   cpp_sync_instrument_to_double_type:
     counter: metrics::Counter<double>
     histogram: metrics::Histogram<double>
     updowncounter: metrics::UpDownCounter<double>
-    # Not supported yet
     gauge: metrics::Gauge<double>
 
   cpp_sync_instrument_to_int64_factory:
     counter: CreateUInt64Counter
     histogram: CreateUInt64Histogram
     updowncounter: CreateInt64UpDownCounter
-    # Not supported yet
     gauge: CreateUInt64Gauge
 
   cpp_sync_instrument_to_double_factory:
     counter: CreateDoubleCounter
     histogram: CreateDoubleHistogram
     updowncounter: CreateDoubleUpDownCounter
-    # Not supported yet
     gauge: CreateDoubleGauge
 
-  cpp_async_support:
-    counter: "true"
-    histogram: "false"
-    updowncounter: "true"
-    gauge: "true"
+  # Minimum ABI_VERSION to support the feature:
+  # 0 - not supported
+  # 1 - supported in all versions
+  # 2 - supported in ABI_VERSION >= 2
+  cpp_async_min_abi_version:
+    counter: 1
+    histogram: 0
+    updowncounter: 1
+    gauge: 1
 
   cpp_async_instrument_to_type:
     counter: metrics::ObservableInstrument
-    # Not supported yet
-    histogram: metrics::ObservableInstrument
+    histogram: UNSUPPORTED
     updowncounter: metrics::ObservableInstrument
     gauge: metrics::ObservableInstrument
 
   cpp_async_instrument_to_int64_factory:
     counter: CreateInt64ObservableCounter
-    # Not supported yet
-    histogram: CreateInt64ObservableHistogram
+    histogram: UNSUPPORTED
     updowncounter: CreateInt64ObservableUpDownCounter
     gauge: CreateInt64ObservableGauge
 
   cpp_async_instrument_to_double_factory:
     counter: CreateDoubleObservableCounter
-    # Not supported yet
-    histogram: CreateDoubleObservableHistogram
+    histogram: UNSUPPORTED
     updowncounter: CreateDoubleObservableUpDownCounter
     gauge: CreateDoubleObservableGauge
 

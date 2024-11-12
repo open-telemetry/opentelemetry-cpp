@@ -44,23 +44,6 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
                                       unitMetricDnsLookupDuration);
 }
 
-#ifdef OPENTELEMETRY_LATER
-// Unsupported: Async histogram
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricDnsLookupDuration(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableHistogram(
-      kMetricDnsLookupDuration, descrMetricDnsLookupDuration, unitMetricDnsLookupDuration);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricDnsLookupDuration(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableHistogram(
-      kMetricDnsLookupDuration, descrMetricDnsLookupDuration, unitMetricDnsLookupDuration);
-}
-#endif /* OPENTELEMETRY_LATER */
-
 }  // namespace dns
 }  // namespace semconv
 OPENTELEMETRY_END_NAMESPACE
