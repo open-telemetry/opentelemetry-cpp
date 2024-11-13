@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <opentelemetry/trace/propagation/b3_propagator.h>
+#include <stddef.h>
+#include <ostream>
 #include <string>
+#include <vector>
 
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/trace/propagation/detail/string.h"
 
 using namespace opentelemetry;
 

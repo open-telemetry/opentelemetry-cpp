@@ -1,24 +1,38 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/recordable.h"
-#include "opentelemetry/sdk/trace/simple_processor.h"
-#include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/trace/provider.h"
+#include <gtest/gtest.h>
+#include <algorithm>
+#include <array>
+#include <chrono>
+#include <cstdint>
+#include <map>
+#include <memory>
+#include <nlohmann/json.hpp>
+#include <string>
+#include <vector>
 
-#include "opentelemetry/sdk/trace/exporter.h"
-
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/zipkin/recordable.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
 
 #if defined(__GNUC__)
 // GCC raises -Wsuggest-override warnings on GTest,
 // in code related to TYPED_TEST() .
 #  pragma GCC diagnostic ignored "-Wsuggest-override"
 #endif
-
-#include <gtest/gtest.h>
 
 namespace trace    = opentelemetry::trace;
 namespace nostd    = opentelemetry::nostd;

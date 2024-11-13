@@ -1,17 +1,28 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <gtest/gtest.h>
+#include <stdint.h>
+#include <algorithm>
+#include <map>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/trace_state.h"
 
 #if defined(__GNUC__)
 // GCC raises -Wsuggest-override warnings on GTest,
 // in code related to TYPED_TEST() .
 #  pragma GCC diagnostic ignored "-Wsuggest-override"
 #endif
-
-#include <gtest/gtest.h>
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
