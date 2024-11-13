@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 

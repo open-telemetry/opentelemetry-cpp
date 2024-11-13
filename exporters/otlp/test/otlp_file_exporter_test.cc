@@ -1,32 +1,49 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <gtest/gtest.h>
+#include <stddef.h>
+#include <algorithm>
+#include <chrono>
+#include <cstdint>
+#include <functional>
+#include <initializer_list>
+#include <nlohmann/json.hpp>
+#include <sstream>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
+#include "opentelemetry/exporters/otlp/otlp_file_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
-
-#include "opentelemetry/exporters/otlp/otlp_file_exporter.h"
-
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-
-#include "google/protobuf/message_lite.h"
-#include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
-
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_startoptions.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/version.h"
 
-#include "opentelemetry/trace/provider.h"
-
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-
-#include "nlohmann/json.hpp"
-
-#include <chrono>
-#include <iostream>
-#include <sstream>
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#include "google/protobuf/message_lite.h"
+#include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+// clang-format on
 
 using namespace testing;
 

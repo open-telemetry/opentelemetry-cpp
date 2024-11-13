@@ -3,22 +3,19 @@
 
 #pragma once
 
+#include <stddef.h>
 #include <map>
 #include <memory>
 #include <string>
 #include <tuple>
 
 #include "opentelemetry/exporters/memory/in_memory_data.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
-{
-namespace metrics
-{
-struct ResourceMetrics;
-}
-}  // namespace sdk
 namespace exporter
 {
 namespace memory

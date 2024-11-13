@@ -4,6 +4,7 @@
 #include <gmock/gmock.h>
 #include <google/protobuf/message_lite.h>
 #include <gtest/gtest.h>
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
@@ -26,7 +27,6 @@
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
 #include "opentelemetry/ext/http/client/http_client.h"
-#include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/metrics/v1/metrics.pb.h"

@@ -1,34 +1,50 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/common/key_value_iterable_view.h"
-
-#include "opentelemetry/exporters/otlp/otlp_file_client.h"
-#include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
-#include "opentelemetry/exporters/otlp/otlp_recordable.h"
-#include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
-#include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/resource/resource.h"
-
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-
-#include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
-
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-
-#include "nlohmann/json.hpp"
-
+#include <google/protobuf/message_lite.h>
+#include <gtest/gtest.h>
 #include <chrono>
+#include <cstdint>
 #include <ctime>
 #include <fstream>
+#include <functional>
+#include <initializer_list>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
 #include <thread>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/exporters/otlp/otlp_file_client.h"
+#include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/proto/trace/v1/trace.pb.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/trace_state.h"
+#include "opentelemetry/version.h"
+
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
 
 using namespace testing;
 

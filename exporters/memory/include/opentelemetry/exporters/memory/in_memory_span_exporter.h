@@ -8,7 +8,9 @@
 #include <chrono>
 #include <memory>
 #include <ostream>
+#include <type_traits>
 #include <utility>
+#include <vector>
 
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/nostd/span.h"
