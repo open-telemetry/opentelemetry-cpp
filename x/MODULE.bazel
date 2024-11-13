@@ -38,3 +38,5 @@ use_repo(
     use_extension("@bazel_tools//tools/cpp:cc_configure.bzl", "cc_configure_extension"),
     "local_config_cc",
 )
+
+bazel_dep(name = "rules_cue", version = "0.8.3")
