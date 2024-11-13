@@ -8,7 +8,7 @@
 #include "opentelemetry/opentracingshim/span_context_shim.h"
 #include "opentelemetry/opentracingshim/tracer_shim.h"
 
-#include "opentelemetry/trace/semantic_conventions.h"
+#include "opentelemetry/semconv/exception_attributes.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentracing/ext/tags.h"
 
@@ -134,15 +134,15 @@ void SpanShim::logImpl(nostd::span<const EventEntry> fields,
     {
       if (key == "error.kind")  // - error.kind maps to exception.type.
       {
-        key = opentelemetry::trace::SemanticConventions::kExceptionType;
+        key = opentelemetry::semconv::exception::kExceptionType;
       }
       else if (key == "message")  // - message maps to exception.message.
       {
-        key = opentelemetry::trace::SemanticConventions::kExceptionMessage;
+        key = opentelemetry::semconv::exception::kExceptionMessage;
       }
       else if (key == "stack")  // - stack maps to exception.stacktrace.
       {
-        key = opentelemetry::trace::SemanticConventions::kExceptionStacktrace;
+        key = opentelemetry::semconv::exception::kExceptionStacktrace;
       }
     }
 

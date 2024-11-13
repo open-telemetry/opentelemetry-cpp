@@ -154,6 +154,18 @@ int main(int argc, char **argv)
     foo_library::gauge_example(name);
   }
 #endif
+  else if (example_type == "semconv_counter")
+  {
+    foo_library::semconv_counter_example();
+  }
+  else if (example_type == "semconv_observable_counter")
+  {
+    foo_library::semconv_observable_counter_example();
+  }
+  else if (example_type == "semconv_histogram")
+  {
+    foo_library::semconv_histogram_example();
+  }
   else
   {
     std::thread counter_example{&foo_library::counter_example, name};
@@ -162,6 +174,10 @@ int main(int argc, char **argv)
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
     std::thread gauge_example{&foo_library::gauge_example, name};
 #endif
+    std::thread semconv_counter_example{&foo_library::semconv_counter_example};
+    std::thread semconv_observable_counter_example{
+        &foo_library::semconv_observable_counter_example};
+    std::thread semconv_histogram_example{&foo_library::semconv_histogram_example};
 
     counter_example.join();
     observable_counter_example.join();
@@ -169,6 +185,9 @@ int main(int argc, char **argv)
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
     gauge_example.join();
 #endif
+    semconv_counter_example.join();
+    semconv_observable_counter_example.join();
+    semconv_histogram_example.join();
   }
 
   CleanupMetrics();
