@@ -14,6 +14,7 @@ copy_directory(
     name = "dashboards_dir",
     src = "dashboards",
     out = "dashboards",
+    hardlink = "on",
 )
 
 native_binary(
