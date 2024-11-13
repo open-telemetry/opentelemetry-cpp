@@ -13,29 +13,28 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../../"
 
-# freeze the spec & generator tools versions to make SemanticAttributes generation reproducible
+# freeze the spec & generator tools versions to make the generation reproducible
 
-# Repository up to 1.20.0:
-#   https://github.com/open-telemetry/opentelemetry-specification
-# Repository from 1.21.0:
-#   https://github.com/open-telemetry/semantic-conventions
+# repository: https://github.com/open-telemetry/semantic-conventions
 SEMCONV_VERSION=1.27.0
 
-# repository: https://github.com/open-telemetry/build-tools
-GENERATOR_VERSION=0.25.0
+# repository: https://github.com/open-telemetry/weaver
+WEAVER_VERSION=0.10.0
 
-SPEC_VERSION=v$SEMCONV_VERSION
-SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
+SEMCONV_VERSION_TAG=v$SEMCONV_VERSION
+WEAVER_VERSION_TAG=v$WEAVER_VERSION
+SCHEMA_URL="https://opentelemetry.io/schemas/${SEMCONV_VERSION}"
+INCUBATING_DIR=incubating
 
 cd ${SCRIPT_DIR}
 
-rm -rf tmp-semconv || true
-mkdir tmp-semconv
-cd tmp-semconv
+rm -rf semantic-conventions || true
+mkdir semantic-conventions
+cd semantic-conventions
 
 git init
 git remote add origin https://github.com/open-telemetry/semantic-conventions.git
-git fetch origin "$SPEC_VERSION"
+git fetch origin "$SEMCONV_VERSION_TAG"
 git reset --hard FETCH_HEAD
 cd ${SCRIPT_DIR}
 
@@ -52,41 +51,70 @@ if [ -x "$(command -v getenforce)" ]; then
   fi;
 fi
 
-# echo "Help ..."
+# DOCKER
+# ======
+#
+# docker is a root container
+#
+# MY_UID=$(id -u)
+# MY_GID=$(id -g)
+# docker --user ${MY_UID}:${MY_GID}
+#
+# PODMAN
+# ======
+#
+# podman is a rootless container
+# docker is an alias to podman
+#
+# docker --user 0:0
 
-# docker run --rm otel/semconvgen:$GENERATOR_VERSION -h
+MY_UID=$(id -u)
+MY_GID=$(id -g)
 
-echo "Generating semantic conventions for traces ..."
+if [ -x "$(command -v docker)" ]; then
+  PODMANSTATUS=$(docker -v | grep -c podman);
+  if [ "${PODMANSTATUS}" -ge "1" ]; then
+    echo "Detected PODMAN"
+    # podman is a rootless container.
+    # Execute the docker image as root,
+    # to avoid creating files as weaver:weaver in the container,
+    # so files end up created as the local user:group outside the container.
+    MY_UID="0"
+    MY_GID="0"
+    # Possible alternate solution: --userns=keep-id
+  fi;
+fi
 
-docker run --rm \
-  -v ${SCRIPT_DIR}/tmp-semconv/model:/source${USE_MOUNT_OPTION} \
-  -v ${SCRIPT_DIR}/templates:/templates${USE_MOUNT_OPTION} \
-  -v ${ROOT_DIR}/api/include/opentelemetry/trace/:/output${USE_MOUNT_OPTION} \
-  otel/semconvgen:$GENERATOR_VERSION \
-  --only span,event,attribute_group\
-  -f /source code \
-  --template /templates/SemanticAttributes.h.j2 \
-  --output /output/semantic_conventions.h \
-  -Dsemconv=trace \
-  -Dclass=SemanticConventions \
-  -DschemaUrl=$SCHEMA_URL \
-  -Dnamespace_open="namespace trace {" \
-  -Dnamespace_close="}"
+generate() {
+  TARGET=$1
+  OUTPUT=$2
+  FILTER=$3
+  docker run --rm --user ${MY_UID}:${MY_GID} \
+    -v ${SCRIPT_DIR}/semantic-conventions/model:/source${USE_MOUNT_OPTION} \
+    -v ${SCRIPT_DIR}/templates:/templates${USE_MOUNT_OPTION} \
+    -v ${ROOT_DIR}/tmpgen/:/output${USE_MOUNT_OPTION} \
+    otel/weaver:$WEAVER_VERSION_TAG \
+    registry \
+    generate \
+    --registry=/source \
+    --templates=/templates \
+    ${TARGET} \
+    /output/${TARGET} \
+    --param output=${OUTPUT} \
+    --param filter=${FILTER} \
+    --param schema_url=${SCHEMA_URL}
+}
 
-echo "Generating semantic conventions for resources ..."
+# stable attributes and metrics
+mkdir -p ${ROOT_DIR}/tmpgen
+generate "./" "./" "stable"
 
-docker run --rm \
-  -v ${SCRIPT_DIR}/tmp-semconv/model:/source${USE_MOUNT_OPTION} \
-  -v ${SCRIPT_DIR}/templates:/templates${USE_MOUNT_OPTION} \
-  -v ${ROOT_DIR}/sdk/include/opentelemetry/sdk/resource/:/output${USE_MOUNT_OPTION} \
-  otel/semconvgen:$GENERATOR_VERSION \
-  --only resource,attribute_group \
-  -f /source code \
-  --template /templates/SemanticAttributes.h.j2 \
-  --output /output/semantic_conventions.h \
-  -Dsemconv=resource \
-  -Dclass=SemanticConventions \
-  -DschemaUrl=$SCHEMA_URL \
-  -Dnamespace_open="namespace sdk { namespace resource {" \
-  -Dnamespace_close="} }"
+mkdir -p ${ROOT_DIR}/tmpgen/${INCUBATING_DIR}
+generate "./" "./${INCUBATING_DIR}/" "any"
+
+cp -r ${ROOT_DIR}/tmpgen/*.h \
+      ${ROOT_DIR}/api/include/opentelemetry/semconv/
+
+cp -r ${ROOT_DIR}/tmpgen/${INCUBATING_DIR}/*.h \
+      ${ROOT_DIR}/api/include/opentelemetry/semconv/incubating
 
