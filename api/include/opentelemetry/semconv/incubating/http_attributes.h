@@ -126,10 +126,10 @@ static constexpr const char *kHttpRequestResendCount = "http.request.resend_coun
 static constexpr const char *kHttpRequestSize = "http.request.size";
 
 /**
- * Deprecated, use @code http.request.header.content-length @endcode instead.
+ * Deprecated, use @code http.request.header.<key> @endcode instead.
  * <p>
  * @deprecated
- * Replaced by @code http.request.header.content-length @endcode.
+ * Replaced by @code http.request.header.<key> @endcode.
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kHttpRequestContentLength = "http.request_content_length";
@@ -177,10 +177,10 @@ static constexpr const char *kHttpResponseSize = "http.response.size";
 static constexpr const char *kHttpResponseStatusCode = "http.response.status_code";
 
 /**
- * Deprecated, use @code http.response.header.content-length @endcode instead.
+ * Deprecated, use @code http.response.header.<key> @endcode instead.
  * <p>
  * @deprecated
- * Replaced by @code http.response.header.content-length @endcode.
+ * Replaced by @code http.response.header.<key> @endcode.
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kHttpResponseContentLength = "http.response_content_length";

@@ -217,14 +217,14 @@ CreateAsyncDoubleMetricDbClientConnectionMax(metrics::Meter *meter)
 }
 
 /**
- * The number of pending requests for an open connection, cumulative for the entire pool
+ * The number of current pending requests for an open connection
  * <p>
  * updowncounter
  */
 static constexpr const char *kMetricDbClientConnectionPendingRequests =
     "metric.db.client.connection.pending_requests";
 static constexpr const char *descrMetricDbClientConnectionPendingRequests =
-    "The number of pending requests for an open connection, cumulative for the entire pool";
+    "The number of current pending requests for an open connection";
 static constexpr const char *unitMetricDbClientConnectionPendingRequests = "{request}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
