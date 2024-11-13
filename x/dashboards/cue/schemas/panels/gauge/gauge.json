@@ -1,0 +1,20 @@
+{
+  "kind": "GaugeChart",
+  "spec": {
+    "calculation": "last-number",
+    "format": {
+      "unit": "percent",
+      "decimalPlaces": 2
+    },
+    "thresholds": {
+      "steps": [
+        {
+          "value": 85
+        },
+        {
+          "value": 95
+        }
+      ]
+    }
+  }
+}
