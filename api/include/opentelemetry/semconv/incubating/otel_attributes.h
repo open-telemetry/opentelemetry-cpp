@@ -20,15 +20,19 @@ namespace otel
 {
 
 /**
+ * Deprecated. Use the @code otel.scope.name @endcode attribute
+ * <p>
  * @deprecated
- * use the @code otel.scope.name @endcode attribute.
+ * Use the @code otel.scope.name @endcode attribute.
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kOtelLibraryName = "otel.library.name";
 
 /**
+ * Deprecated. Use the @code otel.scope.version @endcode attribute.
+ * <p>
  * @deprecated
- * use the @code otel.scope.version @endcode attribute.
+ * Use the @code otel.scope.version @endcode attribute.
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kOtelLibraryVersion = "otel.library.version";

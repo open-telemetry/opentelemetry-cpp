@@ -60,6 +60,49 @@ CreateAsyncDoubleMetricContainerCpuTime(metrics::Meter *meter)
 }
 
 /**
+ * Container's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs
+ * <p>
+ * CPU usage of the specific container on all available CPU cores, averaged over the sample window
+ * <p>
+ * gauge
+ */
+static constexpr const char *kMetricContainerCpuUsage = "metric.container.cpu.usage";
+static constexpr const char *descrMetricContainerCpuUsage =
+    "Container's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs";
+static constexpr const char *unitMetricContainerCpuUsage = "{cpu}";
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>> CreateSyncInt64MetricContainerCpuUsage(
+    metrics::Meter *meter)
+{
+  return meter->CreateInt64Gauge(kMetricContainerCpuUsage, descrMetricContainerCpuUsage,
+                                 unitMetricContainerCpuUsage);
+}
+
+static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricContainerCpuUsage(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricContainerCpuUsage, descrMetricContainerCpuUsage,
+                                  unitMetricContainerCpuUsage);
+}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricContainerCpuUsage(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableGauge(kMetricContainerCpuUsage, descrMetricContainerCpuUsage,
+                                           unitMetricContainerCpuUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricContainerCpuUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(kMetricContainerCpuUsage, descrMetricContainerCpuUsage,
+                                            unitMetricContainerCpuUsage);
+}
+
+/**
  * Disk bytes for the container.
  * <p>
  * The total number of bytes read/written successfully (aggregated from all disks).

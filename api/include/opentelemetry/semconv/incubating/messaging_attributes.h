@@ -328,10 +328,10 @@ static constexpr const char *kMessagingRocketmqMessageType = "messaging.rocketmq
 static constexpr const char *kMessagingRocketmqNamespace = "messaging.rocketmq.namespace";
 
 /**
- * Deprecated, use @code messaging.servicebus.destination.subscription_name @endcode instead.
+ * Deprecated, use @code messaging.destination.subscription.name @endcode instead.
  * <p>
  * @deprecated
- * Replaced by @code messaging.servicebus.destination.subscription_name @endcode.
+ * Replaced by @code messaging.destination.subscription.name @endcode.
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kMessagingServicebusDestinationSubscriptionName =
@@ -369,17 +369,17 @@ static constexpr const char *kMessagingSystem = "messaging.system";
 namespace MessagingOperationTypeValues
 {
 /**
- * One or more messages are provided for publishing to an intermediary. If a single message is
- * published, the context of the "Publish" span can be used as the creation context and no "Create"
- * span needs to be created.
- */
-static constexpr const char *kPublish = "publish";
-
-/**
  * A message is created. "Create" spans always refer to a single message and are used to provide a
- * unique creation context for messages in batch publishing scenarios.
+ * unique creation context for messages in batch sending scenarios.
  */
 static constexpr const char *kCreate = "create";
+
+/**
+ * One or more messages are provided for sending to an intermediary. If a single message is sent,
+ * the context of the "Send" span can be used as the creation context and no "Create" span needs to
+ * be created.
+ */
+static constexpr const char *kSend = "send";
 
 /**
  * One or more messages are requested by a consumer. This operation refers to pull-based scenarios,
@@ -405,6 +405,15 @@ static constexpr const char *kSettle = "settle";
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kDeliver = "deliver";
+
+/**
+ * Deprecated. Use @code send @endcode instead.
+ * <p>
+ * @deprecated
+ * Replaced by @code send @endcode.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kPublish = "publish";
 
 }  // namespace MessagingOperationTypeValues
 

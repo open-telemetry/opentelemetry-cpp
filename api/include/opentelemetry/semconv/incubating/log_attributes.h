@@ -45,7 +45,7 @@ static constexpr const char *kLogFilePathResolved = "log.file.path_resolved";
 static constexpr const char *kLogIostream = "log.iostream";
 
 /**
- * The complete orignal Log Record.
+ * The complete original Log Record.
  * <p>
  * This value MAY be added when processing a Log Record which was originally transmitted as a string
  * or equivalent data type AND the Body field of the Log Record does not contain the same value.
