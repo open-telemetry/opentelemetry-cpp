@@ -102,7 +102,8 @@ static constexpr const char *kDbClientConnectionsState = "db.client.connections.
  * first collection name found in the query and it SHOULD match the value provided in the query text
  * including any schema and database name prefix. For batch operations, if the individual operations
  * are known to have the same collection name then that collection name SHOULD be used, otherwise
- * @code db.collection.name @endcode SHOULD NOT be captured.
+ * @code db.collection.name @endcode SHOULD NOT be captured. This attribute has stability level
+ * RELEASE CANDIDATE.
  */
 static constexpr const char *kDbCollectionName = "db.collection.name";
 
@@ -110,7 +111,7 @@ static constexpr const char *kDbCollectionName = "db.collection.name";
  * Deprecated, use @code server.address @endcode, @code server.port @endcode attributes instead.
  * <p>
  * @deprecated
- * "Replaced by @code server.address @endcode and @code server.port @endcode."
+ * Replaced by @code server.address @endcode and @code server.port @endcode.
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kDbConnectionString = "db.connection_string";
@@ -135,7 +136,7 @@ OPENTELEMETRY_DEPRECATED
 static constexpr const char *kDbCosmosdbContainer = "db.cosmosdb.container";
 
 /**
- * CosmosDB Operation Type.
+ * Cosmos DB Operation Type.
  */
 static constexpr const char *kDbCosmosdbOperationType = "db.cosmosdb.operation_type";
 
@@ -150,8 +151,12 @@ static constexpr const char *kDbCosmosdbRequestCharge = "db.cosmosdb.request_cha
 static constexpr const char *kDbCosmosdbRequestContentLength = "db.cosmosdb.request_content_length";
 
 /**
- * Cosmos DB status code.
+ * Deprecated, use @code db.response.status_code @endcode instead.
+ * <p>
+ * @deprecated
+ * Replaced by @code db.response.status_code @endcode.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kDbCosmosdbStatusCode = "db.cosmosdb.status_code";
 
 /**
@@ -239,7 +244,8 @@ static constexpr const char *kDbName = "db.name";
  * namespaces, to ensure that "startswith" queries for the more general namespaces will be valid.
  * Semantic conventions for individual database systems SHOULD document what @code db.namespace
  * @endcode means in the context of that system. It is RECOMMENDED to capture the value as provided
- * by the application without attempting to do any case normalization.
+ * by the application without attempting to do any case normalization. This attribute has stability
+ * level RELEASE CANDIDATE.
  */
 static constexpr const char *kDbNamespace = "db.namespace";
 
@@ -253,10 +259,11 @@ OPENTELEMETRY_DEPRECATED
 static constexpr const char *kDbOperation = "db.operation";
 
 /**
- * The number of queries included in a <a
- * href="/docs/database/database-spans.md#batch-operations">batch operation</a>. <p> Operations are
- * only considered batches when they contain two or more operations, and so @code
- * db.operation.batch.size @endcode SHOULD never be @code 1 @endcode.
+ * The number of queries included in a batch operation.
+ * <p>
+ * Operations are only considered batches when they contain two or more operations, and so @code
+ * db.operation.batch.size @endcode SHOULD never be @code 1 @endcode. This attribute has stability
+ * level RELEASE CANDIDATE.
  */
 static constexpr const char *kDbOperationBatchSize = "db.operation.batch.size";
 
@@ -268,7 +275,8 @@ static constexpr const char *kDbOperationBatchSize = "db.operation.batch.size";
  * first operation name found in the query. For batch operations, if the individual operations are
  * known to have the same operation name then that operation name SHOULD be used prepended by @code
  * BATCH  @endcode, otherwise @code db.operation.name @endcode SHOULD be @code BATCH @endcode or
- * some other database system specific term if more applicable.
+ * some other database system specific term if more applicable. This attribute has stability level
+ * RELEASE CANDIDATE.
  */
 static constexpr const char *kDbOperationName = "db.operation.name";
 
@@ -277,7 +285,7 @@ static constexpr const char *kDbOperationName = "db.operation.name";
  * parameter name, and the attribute value being a string representation of the parameter value. <p>
  * Query parameters should only be captured when @code db.query.text @endcode is parameterized with
  * placeholders. If a parameter has no name and instead is referenced only by index, then @code
- * <key> @endcode SHOULD be the 0-based index.
+ * <key> @endcode SHOULD be the 0-based index. This attribute has stability level RELEASE CANDIDATE.
  */
 static constexpr const char *kDbQueryParameter = "db.query.parameter";
 
@@ -292,7 +300,8 @@ static constexpr const char *kDbQueryParameter = "db.query.parameter";
  * specific separator if more applicable. Even though parameterized query text can potentially have
  * sensitive data, by using a parameterized query the user is giving a strong signal that any
  * sensitive data will be passed as parameter values, and the benefit to observability of capturing
- * the static part of the query text by default outweighs the risk.
+ * the static part of the query text by default outweighs the risk. This attribute has stability
+ * level RELEASE CANDIDATE.
  */
 static constexpr const char *kDbQueryText = "db.query.text";
 
@@ -304,6 +313,17 @@ static constexpr const char *kDbQueryText = "db.query.text";
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kDbRedisDatabaseIndex = "db.redis.database_index";
+
+/**
+ * Database response status code.
+ * <p>
+ * The status code returned by the database. Usually it represents an error code, but may also
+ * represent partial success, warning, or differentiate between various types of successful
+ * outcomes. Semantic conventions for individual database systems SHOULD document what @code
+ * db.response.status_code @endcode means in the context of that system. This attribute has
+ * stability level RELEASE CANDIDATE.
+ */
+static constexpr const char *kDbResponseStatusCode = "db.response.status_code";
 
 /**
  * Deprecated, use @code db.collection.name @endcode instead.
@@ -328,7 +348,8 @@ static constexpr const char *kDbStatement = "db.statement";
  * <p>
  * The actual DBMS may differ from the one identified by the client. For example, when using
  * PostgreSQL client libraries to connect to a CockroachDB, the @code db.system @endcode is set to
- * @code postgresql @endcode based on the instrumentation's best knowledge.
+ * @code postgresql @endcode based on the instrumentation's best knowledge. This attribute has
+ * stability level RELEASE CANDIDATE.
  */
 static constexpr const char *kDbSystem = "db.system";
 
@@ -447,77 +468,77 @@ namespace DbCosmosdbOperationTypeValues
 /**
  * none
  */
-static constexpr const char *kInvalid = "Invalid";
+static constexpr const char *kBatch = "batch";
 
 /**
  * none
  */
-static constexpr const char *kCreate = "Create";
+static constexpr const char *kCreate = "create";
 
 /**
  * none
  */
-static constexpr const char *kPatch = "Patch";
+static constexpr const char *kDelete = "delete";
 
 /**
  * none
  */
-static constexpr const char *kRead = "Read";
+static constexpr const char *kExecute = "execute";
 
 /**
  * none
  */
-static constexpr const char *kReadFeed = "ReadFeed";
+static constexpr const char *kExecuteJavascript = "execute_javascript";
 
 /**
  * none
  */
-static constexpr const char *kDelete = "Delete";
+static constexpr const char *kInvalid = "invalid";
 
 /**
  * none
  */
-static constexpr const char *kReplace = "Replace";
+static constexpr const char *kHead = "head";
 
 /**
  * none
  */
-static constexpr const char *kExecute = "Execute";
+static constexpr const char *kHeadFeed = "head_feed";
 
 /**
  * none
  */
-static constexpr const char *kQuery = "Query";
+static constexpr const char *kPatch = "patch";
 
 /**
  * none
  */
-static constexpr const char *kHead = "Head";
+static constexpr const char *kQuery = "query";
 
 /**
  * none
  */
-static constexpr const char *kHeadFeed = "HeadFeed";
+static constexpr const char *kQueryPlan = "query_plan";
 
 /**
  * none
  */
-static constexpr const char *kUpsert = "Upsert";
+static constexpr const char *kRead = "read";
 
 /**
  * none
  */
-static constexpr const char *kBatch = "Batch";
+static constexpr const char *kReadFeed = "read_feed";
 
 /**
  * none
  */
-static constexpr const char *kQueryPlan = "QueryPlan";
+static constexpr const char *kReplace = "replace";
 
 /**
  * none
  */
-static constexpr const char *kExecuteJavascript = "ExecuteJavaScript";
+static constexpr const char *kUpsert = "upsert";
 
 }  // namespace DbCosmosdbOperationTypeValues
 
@@ -695,7 +716,7 @@ static constexpr const char *kInstantdb = "instantdb";
 static constexpr const char *kInterbase = "interbase";
 
 /**
- * MariaDB
+ * MariaDB (This value has stability level RELEASE CANDIDATE)
  */
 static constexpr const char *kMariadb = "mariadb";
 
@@ -715,7 +736,7 @@ static constexpr const char *kMemcached = "memcached";
 static constexpr const char *kMongodb = "mongodb";
 
 /**
- * Microsoft SQL Server
+ * Microsoft SQL Server (This value has stability level RELEASE CANDIDATE)
  */
 static constexpr const char *kMssql = "mssql";
 
@@ -729,7 +750,7 @@ OPENTELEMETRY_DEPRECATED
 static constexpr const char *kMssqlcompact = "mssqlcompact";
 
 /**
- * MySQL
+ * MySQL (This value has stability level RELEASE CANDIDATE)
  */
 static constexpr const char *kMysql = "mysql";
 
@@ -764,7 +785,7 @@ static constexpr const char *kPervasive = "pervasive";
 static constexpr const char *kPointbase = "pointbase";
 
 /**
- * PostgreSQL
+ * PostgreSQL (This value has stability level RELEASE CANDIDATE)
  */
 static constexpr const char *kPostgresql = "postgresql";
 

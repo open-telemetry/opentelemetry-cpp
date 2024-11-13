@@ -20,12 +20,35 @@ namespace gen_ai
 {
 
 /**
- * The full response received from the GenAI model.
+ * Deprecated, use Event API to report completions contents.
  * <p>
- * It's RECOMMENDED to format completions as JSON string matching <a
- * href="https://platform.openai.com/docs/guides/text-generation">OpenAI messages format</a>
+ * @deprecated
+ * Removed, no replacement at this time.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kGenAiCompletion = "gen_ai.completion";
+
+/**
+ * The response format that is requested.
+ */
+static constexpr const char *kGenAiOpenaiRequestResponseFormat =
+    "gen_ai.openai.request.response_format";
+
+/**
+ * Requests with same seed value more likely to return same result.
+ */
+static constexpr const char *kGenAiOpenaiRequestSeed = "gen_ai.openai.request.seed";
+
+/**
+ * The service tier requested. May be a specific tier, detault, or auto.
+ */
+static constexpr const char *kGenAiOpenaiRequestServiceTier = "gen_ai.openai.request.service_tier";
+
+/**
+ * The service tier used for the response.
+ */
+static constexpr const char *kGenAiOpenaiResponseServiceTier =
+    "gen_ai.openai.response.service_tier";
 
 /**
  * The name of the operation being performed.
@@ -38,11 +61,12 @@ static constexpr const char *kGenAiCompletion = "gen_ai.completion";
 static constexpr const char *kGenAiOperationName = "gen_ai.operation.name";
 
 /**
- * The full prompt sent to the GenAI model.
+ * Deprecated, use Event API to report prompt contents.
  * <p>
- * It's RECOMMENDED to format prompts as JSON string matching <a
- * href="https://platform.openai.com/docs/guides/text-generation">OpenAI messages format</a>
+ * @deprecated
+ * Removed, no replacement at this time.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kGenAiPrompt = "gen_ai.prompt";
 
 /**
@@ -145,6 +169,39 @@ static constexpr const char *kGenAiUsageOutputTokens = "gen_ai.usage.output_toke
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kGenAiUsagePromptTokens = "gen_ai.usage.prompt_tokens";
+
+namespace GenAiOpenaiRequestResponseFormatValues
+{
+/**
+ * Text response format
+ */
+static constexpr const char *kText = "text";
+
+/**
+ * JSON object response format
+ */
+static constexpr const char *kJsonObject = "json_object";
+
+/**
+ * JSON schema response format
+ */
+static constexpr const char *kJsonSchema = "json_schema";
+
+}  // namespace GenAiOpenaiRequestResponseFormatValues
+
+namespace GenAiOpenaiRequestServiceTierValues
+{
+/**
+ * The system will utilize scale tier credits until they are exhausted.
+ */
+static constexpr const char *kAuto = "auto";
+
+/**
+ * The system will utilize the default scale tier.
+ */
+static constexpr const char *kDefault = "default";
+
+}  // namespace GenAiOpenaiRequestServiceTierValues
 
 namespace GenAiOperationNameValues
 {

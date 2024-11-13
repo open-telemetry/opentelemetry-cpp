@@ -28,12 +28,12 @@ namespace container
 static constexpr const char *kContainerCommand = "container.command";
 
 /**
- * All the command arguments (including the command/executable itself) run by the container. [2]
+ * All the command arguments (including the command/executable itself) run by the container.
  */
 static constexpr const char *kContainerCommandArgs = "container.command_args";
 
 /**
- * The full command run by the container as a single string representing the full command. [2]
+ * The full command run by the container as a single string representing the full command.
  */
 static constexpr const char *kContainerCommandLine = "container.command_line";
 
@@ -47,8 +47,24 @@ OPENTELEMETRY_DEPRECATED
 static constexpr const char *kContainerCpuState = "container.cpu.state";
 
 /**
+ * The name of the CSI (<a href="https://github.com/container-storage-interface/spec">Container
+ * Storage Interface</a>) plugin used by the volume. <p> This can sometimes be referred to as a
+ * "driver" in CSI implementations. This should represent the @code name @endcode field of the
+ * GetPluginInfo RPC.
+ */
+static constexpr const char *kContainerCsiPluginName = "container.csi.plugin.name";
+
+/**
+ * The unique volume ID returned by the CSI (<a
+ * href="https://github.com/container-storage-interface/spec">Container Storage Interface</a>)
+ * plugin. <p> This can sometimes be referred to as a "volume handle" in CSI implementations. This
+ * should represent the @code Volume.volume_id @endcode field in CSI spec.
+ */
+static constexpr const char *kContainerCsiVolumeId = "container.csi.volume.id";
+
+/**
  * Container ID. Usually a UUID, as for example used to <a
- * href="https://docs.docker.com/engine/reference/run/#container-identification">identify Docker
+ * href="https://docs.docker.com/engine/containers/run/#container-identification">identify Docker
  * containers</a>. The UUID might be abbreviated.
  */
 static constexpr const char *kContainerId = "container.id";

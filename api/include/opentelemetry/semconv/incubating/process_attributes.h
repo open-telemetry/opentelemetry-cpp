@@ -20,6 +20,14 @@ namespace process
 {
 
 /**
+ * Length of the process.command_args array
+ * <p>
+ * This field can be useful for querying or performing bucket analysis on how many arguments were
+ * provided to start a process. More arguments may be an indication of suspicious activity.
+ */
+static constexpr const char *kProcessArgsCount = "process.args_count";
+
+/**
  * The command used to launch the process (i.e. the command name). On Linux based systems, can be
  * set to the zeroth string in @code proc/[pid]/cmdline @endcode. On Windows, can be set to the
  * first parameter extracted from @code GetCommandLineW @endcode.
@@ -59,6 +67,23 @@ static constexpr const char *kProcessCpuState = "process.cpu.state";
  * The date and time the process was created, in ISO 8601 format.
  */
 static constexpr const char *kProcessCreationTime = "process.creation.time";
+
+/**
+ * The GNU build ID as found in the @code .note.gnu.build-id @endcode ELF section (hex string).
+ */
+static constexpr const char *kProcessExecutableBuildIdGnu = "process.executable.build_id.gnu";
+
+/**
+ * The Go build ID as retrieved by @code go tool buildid <go executable> @endcode.
+ */
+static constexpr const char *kProcessExecutableBuildIdGo = "process.executable.build_id.go";
+
+/**
+ * Profiling specific build ID for executables. See the OTel specification for Profiles for more
+ * information.
+ */
+static constexpr const char *kProcessExecutableBuildIdProfiling =
+    "process.executable.build_id.profiling";
 
 /**
  * The name of the process executable. On Linux based systems, can be set to the @code Name @endcode
@@ -157,6 +182,14 @@ static constexpr const char *kProcessSavedUserName = "process.saved_user.name";
 static constexpr const char *kProcessSessionLeaderPid = "process.session_leader.pid";
 
 /**
+ * Process title (proctitle)
+ * <p>
+ * In many Unix-like systems, process title (proctitle), is the string that represents the name or
+ * command line of a running process, displayed by system monitoring tools like ps, top, and htop.
+ */
+static constexpr const char *kProcessTitle = "process.title";
+
+/**
  * The effective user ID (EUID) of the process.
  */
 static constexpr const char *kProcessUserId = "process.user.id";
@@ -173,6 +206,11 @@ static constexpr const char *kProcessUserName = "process.user.name";
  * host but it is unique within the process namespace that the process exists within.
  */
 static constexpr const char *kProcessVpid = "process.vpid";
+
+/**
+ * The working directory of the process.
+ */
+static constexpr const char *kProcessWorkingDirectory = "process.working_directory";
 
 namespace ProcessContextSwitchTypeValues
 {

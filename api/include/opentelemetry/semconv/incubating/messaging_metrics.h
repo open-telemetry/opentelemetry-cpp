@@ -96,18 +96,23 @@ CreateSyncDoubleMetricMessagingClientOperationDuration(metrics::Meter *meter)
 }
 
 /**
- * Number of messages producer attempted to publish to the broker.
+ * Deprecated. Use @code messaging.client.sent.messages @endcode instead.
  * <p>
- * This metric MUST NOT count messages that were created haven't yet been attempted to be published.
+ * @deprecated
+ * Replaced by @code messaging.client.sent.messages @endcode.
  * <p>
  * counter
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kMetricMessagingClientPublishedMessages =
     "metric.messaging.client.published.messages";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricMessagingClientPublishedMessages =
-    "Number of messages producer attempted to publish to the broker.";
+    "Deprecated. Use `messaging.client.sent.messages` instead.";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *unitMetricMessagingClientPublishedMessages = "{message}";
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
 CreateSyncInt64MetricMessagingClientPublishedMessages(metrics::Meter *meter)
 {
@@ -116,6 +121,7 @@ CreateSyncInt64MetricMessagingClientPublishedMessages(metrics::Meter *meter)
                                     unitMetricMessagingClientPublishedMessages);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::Counter<double>>
 CreateSyncDoubleMetricMessagingClientPublishedMessages(metrics::Meter *meter)
 {
@@ -124,6 +130,7 @@ CreateSyncDoubleMetricMessagingClientPublishedMessages(metrics::Meter *meter)
                                     unitMetricMessagingClientPublishedMessages);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricMessagingClientPublishedMessages(metrics::Meter *meter)
 {
@@ -132,12 +139,58 @@ CreateAsyncInt64MetricMessagingClientPublishedMessages(metrics::Meter *meter)
                                              unitMetricMessagingClientPublishedMessages);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricMessagingClientPublishedMessages(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableCounter(kMetricMessagingClientPublishedMessages,
                                               descrMetricMessagingClientPublishedMessages,
                                               unitMetricMessagingClientPublishedMessages);
+}
+
+/**
+ * Number of messages producer attempted to send to the broker.
+ * <p>
+ * This metric MUST NOT count messages that were created but haven't yet been sent.
+ * <p>
+ * counter
+ */
+static constexpr const char *kMetricMessagingClientSentMessages =
+    "metric.messaging.client.sent.messages";
+static constexpr const char *descrMetricMessagingClientSentMessages =
+    "Number of messages producer attempted to send to the broker.";
+static constexpr const char *unitMetricMessagingClientSentMessages = "{message}";
+
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricMessagingClientSentMessages(metrics::Meter *meter)
+{
+  return meter->CreateUInt64Counter(kMetricMessagingClientSentMessages,
+                                    descrMetricMessagingClientSentMessages,
+                                    unitMetricMessagingClientSentMessages);
+}
+
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricMessagingClientSentMessages(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricMessagingClientSentMessages,
+                                    descrMetricMessagingClientSentMessages,
+                                    unitMetricMessagingClientSentMessages);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricMessagingClientSentMessages(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableCounter(kMetricMessagingClientSentMessages,
+                                             descrMetricMessagingClientSentMessages,
+                                             unitMetricMessagingClientSentMessages);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricMessagingClientSentMessages(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricMessagingClientSentMessages,
+                                              descrMetricMessagingClientSentMessages,
+                                              unitMetricMessagingClientSentMessages);
 }
 
 /**
