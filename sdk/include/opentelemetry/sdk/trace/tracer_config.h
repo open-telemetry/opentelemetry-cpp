@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -11,6 +11,11 @@ namespace sdk
 {
 namespace trace
 {
+// Forward declaration to support typedef creation
+class TracerConfig;
+
+typedef std::function<TracerConfig(const instrumentationscope::InstrumentationScope &)>
+    TracerConfigurator;
 /**
  * TracerConfig defines various configurable aspects of a Tracer's behavior.
  */
@@ -26,14 +31,14 @@ public:
   static TracerConfig Disabled();
   static TracerConfig Enabled();
   static TracerConfig Default();
-  static const instrumentationscope::ScopeConfigurator<TracerConfig> &DefaultConfigurator();
+  static const TracerConfigurator &DefaultConfigurator();
 
 private:
   explicit TracerConfig(const bool disabled = false) : disabled_(disabled) {}
   bool disabled_;
   static const TracerConfig kDefaultConfig;
   static const TracerConfig kDisabledConfig;
-  static const instrumentationscope::ScopeConfigurator<TracerConfig> kDefaultTracerConfigurator;
+  static const TracerConfigurator kDefaultTracerConfigurator;
 };
 }  // namespace trace
 }  // namespace sdk

@@ -6,7 +6,6 @@
 #include <utility>
 #include <vector>
 
-#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/multi_span_processor.h"
@@ -23,12 +22,11 @@ namespace trace
 {
 namespace resource = opentelemetry::sdk::resource;
 
-TracerContext::TracerContext(
-    std::vector<std::unique_ptr<SpanProcessor>> &&processors,
-    const resource::Resource &resource,
-    std::unique_ptr<Sampler> sampler,
-    std::unique_ptr<IdGenerator> id_generator,
-    std::unique_ptr<ScopeConfigurator<TracerConfig>> tracer_configurator) noexcept
+TracerContext::TracerContext(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
+                             const resource::Resource &resource,
+                             std::unique_ptr<Sampler> sampler,
+                             std::unique_ptr<IdGenerator> id_generator,
+                             std::unique_ptr<TracerConfigurator> tracer_configurator) noexcept
     : resource_(resource),
       sampler_(std::move(sampler)),
       id_generator_(std::move(id_generator)),
@@ -46,7 +44,7 @@ const resource::Resource &TracerContext::GetResource() const noexcept
   return resource_;
 }
 
-ScopeConfigurator<TracerConfig> &TracerContext::GetTracerConfigurator() const noexcept
+TracerConfigurator &TracerContext::GetTracerConfigurator() const noexcept
 {
   return *tracer_configurator_;
 }
