@@ -11,7 +11,8 @@
 #include <memory>
 #include <string>
 
-#include "opentelemetry/trace/semantic_conventions.h"
+#include "opentelemetry/semconv/incubating/rpc_attributes.h"
+#include "opentelemetry/semconv/network_attributes.h"
 #include "tracer_common.h"
 
 using grpc::Channel;
@@ -25,6 +26,7 @@ using grpc_example::GreetResponse;
 namespace
 {
 namespace context = opentelemetry::context;
+namespace semconv = opentelemetry::semconv;
 using namespace opentelemetry::trace;
 class GreeterClient
 {
@@ -43,14 +45,14 @@ public:
     options.kind = SpanKind::kClient;
 
     std::string span_name = "GreeterClient/Greet";
-    auto span             = get_tracer("grpc")->StartSpan(
-        span_name,
-        {{SemanticConventions::kRpcSystem, "grpc"},
-                     {SemanticConventions::kRpcService, "grpc-example.GreetService"},
-                     {SemanticConventions::kRpcMethod, "Greet"},
-                     {SemanticConventions::kNetworkPeerAddress, ip},
-                     {SemanticConventions::kNetworkPeerPort, port}},
-        options);
+    auto span =
+        get_tracer("grpc")->StartSpan(span_name,
+                                      {{semconv::rpc::kRpcSystem, "grpc"},
+                                       {semconv::rpc::kRpcService, "grpc-example.GreetService"},
+                                       {semconv::rpc::kRpcMethod, "Greet"},
+                                       {semconv::network::kNetworkPeerAddress, ip},
+                                       {semconv::network::kNetworkPeerPort, port}},
+                                      options);
 
     auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
 
@@ -65,7 +67,7 @@ public:
     if (status.ok())
     {
       span->SetStatus(StatusCode::kOk);
-      span->SetAttribute(SemanticConventions::kRpcGrpcStatusCode, status.error_code());
+      span->SetAttribute(semconv::rpc::kRpcGrpcStatusCode, status.error_code());
       // Make sure to end your spans!
       span->End();
       return response.response();
@@ -74,7 +76,7 @@ public:
     {
       std::cout << status.error_code() << ": " << status.error_message() << '\n';
       span->SetStatus(StatusCode::kError);
-      span->SetAttribute(SemanticConventions::kRpcGrpcStatusCode, status.error_code());
+      span->SetAttribute(semconv::rpc::kRpcGrpcStatusCode, status.error_code());
       // Make sure to end your spans!
       span->End();
       return "RPC failed";

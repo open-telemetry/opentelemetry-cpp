@@ -3,8 +3,8 @@
 
 #include "messages.grpc.pb.h"
 
+#include "opentelemetry/semconv/incubating/rpc_attributes.h"
 #include "opentelemetry/trace/context.h"
-#include "opentelemetry/trace/semantic_conventions.h"
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
 #include "tracer_common.h"
 
@@ -34,6 +34,7 @@ using SpanContext = opentelemetry::trace::SpanContext;
 using namespace opentelemetry::trace;
 
 namespace context = opentelemetry::context;
+namespace semconv = opentelemetry::semconv;
 
 namespace
 {
@@ -63,10 +64,10 @@ public:
 
     std::string span_name = "GreeterService/Greet";
     auto span             = get_tracer("grpc")->StartSpan(span_name,
-                                                          {{SemanticConventions::kRpcSystem, "grpc"},
-                                                           {SemanticConventions::kRpcService, "GreeterService"},
-                                                           {SemanticConventions::kRpcMethod, "Greet"},
-                                                           {SemanticConventions::kRpcGrpcStatusCode, 0}},
+                                                          {{semconv::rpc::kRpcSystem, "grpc"},
+                                                           {semconv::rpc::kRpcService, "GreeterService"},
+                                                           {semconv::rpc::kRpcMethod, "Greet"},
+                                                           {semconv::rpc::kRpcGrpcStatusCode, 0}},
                                                           options);
     auto scope            = get_tracer("grpc")->WithActiveSpan(span);
 
