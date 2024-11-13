@@ -13,6 +13,8 @@
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/trace/tracer_config.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

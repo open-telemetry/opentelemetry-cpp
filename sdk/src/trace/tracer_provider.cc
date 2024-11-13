@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>
 #include <chrono>
 #include <mutex>
 #include <utility>
@@ -11,6 +12,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -19,6 +21,7 @@
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 

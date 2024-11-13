@@ -17,6 +17,7 @@
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/span_startoptions.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
