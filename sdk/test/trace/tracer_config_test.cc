@@ -36,38 +36,41 @@ std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeVal
 std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> attr3 = {
     "accept_third_attr", 3};
 
-const instrumentation_scope::InstrumentationScope instrumentation_scopes[] = {
-    *instrumentation_scope::InstrumentationScope::Create("test_scope_1").get(),
-    *instrumentation_scope::InstrumentationScope::Create("test_scope_2", "1.0").get(),
-    *instrumentation_scope::InstrumentationScope::Create("test_scope_3",
-                                                         "0",
-                                                         "https://opentelemetry.io/schemas/v1.18.0")
-         .get(),
-    *instrumentation_scope::InstrumentationScope::Create("test_scope_3",
-                                                         "0",
-                                                         "https://opentelemetry.io/schemas/v1.18.0",
-                                                         {attr1})
-         .get(),
-    *instrumentation_scope::InstrumentationScope::Create("test_scope_4",
-                                                         "0",
-                                                         "https://opentelemetry.io/schemas/v1.18.0",
-                                                         {attr1, attr2, attr3})
-         .get(),
+const std::array<instrumentation_scope::InstrumentationScope *, 5> instrumentation_scopes = {
+    std::move(instrumentation_scope::InstrumentationScope::Create("test_scope_1")).get(),
+    std::move(instrumentation_scope::InstrumentationScope::Create("test_scope_2", "1.0")).get(),
+    std::move(instrumentation_scope::InstrumentationScope::Create(
+                  "test_scope_3",
+                  "0",
+                  "https://opentelemetry.io/schemas/v1.18.0"))
+        .get(),
+    std::move(instrumentation_scope::InstrumentationScope::Create(
+                  "test_scope_3",
+                  "0",
+                  "https://opentelemetry.io/schemas/v1.18.0",
+                  {attr1}))
+        .get(),
+    std::move(instrumentation_scope::InstrumentationScope::Create(
+                  "test_scope_4",
+                  "0",
+                  "https://opentelemetry.io/schemas/v1.18.0",
+                  {attr1, attr2, attr3}))
+        .get(),
 };
 
 // Test fixture for VerifyDefaultConfiguratorBehavior
 class DefaultTracerConfiguratorTestFixture
-    : public ::testing::TestWithParam<instrumentation_scope::InstrumentationScope>
+    : public ::testing::TestWithParam<instrumentation_scope::InstrumentationScope *>
 {};
 
 // verifies that the default configurator always returns the default tracer config
 TEST_P(DefaultTracerConfiguratorTestFixture, VerifyDefaultConfiguratorBehavior)
 {
-  const instrumentation_scope::InstrumentationScope &scope = GetParam();
+  instrumentation_scope::InstrumentationScope *scope = GetParam();
   trace_sdk::TracerConfigurator default_configurator =
       trace_sdk::TracerConfig::DefaultConfigurator();
 
-  ASSERT_EQ(default_configurator(scope), trace_sdk::TracerConfig::Default());
+  ASSERT_EQ(default_configurator(*scope), trace_sdk::TracerConfig::Default());
 }
 
 INSTANTIATE_TEST_SUITE_P(InstrumentationScopes,
