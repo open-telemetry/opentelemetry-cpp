@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include <stdlib.h>
+#include <cerrno>
 #include <cstdint>
+#include <cstdlib>
 #include <string>
 
 #include "opentelemetry/version.h"
@@ -88,8 +89,11 @@ public:
       path_ = std::string("/");  // use default path
       if (is_port)
       {
-        port_ = static_cast<uint16_t>(
-            std::stoi(std::string(url_.begin() + cpos, url_.begin() + url_.length())));
+        std::string port_str(
+            url_.begin() + static_cast<std::string::difference_type>(cpos),
+            url_.begin() + static_cast<std::string::difference_type>(url_.length()));
+
+        port_ = GetPort(port_str);
       }
       else
       {
@@ -99,8 +103,9 @@ public:
     }
     if (is_port)
     {
-      port_ =
-          static_cast<uint16_t>(std::stoi(std::string(url_.begin() + cpos, url_.begin() + pos)));
+      std::string port_str(url_.begin() + static_cast<std::string::difference_type>(cpos),
+                           url_.begin() + static_cast<std::string::difference_type>(pos));
+      port_ = GetPort(port_str);
     }
     else
     {
@@ -163,6 +168,20 @@ private:
     }
 
     return std::string::npos;
+  }
+
+  std::uint16_t GetPort(const std::string &s)
+  {
+    char *e   = nullptr;
+    errno     = 0;
+    auto port = std::strtol(s.c_str(), &e, 10);
+    if (e == s.c_str() || e != s.c_str() + s.size() || errno == ERANGE || port < 0 || port > 65535)
+    {
+      success_ = false;
+      return 0;
+    }
+
+    return static_cast<uint16_t>(port);
   }
 };
 

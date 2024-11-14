@@ -77,7 +77,7 @@ static constexpr const char *kCloudRegion = "cloud.region";
  * href="https://docs.microsoft.com/rest/api/resources/resources/get-by-id">Fully Qualified Resource
  * ID</a> of the invoked function, <em>not</em> the function app, having the form
  * @code
- * /subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>
+ * /subscriptions/<SUBSCRIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>
  * @endcode. This means that a span attribute MUST be used, as an Azure function app can host
  * multiple functions that would usually share a TracerProvider.</li>
  * </ul>
