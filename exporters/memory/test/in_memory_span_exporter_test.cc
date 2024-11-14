@@ -7,6 +7,7 @@
 
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
 using opentelemetry::exporter::memory::InMemorySpanExporter;
