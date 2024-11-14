@@ -63,6 +63,9 @@ jobs:
       - name: count warnings
         run: |
           cd build
-          COUNT=`grep -c "Warning:" iwyu.log`
-          echo "include-what-you-use reported ${COUNT} warning(s)"
-
+          export WARNING_COUNT=`grep -c "include-what-you-use reported diagnostics:" iwyu.log`
+          echo "include-what-you-use reported ${WARNING_COUNT} warning(s)"
+          # Acceptable limit, to decrease over time down to 0
+          export WARNING_LIMIT=10
+          # FAIL the build if WARNING_COUNT >= WARNING_LIMIT
+          exit $(( WARNING_COUNT >= WARNING_LIMIT ? 1 : 0 ))
