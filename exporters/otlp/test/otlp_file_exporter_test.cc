@@ -3,7 +3,6 @@
 
 #include <gtest/gtest.h>
 #include <stddef.h>
-#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <functional>
@@ -39,10 +38,9 @@
 #include "opentelemetry/version.h"
 
 // clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 #include "google/protobuf/message_lite.h"
-#include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
 using namespace testing;

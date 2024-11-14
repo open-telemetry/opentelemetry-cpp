@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <chrono>
+#include <cstdlib>
 #include <string>
 #include <unordered_map>
 

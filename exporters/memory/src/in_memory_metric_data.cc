@@ -1,9 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <utility>
+#include <vector>
+
 #include "opentelemetry/exporters/memory/in_memory_metric_data.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
