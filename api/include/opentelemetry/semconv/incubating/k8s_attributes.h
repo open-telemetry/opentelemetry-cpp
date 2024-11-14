@@ -175,6 +175,60 @@ static constexpr const char *kK8sStatefulsetName = "k8s.statefulset.name";
  */
 static constexpr const char *kK8sStatefulsetUid = "k8s.statefulset.uid";
 
+/**
+ * The name of the K8s volume.
+ */
+static constexpr const char *kK8sVolumeName = "k8s.volume.name";
+
+/**
+ * The type of the K8s volume.
+ */
+static constexpr const char *kK8sVolumeType = "k8s.volume.type";
+
+namespace K8sVolumeTypeValues
+{
+/**
+ * A <a
+ * href="https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#persistentvolumeclaim">persistentVolumeClaim</a>
+ * volume
+ */
+static constexpr const char *kPersistentVolumeClaim = "persistentVolumeClaim";
+
+/**
+ * A <a
+ * href="https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#configmap">configMap</a>
+ * volume
+ */
+static constexpr const char *kConfigMap = "configMap";
+
+/**
+ * A <a
+ * href="https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#downwardapi">downwardAPI</a>
+ * volume
+ */
+static constexpr const char *kDownwardApi = "downwardAPI";
+
+/**
+ * An <a
+ * href="https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#emptydir">emptyDir</a>
+ * volume
+ */
+static constexpr const char *kEmptyDir = "emptyDir";
+
+/**
+ * A <a href="https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#secret">secret</a>
+ * volume
+ */
+static constexpr const char *kSecret = "secret";
+
+/**
+ * A <a href="https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#local">local</a>
+ * volume
+ */
+static constexpr const char *kLocal = "local";
+
+}  // namespace K8sVolumeTypeValues
+
 }  // namespace k8s
 }  // namespace semconv
 OPENTELEMETRY_END_NAMESPACE

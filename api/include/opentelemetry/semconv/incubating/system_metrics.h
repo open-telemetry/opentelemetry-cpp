@@ -305,6 +305,43 @@ CreateAsyncDoubleMetricSystemDiskIoTime(metrics::Meter *meter)
 }
 
 /**
+ * The total storage capacity of the disk
+ * <p>
+ * updowncounter
+ */
+static constexpr const char *kMetricSystemDiskLimit     = "metric.system.disk.limit";
+static constexpr const char *descrMetricSystemDiskLimit = "The total storage capacity of the disk";
+static constexpr const char *unitMetricSystemDiskLimit  = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemDiskLimit(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricSystemDiskLimit, descrMetricSystemDiskLimit,
+                                         unitMetricSystemDiskLimit);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemDiskLimit(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemDiskLimit, descrMetricSystemDiskLimit,
+                                          unitMetricSystemDiskLimit);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemDiskLimit(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(
+      kMetricSystemDiskLimit, descrMetricSystemDiskLimit, unitMetricSystemDiskLimit);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemDiskLimit(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(
+      kMetricSystemDiskLimit, descrMetricSystemDiskLimit, unitMetricSystemDiskLimit);
+}
+
+/**
  * counter
  */
 static constexpr const char *kMetricSystemDiskMerged     = "metric.system.disk.merged";
@@ -423,11 +460,58 @@ CreateAsyncDoubleMetricSystemDiskOperations(metrics::Meter *meter)
 }
 
 /**
+ * The total storage capacity of the filesystem
+ * <p>
  * updowncounter
  */
-static constexpr const char *kMetricSystemFilesystemUsage     = "metric.system.filesystem.usage";
-static constexpr const char *descrMetricSystemFilesystemUsage = "";
-static constexpr const char *unitMetricSystemFilesystemUsage  = "By";
+static constexpr const char *kMetricSystemFilesystemLimit = "metric.system.filesystem.limit";
+static constexpr const char *descrMetricSystemFilesystemLimit =
+    "The total storage capacity of the filesystem";
+static constexpr const char *unitMetricSystemFilesystemLimit = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemFilesystemLimit(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricSystemFilesystemLimit,
+                                         descrMetricSystemFilesystemLimit,
+                                         unitMetricSystemFilesystemLimit);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemFilesystemLimit(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemFilesystemLimit,
+                                          descrMetricSystemFilesystemLimit,
+                                          unitMetricSystemFilesystemLimit);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemFilesystemLimit(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricSystemFilesystemLimit,
+                                                   descrMetricSystemFilesystemLimit,
+                                                   unitMetricSystemFilesystemLimit);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemFilesystemLimit(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricSystemFilesystemLimit,
+                                                    descrMetricSystemFilesystemLimit,
+                                                    unitMetricSystemFilesystemLimit);
+}
+
+/**
+ * Reports a filesystem's space usage across different states.
+ * <p>
+ * The sum of all @code system.filesystem.usage @endcode values over the different @code
+ * system.filesystem.state @endcode attributes SHOULD equal the total storage capacity of the
+ * filesystem, that is @code system.filesystem.limit @endcode. <p> updowncounter
+ */
+static constexpr const char *kMetricSystemFilesystemUsage = "metric.system.filesystem.usage";
+static constexpr const char *descrMetricSystemFilesystemUsage =
+    "Reports a filesystem's space usage across different states.";
+static constexpr const char *unitMetricSystemFilesystemUsage = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricSystemFilesystemUsage(metrics::Meter *meter)
