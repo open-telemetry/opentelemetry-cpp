@@ -28,6 +28,7 @@ public:
    * @return a boolean indicating if the Tracer is enabled. Defaults to true.
    */
   bool IsEnabled() const noexcept;
+  bool operator==(const TracerConfig& other) const noexcept;
 
   static TracerConfig Disabled();
   static TracerConfig Enabled();

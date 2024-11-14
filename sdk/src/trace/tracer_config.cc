@@ -40,6 +40,12 @@ bool TracerConfig::IsEnabled() const noexcept
 {
   return !disabled_;
 }
+
+bool TracerConfig::operator==(const TracerConfig &other) const noexcept
+{
+  return disabled_ == other.disabled_;
+}
+
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
