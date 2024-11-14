@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <chrono>
 #include <cstdint>
 #include <cstdlib>
 #include <functional>
@@ -11,7 +10,6 @@
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
-#include <thread>
 #include <vector>
 
 #include "opentelemetry/common/timestamp.h"
@@ -34,7 +32,6 @@
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 #include "google/protobuf/message_lite.h"
-#include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 

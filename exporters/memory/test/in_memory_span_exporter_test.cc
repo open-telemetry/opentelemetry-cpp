@@ -1,11 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <gtest/gtest.h>
+#include <type_traits>
+#include <vector>
+
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-
-#include <gtest/gtest.h>
 
 using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::sdk::trace::Recordable;

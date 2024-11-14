@@ -3,6 +3,8 @@
 
 #include "opentelemetry/exporters/otlp/otlp_file_client.h"
 
+#include <features.h>
+
 #if defined(HAVE_GSL)
 #  include <gsl/gsl>
 #else
@@ -13,6 +15,7 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 // clang-format on
 
+#include "google/protobuf/descriptor.h"
 #include "google/protobuf/message.h"
 #include "nlohmann/json.hpp"
 
@@ -34,6 +37,7 @@
 #endif
 
 #include <limits.h>
+#include <algorithm>
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
@@ -43,6 +47,7 @@
 #include <fstream>
 #include <functional>
 #include <mutex>
+#include <ratio>
 #include <string>
 #include <thread>
 #include <utility>

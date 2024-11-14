@@ -10,7 +10,6 @@
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
-#include <thread>
 #include <utility>
 #include <vector>
 

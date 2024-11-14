@@ -1,14 +1,18 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/memory/in_memory_metric_data.h"
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/metrics/export/metric_producer.h"
-#include "opentelemetry/sdk/resource/resource.h"
-
 #include <gtest/gtest.h>
-
+#include <algorithm>
+#include <utility>
 #include <vector>
+
+#include "opentelemetry/exporters/memory/in_memory_metric_data.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/resource/resource.h"
 
 using opentelemetry::exporter::memory::CircularBufferInMemoryMetricData;
 using opentelemetry::exporter::memory::SimpleAggregateInMemoryMetricData;
