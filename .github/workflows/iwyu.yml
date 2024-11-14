@@ -67,5 +67,5 @@ jobs:
           echo "include-what-you-use reported ${WARNING_COUNT} warning(s)"
           # Acceptable limit, to decrease over time down to 0
           export WARNING_LIMIT=10
-          # FAIL the build if WARNING_COUNT >= WARNING_LIMIT
-          exit $(( WARNING_COUNT >= WARNING_LIMIT ? 1 : 0 ))
+          # FAIL the build if WARNING_COUNT > WARNING_LIMIT
+          exit $(( WARNING_COUNT > WARNING_LIMIT ? 1 : 0 ))
