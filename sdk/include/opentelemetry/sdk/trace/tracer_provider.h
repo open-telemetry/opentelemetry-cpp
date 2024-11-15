@@ -123,9 +123,6 @@ private:
   std::vector<std::shared_ptr<Tracer>> tracers_;
   std::shared_ptr<TracerContext> context_;
   std::mutex lock_;
-
-  // private helper to get TracerConfig from InstrumentationScope using tracer configurator.
-  TracerConfig GetTracerConfig(const InstrumentationScope &instrumentation_scope) const;
 };
 }  // namespace trace
 }  // namespace sdk

@@ -37,8 +37,7 @@ public:
   /** Construct a new Tracer with the given context pipeline. */
   explicit Tracer(std::shared_ptr<TracerContext> context,
                   std::unique_ptr<InstrumentationScope> instrumentation_scope =
-                      InstrumentationScope::Create(""),
-                  TracerConfig tracer_config = TracerConfig::Default()) noexcept;
+                      InstrumentationScope::Create("")) noexcept;
 
   nostd::shared_ptr<opentelemetry::trace::Span> StartSpan(
       nostd::string_view name,
@@ -106,9 +105,9 @@ public:
 private:
   // order of declaration is important here - instrumentation scope should destroy after
   // tracer-context.
+  std::unique_ptr<TracerConfig> tracer_config_;
   std::shared_ptr<InstrumentationScope> instrumentation_scope_;
   std::shared_ptr<TracerContext> context_;
-  TracerConfig tracer_config_;
   static const std::shared_ptr<opentelemetry::trace::NoopTracer> kNoopTracer;
 };
 }  // namespace trace

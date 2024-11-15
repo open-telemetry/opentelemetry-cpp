@@ -119,11 +119,8 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
   instrumentationscope::InstrumentationScopeAttributes attrs_map(attributes);
   auto scope =
       instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attrs_map);
-  const instrumentationscope::InstrumentationScope &scope_reference =
-      instrumentationscope::InstrumentationScope(*scope);
 
-  auto tracer = std::shared_ptr<Tracer>(
-      new Tracer(context_, std::move(scope), GetTracerConfig(scope_reference)));
+  auto tracer = std::shared_ptr<Tracer>(new Tracer(context_, std::move(scope)));
   tracers_.push_back(tracer);
   return nostd::shared_ptr<trace_api::Tracer>{tracer};
 }
@@ -147,13 +144,6 @@ bool TracerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   return context_->ForceFlush(timeout);
 }
-
-TracerConfig TracerProvider::GetTracerConfig(
-    const InstrumentationScope &instrumentation_scope) const
-{
-  return context_->GetTracerConfigurator()(instrumentation_scope);
-}
-
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

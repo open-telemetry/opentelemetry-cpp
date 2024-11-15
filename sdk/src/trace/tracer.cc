@@ -41,12 +41,12 @@ const std::shared_ptr<opentelemetry::trace::NoopTracer> Tracer::kNoopTracer =
     std::make_shared<opentelemetry::trace::NoopTracer>();
 
 Tracer::Tracer(std::shared_ptr<TracerContext> context,
-               std::unique_ptr<InstrumentationScope> instrumentation_scope,
-               TracerConfig tracer_config) noexcept
-    : instrumentation_scope_{std::move(instrumentation_scope)},
-      context_{std::move(context)},
-      tracer_config_(tracer_config)
-{}
+               std::unique_ptr<InstrumentationScope> instrumentation_scope) noexcept
+    : instrumentation_scope_{std::move(instrumentation_scope)}, context_{std::move(context)}
+{
+  tracer_config_ =
+      std::make_unique<TracerConfig>(context_->GetTracerConfigurator()(*instrumentation_scope_));
+}
 
 nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     nostd::string_view name,
@@ -57,7 +57,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
   opentelemetry::trace::SpanContext parent_context = GetCurrentSpan()->GetContext();
   if (nostd::holds_alternative<opentelemetry::trace::SpanContext>(options.parent))
   {
-    if (!tracer_config_.IsEnabled())
+    if (!tracer_config_->IsEnabled())
     {
       return kNoopTracer->StartSpan(name, attributes, links, options);
     }
