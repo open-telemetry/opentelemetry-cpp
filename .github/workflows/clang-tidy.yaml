@@ -65,12 +65,12 @@ jobs:
 
       - name: Run clang-tidy
         run: |
-          clang-tidy -p build $(jq -r .[].file build/compile_commands.json) 2>&1 | tee -a clang-tidy.log
+          clang-tidy -p build $(jq -r .[].file build/compile_commands.json | grep -vF /generated/) 2>&1 | tee -a clang-tidy.log
 
       - uses: actions/upload-artifact@v4
         with:
           name: Logs (clang-tidy)
-          path: ./build/clang-tidy.log
+          path: ./clang-tidy.log
 
       - name: Count warnings
         run: |
