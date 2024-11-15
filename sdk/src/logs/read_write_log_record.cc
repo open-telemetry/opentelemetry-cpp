@@ -29,11 +29,12 @@ ReadWriteLogRecord::ReadWriteLogRecord()
     : severity_(opentelemetry::logs::Severity::kInvalid),
       resource_(nullptr),
       instrumentation_scope_(nullptr),
-      body_(nostd::string_view()),
       observed_timestamp_(std::chrono::system_clock::now()),
       event_id_(0),
       event_name_("")
-{}
+{
+  body_.SetAttribute("", nostd::string_view());
+}
 
 ReadWriteLogRecord::~ReadWriteLogRecord() {}
 
@@ -70,12 +71,12 @@ opentelemetry::logs::Severity ReadWriteLogRecord::GetSeverity() const noexcept
 
 void ReadWriteLogRecord::SetBody(const opentelemetry::common::AttributeValue &message) noexcept
 {
-  body_ = message;
+  body_.SetAttribute("", message);
 }
 
 const opentelemetry::common::AttributeValue &ReadWriteLogRecord::GetBody() const noexcept
 {
-  return body_;
+  return body_.GetAttributes().begin()->second;
 }
 
 void ReadWriteLogRecord::SetEventId(int64_t id, nostd::string_view name) noexcept
@@ -160,13 +161,13 @@ const opentelemetry::trace::TraceFlags &ReadWriteLogRecord::GetTraceFlags() cons
 void ReadWriteLogRecord::SetAttribute(nostd::string_view key,
                                       const opentelemetry::common::AttributeValue &value) noexcept
 {
-  attributes_map_[static_cast<std::string>(key)] = value;
+  attributes_map_.SetAttribute(key, value);
 }
 
 const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &
 ReadWriteLogRecord::GetAttributes() const noexcept
 {
-  return attributes_map_;
+  return attributes_map_.GetAttributes();
 }
 
 const opentelemetry::sdk::resource::Resource &ReadWriteLogRecord::GetResource() const noexcept
