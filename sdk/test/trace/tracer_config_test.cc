@@ -67,7 +67,7 @@ class DefaultTracerConfiguratorTestFixture
 TEST_P(DefaultTracerConfiguratorTestFixture, VerifyDefaultConfiguratorBehavior)
 {
   instrumentation_scope::InstrumentationScope *scope = GetParam();
-  trace_sdk::TracerConfigurator default_configurator =
+  instrumentation_scope::ScopeConfigurator<trace_sdk::TracerConfig> default_configurator =
       trace_sdk::TracerConfig::DefaultConfigurator();
 
   ASSERT_EQ(default_configurator(*scope), trace_sdk::TracerConfig::Default());

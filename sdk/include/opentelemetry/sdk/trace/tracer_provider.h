@@ -51,8 +51,9 @@ public:
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
       std::unique_ptr<IdGenerator> id_generator =
           std::unique_ptr<IdGenerator>(new RandomIdGenerator()),
-      std::unique_ptr<TracerConfigurator> tracer_configurator =
-          std::make_unique<TracerConfigurator>(TracerConfig::DefaultConfigurator())) noexcept;
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator =
+          std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
+              TracerConfig::DefaultConfigurator())) noexcept;
 
   explicit TracerProvider(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
@@ -61,8 +62,9 @@ public:
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
       std::unique_ptr<IdGenerator> id_generator =
           std::unique_ptr<IdGenerator>(new RandomIdGenerator()),
-      std::unique_ptr<TracerConfigurator> tracer_configurator =
-          std::make_unique<TracerConfigurator>(TracerConfig::DefaultConfigurator())) noexcept;
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator =
+          std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
+              TracerConfig::DefaultConfigurator())) noexcept;
 
   /**
    * Initialize a new tracer provider with a specified context

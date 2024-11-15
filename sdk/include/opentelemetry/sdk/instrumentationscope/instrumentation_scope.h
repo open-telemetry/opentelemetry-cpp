@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <functional>
 #include <string>
 #include <type_traits>
 
@@ -158,6 +159,8 @@ private:
   InstrumentationScopeAttributes attributes_;
 };
 
+template <class T>
+using ScopeConfigurator = std::function<T(const InstrumentationScope &)>;
 }  // namespace instrumentationscope
 }  // namespace sdk
 

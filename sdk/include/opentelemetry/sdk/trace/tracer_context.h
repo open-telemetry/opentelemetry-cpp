@@ -47,8 +47,9 @@ public:
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
       std::unique_ptr<IdGenerator> id_generator =
           std::unique_ptr<IdGenerator>(new RandomIdGenerator()),
-      std::unique_ptr<TracerConfigurator> tracer_configurator =
-          std::make_unique<TracerConfigurator>(TracerConfig::DefaultConfigurator())) noexcept;
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator =
+          std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
+              TracerConfig::DefaultConfigurator())) noexcept;
 
   virtual ~TracerContext() = default;
 
@@ -82,7 +83,7 @@ public:
    */
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
 
-  TracerConfigurator &GetTracerConfigurator() const noexcept;
+  instrumentationscope::ScopeConfigurator<TracerConfig> &GetTracerConfigurator() const noexcept;
 
   /**
    * Obtain the Id Generator associated with this tracer context.
@@ -107,7 +108,7 @@ private:
   std::unique_ptr<Sampler> sampler_;
   std::unique_ptr<IdGenerator> id_generator_;
   std::unique_ptr<SpanProcessor> processor_;
-  std::unique_ptr<TracerConfigurator> tracer_configurator_;
+  std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator_;
 };
 
 }  // namespace trace

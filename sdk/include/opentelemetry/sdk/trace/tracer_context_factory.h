@@ -63,7 +63,7 @@ public:
       const opentelemetry::sdk::resource::Resource &resource,
       std::unique_ptr<Sampler> sampler,
       std::unique_ptr<IdGenerator> id_generator,
-      std::unique_ptr<TracerConfigurator> tracer_configurator);
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator);
 };
 
 }  // namespace trace

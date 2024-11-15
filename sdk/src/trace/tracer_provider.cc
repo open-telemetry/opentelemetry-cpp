@@ -39,11 +39,13 @@ TracerProvider::TracerProvider(std::unique_ptr<TracerContext> context) noexcept
   OTEL_INTERNAL_LOG_DEBUG("[TracerProvider] TracerProvider created.");
 }
 
-TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
-                               const resource::Resource &resource,
-                               std::unique_ptr<Sampler> sampler,
-                               std::unique_ptr<IdGenerator> id_generator,
-                               std::unique_ptr<TracerConfigurator> tracer_configurator) noexcept
+TracerProvider::TracerProvider(
+    std::unique_ptr<SpanProcessor> processor,
+    const resource::Resource &resource,
+    std::unique_ptr<Sampler> sampler,
+    std::unique_ptr<IdGenerator> id_generator,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
+        tracer_configurator) noexcept
 {
   std::vector<std::unique_ptr<SpanProcessor>> processors;
   processors.push_back(std::move(processor));
@@ -52,11 +54,13 @@ TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
                                       std::move(id_generator), std::move(tracer_configurator));
 }
 
-TracerProvider::TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
-                               const resource::Resource &resource,
-                               std::unique_ptr<Sampler> sampler,
-                               std::unique_ptr<IdGenerator> id_generator,
-                               std::unique_ptr<TracerConfigurator> tracer_configurator) noexcept
+TracerProvider::TracerProvider(
+    std::vector<std::unique_ptr<SpanProcessor>> &&processors,
+    const resource::Resource &resource,
+    std::unique_ptr<Sampler> sampler,
+    std::unique_ptr<IdGenerator> id_generator,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
+        tracer_configurator) noexcept
 {
   context_ =
       std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),

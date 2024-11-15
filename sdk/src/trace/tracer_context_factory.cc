@@ -53,7 +53,8 @@ std::unique_ptr<TracerContext> TracerContextFactory::Create(
     std::unique_ptr<IdGenerator> id_generator)
 {
   auto tracer_configurator =
-      std::make_unique<TracerConfigurator>(TracerConfig::DefaultConfigurator());
+      std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
+          TracerConfig::DefaultConfigurator());
   return Create(std::move(processors), resource, std::move(sampler), std::move(id_generator),
                 std::move(tracer_configurator));
 }
@@ -63,7 +64,7 @@ std::unique_ptr<TracerContext> TracerContextFactory::Create(
     const opentelemetry::sdk::resource::Resource &resource,
     std::unique_ptr<Sampler> sampler,
     std::unique_ptr<IdGenerator> id_generator,
-    std::unique_ptr<TracerConfigurator> tracer_configurator)
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator)
 {
   std::unique_ptr<TracerContext> context(
       new TracerContext(std::move(processors), resource, std::move(sampler),

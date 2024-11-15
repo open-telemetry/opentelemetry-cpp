@@ -26,7 +26,8 @@ TracerContext::TracerContext(std::vector<std::unique_ptr<SpanProcessor>> &&proce
                              const resource::Resource &resource,
                              std::unique_ptr<Sampler> sampler,
                              std::unique_ptr<IdGenerator> id_generator,
-                             std::unique_ptr<TracerConfigurator> tracer_configurator) noexcept
+                             std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
+                                 tracer_configurator) noexcept
     : resource_(resource),
       sampler_(std::move(sampler)),
       id_generator_(std::move(id_generator)),
@@ -44,7 +45,8 @@ const resource::Resource &TracerContext::GetResource() const noexcept
   return resource_;
 }
 
-TracerConfigurator &TracerContext::GetTracerConfigurator() const noexcept
+instrumentationscope::ScopeConfigurator<TracerConfig> &TracerContext::GetTracerConfigurator()
+    const noexcept
 {
   return *tracer_configurator_;
 }

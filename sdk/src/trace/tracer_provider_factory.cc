@@ -54,7 +54,8 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> TracerProviderFactory
     std::unique_ptr<IdGenerator> id_generator)
 {
   auto tracer_configurator =
-      std::make_unique<TracerConfigurator>(TracerConfig::DefaultConfigurator());
+      std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
+          TracerConfig::DefaultConfigurator());
   return Create(std::move(processor), resource, std::move(sampler), std::move(id_generator),
                 std::move(tracer_configurator));
 }
@@ -64,7 +65,7 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> TracerProviderFactory
     const opentelemetry::sdk::resource::Resource &resource,
     std::unique_ptr<Sampler> sampler,
     std::unique_ptr<IdGenerator> id_generator,
-    std::unique_ptr<TracerConfigurator> tracer_configurator)
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator)
 {
   std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> provider(
       new opentelemetry::sdk::trace::TracerProvider(std::move(processor), resource,
@@ -104,7 +105,8 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> TracerProviderFactory
     std::unique_ptr<IdGenerator> id_generator)
 {
   auto tracer_configurator =
-      std::make_unique<TracerConfigurator>(TracerConfig::DefaultConfigurator());
+      std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
+          TracerConfig::DefaultConfigurator());
   return Create(std::move(processors), resource, std::move(sampler), std::move(id_generator),
                 std::move(tracer_configurator));
 }
@@ -114,7 +116,7 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> TracerProviderFactory
     const opentelemetry::sdk::resource::Resource &resource,
     std::unique_ptr<Sampler> sampler,
     std::unique_ptr<IdGenerator> id_generator,
-    std::unique_ptr<TracerConfigurator> tracer_configurator)
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator)
 {
   std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> provider(
       new opentelemetry::sdk::trace::TracerProvider(std::move(processors), resource,
