@@ -1,7 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <features.h>
 #include <google/protobuf/message_lite.h>
 #include <gtest/gtest.h>
 #include <algorithm>

@@ -3,8 +3,6 @@
 
 #include "opentelemetry/exporters/otlp/otlp_file_client.h"
 
-#include <features.h>
-
 #if defined(HAVE_GSL)
 #  include <gsl/gsl>
 #else
