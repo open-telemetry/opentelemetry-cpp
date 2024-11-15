@@ -149,7 +149,7 @@ TEST(MixedAttributeMapTest, SetterAndGetter)
   attribute_map.SetAttribute("const char *", "const char *");
   attribute_map.SetAttribute("string_view", opentelemetry::nostd::string_view("string_view"));
 
-  bool array_bool[]       = {true, false};
+  bool array_bool[]       = {true, false, true};
   uint8_t array_uint8[]   = {47, 48};
   int32_t array_int32[]   = {48, 49};
   int64_t array_int64[]   = {49, 50};

@@ -105,17 +105,23 @@ public:
   {
     if (record)
     {
-      last_body_ = static_cast<ReadWriteLogRecord *>(record.get())->GetBody();
+      last_body_.reset(static_cast<ReadWriteLogRecord *>(record.release()));
     }
   }
 
   const opentelemetry::common::AttributeValue &GetLastLogRecord() const noexcept
   {
-    return last_body_;
+    if (last_body_)
+    {
+      return last_body_->GetBody();
+    }
+
+    return empty_;
   }
 
 private:
-  opentelemetry::common::AttributeValue last_body_;
+  opentelemetry::common::AttributeValue empty_ = nostd::string_view();
+  nostd::unique_ptr<ReadWriteLogRecord> last_body_;
 };
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
@@ -177,8 +183,8 @@ TEST(LogBody, BodyConversation)
       opentelemetry::nostd::holds_alternative<nostd::string_view>(real_logger->GetLastLogRecord()));
   if (opentelemetry::nostd::holds_alternative<const char *>(real_logger->GetLastLogRecord()))
   {
-    ASSERT_EQ(nostd::string_view{"128"},
-              opentelemetry::nostd::get<const char *>(real_logger->GetLastLogRecord()));
+    ASSERT_EQ(nostd::string_view{"128"}, nostd::string_view{opentelemetry::nostd::get<const char *>(
+                                             real_logger->GetLastLogRecord())});
   }
   else
   {
