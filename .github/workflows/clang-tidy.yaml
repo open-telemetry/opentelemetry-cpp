@@ -65,7 +65,7 @@ jobs:
 
       - name: Run clang-tidy
         run: |
-          clang-tidy -p build $(jq -r .[].file build/compile_commands.json | grep -vF /generated/) 2>&1 | tee -a clang-tidy.log
+          jq -r .[].file build/compile_commands.json | grep -vE '/(generated|third_party)/' | xargs -P $(nproc) -n 1 clang-tidy --quiet -p build 2>&1 | tee -a clang-tidy.log
 
       - uses: actions/upload-artifact@v4
         with:
