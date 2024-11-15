@@ -25,6 +25,15 @@
 #include "opentelemetry/exporters/ostream/metric_exporter_factory.h"
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 
+
+#include <opentelemetry/metrics/provider.h>
+#include <opentelemetry/sdk/common/global_log_handler.h>
+#include <opentelemetry/sdk/common/env_variables.h>
+#include <opentelemetry/sdk/resource/semantic_conventions.h>
+#include <opentelemetry/sdk/metrics/meter_provider_factory.h>
+#include <opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h>
+#include <opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h>
+
 opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer()
 {
   auto provider = opentelemetry::trace::Provider::GetTracerProvider();
@@ -191,9 +200,21 @@ void CleanupLogger()
   opentelemetry::logs::Provider::SetLoggerProvider(noop);
 }
 
+static void init_metrics()
+{
+  using namespace opentelemetry;
+}
+
+
 void InitMetrics(const std::string &name)
 {
+  #if 0
   auto exporter = opentelemetry::exporter::metrics::OStreamMetricExporterFactory::Create();
+  #else
+    opentelemetry::exporter::otlp::OtlpGrpcMetricExporterOptions exporterOptions;
+    exporterOptions.compression = "gzip";
+    auto exporter{ opentelemetry::exporter::otlp::OtlpGrpcMetricExporterFactory::Create( exporterOptions ) };
+  #endif
 
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
@@ -280,14 +301,19 @@ void CleanupMetrics()
   opentelemetry::metrics::Provider::SetMeterProvider(none);
 }
 
+
 int main(int argc, const char *argv[])
 {
-  std::string metrics_name{"foo_metrics"};
-  InitTracer();
-  InitLogger();
+  opentelemetry::sdk::common::setenv( "OTEL_EXPORTER_OTLP_ENDPOINT", "http://127.0.0.1:4317", 1 /* override */ );
+
+  std::string metrics_name{"malkia_metrics_test"};
+  //InitTracer();
+  //InitLogger();
   InitMetrics(metrics_name);
-  logs_foo_library();
-  traces_foo_library();
+
+  init_metrics();
+  //logs_foo_library();
+  //traces_foo_library();
   std::thread counter_example{&metrics_counter_example, metrics_name};
   std::thread observable_counter_example{&metrics_observable_counter_example, metrics_name};
   std::thread histogram_example{&metrics_histogram_example, metrics_name};
@@ -295,7 +321,7 @@ int main(int argc, const char *argv[])
   observable_counter_example.join();
   histogram_example.join();
   CleanupMetrics();
-  CleanupLogger();
-  CleanupTracer();
+  //CleanupLogger();
+  //CleanupTracer();
   return 0;
 }

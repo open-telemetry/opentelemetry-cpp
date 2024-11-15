@@ -32,3 +32,16 @@ run_binary(
 #    args = ["migrate", "--help"],
     tool = "@otel_sdk//:percli",
 )
+
+cc_binary(
+    name = "proxy",
+    srcs = ["proxy.cpp"],
+    deps = [
+        "@otel_sdk//:dll",
+        "@grpc//:grpc++",
+        "@grpc//:grpc++_reflection",
+        "@opentelemetry-proto//:logs_service_grpc_cc",
+        "@opentelemetry-proto//:metrics_service_grpc_cc",
+        "@opentelemetry-proto//:trace_service_grpc_cc",
+    ],
+)
