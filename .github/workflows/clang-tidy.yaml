@@ -46,9 +46,8 @@ jobs:
           CC: clang
           CXX: clang++
         run: |
-          mkdir -p build && cd build
           echo "Running cmake..."
-          cmake .. \
+          cmake -B build \
             -DCMAKE_CXX_STANDARD=14 \
             -DWITH_STL=CXX14 \
             -DWITH_OTLP_HTTP=ON \
@@ -62,13 +61,11 @@ jobs:
             -DBUILD_W3CTRACECONTEXT_TEST=ON \
             -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
             -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-            -DCMAKE_CXX_CLANG_TIDY="clang-tidy"
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       - name: Run clang-tidy
         run: |
-          cd build
-          make 2>&1 | tee -a clang-tidy.log || exit 1
+          clang-tidy -p build $(jq -r .[].file build/compile_commands.json) 2>&1 | tee -a clang-tidy.log
 
       - uses: actions/upload-artifact@v4
         with:
@@ -77,7 +74,6 @@ jobs:
 
       - name: Count warnings
         run: |
-          cd build
           COUNT=$(grep -c "warning:" clang-tidy.log)
           echo "clang-tidy reported ${COUNT} warning(s)"
 
