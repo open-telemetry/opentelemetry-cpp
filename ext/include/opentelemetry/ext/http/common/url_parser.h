@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <string>
+#include <utility>
 
 #include "opentelemetry/version.h"
 
@@ -34,7 +35,7 @@ public:
   std::string query_;
   bool success_;
 
-  UrlParser(std::string url) : url_(url), success_(true)
+  UrlParser(std::string url) : url_(std::move(url)), success_(true)
   {
     if (url_.length() == 0)
     {
@@ -50,15 +51,16 @@ public:
     }
     else
     {
-      scheme_ = std::string(url_.begin() + cpos, url_.begin() + pos);
+      scheme_ = std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
+                            url_.begin() + static_cast<std::string::difference_type>(pos));
       cpos    = pos + 3;
     }
 
     // credentials
-    size_t pos1 = url_.find_first_of("@", cpos);
-    size_t pos2 = url_.find_first_of("/", cpos);
+    size_t pos1 = url_.find_first_of('@', cpos);
     if (pos1 != std::string::npos)
     {
+      size_t pos2 = url_.find_first_of('/', cpos);
       // TODO - handle credentials
       if (pos2 == std::string::npos || pos1 < pos2)
       {
@@ -80,7 +82,8 @@ public:
     {
       // port present
       is_port = true;
-      host_   = std::string(url_.begin() + cpos, url_.begin() + pos);
+      host_   = std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
+                            url_.begin() + static_cast<std::string::difference_type>(pos));
       cpos    = pos + 1;
     }
     pos = url_.find_first_of("/?", cpos);
@@ -97,7 +100,9 @@ public:
       }
       else
       {
-        host_ = std::string(url_.begin() + cpos, url_.begin() + url_.length());
+        host_ =
+            std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
+                        url_.begin() + static_cast<std::string::difference_type>(url_.length()));
       }
       return;
     }
@@ -109,7 +114,8 @@ public:
     }
     else
     {
-      host_ = std::string(url_.begin() + cpos, url_.begin() + pos);
+      host_ = std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
+                          url_.begin() + static_cast<std::string::difference_type>(pos));
     }
     cpos = pos;
 
@@ -118,21 +124,27 @@ public:
       pos = url_.find('?', cpos);
       if (pos == std::string::npos)
       {
-        path_  = std::string(url_.begin() + cpos, url_.begin() + url_.length());
+        path_ =
+            std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
+                        url_.begin() + static_cast<std::string::difference_type>(url_.length()));
         query_ = "";
       }
       else
       {
-        path_  = std::string(url_.begin() + cpos, url_.begin() + pos);
-        cpos   = pos + 1;
-        query_ = std::string(url_.begin() + cpos, url_.begin() + url_.length());
+        path_ = std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
+                            url_.begin() + static_cast<std::string::difference_type>(pos));
+        cpos  = pos + 1;
+        query_ =
+            std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
+                        url_.begin() + static_cast<std::string::difference_type>(url_.length()));
       }
       return;
     }
     path_ = std::string("/");
     if (url_[cpos] == '?')
     {
-      query_ = std::string(url_.begin() + cpos, url_.begin() + url_.length());
+      query_ = std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
+                           url_.begin() + static_cast<std::string::difference_type>(url_.length()));
     }
   }
 
@@ -209,7 +221,7 @@ public:
         hex[1]      = encoded[++pos];
 
         char *endptr;
-        long value = strtol(hex, &endptr, 16);
+        int value = static_cast<int>(std::strtol(hex, &endptr, 16));
 
         // Invalid input: no valid hex characters after '%'
         if (endptr != &hex[2])
