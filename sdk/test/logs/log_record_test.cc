@@ -200,7 +200,7 @@ TEST(LogBody, BodyConversation)
 
     for (size_t i = 0; i < data_span.size(); ++i)
     {
-      ASSERT_EQ(data_span[i], output[i]);
+      ASSERT_TRUE(data_span[i] == output[i]);
     }
   }
 
@@ -218,7 +218,7 @@ TEST(LogBody, BodyConversation)
 
     for (size_t i = 0; i < data_span.size(); ++i)
     {
-      ASSERT_EQ(data_span[i], output[i]);
+      EXPECT_EQ(data_span[i], output[i]);
     }
   }
 
@@ -236,7 +236,7 @@ TEST(LogBody, BodyConversation)
 
     for (size_t i = 0; i < data_span.size(); ++i)
     {
-      ASSERT_EQ(data_span[i], output[i]);
+      EXPECT_EQ(data_span[i], output[i]);
     }
   }
 
@@ -254,7 +254,7 @@ TEST(LogBody, BodyConversation)
 
     for (size_t i = 0; i < data_span.size(); ++i)
     {
-      ASSERT_EQ(data_span[i], output[i]);
+      EXPECT_EQ(data_span[i], output[i]);
     }
   }
 
@@ -272,7 +272,7 @@ TEST(LogBody, BodyConversation)
 
     for (size_t i = 0; i < data_span.size(); ++i)
     {
-      ASSERT_EQ(data_span[i], output[i]);
+      EXPECT_EQ(data_span[i], output[i]);
     }
   }
 
@@ -290,7 +290,7 @@ TEST(LogBody, BodyConversation)
 
     for (size_t i = 0; i < data_span.size(); ++i)
     {
-      ASSERT_EQ(data_span[i], output[i]);
+      EXPECT_EQ(data_span[i], output[i]);
     }
   }
 
@@ -328,7 +328,7 @@ TEST(LogBody, BodyConversation)
 
     for (size_t i = 0; i < data_span.size(); ++i)
     {
-      ASSERT_EQ(data_span[i], output[i]);
+      EXPECT_EQ(data_span[i], output[i]);
     }
   }
 }
