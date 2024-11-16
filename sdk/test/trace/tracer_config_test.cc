@@ -1,8 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/sdk/trace/tracer_config.h"
 #include <gtest/gtest.h>
-#include <opentelemetry/sdk/trace/tracer_config.h>
+#include <array>
+#include <functional>
+#include <type_traits>
+#include <utility>
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 
 namespace trace_sdk             = opentelemetry::sdk::trace;
 namespace instrumentation_scope = opentelemetry::sdk::instrumentationscope;

@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <chrono>
+#include <functional>
 #include <map>
 #include <new>
 #include <utility>
