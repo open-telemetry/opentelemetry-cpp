@@ -224,7 +224,7 @@ private:
 struct MixedAttributeMapStorage
 {
   std::unordered_map<std::string, opentelemetry::common::AttributeValue> attributes;
-  AttributeMap owened_attributes;
+  AttributeMap owned_attributes;
   std::unordered_map<std::string, OwnedAttributeView> owened_attributes_view;
 };
 
@@ -242,64 +242,64 @@ public:
 
   void operator()(bool v)
   {
-    storage_->owened_attributes[std::string(*key_)] = (*converter_)(v);
-    storage_->attributes[std::string(*key_)]        = v;
+    storage_->owned_attributes[std::string(*key_)] = (*converter_)(v);
+    storage_->attributes[std::string(*key_)]       = v;
   }
 
   void operator()(int32_t v)
   {
-    storage_->owened_attributes[std::string(*key_)] = (*converter_)(v);
-    storage_->attributes[std::string(*key_)]        = v;
+    storage_->owned_attributes[std::string(*key_)] = (*converter_)(v);
+    storage_->attributes[std::string(*key_)]       = v;
   }
 
   void operator()(uint32_t v)
   {
-    storage_->owened_attributes[std::string(*key_)] = (*converter_)(v);
-    storage_->attributes[std::string(*key_)]        = v;
+    storage_->owned_attributes[std::string(*key_)] = (*converter_)(v);
+    storage_->attributes[std::string(*key_)]       = v;
   }
 
   void operator()(int64_t v)
   {
-    storage_->owened_attributes[std::string(*key_)] = (*converter_)(v);
-    storage_->attributes[std::string(*key_)]        = v;
+    storage_->owned_attributes[std::string(*key_)] = (*converter_)(v);
+    storage_->attributes[std::string(*key_)]       = v;
   }
 
   void operator()(uint64_t v)
   {
-    storage_->owened_attributes[std::string(*key_)] = (*converter_)(v);
-    storage_->attributes[std::string(*key_)]        = v;
+    storage_->owned_attributes[std::string(*key_)] = (*converter_)(v);
+    storage_->attributes[std::string(*key_)]       = v;
   }
 
   void operator()(double v)
   {
-    storage_->owened_attributes[std::string(*key_)] = (*converter_)(v);
-    storage_->attributes[std::string(*key_)]        = v;
+    storage_->owned_attributes[std::string(*key_)] = (*converter_)(v);
+    storage_->attributes[std::string(*key_)]       = v;
   }
 
   void operator()(nostd::string_view v)
   {
-    auto &owned_value                        = storage_->owened_attributes[std::string(*key_)];
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
     owned_value                              = (*converter_)(v);
     storage_->attributes[std::string(*key_)] = nostd::get<std::string>(owned_value);
   }
 
   void operator()(const char *v)
   {
-    auto &owned_value                        = storage_->owened_attributes[std::string(*key_)];
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
     owned_value                              = (*converter_)(v);
     storage_->attributes[std::string(*key_)] = nostd::get<std::string>(owned_value).c_str();
   }
 
   void operator()(nostd::span<const uint8_t> v)
   {
-    auto &owned_value                        = storage_->owened_attributes[std::string(*key_)];
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
     owned_value                              = (*converter_)(v);
     storage_->attributes[std::string(*key_)] = nostd::get<std::vector<uint8_t>>(owned_value);
   }
 
   void operator()(nostd::span<const bool> v)
   {
-    storage_->owened_attributes[std::string(*key_)] = (*converter_)(v);
+    storage_->owned_attributes[std::string(*key_)] = (*converter_)(v);
     if (v.empty())
     {
       storage_->attributes[std::string(*key_)] = nostd::span<const bool>{};
@@ -320,42 +320,42 @@ public:
 
   void operator()(nostd::span<const int32_t> v)
   {
-    auto &owned_value                        = storage_->owened_attributes[std::string(*key_)];
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
     owned_value                              = (*converter_)(v);
     storage_->attributes[std::string(*key_)] = nostd::get<std::vector<int32_t>>(owned_value);
   }
 
   void operator()(nostd::span<const uint32_t> v)
   {
-    auto &owned_value                        = storage_->owened_attributes[std::string(*key_)];
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
     owned_value                              = (*converter_)(v);
     storage_->attributes[std::string(*key_)] = nostd::get<std::vector<uint32_t>>(owned_value);
   }
 
   void operator()(nostd::span<const int64_t> v)
   {
-    auto &owned_value                        = storage_->owened_attributes[std::string(*key_)];
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
     owned_value                              = (*converter_)(v);
     storage_->attributes[std::string(*key_)] = nostd::get<std::vector<int64_t>>(owned_value);
   }
 
   void operator()(nostd::span<const uint64_t> v)
   {
-    auto &owned_value                        = storage_->owened_attributes[std::string(*key_)];
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
     owned_value                              = (*converter_)(v);
     storage_->attributes[std::string(*key_)] = nostd::get<std::vector<uint64_t>>(owned_value);
   }
 
   void operator()(nostd::span<const double> v)
   {
-    auto &owned_value                        = storage_->owened_attributes[std::string(*key_)];
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
     owned_value                              = (*converter_)(v);
     storage_->attributes[std::string(*key_)] = nostd::get<std::vector<double>>(owned_value);
   }
 
   void operator()(nostd::span<const nostd::string_view> v)
   {
-    auto &owned_value = storage_->owened_attributes[std::string(*key_)];
+    auto &owned_value = storage_->owned_attributes[std::string(*key_)];
     owned_value       = (*converter_)(v);
 
     if (v.empty())
@@ -436,7 +436,7 @@ public:
     return storage_.attributes;
   }
 
-  const AttributeMap &GetOwnedAttributes() const noexcept { return storage_.owened_attributes; }
+  const AttributeMap &GetOwnedAttributes() const noexcept { return storage_.owned_attributes; }
 
   // Convert non-owning key-value to owning std::string(key) and OwnedAttributeValue(value)
   void SetAttribute(nostd::string_view key,
@@ -448,7 +448,7 @@ public:
   void Reserve(AttributeMap::size_type size)
   {
     storage_.attributes.reserve(size);
-    storage_.owened_attributes.reserve(size);
+    storage_.owned_attributes.reserve(size);
   }
 
   AttributeMap::size_type Size() const noexcept { return storage_.attributes.size(); }
