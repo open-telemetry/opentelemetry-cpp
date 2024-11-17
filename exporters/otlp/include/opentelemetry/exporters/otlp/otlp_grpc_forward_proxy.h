@@ -22,6 +22,7 @@ class OPENTELEMETRY_EXPORT_TYPE OtlpGrpcForwardProxy
     std::unique_ptr<Impl> impl;
 public:
     explicit OtlpGrpcForwardProxy(bool syncExport = false);
+    ~OtlpGrpcForwardProxy();
     void AddListenAddress(const std::string& listenAddress);
     void RegisterMetricExporter(const OtlpGrpcMetricExporterOptions& options);
     void Start();

@@ -41,7 +41,7 @@ otel_cc_library(
 )
 
 otel_cc_library(
-    name = "otel_grpc_forward_proxy",
+    name = "otlp_grpc_forward_proxy",
     srcs = [
         "src/otlp_grpc_forward_proxy.cc",
     ],

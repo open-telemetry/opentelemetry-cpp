@@ -147,6 +147,11 @@ OtlpGrpcForwardProxy::OtlpGrpcForwardProxy(bool syncExport)
 {
 }
 
+OtlpGrpcForwardProxy::~OtlpGrpcForwardProxy()
+{
+}
+
+
 void OtlpGrpcForwardProxy::AddListenAddress(const std::string& listenAddress)
 {
     assert(impl != nullptr);

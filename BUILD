@@ -76,6 +76,7 @@ otel_cc_library(
         "@otel_sdk//exporters/otlp:otlp_grpc_exporter",
         "@otel_sdk//exporters/otlp:otlp_grpc_log_record_exporter",
         "@otel_sdk//exporters/otlp:otlp_grpc_metric_exporter",
+        "@otel_sdk//exporters/otlp:otlp_grpc_forward_proxy",
         "@otel_sdk//exporters/otlp:otlp_http_exporter",
         "@otel_sdk//exporters/otlp:otlp_http_log_record_exporter",
         "@otel_sdk//exporters/otlp:otlp_http_metric_exporter",

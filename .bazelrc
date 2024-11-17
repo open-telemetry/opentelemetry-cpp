@@ -12,7 +12,7 @@ build --features=parse_headers
 build --dynamic_mode=off
 
 common --noenable_workspace
-common --remote_download_minimal
+common --remote_download_all
 
 # Avoid using c:\windows\system32\bash.exe
 common:windows --shell_executable="c:\\program files\\git\\usr\\bin\\bash.exe"
