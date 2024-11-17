@@ -10,6 +10,12 @@ cc_binary(
     deps = ["@otel_sdk//:dll"]
 )
 
+cc_binary(
+    name = "p",
+    srcs = ["p.cpp"],
+    deps = ["@otel_sdk//:dll"]
+)
+
 copy_directory(
     name = "dashboards_dir",
     src = "dashboards",
