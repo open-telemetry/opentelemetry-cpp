@@ -968,7 +968,6 @@ public:
   explicit OtlpFileSystemBackend(const OtlpFileClientFileSystemOptions &options)
       : options_(options), is_initialized_{false}
   {
-    file_ = std::make_shared<FileStats>();
     file_->is_shutdown.store(false);
     file_->rotate_index            = 0;
     file_->written_size            = 0;
@@ -1536,9 +1535,9 @@ private:
     std::mutex background_thread_waiter_lock;
     std::condition_variable background_thread_waiter_cv;
   };
-  std::shared_ptr<FileStats> file_;
+  std::shared_ptr<FileStats> file_ = std::make_shared<FileStats>();
 
-  std::atomic<bool> is_initialized_;
+  std::atomic<bool> is_initialized_{false};
   std::time_t check_file_path_interval_{0};
 };
 

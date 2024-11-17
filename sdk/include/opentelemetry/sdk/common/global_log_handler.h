@@ -109,7 +109,7 @@ public:
    * This should be called once at the start of application before creating any Provider
    * instance.
    */
-  static inline void SetLogHandler(nostd::shared_ptr<LogHandler> eh) noexcept
+  static inline void SetLogHandler(const nostd::shared_ptr<LogHandler>& eh) noexcept
   {
     GetHandlerAndLevel().first = eh;
   }
