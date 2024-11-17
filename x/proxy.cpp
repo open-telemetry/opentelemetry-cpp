@@ -17,8 +17,8 @@ public:
   MetricsProxyService()
   {
     metricsOtlpOptions.endpoint = "motel.cat.factz.com:4317";
-    arenaOptions.initial_block_size = 4 * 1024;
-    arenaOptions.max_block_size = 1024 * 1024;
+    arenaOptions.initial_block_size = 4096;
+    arenaOptions.max_block_size = 128 * 1024 * 1024;
     otlpStub = otlpClient.MakeMetricsServiceStub(metricsOtlpOptions);
   }
 

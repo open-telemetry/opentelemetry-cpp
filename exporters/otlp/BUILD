@@ -41,6 +41,32 @@ otel_cc_library(
 )
 
 otel_cc_library(
+    name = "otel_grpc_forward_proxy",
+    srcs = [
+        "src/otlp_grpc_forward_proxy.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_grpc_forward_proxy.h",
+    ],
+    strip_include_prefix = "include",
+    tags = [
+        "otlp",
+        "otlp_grpc",
+    ],
+    deps = [
+        ":otlp_grpc_client",
+        ":otlp_grpc_metric_exporter",
+        "//ext:headers",
+        "//sdk/src/common:global_log_handler",
+        "@grpc//:grpc++",
+        "@grpc//:grpc++_reflection",
+        "@opentelemetry-proto//:logs_service_grpc_cc",
+        "@opentelemetry-proto//:metrics_service_grpc_cc",
+        "@opentelemetry-proto//:trace_service_grpc_cc",
+    ],
+)
+
+otel_cc_library(
     name = "otlp_grpc_client",
     srcs = [
         "src/otlp_grpc_client.cc",

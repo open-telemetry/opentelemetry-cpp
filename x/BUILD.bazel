@@ -17,21 +17,33 @@ copy_directory(
     hardlink = "on",
 )
 
-native_binary(
-    name = "perses",
-    src = "@otel_sdk//:perses",
-    data = ["dashboards_dir"],
-    args = ["-config $(location dashboards_dir)/config.yaml"],
-)
+# native_binary(
+#     name = "percli_binary",
+#     src = "@otel_sdk//:percli",
+# )
 
-run_binary(
-    name = "percli",
-    outs = ["aux"],
-    srcs = ["dashboards_dir"],
-#    args = ["--percliconfig $(location dashboards_dir)/config.yaml"],
-#    args = ["migrate", "--help"],
-    tool = "@otel_sdk//:percli",
-)
+# native_binary(
+#     name = "perses",
+#     src = "@otel_sdk//:perses",
+#     data = ["dashboards_dir"],
+#     args = ["-config $(rootpath dashboards_dir)/config.yaml"],
+# )
+
+# run_binary(
+#     name = "perses_run",
+#     outs = ["@otel_sdk//:perses"],
+#     tool = "@otel_sdk//:perses",
+#     args = ["--help","2>$(location 1.txt)"],
+# )
+
+# run_binary(
+#     name = "percli",
+#     outs = ["aux"],
+#     srcs = ["dashboards_dir", "perses_run"],
+# #    args = ["--percliconfig $(location dashboards_dir)/config.yaml"],
+# #    args = ["migrate", "--help"],
+#     tool = "@otel_sdk//:percli",
+# )
 
 cc_binary(
     name = "proxy",
