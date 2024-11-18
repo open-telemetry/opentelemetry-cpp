@@ -1,3 +1,8 @@
+#include <thread>
+#include <condition_variable>
+#include <mutex>
+#include <memory>
+
 #include "opentelemetry/sdk/version/version.h"
 
 // api headers (logs, traces, metrics)
@@ -24,7 +29,7 @@
 #include "opentelemetry/exporters/ostream/log_record_exporter.h"
 #include "opentelemetry/exporters/ostream/metric_exporter_factory.h"
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
-
+#include "opentelemetry/exporters/otlp/otlp_grpc_forward_proxy.h"
 
 #include <opentelemetry/metrics/provider.h>
 #include <opentelemetry/sdk/common/global_log_handler.h>
@@ -301,9 +306,52 @@ void CleanupMetrics()
   opentelemetry::metrics::Provider::SetMeterProvider(none);
 }
 
+struct proxy_thread
+{
+  std::mutex mu;
+  std::condition_variable cv;
+  bool ready{ false };
+  static void entry(proxy_thread* ctx)
+  {
+      using namespace opentelemetry::exporter::otlp;
+      
+      OtlpGrpcMetricExporterOptions metricExporterOptions;
+      metricExporterOptions.endpoint = "motel.cat.fact.com:4317";
+
+      auto proxy{ std::make_unique<OtlpGrpcForwardProxy>(false) };
+
+      proxy->AddListenAddress("127.0.0.1:4317");
+      proxy->RegisterMetricExporter(metricExporterOptions);
+      printf("Start\n");
+      proxy->Start();
+      {
+        std::unique_lock<std::mutex> lock(ctx->mu);  
+        ctx->ready = true;
+        ctx->cv.notify_one();
+      }
+      printf("Wait\n");
+      proxy->Wait();
+      printf("Done Wait\n");
+  }
+  static void start()
+  {
+    proxy_thread ctx;
+    std::thread pt(proxy_thread::entry, &ctx);
+    pt.detach();
+    std::unique_lock<std::mutex> lock(ctx.mu);
+    ctx.cv.wait(lock, [&ctx]{ return ctx.ready; });
+  }
+};
 
 int main(int argc, const char *argv[])
 {
+  {
+    using namespace opentelemetry::sdk::common::internal_log;
+    GlobalLogHandler::SetLogLevel(LogLevel::Debug);
+  }
+
+  proxy_thread::start();
+
   opentelemetry::sdk::common::setenv( "OTEL_EXPORTER_OTLP_ENDPOINT", "http://127.0.0.1:4317", 1 /* override */ );
 
   std::string metrics_name{"malkia_metrics_test"};

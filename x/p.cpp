@@ -6,7 +6,7 @@ int main()
     using namespace opentelemetry::exporter::otlp;
     
     OtlpGrpcMetricExporterOptions metricExporterOptions;
-    metricExporterOptions.endpoint = "otel.ct.activision.com:4317";
+    metricExporterOptions.endpoint = "motel.cat.fact.com:4317";
 
     auto proxy{ std::make_unique<OtlpGrpcForwardProxy>() };
 

@@ -62,11 +62,11 @@ bool OtlpGrpcForwardProxy::Impl::HandleExportResult(sdk::common::ExportResult re
 {
     if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
     {
-        OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC FORWARD PROXY] AsyncExport failed with result ");// << result);
+        OTEL_INTERNAL_LOG_ERROR("[otlp_grpc_forward_proxy] AsyncExport failed");// << result);
     }
     else
     {
-        OTEL_INTERNAL_LOG_DEBUG("[OTLP GRPC FORWARD PROXY] AsyncExport succeeded!");
+        OTEL_INTERNAL_LOG_DEBUG("[otlp_grpc_forward_proxy] AsyncExport succeeded!");
     }
     return true;
 }
@@ -112,29 +112,31 @@ grpc::ServerUnaryReactor* OtlpGrpcForwardProxy::Impl::Finish(grpc::CallbackServe
 
 struct OtlpGrpcForwardProxy::Impl::MetricExporterProxy : public MetricsService::CallbackService 
 {
-    const OtlpGrpcForwardProxy::Impl& impl;
-    explicit MetricExporterProxy(const OtlpGrpcForwardProxy::Impl& impl_): impl(impl_){}
+    OtlpGrpcForwardProxy::Impl& impl;
+    explicit MetricExporterProxy(OtlpGrpcForwardProxy::Impl& impl_): impl(impl_){}
     grpc::ServerUnaryReactor* Export(grpc::CallbackServerContext* cbServerContext, const ExportMetricsServiceRequest* req, ExportMetricsServiceResponse* resp) override
     {
         auto context{ impl.client.MakeClientContext(impl.metricExporterOptions) };
         auto exportResult{ sdk::common::ExportResult::kFailure };
         bool exported{ false };
-#if defined(ENABLE_ASYNC_EXPORTER) && ENABLE_ASYNC_EXPORTER
-        if( !syncExport )
+#if defined(ENABLE_ASYNC_EXPORT) && ENABLE_ASYNC_EXPORT
+        if( !impl.syncExport )
         {
+            OTEL_INTERNAL_LOG_DEBUG("[otlp_grpc_forward_proxy] AsyncExport called!");
             auto arena{ std::make_unique<google::protobuf::Arena>(impl.arenaOptions) };
-            auto request{ ExportMetricsServiceRequest->New(arena) };
-            request->CopyFrom( *req );
+            // TODO: Can we copy req -> request using the arena above ^^^ (New() + CopyFrom() of sorts?)
+            auto request{ *req };
             exportResult = impl.client.DelegateAsyncExport( impl.metricExporterOptions, impl.metricExporterStub.get(), std::move(context), std::move(arena), std::move(request),
-                [impl = &impl] (sdk::common::ExportResult r, std::unique_ptr<google::protobuf::Arena>&&, const ExportMetricsServiceRequest&, ExportMetricsServiceResponse* ) -> bool 
+                [implPtr = &impl] (sdk::common::ExportResult r, std::unique_ptr<google::protobuf::Arena>&&, const ExportMetricsServiceRequest&, ExportMetricsServiceResponse* ) -> bool
                 { 
-                    return impl->HandleExportResult(r); 
+                    return implPtr->HandleExportResult(r); 
                 });
             exported = true;
         }
 #endif
         if( !exported )
         {
+            OTEL_INTERNAL_LOG_DEBUG("[otlp_grpc_forward_proxy] SyncExport called!");
             const auto status{ impl.metricExporterStub->Export( context.get(), *req, resp ) };
             exportResult = status.ok() ? sdk::common::ExportResult::kSuccess : sdk::common::ExportResult::kFailure;
         }
@@ -150,7 +152,6 @@ OtlpGrpcForwardProxy::OtlpGrpcForwardProxy(bool syncExport)
 OtlpGrpcForwardProxy::~OtlpGrpcForwardProxy()
 {
 }
-
 
 void OtlpGrpcForwardProxy::AddListenAddress(const std::string& listenAddress)
 {
