@@ -85,6 +85,7 @@ public:
    *
    * NOTE: Timeout functionality not supported yet.
    */
+  // cppcheck-suppress [virtualCallInConstructor]
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 

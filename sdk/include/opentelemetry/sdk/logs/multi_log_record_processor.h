@@ -43,6 +43,7 @@ public:
    * @param timeout that the forceflush is required to finish within.
    * @return a result code indicating whether it succeeded, failed or timed out
    */
+  // cppcheck-suppress [virtualCallInConstructor]
   bool ForceFlush(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
@@ -53,6 +54,7 @@ public:
    * shutdown before giving up and returning failure.
    * @return true if the shutdown succeeded, false otherwise
    */
+  // cppcheck-suppress [virtualCallInConstructor]
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 

@@ -121,6 +121,7 @@ public:
     return result;
   }
 
+  // cppcheck-suppress [virtualCallInConstructor]
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
   {

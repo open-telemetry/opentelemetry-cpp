@@ -221,6 +221,7 @@ template <class ReturnType, class FunctionObject, std::size_t... BoundIndices>
 struct MakeVisitationMatrix<ReturnType, FunctionObject, index_sequence<>,
                             index_sequence<BoundIndices...>> {
   using ResultType = ReturnType (*)(FunctionObject&&);
+  // cppcheck-suppress [duplInheritedMember]
   static constexpr ResultType Run() {
     return &call_with_indices<ReturnType, FunctionObject,
                               (BoundIndices - 1)...>;
@@ -722,6 +723,7 @@ struct VariantCoreAccess {
       Self* self, Args&&... args) {
     Destroy(*self);
     using New = typename absl::variant_alternative<NewIndex, Self>::type;
+    // cppcheck-suppress [legacyUninitvar]
     New* const result = ::new (static_cast<void*>(&self->state_))
         New(absl::forward<Args>(args)...);
     self->index_ = NewIndex;
@@ -1310,6 +1312,7 @@ class VariantStateBaseDestructorNontrivial : protected VariantStateBase<T...> {
     VariantStateBaseDestructorNontrivial* self;
   };
 
+  // cppcheck-suppress [duplInheritedMember]
   void destroy() { VisitIndices<sizeof...(T)>::Run(Destroyer{this}, index_); }
 
   ~VariantStateBaseDestructorNontrivial() { destroy(); }

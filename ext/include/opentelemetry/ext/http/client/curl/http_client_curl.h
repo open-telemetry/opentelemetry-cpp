@@ -307,6 +307,7 @@ public:
   std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
       nostd::string_view url) noexcept override;
 
+  // cppcheck-suppress [virtualCallInConstructor]
   bool CancelAllSessions() noexcept override;
 
   bool FinishAllSessions() noexcept override;

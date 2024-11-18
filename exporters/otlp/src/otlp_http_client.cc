@@ -898,7 +898,7 @@ OtlpHttpClient::createSession(
       {
         std::cerr << error_message << '\n';
       }
-      OTEL_INTERNAL_LOG_ERROR(error_message.c_str());
+      OTEL_INTERNAL_LOG_ERROR(error_message);
 
       const auto result = opentelemetry::sdk::common::ExportResult::kFailure;
       result_callback(result);

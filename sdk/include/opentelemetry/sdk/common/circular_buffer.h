@@ -185,8 +185,10 @@ private:
     if (tail_index < head_index)
     {
       return CircularBufferRange<AtomicUniquePtr<T>>{nostd::span<AtomicUniquePtr<T>>{
+          // cppcheck-suppress [arithOperationsOnVoidPointer]
           data + tail_index, static_cast<std::size_t>(head_index - tail_index)}};
     }
+    // cppcheck-suppress [arithOperationsOnVoidPointer]
     return {nostd::span<AtomicUniquePtr<T>>{data + tail_index,
                                             static_cast<std::size_t>(capacity_ - tail_index)},
             nostd::span<AtomicUniquePtr<T>>{data, static_cast<std::size_t>(head_index)}};

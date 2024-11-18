@@ -38,7 +38,7 @@ public:
   /**
    * Changes the singleton MeterProvider.
    */
-  static void SetMeterProvider(nostd::shared_ptr<MeterProvider> tp) noexcept
+  static void SetMeterProvider(const nostd::shared_ptr<MeterProvider>& tp) noexcept
   {
     std::lock_guard<common::SpinLockMutex> guard(GetLock());
     GetProvider() = tp;
