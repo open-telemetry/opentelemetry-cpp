@@ -56,6 +56,8 @@ otel_cc_library(
     deps = [
         ":otlp_grpc_client",
         ":otlp_grpc_metric_exporter",
+        ":otlp_grpc_log_record_exporter",
+        ":otlp_grpc_exporter",
         "//ext:headers",
         "//sdk/src/common:global_log_handler",
         "@grpc//:grpc++",

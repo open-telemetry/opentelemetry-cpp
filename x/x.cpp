@@ -1,3 +1,5 @@
+#include <conio.h>
+
 #include <thread>
 #include <condition_variable>
 #include <mutex>
@@ -40,6 +42,26 @@
 #include <opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h>
 #include <opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h>
 
+#include <opentelemetry/version.h>
+#include <opentelemetry/trace/provider.h>
+#include <opentelemetry/logs/provider.h>
+#include <opentelemetry/sdk/common/global_log_handler.h>
+#include <opentelemetry/sdk/common/env_variables.h>
+#include <opentelemetry/sdk/resource/semantic_conventions.h>
+#include <opentelemetry/sdk/trace/tracer_provider.h>
+#include <opentelemetry/sdk/trace/tracer_provider_factory.h>
+#include <opentelemetry/sdk/trace/batch_span_processor_options.h>
+#include <opentelemetry/sdk/trace/batch_span_processor_factory.h>
+#include "opentelemetry/sdk/trace/processor.h"
+#include <opentelemetry/sdk/logs/logger_provider_factory.h>
+#include <opentelemetry/sdk/logs/batch_log_record_processor_options.h>
+#include <opentelemetry/sdk/logs/batch_log_record_processor_factory.h>
+#include <opentelemetry/sdk/logs/processor.h>
+#include <opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h>
+#include <opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h>
+
+#include <windows.h>
+
 opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer()
 {
   auto provider = opentelemetry::trace::Provider::GetTracerProvider();
@@ -54,30 +76,30 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> get_logger()
 
 void traces_f1()
 {
-  auto scoped_span = opentelemetry::trace::Scope(get_tracer()->StartSpan("f1"));
+  auto scoped_span = opentelemetry::trace::Scope(get_tracer()->StartSpan("malkia_span_f1"));
 }
 
 void traces_f2()
 {
-  auto scoped_span = opentelemetry::trace::Scope(get_tracer()->StartSpan("f2"));
+  auto scoped_span = opentelemetry::trace::Scope(get_tracer()->StartSpan("malkia_span_f2"));
   traces_f1();
   traces_f1();
 }
 
 void traces_foo_library()
 {
-  auto scoped_span = opentelemetry::trace::Scope(get_tracer()->StartSpan("library"));
+  auto scoped_span = opentelemetry::trace::Scope(get_tracer()->StartSpan("malkia_span_library"));
   traces_f2();
 }
 
 void logs_foo_library()
 {
-  auto span        = get_tracer()->StartSpan("span 1");
-  auto scoped_span = opentelemetry::trace::Scope(get_tracer()->StartSpan("foo_library"));
+  auto span        = get_tracer()->StartSpan("malkia span 1");
+  auto scoped_span = opentelemetry::trace::Scope(get_tracer()->StartSpan("malkia_span_foo_library"));
   auto ctx         = span->GetContext();
   auto logger      = get_logger();
 
-  logger->Debug("body", ctx.trace_id(), ctx.span_id(), ctx.trace_flags());
+  logger->Debug("malkia_logs_test", ctx.trace_id(), ctx.span_id(), ctx.trace_flags());
 }
 
 static opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
@@ -86,9 +108,6 @@ static opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObservableInstru
 std::map<std::string, std::string> get_random_attr()
 {
   const std::vector<std::pair<std::string, std::string>> labels = {{"key1", "value1"},
-                                                                   {"key2", "value2"},
-                                                                   {"key3", "value3"},
-                                                                   {"key4", "value4"},
                                                                    {"key5", "value5"}};
   return std::map<std::string, std::string>{labels[rand() % (labels.size() - 1)],
                                             labels[rand() % (labels.size() - 1)]};
@@ -166,32 +185,86 @@ void metrics_histogram_example(const std::string &name)
 
 void InitTracer()
 {
-  auto exporter = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Create();
-  auto processor =
-      opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Create(std::move(exporter));
+  // auto exporter = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Create();
+  // auto processor =
+  //     opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
-  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> sdk_provider =
-      opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(processor));
+  // std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> sdk_provider =
+  //     opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(processor));
 
-  // Set the global trace provider
-  const std::shared_ptr<opentelemetry::trace::TracerProvider> &api_provider = sdk_provider;
-  opentelemetry::trace::Provider::SetTracerProvider(api_provider);
+  // // Set the global trace provider
+  // const std::shared_ptr<opentelemetry::trace::TracerProvider> &api_provider = sdk_provider;
+  // opentelemetry::trace::Provider::SetTracerProvider(api_provider);
+
+    using namespace opentelemetry;
+
+        exporter::otlp::OtlpGrpcExporterOptions exporterOptions;
+        // GTEST_LOG_( INFO ) << "\n"
+        //                                    << "otlp trace exporter: " << exporterOptions.endpoint << "\n"
+        //                                    << "otlp trace user_agent: " << exporterOptions.user_agent << "\n";
+        auto exporter{ exporter::otlp::OtlpGrpcExporterFactory::Create( exporterOptions ) };
+
+        sdk::trace::BatchSpanProcessorOptions batchProcessorOptions;
+        batchProcessorOptions.max_export_batch_size = 4096;
+        batchProcessorOptions.max_queue_size = 16384;
+        batchProcessorOptions.schedule_delay_millis = std::chrono::milliseconds{ 1000 };
+        auto batchProcessor{ sdk::trace::BatchSpanProcessorFactory::Create( std::move( exporter ), batchProcessorOptions ) };
+
+        std::vector<std::unique_ptr<sdk::trace::SpanProcessor>> spanProcessors;
+        spanProcessors.emplace_back( std::move( batchProcessor ) );
+        const std::shared_ptr tracerProvider{ sdk::trace::TracerProviderFactory::Create( std::move( spanProcessors ) ) };
+
+        trace::Provider::SetTracerProvider( tracerProvider );
+
 }
 
 void InitLogger()
 {
-  // Create ostream log exporter instance
-  auto exporter = std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>(
-      new opentelemetry::exporter::logs::OStreamLogRecordExporter);
-  auto processor =
-      opentelemetry::sdk::logs::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
+  // // Create ostream log exporter instance
+  // auto exporter = std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>(
+  //     new opentelemetry::exporter::logs::OStreamLogRecordExporter);
+  // auto processor =
+  //     opentelemetry::sdk::logs::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
 
-  std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> sdk_provider(
-      opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(processor)));
+  // std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> sdk_provider(
+  //     opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(processor)));
 
-  // Set the global logger provider
-  const std::shared_ptr<opentelemetry::logs::LoggerProvider> &api_provider = sdk_provider;
-  opentelemetry::logs::Provider::SetLoggerProvider(api_provider);
+  // // Set the global logger provider
+  // const std::shared_ptr<opentelemetry::logs::LoggerProvider> &api_provider = sdk_provider;
+  // opentelemetry::logs::Provider::SetLoggerProvider(api_provider);
+
+    using namespace opentelemetry;
+
+  exporter::otlp::OtlpGrpcLogRecordExporterOptions log_opts;
+  auto exporter = exporter::otlp::OtlpGrpcLogRecordExporterFactory::Create( log_opts );
+  sdk::logs::BatchLogRecordProcessorOptions processorOptions;
+  processorOptions.max_export_batch_size = 4096;
+  processorOptions.max_queue_size = 16384;
+  processorOptions.schedule_delay_millis = std::chrono::milliseconds{ 1000 };
+  auto processor = sdk::logs::BatchLogRecordProcessorFactory::Create( std::move( exporter ), processorOptions );
+
+  std::vector<std::unique_ptr<sdk::logs::LogRecordProcessor>> logRecordProcessors;
+  logRecordProcessors.emplace_back( std::move( processor ) );
+
+#if 0
+  exporter::logs::ElasticsearchExporterOptions elasticOptions;
+  elasticOptions.console_debug_ = true;
+  elasticOptions.port_ = 9200;
+  elasticOptions.host_ = "localhost:";
+  elasticOptions.index_ = "otel2";
+  {
+          nostd::unique_ptr<sdk::logs::LogRecordExporter> elasticExporter( new exporter::logs::ElasticsearchLogRecordExporter(elasticOptions) );
+          sdk::logs::BatchLogRecordProcessorOptions processorOptions2;
+          processorOptions2.max_export_batch_size = 128;
+          processorOptions2.max_queue_size = 256;
+          processorOptions2.schedule_delay_millis = std::chrono::milliseconds{ 1000 };
+          auto elasticProcessor = sdk::logs::BatchLogRecordProcessorFactory::Create(std::move(elasticExporter), processorOptions);
+          logRecordProcessors.emplace_back(std::move(elasticProcessor));
+  }
+#endif // #if 0
+
+  nostd::shared_ptr<logs::LoggerProvider> provider( sdk::logs::LoggerProviderFactory::Create( std::move( logRecordProcessors ) ) );
+  logs::Provider::SetLoggerProvider( provider );
 }
 
 void CleanupTracer()
@@ -318,13 +391,23 @@ struct proxy_thread
   {
       using namespace opentelemetry::exporter::otlp;
       
-      OtlpGrpcMetricExporterOptions metricExporterOptions;
-      metricExporterOptions.endpoint = GetOtlpDefaultGrpcMetricsEndpoint();
+      OtlpGrpcExporterOptions traceExporterOptions;
+      traceExporterOptions.endpoint = GetOtlpDefaultGrpcEndpoint();
 
-      ctx->proxy = std::make_unique<OtlpGrpcForwardProxy>(false);
+      OtlpGrpcMetricExporterOptions metricExporterOptions;
+      metricExporterOptions.endpoint = GetOtlpDefaultGrpcEndpoint();
+
+      OtlpGrpcLogRecordExporterOptions logExporterOptions;
+      logExporterOptions.endpoint = GetOtlpDefaultGrpcEndpoint();
+
+      ctx->proxy = std::make_unique<OtlpGrpcForwardProxy>();
+      ctx->proxy->SetActive(true);
+      ctx->proxy->SetAsync(true);
 
       ctx->proxy->AddListenAddress("127.0.0.1:4317");
       proxy->RegisterMetricExporter(metricExporterOptions);
+      proxy->RegisterTraceExporter(traceExporterOptions);
+      proxy->RegisterLogRecordExporter(logExporterOptions);
       printf("Start\n");
       ctx->proxy->Start();
       {
@@ -354,6 +437,10 @@ struct proxy_thread
 
 int main(int argc, const char *argv[])
 {
+  setvbuf(stdout, nullptr, _IONBF,0);
+  setvbuf(stderr, nullptr, _IONBF,0);
+  setvbuf(stdin, nullptr, _IONBF,0);
+
   {
     using namespace opentelemetry::sdk::common::internal_log;
     GlobalLogHandler::SetLogLevel(LogLevel::Debug);
@@ -364,13 +451,13 @@ int main(int argc, const char *argv[])
   opentelemetry::sdk::common::setenv( "OTEL_EXPORTER_OTLP_ENDPOINT", "http://127.0.0.1:4317", 1 /* override */ );
 
   std::string metrics_name{"malkia_metrics_test"};
-  //InitTracer();
-  //InitLogger();
+  InitTracer();
+  InitLogger();
   InitMetrics(metrics_name);
 
   init_metrics();
-  //logs_foo_library();
-  //traces_foo_library();
+  logs_foo_library();
+  traces_foo_library();
   std::thread counter_example{&metrics_counter_example, metrics_name};
   std::thread observable_counter_example{&metrics_observable_counter_example, metrics_name};
   std::thread histogram_example{&metrics_histogram_example, metrics_name};
@@ -378,8 +465,17 @@ int main(int argc, const char *argv[])
   observable_counter_example.join();
   histogram_example.join();
   CleanupMetrics();
-  //CleanupLogger();
-  //CleanupTracer();
+  CleanupLogger();
+  CleanupTracer();
+
+  printf("Press Ctrl+C to break\n");
+  try {
+    std::this_thread::sleep_for(std::chrono::seconds(600));
+  }
+  catch( ... )
+  {
+    printf("Caught something?\n");
+  }
 
   proxy_thread::shutdown();
   return 0;
