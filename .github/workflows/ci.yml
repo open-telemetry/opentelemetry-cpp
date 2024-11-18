@@ -878,7 +878,7 @@ jobs:
     - name: upload report
       uses: codecov/codecov-action@v5
       with:
-        file: /home/runner/build/coverage.info
+        files: /home/runner/build/coverage.info
 
   markdown-lint:
     runs-on: ubuntu-latest
