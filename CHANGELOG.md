@@ -149,6 +149,9 @@ Increment the:
 * [bazel] Update opentelemetry-proto in MODULE.bazel
   [#3163](https://github.com/open-telemetry/opentelemetry-cpp/pull/3163)
 
+* [SDK] Add tracer scope configurator
+  [#3137](https://github.com/open-telemetry/opentelemetry-cpp/pull/3137)
+
 Important changes:
 
 * [API] Jaeger Propagator should not be deprecated
