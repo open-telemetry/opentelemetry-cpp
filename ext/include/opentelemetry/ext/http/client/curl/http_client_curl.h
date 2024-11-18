@@ -172,7 +172,7 @@ public:
           const std::string &scheme = "http",
           const std::string &host   = "",
           uint16_t port             = 80)
-      : http_client_(http_client), host_{scheme + "://" + host + ":" + std::to_string(port) + "/"}
+      : host_{scheme + "://" + host + ":" + std::to_string(port) + "/"}, http_client_(http_client)
   {}
 
   std::shared_ptr<opentelemetry::ext::http::client::Request> CreateRequest() noexcept override
