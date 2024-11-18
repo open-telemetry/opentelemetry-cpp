@@ -135,7 +135,10 @@ private:
     }
 
     DataList(const DataList &other)
-        : key_length_(other.key_length_), next_(other.next_), value_(other.value_)
+        : key_(new char[other.key_length_]),
+          key_length_(other.key_length_),
+          next_(other.next_),
+          value_(other.value_)
     {
       memcpy(key_, other.key_, other.key_length_ * sizeof(char));
     }
