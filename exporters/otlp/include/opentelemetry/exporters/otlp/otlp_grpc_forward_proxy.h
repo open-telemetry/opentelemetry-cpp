@@ -27,6 +27,7 @@ public:
     void RegisterMetricExporter(const OtlpGrpcMetricExporterOptions& options);
     void Start();
     void Wait();
+    void Shutdown();
 };
 
 }  // namespace otlp

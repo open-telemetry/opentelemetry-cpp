@@ -4,10 +4,12 @@ load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_binary(
+cc_test(
     name = "x",
     srcs = ["x.cpp"],
-    deps = ["@otel_sdk//:dll"]
+    deps = ["@otel_sdk//:dll"],
+    local = True,
+    tags = ["manual", "external"],
 )
 
 cc_binary(

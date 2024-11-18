@@ -30,6 +30,7 @@
 #include "opentelemetry/exporters/ostream/metric_exporter_factory.h"
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_forward_proxy.h"
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 #include <opentelemetry/metrics/provider.h>
 #include <opentelemetry/sdk/common/global_log_handler.h>
@@ -306,31 +307,33 @@ void CleanupMetrics()
   opentelemetry::metrics::Provider::SetMeterProvider(none);
 }
 
+// TODO: This is a mess.
 struct proxy_thread
 {
   std::mutex mu;
   std::condition_variable cv;
   bool ready{ false };
+  static inline std::unique_ptr<opentelemetry::exporter::otlp::OtlpGrpcForwardProxy> proxy;
   static void entry(proxy_thread* ctx)
   {
       using namespace opentelemetry::exporter::otlp;
       
       OtlpGrpcMetricExporterOptions metricExporterOptions;
-      metricExporterOptions.endpoint = "motel.cat.fact.com:4317";
+      metricExporterOptions.endpoint = GetOtlpDefaultGrpcMetricsEndpoint();
 
-      auto proxy{ std::make_unique<OtlpGrpcForwardProxy>(false) };
+      ctx->proxy = std::make_unique<OtlpGrpcForwardProxy>(false);
 
-      proxy->AddListenAddress("127.0.0.1:4317");
+      ctx->proxy->AddListenAddress("127.0.0.1:4317");
       proxy->RegisterMetricExporter(metricExporterOptions);
       printf("Start\n");
-      proxy->Start();
+      ctx->proxy->Start();
       {
         std::unique_lock<std::mutex> lock(ctx->mu);  
         ctx->ready = true;
         ctx->cv.notify_one();
       }
       printf("Wait\n");
-      proxy->Wait();
+      ctx->proxy->Wait();
       printf("Done Wait\n");
   }
   static void start()
@@ -340,6 +343,12 @@ struct proxy_thread
     pt.detach();
     std::unique_lock<std::mutex> lock(ctx.mu);
     ctx.cv.wait(lock, [&ctx]{ return ctx.ready; });
+  }
+  static void shutdown()
+  {
+    if( proxy )
+      proxy->Shutdown();
+    proxy.reset();
   }
 };
 
@@ -371,5 +380,7 @@ int main(int argc, const char *argv[])
   CleanupMetrics();
   //CleanupLogger();
   //CleanupTracer();
+
+  proxy_thread::shutdown();
   return 0;
 }

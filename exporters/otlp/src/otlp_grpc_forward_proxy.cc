@@ -184,6 +184,12 @@ void OtlpGrpcForwardProxy::Wait()
     impl->server->Wait();
 }
 
+void OtlpGrpcForwardProxy::Shutdown()
+{
+    assert(impl->server != nullptr);
+    impl->server->Shutdown();
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
