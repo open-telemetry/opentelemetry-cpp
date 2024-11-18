@@ -24,7 +24,7 @@ public:
   {}
 
   inline const opentelemetry::trace::SpanContext &context() const { return context_; }
-  inline const BaggagePtr& baggage() const { return baggage_; }
+  inline const BaggagePtr &baggage() const { return baggage_; }
   SpanContextShim newWithKeyValue(nostd::string_view key, nostd::string_view value) const noexcept;
   bool BaggageItem(nostd::string_view key, std::string &value) const noexcept;
 
