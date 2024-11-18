@@ -40,7 +40,6 @@ jobs:
         run: |
           cppcheck \
             --force \
-            --quiet \
             --enable=warning,performance,portability \
             --inline-suppr \
             --suppress=unknownMacro:exporters/etw/include/opentelemetry/exporters/etw/TraceLoggingDynamic.h \
