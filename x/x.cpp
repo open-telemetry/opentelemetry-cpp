@@ -391,23 +391,17 @@ struct proxy_thread
   {
       using namespace opentelemetry::exporter::otlp;
       
-      OtlpGrpcExporterOptions traceExporterOptions;
-      traceExporterOptions.endpoint = GetOtlpDefaultGrpcEndpoint();
+      OtlpGrpcClientOptions clientOptions;
+      clientOptions.endpoint = GetOtlpDefaultGrpcEndpoint();
+      clientOptions.max_concurrent_requests = 1024;
 
-      OtlpGrpcMetricExporterOptions metricExporterOptions;
-      metricExporterOptions.endpoint = GetOtlpDefaultGrpcEndpoint();
-
-      OtlpGrpcLogRecordExporterOptions logExporterOptions;
-      logExporterOptions.endpoint = GetOtlpDefaultGrpcEndpoint();
-
-      ctx->proxy = std::make_unique<OtlpGrpcForwardProxy>();
+      ctx->proxy = std::make_unique<OtlpGrpcForwardProxy>(clientOptions);
       ctx->proxy->SetActive(true);
-      ctx->proxy->SetAsync(true);
 
       ctx->proxy->AddListenAddress("127.0.0.1:4317");
-      proxy->RegisterMetricExporter(metricExporterOptions);
-      proxy->RegisterTraceExporter(traceExporterOptions);
-      proxy->RegisterLogRecordExporter(logExporterOptions);
+      proxy->RegisterMetricExporter(OtlpGrpcForwardProxy::ExportMode::AsyncBlockOnFull);
+      proxy->RegisterTraceExporter(OtlpGrpcForwardProxy::ExportMode::AsyncBlockOnFull);
+      proxy->RegisterLogRecordExporter(OtlpGrpcForwardProxy::ExportMode::AsyncBlockOnFull);
       printf("Start\n");
       ctx->proxy->Start();
       {
