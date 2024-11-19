@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
 
@@ -13,6 +14,8 @@
 #ifdef GOOGLE_PROTOBUF_VERSION
 #  error "protobuf should not be included"
 #endif
+
+#include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -29,6 +32,27 @@ TEST(OtlpGrpcMetricExporterFactory, BuildTest)
       OtlpGrpcMetricExporterFactory::Create(opts);
 
   EXPECT_TRUE(exporter != nullptr);
+}
+
+TEST(OtlpGrpcMetricExporterFactory, ShareClient)
+{
+  OtlpGrpcMetricExporterOptions opts;
+  opts.endpoint = "localhost:45454";
+
+  std::shared_ptr<OtlpGrpcClient> client = OtlpGrpcClientFactory::Create(opts);
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter1 =
+      OtlpGrpcMetricExporterFactory::Create(opts, client);
+
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter2 =
+      OtlpGrpcMetricExporterFactory::Create(opts, client);
+
+  EXPECT_TRUE(exporter1 != nullptr);
+  EXPECT_TRUE(exporter2 != nullptr);
+
+  EXPECT_TRUE(static_cast<OtlpGrpcMetricExporter *>(exporter1.get())->GetClient().get() ==
+              client.get());
+  EXPECT_TRUE(static_cast<OtlpGrpcMetricExporter *>(exporter2.get())->GetClient().get() ==
+              client.get());
 }
 
 }  // namespace otlp

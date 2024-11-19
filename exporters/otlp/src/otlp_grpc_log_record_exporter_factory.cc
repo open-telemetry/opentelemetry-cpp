@@ -28,6 +28,15 @@ OtlpGrpcLogRecordExporterFactory::Create(const OtlpGrpcLogRecordExporterOptions 
   return exporter;
 }
 
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
+OtlpGrpcLogRecordExporterFactory::Create(const OtlpGrpcLogRecordExporterOptions &options,
+                                         const std::shared_ptr<OtlpGrpcClient> &client)
+{
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> exporter(
+      new OtlpGrpcLogRecordExporter(options, client));
+  return exporter;
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
