@@ -194,36 +194,32 @@ public:
     std::string result;
     result.reserve(encoded.size());
 
+    auto hex_to_int = [](int ch) -> int {
+      if (ch >= '0' && ch <= '9')
+        return ch - '0';
+      if (ch >= 'a' && ch <= 'f')
+        return ch - 'a' + 10;
+      if (ch >= 'A' && ch <= 'F')
+        return ch - 'A' + 10;
+      return -1;
+    };
+
     for (size_t pos = 0; pos < encoded.size(); pos++)
     {
-      if (encoded[pos] == '%')
+      auto c = encoded[pos];
+      if (c == '%' && pos + 2 < encoded.size())
       {
+        int hi = hex_to_int(encoded[pos + 1]);
+        int lo = hex_to_int(encoded[pos + 2]);
 
-        // Invalid input: less than two characters left after '%'
-        if (encoded.size() < pos + 3)
+        if (hi != -1 && lo != -1)
         {
-          return encoded;
+          c = static_cast<char>((hi << 4) | lo);
+          pos += 2;
         }
-
-        char hex[3] = {0};
-        hex[0]      = encoded[++pos];
-        hex[1]      = encoded[++pos];
-
-        char *endptr;
-        int value = static_cast<int>(std::strtol(hex, &endptr, 16));
-
-        // Invalid input: no valid hex characters after '%'
-        if (endptr != &hex[2])
-        {
-          return encoded;
-        }
-
-        result.push_back(static_cast<char>(value));
       }
-      else
-      {
-        result.push_back(encoded[pos]);
-      }
+
+      result.push_back(c);
     }
 
     return result;
