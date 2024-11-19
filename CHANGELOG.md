@@ -27,6 +27,9 @@ Increment the:
 * [SEMANTIC CONVENTIONS] Migration to weaver
   [#3105](https://github.com/open-telemetry/opentelemetry-cpp/pull/3105)
 
+* [EXPORTER] Allow to share gRPC clients between OTLP exporters.
+  [#3041](https://github.com/open-telemetry/opentelemetry-cpp/pull/3041)
+
 Important changes:
 
 * [API] Jaeger Propagator should not be deprecated
