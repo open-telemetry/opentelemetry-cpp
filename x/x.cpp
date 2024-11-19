@@ -1,5 +1,3 @@
-#include <conio.h>
-
 #include <thread>
 #include <condition_variable>
 #include <mutex>
@@ -59,8 +57,6 @@
 #include <opentelemetry/sdk/logs/processor.h>
 #include <opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h>
 #include <opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h>
-
-#include <windows.h>
 
 opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer()
 {
@@ -393,15 +389,16 @@ struct proxy_thread
       
       OtlpGrpcClientOptions clientOptions;
       clientOptions.endpoint = GetOtlpDefaultGrpcEndpoint();
-      clientOptions.max_concurrent_requests = 1024;
+      clientOptions.max_concurrent_requests = 16384;
+      clientOptions.max_threads = 64;
 
       ctx->proxy = std::make_unique<OtlpGrpcForwardProxy>(clientOptions);
       ctx->proxy->SetActive(true);
 
       ctx->proxy->AddListenAddress("127.0.0.1:4317");
-      proxy->RegisterMetricExporter(OtlpGrpcForwardProxy::ExportMode::AsyncBlockOnFull);
-      proxy->RegisterTraceExporter(OtlpGrpcForwardProxy::ExportMode::AsyncBlockOnFull);
-      proxy->RegisterLogRecordExporter(OtlpGrpcForwardProxy::ExportMode::AsyncBlockOnFull);
+      proxy->RegisterMetricExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
+      proxy->RegisterTraceExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
+      proxy->RegisterLogRecordExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
       printf("Start\n");
       ctx->proxy->Start();
       {
@@ -441,8 +438,11 @@ int main(int argc, const char *argv[])
   }
 
   proxy_thread::start();
-
-  opentelemetry::sdk::common::setenv( "OTEL_EXPORTER_OTLP_ENDPOINT", "http://127.0.0.1:4317", 1 /* override */ );
+  
+  {
+    using namespace opentelemetry::sdk::common;
+    setenv( "OTEL_EXPORTER_OTLP_ENDPOINT", "http://127.0.0.1:4317", 1 /* override */ );
+  }
 
   std::string metrics_name{"malkia_metrics_test"};
   InitTracer();
@@ -464,7 +464,7 @@ int main(int argc, const char *argv[])
 
   printf("Press Ctrl+C to break\n");
   try {
-    std::this_thread::sleep_for(std::chrono::seconds(600));
+    std::this_thread::sleep_for(std::chrono::seconds(500));
   }
   catch( ... )
   {
