@@ -94,13 +94,13 @@ private:
   {
     char *key_ = nullptr;
 
-    nostd::shared_ptr<DataList> next_;
+    nostd::shared_ptr<DataList> next_{nullptr};
 
     size_t key_length_ = 0UL;
 
     ContextValue value_;
 
-    DataList() : next_{nullptr} {}
+    DataList() = default;
 
     // Builds a data list off of a key and value iterable and returns the head
     template <class T>
@@ -136,8 +136,8 @@ private:
 
     DataList(const DataList &other)
         : key_(new char[other.key_length_]),
-          key_length_(other.key_length_),
           next_(other.next_),
+          key_length_(other.key_length_),
           value_(other.value_)
     {
       memcpy(key_, other.key_, other.key_length_ * sizeof(char));
