@@ -876,9 +876,9 @@ jobs:
         CXX: /usr/bin/g++-10
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
-        file: /home/runner/build/coverage.info
+        files: /home/runner/build/coverage.info
 
   markdown-lint:
     runs-on: ubuntu-latest
