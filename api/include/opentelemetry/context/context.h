@@ -94,9 +94,9 @@ private:
   {
     char *key_ = nullptr;
 
-    size_t key_length_ = 0UL;
-
     nostd::shared_ptr<DataList> next_;
+
+    size_t key_length_ = 0UL;
 
     ContextValue value_;
 
