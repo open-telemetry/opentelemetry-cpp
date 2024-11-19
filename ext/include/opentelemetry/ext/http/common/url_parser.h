@@ -94,12 +94,12 @@ public:
       path_ = std::string("/");  // use default path
       if (is_port)
       {
-        auto port_str = url_.substr(cpos, url_.length());
+        auto port_str = url_.substr(cpos);
         port_         = GetPort(port_str);
       }
       else
       {
-        host_ = url_.substr(cpos, url_.length());
+        host_ = url_.substr(cpos);
       }
       return;
     }
@@ -119,21 +119,20 @@ public:
       pos = url_.find('?', cpos);
       if (pos == std::string::npos)
       {
-        path_  = url_.substr(cpos, url_.length());
-        query_ = "";
+        path_ = url_.substr(cpos);
       }
       else
       {
         path_  = url_.substr(cpos, pos - cpos);
         cpos   = pos + 1;
-        query_ = url_.substr(cpos, url_.length());
+        query_ = url_.substr(cpos);
       }
       return;
     }
     path_ = std::string("/");
     if (url_[cpos] == '?')
     {
-      query_ = url_.substr(cpos, url_.length());
+      query_ = url_.substr(cpos);
     }
   }
 
@@ -207,16 +206,23 @@ public:
     for (size_t pos = 0; pos < encoded.size(); pos++)
     {
       auto c = encoded[pos];
-      if (c == '%' && pos + 2 < encoded.size())
+      if (c == '%')
       {
+        if (pos + 2 >= encoded.size())
+        {
+          return encoded;
+        }
+
         int hi = hex_to_int(encoded[pos + 1]);
         int lo = hex_to_int(encoded[pos + 2]);
 
-        if (hi != -1 && lo != -1)
+        if (hi == -1 || lo == -1)
         {
-          c = static_cast<char>((hi << 4) | lo);
-          pos += 2;
+          return encoded;
         }
+
+        c = static_cast<char>((hi << 4) | lo);
+        pos += 2;
       }
 
       result.push_back(c);

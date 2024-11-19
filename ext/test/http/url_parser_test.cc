@@ -238,7 +238,8 @@ TEST(UrlDecoderTests, BasicTests)
       {"%2x", "%2x"},
       {"%20", " "},
       {"text%2", "text%2"},
-  };
+      {"%20test%zztest", "%20test%zztest"},
+      {"%20test%2", "%20test%2"}};
 
   for (auto &testsample : testdata)
   {
