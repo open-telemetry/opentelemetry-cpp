@@ -51,8 +51,7 @@ public:
     }
     else
     {
-      scheme_ = std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
-                            url_.begin() + static_cast<std::string::difference_type>(pos));
+      scheme_ = url_.substr(cpos, pos - cpos);
       cpos    = pos + 3;
     }
 
@@ -74,16 +73,19 @@ public:
     {
       // port missing. Used default 80 / 443
       if (scheme_ == "http")
+      {
         port_ = 80;
-      if (scheme_ == "https")
+      }
+      else if (scheme_ == "https")
+      {
         port_ = 443;
+      }
     }
     else
     {
       // port present
       is_port = true;
-      host_   = std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
-                            url_.begin() + static_cast<std::string::difference_type>(pos));
+      host_   = url_.substr(cpos, pos - cpos);
       cpos    = pos + 1;
     }
     pos = url_.find_first_of("/?", cpos);
@@ -92,30 +94,23 @@ public:
       path_ = std::string("/");  // use default path
       if (is_port)
       {
-        std::string port_str(
-            url_.begin() + static_cast<std::string::difference_type>(cpos),
-            url_.begin() + static_cast<std::string::difference_type>(url_.length()));
-
-        port_ = GetPort(port_str);
+        auto port_str = url_.substr(cpos, url_.length());
+        port_         = GetPort(port_str);
       }
       else
       {
-        host_ =
-            std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
-                        url_.begin() + static_cast<std::string::difference_type>(url_.length()));
+        host_ = url_.substr(cpos, url_.length());
       }
       return;
     }
     if (is_port)
     {
-      std::string port_str(url_.begin() + static_cast<std::string::difference_type>(cpos),
-                           url_.begin() + static_cast<std::string::difference_type>(pos));
-      port_ = GetPort(port_str);
+      auto port_str = url_.substr(cpos, pos - cpos);
+      port_         = GetPort(port_str);
     }
     else
     {
-      host_ = std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
-                          url_.begin() + static_cast<std::string::difference_type>(pos));
+      host_ = url_.substr(cpos, pos - cpos);
     }
     cpos = pos;
 
@@ -124,27 +119,21 @@ public:
       pos = url_.find('?', cpos);
       if (pos == std::string::npos)
       {
-        path_ =
-            std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
-                        url_.begin() + static_cast<std::string::difference_type>(url_.length()));
+        path_  = url_.substr(cpos, url_.length());
         query_ = "";
       }
       else
       {
-        path_ = std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
-                            url_.begin() + static_cast<std::string::difference_type>(pos));
-        cpos  = pos + 1;
-        query_ =
-            std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
-                        url_.begin() + static_cast<std::string::difference_type>(url_.length()));
+        path_  = url_.substr(cpos, pos - cpos);
+        cpos   = pos + 1;
+        query_ = url_.substr(cpos, url_.length());
       }
       return;
     }
     path_ = std::string("/");
     if (url_[cpos] == '?')
     {
-      query_ = std::string(url_.begin() + static_cast<std::string::difference_type>(cpos),
-                           url_.begin() + static_cast<std::string::difference_type>(url_.length()));
+      query_ = url_.substr(cpos, url_.length());
     }
   }
 
