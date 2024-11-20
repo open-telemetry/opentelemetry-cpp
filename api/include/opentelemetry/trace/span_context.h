@@ -41,12 +41,12 @@ public:
               SpanId span_id,
               TraceFlags trace_flags,
               bool is_remote,
-              const nostd::shared_ptr<TraceState> &trace_state = TraceState::GetDefault()) noexcept
+              nostd::shared_ptr<TraceState> trace_state = TraceState::GetDefault()) noexcept
       : trace_id_(trace_id),
         span_id_(span_id),
         trace_flags_(trace_flags),
         is_remote_(is_remote),
-        trace_state_(trace_state)
+        trace_state_(std::move(trace_state))
   {}
 
   SpanContext(const SpanContext &ctx) = default;
