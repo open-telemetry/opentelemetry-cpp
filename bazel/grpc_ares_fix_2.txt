@@ -1,0 +1,1 @@
+the grpc_ares_fix.patch did not work against 1.66.0 (it was done against HEAD), hence I applied it locally then took it again without the .rej-ected

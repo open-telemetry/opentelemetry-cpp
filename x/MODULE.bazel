@@ -19,9 +19,23 @@ bazel_dep(name = "grpc", version = "1.66.0.bcr.3")
 single_version_override(
     module_name = "grpc",
     patch_strip = 1,
-    # https://github.com/grpc/grpc/pull/37534
-    # https://github.com/grpc/grpc/pull/37534.diff
-    patches = ["bazel/grpc_bzlmod.diff"],
+    patches = [
+        # https://github.com/grpc/grpc/pull/37534
+        # https://github.com/grpc/grpc/pull/37534.diff
+        "bazel/grpc_bzlmod.diff",
+        # https://github.com/grpc/grpc/pull/38101/files
+        # https://github.com/grpc/grpc/pull/38101/commits/f093af21a9bc2a27156e7cd30744844797287253/patch
+        # https://github.com/grpc/grpc/commit/f093af21a9bc2a27156e7cd30744844797287253.diff        
+        "bazel/grpc_ares_fix_2.diff",
+    ],
+)
+
+bazel_dep(name = "c-ares", version = "1.16.1")
+archive_override(
+    module_name = "c-ares", 
+    urls=["https://github.com/malkia/c-ares/archive/5ff026975caa04eb25e02b21976be5aace7da3c8.zip"], 
+    integrity = "sha256-nlYybA2PLmf6hzcaFxCoVQ0+QWOyw0NOii3pUr+AsbQ=",
+    strip_prefix="c-ares-5ff026975caa04eb25e02b21976be5aace7da3c8"
 )
 
 # ditto here
