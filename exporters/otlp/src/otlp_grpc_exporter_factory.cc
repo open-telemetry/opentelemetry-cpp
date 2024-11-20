@@ -27,6 +27,15 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcExporterFactory
   return exporter;
 }
 
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcExporterFactory::Create(
+    const OtlpGrpcExporterOptions &options,
+    const std::shared_ptr<OtlpGrpcClient> &client)
+{
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter(
+      new OtlpGrpcExporter(options, client));
+  return exporter;
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

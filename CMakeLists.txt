@@ -389,14 +389,8 @@ if(WITH_OTLP_GRPC
    OR WITH_OTLP_HTTP
    OR WITH_OTLP_FILE)
   find_package(Protobuf)
-  if(Protobuf_VERSION AND Protobuf_VERSION VERSION_GREATER_EQUAL "3.22.0")
-    if(NOT WITH_ABSEIL)
-      message(
-        FATAL_ERROR
-          "Protobuf 3.22 or upper require abseil-cpp(Recommended version: 20230125 or upper)"
-      )
-    endif()
-  endif()
+  # Protobuf 3.22 or upper require abseil-cpp, we can find it in
+  # opentelemetry-cpp-config.cmake
 
   if(WITH_OTLP_GRPC)
     find_package(gRPC)
