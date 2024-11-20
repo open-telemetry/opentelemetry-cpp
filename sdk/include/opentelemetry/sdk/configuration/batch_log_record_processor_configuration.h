@@ -14,6 +14,7 @@ namespace sdk
 namespace configuration
 {
 
+// REF: schema/logger_provider.json
 class BatchLogRecordProcessorConfiguration : public LogRecordProcessorConfiguration
 {
 public:

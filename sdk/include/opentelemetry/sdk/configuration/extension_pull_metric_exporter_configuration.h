@@ -14,6 +14,7 @@ namespace sdk
 namespace configuration
 {
 
+// REF: schema/meter_provider.json
 class ExtensionPullMetricExporterConfiguration : public PullMetricExporterConfiguration
 {
 public:

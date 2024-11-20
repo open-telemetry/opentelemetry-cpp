@@ -12,6 +12,7 @@ namespace configuration
 {
 class PushMetricExporterConfigurationVisitor;
 
+// REF: schema/meter_provider.json
 class PushMetricExporterConfiguration
 {
 public:

@@ -20,10 +20,17 @@ void OtlpHttpSpanBuilder::Register(opentelemetry::sdk::init::Registry *registry)
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpSpanBuilder::Build(
-    const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration * /* model */) const
+    const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model) const
 {
-  // FIXME, use model
-  OtlpHttpExporterOptions options;
+  OtlpHttpExporterOptions options(nullptr);
+  options.url          = model->endpoint;
+  options.content_type = GetOtlpHttpProtocolFromString(model->protocol);
+  options.timeout      = std::chrono::duration_cast<std::chrono::system_clock::duration>(
+      std::chrono::seconds{model->timeout});
+  // options.http_headers = model->xxx;
+  options.ssl_ca_cert_path     = model->certificate;
+  options.ssl_client_key_path  = model->client_key;
+  options.ssl_client_cert_path = model->client_certificate;
   return OtlpHttpExporterFactory::Create(options);
 }
 

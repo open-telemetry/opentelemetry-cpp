@@ -133,9 +133,10 @@ static std::unique_ptr<OtlpLogRecordExporterConfiguration> ParseOtlpLogRecordExp
     model->headers = ParseHeadersConfiguration(child);
   }
 
-  model->compression = node->GetString("compression", "");
-  model->timeout     = node->GetInteger("timeout", 10000);
-  model->insecure    = node->GetBoolean("insecure", false);
+  model->headers_list = node->GetString("headers_list", "");
+  model->compression  = node->GetString("compression", "");
+  model->timeout      = node->GetInteger("timeout", 10000);
+  model->insecure     = node->GetBoolean("insecure", false);
 
   return model;
 }
@@ -353,6 +354,7 @@ ParseOtlpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &no
     model->headers = ParseHeadersConfiguration(child);
   }
 
+  model->headers_list           = node->GetString("headers_list", "");
   model->compression            = node->GetString("compression", "");
   model->timeout                = node->GetInteger("timeout", 10000);
   model->temporality_preference = node->GetString("temporality_preference", "");
@@ -1049,9 +1051,10 @@ static std::unique_ptr<OtlpSpanExporterConfiguration> ParseOtlpSpanExporterConfi
     model->headers = ParseHeadersConfiguration(child);
   }
 
-  model->compression = node->GetString("compression", "");
-  model->timeout     = node->GetInteger("timeout", 10000);
-  model->insecure    = node->GetBoolean("insecure", false);
+  model->headers_list = node->GetString("headers_list", "");
+  model->compression  = node->GetString("compression", "");
+  model->timeout      = node->GetInteger("timeout", 10000);
+  model->insecure     = node->GetBoolean("insecure", false);
 
   return model;
 }

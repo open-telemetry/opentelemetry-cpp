@@ -11,6 +11,7 @@ namespace sdk
 namespace configuration
 {
 
+// REF: schema/logger_provider.json
 class LogRecordLimitsConfiguration
 {
 public:

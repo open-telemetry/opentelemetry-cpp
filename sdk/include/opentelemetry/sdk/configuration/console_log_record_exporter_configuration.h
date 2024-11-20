@@ -13,6 +13,7 @@ namespace sdk
 namespace configuration
 {
 
+// REF: schema/common.json, Console
 class ConsoleLogRecordExporterConfiguration : public LogRecordExporterConfiguration
 {
 public:

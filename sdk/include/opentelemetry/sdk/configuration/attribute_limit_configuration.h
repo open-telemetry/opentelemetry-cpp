@@ -13,6 +13,7 @@ namespace sdk
 namespace configuration
 {
 
+// REF: schema/opentelemetry_configuration.json
 class AttributeLimitConfiguration
 {
 public:

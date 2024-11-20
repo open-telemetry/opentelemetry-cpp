@@ -14,6 +14,7 @@ namespace sdk
 namespace configuration
 {
 
+// REF: schema/meter_provider.json
 class PrometheusPullMetricExporterConfiguration : public PullMetricExporterConfiguration
 {
 public:
@@ -30,6 +31,7 @@ public:
   bool without_units;
   bool without_type_suffix;
   bool without_scope_info;
+  // FIXME: with_resource_constant_labels;
 };
 
 }  // namespace configuration

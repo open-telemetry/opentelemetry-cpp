@@ -20,6 +20,7 @@ namespace sdk
 namespace configuration
 {
 
+// REF: schema/opentelemetry_configuration.json
 class Configuration
 {
 public:
@@ -35,6 +36,7 @@ public:
   std::unique_ptr<PropagatorConfiguration> propagator;
   std::unique_ptr<TracerProviderConfiguration> tracer_provider;
   std::unique_ptr<ResourceConfiguration> resource;
+  // Ignored: instrumentation
 
 private:
   std::unique_ptr<Document> m_doc;

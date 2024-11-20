@@ -12,6 +12,7 @@ namespace configuration
 {
 class LogRecordProcessorConfigurationVisitor;
 
+// REF: schema/logger_provider.json
 class LogRecordProcessorConfiguration
 {
 public:

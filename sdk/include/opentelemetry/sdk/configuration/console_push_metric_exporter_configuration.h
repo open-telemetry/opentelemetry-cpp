@@ -14,6 +14,7 @@ namespace sdk
 namespace configuration
 {
 
+// REF: schema/common.json, Console
 class ConsolePushMetricExporterConfiguration : public PushMetricExporterConfiguration
 {
 public:

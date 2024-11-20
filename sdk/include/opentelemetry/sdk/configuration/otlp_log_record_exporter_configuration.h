@@ -14,6 +14,7 @@ namespace sdk
 namespace configuration
 {
 
+// REF: schema/common.json, Otlp
 class OtlpLogRecordExporterConfiguration : public LogRecordExporterConfiguration
 {
 public:
@@ -31,6 +32,7 @@ public:
   std::string client_key;
   std::string client_certificate;
   std::unique_ptr<HeadersConfiguration> headers;
+  std::string headers_list;
   std::string compression;
   size_t timeout;
   bool insecure;

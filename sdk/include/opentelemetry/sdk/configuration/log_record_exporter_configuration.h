@@ -12,6 +12,7 @@ namespace configuration
 {
 class LogRecordExporterConfigurationVisitor;
 
+// REF: schema/logger_provider.json
 class LogRecordExporterConfiguration
 {
 public:

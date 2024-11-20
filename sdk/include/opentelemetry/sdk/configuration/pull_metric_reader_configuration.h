@@ -16,6 +16,8 @@ namespace sdk
 namespace configuration
 {
 
+// REF: schema/meter_provider.json
+// FIXME: https://github.com/open-telemetry/opentelemetry-configuration/issues/138
 class PullMetricReaderConfiguration : public MetricReaderConfiguration
 {
 public:

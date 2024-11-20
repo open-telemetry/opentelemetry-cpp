@@ -16,11 +16,13 @@ namespace sdk
 namespace configuration
 {
 
+// REF: schema/meter_provider.json
 class MeterProviderConfiguration
 {
 public:
   std::vector<std::unique_ptr<MetricReaderConfiguration>> readers;
   std::vector<std::unique_ptr<ViewConfiguration>> views;
+  // FIXME: exemplar_filter
 };
 
 }  // namespace configuration

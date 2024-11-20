@@ -20,6 +20,7 @@ enum enum_default_histogram_aggregation
   base2_exponential_bucket_histogram
 };
 
+// REF: schema/meter_provider.json, OtlpMetric
 class OtlpPushMetricExporterConfiguration : public PushMetricExporterConfiguration
 {
 public:
@@ -37,6 +38,7 @@ public:
   std::string client_key;
   std::string client_certificate;
   std::unique_ptr<HeadersConfiguration> headers;
+  std::string headers_list;
   std::string compression;
   size_t timeout;
   std::string temporality_preference;
