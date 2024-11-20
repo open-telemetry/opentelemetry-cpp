@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/elasticsearch/es_log_record_exporter.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"
@@ -104,10 +105,9 @@ TEST(ElasticsearchLogRecordableTests, BasicTests)
       {"observedtimestamp", expected_observed_ts},
       {"stringlist", {stringlist[0], stringlist[1]}}};
 
-  const std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds> now{
-      std::chrono::nanoseconds(expected_observed_ts)};
+  const opentelemetry::common::SystemTimestamp now{std::chrono::nanoseconds(expected_observed_ts)};
 
-  auto scope =
+  const auto scope =
       opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(expected_scope_name);
 
   opentelemetry::exporter::logs::ElasticSearchRecordable recordable;
