@@ -179,6 +179,41 @@ TEST(UrlParserTests, BasicTests)
         {"path", "/path1@bbb/path2"},
         {"query", "q1=a1&q2=a2"},
         {"success", "true"}}},
+      {"https://https://example.com/some/path",
+       {{"host", "https"},
+        {"port", "0"},
+        {"scheme", "https"},
+        {"path", "//example.com/some/path"},
+        {"query", ""},
+        {"success", "false"}}},
+      {"https://example.com:-1/some/path",
+       {{"host", "example.com"},
+        {"port", "0"},
+        {"scheme", "https"},
+        {"path", "/some/path"},
+        {"query", ""},
+        {"success", "false"}}},
+      {"https://example.com:65536/some/path",
+       {{"host", "example.com"},
+        {"port", "0"},
+        {"scheme", "https"},
+        {"path", "/some/path"},
+        {"query", ""},
+        {"success", "false"}}},
+      {"https://example.com:80a/some/path",
+       {{"host", "example.com"},
+        {"port", "0"},
+        {"scheme", "https"},
+        {"path", "/some/path"},
+        {"query", ""},
+        {"success", "false"}}},
+      {"https://example.com:18446744073709551616/some/path",
+       {{"host", "example.com"},
+        {"port", "0"},
+        {"scheme", "https"},
+        {"path", "/some/path"},
+        {"query", ""},
+        {"success", "false"}}},
   };
   for (auto &url_map : urls_map)
   {
@@ -203,7 +238,8 @@ TEST(UrlDecoderTests, BasicTests)
       {"%2x", "%2x"},
       {"%20", " "},
       {"text%2", "text%2"},
-  };
+      {"%20test%zztest", "%20test%zztest"},
+      {"%20test%2", "%20test%2"}};
 
   for (auto &testsample : testdata)
   {

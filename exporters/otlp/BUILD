@@ -42,11 +42,13 @@ cc_library(
     name = "otlp_grpc_client",
     srcs = [
         "src/otlp_grpc_client.cc",
+        "src/otlp_grpc_client_factory.cc",
         "src/otlp_grpc_utils.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_client.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_client_factory.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_client_options.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_utils.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
