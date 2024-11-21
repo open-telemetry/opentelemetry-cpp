@@ -30,7 +30,7 @@ single_version_override(
     ],
 )
 
-bazel_dep(name = "c-ares", version = "1.16.1")
+bazel_dep(name = "c-ares") #, version = "1.16.1")
 archive_override(
     module_name = "c-ares", 
     urls=["https://github.com/malkia/c-ares/archive/5ff026975caa04eb25e02b21976be5aace7da3c8.zip"], 
@@ -40,7 +40,7 @@ archive_override(
 
 # ditto here
 
-bazel_dep(name = "opentelemetry-proto", version = "1.3.2")
+bazel_dep(name = "opentelemetry-proto" ) #, version = "1.3.2")
 archive_override(
     module_name = "opentelemetry-proto",
     integrity = "sha256-wGnA2WE3zwBdNEEfpn3TtvH4xkrx5/sv4AiaQcQlrNc=",
@@ -51,7 +51,7 @@ archive_override(
     urls = "https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.3.2.tar.gz",
 )
 
-bazel_dep(name = "prometheus-cpp", version = "1.2.4")
+bazel_dep(name = "prometheus-cpp") #, version = "1.2.4")
 archive_override(
     module_name = "prometheus-cpp",
     integrity = "sha256-uElFYvmIrzXsElYbbrNS0Mvtfj99aKae2nhsZhCvxG4=",
