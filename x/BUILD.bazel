@@ -65,3 +65,8 @@ cc_binary(
         "@opentelemetry-proto//:trace_service_grpc_cc",
     ],
 )
+
+cc_binary(
+    name = "z",
+    srcs = ["z.cpp"],
+)

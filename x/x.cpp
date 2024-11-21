@@ -389,13 +389,13 @@ struct proxy_thread
       
       OtlpGrpcClientOptions clientOptions;
       clientOptions.endpoint = GetOtlpDefaultGrpcEndpoint();
-      clientOptions.max_concurrent_requests = 16384;
-      clientOptions.max_threads = 64;
+      clientOptions.max_concurrent_requests = 10; //16384;
+      clientOptions.max_threads = 10;
 
       ctx->proxy = std::make_unique<OtlpGrpcForwardProxy>(clientOptions);
       ctx->proxy->SetActive(true);
 
-      ctx->proxy->AddListenAddress("127.0.0.1:4317");
+      ctx->proxy->AddListenAddress("localhost:4317");
       proxy->RegisterMetricExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
       proxy->RegisterTraceExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
       proxy->RegisterLogRecordExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
