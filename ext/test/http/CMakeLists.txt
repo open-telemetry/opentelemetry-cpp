@@ -1,6 +1,29 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+if(NOT GMOCK_LIB AND TARGET GTest::gmock)
+  set(GMOCK_LIB GTest::gmock)
+elseif(MSVC)
+  # Explicitly specify that we consume GTest from shared library. The rest of
+  # code logic below determines whether we link Release or Debug flavor of the
+  # library. These flavors have different prefix on Windows, gmock and gmockd
+  # respectively.
+  add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
+  if(GMOCK_LIB)
+    # unset GMOCK_LIB to force find_library to redo the lookup, as the cached
+    # entry could cause linking to incorrect flavor of gmock and leading to
+    # runtime error.
+    unset(GMOCK_LIB CACHE)
+  endif()
+endif()
+if(NOT GMOCK_LIB)
+  if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+    find_library(GMOCK_LIB gmockd PATH_SUFFIXES lib)
+  else()
+    find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
+  endif()
+endif()
+
 if(WITH_HTTP_CLIENT_CURL)
   set(FILENAME curl_http_test)
   add_compile_definitions(WITH_CURL)
