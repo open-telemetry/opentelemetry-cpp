@@ -2,248 +2,136 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <map>
 #include <string>
-#include <utility>
+#include <tuple>
 
 #include "opentelemetry/ext/http/common/url_parser.h"
 
 namespace http_common = opentelemetry::ext::http::common;
 
-inline const char *BoolToString(bool b)
+struct ParsedUrl
 {
-  return b ? "true" : "false";
+  std::string scheme;
+  std::string host;
+  std::uint16_t port;
+  std::string path;
+  std::string query;
+  bool success;
+
+  friend void PrintTo(const ParsedUrl &p, std::ostream *os)
+  {
+    *os << "(valid: " << (p.success ? "yes" : "no") << ", scheme: " << p.scheme
+        << ", host: " << p.host << ", port: " << p.port << ", path: " << p.path
+        << ", query: " << p.query << ")";
+  }
+};
+
+class UrlParserTests : public testing::TestWithParam<std::tuple<std::string, ParsedUrl>>
+{};
+
+INSTANTIATE_TEST_SUITE_P(
+    SampleValues,
+    UrlParserTests,
+    testing::Values(
+        std::make_tuple("www.abc.com", ParsedUrl{"http", "www.abc.com", 80, "/", "", true}),
+        std::make_tuple("http://www.abc.com", ParsedUrl{"http", "www.abc.com", 80, "/", "", true}),
+        std::make_tuple("https://www.abc.com",
+                        ParsedUrl{"https", "www.abc.com", 443, "/", "", true}),
+        std::make_tuple("https://www.abc.com:4431",
+                        ParsedUrl{"https", "www.abc.com", 4431, "/", "", true}),
+        std::make_tuple("https://www.abc.com:4431/path1",
+                        ParsedUrl{"https", "www.abc.com", 4431, "/path1", "", true}),
+        std::make_tuple("https://www.abc.com:4431/path1/path2",
+                        ParsedUrl{"https", "www.abc.com", 4431, "/path1/path2", "", true}),
+        std::make_tuple("https://www.abc.com/path1/path2",
+                        ParsedUrl{"https", "www.abc.com", 443, "/path1/path2", "", true}),
+        std::make_tuple("http://www.abc.com/path1/path2?q1=a1&q2=a2",
+                        ParsedUrl{"http", "www.abc.com", 80, "/path1/path2", "q1=a1&q2=a2", true}),
+        std::make_tuple("http://www.abc.com:8080/path1/path2?q1=a1&q2=a2",
+                        ParsedUrl{"http", "www.abc.com", 8080, "/path1/path2", "q1=a1&q2=a2",
+                                  true}),
+        std::make_tuple("www.abc.com:8080/path1/path2?q1=a1&q2=a2",
+                        ParsedUrl{"http", "www.abc.com", 8080, "/path1/path2", "q1=a1&q2=a2",
+                                  true}),
+        std::make_tuple("http://user:password@www.abc.com:8080/path1/path2?q1=a1&q2=a2",
+                        ParsedUrl{"http", "www.abc.com", 8080, "/path1/path2", "q1=a1&q2=a2",
+                                  true}),
+        std::make_tuple("user:password@www.abc.com:8080/path1/path2?q1=a1&q2=a2",
+                        ParsedUrl{"http", "www.abc.com", 8080, "/path1/path2", "q1=a1&q2=a2",
+                                  true}),
+        std::make_tuple("https://user@www.abc.com/path1/path2?q1=a1&q2=a2",
+                        ParsedUrl{"https", "www.abc.com", 443, "/path1/path2", "q1=a1&q2=a2",
+                                  true}),
+        std::make_tuple("http://www.abc.com/path1@bbb/path2?q1=a1&q2=a2",
+                        ParsedUrl{"http", "www.abc.com", 80, "/path1@bbb/path2", "q1=a1&q2=a2",
+                                  true}),
+        std::make_tuple("http://1.2.3.4/path1/path2?q1=a1&q2=a2",
+                        ParsedUrl{"http", "1.2.3.4", 80, "/path1/path2", "q1=a1&q2=a2", true}),
+        std::make_tuple("user:password@1.2.3.4:8080/path1/path2?q1=a1&q2=a2",
+                        ParsedUrl{"http", "1.2.3.4", 8080, "/path1/path2", "q1=a1&q2=a2", true}),
+        std::make_tuple("https://user@1.2.3.4/path1/path2?q1=a1&q2=a2",
+                        ParsedUrl{"https", "1.2.3.4", 443, "/path1/path2", "q1=a1&q2=a2", true}),
+        std::make_tuple("http://1.2.3.4/path1@bbb/path2?q1=a1&q2=a2",
+                        ParsedUrl{"http", "1.2.3.4", 80, "/path1@bbb/path2", "q1=a1&q2=a2", true}),
+        std::make_tuple("http://[fe80::225:93da:bfde:b5f5]/path1/path2?q1=a1&q2=a2",
+                        ParsedUrl{"http", "[fe80::225:93da:bfde:b5f5]", 80, "/path1/path2",
+                                  "q1=a1&q2=a2", true}),
+        std::make_tuple("user:password@[fe80::225:93da:bfde:b5f5]:8080/path1/path2?q1=a1&q2=a2",
+                        ParsedUrl{"http", "[fe80::225:93da:bfde:b5f5]", 8080, "/path1/path2",
+                                  "q1=a1&q2=a2", true}),
+        std::make_tuple("https://user@[fe80::225:93da:bfde:b5f5]/path1/path2?q1=a1&q2=a2",
+                        ParsedUrl{"https", "[fe80::225:93da:bfde:b5f5]", 443, "/path1/path2",
+                                  "q1=a1&q2=a2", true}),
+        std::make_tuple("http://[fe80::225:93da:bfde:b5f5]/path1@bbb/path2?q1=a1&q2=a2",
+                        ParsedUrl{"http", "[fe80::225:93da:bfde:b5f5]", 80, "/path1@bbb/path2",
+                                  "q1=a1&q2=a2", true}),
+        std::make_tuple("https://https://example.com/some/path",
+                        ParsedUrl{"https", "https", 0, "//example.com/some/path", "", false}),
+        std::make_tuple("https://example.com:-1/some/path",
+                        ParsedUrl{"https", "example.com", 0, "/some/path", "", false}),
+        std::make_tuple("https://example.com:65536/some/path",
+                        ParsedUrl{"https", "example.com", 0, "/some/path", "", false}),
+        std::make_tuple("https://example.com:80a/some/path",
+                        ParsedUrl{"https", "example.com", 0, "/some/path", "", false}),
+        std::make_tuple("https://example.com:18446744073709551616/some/path",
+                        ParsedUrl{"https", "example.com", 0, "/some/path", "", false})));
+
+TEST_P(UrlParserTests, BasicTests)
+{
+  const auto &url      = std::get<0>(GetParam());
+  const auto &expected = std::get<1>(GetParam());
+
+  const auto actual = http_common::UrlParser(url);
+
+  EXPECT_EQ(actual.success_, expected.success);
+  EXPECT_EQ(actual.host_, expected.host);
+  EXPECT_EQ(actual.port_, expected.port);
+  EXPECT_EQ(actual.scheme_, expected.scheme);
+  EXPECT_EQ(actual.path_, expected.path);
+  EXPECT_EQ(actual.query_, expected.query);
 }
 
-TEST(UrlParserTests, BasicTests)
-{
-  std::map<std::string, std::map<std::string, std::string>> urls_map{
-      {"www.abc.com",
-       {{"host", "www.abc.com"},
-        {"port", "80"},
-        {"scheme", "http"},
-        {"path", "/"},
-        {"query", ""},
-        {"success", "true"}}},
-      {"http://www.abc.com",
-       {{"host", "www.abc.com"},
-        {"port", "80"},
-        {"scheme", "http"},
-        {"path", "/"},
-        {"query", ""},
-        {"success", "true"}}},
-      {"https://www.abc.com",
-       {{"host", "www.abc.com"},
-        {"port", "443"},
-        {"scheme", "https"},
-        {"path", "/"},
-        {"query", ""},
-        {"success", "true"}}},
-      {"https://www.abc.com:4431",
-       {{"host", "www.abc.com"},
-        {"port", "4431"},
-        {"scheme", "https"},
-        {"path", "/"},
-        {"query", ""},
-        {"success", "true"}}},
-      {"https://www.abc.com:4431",
-       {{"host", "www.abc.com"},
-        {"port", "4431"},
-        {"scheme", "https"},
-        {"path", "/"},
-        {"query", ""},
-        {"success", "true"}}},
-      {"https://www.abc.com:4431/path1",
-       {{"host", "www.abc.com"},
-        {"port", "4431"},
-        {"scheme", "https"},
-        {"path", "/path1"},
-        {"query", ""},
-        {"success", "true"}}},
-      {"https://www.abc.com:4431/path1/path2",
-       {{"host", "www.abc.com"},
-        {"port", "4431"},
-        {"scheme", "https"},
-        {"path", "/path1/path2"},
-        {"query", ""},
-        {"success", "true"}}},
-      {"https://www.abc.com/path1/path2",
-       {{"host", "www.abc.com"},
-        {"port", "443"},
-        {"scheme", "https"},
-        {"path", "/path1/path2"},
-        {"query", ""},
-        {"success", "true"}}},
-      {"http://www.abc.com/path1/path2?q1=a1&q2=a2",
-       {{"host", "www.abc.com"},
-        {"port", "80"},
-        {"scheme", "http"},
-        {"path", "/path1/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"http://www.abc.com:8080/path1/path2?q1=a1&q2=a2",
-       {{"host", "www.abc.com"},
-        {"port", "8080"},
-        {"scheme", "http"},
-        {"path", "/path1/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"www.abc.com:8080/path1/path2?q1=a1&q2=a2",
-       {{"host", "www.abc.com"},
-        {"port", "8080"},
-        {"scheme", "http"},
-        {"path", "/path1/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"http://user:password@www.abc.com:8080/path1/path2?q1=a1&q2=a2",
-       {{"host", "www.abc.com"},
-        {"port", "8080"},
-        {"scheme", "http"},
-        {"path", "/path1/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"user:password@www.abc.com:8080/path1/path2?q1=a1&q2=a2",
-       {{"host", "www.abc.com"},
-        {"port", "8080"},
-        {"scheme", "http"},
-        {"path", "/path1/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"https://user@www.abc.com/path1/path2?q1=a1&q2=a2",
-       {{"host", "www.abc.com"},
-        {"port", "443"},
-        {"scheme", "https"},
-        {"path", "/path1/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"http://www.abc.com/path1@bbb/path2?q1=a1&q2=a2",
-       {{"host", "www.abc.com"},
-        {"port", "80"},
-        {"scheme", "http"},
-        {"path", "/path1@bbb/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"http://1.2.3.4/path1/path2?q1=a1&q2=a2",
-       {{"host", "1.2.3.4"},
-        {"port", "80"},
-        {"scheme", "http"},
-        {"path", "/path1/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"user:password@1.2.3.4:8080/path1/path2?q1=a1&q2=a2",
-       {{"host", "1.2.3.4"},
-        {"port", "8080"},
-        {"scheme", "http"},
-        {"path", "/path1/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"https://user@1.2.3.4/path1/path2?q1=a1&q2=a2",
-       {{"host", "1.2.3.4"},
-        {"port", "443"},
-        {"scheme", "https"},
-        {"path", "/path1/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"http://1.2.3.4/path1@bbb/path2?q1=a1&q2=a2",
-       {{"host", "1.2.3.4"},
-        {"port", "80"},
-        {"scheme", "http"},
-        {"path", "/path1@bbb/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"http://[fe80::225:93da:bfde:b5f5]/path1/path2?q1=a1&q2=a2",
-       {{"host", "[fe80::225:93da:bfde:b5f5]"},
-        {"port", "80"},
-        {"scheme", "http"},
-        {"path", "/path1/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"user:password@[fe80::225:93da:bfde:b5f5]:8080/path1/path2?q1=a1&q2=a2",
-       {{"host", "[fe80::225:93da:bfde:b5f5]"},
-        {"port", "8080"},
-        {"scheme", "http"},
-        {"path", "/path1/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"https://user@[fe80::225:93da:bfde:b5f5]/path1/path2?q1=a1&q2=a2",
-       {{"host", "[fe80::225:93da:bfde:b5f5]"},
-        {"port", "443"},
-        {"scheme", "https"},
-        {"path", "/path1/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"http://[fe80::225:93da:bfde:b5f5]/path1@bbb/path2?q1=a1&q2=a2",
-       {{"host", "[fe80::225:93da:bfde:b5f5]"},
-        {"port", "80"},
-        {"scheme", "http"},
-        {"path", "/path1@bbb/path2"},
-        {"query", "q1=a1&q2=a2"},
-        {"success", "true"}}},
-      {"https://https://example.com/some/path",
-       {{"host", "https"},
-        {"port", "0"},
-        {"scheme", "https"},
-        {"path", "//example.com/some/path"},
-        {"query", ""},
-        {"success", "false"}}},
-      {"https://example.com:-1/some/path",
-       {{"host", "example.com"},
-        {"port", "0"},
-        {"scheme", "https"},
-        {"path", "/some/path"},
-        {"query", ""},
-        {"success", "false"}}},
-      {"https://example.com:65536/some/path",
-       {{"host", "example.com"},
-        {"port", "0"},
-        {"scheme", "https"},
-        {"path", "/some/path"},
-        {"query", ""},
-        {"success", "false"}}},
-      {"https://example.com:80a/some/path",
-       {{"host", "example.com"},
-        {"port", "0"},
-        {"scheme", "https"},
-        {"path", "/some/path"},
-        {"query", ""},
-        {"success", "false"}}},
-      {"https://example.com:18446744073709551616/some/path",
-       {{"host", "example.com"},
-        {"port", "0"},
-        {"scheme", "https"},
-        {"path", "/some/path"},
-        {"query", ""},
-        {"success", "false"}}},
-  };
-  for (auto &url_map : urls_map)
-  {
-    http_common::UrlParser url(url_map.first);
-    auto url_properties = url_map.second;
-    ASSERT_EQ(BoolToString(url.success_), url_properties["success"]);
-    ASSERT_EQ(url.host_, url_properties["host"]);
-    ASSERT_EQ(std::to_string(url.port_), url_properties["port"]);
-    ASSERT_EQ(url.scheme_, url_properties["scheme"]);
-    ASSERT_EQ(url.path_, url_properties["path"]);
-    ASSERT_EQ(url.query_, url_properties["query"]);
-  }
-}
+class UrlDecoderTests : public ::testing::TestWithParam<std::tuple<std::string, std::string>>
+{};
 
-TEST(UrlDecoderTests, BasicTests)
-{
-  std::map<std::string, std::string> testdata{
-      {"Authentication=Basic xxx", "Authentication=Basic xxx"},
-      {"Authentication=Basic%20xxx", "Authentication=Basic xxx"},
-      {"%C3%B6%C3%A0%C2%A7%C3%96abcd%C3%84",
-       "\xc3\xb6\xc3\xa0\xc2\xa7\xc3\x96\x61\x62\x63\x64\xc3\x84"},
-      {"%2x", "%2x"},
-      {"%20", " "},
-      {"text%2", "text%2"},
-      {"%20test%zztest", "%20test%zztest"},
-      {"%20test%2", "%20test%2"}};
+INSTANTIATE_TEST_SUITE_P(
+    SampleValues,
+    UrlDecoderTests,
+    testing::Values(std::make_tuple("Authentication=Basic xxx", "Authentication=Basic xxx"),
+                    std::make_tuple("Authentication=Basic%20xxx", "Authentication=Basic xxx"),
+                    std::make_tuple("%C3%B6%C3%A0%C2%A7%C3%96abcd%C3%84",
+                                    "\xc3\xb6\xc3\xa0\xc2\xa7\xc3\x96\x61\x62\x63\x64\xc3\x84"),
+                    std::make_tuple("%2x", "%2x"),
+                    std::make_tuple("%20", " "),
+                    std::make_tuple("text%2", "text%2"),
+                    std::make_tuple("%20test%zztest", "%20test%zztest"),
+                    std::make_tuple("%20test%2", "%20test%2")));
 
-  for (auto &testsample : testdata)
-  {
-    ASSERT_EQ(http_common::UrlDecoder::Decode(testsample.first), testsample.second);
-    ASSERT_TRUE(http_common::UrlDecoder::Decode(testsample.first) == testsample.second);
-  }
+TEST_P(UrlDecoderTests, BasicTests)
+{
+  const auto &encoded  = std::get<0>(GetParam());
+  const auto &expected = std::get<1>(GetParam());
+  const auto actual    = http_common::UrlDecoder::Decode(encoded);
+
+  EXPECT_EQ(actual, expected);
 }
