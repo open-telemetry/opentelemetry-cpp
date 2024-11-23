@@ -26,8 +26,16 @@ common --skip_incompatible_explicit_targets
 common --enable_platform_specific_config
 common --enable_runfiles
 
+<<<<<<< HEAD
 build --build_tag_filters=-jaeger,-opentracing,-opentracing_shim
 test --test_tag_filters=-jaeger,-opentracing,-opentracing_shim
+=======
+# Make globs that don't match anything fail
+common --incompatible_disallow_empty_glob
+
+# Needed by gRPC to build on some platforms.
+build --copt -DGRPC_BAZEL_BUILD
+>>>>>>> 9d998e33412bbff3c227fdf1a2d1403527345d0e
 
 build --experimental_convenience_symlinks=clean
 

@@ -8,10 +8,6 @@ package(default_visibility = ["//visibility:public"])
 otel_cc_library(
     name = "logs",
     srcs = glob(["**/*.cc"]),
-    hdrs = glob(
-        ["**/*.h"],
-        allow_empty = True,
-    ),
     include_prefix = "src/logs",
     deps = [
         "//api",
