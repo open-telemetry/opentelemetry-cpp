@@ -1,11 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <chrono>
+#include <ctime>
 #include <iomanip>
+#include <nlohmann/json.hpp>
+#include <sstream>
 #include <string>
 
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
 #include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/trace/span_id.h"
