@@ -129,7 +129,7 @@ private:
     {
       key_        = new char[key.size()];
       key_length_ = key.size();
-      memcpy(key_, key.data(), key.size() * sizeof(char));
+      std::memcpy(key_, key.data(), key.size() * sizeof(char));
       next_  = nostd::shared_ptr<DataList>{nullptr};
       value_ = value;
     }
@@ -140,7 +140,7 @@ private:
           key_length_(other.key_length_),
           value_(other.value_)
     {
-      memcpy(key_, other.key_, other.key_length_ * sizeof(char));
+      std::memcpy(key_, other.key_, other.key_length_ * sizeof(char));
     }
 
     DataList &operator=(DataList &&other) noexcept
