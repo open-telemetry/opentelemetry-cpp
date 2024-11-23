@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <iomanip>
 #include <string>
 
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
@@ -70,21 +71,17 @@ void ElasticSearchRecordable::SetTimestamp(
 #if __cplusplus >= 202002L
   const std::string dateStr = std::format("{:%FT%T%Ez}", timePoint);
 #else
-  constexpr auto dateToSecondsSize = sizeof("YYYY-MM-DDTHH:MM:SS") - 1;
-  constexpr auto millisecondsSize  = sizeof(".123456") - 1;
-  constexpr auto timeZoneSize      = sizeof("Z") - 1;
-  constexpr auto dateSize          = dateToSecondsSize + millisecondsSize + timeZoneSize;
-
   std::time_t time = std::chrono::system_clock::to_time_t(timePoint);
   std::tm tm       = *std::gmtime(&time);
   auto microseconds =
       std::chrono::duration_cast<std::chrono::microseconds>(timePoint.time_since_epoch()) %
       std::chrono::seconds(1);
 
-  char dateStr[dateSize + 1];  // example: 2024-10-18T07:26:00.123456Z
-  std::snprintf(dateStr, sizeof(dateStr), "%04d-%02d-%02dT%02d:%02d:%02d.%06ldZ", tm.tm_year + 1900,
-                tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec,
-                static_cast<long>(microseconds.count()));
+  std::ostringstream oss;
+  oss << std::put_time(&tm, "%FT%T") << '.' << std::setw(6) << std::setfill('0')
+      << microseconds.count() << 'Z';
+
+  const std::string dateStr = oss.str();
 #endif
 
   json_["@timestamp"] = dateStr;
