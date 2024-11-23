@@ -4,9 +4,13 @@
  */
 
 /*
-  DO NOT EDIT, this is an Auto-generated file
-  from buildscripts/semantic-convention/templates/SemanticAttributes.h.j2
-*/
+ * This file is DEPRECATED, and no longer updated.
+ * See file DEPRECATED.md for details.
+ */
+
+#ifdef OPENTELEMETRY_NO_DEPRECATED_CODE
+#  error "header <resource/semantic_conventions.h> is deprecated."
+#endif
 
 #pragma once
 

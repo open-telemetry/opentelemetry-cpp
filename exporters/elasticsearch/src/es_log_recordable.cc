@@ -14,44 +14,7 @@ namespace exporter
 {
 namespace logs
 {
-void ElasticSearchRecordable::WriteKeyValue(nostd::string_view key,
-                                            const opentelemetry::common::AttributeValue &value,
-                                            const std::string &name)
-{
-  switch (value.index())
-  {
-    case common::AttributeType::kTypeBool:
-      json_[name][key.data()] = opentelemetry::nostd::get<bool>(value) ? true : false;
-      return;
-    case common::AttributeType::kTypeInt:
-      json_[name][key.data()] = opentelemetry::nostd::get<int>(value);
-      return;
-    case common::AttributeType::kTypeInt64:
-      json_[name][key.data()] = opentelemetry::nostd::get<int64_t>(value);
-      return;
-    case common::AttributeType::kTypeUInt:
-      json_[name][key.data()] = opentelemetry::nostd::get<unsigned int>(value);
-      return;
-    case common::AttributeType::kTypeUInt64:
-      json_[name][key.data()] = opentelemetry::nostd::get<uint64_t>(value);
-      return;
-    case common::AttributeType::kTypeDouble:
-      json_[name][key.data()] = opentelemetry::nostd::get<double>(value);
-      return;
-    case common::AttributeType::kTypeCString:
-      json_[name][key.data()] = opentelemetry::nostd::get<const char *>(value);
-      return;
-    case common::AttributeType::kTypeString:
-      json_[name][key.data()] =
-          opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();
-      return;
-    default:
-      return;
-  }
-}
-
-void ElasticSearchRecordable::WriteKeyValue(
-    nostd::string_view key,
+void ElasticSearchRecordable::WriteValue(
     const opentelemetry::sdk::common::OwnedAttributeValue &value,
     const std::string &name)
 {
@@ -59,25 +22,25 @@ void ElasticSearchRecordable::WriteKeyValue(
   switch (value.index())
   {
     case common::kTypeBool:
-      json_[name][key.data()] = opentelemetry::nostd::get<bool>(value) ? true : false;
+      json_[name] = opentelemetry::nostd::get<bool>(value) ? true : false;
       return;
     case common::kTypeInt:
-      json_[name][key.data()] = opentelemetry::nostd::get<int>(value);
+      json_[name] = opentelemetry::nostd::get<int>(value);
       return;
     case common::kTypeInt64:
-      json_[name][key.data()] = opentelemetry::nostd::get<int64_t>(value);
+      json_[name] = opentelemetry::nostd::get<int64_t>(value);
       return;
     case common::kTypeUInt:
-      json_[name][key.data()] = opentelemetry::nostd::get<unsigned int>(value);
+      json_[name] = opentelemetry::nostd::get<unsigned int>(value);
       return;
     case common::kTypeUInt64:
-      json_[name][key.data()] = opentelemetry::nostd::get<uint64_t>(value);
+      json_[name] = opentelemetry::nostd::get<uint64_t>(value);
       return;
     case common::kTypeDouble:
-      json_[name][key.data()] = opentelemetry::nostd::get<double>(value);
+      json_[name] = opentelemetry::nostd::get<double>(value);
       return;
     case common::kTypeString:
-      json_[name][key.data()] = opentelemetry::nostd::get<std::string>(value).data();
+      json_[name] = opentelemetry::nostd::get<std::string>(value).data();
       return;
     default:
       return;
@@ -321,7 +284,7 @@ void ElasticSearchRecordable::SetResource(
 {
   for (auto &attribute : resource.GetAttributes())
   {
-    WriteKeyValue(attribute.first, attribute.second, "resource");
+    WriteValue(attribute.second, attribute.first);
   }
 }
 
