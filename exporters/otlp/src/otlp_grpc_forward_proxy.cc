@@ -20,16 +20,15 @@
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
 #include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
 
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace otlp
 {
 
-// Send this header along with unique random number, which we'll reject if received back.
-// This is to avoid loops due to misconfugration
-static std::string kFwProxyIdHeader{ "otelcpp-otlp-grpc-forward-proxy-id" };
+// Detect loops, by sending a random identifier for each forward proxy instance.
+// All identifiers received are collected, and send as individual http headers.
+static std::string kFwProxyRidHeader{ "otel-fw-proxy-rid" };
 
 using namespace opentelemetry;
 
@@ -89,11 +88,41 @@ struct OtlpGrpcForwardProxy::Impl
 
     std::string fw_proxy_id;
 
-    bool LoopDetected( const std::multimap<grpc::string_ref, grpc::string_ref>& client_metadata ) const
+    static inline char ascii_tolower( const char c ) noexcept
     {
-        const auto key{ grpc::string_ref( kFwProxyIdHeader ) };
-        const auto it{ client_metadata.find(key) };
-        return it != client_metadata.cend() && it->second.compare( grpc::string_ref( fw_proxy_id ) ) == 0;
+        const unsigned char letter = c - 'A';
+        return letter < 26 ? ( c | 0x20 ) : c;
+    }
+
+    static inline bool ascii_strieq( const char *s0, const char *s1 ) noexcept
+    {
+        assert(s0);
+        assert(s1);
+        for( ;; )
+        {
+            const auto c0{ ascii_tolower( *s0 ++ ) };
+            const auto c1{ ascii_tolower( *s1 ++ ) };
+            if( c0 != c1 )
+                return false;
+            if( c0 == 0 ) // reached end, also c0 == c1
+                return true;
+        }
+    }    
+
+    bool CheckForLoop( grpc::ClientContext* context, const std::multimap<grpc::string_ref, grpc::string_ref>& client_metadata ) const
+    {
+        assert(context != nullptr);
+        const auto matching_keys{ client_metadata.equal_range( grpc::string_ref( kFwProxyRidHeader ) ) };
+        for( auto i = matching_keys.first; i != matching_keys.second; ++i )
+            if( ascii_strieq( i->second.data(), fw_proxy_id.c_str() ) )
+                // Loop detected.
+                return true;
+            else
+                // Add what we've got so far
+                context->AddMetadata(kFwProxyRidHeader, i->second.data() );
+        // Add ourselves too.
+        context->AddMetadata(kFwProxyRidHeader, fw_proxy_id);
+        return false;
     }
 
     Impl(const OtlpGrpcClientOptions&);
@@ -192,13 +221,12 @@ grpc::ServerUnaryReactor* OtlpGrpcForwardProxy::Impl::Finish(grpc::CallbackServe
         explicit NAME(OtlpGrpcForwardProxy::Impl& impl_): impl(impl_){} \
         grpc::ServerUnaryReactor* Export(grpc::CallbackServerContext* cbServerContext, const REQUEST* req, RESPONSE* resp) override { \
             auto exportResult{ sdk::common::ExportResult::kFailure }; \
-            if( impl.LoopDetected(cbServerContext->client_metadata()) ) \
-                return impl.Finish(cbServerContext, exportResult, grpc::Status(grpc::StatusCode::FAILED_PRECONDITION, "OtlpGrpcForwardProxy detected loop.")); \
             if( impl.active ) { \
+                auto context{ impl.client->MakeClientContext(impl.clientOptions) }; \
+                if( impl.CheckForLoop(context.get(), cbServerContext->client_metadata()) ) \
+                    return impl.Finish(cbServerContext, exportResult, grpc::Status(grpc::StatusCode::FAILED_PRECONDITION, "OtlpGrpcForwardProxy detected loop.")); \
                 OTEL_INTERNAL_LOG_DEBUG("[otlp_grpc_forward_proxy] " TEXT " export"); \
                 auto syncStatus{ grpc::Status(grpc::Status(grpc::StatusCode::DO_NOT_USE, "")) }; \
-                auto context{ impl.client->MakeClientContext(impl.clientOptions) }; \
-                context->AddMetadata(kFwProxyIdHeader, impl.fw_proxy_id); \
                 auto arena{ std::make_unique<google::protobuf::Arena>(impl.arenaOptions) }; \
                 auto request{ *req }; \
                 exportResult = impl.client->DelegateAsyncExport( impl.clientOptions, impl.STUB.get(), std::move(context), std::move(arena), std::move(request), \
@@ -221,12 +249,11 @@ grpc::ServerUnaryReactor* OtlpGrpcForwardProxy::Impl::Finish(grpc::CallbackServe
         OtlpGrpcForwardProxy::Impl& impl; \
         explicit NAME(OtlpGrpcForwardProxy::Impl& impl_): impl(impl_){} \
         grpc::Status Export(grpc::ServerContext* serverContext, const REQUEST* req, RESPONSE* resp) override { \
-            if( impl.LoopDetected(serverContext->client_metadata()) ) \
-                return grpc::Status(grpc::StatusCode::FAILED_PRECONDITION, "OtlpGrpcForwardProxy detected loop."); \
             if( impl.active ) { \
-                OTEL_INTERNAL_LOG_DEBUG("[otlp_grpc_forward_proxy] " TEXT " export"); \
                 auto context{ impl.client->MakeClientContext(impl.clientOptions) }; \
-                context->AddMetadata(kFwProxyIdHeader, impl.fw_proxy_id); \
+                if( impl.CheckForLoop( context.get(), serverContext->client_metadata()) ) \
+                    return grpc::Status(grpc::StatusCode::FAILED_PRECONDITION, "OtlpGrpcForwardProxy detected loop."); \
+                OTEL_INTERNAL_LOG_DEBUG("[otlp_grpc_forward_proxy] " TEXT " export"); \
                 return impl.STUB->Export( context.get(), *req, resp ); \
             } \
             return grpc::Status(grpc::StatusCode::FAILED_PRECONDITION, "OtlpGrpcForwardProxy is not active."); \
