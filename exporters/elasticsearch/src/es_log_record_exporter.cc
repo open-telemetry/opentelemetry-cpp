@@ -63,7 +63,7 @@ public:
       {
         log_message = BuildResponseLogMessage(response, body_);
 
-        OTEL_INTERNAL_LOG_ERROR("ES Log Exporter] Export failed, " << log_message);
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Export failed, " << log_message);
       }
 
       if (console_debug_)
