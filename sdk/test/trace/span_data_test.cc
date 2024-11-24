@@ -69,8 +69,7 @@ TEST(SpanData, Set)
   data.SetStartTime(now);
   data.SetDuration(std::chrono::nanoseconds(1000000));
   data.SetAttribute("attr1", static_cast<int64_t>(314159));
-  data.AddEvent("event1", now,
-                opentelemetry::common::KeyValueIterableView<std::map<std::string, int32_t>>({}));
+  data.AddEvent("event1", now);
 
   ASSERT_EQ(data.GetTraceId(), trace_id);
   ASSERT_EQ(data.GetSpanId(), span_id);
