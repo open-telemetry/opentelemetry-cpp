@@ -3,9 +3,7 @@
 
 #include <chrono>
 #include <ctime>
-#include <iomanip>
 #include <nlohmann/json.hpp>
-#include <sstream>
 #include <string>
 
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
@@ -82,11 +80,14 @@ void ElasticSearchRecordable::SetTimestamp(
       std::chrono::duration_cast<std::chrono::microseconds>(timePoint.time_since_epoch()) %
       std::chrono::seconds(1);
 
-  std::ostringstream oss;
-  oss << std::put_time(&tm, "%FT%T") << '.' << std::setw(6) << std::setfill('0')
-      << microseconds.count() << 'Z';
+  // `sizeof()` includes the null terminator
+  constexpr auto dateSize = sizeof("YYYY-MM-DDTHH:MM:SS.uuuuuuZ");
+  char bufferDate[dateSize];
+  auto offset = std::strftime(bufferDate, sizeof(bufferDate), "%Y-%m-%dT%H:%M:%S", &tm);
+  std::snprintf(bufferDate + offset, sizeof(bufferDate) - offset, ".%06ldZ",
+                static_cast<long>(microseconds.count()));
 
-  const std::string dateStr = oss.str();
+  const std::string dateStr(bufferDate);
 #endif
 
   json_["@timestamp"] = dateStr;
