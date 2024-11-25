@@ -260,10 +260,6 @@ if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
 endif()
 
-set(OTELCPP_PROTO_PATH
-    ""
-    CACHE PATH "Path to opentelemetry-proto")
-
 if(WIN32)
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
 else()

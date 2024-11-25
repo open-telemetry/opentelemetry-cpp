@@ -105,7 +105,7 @@ endif()
 
 if(@WITH_ABSEIL@ OR @WITH_OTLP_GRPC@)
   find_package(absl CONFIG)
-elseif(OR @WITH_OTLP_HTTP@ OR @WITH_OTLP_FILE@)
+elseif(@WITH_OTLP_HTTP@ OR @WITH_OTLP_FILE@)
   if("@Protobuf_VERSION@" VERSION_GREATER_EQUAL "3.22.0")
     find_package(absl CONFIG)
   endif()

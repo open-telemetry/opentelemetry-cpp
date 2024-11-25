@@ -6,7 +6,6 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "metrics",
     srcs = glob(["**/*.cc"]),
-    hdrs = glob(["**/*.h"]),
     include_prefix = "src/metrics",
     deps = [
         "//api",
