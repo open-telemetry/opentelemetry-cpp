@@ -28,7 +28,7 @@ namespace otlp
 
 // Detect loops, by sending a random identifier for each forward proxy instance.
 // All identifiers received are collected, and send as individual http headers.
-static std::string kFwProxyRidHeader{ "otel-fw-proxy-rid" };
+static std::string kFwProxyRidHeader{ "otel-grpc-fw-proxy-uid" };
 
 using namespace opentelemetry;
 
@@ -112,14 +112,23 @@ struct OtlpGrpcForwardProxy::Impl
     bool CheckForLoop( grpc::ClientContext* context, const std::multimap<grpc::string_ref, grpc::string_ref>& client_metadata ) const
     {
         assert(context != nullptr);
-        const auto matching_keys{ client_metadata.equal_range( grpc::string_ref( kFwProxyRidHeader ) ) };
-        for( auto i = matching_keys.first; i != matching_keys.second; ++i )
-            if( ascii_strieq( i->second.data(), fw_proxy_id.c_str() ) )
-                // Loop detected.
+        const auto matching_keys{ client_metadata.equal_range( kFwProxyRidHeader ) };
+        auto index{ 0 };
+        for( auto it = matching_keys.first; it != matching_keys.second; ++it )
+        {
+            std::string value(it->second.cbegin(), it->second.cend());
+            OTEL_INTERNAL_LOG_DEBUG("[otlp_grpc_forward_proxy] proxy=" << fw_proxy_id << " got=" << value << " index=" << ++index);
+            if( ascii_strieq( value.c_str(), fw_proxy_id.c_str() ) )
+            {
+                OTEL_INTERNAL_LOG_ERROR("[otlp_grpc_forward_proxy] Loop detected!");
                 return true;
+            }
             else
+            {
                 // Add what we've got so far
-                context->AddMetadata(kFwProxyRidHeader, i->second.data() );
+                context->AddMetadata(kFwProxyRidHeader, value );
+            }
+        }
         // Add ourselves too.
         context->AddMetadata(kFwProxyRidHeader, fw_proxy_id);
         return false;

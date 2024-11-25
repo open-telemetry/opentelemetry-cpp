@@ -139,11 +139,11 @@ void metrics_counter_example(const std::string &name)
       provider->GetMeter(name, "1.2.0");
   auto double_counter = meter->CreateDoubleCounter(counter_name);
 
-  for (uint32_t i = 0; i < 20; ++i)
+  for (uint32_t i = 0; i < 2000; ++i)
   {
     double val = (rand() % 700) + 1.1;
     double_counter->Add(val);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
   }
 }
 
@@ -155,9 +155,9 @@ void metrics_observable_counter_example(const std::string &name)
       provider->GetMeter(name, "1.2.0");
   double_observable_counter = meter->CreateDoubleObservableCounter(counter_name);
   double_observable_counter->AddCallback(MeasurementFetcher::Fetcher, nullptr);
-  for (uint32_t i = 0; i < 20; ++i)
+  for (uint32_t i = 0; i < 2000; ++i)
   {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
   }
 }
 
@@ -169,13 +169,13 @@ void metrics_histogram_example(const std::string &name)
       provider->GetMeter(name, "1.2.0");
   auto histogram_counter = meter->CreateDoubleHistogram(histogram_name, "des", "unit");
   auto context           = opentelemetry::context::Context{};
-  for (uint32_t i = 0; i < 20; ++i)
+  for (uint32_t i = 0; i < 2000; ++i)
   {
     double val                                = (rand() % 700) + 1.1;
     std::map<std::string, std::string> labels = get_random_attr();
     auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
     histogram_counter->Record(val, labelkv, context);
-    std::this_thread::sleep_for(std::chrono::milliseconds(250));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2));
   }
 }
 
@@ -296,8 +296,8 @@ void InitMetrics(const std::string &name)
 
   // Initialize and set the global MeterProvider
   opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions options;
-  options.export_interval_millis = std::chrono::milliseconds(1000);
-  options.export_timeout_millis  = std::chrono::milliseconds(500);
+  options.export_interval_millis = std::chrono::milliseconds(100);
+  options.export_timeout_millis  = std::chrono::milliseconds(50);
 
   auto reader = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
       std::move(exporter), options);
@@ -382,43 +382,47 @@ struct proxy_thread
   std::mutex mu;
   std::condition_variable cv;
   bool ready{ false };
-  static inline std::unique_ptr<opentelemetry::exporter::otlp::OtlpGrpcForwardProxy> proxy;
-  static void entry(proxy_thread* ctx)
+  std::unique_ptr<opentelemetry::exporter::otlp::OtlpGrpcForwardProxy> proxy;
+  static void thread_entry(proxy_thread* this_, const std::string& listenAddress, const std::string& sendAddress )
+  {
+    this_->entry(listenAddress, sendAddress);
+  }
+  void entry(const std::string& listenAddress, const std::string& sendAddress )
   {
       using namespace opentelemetry::exporter::otlp;
       
-      OtlpGrpcClientOptions clientOptions;
-      clientOptions.endpoint = GetOtlpDefaultGrpcEndpoint();
-      clientOptions.max_concurrent_requests = 10; //16384;
-      clientOptions.max_threads = 10;
+      OtlpGrpcClientOptions clientOptions{};
+      clientOptions.endpoint = sendAddress; //GetOtlpDefaultGrpcEndpoint();
+      clientOptions.max_concurrent_requests = 16384;
+      clientOptions.max_threads = 32;
 
-      ctx->proxy = std::make_unique<OtlpGrpcForwardProxy>(clientOptions);
-      ctx->proxy->SetActive(true);
+      proxy = std::make_unique<OtlpGrpcForwardProxy>(clientOptions);
+      proxy->SetActive(true);
 
-      ctx->proxy->AddListenAddress("localhost:4317");
+      proxy->AddListenAddress(listenAddress);
       proxy->RegisterMetricExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
       proxy->RegisterTraceExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
       proxy->RegisterLogRecordExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
       printf("Start\n");
-      ctx->proxy->Start();
+      proxy->Start();
       {
-        std::unique_lock<std::mutex> lock(ctx->mu);  
-        ctx->ready = true;
-        ctx->cv.notify_one();
+        std::unique_lock<std::mutex> lock(mu);  
+        ready = true;
+        cv.notify_one();
       }
       printf("Wait\n");
-      ctx->proxy->Wait();
+      proxy->Wait();
       printf("Done Wait\n");
   }
-  static void start()
+  proxy_thread() = delete;
+  explicit proxy_thread(const std::string& listenAddress, const std::string& sendAddress)
   {
-    proxy_thread ctx;
-    std::thread pt(proxy_thread::entry, &ctx);
+    std::thread pt(proxy_thread::thread_entry, this, listenAddress, sendAddress);
     pt.detach();
-    std::unique_lock<std::mutex> lock(ctx.mu);
-    ctx.cv.wait(lock, [&ctx]{ return ctx.ready; });
+    std::unique_lock<std::mutex> lock( mu );
+    cv.wait(lock, [this]{ return ready; });
   }
-  static void shutdown()
+  ~proxy_thread()
   {
     if( proxy )
       proxy->Shutdown();
@@ -434,10 +438,24 @@ int main(int argc, const char *argv[])
 
   {
     using namespace opentelemetry::sdk::common::internal_log;
+    GlobalLogHandler::SetLogLevel(LogLevel::None);
     GlobalLogHandler::SetLogLevel(LogLevel::Debug);
   }
 
-  proxy_thread::start();
+  proxy_thread p0("127.0.0.1:4317", "unix://p/1");
+//  proxy_thread p1("unix:q:/p/m/opentelemetry-cpp/1.sock", "unix:q:/p/m/opentelemetry-cpp/2.sock");
+//  proxy_thread p2("unix:q:/p/m/opentelemetry-cpp/2.sock", "unix:q:/p/m/opentelemetry-cpp/3.sock");
+  // proxy_thread p1("127.0.0.1:43170", "127.0.0.1:43171");
+  // proxy_thread p2("127.0.0.1:43171", "127.0.0.1:43172");
+  // proxy_thread p3("127.0.0.1:43172", "127.0.0.1:43173");
+  // proxy_thread p4("127.0.0.1:43173", "127.0.0.1:43174");
+  // proxy_thread p5("127.0.0.1:43174", "127.0.0.1:43175");
+  // proxy_thread p6("127.0.0.1:43175", "127.0.0.1:43176");
+  // proxy_thread p7("127.0.0.1:43176", "127.0.0.1:43177");
+  // proxy_thread p8("127.0.0.1:43177", "127.0.0.1:43178");
+  // proxy_thread p9("127.0.0.1:43178", "127.0.0.1:43179");
+  // proxy_thread pA("127.0.0.1:43179", opentelemetry::exporter::otlp::GetOtlpDefaultGrpcEndpoint());
+  //pA.proxy->SetActive( false );
   
   {
     using namespace opentelemetry::sdk::common;
@@ -462,15 +480,14 @@ int main(int argc, const char *argv[])
   CleanupLogger();
   CleanupTracer();
 
-  printf("Press Ctrl+C to break\n");
-  try {
-    std::this_thread::sleep_for(std::chrono::seconds(500));
-  }
-  catch( ... )
-  {
-    printf("Caught something?\n");
-  }
+  // printf("Press Ctrl+C to break\n");
+  // try {
+  //   std::this_thread::sleep_for(std::chrono::seconds(500));
+  // }
+  // catch( ... )
+  // {
+  //   printf("Caught something?\n");
+  // }
 
-  proxy_thread::shutdown();
   return 0;
 }
