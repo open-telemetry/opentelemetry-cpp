@@ -439,23 +439,21 @@ int main(int argc, const char *argv[])
   {
     using namespace opentelemetry::sdk::common::internal_log;
     GlobalLogHandler::SetLogLevel(LogLevel::None);
-    GlobalLogHandler::SetLogLevel(LogLevel::Debug);
+ //   GlobalLogHandler::SetLogLevel(LogLevel::Debug);
   }
 
-  proxy_thread p0("127.0.0.1:4317", "unix://p/1");
-//  proxy_thread p1("unix:q:/p/m/opentelemetry-cpp/1.sock", "unix:q:/p/m/opentelemetry-cpp/2.sock");
-//  proxy_thread p2("unix:q:/p/m/opentelemetry-cpp/2.sock", "unix:q:/p/m/opentelemetry-cpp/3.sock");
-  // proxy_thread p1("127.0.0.1:43170", "127.0.0.1:43171");
-  // proxy_thread p2("127.0.0.1:43171", "127.0.0.1:43172");
-  // proxy_thread p3("127.0.0.1:43172", "127.0.0.1:43173");
-  // proxy_thread p4("127.0.0.1:43173", "127.0.0.1:43174");
-  // proxy_thread p5("127.0.0.1:43174", "127.0.0.1:43175");
-  // proxy_thread p6("127.0.0.1:43175", "127.0.0.1:43176");
-  // proxy_thread p7("127.0.0.1:43176", "127.0.0.1:43177");
-  // proxy_thread p8("127.0.0.1:43177", "127.0.0.1:43178");
-  // proxy_thread p9("127.0.0.1:43178", "127.0.0.1:43179");
-  // proxy_thread pA("127.0.0.1:43179", opentelemetry::exporter::otlp::GetOtlpDefaultGrpcEndpoint());
-  //pA.proxy->SetActive( false );
+  proxy_thread p0("127.0.0.1:4317", "127.0.0.1:43170");
+  proxy_thread p1("127.0.0.1:43170", "127.0.0.1:43171");
+  proxy_thread p2("127.0.0.1:43171", "127.0.0.1:43172");
+  proxy_thread p3("127.0.0.1:43172", "127.0.0.1:43173");
+  proxy_thread p4("127.0.0.1:43173", "127.0.0.1:43174");
+  proxy_thread p5("127.0.0.1:43174", "127.0.0.1:43175");
+  proxy_thread p6("127.0.0.1:43175", "127.0.0.1:43176");
+  proxy_thread p7("127.0.0.1:43176", "127.0.0.1:43177");
+  proxy_thread p8("127.0.0.1:43177", "127.0.0.1:43178");
+  proxy_thread p9("127.0.0.1:43178", "127.0.0.1:43179");
+  proxy_thread pA("127.0.0.1:43179", opentelemetry::exporter::otlp::GetOtlpDefaultGrpcEndpoint());
+  pA.proxy->SetActive( false );
   
   {
     using namespace opentelemetry::sdk::common;

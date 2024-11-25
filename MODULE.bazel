@@ -5,6 +5,13 @@ module(
 )
 
 bazel_dep(name = "abseil-cpp", version = "20240722.0.bcr.1")
+single_version_override(
+    module_name = "abseil-cpp",
+    patch_strip = 1,
+    patches = [
+        "bazel/absl_win10_cache_zone.diff",
+    ],
+)
 bazel_dep(name = "aspect_bazel_lib", version = "2.9.4")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "boringssl", version = "0.20241024.0")

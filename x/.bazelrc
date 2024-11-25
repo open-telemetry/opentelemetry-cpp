@@ -3,5 +3,5 @@ build --@otel_sdk//:with_dll=true
 try-import %workspace%/../../top.bazelrc
 test --test_output=streamed
 
-common:devenv --run_under='"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Common7/IDE/devenv.exe" /debugexe '
-test:devenv --run_under='"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Common7/IDE/devenv.exe" /debugexe '
+common:devenv --run_under='"c:/windows/system32/cmd.exe" /c start /wait devenv /debugexe '
+test:devenv --run_under='"c:/windows/system32/cmd.exe" /c start /wait devenv /debugexe '
