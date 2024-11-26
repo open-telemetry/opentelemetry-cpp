@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gmock/gmock.h>
-#include <google/protobuf/message_lite.h>
 #include <gtest/gtest.h>
 #include <algorithm>
 #include <chrono>
@@ -42,6 +41,7 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include <google/protobuf/message_lite.h>
 #include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/metrics/v1/metrics.pb.h"
