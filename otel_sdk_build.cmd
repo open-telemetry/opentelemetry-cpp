@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-for /F "usebackq delims=" %%i in (`where bazelisk bazel`) do set __BAZEL__=%%i
+for /F "usebackq delims=" %%i in (`where bazelisk.exe bazel.exe`) do set __BAZEL__=%%i
 if "%__BAZEL__%"=="" goto:no-bazel
 
 set PATH=
