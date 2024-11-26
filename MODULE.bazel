@@ -1,6 +1,6 @@
 module(
     name = "otel_sdk",
-    version = "1.17.0-dll",
+    version = "1.18.0-dll",
     compatibility_level = 0,
 )
 
@@ -55,24 +55,18 @@ archive_override(
 # this rule is missing dependency declarations for the following files included by 'src/google/protobuf/any_lite.cc':
 #   'bazel-out/x64_windows-opt-exec-ST-d610928244b0/bin/external/protobuf+/src/google/protobuf/_virtual_includes/protobuf_lite/google/protobuf/port.h'
 bazel_dep(name = "protobuf", version = "29.0-rc3")
-bazel_dep(name = "opentelemetry-proto", version = "1.3.2")
+bazel_dep(name = "opentelemetry-proto", version = "1.4.0")
 archive_override(
     module_name = "opentelemetry-proto",
-    integrity = "sha256-wGnA2WE3zwBdNEEfpn3TtvH4xkrx5/sv4AiaQcQlrNc=",
+    integrity = "sha256-U80yztsndi6iBgqcjYPkuCLeE9c7XV03ots89VAY1pQ=",
     patch_strip = 1,
     # Copied from https://github.com/bazelbuild/bazel-central-registry/tree/main/modules/opentelemetry-proto/1.3.1/patches
     patches = ["bazel/opentelemetry-proto.patch"],
-    strip_prefix = "opentelemetry-proto-1.3.2",
-    urls = "https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.3.2.tar.gz",
+    strip_prefix = "opentelemetry-proto-1.4.0",
+    urls = "https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.4.0.tar.gz",
 )
 
-bazel_dep(name = "prometheus-cpp", version = "1.2.4")
-archive_override(
-    module_name = "prometheus-cpp",
-    integrity = "sha256-uElFYvmIrzXsElYbbrNS0Mvtfj99aKae2nhsZhCvxG4=",
-    strip_prefix = "prometheus-cpp-6492e820cdff7e7345d46d82b43735aaea542098",
-    urls = "https://github.com/jupp0r/prometheus-cpp/archive/6492e820cdff7e7345d46d82b43735aaea542098.zip",
-)
+bazel_dep(name = "prometheus-cpp", version = "1.3.0")
 
 use_repo(
     use_extension("@bazel_tools//tools/cpp:cc_configure.bzl", "cc_configure_extension"),

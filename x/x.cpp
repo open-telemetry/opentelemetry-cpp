@@ -143,7 +143,7 @@ void metrics_counter_example(const std::string &name)
   {
     double val = (rand() % 700) + 1.1;
     double_counter->Add(val);
-    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 }
 
@@ -157,7 +157,7 @@ void metrics_observable_counter_example(const std::string &name)
   double_observable_counter->AddCallback(MeasurementFetcher::Fetcher, nullptr);
   for (uint32_t i = 0; i < 2000; ++i)
   {
-    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 }
 
@@ -175,7 +175,7 @@ void metrics_histogram_example(const std::string &name)
     std::map<std::string, std::string> labels = get_random_attr();
     auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
     histogram_counter->Record(val, labelkv, context);
-    std::this_thread::sleep_for(std::chrono::milliseconds(2));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 }
 
@@ -287,7 +287,7 @@ void InitMetrics(const std::string &name)
   auto exporter = opentelemetry::exporter::metrics::OStreamMetricExporterFactory::Create();
   #else
     opentelemetry::exporter::otlp::OtlpGrpcMetricExporterOptions exporterOptions;
-    exporterOptions.compression = "gzip";
+    //exporterOptions.compression = "gzip";
     auto exporter{ opentelemetry::exporter::otlp::OtlpGrpcMetricExporterFactory::Create( exporterOptions ) };
   #endif
 
@@ -403,16 +403,13 @@ struct proxy_thread
       proxy->RegisterMetricExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
       proxy->RegisterTraceExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
       proxy->RegisterLogRecordExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
-      printf("Start\n");
       proxy->Start();
       {
         std::unique_lock<std::mutex> lock(mu);  
         ready = true;
         cv.notify_one();
       }
-      printf("Wait\n");
       proxy->Wait();
-      printf("Done Wait\n");
   }
   proxy_thread() = delete;
   explicit proxy_thread(const std::string& listenAddress, const std::string& sendAddress)
@@ -430,7 +427,7 @@ struct proxy_thread
   }
 };
 
-int main(int argc, const char *argv[])
+int main1()
 {
   setvbuf(stdout, nullptr, _IONBF,0);
   setvbuf(stderr, nullptr, _IONBF,0);
@@ -439,21 +436,24 @@ int main(int argc, const char *argv[])
   {
     using namespace opentelemetry::sdk::common::internal_log;
     GlobalLogHandler::SetLogLevel(LogLevel::None);
- //   GlobalLogHandler::SetLogLevel(LogLevel::Debug);
+    //GlobalLogHandler::SetLogLevel(LogLevel::Error);
   }
 
   proxy_thread p0("127.0.0.1:4317", "127.0.0.1:43170");
-  proxy_thread p1("127.0.0.1:43170", "127.0.0.1:43171");
-  proxy_thread p2("127.0.0.1:43171", "127.0.0.1:43172");
-  proxy_thread p3("127.0.0.1:43172", "127.0.0.1:43173");
-  proxy_thread p4("127.0.0.1:43173", "127.0.0.1:43174");
-  proxy_thread p5("127.0.0.1:43174", "127.0.0.1:43175");
-  proxy_thread p6("127.0.0.1:43175", "127.0.0.1:43176");
-  proxy_thread p7("127.0.0.1:43176", "127.0.0.1:43177");
-  proxy_thread p8("127.0.0.1:43177", "127.0.0.1:43178");
-  proxy_thread p9("127.0.0.1:43178", "127.0.0.1:43179");
-  proxy_thread pA("127.0.0.1:43179", opentelemetry::exporter::otlp::GetOtlpDefaultGrpcEndpoint());
-  pA.proxy->SetActive( false );
+  std::vector<std::unique_ptr<proxy_thread>> proxies;
+  std::string last;
+  for(int i=0; i<100; i++)
+  {
+    printf("."); fflush(stdout);
+    auto one = std::string("127.0.0.1:" + std::to_string(43170 + i));
+    auto two = std::string("127.0.0.1:" + std::to_string(43170 + i + 1));
+    auto proxy = std::make_unique<proxy_thread>(one,two);
+    proxies.emplace_back(std::move(proxy));
+    last = two;
+  }
+//  proxy_thread pA(last, opentelemetry::exporter::otlp::GetOtlpDefaultGrpcEndpoint());
+  proxy_thread pA(last,"127.0.0.1:4317");
+//  pA.proxy->SetActive( false );
   
   {
     using namespace opentelemetry::sdk::common;
@@ -488,4 +488,13 @@ int main(int argc, const char *argv[])
   // }
 
   return 0;
+}
+
+int main()
+{
+ auto t1 = std::chrono::steady_clock::now();
+ main1();
+ auto t2 = std::chrono::steady_clock::now();
+ auto duration = t2 - t1;
+ printf("\nit took %.3f seconds\n", double(duration.count()) / 1e9);
 }

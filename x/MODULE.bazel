@@ -18,10 +18,11 @@ single_version_override(
 )
 bazel_dep(name = "aspect_bazel_lib", version = "2.9.4")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
-# Below is needed as we have "build --@curl//:use_mbedtls=true" from ..\.bazelrc
+bazel_dep(name = "boringssl", version = "0.20241024.0")
 bazel_dep(name = "curl", version = "8.8.0.bcr.1")
-
-# We need this to match the parent, as it's locally patched there
+bazel_dep(name = "depend_on_what_you_use", version = "0.5.0")
+bazel_dep(name = "google_benchmark", version = "1.8.5")
+bazel_dep(name = "googletest", version = "1.15.2")
 bazel_dep(name = "grpc", version = "1.66.0.bcr.3")
 single_version_override(
     module_name = "grpc",
@@ -37,7 +38,16 @@ single_version_override(
     ],
 )
 
-bazel_dep(name = "c-ares") #, version = "1.16.1")
+bazel_dep(name = "nlohmann_json", version = "3.11.3.bcr.1")
+bazel_dep(name = "platforms", version = "0.0.10")
+bazel_dep(name = "rules_cc", version = "0.0.13") # Issues with 0.0.14 and grpc/protobuf
+bazel_dep(name = "rules_pkg", version = "1.0.1")
+bazel_dep(name = "rules_proto", version = "6.0.2") # Issues with 7.0.0 and grpc/protobuf
+bazel_dep(name = "zlib", version = "1.3.1.bcr.3")
+bazel_dep(name = "opentracing-cpp", version = "1.6.0")
+bazel_dep(name = "rules_multitool", version = "1.0.0")
+
+bazel_dep(name = "c-ares", version = "1.16.1")
 archive_override(
     module_name = "c-ares", 
     urls=["https://github.com/malkia/c-ares/archive/5ff026975caa04eb25e02b21976be5aace7da3c8.zip"], 
@@ -45,30 +55,37 @@ archive_override(
     strip_prefix="c-ares-5ff026975caa04eb25e02b21976be5aace7da3c8"
 )
 
-# ditto here
-
-bazel_dep(name = "opentelemetry-proto" ) #, version = "1.3.2")
+# ERROR: Q:/b/u/c56xnmzt/external/protobuf+/src/google/protobuf/BUILD.bazel:462:11: Compiling src/google/protobuf/any_lite.cc [for tool] failed: undeclared inclusion(s) in rule '@@protobuf+//src/google/protobuf:protobuf_lite':
+# this rule is missing dependency declarations for the following files included by 'src/google/protobuf/any_lite.cc':
+#   'bazel-out/x64_windows-opt-exec-ST-d610928244b0/bin/external/protobuf+/src/google/protobuf/_virtual_includes/protobuf_lite/google/protobuf/port.h'
+bazel_dep(name = "protobuf", version = "29.0-rc3")
+bazel_dep(name = "opentelemetry-proto", version = "1.4.0")
 archive_override(
     module_name = "opentelemetry-proto",
-    integrity = "sha256-wGnA2WE3zwBdNEEfpn3TtvH4xkrx5/sv4AiaQcQlrNc=",
+    integrity = "sha256-U80yztsndi6iBgqcjYPkuCLeE9c7XV03ots89VAY1pQ=",
     patch_strip = 1,
     # Copied from https://github.com/bazelbuild/bazel-central-registry/tree/main/modules/opentelemetry-proto/1.3.1/patches
     patches = ["bazel/opentelemetry-proto.patch"],
-    strip_prefix = "opentelemetry-proto-1.3.2",
-    urls = "https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.3.2.tar.gz",
+    strip_prefix = "opentelemetry-proto-1.4.0",
+    urls = "https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.4.0.tar.gz",
 )
 
-bazel_dep(name = "prometheus-cpp") #, version = "1.2.4")
-archive_override(
-    module_name = "prometheus-cpp",
-    integrity = "sha256-uElFYvmIrzXsElYbbrNS0Mvtfj99aKae2nhsZhCvxG4=",
-    strip_prefix = "prometheus-cpp-6492e820cdff7e7345d46d82b43735aaea542098",
-    urls = "https://github.com/jupp0r/prometheus-cpp/archive/6492e820cdff7e7345d46d82b43735aaea542098.zip",
-)
+bazel_dep(name = "prometheus-cpp", version = "1.3.0")
 
 use_repo(
     use_extension("@bazel_tools//tools/cpp:cc_configure.bzl", "cc_configure_extension"),
     "local_config_cc",
 )
+
+# This is needed only for most of the `bazel mod xxx` functions to work.
+#
+# Otherwise it complaints with
+#
+# ERROR: in tag at https://bcr.bazel.build/modules/grpc-java/1.62.2/MODULE.bazel:89:15: no repository visible as
+#        '@com_google_protobuf_javalite' to the repository '@@grpc-java+', but referenced by label
+#        '@com_google_protobuf_javalite//:protobuf_javalite' in attribute 'target' of tag 'override'.
+#      Is the module 'grpc-java' missing a bazel_dep or use_repo(..., "com_google_protobuf_javalite")?.
+#
+bazel_dep(name = "grpc-java", version = "1.67.1")
 
 bazel_dep(name = "rules_cue", version = "0.8.3")
