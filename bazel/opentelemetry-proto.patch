@@ -167,5 +167,5 @@ index 0000000..a5a5e54
 +    compatibility_level = 0,
 +)
 +
-+bazel_dep(name = "grpc", version = "1.66.0.bcr.3")
++bazel_dep(name = "grpc", version = "1.68.0")
 +bazel_dep(name = "rules_proto", version = "6.0.2")
