@@ -8,6 +8,9 @@ set PATH=
 
 pushd "%~dp0"
 
+echo BAZEL="%__BAZEL__%"
+"%__BAZEL__%" version
+
 if "%1"=="" goto:all
 if "%1"=="test" goto:test
 if "%1"=="zip" goto:zip
