@@ -11,6 +11,7 @@
 #include <mutex>
 #include <thread>
 
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
@@ -49,6 +50,8 @@ private:
 
   /* The background worker thread */
   std::thread worker_thread_;
+  std::shared_ptr<sdk::common::ThreadInstrumentation> worker_thread_instrumentation_;
+  std::shared_ptr<sdk::common::ThreadInstrumentation> collect_thread_instrumentation_;
 
   /* Synchronization primitives */
   std::atomic<bool> is_force_wakeup_background_worker_{false};

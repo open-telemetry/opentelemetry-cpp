@@ -44,7 +44,8 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(
       max_export_batch_size_(max_export_batch_size),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_(&BatchLogRecordProcessor::DoBackgroundWork, this)
+      worker_thread_(&BatchLogRecordProcessor::DoBackgroundWork, this),
+      worker_thread_instrumentation_(nullptr)
 {}
 
 BatchLogRecordProcessor::BatchLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
@@ -55,7 +56,8 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(std::unique_ptr<LogRecordExport
       max_export_batch_size_(options.max_export_batch_size),
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_(&BatchLogRecordProcessor::DoBackgroundWork, this)
+      worker_thread_(&BatchLogRecordProcessor::DoBackgroundWork, this),
+      worker_thread_instrumentation_(options.thread_instrumentation)
 {}
 
 std::unique_ptr<Recordable> BatchLogRecordProcessor::MakeRecordable() noexcept
@@ -151,10 +153,20 @@ bool BatchLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noex
 
 void BatchLogRecordProcessor::DoBackgroundWork()
 {
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->OnStart();
+  }
+
   auto timeout = scheduled_delay_millis_;
 
   while (true)
   {
+    if (worker_thread_instrumentation_ != nullptr)
+    {
+      worker_thread_instrumentation_->BeforeWait();
+    }
+
     // Wait for `timeout` milliseconds
     std::unique_lock<std::mutex> lk(synchronization_data_->cv_m);
     synchronization_data_->cv.wait_for(lk, timeout, [this] {
@@ -167,6 +179,11 @@ void BatchLogRecordProcessor::DoBackgroundWork()
     });
     synchronization_data_->is_force_wakeup_background_worker.store(false,
                                                                    std::memory_order_release);
+
+    if (worker_thread_instrumentation_ != nullptr)
+    {
+      worker_thread_instrumentation_->AfterWait();
+    }
 
     if (synchronization_data_->is_shutdown.load() == true)
     {
@@ -182,10 +199,20 @@ void BatchLogRecordProcessor::DoBackgroundWork()
     // Subtract the duration of this export call from the next `timeout`.
     timeout = scheduled_delay_millis_ - duration;
   }
+
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->OnEnd();
+  }
 }
 
 void BatchLogRecordProcessor::Export()
 {
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->BeforeLoad();
+  }
+
   do
   {
     std::vector<std::unique_ptr<Recordable>> records_arr;
@@ -224,6 +251,11 @@ void BatchLogRecordProcessor::Export()
         nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
     NotifyCompletion(notify_force_flush, exporter_, synchronization_data_);
   } while (true);
+
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->AfterLoad();
+  }
 }
 
 void BatchLogRecordProcessor::NotifyCompletion(

@@ -23,6 +23,7 @@
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -304,6 +305,7 @@ class HttpClient : public opentelemetry::ext::http::client::HttpClient
 public:
   // The call (curl_global_init) is not thread safe. Ensure this is called only once.
   HttpClient();
+  HttpClient(const std::shared_ptr<sdk::common::ThreadInstrumentation> &thread_instrumentation);
   ~HttpClient() override;
 
   std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
@@ -366,6 +368,7 @@ private:
 
   std::mutex background_thread_m_;
   std::unique_ptr<std::thread> background_thread_;
+  std::shared_ptr<sdk::common::ThreadInstrumentation> background_thread_instrumentation_;
   std::chrono::milliseconds scheduled_delay_milliseconds_;
 
   nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;

@@ -60,7 +60,8 @@ OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(
                                                             options.use_json_name,
                                                             options.console_debug,
                                                             options.timeout,
-                                                            options.http_headers
+                                                            options.http_headers,
+                                                            options.thread_instrumentation
 #ifdef ENABLE_ASYNC_EXPORT
                                                             ,
                                                             options.max_concurrent_requests,

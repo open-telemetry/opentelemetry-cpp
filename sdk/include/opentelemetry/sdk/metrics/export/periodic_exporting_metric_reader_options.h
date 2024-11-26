@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
 #include <chrono>
@@ -28,6 +29,9 @@ struct PeriodicExportingMetricReaderOptions
 
   /*  how long the export can run before it is cancelled. */
   std::chrono::milliseconds export_timeout_millis = std::chrono::milliseconds(kExportTimeOutMillis);
+
+  std::shared_ptr<sdk::common::ThreadInstrumentation> periodic_thread_instrumentation;
+  std::shared_ptr<sdk::common::ThreadInstrumentation> collect_thread_instrumentation;
 };
 
 }  // namespace metrics

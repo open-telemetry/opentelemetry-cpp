@@ -158,6 +158,7 @@ protected:
 
   /* The background worker thread */
   std::thread worker_thread_;
+  std::shared_ptr<sdk::common::ThreadInstrumentation> worker_thread_instrumentation_;
 };
 
 }  // namespace logs

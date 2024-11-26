@@ -189,7 +189,18 @@ HttpClient::HttpClient()
       next_session_id_{0},
       max_sessions_per_connection_{8},
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
-      curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
+      curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance()),
+      background_thread_instrumentation_(nullptr)
+{}
+
+HttpClient::HttpClient(
+    const std::shared_ptr<sdk::common::ThreadInstrumentation> &thread_instrumentation)
+    : multi_handle_(curl_multi_init()),
+      next_session_id_{0},
+      max_sessions_per_connection_{8},
+      scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
+      curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance()),
+      background_thread_instrumentation_(thread_instrumentation)
 {}
 
 HttpClient::~HttpClient()
@@ -345,6 +356,11 @@ void HttpClient::MaybeSpawnBackgroundThread()
 
   background_thread_.reset(new std::thread(
       [](HttpClient *self) {
+        if (self->background_thread_instrumentation_ != nullptr)
+        {
+          self->background_thread_instrumentation_->OnStart();
+        }
+
         int still_running = 1;
         while (true)
         {
@@ -451,6 +467,11 @@ void HttpClient::MaybeSpawnBackgroundThread()
               break;
             }
           }
+        }
+
+        if (self->background_thread_instrumentation_ != nullptr)
+        {
+          self->background_thread_instrumentation_->OnEnd();
         }
       },
       this));
