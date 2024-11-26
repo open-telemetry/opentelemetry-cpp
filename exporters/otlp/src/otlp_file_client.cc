@@ -32,10 +32,6 @@
 #  include <strings.h>
 #endif
 
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-#  include <exception>
-#endif
-
 #if !defined(__CYGWIN__) && defined(_WIN32)
 #  ifndef WIN32_LEAN_AND_MEAN
 #    define WIN32_LEAN_AND_MEAN
@@ -118,6 +114,12 @@
 #include "google/protobuf/message.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
+
+// Must be included after opentelemetry/version.h,
+// which exports opentelemetry/common/macros.h
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#  include <exception>
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
