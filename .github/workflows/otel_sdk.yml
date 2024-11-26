@@ -17,6 +17,7 @@ jobs:
     steps:
       - run: systeminfo
       - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize -Wrap
+      - run: choco uninstall bazel --yes
       - uses: Cyberboss/install-winget@1c6f189175e9f015bf1aa113cd1cc6c73efb9d47
       - run: winget list --accept-source-agreements --disable-interactivity
       - run: winget install bazelisk -r bazel --accept-package-agreements --disable-interactivity --silent
