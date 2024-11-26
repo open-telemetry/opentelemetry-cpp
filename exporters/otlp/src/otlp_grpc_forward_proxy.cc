@@ -42,7 +42,7 @@ struct OtlpGrpcForwardProxy::Impl
 {
     bool active{ false };
 
-    OtlpGrpcClientOptions clientOptions;
+    OtlpGrpcClientOptions clientOptions{};
     std::shared_ptr<OtlpGrpcClient> client;
 
     grpc::ServerBuilder serverBuilder;
@@ -65,10 +65,6 @@ struct OtlpGrpcForwardProxy::Impl
     std::unique_ptr<MetricsService::StubInterface> metricExporterStub;
 
 #if defined(ENABLE_ASYNC_EXPORT)
-    ExportMode logExporterMode{ ExportMode::Unknown };
-    ExportMode traceExporterMode{ ExportMode::Unknown };;
-    ExportMode metricExporterMode{ ExportMode::Unknown };;
-
     struct LogExporterProxyAsync;
     struct TraceExporterProxyAsync;
     struct MetricExporterProxyAsync;
@@ -123,11 +119,8 @@ struct OtlpGrpcForwardProxy::Impl
                 OTEL_INTERNAL_LOG_ERROR("[otlp_grpc_forward_proxy] Loop detected!");
                 return true;
             }
-            else
-            {
-                // Add what we've got so far
-                context->AddMetadata(kFwProxyRidHeader, value );
-            }
+            // Add what we've got so far
+            context->AddMetadata(kFwProxyRidHeader, value );
         }
         // Add ourselves too.
         context->AddMetadata(kFwProxyRidHeader, fw_proxy_id);
@@ -154,7 +147,6 @@ OtlpGrpcForwardProxy::Impl::Impl(const OtlpGrpcClientOptions& options)
     uint64_t p1 = (uint64_t(rd())<<32) | uint64_t(rd());
     sprintf_s(buf, "%08.8lx%08.8lx", p0, p1);
     fw_proxy_id = buf;
-
 }
 
 #if defined(ENABLE_ASYNC_EXPORT)
@@ -222,9 +214,8 @@ grpc::ServerUnaryReactor* OtlpGrpcForwardProxy::Impl::Finish(grpc::CallbackServe
 }
 #endif
 
-// This is bit ugly, but still easier to understand (at least by me) than template<>'s
 #if defined(ENABLE_ASYNC_EXPORT)
-#define MAKE_PROXY_ASYNC(NAME, STUB, SERVICE, REQUEST, RESPONSE, TEXT, MODE) \
+#define MAKE_PROXY_ASYNC(NAME, STUB, SERVICE, REQUEST, RESPONSE, TEXT) \
     struct OtlpGrpcForwardProxy::Impl::NAME final : public SERVICE::CallbackService { \
         OtlpGrpcForwardProxy::Impl& impl; \
         explicit NAME(OtlpGrpcForwardProxy::Impl& impl_): impl(impl_){} \
@@ -234,22 +225,16 @@ grpc::ServerUnaryReactor* OtlpGrpcForwardProxy::Impl::Finish(grpc::CallbackServe
                 auto context{ impl.client->MakeClientContext(impl.clientOptions) }; \
                 if( impl.CheckForLoop(context.get(), cbServerContext->client_metadata()) ) \
                     return impl.Finish(cbServerContext, exportResult, grpc::Status(grpc::StatusCode::FAILED_PRECONDITION, "OtlpGrpcForwardProxy detected loop.")); \
-                OTEL_INTERNAL_LOG_DEBUG("[otlp_grpc_forward_proxy] " TEXT " export"); \
-                auto syncStatus{ grpc::Status(grpc::Status(grpc::StatusCode::DO_NOT_USE, "")) }; \
+                OTEL_INTERNAL_LOG_DEBUG("[otlp_grpc_forward_proxy] async " TEXT " export"); \
                 auto arena{ std::make_unique<google::protobuf::Arena>(impl.arenaOptions) }; \
-                auto request{ *req }; \
-                exportResult = impl.client->DelegateAsyncExport( impl.clientOptions, impl.STUB.get(), std::move(context), std::move(arena), std::move(request), \
+                auto reqCopy{ *req }; \
+                exportResult = impl.client->DelegateAsyncExport( impl.clientOptions, impl.STUB.get(), std::move(context), std::move(arena), std::move(reqCopy), \
                     [implPtr = &impl] (sdk::common::ExportResult r, std::unique_ptr<google::protobuf::Arena>&&, const REQUEST&, RESPONSE* ) -> bool {  \
                         return implPtr->HandleExportResult(r); \
                     }); \
-                if( exportResult == sdk::common::ExportResult::kFailureFull && impl.MODE == OtlpGrpcForwardProxy::ExportMode::AsyncBlockOnFull ) { \
-                    OTEL_INTERNAL_LOG_DEBUG("[otlp_grpc_forward_proxy] " TEXT " export (blocking)"); \
-                    auto syncContext{ impl.client->MakeClientContext(impl.clientOptions ) }; \
-                    syncStatus = impl.STUB->Export( syncContext.get(), *req, resp ); \
-                } \
-                return impl.Finish(cbServerContext, exportResult, syncStatus); \
+                return impl.Finish(cbServerContext, exportResult, grpc::Status(grpc::StatusCode::DO_NOT_USE, "")); \
             } \
-            return impl.Finish(cbServerContext, exportResult, grpc::Status(grpc::StatusCode::FAILED_PRECONDITION, "OtlpGrpcForwardProxy is not active.")); \
+            return impl.Finish(cbServerContext, exportResult, grpc::Status(grpc::StatusCode::DO_NOT_USE, "")); \
         }};
 #endif
 
@@ -269,18 +254,19 @@ grpc::ServerUnaryReactor* OtlpGrpcForwardProxy::Impl::Finish(grpc::CallbackServe
         }};
 
 #if defined(ENABLE_ASYNC_EXPORT)
-MAKE_PROXY_ASYNC(MetricExporterProxyAsync, metricExporterStub, MetricsService, ExportMetricsServiceRequest, ExportMetricsServiceResponse, "Async Metric", metricExporterMode)
-MAKE_PROXY_ASYNC(TraceExporterProxyAsync, traceExporterStub, TraceService, ExportTraceServiceRequest, ExportTraceServiceResponse, "Async Trace", traceExporterMode)
-MAKE_PROXY_ASYNC(LogExporterProxyAsync, logExporterStub, LogsService, ExportLogsServiceRequest, ExportLogsServiceResponse, "Async Log", logExporterMode)
+MAKE_PROXY_ASYNC(MetricExporterProxyAsync, metricExporterStub, MetricsService, ExportMetricsServiceRequest, ExportMetricsServiceResponse, "metric")
+MAKE_PROXY_ASYNC(TraceExporterProxyAsync, traceExporterStub, TraceService, ExportTraceServiceRequest, ExportTraceServiceResponse, "trace")
+MAKE_PROXY_ASYNC(LogExporterProxyAsync, logExporterStub, LogsService, ExportLogsServiceRequest, ExportLogsServiceResponse, "log")
 #endif
 
-MAKE_PROXY(MetricExporterProxy, metricExporterStub, MetricsService, ExportMetricsServiceRequest, ExportMetricsServiceResponse, "Metric")
-MAKE_PROXY(TraceExporterProxy, traceExporterStub, TraceService, ExportTraceServiceRequest, ExportTraceServiceResponse, "Trace")
-MAKE_PROXY(LogExporterProxy, logExporterStub, LogsService, ExportLogsServiceRequest, ExportLogsServiceResponse, "Log")
+MAKE_PROXY(MetricExporterProxy, metricExporterStub, MetricsService, ExportMetricsServiceRequest, ExportMetricsServiceResponse, "metric")
+MAKE_PROXY(TraceExporterProxy, traceExporterStub, TraceService, ExportTraceServiceRequest, ExportTraceServiceResponse, "trace")
+MAKE_PROXY(LogExporterProxy, logExporterStub, LogsService, ExportLogsServiceRequest, ExportLogsServiceResponse, "log")
 
 OtlpGrpcForwardProxy::OtlpGrpcForwardProxy(const OtlpGrpcClientOptions& options_)
     : impl(std::make_unique<Impl>(options_))
 {
+    assert(impl != nullptr);
 }
 
 OtlpGrpcForwardProxy::~OtlpGrpcForwardProxy()
@@ -306,7 +292,7 @@ void OtlpGrpcForwardProxy::AddListenAddress(const std::string& listenAddress)
     impl->serverBuilder.AddListeningPort(listenAddress, grpc::InsecureServerCredentials(), &( pair.port ));
 }
 
-void OtlpGrpcForwardProxy::RegisterMetricExporter( ExportMode exportMode )
+void OtlpGrpcForwardProxy::RegisterMetricExporter( )
 {
     assert(impl != nullptr);
     assert(impl->metricExporterStub == nullptr);
@@ -314,21 +300,18 @@ void OtlpGrpcForwardProxy::RegisterMetricExporter( ExportMode exportMode )
     impl->metricExporterStub = impl->client->MakeMetricsServiceStub();
 #if defined(ENABLE_ASYNC_EXPORT)
     assert(impl->metricExporterProxyAsync == nullptr);
-    assert(impl->metricExporterMode == ExportMode::Unknown);
-    if( exportMode != ExportMode::Sync && impl->clientOptions.max_concurrent_requests > 1 )
+    if( impl->clientOptions.max_concurrent_requests > 1 )
     {
-        impl->metricExporterMode = exportMode;
         impl->metricExporterProxyAsync = std::make_unique<Impl::MetricExporterProxyAsync>(*impl);
         impl->serverBuilder.RegisterService(impl->metricExporterProxyAsync.get());
         return;
     }
-    impl->metricExporterMode = ExportMode::Sync;
 #endif
     impl->metricExporterProxy = std::make_unique<Impl::MetricExporterProxy>(*impl);
     impl->serverBuilder.RegisterService(impl->metricExporterProxy.get());
 }
 
-void OtlpGrpcForwardProxy::RegisterTraceExporter( ExportMode exportMode )
+void OtlpGrpcForwardProxy::RegisterTraceExporter( )
 {
     assert(impl != nullptr);
     assert(impl->traceExporterStub == nullptr);
@@ -336,21 +319,18 @@ void OtlpGrpcForwardProxy::RegisterTraceExporter( ExportMode exportMode )
     impl->traceExporterStub = impl->client->MakeTraceServiceStub();
 #if defined(ENABLE_ASYNC_EXPORT)
     assert(impl->traceExporterProxyAsync == nullptr);
-    assert(impl->traceExporterMode == ExportMode::Unknown);
-    if( exportMode != ExportMode::Sync && impl->clientOptions.max_concurrent_requests > 1 )
+    if( impl->clientOptions.max_concurrent_requests > 1 )
     {
-        impl->traceExporterMode = exportMode;
         impl->traceExporterProxyAsync = std::make_unique<Impl::TraceExporterProxyAsync>(*impl);
         impl->serverBuilder.RegisterService(impl->traceExporterProxyAsync.get());
         return;
     }
-    impl->traceExporterMode = ExportMode::Sync;
 #endif
     impl->traceExporterProxy = std::make_unique<Impl::TraceExporterProxy>(*impl);
     impl->serverBuilder.RegisterService(impl->traceExporterProxy.get());
 }
 
-void OtlpGrpcForwardProxy::RegisterLogRecordExporter( ExportMode exportMode )
+void OtlpGrpcForwardProxy::RegisterLogRecordExporter( )
 {
     assert(impl != nullptr);
     assert(impl->logExporterStub == nullptr);
@@ -358,15 +338,12 @@ void OtlpGrpcForwardProxy::RegisterLogRecordExporter( ExportMode exportMode )
     impl->logExporterStub = impl->client->MakeLogsServiceStub();
 #if defined(ENABLE_ASYNC_EXPORT)
     assert(impl->logExporterProxyAsync == nullptr);
-    assert(impl->logExporterMode == ExportMode::Unknown);
-    if( exportMode != ExportMode::Sync && impl->clientOptions.max_concurrent_requests > 1 )
+    if( impl->clientOptions.max_concurrent_requests > 1 )
     {
-        impl->logExporterMode = exportMode;
         impl->logExporterProxyAsync = std::make_unique<Impl::LogExporterProxyAsync>(*impl);
         impl->serverBuilder.RegisterService(impl->logExporterProxyAsync.get());
         return;
     }
-    impl->logExporterMode = ExportMode::Sync;
 #endif
     impl->logExporterProxy = std::make_unique<Impl::LogExporterProxy>(*impl);
     impl->serverBuilder.RegisterService(impl->logExporterProxy.get());

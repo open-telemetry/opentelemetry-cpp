@@ -22,23 +22,23 @@ class OPENTELEMETRY_EXPORT_TYPE OtlpGrpcForwardProxy
 {
     struct Impl;
     std::unique_ptr<Impl> impl;
+
     OtlpGrpcForwardProxy() = delete;
+
 public:
-    enum class ExportMode {
-        Unknown          = -1,
-        Sync             = 0,
-        // For async to work, options.max_concurrent_requests > 1.
-        AsyncBlockOnFull = 1, 
-        AsyncDropOnFull  = 2,
-    };
+
     explicit OtlpGrpcForwardProxy(const OtlpGrpcClientOptions& options);
     ~OtlpGrpcForwardProxy();
+
     void SetActive(bool active);
     bool IsActive() const;
+
     void AddListenAddress(const std::string& listenAddress);
-    void RegisterTraceExporter( ExportMode exportMode );
-    void RegisterMetricExporter( ExportMode exportMode );
-    void RegisterLogRecordExporter( ExportMode exportMode );
+
+    void RegisterTraceExporter( );
+    void RegisterMetricExporter( );
+    void RegisterLogRecordExporter( );
+
     void Start();
     void Wait();
     void Shutdown();

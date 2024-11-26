@@ -400,9 +400,9 @@ struct proxy_thread
       proxy->SetActive(true);
 
       proxy->AddListenAddress(listenAddress);
-      proxy->RegisterMetricExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
-      proxy->RegisterTraceExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
-      proxy->RegisterLogRecordExporter(OtlpGrpcForwardProxy::ExportMode::AsyncDropOnFull);
+      proxy->RegisterMetricExporter();
+      proxy->RegisterTraceExporter();
+      proxy->RegisterLogRecordExporter();
       proxy->Start();
       {
         std::unique_lock<std::mutex> lock(mu);  
