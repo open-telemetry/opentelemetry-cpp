@@ -1,7 +1,9 @@
 @echo off
 setlocal
 
-for /F "usebackq delims=" %%i in (`where bazelisk.exe bazel.exe`) do set __BAZEL__=%%i
+for /F "usebackq delims=" %%i in (`where bazelisk1.exe bazel1.exe`) do set __BAZEL__=%%i
+if "%__BAZEL__%"=="" IF EXIST "%LOCALAPPDATA%\Microsoft\WinGet\Links\bazelisk.exe" set __BAZEL__=%LOCALAPPDATA%\Microsoft\WinGet\Links\bazelisk.exe
+if "%__BAZEL__%"=="" IF EXIST "%LOCALAPPDATA%\Microsoft\WinGet\Links\bazel.exe" set __BAZEL__=%LOCALAPPDATA%\Microsoft\WinGet\Links\bazel.exe
 if "%__BAZEL__%"=="" goto:no-bazel
 
 set PATH=
