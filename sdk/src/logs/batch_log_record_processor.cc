@@ -19,6 +19,7 @@
 #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 #include "opentelemetry/sdk/common/circular_buffer.h"
 #include "opentelemetry/sdk/common/circular_buffer_range.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
@@ -44,9 +45,12 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(
       max_export_batch_size_(max_export_batch_size),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_(&BatchLogRecordProcessor::DoBackgroundWork, this),
-      worker_thread_instrumentation_(nullptr)
-{}
+      worker_thread_instrumentation_(nullptr),
+      worker_thread_()
+{
+  // Make sure the constructor is complete before giving 'this' to a thread.
+  worker_thread_ = std::thread(&BatchLogRecordProcessor::DoBackgroundWork, this);
+}
 
 BatchLogRecordProcessor::BatchLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
                                                  const BatchLogRecordProcessorOptions &options)
@@ -56,9 +60,12 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(std::unique_ptr<LogRecordExport
       max_export_batch_size_(options.max_export_batch_size),
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_(&BatchLogRecordProcessor::DoBackgroundWork, this),
-      worker_thread_instrumentation_(options.thread_instrumentation)
-{}
+      worker_thread_instrumentation_(options.thread_instrumentation),
+      worker_thread_()
+{
+  // Make sure the constructor is complete before giving 'this' to a thread.
+  worker_thread_ = std::thread(&BatchLogRecordProcessor::DoBackgroundWork, this);
+}
 
 std::unique_ptr<Recordable> BatchLogRecordProcessor::MakeRecordable() noexcept
 {

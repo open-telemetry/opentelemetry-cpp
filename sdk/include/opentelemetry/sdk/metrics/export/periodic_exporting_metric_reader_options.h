@@ -31,9 +31,9 @@ struct PeriodicExportingMetricReaderOptions
   std::chrono::milliseconds export_timeout_millis = std::chrono::milliseconds(kExportTimeOutMillis);
 
   std::shared_ptr<sdk::common::ThreadInstrumentation> periodic_thread_instrumentation =
-      std::shared_ptr<sdk::common::ThreadInstrumentation>{};
+      std::shared_ptr<sdk::common::ThreadInstrumentation>(nullptr);
   std::shared_ptr<sdk::common::ThreadInstrumentation> collect_thread_instrumentation =
-      std::shared_ptr<sdk::common::ThreadInstrumentation>{};
+      std::shared_ptr<sdk::common::ThreadInstrumentation>(nullptr);
 };
 
 }  // namespace metrics

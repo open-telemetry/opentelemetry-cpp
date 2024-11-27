@@ -48,17 +48,17 @@ private:
   void DoBackgroundWork();
   bool CollectAndExportOnce();
 
-  /* The background worker thread */
-  std::thread worker_thread_;
-  std::shared_ptr<sdk::common::ThreadInstrumentation> worker_thread_instrumentation_;
-  std::shared_ptr<sdk::common::ThreadInstrumentation> collect_thread_instrumentation_;
-
   /* Synchronization primitives */
   std::atomic<bool> is_force_wakeup_background_worker_{false};
   std::atomic<uint64_t> force_flush_pending_sequence_{0};
   std::atomic<uint64_t> force_flush_notified_sequence_{0};
   std::condition_variable cv_, force_flush_cv_;
   std::mutex cv_m_, force_flush_m_;
+
+  /* The background worker thread */
+  std::shared_ptr<sdk::common::ThreadInstrumentation> worker_thread_instrumentation_;
+  std::shared_ptr<sdk::common::ThreadInstrumentation> collect_thread_instrumentation_;
+  std::thread worker_thread_;
 };
 
 }  // namespace metrics

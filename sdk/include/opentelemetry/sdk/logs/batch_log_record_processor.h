@@ -157,8 +157,8 @@ protected:
   std::shared_ptr<SynchronizationData> synchronization_data_;
 
   /* The background worker thread */
-  std::thread worker_thread_;
   std::shared_ptr<sdk::common::ThreadInstrumentation> worker_thread_instrumentation_;
+  std::thread worker_thread_;
 };
 
 }  // namespace logs

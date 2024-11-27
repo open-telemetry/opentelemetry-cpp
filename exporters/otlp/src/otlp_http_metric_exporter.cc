@@ -85,6 +85,7 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(std::unique_ptr<OtlpHttpClient> h
   options.console_debug                  = http_client_->GetOptions().console_debug;
   options.timeout                        = http_client_->GetOptions().timeout;
   options.http_headers                   = http_client_->GetOptions().http_headers;
+  options.thread_instrumentation         = http_client_->GetOptions().thread_instrumentation;
 #ifdef ENABLE_ASYNC_EXPORT
   options.max_concurrent_requests     = http_client_->GetOptions().max_concurrent_requests;
   options.max_requests_per_connection = http_client_->GetOptions().max_requests_per_connection;

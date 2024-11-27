@@ -108,7 +108,7 @@ struct OPENTELEMETRY_EXPORT OtlpHttpMetricExporterOptions
   std::string compression;
 
   std::shared_ptr<sdk::common::ThreadInstrumentation> thread_instrumentation =
-      std::shared_ptr<sdk::common::ThreadInstrumentation>{};
+      std::shared_ptr<sdk::common::ThreadInstrumentation>(nullptr);
 };
 
 }  // namespace otlp
