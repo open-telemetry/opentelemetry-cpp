@@ -36,7 +36,9 @@ struct BatchLogRecordProcessorOptions
    */
   size_t max_export_batch_size = 512;
 
-  std::shared_ptr<sdk::common::ThreadInstrumentation> thread_instrumentation;
+  std::shared_ptr<sdk::common::ThreadInstrumentation> thread_instrumentation =
+      std::shared_ptr<sdk::common::ThreadInstrumentation>
+  {}
 };
 
 }  // namespace logs

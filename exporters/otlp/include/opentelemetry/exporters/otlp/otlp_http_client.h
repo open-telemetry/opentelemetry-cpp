@@ -84,7 +84,8 @@ struct OtlpHttpClientOptions
   // User agent
   std::string user_agent;
 
-  std::shared_ptr<sdk::common::ThreadInstrumentation> thread_instrumentation;
+  std::shared_ptr<sdk::common::ThreadInstrumentation> thread_instrumentation =
+      std::shared_ptr<sdk::common::ThreadInstrumentation>{};
 
   inline OtlpHttpClientOptions(
       nostd::string_view input_url,
