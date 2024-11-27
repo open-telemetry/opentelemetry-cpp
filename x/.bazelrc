@@ -1,7 +1,7 @@
 import %workspace%/../.bazelrc
 build --@otel_sdk//:with_dll=true
 try-import %workspace%/../../top.bazelrc
-test --test_output=streamed
+test --test_output=streamed --test_timeout=36000,36000,36000,36000
 
 common:devenv --run_under='"c:/windows/system32/cmd.exe" /c start /wait devenv /debugexe '
 test:devenv --run_under='"c:/windows/system32/cmd.exe" /c start /wait devenv /debugexe '

@@ -11,52 +11,13 @@ cc_test(
     local = True,
     tags = ["manual", "external"],
 
-    env_inherit =
-    [
-        "ALLUSERSPROFILE",
-        "APPDATA",
-        "CommonProgramFiles",
-        "CommonProgramFiles(x86)",
-        "CommonProgramW6432",
-        "COMPUTERNAME",
-        "ComSpec",
-        "LOCALAPPDATA",
-        "NUMBER_OF_PROCESSORS",
-        "OS",
-        "Path",
-        "PATHEXT",
-        "PROCESSOR_ARCHITECTURE",
-        "PROCESSOR_IDENTIFIER",
-        "PROCESSOR_LEVEL",
-        "PROCESSOR_REVISION",
-        "ProgramData",
-        "ProgramFiles",
-        "ProgramFiles(x86)",
-        "ProgramW6432",
-        "SystemDrive",
-        "SystemRoot",
-        "TEMP",
-        "TMP",
-        "USERNAME",
-        "USERPROFILE",
-        "VS140COMNTOOLS",
-        "windir",
-        "_NT_SYMBOL_PATH",
+    # Minimal set of env vars for Visual Studio
+    env_inherit = [ 
+        "windir", # Mandatory
+        #"USERPROFILE", # In order to avoid creating %USERPROFILE%
     ],
 )
 
-cc_binary(
-    name = "xx",
-    srcs = ["x.cpp"],
-    deps = ["@otel_sdk//:dll"],
-)
-
-# cc_binary(
-#     name = "p",
-#     srcs = ["p.cpp"],
-#     deps = ["@otel_sdk//:dll"]
-# )
-#
 # copy_directory(
 #     name = "dashboards_dir",
 #     src = "dashboards",
@@ -92,19 +53,6 @@ cc_binary(
 #     tool = "@otel_sdk//:percli",
 # )
 
-# cc_binary(
-#     name = "proxy",
-#     srcs = ["proxy.cpp"],
-#     deps = [
-#         "@otel_sdk//:dll",
-#         "@grpc//:grpc++",
-#         "@grpc//:grpc++_reflection",
-#         "@opentelemetry-proto//:logs_service_grpc_cc",
-#         "@opentelemetry-proto//:metrics_service_grpc_cc",
-#         "@opentelemetry-proto//:trace_service_grpc_cc",
-#     ],
-# )
-#
 # cc_binary(
 #     name = "z",
 #     srcs = ["z.cpp"],
