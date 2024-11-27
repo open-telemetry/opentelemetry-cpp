@@ -6,21 +6,16 @@
 #include <memory>
 
 #include "opentelemetry/version.h"
+#include "opentelemetry/exporters/memory/in_memory_metric_data.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
-{
-namespace metrics
-{
-class PushMetricExporter;
-}  // namespace metrics
-}  // namespace sdk
 namespace exporter
 {
 namespace memory
 {
-class InMemoryMetricData;
 
 /// A factory for InMemoryMetricExporter
 class OPENTELEMETRY_EXPORT InMemoryMetricExporterFactory

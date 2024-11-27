@@ -435,57 +435,61 @@ int main1()
 
   {
     using namespace opentelemetry::sdk::common::internal_log;
-    GlobalLogHandler::SetLogLevel(LogLevel::None);
+    GlobalLogHandler::SetLogLevel(LogLevel::Debug);
     //GlobalLogHandler::SetLogLevel(LogLevel::Error);
   }
 
-  proxy_thread p0("127.0.0.1:4317", "127.0.0.1:43170");
-  std::vector<std::unique_ptr<proxy_thread>> proxies;
-  std::string last;
-  for(int i=0; i<100; i++)
-  {
-    printf("."); fflush(stdout);
-    auto one = std::string("127.0.0.1:" + std::to_string(43170 + i));
-    auto two = std::string("127.0.0.1:" + std::to_string(43170 + i + 1));
-    auto proxy = std::make_unique<proxy_thread>(one,two);
-    proxies.emplace_back(std::move(proxy));
-    last = two;
-  }
-//  proxy_thread pA(last, opentelemetry::exporter::otlp::GetOtlpDefaultGrpcEndpoint());
-  proxy_thread pA(last,"127.0.0.1:4317");
+  // proxy_thread p0("127.0.0.1:4317", "127.0.0.1:43170");
+  // std::vector<std::unique_ptr<proxy_thread>> proxies;
+  // std::string last;
+  // for(int i=0; i<100; i++)
+  // {
+  //   printf("."); fflush(stdout);
+  //   auto one = std::string("127.0.0.1:" + std::to_string(43170 + i));
+  //   auto two = std::string("127.0.0.1:" + std::to_string(43170 + i + 1));
+  //   auto proxy = std::make_unique<proxy_thread>(one,two);
+  //   proxies.emplace_back(std::move(proxy));
+  //   last = two;
+  // }
+  //proxy_thread pA(last, opentelemetry::exporter::otlp::GetOtlpDefaultGrpcEndpoint());
+//  proxy_thread pA(last,"127.0.0.1:4317");
 //  pA.proxy->SetActive( false );
   
-  {
-    using namespace opentelemetry::sdk::common;
-    setenv( "OTEL_EXPORTER_OTLP_ENDPOINT", "http://127.0.0.1:4317", 1 /* override */ );
-  }
-
-  std::string metrics_name{"malkia_metrics_test"};
-  InitTracer();
-  InitLogger();
-  InitMetrics(metrics_name);
-
-  init_metrics();
-  logs_foo_library();
-  traces_foo_library();
-  std::thread counter_example{&metrics_counter_example, metrics_name};
-  std::thread observable_counter_example{&metrics_observable_counter_example, metrics_name};
-  std::thread histogram_example{&metrics_histogram_example, metrics_name};
-  counter_example.join();
-  observable_counter_example.join();
-  histogram_example.join();
-  CleanupMetrics();
-  CleanupLogger();
-  CleanupTracer();
-
-  // printf("Press Ctrl+C to break\n");
-  // try {
-  //   std::this_thread::sleep_for(std::chrono::seconds(500));
-  // }
-  // catch( ... )
+  printf("starting...\n");
+  proxy_thread proxy("127.0.0.1:4317", opentelemetry::exporter::otlp::GetOtlpDefaultGrpcEndpoint());
+  printf("started...\n");
   // {
-  //   printf("Caught something?\n");
+  //   using namespace opentelemetry::sdk::common;
+  //   setenv( "OTEL_EXPORTER_OTLP_ENDPOINT", "http://127.0.0.1:4317", 1 /* override */ );
   // }
+
+  // std::string metrics_name{"malkia_metrics_test"};
+  // InitTracer();
+  // InitLogger();
+  // InitMetrics(metrics_name);
+
+  // init_metrics();
+  // logs_foo_library();
+  // traces_foo_library();
+  // std::thread counter_example{&metrics_counter_example, metrics_name};
+  // std::thread observable_counter_example{&metrics_observable_counter_example, metrics_name};
+  // std::thread histogram_example{&metrics_histogram_example, metrics_name};
+  // counter_example.join();
+  // observable_counter_example.join();
+  // histogram_example.join();
+  // CleanupMetrics();
+  // CleanupLogger();
+  // CleanupTracer();
+
+  printf("Press Ctrl+C to break\n");
+  try {
+      printf("waiting...\n");
+     std::this_thread::sleep_for(std::chrono::seconds(3600*10));
+  }
+  catch( ... )
+  {
+     printf("Caught something?\n");
+  }
 
   return 0;
 }

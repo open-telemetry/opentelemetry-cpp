@@ -1,40 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/version.h"
-#include "opentelemetry/exporters/otlp/otlp_file_client.h"
-
-#if defined(HAVE_GSL)
-#  include <gsl/gsl>
-#else
-#  include <assert.h>
-#endif
-
-// clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
-// clang-format on
-
-#include "google/protobuf/message.h"
-#include "nlohmann/json.hpp"
-
-// clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
-// clang-format on
-
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/common/base64.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
-
-#ifdef _MSC_VER
-#  include <string.h>
-#  define strcasecmp _stricmp
-#else
-#  include <strings.h>
-#endif
-
 #include <limits.h>
+#include <algorithm>
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
 #include <cstdint>
 #include <cstdio>
@@ -43,12 +13,24 @@
 #include <fstream>
 #include <functional>
 #include <mutex>
+#include <nlohmann/json.hpp>
+#include <ratio>
 #include <string>
 #include <thread>
 #include <utility>
 #include <vector>
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-#  include <exception>
+
+#if defined(HAVE_GSL)
+#  include <gsl/gsl>
+#else
+#  include <assert.h>
+#endif
+
+#ifdef _MSC_VER
+#  include <string.h>
+#  define strcasecmp _stricmp
+#else
+#  include <strings.h>
 #endif
 
 #if !defined(__CYGWIN__) && defined(_WIN32)
@@ -118,6 +100,29 @@
 #else
 #  include <errno.h>
 #  define OTLP_FILE_OPEN(f, path, mode) f = fopen(path, mode)
+#endif
+
+#include "opentelemetry/exporters/otlp/otlp_file_client.h"
+#include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/base64.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/version.h"
+
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/message.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
+
+// Must be included after opentelemetry/version.h,
+// which exports opentelemetry/common/macros.h
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#  include <exception>
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
