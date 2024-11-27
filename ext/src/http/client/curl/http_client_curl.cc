@@ -188,9 +188,9 @@ HttpClient::HttpClient()
     : multi_handle_(curl_multi_init()),
       next_session_id_{0},
       max_sessions_per_connection_{8},
+      background_thread_instrumentation_(nullptr),
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
-      curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance()),
-      background_thread_instrumentation_(nullptr)
+      curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
 {}
 
 HttpClient::HttpClient(
@@ -198,9 +198,9 @@ HttpClient::HttpClient(
     : multi_handle_(curl_multi_init()),
       next_session_id_{0},
       max_sessions_per_connection_{8},
+      background_thread_instrumentation_(thread_instrumentation),
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
-      curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance()),
-      background_thread_instrumentation_(thread_instrumentation)
+      curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
 {}
 
 HttpClient::~HttpClient()
