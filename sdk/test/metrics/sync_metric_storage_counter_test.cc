@@ -25,7 +25,7 @@
 #include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
-#if ENABLE_METRICS_EXEMPLAR_PREVIEW
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif

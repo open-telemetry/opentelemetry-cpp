@@ -6,6 +6,10 @@
 [
   # Work around for C++ STL
   { "include": ["<bits/chrono.h>", "private", "<chrono>", "public"] },
+  { "include": ["<bits/std_abs.h>", "private", "<cstdlib>", "public"] },
+  { "include": ["<ext/alloc_traits.h>", "private", "<memory>", "public"] },
+  { "include": ["<bits/types/struct_tm.h>", "private", "<time.h>", "public"] },
+  { "include": ["<bits/types/struct_FILE.h>", "private", "<stdio.h>", "public"] },
 
   # Local opentelemetry-cpp style
 
@@ -14,6 +18,7 @@
   { "include": ["<gtest/gtest-test-part.h>", "private", "<gtest/gtest.h>", "public"] },
   { "include": ["<gtest/gtest-param-test.h>", "private", "<gtest/gtest.h>", "public"] },
   { "include": ["<gtest/gtest_pred_impl.h>", "private", "<gtest/gtest.h>", "public"] },
+  { "include": ["<gtest/gtest-typed-test.h>", "private", "<gtest/gtest.h>", "public"] },
 
   # We prefer to include <gmock/gmock.h> for simplicity
   { "include": ["<gmock/gmock-function-mocker.h>", "private", "<gmock/gmock.h>", "public"] },
