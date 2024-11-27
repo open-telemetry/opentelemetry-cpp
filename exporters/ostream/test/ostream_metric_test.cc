@@ -2,20 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-
-#include "opentelemetry/exporters/ostream/metric_exporter.h"
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#include "opentelemetry/sdk/metrics/data/metric_data.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/resource/resource_detector.h"
-#include "opentelemetry/sdk/version/version.h"
-
+#include <cstdint>
 #include <iostream>
 #include <memory>
+#include <sstream>
+#include <string>
 #include <vector>
+
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/exporters/ostream/metric_exporter.h"
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/version/version.h"
 
 namespace metric_sdk      = opentelemetry::sdk::metrics;
 namespace nostd           = opentelemetry::nostd;
