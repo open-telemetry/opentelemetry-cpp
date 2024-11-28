@@ -45,9 +45,9 @@ bazel_dep(name = "rules_multitool", version = "1.0.0")
 bazel_dep(name = "c-ares", version = "1.16.1")
 archive_override(
     module_name = "c-ares", 
-    urls=["https://github.com/malkia/c-ares/archive/5ff026975caa04eb25e02b21976be5aace7da3c8.zip"], 
-    integrity = "sha256-nlYybA2PLmf6hzcaFxCoVQ0+QWOyw0NOii3pUr+AsbQ=",
-    strip_prefix="c-ares-5ff026975caa04eb25e02b21976be5aace7da3c8"
+    urls=["https://github.com/malkia/c-ares/archive/92a22155da5494d03d1304d9e0a504b9abef3fd8.zip"], 
+    integrity = "sha256-MwmcYlqIty1yerC76fvX2uW3xiZ2no85PMiZxtU/JaA=",
+    strip_prefix="c-ares-92a22155da5494d03d1304d9e0a504b9abef3fd8"
 )
 
 # ERROR: Q:/b/u/c56xnmzt/external/protobuf+/src/google/protobuf/BUILD.bazel:462:11: Compiling src/google/protobuf/any_lite.cc [for tool] failed: undeclared inclusion(s) in rule '@@protobuf+//src/google/protobuf:protobuf_lite':
@@ -64,9 +64,7 @@ archive_override(
         "bazel/opentelemetry-proto.patch",
     ],
     strip_prefix = "opentelemetry-proto-1.4.0",
-    urls = [
-        "https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.4.0.tar.gz",
-    ]
+    urls = ["https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.4.0.tar.gz"]
 )
 
 bazel_dep(name = "prometheus-cpp", version = "1.3.0")
