@@ -15,20 +15,139 @@ Increment the:
 
 ## [Unreleased]
 
-* [API] Comply with W3C Trace Context
-  [#3115](https://github.com/open-telemetry/opentelemetry-cpp/pull/3115)
+## [1.18 2024-11-25]
+
+* [EXPORTER] Fix crash in ElasticsearchLogRecordExporter
+  [#3082](https://github.com/open-telemetry/opentelemetry-cpp/pull/3082)
+
+* [BUILD] Avoid buggy warning with gcc <= 8
+  [#3087](https://github.com/open-telemetry/opentelemetry-cpp/pull/3087)
 
 * [API] Jaeger Propagator should not be deprecated
   [#3086](https://github.com/open-telemetry/opentelemetry-cpp/pull/3086)
 
-* Upgrade to prometheus 1.3.0
+* Update bzlmod version
+  [#3093](https://github.com/open-telemetry/opentelemetry-cpp/pull/3093)
+
+* [BUILD] Remove std::make_unique
+  [#3098](https://github.com/open-telemetry/opentelemetry-cpp/pull/3098)
+
+* [BUILD] Fix compiling problems for gcc 4.8
+  [#3100](https://github.com/open-telemetry/opentelemetry-cpp/pull/3100)
+
+* [TEST] Fix linking order and gmock linking
+  [#3106](https://github.com/open-telemetry/opentelemetry-cpp/pull/3106)
+
+* [EXPORTER] Add config options to prometheus exporter
+  [#3104](https://github.com/open-telemetry/opentelemetry-cpp/pull/3104)
+
+* [BUILD] Add a CMake option to disable shared libs
+  [#3095](https://github.com/open-telemetry/opentelemetry-cpp/pull/3095)
+
+* [EXPORTER] Remove out of date ETW exporter doc
+  [#3103](https://github.com/open-telemetry/opentelemetry-cpp/pull/3103)
+
+* [EXPORTER] Add logging for async gRPC errors
+  [#3108](https://github.com/open-telemetry/opentelemetry-cpp/pull/3108)
+
+* [BUILD] Remove aligned_storage from nostd
+  [#3112](https://github.com/open-telemetry/opentelemetry-cpp/pull/3112)
+
+* [EXPORTER] Elastic Search exporter follow ECS guidelines
+  [#3107](https://github.com/open-telemetry/opentelemetry-cpp/pull/3107)
+
+* [INSTALL] Resolve dependencies in opentelemetry-cpp-config.cmake
+  [#3094](https://github.com/open-telemetry/opentelemetry-cpp/pull/3094)
+
+* [API] Add synchronous gauge
+  [#3029](https://github.com/open-telemetry/opentelemetry-cpp/pull/3029)
+
+* [BUILD] allow building with -DWITH_OTLP_HTTP_COMPRESSION=OFF without zlib
+  [#3120](https://github.com/open-telemetry/opentelemetry-cpp/pull/3120)
+
+* [CI] Comment the arm64 CI
+  [#3125](https://github.com/open-telemetry/opentelemetry-cpp/pull/3125)
+
+* [API] Comply with W3C Trace Context
+  [#3115](https://github.com/open-telemetry/opentelemetry-cpp/pull/3115)
+
+* [EXPORTER] bump prometheus to v1.3.0
   [#3122](https://github.com/open-telemetry/opentelemetry-cpp/pull/3122)
+
+* [EXPORTER] Log SSL Connection Information
+  [#3113](https://github.com/open-telemetry/opentelemetry-cpp/pull/3113)
+
+* [BUILD] Improve how to handle yield() in ARM
+  [#3129](https://github.com/open-telemetry/opentelemetry-cpp/pull/3129)
+
+* [BUILD] Fix -Wmissing-template-arg-list-after-template-kw warning
+  [#3133](https://github.com/open-telemetry/opentelemetry-cpp/pull/3133)
+
+* [EXPORTER]: Elasticsearch exporter put log resource in root instead of under 'resources'
+  [#3131](https://github.com/open-telemetry/opentelemetry-cpp/pull/3131)
+
+* [TEST] Rename w3c_tracecontext_test to w3c_tracecontext_http_test_server
+  [#3132](https://github.com/open-telemetry/opentelemetry-cpp/pull/3132)
+
+* [BUILD] Patches for building on AIX
+  [#3127](https://github.com/open-telemetry/opentelemetry-cpp/pull/3127)
 
 * [SEMANTIC CONVENTIONS] Migration to weaver
   [#3105](https://github.com/open-telemetry/opentelemetry-cpp/pull/3105)
 
-* [EXPORTER] Allow to share gRPC clients between OTLP exporters.
+* [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.28.0
+  [#3139](https://github.com/open-telemetry/opentelemetry-cpp/pull/3139)
+
+* [EXPORTER] handling of invalid ports in UrlParser
+  [#3142](https://github.com/open-telemetry/opentelemetry-cpp/pull/3142)
+
+* [CI] speed up clang-tidy workflow
+  [#3148](https://github.com/open-telemetry/opentelemetry-cpp/pull/3148)
+
+* [EXPORTER] Allow to share gRPC clients between OTLP exporters
   [#3041](https://github.com/open-telemetry/opentelemetry-cpp/pull/3041)
+
+* Bump codecov/codecov-action from 4 to 5
+  [#3143](https://github.com/open-telemetry/opentelemetry-cpp/pull/3143)
+
+* [CI] Add cppcheck in the build
+  [#3151](https://github.com/open-telemetry/opentelemetry-cpp/pull/3151)
+
+* [BUILD] Fix error message
+  [#3152](https://github.com/open-telemetry/opentelemetry-cpp/pull/3152)
+
+* [EXPORTER] fix clang-tidy warnings in UrlParser
+  [#3146](https://github.com/open-telemetry/opentelemetry-cpp/pull/3146)
+
+* [EXPORTER] Upgrade to opentelemetry-proto 1.4.0
+  [#3157](https://github.com/open-telemetry/opentelemetry-cpp/pull/3157)
+
+* [TEST] refactor UrlParser tests to use value-paramterized tests
+  [#3153](https://github.com/open-telemetry/opentelemetry-cpp/pull/3153)
+
+* [TEST] add a test for ElasticSearchRecordable
+  [#3154](https://github.com/open-telemetry/opentelemetry-cpp/pull/3154)
+
+* [BUILD] Fix missing dependency on protoc compiler
+  [#3159](https://github.com/open-telemetry/opentelemetry-cpp/pull/3159)
+
+* [bazel] Update prometheus-cpp in MODULE.bazel
+  [#3162](https://github.com/open-telemetry/opentelemetry-cpp/pull/3162)
+
+* [bazel] Enable --incompatible_disallow_empty_glob
+  [#2642](https://github.com/open-telemetry/opentelemetry-cpp/pull/2642)
+
+* [INSTALL] Fix cmake/opentelemetry-cpp-config.cmake.in
+  [#3165](https://github.com/open-telemetry/opentelemetry-cpp/pull/3165)
+
+* [BUILD] Do not set OTELCPP_PROTO_PATH in the CMake cache
+  [#3160](https://github.com/open-telemetry/opentelemetry-cpp/pull/3160)
+
+* [BUILD] Fix build for esp32
+  [#3155](https://github.com/open-telemetry/opentelemetry-cpp/pull/3155)
+
+* [bazel] Update opentelemetry-proto in MODULE.bazel
+  [#3163](https://github.com/open-telemetry/opentelemetry-cpp/pull/3163)
 
 Important changes:
 
@@ -53,6 +172,10 @@ Important changes:
     replaced by `semconv/xxx_attributes.h` header files,
     for each `xxx` semantic attribute group.
   * See file DEPRECATED.md for details.
+
+Deprecations:
+
+* This release contains deprecations, see file DEPRECATED.md for details.
 
 ## [1.17 2024-10-07]
 
