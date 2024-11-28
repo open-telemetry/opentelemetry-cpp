@@ -145,7 +145,11 @@ OtlpGrpcForwardProxy::Impl::Impl(const OtlpGrpcClientOptions& options)
     std::random_device rd;
     uint64_t p0 = (uint64_t(rd())<<32) | uint64_t(rd());
     uint64_t p1 = (uint64_t(rd())<<32) | uint64_t(rd());
-    sprintf_s(buf, "%08.8lx%08.8lx", p0, p1);
+#if defined(_MSC_VER)
+    sprintf_s(buf, "%8.8lx%8.8lx", p0, p1);
+#else
+    snprintf(buf, sizeof(buf), "%8.8lx%8.8lx", p0, p1);
+#endif
     fw_proxy_id = buf;
 }
 
