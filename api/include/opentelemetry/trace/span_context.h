@@ -5,6 +5,8 @@
 
 #include <stdint.h>
 
+#include <utility>
+
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
