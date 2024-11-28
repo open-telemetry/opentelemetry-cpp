@@ -275,12 +275,6 @@ void CleanupLogger()
   opentelemetry::logs::Provider::SetLoggerProvider(noop);
 }
 
-static void init_metrics()
-{
-  using namespace opentelemetry;
-}
-
-
 void InitMetrics(const std::string &name)
 {
   #if 0
@@ -453,43 +447,42 @@ int main1()
   // }
   //proxy_thread pA(last, opentelemetry::exporter::otlp::GetOtlpDefaultGrpcEndpoint());
 //  proxy_thread pA(last,"127.0.0.1:4317");
-//  pA.proxy->SetActive( false );
+  //pA.proxy->SetActive( false );
   
   printf("starting...\n");
-  proxy_thread proxy("127.0.0.1:4317", opentelemetry::exporter::otlp::GetOtlpDefaultGrpcEndpoint());
+  proxy_thread proxy("127.0.0.1:43170", opentelemetry::exporter::otlp::GetOtlpDefaultGrpcEndpoint());
+  proxy.proxy->SetActive(false);
   printf("started...\n");
-  // {
-  //   using namespace opentelemetry::sdk::common;
-  //   setenv( "OTEL_EXPORTER_OTLP_ENDPOINT", "http://127.0.0.1:4317", 1 /* override */ );
-  // }
 
-  // std::string metrics_name{"malkia_metrics_test"};
-  // InitTracer();
-  // InitLogger();
-  // InitMetrics(metrics_name);
-
-  // init_metrics();
-  // logs_foo_library();
-  // traces_foo_library();
-  // std::thread counter_example{&metrics_counter_example, metrics_name};
-  // std::thread observable_counter_example{&metrics_observable_counter_example, metrics_name};
-  // std::thread histogram_example{&metrics_histogram_example, metrics_name};
-  // counter_example.join();
-  // observable_counter_example.join();
-  // histogram_example.join();
-  // CleanupMetrics();
-  // CleanupLogger();
-  // CleanupTracer();
-
-  printf("Press Ctrl+C to break\n");
-  try {
-      printf("waiting...\n");
-     std::this_thread::sleep_for(std::chrono::seconds(3600*10));
-  }
-  catch( ... )
   {
-     printf("Caught something?\n");
+    using namespace opentelemetry::sdk::common;
+    setenv( "OTEL_EXPORTER_OTLP_ENDPOINT", "http://127.0.0.1:43170", 1 /* override */ );
   }
+
+  std::string metrics_name{"malkia_metrics_test"};
+
+  InitTracer();
+  InitLogger();
+  InitMetrics(metrics_name);
+
+  for(int i=0; i<10000; i++)
+  {
+    logs_foo_library();
+    traces_foo_library();
+    if( i % 100 == 0 )
+    {
+      std::thread counter_example{&metrics_counter_example, metrics_name};
+      std::thread observable_counter_example{&metrics_observable_counter_example, metrics_name};
+      std::thread histogram_example{&metrics_histogram_example, metrics_name};
+      counter_example.join();
+      observable_counter_example.join();
+      histogram_example.join();
+    }
+  }
+
+  CleanupMetrics();
+  CleanupLogger();
+  CleanupTracer();
 
   return 0;
 }
