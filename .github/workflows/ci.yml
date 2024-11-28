@@ -782,7 +782,7 @@ jobs:
 
   windows:
     name: CMake -> exporter proto
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v4
       with:
@@ -798,7 +798,7 @@ jobs:
 
   windows-build-dll:
     name: CMake -> exporter proto (Build as DLL)
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v4
       with:
@@ -816,7 +816,7 @@ jobs:
 
   windows_with_async_export:
     name: CMake (With async export) -> exporter proto
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v4
       with:
@@ -832,7 +832,7 @@ jobs:
 
   windows_bazel:
     name: Bazel Windows
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v4
       with:
@@ -845,7 +845,7 @@ jobs:
 
   windows_plugin_test:
     name: Plugin -> CMake Windows
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v4
       with:
