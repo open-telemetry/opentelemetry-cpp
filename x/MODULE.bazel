@@ -45,9 +45,9 @@ bazel_dep(name = "rules_multitool", version = "1.0.0")
 bazel_dep(name = "c-ares", version = "1.16.1")
 archive_override(
     module_name = "c-ares", 
-    urls=["https://github.com/malkia/c-ares/archive/92a22155da5494d03d1304d9e0a504b9abef3fd8.zip"], 
-    integrity = "sha256-MwmcYlqIty1yerC76fvX2uW3xiZ2no85PMiZxtU/JaA=",
-    strip_prefix="c-ares-92a22155da5494d03d1304d9e0a504b9abef3fd8"
+    urls=["https://github.com/malkia/c-ares/archive/548f7f9d3fa42bd4874b6c4b2979ea1fd2cd6952.zip"], 
+    integrity = "sha256-sO3H/U6fRoXGntJujkdyVMel636mDOJhB27rutS8r98=",
+    strip_prefix="c-ares-548f7f9d3fa42bd4874b6c4b2979ea1fd2cd6952"
 )
 
 # ERROR: Q:/b/u/c56xnmzt/external/protobuf+/src/google/protobuf/BUILD.bazel:462:11: Compiling src/google/protobuf/any_lite.cc [for tool] failed: undeclared inclusion(s) in rule '@@protobuf+//src/google/protobuf:protobuf_lite':

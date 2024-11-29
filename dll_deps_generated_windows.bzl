@@ -17,6 +17,7 @@ DLL_DEPS = {
   Label("@otel_sdk//exporters/otlp:otlp_file_metric_exporter"): None,
   Label("@otel_sdk//exporters/otlp:otlp_grpc_client"): None,
   Label("@otel_sdk//exporters/otlp:otlp_grpc_exporter"): None,
+  Label("@otel_sdk//exporters/otlp:otlp_grpc_forward_proxy"): None,
   Label("@otel_sdk//exporters/otlp:otlp_grpc_log_record_exporter"): None,
   Label("@otel_sdk//exporters/otlp:otlp_grpc_metric_exporter"): None,
   Label("@otel_sdk//exporters/otlp:otlp_http_client"): None,
