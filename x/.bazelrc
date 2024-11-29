@@ -4,7 +4,9 @@ try-import %workspace%/../../top.bazelrc
 test --test_output=streamed --test_timeout=36000,36000,36000,36000
 
 common:devenv --run_under='"c:/windows/system32/cmd.exe" /D /C start /wait devenv /debugexe '
-common:xcode  --run_under='/Users/malkia/p/m/opentelemetry-cpp/x/xcdebug.sh'
+
+# Make sure XCode is started first, then this works, otherwise fails the first time.
+common:xcode  --run_under='/usr/bin/xcdebug'
 
 #test:devenv --run_under='"c:/windows/system32/cmd.exe" /c start /wait devenv /debugexe '
 #common:slrun --run_under='sudo -E --inline q:/superluminal/SuperluminalCmd.exe run windows --symbol-location q:/symbols --resolve --symbol-cache-dir q:/symcache '
