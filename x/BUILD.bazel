@@ -4,6 +4,10 @@ load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
 
 package(default_visibility = ["//visibility:public"])
 
+exports_files(
+    ["xcdebug.sh"]
+)
+
 cc_test(
     name = "x",
     srcs = ["x.cpp"],
