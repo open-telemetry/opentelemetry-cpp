@@ -89,10 +89,11 @@ void Session::SendRequest(
     zs.next_out  = compressed_body.data();
 
     // ZLIB: Have to maually specify 16 bits for the Gzip headers
-    const int window_bits = 15 + 16;
+    static constexpr int kWindowBits = MAX_WBITS + 16;
+    static constexpr int kMemLevel   = MAX_MEM_LEVEL;
 
-    int stream =
-        deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, window_bits, 8, Z_DEFAULT_STRATEGY);
+    int stream = deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, kWindowBits, kMemLevel,
+                              Z_DEFAULT_STRATEGY);
 
     if (stream == Z_OK)
     {
@@ -223,7 +224,7 @@ HttpClient::~HttpClient()
 std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSession(
     nostd::string_view url) noexcept
 {
-  auto parsedUrl = common::UrlParser(std::string(url));
+  const auto& parsedUrl = common::UrlParser(std::string(url));
   if (!parsedUrl.success_)
   {
     return std::make_shared<Session>(*this);
