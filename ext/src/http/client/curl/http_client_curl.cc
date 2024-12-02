@@ -3,6 +3,7 @@
 
 #include <curl/curl.h>
 #include <curl/curlver.h>
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <cstddef>
@@ -57,6 +58,78 @@ nostd::shared_ptr<HttpCurlGlobalInitializer> HttpCurlGlobalInitializer::GetInsta
   return shared_initializer;
 }
 
+#ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
+int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *max)
+{
+  // must be large enough to hold zlib or gzip header (if any) and one more byte -- 11 works for the
+  // worst case here, but if gzip encoding is used and a deflateSetHeader() call is inserted in this
+  // code after the deflateReset(), then the 11 needs to be increased to accomodate the resulting
+  // gzip header size plus one
+  std::array<unsigned char, 11> temp{};
+
+  // kick start the process with a temporary output buffer -- this allows deflate to consume a large
+  // chunk of input data in order to make room for output data there
+  strm->next_in  = buf;
+  strm->avail_in = len;
+  if (*max < len)
+  {
+    *max = len;
+  }
+  strm->next_out  = temp.data();
+  strm->avail_out = std::min(static_cast<decltype(z_stream::avail_out)>(temp.size()), *max);
+  auto ret        = deflate(strm, Z_FINISH);
+  if (ret == Z_STREAM_ERROR)
+  {
+    return ret;
+  }
+
+  // if we can, copy the temporary output data to the consumed portion of the input buffer, and then
+  // continue to write up to the start of the consumed input for as long as possible
+  auto have = strm->next_out - temp.data();  // number of bytes in temp[]
+  if (have <= (strm->avail_in ? len - strm->avail_in : *max))
+  {
+    std::memcpy(buf, temp.data(), have);
+    strm->next_out = buf + have;
+    have           = 0;
+    while (ret == Z_OK)
+    {
+      strm->avail_out =
+          strm->avail_in ? strm->next_in - strm->next_out : (buf + *max) - strm->next_out;
+      ret = deflate(strm, Z_FINISH);
+    }
+    if (ret != Z_BUF_ERROR || strm->avail_in == 0)
+    {
+      *max = strm->next_out - buf;
+      return ret == Z_STREAM_END ? Z_OK : ret;
+    }
+  }
+
+  // the output caught up with the input due to insufficiently compressible data -- copy the
+  // remaining input data into an allocated buffer and complete the compression from there to the
+  // now empty input buffer (this will only occur for long incompressible streams, more than ~20 MB
+  // for the default deflate memLevel of 8, or when *max is too small and less than the length of
+  // the header plus one byte)
+  auto hold = static_cast<std::remove_const_t<decltype(z_stream::next_in)>>(
+      strm->zalloc(strm->opaque, strm->avail_in, 1));  // allocated buffer to hold input data
+  if (hold == Z_NULL)
+  {
+    return Z_MEM_ERROR;
+  }
+  std::memcpy(hold, strm->next_in, strm->avail_in);
+  strm->next_in = hold;
+  if (have)
+  {
+    std::memcpy(buf, temp.data(), have);
+    strm->next_out = buf + have;
+  }
+  strm->avail_out = (buf + *max) - strm->next_out;
+  ret             = deflate(strm, Z_FINISH);
+  strm->zfree(strm->opaque, hold);
+  *max = strm->next_out - buf;
+  return ret == Z_OK ? Z_BUF_ERROR : (ret == Z_STREAM_END ? Z_OK : ret);
+}
+#endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
+
 void Session::SendRequest(
     std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) noexcept
 {
@@ -76,45 +149,47 @@ void Session::SendRequest(
   if (http_request_->compression_ == opentelemetry::ext::http::client::Compression::kGzip)
   {
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
-    http_request_->AddHeader("Content-Encoding", "gzip");
-
-    opentelemetry::ext::http::client::Body compressed_body(http_request_->body_.size());
-    z_stream zs;
-    zs.zalloc    = Z_NULL;
-    zs.zfree     = Z_NULL;
-    zs.opaque    = Z_NULL;
-    zs.avail_in  = static_cast<uInt>(http_request_->body_.size());
-    zs.next_in   = http_request_->body_.data();
-    zs.avail_out = static_cast<uInt>(compressed_body.size());
-    zs.next_out  = compressed_body.data();
+    z_stream zs{};
+    zs.zalloc = Z_NULL;
+    zs.zfree  = Z_NULL;
+    zs.opaque = Z_NULL;
 
     // ZLIB: Have to maually specify 16 bits for the Gzip headers
     static constexpr int kWindowBits = MAX_WBITS + 16;
     static constexpr int kMemLevel   = MAX_MEM_LEVEL;
 
-    int stream = deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, kWindowBits, kMemLevel,
-                              Z_DEFAULT_STRATEGY);
+    auto stream = deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, kWindowBits, kMemLevel,
+                               Z_DEFAULT_STRATEGY);
 
     if (stream == Z_OK)
     {
-      deflate(&zs, Z_FINISH);
-      deflateEnd(&zs);
-      compressed_body.resize(zs.total_out);
-      http_request_->SetBody(compressed_body);
+      auto size = static_cast<uInt>(http_request_->body_.size());
+      auto max  = size;
+      stream    = deflateInPlace(&zs, http_request_->body_.data(), size, &max);
+
+      if (stream == Z_OK)
+      {
+        http_request_->AddHeader("Content-Encoding", "gzip");
+        http_request_->body_.resize(max);
+      }
     }
-    else
+
+    if (stream != Z_OK)
     {
       if (callback)
       {
-        callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed, "");
+        callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
+                          zs.msg ? zs.msg : "");
       }
       is_session_active_.store(false, std::memory_order_release);
     }
+
+    deflateEnd(&zs);
 #else
     OTEL_INTERNAL_LOG_ERROR(
         "[HTTP Client Curl] Set WITH_OTLP_HTTP_COMPRESSION=ON to use gzip compression with the "
         "OTLP HTTP Exporter");
-#endif
+#endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
   }
 
   curl_operation_.reset(new HttpOperation(
@@ -224,7 +299,7 @@ HttpClient::~HttpClient()
 std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSession(
     nostd::string_view url) noexcept
 {
-  const auto& parsedUrl = common::UrlParser(std::string(url));
+  const auto &parsedUrl = common::UrlParser(std::string(url));
   if (!parsedUrl.success_)
   {
     return std::make_shared<Session>(*this);
