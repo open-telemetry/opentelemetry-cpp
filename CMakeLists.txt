@@ -1,21 +1,28 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.10)
 
-# See https://cmake.org/cmake/help/v3.3/policy/CMP0057.html required by certain
-# versions of gtest
-cmake_policy(SET CMP0057 NEW)
-
-# See https://cmake.org/cmake/help/v3.12/policy/CMP0074.html required by certain
-# version of zlib which CURL depends on.
+# See https://cmake.org/cmake/help/latest/policy/CMP0074.html required by
+# certain version of zlib which CURL depends on.
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
   cmake_policy(SET CMP0074 NEW)
+endif()
+
+# Allow to use normal variable for option()
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13")
+  cmake_policy(SET CMP0077 NEW)
 endif()
 
 # Prefer CMAKE_MSVC_RUNTIME_LIBRARY if possible
 if(POLICY CMP0091)
   cmake_policy(SET CMP0091 NEW)
+endif()
+
+# MSVC RTTI flag /GR should not be not added to CMAKE_CXX_FLAGS by default. @see
+# https://cmake.org/cmake/help/latest/policy/CMP0117.html
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.20.0")
+  cmake_policy(SET CMP0117 NEW)
 endif()
 
 project(opentelemetry-cpp)
