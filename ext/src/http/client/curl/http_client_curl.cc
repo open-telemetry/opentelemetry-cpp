@@ -134,7 +134,7 @@ void Session::SendRequest(
     std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) noexcept
 {
   is_session_active_.store(true, std::memory_order_release);
-  std::string url       = host_ + std::string(http_request_->uri_);
+  const auto& url       = host_ + http_request_->uri_;
   auto callback_ptr     = callback.get();
   bool reuse_connection = false;
 
