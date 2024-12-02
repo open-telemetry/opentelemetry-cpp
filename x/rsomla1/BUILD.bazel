@@ -1,0 +1,5 @@
+cc_test(
+    name = "try",
+    srcs = ["try.cc", "lib.cc"],
+    deps = ["@otel_sdk//:dll"],
+)
