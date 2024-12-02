@@ -33,7 +33,7 @@ inline bool GetPrometheusWithoutOtelScope()
   auto exists =
       opentelemetry::sdk::common::GetBoolEnvironmentVariable(kPrometheusWithoutOtelScope, setting);
 
-  return exists ? setting : true;
+  return exists ? setting : false;
 }
 
 inline bool GetPrometheusPopulateTargetInfo()
