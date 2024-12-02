@@ -62,3 +62,21 @@ INFO: Elapsed time: 11.789s, Critical Path: 9.35s
 INFO: 5 processes: 1 internal, 4 local.
 INFO: Build completed successfully, 5 total actions
 ```
+
+# Added proper lib.dll (lib_dll_or_so.dll)
+
+- Bin folder had this, note the `lib_or_so.dll` and `try.exe`
+
+![bin_folder](bin_folder.png)
+
+- Here is what `lib_dll_or_so.dll` ended up importing from `otel_sdk.dll`
+
+![lib_dll_or_so](lib_dll_or_so.png)
+
+- Here is what `try.exe` refernece from `lib_dll_or_so.dll` - e.g. `foo`
+
+![try_importing_lib](try_importing_lib.png)
+
+- And what `try.exe` references from `otel_sdk.dll`
+
+![try_importing_otel_sdk](try_importing_otel_sdk.png)

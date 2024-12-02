@@ -143,3 +143,5 @@ common --experimental_google_legacy_api
 # common --repository_cache=f:/b/r
 # startup --output_user_root=f:/b/u
 try-import %workspace%/../top.bazelrc
+
+common --experimental_cc_static_library
