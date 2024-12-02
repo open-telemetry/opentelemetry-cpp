@@ -3,14 +3,6 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-# These policies belowed are used to keep a more strick behavior of cmake
-cmake_policy(SET CMP0054 NEW)
-cmake_policy(SET CMP0067 NEW)
-
-# See https://cmake.org/cmake/help/latest/policy/CMP0057.html required by
-# certain versions of gtest
-cmake_policy(SET CMP0057 NEW)
-
 # See https://cmake.org/cmake/help/latest/policy/CMP0074.html required by
 # certain version of zlib which CURL depends on.
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
