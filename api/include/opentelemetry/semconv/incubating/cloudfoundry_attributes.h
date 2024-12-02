@@ -32,10 +32,13 @@ static constexpr const char *kCloudfoundryAppId = "cloudfoundry.app.id";
  * The index of the application instance. 0 when just one instance is active.
  * <p>
  * CloudFoundry defines the @code instance_id @endcode in the <a
- * href="https://github.com/cloudfoundry/loggregator-api#v2-envelope">Loggegator v2 envelope</a>. It
- * is used for logs and metrics emitted by CloudFoundry. It is supposed to contain the application
- * instance index for applications deployed on the runtime. <p> Application instrumentation should
- * use the value from environment variable @code CF_INSTANCE_INDEX @endcode.
+ * href="https://github.com/cloudfoundry/loggregator-api#v2-envelope">Loggregator v2 envelope</a>.
+ * It is used for logs and metrics emitted by CloudFoundry. It is
+ * supposed to contain the application instance index for applications
+ * deployed on the runtime.
+ * <p>
+ * Application instrumentation should use the value from environment
+ * variable @code CF_INSTANCE_INDEX @endcode.
  */
 static constexpr const char *kCloudfoundryAppInstanceId = "cloudfoundry.app.instance.id";
 
