@@ -3,15 +3,17 @@
 
 #include <curl/curl.h>
 #include <curl/curlver.h>
+#include <algorithm>
 #include <array>
 #include <atomic>
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <list>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -59,11 +61,13 @@ nostd::shared_ptr<HttpCurlGlobalInitializer> HttpCurlGlobalInitializer::GetInsta
 }
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
+// Original source:
+// https://stackoverflow.com/questions/12398377/is-it-possible-to-have-zlib-read-from-and-write-to-the-same-memory-buffer/12412863#12412863
 int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *max)
 {
   // must be large enough to hold zlib or gzip header (if any) and one more byte -- 11 works for the
   // worst case here, but if gzip encoding is used and a deflateSetHeader() call is inserted in this
-  // code after the deflateReset(), then the 11 needs to be increased to accomodate the resulting
+  // code after the deflateReset(), then the 11 needs to be increased to accommodate the resulting
   // gzip header size plus one
   std::array<unsigned char, 11> temp{};
 
@@ -134,7 +138,7 @@ void Session::SendRequest(
     std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) noexcept
 {
   is_session_active_.store(true, std::memory_order_release);
-  const auto& url       = host_ + http_request_->uri_;
+  const auto &url       = host_ + http_request_->uri_;
   auto callback_ptr     = callback.get();
   bool reuse_connection = false;
 
