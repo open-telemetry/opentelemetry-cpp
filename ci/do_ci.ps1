@@ -27,7 +27,7 @@ $PLUGIN_DIR = Join-Path "$SRC_DIR" "plugin"
 
 $VCPKG_DIR = Join-Path "$SRC_DIR" "tools" "vcpkg"
 
-$CTEST_OUTPUT_ON_FAILURE = 1
+$Env:CTEST_OUTPUT_ON_FAILURE = "1"
 
 switch ($action) {
   "bazel.build" {
