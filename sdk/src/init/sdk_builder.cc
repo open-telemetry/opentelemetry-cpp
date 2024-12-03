@@ -15,7 +15,6 @@
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
-#include "opentelemetry/sdk/configuration/composite_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
@@ -37,7 +36,6 @@
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
-#include "opentelemetry/sdk/configuration/propagator_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
@@ -47,7 +45,6 @@
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/selector_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
-#include "opentelemetry/sdk/configuration/simple_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration_visitor.h"
@@ -117,30 +114,6 @@ namespace sdk
 {
 namespace init
 {
-
-class PropagatorBuilder : public opentelemetry::sdk::configuration::PropagatorConfigurationVisitor
-{
-public:
-  PropagatorBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  ~PropagatorBuilder() override = default;
-
-  void VisitSimple(
-      const opentelemetry::sdk::configuration::SimplePropagatorConfiguration *model) override
-  {
-    propagator = m_sdk_builder->CreateSimplePropagator(model);
-  }
-
-  void VisitComposite(
-      const opentelemetry::sdk::configuration::CompositePropagatorConfiguration *model) override
-  {
-    propagator = m_sdk_builder->CreateCompositePropagator(model);
-  }
-
-  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> propagator;
-
-private:
-  const SdkBuilder *m_sdk_builder;
-};
 
 class SamplerBuilder : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
 {
@@ -747,24 +720,13 @@ SdkBuilder::CreateTextMapPropagator(const std::string &name) const
 }
 
 std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>
-SdkBuilder::CreateSimplePropagator(
-    const opentelemetry::sdk::configuration::SimplePropagatorConfiguration *model) const
-{
-  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> sdk;
-
-  sdk = CreateTextMapPropagator(model->name);
-
-  return sdk;
-}
-
-std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>
-SdkBuilder::CreateCompositePropagator(
-    const opentelemetry::sdk::configuration::CompositePropagatorConfiguration *model) const
+SdkBuilder::CreatePropagator(
+    const std::unique_ptr<opentelemetry::sdk::configuration::PropagatorConfiguration> &model) const
 {
   std::vector<std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>> propagators;
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> propagator;
 
-  for (const auto &name : model->names)
+  for (const auto &name : model->composite)
   {
     propagator = CreateTextMapPropagator(name);
     propagators.push_back(std::move(propagator));
@@ -772,19 +734,6 @@ SdkBuilder::CreateCompositePropagator(
 
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> sdk(
       new opentelemetry::context::propagation::CompositePropagator(std::move(propagators)));
-
-  return sdk;
-}
-
-std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>
-SdkBuilder::CreatePropagator(
-    const std::unique_ptr<opentelemetry::sdk::configuration::PropagatorConfiguration> &model) const
-{
-  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> sdk;
-
-  PropagatorBuilder builder(this);
-  model->Accept(&builder);
-  sdk = std::move(builder.propagator);
 
   return sdk;
 }

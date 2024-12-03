@@ -12,7 +12,8 @@ namespace configuration
 {
 class LogRecordProcessorConfigurationVisitor;
 
-// REF: schema/logger_provider.json
+// YAML-SCHEMA: schema/logger_provider.json
+// YAML-NODE: LogRecordProcessor
 class LogRecordProcessorConfiguration
 {
 public:

@@ -14,6 +14,8 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/meter_provider.json
+// YAML-NODE: explicit_bucket_histogram
 class ExplicitBucketHistogramAggregationConfiguration : public AggregationConfiguration
 {
 public:

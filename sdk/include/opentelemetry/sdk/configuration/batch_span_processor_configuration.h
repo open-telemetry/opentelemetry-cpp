@@ -14,6 +14,8 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/tracer_provider.json
+// YAML-NODE: BatchSpanProcessor
 class BatchSpanProcessorConfiguration : public SpanProcessorConfiguration
 {
 public:

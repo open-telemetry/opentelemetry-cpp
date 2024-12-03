@@ -12,6 +12,8 @@ namespace configuration
 {
 class SpanProcessorConfigurationVisitor;
 
+// YAML-SCHEMA: schema/tracer_provider.json
+// YAML-NODE: SpanProcessor
 class SpanProcessorConfiguration
 {
 public:

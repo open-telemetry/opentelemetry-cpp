@@ -14,8 +14,10 @@ namespace configuration
 {
 class MetricReaderConfigurationVisitor;
 
-// REF: schema/meter_provider.json
-// FIXME: https://github.com/open-telemetry/opentelemetry-configuration/issues/138
+// YAML-SCHEMA: schema/meter_provider.json
+// YAML-NODE: MetricReader
+// FIXME:
+// https://github.com/open-telemetry/opentelemetry-configuration/issues/138
 class MetricReaderConfiguration
 {
 public:

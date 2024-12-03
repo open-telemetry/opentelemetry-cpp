@@ -14,7 +14,8 @@ namespace sdk
 namespace configuration
 {
 
-// REF: schema/common.json, Otlp
+// YAML-SCHEMA: schema/common.json
+// YAML-NODE: Otlp
 class OtlpLogRecordExporterConfiguration : public LogRecordExporterConfiguration
 {
 public:

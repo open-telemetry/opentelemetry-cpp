@@ -13,6 +13,9 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/common.json
+// YAML-NODE: included
+// YAML-NODE: excluded
 class StringArrayConfiguration
 {
 public:

@@ -13,6 +13,8 @@ namespace configuration
 
 class SamplerConfigurationVisitor;
 
+// YAML-SCHEMA: schema/tracer_provider.json
+// YAML-NODE: Sampler
 class SamplerConfiguration
 {
 public:

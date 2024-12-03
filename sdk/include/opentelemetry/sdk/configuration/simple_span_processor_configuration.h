@@ -13,6 +13,8 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/tracer_provider.json
+// YAML-NODE: SimpleSpanProcessor
 class SimpleSpanProcessorConfiguration : public SpanProcessorConfiguration
 {
 public:

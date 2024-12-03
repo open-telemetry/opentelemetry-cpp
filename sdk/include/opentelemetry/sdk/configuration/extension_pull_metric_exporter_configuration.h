@@ -14,7 +14,8 @@ namespace sdk
 namespace configuration
 {
 
-// REF: schema/meter_provider.json
+// YAML-SCHEMA: schema/meter_provider.json
+// YAML-NODE: PullMetricExporter
 class ExtensionPullMetricExporterConfiguration : public PullMetricExporterConfiguration
 {
 public:

@@ -13,8 +13,9 @@ namespace sdk
 namespace configuration
 {
 
-// REF: schema/opentelemetry_configuration.json
-class AttributeLimitConfiguration
+// YAML-SCHEMA: schema/opentelemetry_configuration.json
+// YAML-NODE: AttributeLimits
+class AttributeLimitsConfiguration
 {
 public:
   size_t attribute_value_length_limit;

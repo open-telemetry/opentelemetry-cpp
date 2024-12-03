@@ -13,6 +13,9 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/resource.json
+// YAML-NODE: AttributeNameValue
+// FIXME: Name/Value/Type
 class AttributesConfiguration
 {
 public:

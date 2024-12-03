@@ -13,6 +13,8 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/tracer_provider.json
+// YAML-NODE: trace_id_ratio_based
 class TraceIdRatioBasedSamplerConfiguration : public SamplerConfiguration
 {
 public:

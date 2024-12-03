@@ -14,7 +14,8 @@ namespace sdk
 namespace configuration
 {
 
-// REF: schema/common.json, Console
+// YAML-SCHEMA: schema/common.json
+// YAML-NODE: Console
 class ConsolePushMetricExporterConfiguration : public PushMetricExporterConfiguration
 {
 public:

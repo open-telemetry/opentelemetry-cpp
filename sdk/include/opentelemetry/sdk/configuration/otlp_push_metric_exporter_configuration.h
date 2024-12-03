@@ -20,7 +20,8 @@ enum enum_default_histogram_aggregation
   base2_exponential_bucket_histogram
 };
 
-// REF: schema/meter_provider.json, OtlpMetric
+// YAML-SCHEMA: schema/meter_provider.json
+// YAML-NODE: OtlpMetric
 class OtlpPushMetricExporterConfiguration : public PushMetricExporterConfiguration
 {
 public:

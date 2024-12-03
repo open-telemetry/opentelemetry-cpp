@@ -15,6 +15,8 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/tracer_provider.json
+// YAML-NODE: Zipkin
 class ZipkinSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:

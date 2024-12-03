@@ -13,6 +13,8 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/meter_provider.json
+// YAML-NODE: aggregation
 class AggregationConfiguration
 {
 public:

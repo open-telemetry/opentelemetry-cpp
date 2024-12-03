@@ -6,7 +6,6 @@
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
-#include "opentelemetry/sdk/configuration/composite_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
@@ -23,7 +22,6 @@
 #include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/simple_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
@@ -108,12 +106,6 @@ public:
 
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> CreateTextMapPropagator(
       const std::string &name) const;
-
-  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> CreateSimplePropagator(
-      const opentelemetry::sdk::configuration::SimplePropagatorConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> CreateCompositePropagator(
-      const opentelemetry::sdk::configuration::CompositePropagatorConfiguration *model) const;
 
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> CreatePropagator(
       const std::unique_ptr<opentelemetry::sdk::configuration::PropagatorConfiguration> &model)

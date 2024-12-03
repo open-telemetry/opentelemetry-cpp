@@ -12,6 +12,8 @@ namespace configuration
 {
 class SpanExporterConfigurationVisitor;
 
+// YAML-SCHEMA: schema/tracer_provider.json
+// YAML-NODE: SpanExporter
 class SpanExporterConfiguration
 {
 public:

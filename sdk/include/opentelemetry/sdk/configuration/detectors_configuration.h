@@ -14,6 +14,8 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/resource.json
+// YAML-NODE: Detectors
 class DetectorsConfiguration
 {
 public:

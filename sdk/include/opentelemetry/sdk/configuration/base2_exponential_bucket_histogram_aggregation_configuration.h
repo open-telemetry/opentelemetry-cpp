@@ -14,6 +14,8 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/meter_provider.json
+// YAML-NODE: base2_exponential_bucket_histogram
 class Base2ExponentialBucketHistogramAggregationConfiguration : public AggregationConfiguration
 {
 public:

@@ -14,6 +14,8 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/common.json
+// YAML-NODE: Otlp
 class OtlpSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:

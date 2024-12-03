@@ -12,7 +12,8 @@ namespace configuration
 {
 class PushMetricExporterConfigurationVisitor;
 
-// REF: schema/meter_provider.json
+// YAML-SCHEMA: schema/meter_provider.json
+// YAML-NODE: PushMetricExporter
 class PushMetricExporterConfiguration
 {
 public:

@@ -13,6 +13,8 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/tracer_provider.json
+// YAML-NODE: jaeger_remote
 class JaegerRemoteSamplerConfiguration : public SamplerConfiguration
 {
 public:

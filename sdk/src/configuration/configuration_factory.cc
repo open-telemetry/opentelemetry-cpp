@@ -13,12 +13,11 @@
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/attribute_limit_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
-#include "opentelemetry/sdk/configuration/composite_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_factory.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
@@ -61,7 +60,6 @@
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/selector_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
-#include "opentelemetry/sdk/configuration/simple_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
@@ -104,10 +102,10 @@ static std::unique_ptr<HeadersConfiguration> ParseHeadersConfiguration(
   return model;
 }
 
-static std::unique_ptr<AttributeLimitConfiguration> ParseAttributeLimitConfiguration(
+static std::unique_ptr<AttributeLimitsConfiguration> ParseAttributeLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<AttributeLimitConfiguration> model(new AttributeLimitConfiguration);
+  std::unique_ptr<AttributeLimitsConfiguration> model(new AttributeLimitsConfiguration);
 
   model->attribute_value_length_limit = node->GetInteger("attribute_value_length_limit", 4096);
   model->attribute_count_limit        = node->GetInteger("attribute_count_limit", 128);
@@ -798,54 +796,24 @@ static std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfigurati
   return model;
 }
 
-static std::unique_ptr<SimplePropagatorConfiguration> ParseSimplePropagatorConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
-{
-  std::unique_ptr<SimplePropagatorConfiguration> model(new SimplePropagatorConfiguration);
-
-  model->name = node->AsString();
-
-  return model;
-}
-
-static std::unique_ptr<CompositePropagatorConfiguration> ParseCompositePropagatorConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
-{
-  std::unique_ptr<CompositePropagatorConfiguration> model(new CompositePropagatorConfiguration);
-
-  for (auto it = node->begin(); it != node->end(); ++it)
-  {
-    std::unique_ptr<DocumentNode> child(*it);
-
-    std::string name = child->AsString();
-
-    model->names.push_back(name);
-  }
-
-  return model;
-}
-
 static std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
+  std::unique_ptr<PropagatorConfiguration> model(new PropagatorConfiguration);
+
   std::unique_ptr<DocumentNode> child;
+  child = node->GetRequiredChildNode("composite");
 
-  child = node->GetChildNode("composite");
-  if (child)
+  for (auto it = child->begin(); it != child->end(); ++it)
   {
-    return ParseCompositePropagatorConfiguration(child);
+    std::unique_ptr<DocumentNode> element(*it);
+
+    std::string name = element->AsString();
+
+    model->composite.push_back(name);
   }
 
-  // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/75
-  child = node->GetChildNode("simple");
-  if (child)
-  {
-    return ParseSimplePropagatorConfiguration(child);
-  }
-
-  OTEL_INTERNAL_LOG_ERROR("ParsePropagatorConfiguration: illegal propagator");
-  throw InvalidSchemaException("Illegal propagator");
-  return nullptr;
+  return model;
 }
 
 static std::unique_ptr<SpanLimitsConfiguration> ParseSpanLimitsConfiguration(
@@ -1341,7 +1309,7 @@ std::unique_ptr<Configuration> ConfigurationFactory::ParseConfiguration(
   child = node->GetChildNode("attribute_limits");
   if (child)
   {
-    model->attribute_limits = ParseAttributeLimitConfiguration(child);
+    model->attribute_limits = ParseAttributeLimitsConfiguration(child);
   }
 
   child = node->GetChildNode("logger_provider");

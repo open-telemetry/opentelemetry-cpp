@@ -16,7 +16,8 @@ namespace sdk
 namespace configuration
 {
 
-// REF: schema/logger_provider.json
+// YAML-SCHEMA: schema/logger_provider.json
+// YAML-NODE: LoggerProvider
 class LoggerProviderConfiguration
 {
 public:

@@ -3,14 +3,9 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
-#include "opentelemetry/sdk/configuration/attribute_limit_configuration.h"
-#include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
-#include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
-#include "opentelemetry/sdk/configuration/propagator_configuration.h"
-#include "opentelemetry/sdk/configuration/resource_configuration.h"
-#include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

@@ -13,6 +13,8 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/resource.json
+// YAML-NODE: Resource
 class ResourceConfiguration
 {
 public:

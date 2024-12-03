@@ -13,6 +13,8 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/common.json
+// YAML-NODE: Console
 class ConsoleSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:

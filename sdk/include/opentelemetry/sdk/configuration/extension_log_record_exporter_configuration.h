@@ -14,7 +14,8 @@ namespace sdk
 namespace configuration
 {
 
-// REF: schema/logger_provider.json
+// YAML-SCHEMA: schema/logger_provider.json
+// YAML-NODE: LogRecordProcessor
 class ExtensionLogRecordExporterConfiguration : public LogRecordExporterConfiguration
 {
 public:

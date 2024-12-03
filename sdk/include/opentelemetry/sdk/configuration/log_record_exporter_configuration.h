@@ -12,7 +12,8 @@ namespace configuration
 {
 class LogRecordExporterConfigurationVisitor;
 
-// REF: schema/logger_provider.json
+// YAML-SCHEMA: schema/logger_provider.json
+// YAML-NODE: LogRecordExporter
 class LogRecordExporterConfiguration
 {
 public:

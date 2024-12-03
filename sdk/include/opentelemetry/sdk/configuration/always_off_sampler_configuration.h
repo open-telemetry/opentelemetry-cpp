@@ -13,6 +13,8 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/tracer_provider.json
+// YAML-NODE: always_off
 class AlwaysOffSamplerConfiguration : public SamplerConfiguration
 {
 public:

@@ -11,7 +11,8 @@ namespace sdk
 namespace configuration
 {
 
-// REF: schema/logger_provider.json
+// YAML-SCHEMA: schema/logger_provider.json
+// YAML-NODE: LogRecordLimits
 class LogRecordLimitsConfiguration
 {
 public:

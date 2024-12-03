@@ -11,15 +11,15 @@ namespace sdk
 namespace configuration
 {
 
-class PropagatorConfigurationVisitor;
-
+// YAML-SCHEMA: schema/propagator.json
+// YAML-NODE: Propagator
 class PropagatorConfiguration
 {
 public:
   PropagatorConfiguration()          = default;
   virtual ~PropagatorConfiguration() = default;
 
-  virtual void Accept(PropagatorConfigurationVisitor *visitor) const = 0;
+  std::vector<std::string> composite;
 };
 
 }  // namespace configuration
