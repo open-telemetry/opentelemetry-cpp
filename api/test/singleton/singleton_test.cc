@@ -343,9 +343,9 @@ void cleanup_otel()
 }
 
 #ifdef _WIN32
-#define RUN_FAILING_WINDOWS_TEST 0
+#  define RUN_FAILING_WINDOWS_TEST 0
 #else
-#define RUN_FAILING_WINDOWS_TEST 1
+#  define RUN_FAILING_WINDOWS_TEST 1
 #endif
 
 TEST(SingletonTest, Uniqueness)
