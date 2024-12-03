@@ -24,12 +24,13 @@ std::unique_ptr<opentracing::Span> TracerShim::StartSpanWithOptions(
   if (is_closed_)
     return nullptr;
 
-  const auto &opts       = utils::makeOptionsShim(options);
-  const auto &links      = utils::makeIterableLinks(options);
-  const auto &attributes = utils::makeIterableTags(options);
-  const auto &baggage    = utils::makeBaggage(options);
-  auto span              = tracer_->StartSpan(operation_name.data(), attributes, links, opts);
-  auto span_shim         = new (std::nothrow) SpanShim(*this, span, baggage);
+  const auto &opts         = utils::makeOptionsShim(options);
+  const auto &links        = utils::makeIterableLinks(options);
+  const auto &attributes   = utils::makeIterableTags(options);
+  const auto &baggage      = utils::makeBaggage(options);
+  auto operation_name_view = nostd::string_view{operation_name.data(), operation_name.size()};
+  auto span                = tracer_->StartSpan(operation_name_view, attributes, links, opts);
+  auto span_shim           = new (std::nothrow) SpanShim(*this, span, baggage);
 
   // If an initial set of tags is specified and the OpenTracing error tag
   // is included after the OpenTelemetry Span was created.
