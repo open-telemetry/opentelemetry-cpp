@@ -82,7 +82,7 @@ void do_something()
   /* Call do_something_in_h() */
 
 #  ifdef _WIN32
-  HMODULE component_g = LoadLibraryA("component_h.dll");
+  HMODULE component_h = LoadLibraryA("component_h.dll");
 #  else
   void *component_h = dlopen("libcomponent_h.so", RTLD_NOW);
 #  endif
@@ -90,7 +90,7 @@ void do_something()
   EXPECT_NE(component_h, nullptr);
 
 #  ifdef _WIN32
-  auto *func_h = reinterpret_cast<void (*)()>(GetProcAddress(component_g, "do_something_in_h"));
+  auto *func_h = reinterpret_cast<void (*)()>(GetProcAddress(component_h, "do_something_in_h"));
 #  else
   auto *func_h = reinterpret_cast<void (*)()>(dlsym(component_h, "do_something_in_h"));
 #  endif
