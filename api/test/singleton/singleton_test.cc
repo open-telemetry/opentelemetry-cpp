@@ -343,10 +343,12 @@ void cleanup_otel()
 }
 
 #ifdef _WIN32
-TEST(SingletonTest, DISABLED_Uniqueness)
+#define RUN_FAILING_WINDOWS_TEST 0
 #else
-TEST(SingletonTest, Uniqueness)
+#define RUN_FAILING_WINDOWS_TEST 1
 #endif
+
+TEST(SingletonTest, Uniqueness)
 {
   do_something();
 
@@ -387,6 +389,8 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_b_lib_count, 1);
   EXPECT_EQ(span_b_f1_count, 2);
   EXPECT_EQ(span_b_f2_count, 1);
+
+#if RUN_FAILING_WINDOWS_TEST
   EXPECT_EQ(span_c_lib_count, 1);  // Fails with shared libraries on Windows
   EXPECT_EQ(span_c_f1_count, 2);   // Fails with shared libraries on Windows
   EXPECT_EQ(span_c_f2_count, 1);   // Fails with shared libraries on Windows
@@ -399,14 +403,17 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_f_lib_count, 1);  // Fails with shared libraries on Windows
   EXPECT_EQ(span_f_f1_count, 2);   // Fails with shared libraries on Windows
   EXPECT_EQ(span_f_f2_count, 1);   // Fails with shared libraries on Windows
+#endif
 
 #ifndef BAZEL_BUILD
+#  if RUN_FAILING_WINDOWS_TEST
   EXPECT_EQ(span_g_lib_count, 1);  // Fails with shared libraries on Windows
   EXPECT_EQ(span_g_f1_count, 2);   // Fails with shared libraries on Windows
   EXPECT_EQ(span_g_f2_count, 1);   // Fails with shared libraries on Windows
   EXPECT_EQ(span_h_lib_count, 1);  // Fails with shared libraries on Windows
   EXPECT_EQ(span_h_f1_count, 2);   // Fails with shared libraries on Windows
   EXPECT_EQ(span_h_f2_count, 1);   // Fails with shared libraries on Windows
+#  endif
 #endif
 
   EXPECT_EQ(unknown_span_count, 0);
