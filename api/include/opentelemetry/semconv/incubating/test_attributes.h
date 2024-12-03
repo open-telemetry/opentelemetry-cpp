@@ -21,7 +21,7 @@ namespace test
 
 /**
  * The fully qualified human readable name of the <a
- * href="https://en.wikipedia.org/wiki/Test_case">test case</a>.
+ * href="https://wikipedia.org/wiki/Test_case">test case</a>.
  */
 static constexpr const char *kTestCaseName = "test.case.name";
 
@@ -31,7 +31,7 @@ static constexpr const char *kTestCaseName = "test.case.name";
 static constexpr const char *kTestCaseResultStatus = "test.case.result.status";
 
 /**
- * The human readable name of a <a href="https://en.wikipedia.org/wiki/Test_suite">test suite</a>.
+ * The human readable name of a <a href="https://wikipedia.org/wiki/Test_suite">test suite</a>.
  */
 static constexpr const char *kTestSuiteName = "test.suite.name";
 
