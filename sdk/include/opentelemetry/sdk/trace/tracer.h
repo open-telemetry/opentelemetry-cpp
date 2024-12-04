@@ -105,9 +105,9 @@ public:
 private:
   // order of declaration is important here - instrumentation scope should destroy after
   // tracer-context.
-  std::unique_ptr<TracerConfig> tracer_config_;
   std::shared_ptr<InstrumentationScope> instrumentation_scope_;
   std::shared_ptr<TracerContext> context_;
+  TracerConfig tracer_config_;
   static const std::shared_ptr<opentelemetry::trace::NoopTracer> kNoopTracer;
 };
 }  // namespace trace

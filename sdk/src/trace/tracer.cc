@@ -43,11 +43,10 @@ const std::shared_ptr<opentelemetry::trace::NoopTracer> Tracer::kNoopTracer =
 
 Tracer::Tracer(std::shared_ptr<TracerContext> context,
                std::unique_ptr<InstrumentationScope> instrumentation_scope) noexcept
-    : instrumentation_scope_{std::move(instrumentation_scope)}, context_{std::move(context)}
-{
-  tracer_config_ =
-      std::make_unique<TracerConfig>(context_->GetTracerConfigurator()(*instrumentation_scope_));
-}
+    : instrumentation_scope_{std::move(instrumentation_scope)},
+      context_{std::move(context)},
+      tracer_config_(context_->GetTracerConfigurator()(*instrumentation_scope_))
+{}
 
 nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     nostd::string_view name,
@@ -55,13 +54,13 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     const opentelemetry::trace::SpanContextKeyValueIterable &links,
     const opentelemetry::trace::StartSpanOptions &options) noexcept
 {
+  if (!tracer_config_.IsEnabled())
+  {
+    return kNoopTracer->StartSpan(name, attributes, links, options);
+  }
   opentelemetry::trace::SpanContext parent_context = GetCurrentSpan()->GetContext();
   if (nostd::holds_alternative<opentelemetry::trace::SpanContext>(options.parent))
   {
-    if (!tracer_config_->IsEnabled())
-    {
-      return kNoopTracer->StartSpan(name, attributes, links, options);
-    }
     auto span_context = nostd::get<opentelemetry::trace::SpanContext>(options.parent);
     if (span_context.IsValid())
     {
@@ -176,7 +175,7 @@ void Tracer::ForceFlushWithMicroseconds(uint64_t timeout) noexcept
 void Tracer::CloseWithMicroseconds(uint64_t timeout) noexcept
 {
   // Trace context is shared by many tracers.So we just call ForceFlush to flush all pending spans
-  // and do not  shutdown it.
+  // and do not shutdown it.
   if (context_)
   {
     context_->ForceFlush(
