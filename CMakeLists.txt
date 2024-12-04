@@ -429,7 +429,6 @@ if(WITH_OTLP_GRPC
   # Latest Protobuf imported targets and without legacy module support
   if(TARGET protobuf::protoc)
     if(CMAKE_CROSSCOMPILING AND Protobuf_PROTOC_EXECUTABLE)
-      # Some versions of FindProtobuf.cmake uses mixed case instead of uppercase
       set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
     else()
       project_build_tools_get_imported_location(PROTOBUF_PROTOC_EXECUTABLE
@@ -440,6 +439,9 @@ if(WITH_OTLP_GRPC
         set(PROTOBUF_PROTOC_EXECUTABLE protobuf::protoc)
       endif()
     endif()
+  elseif(Protobuf_PROTOC_EXECUTABLE)
+    # Some versions of FindProtobuf.cmake uses mixed case instead of uppercase
+    set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
   endif()
   include(CMakeDependentOption)
 
