@@ -108,10 +108,26 @@ public:
         new sdk::trace::TracerProvider(std::move(processor), resource));
 
     std::string report_trace_id;
+   
+    const std::string instrumentation_scope_name{"test"}; 
+    const std::string instrumentation_scope_version{"1.2.3"}; 
+    const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    const std::vector<std::pair<std::string, opentelemetry::common::AttributeValue>>
+        instrumentation_scope_attributes{{"scope_key1", "scope_value"},
+                                         { "scope_key2",
+                                           2 }};
+    auto tracer = provider->GetTracer(instrumentation_scope_name, instrumentation_scope_version,
+                                      schema_url, instrumentation_scope_attributes);
+#else
+    auto tracer =
+        provider->GetTracer(instrumentation_scope_name, instrumentation_scope_version, schema_url);
+#endif
+
+    auto parent_span                                 = tracer->StartSpan("Test parent span");
 
     char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
-    auto tracer                                      = provider->GetTracer("test");
-    auto parent_span                                 = tracer->StartSpan("Test parent span");
 
     trace_api::StartSpanOptions child_span_opts = {};
     child_span_opts.parent                      = parent_span->GetContext();
@@ -138,8 +154,21 @@ public:
       {
         auto resource_span     = *check_json["resourceSpans"].begin();
         auto scope_span        = *resource_span["scopeSpans"].begin();
+        auto scope             = scope_span["scope"]; 
         auto span              = *scope_span["spans"].begin();
-        auto received_trace_id = span["traceId"].get<std::string>();
+        
+        const std::string received_schema_url = scope_span["schemaUrl"].get<std::string>(); 
+        const std::string received_instrumentation_scope_name = scope["name"].get<std::string>(); 
+        const std::string received_instrumentation_scope_version = scope["version"].get<std::string>(); 
+        const auto received_trace_id = span["traceId"].get<std::string>();
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+        const auto scope_attributes_json = scope["attributes"]; 
+        EXPECT_EQ(scope_attributes_json.size(), instrumentation_scope_attributes.size()) << scope_attributes_json;
+#endif
+        EXPECT_EQ(received_schema_url, schema_url); 
+        EXPECT_EQ(received_instrumentation_scope_name, instrumentation_scope_name); 
+        EXPECT_EQ(received_instrumentation_scope_version, instrumentation_scope_version); 
         EXPECT_EQ(received_trace_id, report_trace_id);
       }
       else

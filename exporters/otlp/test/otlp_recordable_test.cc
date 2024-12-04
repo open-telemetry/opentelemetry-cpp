@@ -119,6 +119,31 @@ TEST(OtlpRecordable, SetInstrumentationLibraryWithSchemaURL)
   EXPECT_EQ(expected_schema_url, rec.GetInstrumentationLibrarySchemaURL());
 }
 
+TEST(OtlpRecordable, SetInstrumentationScopeWithAttributes)
+{
+  exporter::otlp::OtlpRecordable rec;
+  const std::string expected_attribute_key{"test_key"};
+  const std::string expected_attribute_value{"test_value"};
+
+  auto inst_lib = trace_sdk::InstrumentationScope::Create(
+      "test", "v1", "", {{expected_attribute_key, expected_attribute_value}});
+
+  ASSERT_EQ(inst_lib->GetAttributes().size(), 1);
+
+  rec.SetInstrumentationScope(*inst_lib);
+
+  const auto proto_instr_libr = rec.GetProtoInstrumentationScope();
+
+  ASSERT_EQ(proto_instr_libr.attributes_size(), 1);
+
+  const auto &proto_attributes = proto_instr_libr.attributes(0);
+  
+  ASSERT_TRUE(proto_attributes.value().has_string_value()); 
+
+  EXPECT_EQ(expected_attribute_key, proto_attributes.key());
+  EXPECT_EQ(expected_attribute_value, proto_attributes.value().string_value());
+}
+
 TEST(OtlpRecordable, SetStartTime)
 {
   OtlpRecordable rec;

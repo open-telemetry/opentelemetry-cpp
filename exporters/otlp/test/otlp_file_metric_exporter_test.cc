@@ -88,8 +88,19 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
-        "library_name", "1.5.0");
+
+    const std::string instrumentation_scope_name{"library_name"}; 
+    const std::string instrumentation_scope_version{"1.5.0"}; 
+    const std::string instrumentation_scope_schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+    const std::vector<std::pair<std::string, opentelemetry::common::AttributeValue>>
+        instrumentation_scope_attributes{{"scope_key1", "scope_value"},
+                                         { "scope_key2",
+                                           2 }};
+
+    auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+        instrumentation_scope_name, instrumentation_scope_version, instrumentation_scope_schema_url,
+        instrumentation_scope_attributes);
+
     opentelemetry::sdk::metrics::MetricData metric_data{
         opentelemetry::sdk::metrics::InstrumentDescriptor{
             "metrics_library_name", "metrics_description", "metrics_unit",
@@ -100,6 +111,7 @@ public:
         std::vector<opentelemetry::sdk::metrics::PointDataAttributes>{
             {opentelemetry::sdk::metrics::PointAttributes{{"a1", "b1"}}, sum_point_data},
             {opentelemetry::sdk::metrics::PointAttributes{{"a2", "b2"}}, sum_point_data2}}};
+
     data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
         {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
 
@@ -111,6 +123,7 @@ public:
     output.flush();
     output.sync();
     auto check_json_text = output.str();
+
     if (!check_json_text.empty())
     {
       auto check_json = nlohmann::json::parse(check_json_text, nullptr, false);
@@ -118,8 +131,10 @@ public:
       auto resource_metrics = *check_json["resourceMetrics"].begin();
       auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
       auto scope            = scope_metrics["scope"];
-      EXPECT_EQ("library_name", scope["name"].get<std::string>());
-      EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
+
+      EXPECT_EQ(instrumentation_scope_schema_url, scope_metrics["schemaUrl"].get<std::string>());
+      EXPECT_EQ(instrumentation_scope_name, scope["name"].get<std::string>());
+      EXPECT_EQ(instrumentation_scope_version, scope["version"].get<std::string>());
 
       auto metric = *scope_metrics["metrics"].begin();
       EXPECT_EQ("metrics_library_name", metric["name"].get<std::string>());
