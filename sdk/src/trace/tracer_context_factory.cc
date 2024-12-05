@@ -55,7 +55,8 @@ std::unique_ptr<TracerContext> TracerContextFactory::Create(
 {
   auto tracer_configurator =
       std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
-          TracerConfig::DefaultConfigurator());
+          instrumentationscope::ScopeConfiguratorBuilder<TracerConfig>(TracerConfig::Default())
+              .Build());
   return Create(std::move(processors), resource, std::move(sampler), std::move(id_generator),
                 std::move(tracer_configurator));
 }

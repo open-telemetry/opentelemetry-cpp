@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator_builder.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -21,8 +22,6 @@ namespace sdk
 {
 namespace trace
 {
-
-using namespace opentelemetry::sdk::instrumentationscope;
 
 /**
  * A class which stores the TracerProvider context.
@@ -49,7 +48,8 @@ public:
           std::unique_ptr<IdGenerator>(new RandomIdGenerator()),
       std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator =
           std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
-              TracerConfig::DefaultConfigurator())) noexcept;
+              instrumentationscope::ScopeConfiguratorBuilder<TracerConfig>(TracerConfig::Default())
+                  .Build())) noexcept;
 
   virtual ~TracerContext() = default;
 
@@ -83,7 +83,12 @@ public:
    */
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
 
-  instrumentationscope::ScopeConfigurator<TracerConfig> &GetTracerConfigurator() const noexcept;
+  /**
+   * Obtain the ScopeConfigurator with this tracer context.
+   * @return The ScopeConfigurator for this tracer context.
+   */
+  const instrumentationscope::ScopeConfigurator<TracerConfig> &GetTracerConfigurator()
+      const noexcept;
 
   /**
    * Obtain the Id Generator associated with this tracer context.

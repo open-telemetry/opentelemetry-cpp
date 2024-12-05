@@ -27,8 +27,6 @@ namespace sdk
 namespace trace
 {
 
-using namespace opentelemetry::sdk::instrumentationscope;
-
 class OPENTELEMETRY_EXPORT TracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:
@@ -53,7 +51,8 @@ public:
           std::unique_ptr<IdGenerator>(new RandomIdGenerator()),
       std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator =
           std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
-              TracerConfig::DefaultConfigurator())) noexcept;
+              instrumentationscope::ScopeConfiguratorBuilder<TracerConfig>(TracerConfig::Default())
+                  .Build())) noexcept;
 
   explicit TracerProvider(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
@@ -64,7 +63,8 @@ public:
           std::unique_ptr<IdGenerator>(new RandomIdGenerator()),
       std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator =
           std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
-              TracerConfig::DefaultConfigurator())) noexcept;
+              instrumentationscope::ScopeConfiguratorBuilder<TracerConfig>(TracerConfig::Default())
+                  .Build())) noexcept;
 
   /**
    * Initialize a new tracer provider with a specified context

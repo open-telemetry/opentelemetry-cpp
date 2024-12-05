@@ -13,10 +13,6 @@ namespace trace
 const TracerConfig TracerConfig::kDefaultConfig  = TracerConfig();
 const TracerConfig TracerConfig::kDisabledConfig = TracerConfig(true);
 
-const instrumentationscope::ScopeConfigurator<TracerConfig>
-    TracerConfig::kDefaultTracerConfigurator =
-        [](const instrumentationscope::InstrumentationScope &) { return Default(); };
-
 TracerConfig TracerConfig::Disabled()
 {
   return kDisabledConfig;
@@ -30,11 +26,6 @@ TracerConfig TracerConfig::Enabled()
 TracerConfig TracerConfig::Default()
 {
   return kDefaultConfig;
-}
-
-const instrumentationscope::ScopeConfigurator<TracerConfig> &TracerConfig::DefaultConfigurator()
-{
-  return kDefaultTracerConfigurator;
 }
 
 bool TracerConfig::IsEnabled() const noexcept

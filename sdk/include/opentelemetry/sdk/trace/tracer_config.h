@@ -49,22 +49,11 @@ public:
    */
   static TracerConfig Default();
 
-  /**
-   * Returns a ScopeConfigurator that can be used to get the default tracer configurator.
-   * A tracer configurator computes TracerConfig based on the InstrumentationScope. The default
-   * tracer configurator unconditionally computes the default TracerConfig for all scopes.
-   *
-   * @return a static constant TracerConfig that represents a tracer configurator with default
-   * behavior.
-   */
-  static const instrumentationscope::ScopeConfigurator<TracerConfig> &DefaultConfigurator();
-
 private:
   explicit TracerConfig(const bool disabled = false) : disabled_(disabled) {}
   bool disabled_;
   static const TracerConfig kDefaultConfig;
   static const TracerConfig kDisabledConfig;
-  static const instrumentationscope::ScopeConfigurator<TracerConfig> kDefaultTracerConfigurator;
 };
 }  // namespace trace
 }  // namespace sdk

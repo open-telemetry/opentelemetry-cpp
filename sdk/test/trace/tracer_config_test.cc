@@ -10,7 +10,7 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator_builder.h"
 
 namespace trace_sdk             = opentelemetry::sdk::trace;
 namespace instrumentation_scope = opentelemetry::sdk::instrumentationscope;
@@ -76,7 +76,9 @@ TEST_P(DefaultTracerConfiguratorTestFixture, VerifyDefaultConfiguratorBehavior)
 {
   instrumentation_scope::InstrumentationScope *scope = GetParam();
   instrumentation_scope::ScopeConfigurator<trace_sdk::TracerConfig> default_configurator =
-      trace_sdk::TracerConfig::DefaultConfigurator();
+      instrumentation_scope::ScopeConfiguratorBuilder<trace_sdk::TracerConfig>(
+          trace_sdk::TracerConfig::Default())
+          .Build();
 
   ASSERT_EQ(default_configurator(*scope), trace_sdk::TracerConfig::Default());
 }

@@ -29,6 +29,7 @@
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator_builder.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
@@ -113,7 +114,7 @@ public:
 };
 
 /**
- * A Mock Custom Id Generator
+ * A Mock Custom ID Generator
  */
 class MockIdGenerator : public IdGenerator
 {
@@ -150,7 +151,7 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     Sampler *sampler,
     IdGenerator *id_generator = new RandomIdGenerator,
     const ScopeConfigurator<TracerConfig> &tracer_configurator =
-        TracerConfig::DefaultConfigurator(),
+        ScopeConfiguratorBuilder<TracerConfig>(TracerConfig::Default()).Build(),
     std::unique_ptr<InstrumentationScope> scope = InstrumentationScope::Create(""))
 {
   auto processor = std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(std::move(exporter)));

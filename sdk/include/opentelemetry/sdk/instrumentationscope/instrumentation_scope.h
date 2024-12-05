@@ -158,9 +158,6 @@ private:
 
   InstrumentationScopeAttributes attributes_;
 };
-
-template <class T>
-using ScopeConfigurator = std::function<T(const InstrumentationScope &)>;
 }  // namespace instrumentationscope
 }  // namespace sdk
 

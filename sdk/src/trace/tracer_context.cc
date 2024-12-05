@@ -46,7 +46,7 @@ const resource::Resource &TracerContext::GetResource() const noexcept
   return resource_;
 }
 
-instrumentationscope::ScopeConfigurator<TracerConfig> &TracerContext::GetTracerConfigurator()
+const instrumentationscope::ScopeConfigurator<TracerConfig> &TracerContext::GetTracerConfigurator()
     const noexcept
 {
   return *tracer_configurator_;
