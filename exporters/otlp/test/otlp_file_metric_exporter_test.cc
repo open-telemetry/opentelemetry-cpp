@@ -86,18 +86,12 @@ public:
     sum_point_data2.value_ = 20.0;
     opentelemetry::sdk::metrics::ResourceMetrics data;
 
-    const std::string resource_schema_url{"https://opentelemetry.io/schemas/1.2.1"};
-
     auto resource = opentelemetry::sdk::resource::Resource::Create(
-        opentelemetry::sdk::resource::ResourceAttributes{}, resource_schema_url);
+        opentelemetry::sdk::resource::ResourceAttributes{}, "resource_url");
     data.resource_ = &resource;
 
-    const std::string instrumentation_scope_name{"library_name"};
-    const std::string instrumentation_scope_version{"1.5.0"};
-    const std::string instrumentation_scope_schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-
     auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
-        instrumentation_scope_name, instrumentation_scope_version, instrumentation_scope_schema_url,
+        "library_name", "1.5.0", "scope_url",
         {{"scope_key", "scope_value"}});
 
     opentelemetry::sdk::metrics::MetricData metric_data{
@@ -131,11 +125,10 @@ public:
       auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
       auto scope            = scope_metrics["scope"];
 
-      EXPECT_EQ(resource_schema_url, resource_metrics["schemaUrl"].get<std::string>());
-
-      EXPECT_EQ(instrumentation_scope_schema_url, scope_metrics["schemaUrl"].get<std::string>());
-      EXPECT_EQ(instrumentation_scope_name, scope["name"].get<std::string>());
-      EXPECT_EQ(instrumentation_scope_version, scope["version"].get<std::string>());
+      EXPECT_EQ("resource_url", resource_metrics["schemaUrl"].get<std::string>());
+      EXPECT_EQ("library_name", scope["name"].get<std::string>());
+      EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
+      EXPECT_EQ("scope_url", scope_metrics["schemaUrl"].get<std::string>());
       ASSERT_EQ(1, scope["attributes"].size());
       const auto scope_attribute = scope["attributes"].front();
       EXPECT_EQ("scope_key", scope_attribute["key"].get<std::string>());
