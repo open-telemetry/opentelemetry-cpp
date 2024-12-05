@@ -85,21 +85,20 @@ public:
     opentelemetry::sdk::metrics::SumPointData sum_point_data2{};
     sum_point_data2.value_ = 20.0;
     opentelemetry::sdk::metrics::ResourceMetrics data;
+
+    const std::string resource_schema_url{"https://opentelemetry.io/schemas/1.2.1"};
+
     auto resource = opentelemetry::sdk::resource::Resource::Create(
-        opentelemetry::sdk::resource::ResourceAttributes{});
+        opentelemetry::sdk::resource::ResourceAttributes{}, resource_schema_url);
     data.resource_ = &resource;
 
     const std::string instrumentation_scope_name{"library_name"}; 
     const std::string instrumentation_scope_version{"1.5.0"}; 
     const std::string instrumentation_scope_schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    const std::vector<std::pair<std::string, opentelemetry::common::AttributeValue>>
-        instrumentation_scope_attributes{{"scope_key1", "scope_value"},
-                                         { "scope_key2",
-                                           2 }};
 
     auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
         instrumentation_scope_name, instrumentation_scope_version, instrumentation_scope_schema_url,
-        instrumentation_scope_attributes);
+        {{"scope_key", "scope_value"}});
 
     opentelemetry::sdk::metrics::MetricData metric_data{
         opentelemetry::sdk::metrics::InstrumentDescriptor{
@@ -131,10 +130,18 @@ public:
       auto resource_metrics = *check_json["resourceMetrics"].begin();
       auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
       auto scope            = scope_metrics["scope"];
+      
+
+      EXPECT_EQ(resource_schema_url, resource_metrics["schemaUrl"].get<std::string>());
 
       EXPECT_EQ(instrumentation_scope_schema_url, scope_metrics["schemaUrl"].get<std::string>());
       EXPECT_EQ(instrumentation_scope_name, scope["name"].get<std::string>());
       EXPECT_EQ(instrumentation_scope_version, scope["version"].get<std::string>());
+      ASSERT_EQ(1, scope["attributes"].size());
+      const auto scope_attribute = scope["attributes"].front(); 
+      EXPECT_EQ("scope_key", scope_attribute["key"].get<std::string>());  
+      EXPECT_EQ("scope_value", scope_attribute["value"]["stringValue"].get<std::string>());  
+      
 
       auto metric = *scope_metrics["metrics"].begin();
       EXPECT_EQ("metrics_library_name", metric["name"].get<std::string>());

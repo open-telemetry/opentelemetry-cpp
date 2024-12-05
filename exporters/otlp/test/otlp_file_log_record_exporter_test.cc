@@ -100,15 +100,9 @@ public:
     char span_id_hex[2 * opentelemetry::trace::SpanId::kSize] = {0};
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
-    const std::string instrumentation_scope_name{"opentelelemtry_library"}; 
-    const std::string instrumentation_scope_version{"1.2.3"}; 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    const std::vector<std::pair<std::string, opentelemetry::common::AttributeValue>>
-        instrumentation_scope_attributes{{"scope_key1", "scope_value"},
-                                         { "scope_key2",
-                                           2 }};
-
-    auto logger = provider->GetLogger("test", instrumentation_scope_name, instrumentation_scope_version, schema_url, instrumentation_scope_attributes);
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url,
+                                      {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
     trace_id.ToLowerBase16(MakeSpan(trace_id_hex));
     report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
@@ -149,27 +143,16 @@ public:
       auto scope_logs        = *resource_logs["scopeLogs"].begin();
       auto scope             = scope_logs["scope"];
       auto log               = *scope_logs["logRecords"].begin();
-
-      const auto received_schema_url                    = scope_logs["schemaUrl"].get<std::string>();
-      const auto received_instrumentation_scope_name    = scope["name"].get<std::string>();
-      const auto received_instrumentation_scope_version = scope["version"].get<std::string>();
-      const auto received_instrumentation_scope_attributes     = scope["attributes"];
-      const auto received_trace_id = log["traceId"].get<std::string>();
-      const auto received_span_id  = log["spanId"].get<std::string>();
-
-      EXPECT_EQ(received_instrumentation_scope_attributes.size(), instrumentation_scope_attributes.size())
-          << received_instrumentation_scope_attributes;
-      EXPECT_EQ(received_schema_url, schema_url);
-      EXPECT_EQ(received_instrumentation_scope_name, instrumentation_scope_name);
-      EXPECT_EQ(received_instrumentation_scope_version, instrumentation_scope_version);
-
+      auto received_trace_id = log["traceId"].get<std::string>();
+      auto received_span_id  = log["spanId"].get<std::string>();
       EXPECT_EQ(received_trace_id, report_trace_id);
       EXPECT_EQ(received_span_id, report_span_id);
       EXPECT_EQ("Log message", log["body"]["stringValue"].get<std::string>());
       EXPECT_LE(15, log["attributes"].size());
 
       bool check_scope_attribute = false;
-      for (auto &attribute : received_instrumentation_scope_attributes)
+      auto scope_attributes      = scope["attributes"];
+      for (auto &attribute : scope_attributes)
       {
         if (!attribute.is_object())
         {
