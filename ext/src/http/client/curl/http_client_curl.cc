@@ -303,7 +303,7 @@ HttpClient::~HttpClient()
 std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSession(
     nostd::string_view url) noexcept
 {
-  const auto &parsedUrl = common::UrlParser(std::string(url));
+  const auto parsedUrl = common::UrlParser(std::string(url));
   if (!parsedUrl.success_)
   {
     return std::make_shared<Session>(*this);
