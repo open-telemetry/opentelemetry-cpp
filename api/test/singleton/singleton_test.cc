@@ -342,6 +342,8 @@ void cleanup_otel()
   trace_api::Provider::SetTracerProvider(provider);
 }
 
+// TODO: Remove once windows api singletons are supported.
+// See https://github.com/open-telemetry/opentelemetry-cpp/issues/2534
 #ifdef _WIN32
 #  define RUN_FAILING_WINDOWS_TEST 0
 #else
