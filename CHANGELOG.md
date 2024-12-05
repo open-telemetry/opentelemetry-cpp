@@ -149,7 +149,7 @@ Increment the:
 * [bazel] Update opentelemetry-proto in MODULE.bazel
   [#3163](https://github.com/open-telemetry/opentelemetry-cpp/pull/3163)
 
-* [EXPORTER] Add instrumentation scope attributes to otlp proto messages for traces and metrics
+* [EXPORTER] Fix scope attributes missing from otlp traces metrics
   [#3185](https://github.com/open-telemetry/opentelemetry-cpp/pull/3185)
 
 Important changes:
