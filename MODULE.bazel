@@ -49,7 +49,7 @@ archive_override(
 # ERROR: Q:/b/u/c56xnmzt/external/protobuf+/src/google/protobuf/BUILD.bazel:462:11: Compiling src/google/protobuf/any_lite.cc [for tool] failed: undeclared inclusion(s) in rule '@@protobuf+//src/google/protobuf:protobuf_lite':
 # this rule is missing dependency declarations for the following files included by 'src/google/protobuf/any_lite.cc':
 #   'bazel-out/x64_windows-opt-exec-ST-d610928244b0/bin/external/protobuf+/src/google/protobuf/_virtual_includes/protobuf_lite/google/protobuf/port.h'
-bazel_dep(name = "protobuf", version = "29.0")
+bazel_dep(name = "protobuf", version = "29.1")
 bazel_dep(name = "opentelemetry-proto", version = "1.4.0")
 archive_override(
     module_name = "opentelemetry-proto",
