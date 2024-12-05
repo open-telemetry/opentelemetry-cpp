@@ -117,7 +117,7 @@ public:
     auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url");
 #endif
 
-    auto parent_span                                 = tracer->StartSpan("Test parent span");
+    auto parent_span = tracer->StartSpan("Test parent span");
 
     char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
 
@@ -144,10 +144,10 @@ public:
       auto check_json = nlohmann::json::parse(check_json_text, nullptr, false);
       if (!check_json.is_discarded())
       {
-        auto resource_span     = *check_json["resourceSpans"].begin();
-        auto scope_span        = *resource_span["scopeSpans"].begin();
-        auto scope             = scope_span["scope"];
-        auto span              = *scope_span["spans"].begin();
+        auto resource_span = *check_json["resourceSpans"].begin();
+        auto scope_span    = *resource_span["scopeSpans"].begin();
+        auto scope         = scope_span["scope"];
+        auto span          = *scope_span["spans"].begin();
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
         ASSERT_EQ(1, scope["attributes"].size());

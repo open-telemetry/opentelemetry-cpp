@@ -320,7 +320,6 @@ TEST(OtlpMetricSerializationTest, PopulateExportMetricsServiceRequest)
 
   ASSERT_EQ(1, request_proto.resource_metrics_size());
   const auto &resource_metrics_proto = request_proto.resource_metrics(0);
-  const auto &resource_proto         = resource_metrics_proto.resource();
   EXPECT_EQ("resource_schema_url", resource_metrics_proto.schema_url());
 
   ASSERT_EQ(1, resource_metrics_proto.scope_metrics_size());
