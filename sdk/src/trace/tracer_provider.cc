@@ -125,9 +125,9 @@ const resource::Resource &TracerProvider::GetResource() const noexcept
   return context_->GetResource();
 }
 
-bool TracerProvider::Shutdown() noexcept
+bool TracerProvider::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  return context_->Shutdown();
+  return context_->Shutdown(timeout);
 }
 
 bool TracerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
