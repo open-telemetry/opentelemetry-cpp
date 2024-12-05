@@ -91,8 +91,7 @@ public:
     data.resource_ = &resource;
 
     auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
-        "library_name", "1.5.0", "scope_url",
-        {{"scope_key", "scope_value"}});
+        "library_name", "1.5.0", "scope_url", {{"scope_key", "scope_value"}});
 
     opentelemetry::sdk::metrics::MetricData metric_data{
         opentelemetry::sdk::metrics::InstrumentDescriptor{

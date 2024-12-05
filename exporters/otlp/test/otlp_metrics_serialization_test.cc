@@ -307,37 +307,38 @@ TEST(OtlpMetricSerializationTest, ObservableUpDownCounter)
 
 TEST(OtlpMetricSerializationTest, PopulateExportMetricsServiceRequest)
 {
-  const auto resource = resource::Resource::Create({{"service.name", "test_service_name"}}, "resource_schema_url");   
-  const auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("scope_name", "scope_version", "scope_schema_url",
-                                                           {{"scope_key", "scope_value"}});
-  
-  metrics_sdk::ScopeMetrics scope_metrics{scope.get(), CreateSumAggregationData()}; 
-  metrics_sdk::ResourceMetrics resource_metrics{&resource, scope_metrics}; 
-  
+  const auto resource =
+      resource::Resource::Create({{"service.name", "test_service_name"}}, "resource_schema_url");
+  const auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+      "scope_name", "scope_version", "scope_schema_url", {{"scope_key", "scope_value"}});
+
+  metrics_sdk::ScopeMetrics scope_metrics{scope.get(), CreateSumAggregationData()};
+  metrics_sdk::ResourceMetrics resource_metrics{&resource, scope_metrics};
+
   proto::collector::metrics::v1::ExportMetricsServiceRequest request_proto;
   otlp_exporter::OtlpMetricUtils::PopulateRequest(resource_metrics, &request_proto);
 
-  ASSERT_EQ(1, request_proto.resource_metrics_size()); 
-  const auto& resource_metrics_proto = request_proto.resource_metrics(0);
-  const auto& resource_proto = resource_metrics_proto.resource(); 
-  EXPECT_EQ("resource_schema_url", resource_metrics_proto.schema_url()); 
-  
+  ASSERT_EQ(1, request_proto.resource_metrics_size());
+  const auto &resource_metrics_proto = request_proto.resource_metrics(0);
+  const auto &resource_proto         = resource_metrics_proto.resource();
+  EXPECT_EQ("resource_schema_url", resource_metrics_proto.schema_url());
+
   ASSERT_EQ(1, resource_metrics_proto.scope_metrics_size());
-  const auto& scope_metrics_proto = resource_metrics_proto.scope_metrics(0); 
+  const auto &scope_metrics_proto = resource_metrics_proto.scope_metrics(0);
   EXPECT_EQ("scope_schema_url", scope_metrics_proto.schema_url());
 
-  ASSERT_EQ(1, scope_metrics_proto.metrics_size()); 
-  const auto& metric_proto = scope_metrics_proto.metrics(0);
-  EXPECT_EQ("Counter", metric_proto.name());   
+  ASSERT_EQ(1, scope_metrics_proto.metrics_size());
+  const auto &metric_proto = scope_metrics_proto.metrics(0);
+  EXPECT_EQ("Counter", metric_proto.name());
 
-  const auto& scope_proto = scope_metrics_proto.scope(); 
-  EXPECT_EQ("scope_name", scope_proto.name()); 
-  EXPECT_EQ("scope_version", scope_proto.version()); 
+  const auto &scope_proto = scope_metrics_proto.scope();
+  EXPECT_EQ("scope_name", scope_proto.name());
+  EXPECT_EQ("scope_version", scope_proto.version());
 
-  ASSERT_EQ(1, scope_proto.attributes_size()); 
-  const auto& scope_attributes_proto = scope_proto.attributes(0); 
-  EXPECT_EQ("scope_key", scope_attributes_proto.key()); 
-  EXPECT_EQ("scope_value", scope_attributes_proto.value().string_value());   
+  ASSERT_EQ(1, scope_proto.attributes_size());
+  const auto &scope_attributes_proto = scope_proto.attributes(0);
+  EXPECT_EQ("scope_key", scope_attributes_proto.key());
+  EXPECT_EQ("scope_value", scope_attributes_proto.value().string_value());
 }
 
 }  // namespace otlp
