@@ -414,39 +414,43 @@ CreateAsyncDoubleMetricProcessThreadCount(metrics::Meter *meter)
 /**
  * The time the process has been running.
  * <p>
- * Instrumentations SHOULD use counter with type @code double @endcode and measure uptime with at
- * least millisecond precision <p> counter
+ * Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
+ * as a floating point number with the highest precision available. The actual accuracy would depend
+ * on the instrumentation and operating system. <p> gauge
  */
 static constexpr const char *kMetricProcessUptime     = "metric.process.uptime";
 static constexpr const char *descrMetricProcessUptime = "The time the process has been running.";
 static constexpr const char *unitMetricProcessUptime  = "s";
 
-static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricProcessUptime(
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>> CreateSyncInt64MetricProcessUptime(
     metrics::Meter *meter)
 {
-  return meter->CreateUInt64Counter(kMetricProcessUptime, descrMetricProcessUptime,
-                                    unitMetricProcessUptime);
+  return meter->CreateInt64Gauge(kMetricProcessUptime, descrMetricProcessUptime,
+                                 unitMetricProcessUptime);
 }
 
-static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricProcessUptime(
+static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricProcessUptime(
     metrics::Meter *meter)
 {
-  return meter->CreateDoubleCounter(kMetricProcessUptime, descrMetricProcessUptime,
-                                    unitMetricProcessUptime);
+  return meter->CreateDoubleGauge(kMetricProcessUptime, descrMetricProcessUptime,
+                                  unitMetricProcessUptime);
 }
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncInt64MetricProcessUptime(
     metrics::Meter *meter)
 {
-  return meter->CreateInt64ObservableCounter(kMetricProcessUptime, descrMetricProcessUptime,
-                                             unitMetricProcessUptime);
+  return meter->CreateInt64ObservableGauge(kMetricProcessUptime, descrMetricProcessUptime,
+                                           unitMetricProcessUptime);
 }
 
 static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDoubleMetricProcessUptime(
     metrics::Meter *meter)
 {
-  return meter->CreateDoubleObservableCounter(kMetricProcessUptime, descrMetricProcessUptime,
-                                              unitMetricProcessUptime);
+  return meter->CreateDoubleObservableGauge(kMetricProcessUptime, descrMetricProcessUptime,
+                                            unitMetricProcessUptime);
 }
 
 }  // namespace process

@@ -219,6 +219,48 @@ CreateAsyncDoubleMetricContainerNetworkIo(metrics::Meter *meter)
       kMetricContainerNetworkIo, descrMetricContainerNetworkIo, unitMetricContainerNetworkIo);
 }
 
+/**
+ * The time the container has been running
+ * <p>
+ * Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
+ * as a floating point number with the highest precision available. The actual accuracy would depend
+ * on the instrumentation and operating system. <p> gauge
+ */
+static constexpr const char *kMetricContainerUptime     = "metric.container.uptime";
+static constexpr const char *descrMetricContainerUptime = "The time the container has been running";
+static constexpr const char *unitMetricContainerUptime  = "s";
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>> CreateSyncInt64MetricContainerUptime(
+    metrics::Meter *meter)
+{
+  return meter->CreateInt64Gauge(kMetricContainerUptime, descrMetricContainerUptime,
+                                 unitMetricContainerUptime);
+}
+
+static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricContainerUptime(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricContainerUptime, descrMetricContainerUptime,
+                                  unitMetricContainerUptime);
+}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricContainerUptime(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableGauge(kMetricContainerUptime, descrMetricContainerUptime,
+                                           unitMetricContainerUptime);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricContainerUptime(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(kMetricContainerUptime, descrMetricContainerUptime,
+                                            unitMetricContainerUptime);
+}
+
 }  // namespace container
 }  // namespace semconv
 OPENTELEMETRY_END_NAMESPACE

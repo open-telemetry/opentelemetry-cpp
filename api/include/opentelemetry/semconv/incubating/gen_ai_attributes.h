@@ -40,7 +40,7 @@ static constexpr const char *kGenAiOpenaiRequestResponseFormat =
 static constexpr const char *kGenAiOpenaiRequestSeed = "gen_ai.openai.request.seed";
 
 /**
- * The service tier requested. May be a specific tier, detault, or auto.
+ * The service tier requested. May be a specific tier, default, or auto.
  */
 static constexpr const char *kGenAiOpenaiRequestServiceTier = "gen_ai.openai.request.service_tier";
 
@@ -49,6 +49,12 @@ static constexpr const char *kGenAiOpenaiRequestServiceTier = "gen_ai.openai.req
  */
 static constexpr const char *kGenAiOpenaiResponseServiceTier =
     "gen_ai.openai.response.service_tier";
+
+/**
+ * A fingerprint to track any eventual change in the Generative AI environment.
+ */
+static constexpr const char *kGenAiOpenaiResponseSystemFingerprint =
+    "gen_ai.openai.response.system_fingerprint";
 
 /**
  * The name of the operation being performed.
@@ -68,6 +74,14 @@ static constexpr const char *kGenAiOperationName = "gen_ai.operation.name";
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kGenAiPrompt = "gen_ai.prompt";
+
+/**
+ * The encoding formats requested in an embeddings operation, if specified.
+ * <p>
+ * In some GenAI systems the encoding formats are called embedding types. Also, some GenAI systems
+ * only accept a single format per request.
+ */
+static constexpr const char *kGenAiRequestEncodingFormats = "gen_ai.request.encoding_formats";
 
 /**
  * The frequency penalty setting for the GenAI request.
@@ -218,6 +232,13 @@ static constexpr const char *kChat = "chat";
  */
 static constexpr const char *kTextCompletion = "text_completion";
 
+/**
+ * Embeddings operation such as <a
+ * href="https://platform.openai.com/docs/api-reference/embeddings/create">OpenAI Create embeddings
+ * API</a>
+ */
+static constexpr const char *kEmbeddings = "embeddings";
+
 }  // namespace GenAiOperationNameValues
 
 namespace GenAiSystemValues
@@ -241,6 +262,21 @@ static constexpr const char *kAnthropic = "anthropic";
  * Cohere
  */
 static constexpr const char *kCohere = "cohere";
+
+/**
+ * Azure AI Inference
+ */
+static constexpr const char *kAzAiInference = "az.ai.inference";
+
+/**
+ * IBM Watsonx AI
+ */
+static constexpr const char *kIbmWatsonxAi = "ibm.watsonx.ai";
+
+/**
+ * AWS Bedrock
+ */
+static constexpr const char *kAwsBedrock = "aws.bedrock";
 
 }  // namespace GenAiSystemValues
 

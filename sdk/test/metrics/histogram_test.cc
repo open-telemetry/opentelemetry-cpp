@@ -27,10 +27,6 @@
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
 
-#if OPENTELEMETRY_HAVE_WORKING_REGEX
-#  include <regex>
-#endif
-
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;

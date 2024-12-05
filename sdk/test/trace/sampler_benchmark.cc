@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/context/context_value.h"  // IWYU pragma: keep
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"

@@ -31,8 +31,8 @@ static constexpr const char *kCicdPipelineRunId = "cicd.pipeline.run.id";
 
 /**
  * The human readable name of a task within a pipeline. Task here most closely aligns with a <a
- * href="https://en.wikipedia.org/wiki/Pipeline_(computing)">computing process</a> in a pipeline.
- * Other terms for tasks include commands, steps, and procedures.
+ * href="https://wikipedia.org/wiki/Pipeline_(computing)">computing process</a> in a pipeline. Other
+ * terms for tasks include commands, steps, and procedures.
  */
 static constexpr const char *kCicdPipelineTaskName = "cicd.pipeline.task.name";
 
@@ -42,8 +42,8 @@ static constexpr const char *kCicdPipelineTaskName = "cicd.pipeline.task.name";
 static constexpr const char *kCicdPipelineTaskRunId = "cicd.pipeline.task.run.id";
 
 /**
- * The <a href="https://en.wikipedia.org/wiki/URL">URL</a> of the pipeline run providing the
- * complete address in order to locate and identify the pipeline run.
+ * The <a href="https://wikipedia.org/wiki/URL">URL</a> of the pipeline run providing the complete
+ * address in order to locate and identify the pipeline run.
  */
 static constexpr const char *kCicdPipelineTaskRunUrlFull = "cicd.pipeline.task.run.url.full";
 

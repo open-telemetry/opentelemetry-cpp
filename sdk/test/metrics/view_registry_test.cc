@@ -15,10 +15,6 @@
 #include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 
-#if OPENTELEMETRY_HAVE_WORKING_REGEX
-#  include <regex>
-#endif
-
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::instrumentationscope;
 

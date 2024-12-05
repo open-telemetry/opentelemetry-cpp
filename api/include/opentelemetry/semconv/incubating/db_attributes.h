@@ -98,12 +98,13 @@ static constexpr const char *kDbClientConnectionsState = "db.client.connections.
  * The name of a collection (table, container) within the database.
  * <p>
  * It is RECOMMENDED to capture the value as provided by the application without attempting to do
- * any case normalization. If the collection name is parsed from the query text, it SHOULD be the
- * first collection name found in the query and it SHOULD match the value provided in the query text
- * including any schema and database name prefix. For batch operations, if the individual operations
- * are known to have the same collection name then that collection name SHOULD be used, otherwise
- * @code db.collection.name @endcode SHOULD NOT be captured. This attribute has stability level
- * RELEASE CANDIDATE.
+ * any case normalization. <p> The collection name SHOULD NOT be extracted from @code db.query.text
+ * @endcode, unless the query format is known to only ever have a single collection name present.
+ * <p>
+ * For batch operations, if the individual operations are known to have the same collection name
+ * then that collection name SHOULD be used.
+ * <p>
+ * This attribute has stability level RELEASE CANDIDATE.
  */
 static constexpr const char *kDbCollectionName = "db.collection.name";
 
@@ -127,6 +128,12 @@ static constexpr const char *kDbCosmosdbClientId = "db.cosmosdb.client_id";
 static constexpr const char *kDbCosmosdbConnectionMode = "db.cosmosdb.connection_mode";
 
 /**
+ * Account or request <a
+ * href="https://learn.microsoft.com/azure/cosmos-db/consistency-levels">consistency level</a>.
+ */
+static constexpr const char *kDbCosmosdbConsistencyLevel = "db.cosmosdb.consistency_level";
+
+/**
  * Deprecated, use @code db.collection.name @endcode instead.
  * <p>
  * @deprecated
@@ -136,17 +143,30 @@ OPENTELEMETRY_DEPRECATED
 static constexpr const char *kDbCosmosdbContainer = "db.cosmosdb.container";
 
 /**
- * Cosmos DB Operation Type.
+ * Deprecated, no replacement at this time.
+ * <p>
+ * @deprecated
+ * No replacement at this time.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kDbCosmosdbOperationType = "db.cosmosdb.operation_type";
 
 /**
- * RU consumed for that operation
+ * List of regions contacted during operation in the order that they were contacted. If there is
+ * more than one region listed, it indicates that the operation was performed on multiple regions
+ * i.e. cross-regional call. <p> Region name matches the format of @code displayName @endcode in <a
+ * href="https://learn.microsoft.com/rest/api/subscription/subscriptions/list-locations?view=rest-subscription-2021-10-01&tabs=HTTP#location">Azure
+ * Location API</a>
+ */
+static constexpr const char *kDbCosmosdbRegionsContacted = "db.cosmosdb.regions_contacted";
+
+/**
+ * Request units consumed for the operation.
  */
 static constexpr const char *kDbCosmosdbRequestCharge = "db.cosmosdb.request_charge";
 
 /**
- * Request payload size in bytes
+ * Request payload size in bytes.
  */
 static constexpr const char *kDbCosmosdbRequestContentLength = "db.cosmosdb.request_content_length";
 
@@ -270,24 +290,52 @@ static constexpr const char *kDbOperationBatchSize = "db.operation.batch.size";
 /**
  * The name of the operation or command being executed.
  * <p>
- * It is RECOMMENDED to capture the value as provided by the application without attempting to do
- * any case normalization. If the operation name is parsed from the query text, it SHOULD be the
- * first operation name found in the query. For batch operations, if the individual operations are
- * known to have the same operation name then that operation name SHOULD be used prepended by @code
- * BATCH  @endcode, otherwise @code db.operation.name @endcode SHOULD be @code BATCH @endcode or
- * some other database system specific term if more applicable. This attribute has stability level
- * RELEASE CANDIDATE.
+ * It is RECOMMENDED to capture the value as provided by the application
+ * without attempting to do any case normalization.
+ * <p>
+ * The operation name SHOULD NOT be extracted from @code db.query.text @endcode,
+ * unless the query format is known to only ever have a single operation name present.
+ * <p>
+ * For batch operations, if the individual operations are known to have the same operation name
+ * then that operation name SHOULD be used prepended by @code BATCH  @endcode,
+ * otherwise @code db.operation.name @endcode SHOULD be @code BATCH @endcode or some other database
+ * system specific term if more applicable.
+ * <p>
+ * This attribute has stability level RELEASE CANDIDATE.
  */
 static constexpr const char *kDbOperationName = "db.operation.name";
 
 /**
+ * A database operation parameter, with @code <key> @endcode being the parameter name, and the
+ * attribute value being a string representation of the parameter value. <p> If a parameter has no
+ * name and instead is referenced only by index, then @code <key> @endcode SHOULD be the 0-based
+ * index. If @code db.query.text @endcode is also captured, then @code db.operation.parameter.<key>
+ * @endcode SHOULD match up with the parameterized placeholders present in @code db.query.text
+ * @endcode. This attribute has stability level RELEASE CANDIDATE.
+ */
+static constexpr const char *kDbOperationParameter = "db.operation.parameter";
+
+/**
  * A query parameter used in @code db.query.text @endcode, with @code <key> @endcode being the
  * parameter name, and the attribute value being a string representation of the parameter value. <p>
- * Query parameters should only be captured when @code db.query.text @endcode is parameterized with
- * placeholders. If a parameter has no name and instead is referenced only by index, then @code
- * <key> @endcode SHOULD be the 0-based index. This attribute has stability level RELEASE CANDIDATE.
+ * @deprecated
+ * Replaced by @code db.operation.parameter @endcode.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kDbQueryParameter = "db.query.parameter";
+
+/**
+ * Low cardinality representation of a database query text.
+ * <p>
+ * @code db.query.summary @endcode provides static summary of the query text. It describes a class
+ * of database queries and is useful as a grouping key, especially when analyzing telemetry for
+ * database calls involving complex queries. Summary may be available to the instrumentation through
+ * instrumentation hooks or other means. If it is not available, instrumentations that support query
+ * parsing SHOULD generate a summary following <a
+ * href="../../docs/database/database-spans.md#generating-a-summary-of-the-query-text">Generating
+ * query summary</a> section. This attribute has stability level RELEASE CANDIDATE.
+ */
+static constexpr const char *kDbQuerySummary = "db.query.summary";
 
 /**
  * The database query being executed.
@@ -313,6 +361,11 @@ static constexpr const char *kDbQueryText = "db.query.text";
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kDbRedisDatabaseIndex = "db.redis.database_index";
+
+/**
+ * Number of rows returned by the operation.
+ */
+static constexpr const char *kDbResponseReturnedRows = "db.response.returned_rows";
 
 /**
  * Database response status code.
@@ -452,7 +505,7 @@ static constexpr const char *kUsed = "used";
 namespace DbCosmosdbConnectionModeValues
 {
 /**
- * Gateway (HTTP) connections mode
+ * Gateway (HTTP) connection.
  */
 static constexpr const char *kGateway = "gateway";
 
@@ -462,6 +515,35 @@ static constexpr const char *kGateway = "gateway";
 static constexpr const char *kDirect = "direct";
 
 }  // namespace DbCosmosdbConnectionModeValues
+
+namespace DbCosmosdbConsistencyLevelValues
+{
+/**
+ * none
+ */
+static constexpr const char *kStrong = "Strong";
+
+/**
+ * none
+ */
+static constexpr const char *kBoundedStaleness = "BoundedStaleness";
+
+/**
+ * none
+ */
+static constexpr const char *kSession = "Session";
+
+/**
+ * none
+ */
+static constexpr const char *kEventual = "Eventual";
+
+/**
+ * none
+ */
+static constexpr const char *kConsistentPrefix = "ConsistentPrefix";
+
+}  // namespace DbCosmosdbConsistencyLevelValues
 
 namespace DbCosmosdbOperationTypeValues
 {

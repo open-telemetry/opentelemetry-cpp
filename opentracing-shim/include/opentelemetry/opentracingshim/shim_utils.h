@@ -29,7 +29,10 @@ static inline opentelemetry::common::AttributeValue attributeFromValue(
     AttributeValue operator()(int64_t v) { return v; }
     AttributeValue operator()(uint64_t v) { return v; }
     AttributeValue operator()(const std::string &v) { return nostd::string_view{v}; }
-    AttributeValue operator()(opentracing::string_view v) { return nostd::string_view{v.data()}; }
+    AttributeValue operator()(opentracing::string_view v)
+    {
+      return nostd::string_view{v.data(), v.size()};
+    }
     AttributeValue operator()(std::nullptr_t) { return nostd::string_view{}; }
     AttributeValue operator()(const char *v) { return v; }
     AttributeValue operator()(opentracing::util::recursive_wrapper<opentracing::Values>)
@@ -54,7 +57,7 @@ static inline std::string stringFromValue(const opentracing::Value &value)
     std::string operator()(int64_t v) { return std::to_string(v); }
     std::string operator()(uint64_t v) { return std::to_string(v); }
     std::string operator()(const std::string &v) { return v; }
-    std::string operator()(opentracing::string_view v) { return std::string{v.data()}; }
+    std::string operator()(opentracing::string_view v) { return std::string{v.data(), v.size()}; }
     std::string operator()(std::nullptr_t) { return std::string{}; }
     std::string operator()(const char *v) { return std::string{v}; }
     std::string operator()(opentracing::util::recursive_wrapper<opentracing::Values>)

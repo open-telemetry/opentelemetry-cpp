@@ -23,7 +23,7 @@ bool SpanContextShim::BaggageItem(nostd::string_view key, std::string &value) co
 void SpanContextShim::ForeachBaggageItem(VisitBaggageItem f) const
 {
   baggage_->GetAllEntries([&f](nostd::string_view key, nostd::string_view value) {
-    return f(key.data(), value.data());
+    return f(std::string{key.data(), key.size()}, std::string{value.data(), value.size()});
   });
 }
 

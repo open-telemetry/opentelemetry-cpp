@@ -20,6 +20,11 @@ namespace network
 {
 
 /**
+ * The network interface name.
+ */
+static constexpr const char *kNetworkInterfaceName = "network.interface.name";
+
+/**
  * Local address of the network connection - IP address or Unix domain socket name.
  */
 static constexpr const char *kNetworkLocalAddress = "network.local.address";
@@ -40,7 +45,7 @@ static constexpr const char *kNetworkPeerAddress = "network.peer.address";
 static constexpr const char *kNetworkPeerPort = "network.peer.port";
 
 /**
- * <a href="https://osi-model.com/application-layer/">OSI application layer</a> or non-OSI
+ * <a href="https://wikipedia.org/wiki/Application_layer">OSI application layer</a> or non-OSI
  * equivalent. <p> The value SHOULD be normalized to lowercase.
  */
 static constexpr const char *kNetworkProtocolName = "network.protocol.name";
@@ -56,7 +61,7 @@ static constexpr const char *kNetworkProtocolName = "network.protocol.name";
 static constexpr const char *kNetworkProtocolVersion = "network.protocol.version";
 
 /**
- * <a href="https://osi-model.com/transport-layer/">OSI transport layer</a> or <a
+ * <a href="https://wikipedia.org/wiki/Transport_layer">OSI transport layer</a> or <a
  * href="https://wikipedia.org/wiki/Inter-process_communication">inter-process communication
  * method</a>. <p> The value SHOULD be normalized to lowercase. <p> Consider always setting the
  * transport when setting a port number, since a port number is ambiguous without knowing the
@@ -66,7 +71,7 @@ static constexpr const char *kNetworkProtocolVersion = "network.protocol.version
 static constexpr const char *kNetworkTransport = "network.transport";
 
 /**
- * <a href="https://osi-model.com/network-layer/">OSI network layer</a> or non-OSI equivalent.
+ * <a href="https://wikipedia.org/wiki/Network_layer">OSI network layer</a> or non-OSI equivalent.
  * <p>
  * The value SHOULD be normalized to lowercase.
  */

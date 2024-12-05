@@ -1279,6 +1279,48 @@ CreateAsyncDoubleMetricSystemProcessCreated(metrics::Meter *meter)
       kMetricSystemProcessCreated, descrMetricSystemProcessCreated, unitMetricSystemProcessCreated);
 }
 
+/**
+ * The time the system has been running
+ * <p>
+ * Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
+ * as a floating point number with the highest precision available. The actual accuracy would depend
+ * on the instrumentation and operating system. <p> gauge
+ */
+static constexpr const char *kMetricSystemUptime     = "metric.system.uptime";
+static constexpr const char *descrMetricSystemUptime = "The time the system has been running";
+static constexpr const char *unitMetricSystemUptime  = "s";
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>> CreateSyncInt64MetricSystemUptime(
+    metrics::Meter *meter)
+{
+  return meter->CreateInt64Gauge(kMetricSystemUptime, descrMetricSystemUptime,
+                                 unitMetricSystemUptime);
+}
+
+static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricSystemUptime(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricSystemUptime, descrMetricSystemUptime,
+                                  unitMetricSystemUptime);
+}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncInt64MetricSystemUptime(
+    metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableGauge(kMetricSystemUptime, descrMetricSystemUptime,
+                                           unitMetricSystemUptime);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDoubleMetricSystemUptime(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(kMetricSystemUptime, descrMetricSystemUptime,
+                                            unitMetricSystemUptime);
+}
+
 }  // namespace system
 }  // namespace semconv
 OPENTELEMETRY_END_NAMESPACE
