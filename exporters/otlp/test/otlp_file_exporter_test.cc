@@ -70,7 +70,6 @@ static nostd::span<T, N> MakeSpan(T (&array)[N])
 class OtlpFileExporterTestPeer : public ::testing::Test
 {
 public:
-
   void ExportJsonIntegrationTest()
   {
     static ProtobufGlobalSymbolGuard global_symbol_guard;
@@ -109,12 +108,13 @@ public:
         new sdk::trace::TracerProvider(std::move(processor), resource));
 
     std::string report_trace_id;
-   
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2    
-    auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url", {{"scope_key", "scope_value"}});
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url",
+                                      {{ "scope_key",
+                                         "scope_value" }});
 #else
-    auto tracer =
-        provider->GetTracer("scope_name", "scope_version", "scope_url");
+    auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url");
 #endif
 
     auto parent_span                                 = tracer->StartSpan("Test parent span");
@@ -146,19 +146,19 @@ public:
       {
         auto resource_span     = *check_json["resourceSpans"].begin();
         auto scope_span        = *resource_span["scopeSpans"].begin();
-        auto scope             = scope_span["scope"]; 
+        auto scope             = scope_span["scope"];
         auto span              = *scope_span["spans"].begin();
-        
+
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-        ASSERT_EQ(1, scope["attributes"].size()); 
-        const auto scope_attribute = scope["attributes"].front(); 
-        EXPECT_EQ("scope_key", scope_attribute["key"].get<std::string>()); 
-        EXPECT_EQ("scope_value", scope_attribute["value"]["stringValue"].get<std::string>()); 
+        ASSERT_EQ(1, scope["attributes"].size());
+        const auto scope_attribute = scope["attributes"].front();
+        EXPECT_EQ("scope_key", scope_attribute["key"].get<std::string>());
+        EXPECT_EQ("scope_value", scope_attribute["value"]["stringValue"].get<std::string>());
 #endif
-        EXPECT_EQ("resource_url", resource_span["schemaUrl"].get<std::string>()); 
-        EXPECT_EQ("scope_url", scope_span["schemaUrl"].get<std::string>()); 
-        EXPECT_EQ("scope_name", scope["name"].get<std::string>()); 
-        EXPECT_EQ("scope_version", scope["version"].get<std::string>()); 
+        EXPECT_EQ("resource_url", resource_span["schemaUrl"].get<std::string>());
+        EXPECT_EQ("scope_url", scope_span["schemaUrl"].get<std::string>());
+        EXPECT_EQ("scope_name", scope["name"].get<std::string>());
+        EXPECT_EQ("scope_version", scope["version"].get<std::string>());
         EXPECT_EQ(report_trace_id, span["traceId"].get<std::string>());
       }
       else

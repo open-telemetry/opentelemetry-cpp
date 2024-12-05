@@ -254,7 +254,7 @@ void OtlpMetricUtils::PopulateResourceMetrics(
     proto::common::v1::InstrumentationScope *scope = scope_lib_metrics->mutable_scope();
     scope->set_name(scope_metrics.scope_->GetName());
     scope->set_version(scope_metrics.scope_->GetVersion());
-    scope_lib_metrics->set_schema_url(scope_metrics.scope_->GetSchemaURL()); 
+    scope_lib_metrics->set_schema_url(scope_metrics.scope_->GetSchemaURL());
 
     OtlpPopulateAttributeUtils::PopulateAttribute(scope, *scope_metrics.scope_);
 
