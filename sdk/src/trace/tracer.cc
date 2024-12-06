@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include <chrono>
-#include <functional>
 #include <map>
 #include <new>
 #include <utility>
@@ -14,6 +13,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/tracer.h"

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/trace/tracer_config.h"
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

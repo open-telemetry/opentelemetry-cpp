@@ -129,7 +129,7 @@ public:
   }
 
 private:
-  // Prevent direct initialization of  ScopeConfigurator objects.
+  // Prevent direct initialization of ScopeConfigurator objects.
   explicit ScopeConfigurator(std::function<T(const InstrumentationScope &)> configurator)
       : configurator_(configurator)
   {}
