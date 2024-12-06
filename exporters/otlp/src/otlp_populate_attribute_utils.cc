@@ -321,11 +321,6 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope
         &instrumentation_scope) noexcept
 {
-  if (nullptr == proto)
-  {
-    return;
-  }
-
   for (const auto &kv : instrumentation_scope.GetAttributes())
   {
     OtlpPopulateAttributeUtils::PopulateAttribute(proto->add_attributes(), kv.first, kv.second);
