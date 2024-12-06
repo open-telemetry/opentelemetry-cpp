@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <functional>
 #include <string>
 #include <type_traits>
 
@@ -158,6 +157,7 @@ private:
 
   InstrumentationScopeAttributes attributes_;
 };
+
 }  // namespace instrumentationscope
 }  // namespace sdk
 
