@@ -29,7 +29,7 @@
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/instrumentationscope/scope_configurator_builder.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
@@ -151,7 +151,7 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     Sampler *sampler,
     IdGenerator *id_generator = new RandomIdGenerator,
     const ScopeConfigurator<TracerConfig> &tracer_configurator =
-        ScopeConfiguratorBuilder<TracerConfig>(TracerConfig::Default()).Build(),
+        ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default()).Build(),
     std::unique_ptr<InstrumentationScope> scope = InstrumentationScope::Create(""))
 {
   auto processor = std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(std::move(exporter)));
@@ -502,11 +502,10 @@ TEST(Tracer, SpanSetEvents)
 TEST(Tracer, StartSpanWithDisabledConfig)
 {
 #ifdef OPENTELEMETRY_RTTI_ENABLED
-  InMemorySpanExporter *exporter                 = new InMemorySpanExporter();
-  std::shared_ptr<InMemorySpanData> span_data    = exporter->GetData();
-  ScopeConfigurator<TracerConfig> disable_tracer = [](const InstrumentationScope &) {
-    return TracerConfig::Disabled();
-  };
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  ScopeConfigurator<TracerConfig> disable_tracer =
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Disabled()).Build();
   auto tracer    = initTracer(std::unique_ptr<SpanExporter>{exporter}, new AlwaysOnSampler(),
                               new RandomIdGenerator(), disable_tracer);
   auto span      = tracer->StartSpan("span 1");
@@ -522,11 +521,10 @@ TEST(Tracer, StartSpanWithDisabledConfig)
 TEST(Tracer, StartSpanWithEnabledConfig)
 {
 #ifdef OPENTELEMETRY_RTTI_ENABLED
-  InMemorySpanExporter *exporter                = new InMemorySpanExporter();
-  std::shared_ptr<InMemorySpanData> span_data   = exporter->GetData();
-  ScopeConfigurator<TracerConfig> enable_tracer = [](const InstrumentationScope &) {
-    return TracerConfig::Enabled();
-  };
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  ScopeConfigurator<TracerConfig> enable_tracer =
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Enabled()).Build();
   auto tracer    = initTracer(std::unique_ptr<SpanExporter>{exporter}, new AlwaysOnSampler(),
                               new RandomIdGenerator(), enable_tracer);
   auto span      = tracer->StartSpan("span 1");
@@ -541,13 +539,11 @@ TEST(Tracer, StartSpanWithEnabledConfig)
 TEST(Tracer, StartSpanWithCustomConfig)
 {
 #ifdef OPENTELEMETRY_RTTI_ENABLED
-  ScopeConfigurator<TracerConfig> custom_configurator = [](const InstrumentationScope &scope) {
-    if (scope.GetName() == "" || scope.GetName() == "foo_library")
-    {
-      return TracerConfig::Disabled();
-    }
-    return TracerConfig::Enabled();
-  };
+  ScopeConfigurator<TracerConfig> custom_configurator =
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Enabled())
+          .AddConditionNameEquals("foo_library", TracerConfig::Disabled())
+          .AddConditionNameEquals("", TracerConfig::Disabled())
+          .Build();
 
   const auto tracer_default_scope =
       initTracer(std::unique_ptr<SpanExporter>{new InMemorySpanExporter()}, new AlwaysOnSampler(),

@@ -51,7 +51,8 @@ public:
           std::unique_ptr<IdGenerator>(new RandomIdGenerator()),
       std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator =
           std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
-              instrumentationscope::ScopeConfiguratorBuilder<TracerConfig>(TracerConfig::Default())
+              instrumentationscope::ScopeConfigurator<TracerConfig>::Builder(
+                  TracerConfig::Default())
                   .Build())) noexcept;
 
   explicit TracerProvider(
@@ -63,7 +64,8 @@ public:
           std::unique_ptr<IdGenerator>(new RandomIdGenerator()),
       std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator =
           std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
-              instrumentationscope::ScopeConfiguratorBuilder<TracerConfig>(TracerConfig::Default())
+              instrumentationscope::ScopeConfigurator<TracerConfig>::Builder(
+                  TracerConfig::Default())
                   .Build())) noexcept;
 
   /**

@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 
-#include "opentelemetry/sdk/instrumentationscope/scope_configurator_builder.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -48,7 +48,8 @@ public:
           std::unique_ptr<IdGenerator>(new RandomIdGenerator()),
       std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator =
           std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
-              instrumentationscope::ScopeConfiguratorBuilder<TracerConfig>(TracerConfig::Default())
+              instrumentationscope::ScopeConfigurator<TracerConfig>::Builder(
+                  TracerConfig::Default())
                   .Build())) noexcept;
 
   virtual ~TracerContext() = default;

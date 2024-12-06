@@ -56,7 +56,7 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> TracerProviderFactory
 {
   auto tracer_configurator =
       std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
-          instrumentationscope::ScopeConfiguratorBuilder<TracerConfig>(TracerConfig::Default())
+          instrumentationscope::ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default())
               .Build());
   return Create(std::move(processor), resource, std::move(sampler), std::move(id_generator),
                 std::move(tracer_configurator));
@@ -108,7 +108,7 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> TracerProviderFactory
 {
   auto tracer_configurator =
       std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
-          instrumentationscope::ScopeConfiguratorBuilder<TracerConfig>(TracerConfig::Default())
+          instrumentationscope::ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default())
               .Build());
   return Create(std::move(processors), resource, std::move(sampler), std::move(id_generator),
                 std::move(tracer_configurator));
