@@ -107,6 +107,7 @@ proto::common::v1::InstrumentationScope OtlpRecordable::GetProtoInstrumentationS
   {
     instrumentation_scope.set_name(instrumentation_scope_->GetName());
     instrumentation_scope.set_version(instrumentation_scope_->GetVersion());
+    OtlpPopulateAttributeUtils::PopulateAttribute(&instrumentation_scope, *instrumentation_scope_);
   }
   return instrumentation_scope;
 }

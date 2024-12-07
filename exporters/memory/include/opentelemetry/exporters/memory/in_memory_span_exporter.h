@@ -75,6 +75,11 @@ public:
     return sdk::common::ExportResult::kSuccess;
   }
 
+  virtual bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override
+  {
+    return true;
+  }
+
   /**
    * @param timeout an optional value containing the timeout of the exporter
    * note: passing custom timeout values is not currently supported for this exporter

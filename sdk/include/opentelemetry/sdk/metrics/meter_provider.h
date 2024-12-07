@@ -110,7 +110,7 @@ public:
   /**
    * Shutdown the meter provider.
    */
-  bool Shutdown() noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
   /**
    * Force flush the meter provider.

@@ -16,6 +16,7 @@
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
 
 // clang-format off
@@ -310,6 +311,17 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
   }
 
   for (const auto &kv : resource.GetAttributes())
+  {
+    OtlpPopulateAttributeUtils::PopulateAttribute(proto->add_attributes(), kv.first, kv.second);
+  }
+}
+
+void OtlpPopulateAttributeUtils::PopulateAttribute(
+    opentelemetry::proto::common::v1::InstrumentationScope *proto,
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+        &instrumentation_scope) noexcept
+{
+  for (const auto &kv : instrumentation_scope.GetAttributes())
   {
     OtlpPopulateAttributeUtils::PopulateAttribute(proto->add_attributes(), kv.first, kv.second);
   }

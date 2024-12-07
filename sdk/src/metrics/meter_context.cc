@@ -138,16 +138,15 @@ void MeterContext::RemoveMeter(nostd::string_view name,
   meters_.swap(filtered_meters);
 }
 
-bool MeterContext::Shutdown() noexcept
+bool MeterContext::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   bool result = true;
   // Shutdown only once.
   if (!shutdown_latch_.test_and_set(std::memory_order_acquire))
   {
-
     for (auto &collector : collectors_)
     {
-      bool status = std::static_pointer_cast<MetricCollector>(collector)->Shutdown();
+      bool status = std::static_pointer_cast<MetricCollector>(collector)->Shutdown(timeout);
       result      = result && status;
     }
     if (!result)

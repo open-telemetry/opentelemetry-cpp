@@ -119,6 +119,28 @@ TEST(OtlpRecordable, SetInstrumentationLibraryWithSchemaURL)
   EXPECT_EQ(expected_schema_url, rec.GetInstrumentationLibrarySchemaURL());
 }
 
+TEST(OtlpRecordable, SetInstrumentationScopeWithAttributes)
+{
+  exporter::otlp::OtlpRecordable rec;
+
+  auto inst_lib = trace_sdk::InstrumentationScope::Create(
+      "test_scope_name", "test_version", "test_schema_url", {{"test_key", "test_value"}});
+
+  ASSERT_EQ(inst_lib->GetAttributes().size(), 1);
+
+  rec.SetInstrumentationScope(*inst_lib);
+
+  const auto proto_instr_libr = rec.GetProtoInstrumentationScope();
+  EXPECT_EQ("test_scope_name", proto_instr_libr.name());
+  EXPECT_EQ("test_version", proto_instr_libr.version());
+
+  ASSERT_EQ(proto_instr_libr.attributes_size(), 1);
+  const auto &proto_attributes = proto_instr_libr.attributes(0);
+  ASSERT_TRUE(proto_attributes.value().has_string_value());
+  EXPECT_EQ("test_key", proto_attributes.key());
+  EXPECT_EQ("test_value", proto_attributes.value().string_value());
+}
+
 TEST(OtlpRecordable, SetStartTime)
 {
   OtlpRecordable rec;
@@ -324,7 +346,8 @@ TEST(OtlpRecordable, PopulateRequest)
   auto rec1      = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
   auto resource1 = resource::Resource::Create({{"service.name", "one"}});
   rec1->SetResource(resource1);
-  auto inst_lib1 = trace_sdk::InstrumentationScope::Create("one", "1");
+  auto inst_lib1 = trace_sdk::InstrumentationScope::Create("one", "1", "scope_schema",
+                                                           {{"scope_key", "scope_value"}});
   rec1->SetInstrumentationScope(*inst_lib1);
 
   auto rec2      = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
@@ -350,12 +373,23 @@ TEST(OtlpRecordable, PopulateRequest)
   EXPECT_EQ(req.resource_spans().size(), 2);
   for (const auto &resource_spans : req.resource_spans())
   {
-    auto service_name     = resource_spans.resource().attributes(0).value().string_value();
-    auto scope_spans_size = resource_spans.scope_spans().size();
+    ASSERT_GT(resource_spans.resource().attributes_size(), 0);
+    const auto service_name     = resource_spans.resource().attributes(0).value().string_value();
+    const auto scope_spans_size = resource_spans.scope_spans().size();
     if (service_name == "one")
     {
+      ASSERT_GT(resource_spans.scope_spans_size(), 0);
+      const auto &scope_one = resource_spans.scope_spans(0).scope();
+
       EXPECT_EQ(scope_spans_size, 1);
-      EXPECT_EQ(resource_spans.scope_spans(0).scope().name(), "one");
+      EXPECT_EQ(scope_one.name(), "one");
+      EXPECT_EQ(scope_one.version(), "1");
+
+      ASSERT_EQ(scope_one.attributes_size(), 1);
+      const auto &scope_attribute = scope_one.attributes(0);
+
+      EXPECT_EQ(scope_attribute.key(), "scope_key");
+      EXPECT_EQ(scope_attribute.value().string_value(), "scope_value");
     }
     if (service_name == "two")
     {

@@ -7,6 +7,7 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
 
 namespace opentelemetry
@@ -20,6 +21,7 @@ namespace v1
 {
 class AnyValue;
 class KeyValue;
+class InstrumentationScope;
 }  // namespace v1
 }  // namespace common
 
@@ -48,6 +50,10 @@ class OPENTELEMETRY_EXPORT_TYPE OtlpPopulateAttributeUtils
 public:
   static void PopulateAttribute(opentelemetry::proto::resource::v1::Resource *proto,
                                 const opentelemetry::sdk::resource::Resource &resource) noexcept;
+
+  static void PopulateAttribute(opentelemetry::proto::common::v1::InstrumentationScope *proto,
+                                const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+                                    &instrumentation_scope) noexcept;
 
   static void PopulateAnyValue(opentelemetry::proto::common::v1::AnyValue *proto_value,
                                const opentelemetry::common::AttributeValue &value) noexcept;
