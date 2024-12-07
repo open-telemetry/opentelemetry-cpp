@@ -263,7 +263,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  * Time disk spent activated
  * <p>
  * The real elapsed time ("wall clock") used in the I/O path (time from operations running in
- * parallel are not counted). Measured as: <p> <ul> <li>Linux: Field 13 from <a
+ * parallel are not counted). Measured as: <ul> <li>Linux: Field 13 from <a
  * href="https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats">procfs-diskstats</a></li>
  *   <li>Windows: The complement of
  * <a
@@ -380,7 +380,7 @@ CreateAsyncDoubleMetricSystemDiskMerged(metrics::Meter *meter)
  * Sum of the time each operation took to complete
  * <p>
  * Because it is the sum of time each request took, parallel-issued requests each contribute to make
- * the count grow. Measured as: <p> <ul> <li>Linux: Fields 7 & 11 from <a
+ * the count grow. Measured as: <ul> <li>Linux: Fields 7 & 11 from <a
  * href="https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats">procfs-diskstats</a></li>
  *   <li>Windows: "Avg. Disk sec/Read" perf counter multiplied by "Disk Reads/sec" perf counter
  * (similar for Writes)</li>
@@ -888,7 +888,6 @@ CreateAsyncDoubleMetricSystemNetworkConnections(metrics::Meter *meter)
  * Count of packets that are dropped or discarded even though there was no error
  * <p>
  * Measured as:
- * <p>
  * <ul>
  *   <li>Linux: the @code drop @endcode column in @code /proc/dev/net @endcode (<a
  * href="https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html">source</a>)</li>
@@ -937,7 +936,6 @@ CreateAsyncDoubleMetricSystemNetworkDropped(metrics::Meter *meter)
  * Count of network errors detected
  * <p>
  * Measured as:
- * <p>
  * <ul>
  *   <li>Linux: the @code errs @endcode column in @code /proc/dev/net @endcode (<a
  * href="https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html">source</a>).</li>
