@@ -7,8 +7,9 @@ if(${BUILD_TESTING})
 
   set_target_properties(opentelemetry_http_client_nosend
                         PROPERTIES EXPORT_NAME opentelemetry_http_client_nosend)
-
-  if(MSVC)
+  if(NOT GMOCK_LIB AND TARGET GTest::gmock)
+    set(GMOCK_LIB GTest::gmock)
+  elseif(MSVC)
     # Explicitly specify that we consume GTest from shared library. The rest of
     # code logic below determines whether we link Release or Debug flavor of the
     # library. These flavors have different prefix on Windows, gmock and gmockd
@@ -21,12 +22,15 @@ if(${BUILD_TESTING})
       unset(GMOCK_LIB CACHE)
     endif()
   endif()
-  if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-    find_library(GMOCK_LIB gmockd PATH_SUFFIXES lib)
-  else()
-    find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
-  endif()
 
+  if(NOT GMOCK_LIB)
+    if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+      find_library(GMOCK_LIB gmockd PATH_SUFFIXES lib)
+    else()
+      find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
+    endif()
+  endif()
+  
   target_link_libraries(
     opentelemetry_http_client_nosend opentelemetry_ext
     opentelemetry_test_common ${GMOCK_LIB} ${GTEST_BOTH_LIBRARIES})
