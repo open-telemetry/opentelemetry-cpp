@@ -40,32 +40,30 @@ OtlpHttpExporterOptions::OtlpHttpExporterOptions()
 }
 
 OtlpHttpExporterOptions::OtlpHttpExporterOptions(void *)
-    : json_bytes_mapping(JsonBytesMappingKind::kHexId),
+    : url(),
+      content_type(HttpRequestContentType::kBinary),
+      json_bytes_mapping(JsonBytesMappingKind::kHexId),
       use_json_name(false),
       console_debug(false),
-      ssl_insecure_skip_verify(false)
+      timeout(0),
+      http_headers(),
+      ssl_insecure_skip_verify(false),
+      ssl_ca_cert_path(),
+      ssl_ca_cert_string(),
+      ssl_client_key_path(),
+      ssl_client_key_string(),
+      ssl_client_cert_path(),
+      ssl_client_cert_string(),
+      ssl_min_tls(),
+      ssl_max_tls(),
+      ssl_cipher(),
+      ssl_cipher_suite(),
+      compression()
 {
-  url          = "";
-  content_type = HttpRequestContentType::kBinary;
-
 #ifdef ENABLE_ASYNC_EXPORT
   max_concurrent_requests     = 64;
   max_requests_per_connection = 8;
 #endif /* ENABLE_ASYNC_EXPORT */
-
-  ssl_ca_cert_path       = "";
-  ssl_ca_cert_string     = "";
-  ssl_client_key_path    = "";
-  ssl_client_key_string  = "";
-  ssl_client_cert_path   = "";
-  ssl_client_cert_string = "";
-
-  ssl_min_tls      = "";
-  ssl_max_tls      = "";
-  ssl_cipher       = "";
-  ssl_cipher_suite = "";
-
-  compression = "";
 }
 
 OtlpHttpExporterOptions::~OtlpHttpExporterOptions() {}
