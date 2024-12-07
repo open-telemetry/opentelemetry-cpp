@@ -118,9 +118,9 @@ const opentelemetry::sdk::resource::Resource &LoggerProvider::GetResource() cons
   return context_->GetResource();
 }
 
-bool LoggerProvider::Shutdown() noexcept
+bool LoggerProvider::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  return context_->Shutdown();
+  return context_->Shutdown(timeout);
 }
 
 bool LoggerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
