@@ -52,10 +52,11 @@ TracerProvider::TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&pro
                                const resource::Resource &resource,
                                std::unique_ptr<Sampler> sampler,
                                std::unique_ptr<IdGenerator> id_generator) noexcept
-{
-  context_ = std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
-                                             std::move(id_generator));
-}
+    : context_(std::make_shared<TracerContext>(std::move(processors),
+                                               resource,
+                                               std::move(sampler),
+                                               std::move(id_generator)))
+{}
 
 TracerProvider::~TracerProvider()
 {

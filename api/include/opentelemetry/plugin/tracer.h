@@ -20,7 +20,7 @@ class DynamicLibraryHandle;
 class Span final : public trace::Span
 {
 public:
-  Span(std::shared_ptr<trace::Tracer> &&tracer, nostd::shared_ptr<trace::Span> span) noexcept
+  Span(std::shared_ptr<trace::Tracer> &&tracer, const nostd::shared_ptr<trace::Span> &span) noexcept
       : tracer_{std::move(tracer)}, span_{span}
   {}
 

@@ -754,13 +754,7 @@ sdk::common::ExportResult OtlpHttpClient::Export(
   auto session = createSession(message, std::move(result_callback));
   if (opentelemetry::nostd::holds_alternative<sdk::common::ExportResult>(session))
   {
-    sdk::common::ExportResult result =
-        opentelemetry::nostd::get<sdk::common::ExportResult>(session);
-    if (result_callback)
-    {
-      result_callback(result);
-    }
-    return result;
+    return opentelemetry::nostd::get<sdk::common::ExportResult>(session);
   }
 
   addSession(std::move(opentelemetry::nostd::get<HttpSessionData>(session)));
@@ -905,9 +899,11 @@ OtlpHttpClient::createSession(
       {
         std::cerr << error_message << '\n';
       }
-      OTEL_INTERNAL_LOG_ERROR(error_message.c_str());
+      OTEL_INTERNAL_LOG_ERROR(error_message);
 
-      return opentelemetry::sdk::common::ExportResult::kFailure;
+      const auto result = opentelemetry::sdk::common::ExportResult::kFailure;
+      result_callback(result);
+      return result;
     }
 
     if (!parse_url.path_.empty() && parse_url.path_[0] == '/')
@@ -939,7 +935,10 @@ OtlpHttpClient::createSession(
         OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Serialize body failed(Binary):"
                                 << message.InitializationErrorString());
       }
-      return opentelemetry::sdk::common::ExportResult::kFailure;
+
+      const auto result = opentelemetry::sdk::common::ExportResult::kFailure;
+      result_callback(result);
+      return result;
     }
     content_type = kHttpBinaryContentType;
   }
@@ -972,7 +971,9 @@ OtlpHttpClient::createSession(
     }
     OTEL_INTERNAL_LOG_ERROR(error_message);
 
-    return opentelemetry::sdk::common::ExportResult::kFailure;
+    const auto result = opentelemetry::sdk::common::ExportResult::kFailure;
+    result_callback(result);
+    return result;
   }
 
   auto session = http_client_->CreateSession(options_.url);

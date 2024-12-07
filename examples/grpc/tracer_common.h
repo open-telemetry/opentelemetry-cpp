@@ -44,7 +44,7 @@ public:
     context_->AddMetadata(std::string(key), std::string(value));
   }
 
-  ClientContext *context_;
+  ClientContext *context_ = nullptr;
 };
 
 class GrpcServerCarrier : public opentelemetry::context::propagation::TextMapCarrier
@@ -69,7 +69,7 @@ public:
     // Not required for server
   }
 
-  ServerContext *context_;
+  ServerContext *context_ = nullptr;
 };
 
 void InitTracer()
