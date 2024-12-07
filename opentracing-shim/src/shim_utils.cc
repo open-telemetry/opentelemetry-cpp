@@ -71,11 +71,7 @@ nostd::shared_ptr<opentelemetry::baggage::Baggage> makeBaggage(
     entry.second->ForeachBaggageItem(
         [&baggage_items](const std::string &key, const std::string &value) {
           // It is unspecified which Baggage value is used in the case of repeated keys.
-          if (baggage_items.find(key) == baggage_items.end())
-          {
-            baggage_items.emplace(key, value);  // Here, only insert if key not already present
-          }
-          return true;
+          return baggage_items.emplace(key, value).second;
         });
   }
   // If no such list of references is specified, the current Baggage

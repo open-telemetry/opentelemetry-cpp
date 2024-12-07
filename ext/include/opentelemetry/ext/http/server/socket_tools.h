@@ -270,7 +270,7 @@ struct Socket
 
   Socket(Type sock = Invalid) : m_sock(sock) {}
 
-  Socket(int af, int type, int proto) { m_sock = ::socket(af, type, proto); }
+  Socket(int af, int type, int proto) : m_sock(::socket(af, type, proto)) {}
 
   ~Socket() {}
 
