@@ -52,12 +52,12 @@ struct ElasticsearchExporterOptions
    * from elasticsearch
    * @param console_debug If true, print the status of the exporter methods in the console
    */
-  ElasticsearchExporterOptions(std::string host         = "localhost",
-                               int port                 = 9200,
-                               std::string index        = "logs",
-                               int response_timeout     = 30,
-                               bool console_debug       = false,
-                               HttpHeaders http_headers = {})
+  ElasticsearchExporterOptions(const std::string &host         = "localhost",
+                               int port                        = 9200,
+                               const std::string &index        = "logs",
+                               int response_timeout            = 30,
+                               bool console_debug              = false,
+                               const HttpHeaders &http_headers = {})
       : host_{host},
         port_{port},
         index_{index},
