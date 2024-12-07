@@ -35,8 +35,8 @@ public:
   std::unique_ptr<HeadersConfiguration> headers;
   std::string headers_list;
   std::string compression;
-  size_t timeout;
-  bool insecure;
+  size_t timeout{0};
+  bool insecure{false};
 };
 
 }  // namespace configuration

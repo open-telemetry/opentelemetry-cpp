@@ -41,10 +41,10 @@ public:
   std::unique_ptr<HeadersConfiguration> headers;
   std::string headers_list;
   std::string compression;
-  size_t timeout;
+  size_t timeout{0};
   std::string temporality_preference;
-  enum_default_histogram_aggregation default_histogram_aggregation;
-  bool insecure;
+  enum_default_histogram_aggregation default_histogram_aggregation{explicit_bucket_histogram};
+  bool insecure{false};
 };
 
 }  // namespace configuration

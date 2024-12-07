@@ -28,10 +28,10 @@ public:
   }
 
   std::string host;
-  size_t port;
-  bool without_units;
-  bool without_type_suffix;
-  bool without_scope_info;
+  size_t port{0};
+  bool without_units{false};
+  bool without_type_suffix{false};
+  bool without_scope_info{false};
   // FIXME: with_resource_constant_labels;
 };
 

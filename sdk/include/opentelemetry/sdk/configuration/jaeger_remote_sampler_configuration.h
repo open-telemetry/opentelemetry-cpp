@@ -27,7 +27,7 @@ public:
   }
 
   std::string endpoint;
-  size_t interval;
+  size_t interval{0};
   std::unique_ptr<SamplerConfiguration> initial_sampler;
 };
 

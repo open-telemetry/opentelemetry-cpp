@@ -30,7 +30,7 @@ public:
   ~SelectorConfiguration() = default;
 
   std::string instrument_name;
-  enum_instrument_type instrument_type;
+  enum_instrument_type instrument_type{counter};
   std::string unit;
   std::string meter_name;
   std::string meter_version;

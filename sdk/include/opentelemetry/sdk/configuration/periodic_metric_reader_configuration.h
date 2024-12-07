@@ -32,8 +32,8 @@ public:
     visitor->VisitPeriodic(this);
   }
 
-  size_t interval;
-  size_t timeout;
+  size_t interval{0};
+  size_t timeout{0};
   std::unique_ptr<PushMetricExporterConfiguration> exporter;
   std::vector<std::unique_ptr<MetricProducerConfiguration>> producers;
 };

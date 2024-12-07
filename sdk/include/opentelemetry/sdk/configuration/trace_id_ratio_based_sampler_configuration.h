@@ -26,7 +26,7 @@ public:
     visitor->VisitTraceIdRatioBased(this);
   }
 
-  double ratio;
+  double ratio{0.0};
 };
 
 }  // namespace configuration

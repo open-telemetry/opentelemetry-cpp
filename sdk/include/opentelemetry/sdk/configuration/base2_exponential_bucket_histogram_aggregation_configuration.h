@@ -22,9 +22,9 @@ public:
   Base2ExponentialBucketHistogramAggregationConfiguration()           = default;
   ~Base2ExponentialBucketHistogramAggregationConfiguration() override = default;
 
-  size_t max_scale;
-  size_t max_size;
-  bool record_min_max;
+  size_t max_scale{0};
+  size_t max_size{0};
+  bool record_min_max{false};
 };
 
 }  // namespace configuration

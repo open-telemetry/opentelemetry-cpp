@@ -23,7 +23,7 @@ public:
   ~ExplicitBucketHistogramAggregationConfiguration() override = default;
 
   std::vector<double> boundaries;
-  bool record_min_max;
+  bool record_min_max{false};
 };
 
 }  // namespace configuration

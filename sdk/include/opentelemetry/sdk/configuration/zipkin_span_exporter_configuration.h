@@ -29,7 +29,7 @@ public:
   }
 
   std::string endpoint;
-  size_t timeout;
+  size_t timeout{0};
 };
 
 }  // namespace configuration
