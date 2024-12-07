@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "opentelemetry/sdk/configuration/metric_producer_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
@@ -32,6 +33,7 @@ public:
   }
 
   std::unique_ptr<PullMetricExporterConfiguration> exporter;
+  std::vector<std::unique_ptr<MetricProducerConfiguration>> producers;
 };
 
 }  // namespace configuration

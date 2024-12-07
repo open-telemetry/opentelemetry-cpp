@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "opentelemetry/sdk/configuration/metric_producer_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
@@ -34,6 +35,7 @@ public:
   size_t interval;
   size_t timeout;
   std::unique_ptr<PushMetricExporterConfiguration> exporter;
+  std::vector<std::unique_ptr<MetricProducerConfiguration>> producers;
 };
 
 }  // namespace configuration
