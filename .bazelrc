@@ -55,8 +55,14 @@ build:macos --copt=-DCIVETWEB_API= --copt=-DCIVETWEB_CXX_API= --cxxopt=-DCIVETWE
 build:macos --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
 build:macos --strip=never --copt=-g --action_env=CC=/opt/homebrew/bin/clang --host_action_env=CC=/opt/homebrew/bin/clang 
 # https://github.com/Homebrew/homebrew-core/issues/178435#issuecomment-2250615995
-build:macos --linkopt=-L/opt/homebrew/opt/llvm/lib/c++ --linkopt=-L/opt/homebrew/opt/llvm/lib/unwind --linkopt=-lunwind
-build:macos --host_linkopt=-L/opt/homebrew/opt/llvm/lib/c++ --host_linkopt=-L/opt/homebrew/opt/llvm/lib/unwind --host_linkopt=-lunwind
+#build:macos --linkopt=-L/opt/homebrew/opt/llvm/lib/c++ --linkopt=-L/opt/homebrew/opt/llvm/lib/unwind --linkopt=-lunwind
+#build:macos --host_linkopt=-L/opt/homebrew/opt/llvm/lib/c++ --host_linkopt=-L/opt/homebrew/opt/llvm/lib/unwind --host_linkopt=-lunwind
+
+build:macos --linkopt=-L/opt/homebrew/opt/llvm/lib
+build:macos --host_linkopt=-L/opt/homebrew/opt/llvm/lib
+
+build:macos --copt="-I /opt/homebrew/opt/llvm/include"
+build:macos --host_copt="-I /opt/homebrew/opt/llvm/include"
 
 # --config=asan : Address Sanitizer.
 common:asan --copt -DADDRESS_SANITIZER
