@@ -96,7 +96,7 @@ public:
     FakeServiceStub *stub_;
   };
 
-  async_interface_base *async() { return &async_interface_; }
+  async_interface_base *async() override { return &async_interface_; }
   async_interface_base *experimental_async() { return &async_interface_; }
 
   grpc::Status Export(grpc::ClientContext *,
@@ -182,9 +182,10 @@ void CreateDenseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatch
 
     for (int i = 0; i < kNumAttributes; i++)
     {
-      recordable->SetAttribute("int_key_" + i, static_cast<int64_t>(i));
-      recordable->SetAttribute("str_key_" + i, "string_val_" + i);
-      recordable->SetAttribute("bool_key_" + i, true);
+      const auto si{ std::to_string(i) };
+      recordable->SetAttribute("int_key_" + si, static_cast<int64_t>(i));
+      recordable->SetAttribute("str_key_" + si, "string_val_" + si);
+      recordable->SetAttribute("bool_key_" + si, true);
     }
 
     recordables[i] = std::move(recordable);
