@@ -47,6 +47,8 @@ build:linux --copt=-DCIVETWEB_API= --copt=-DCIVETWEB_CXX_API= --cxxopt=-DCIVETWE
 build:linux --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
 #build:linux --fission=yes --copt=-g 
 build:linux --copt=-g --strip=never
+build:linux --action_env=CC=/usr/bin/clang-19
+build:linux --host_action_env=CC=/usr/bin/clang-19
 
 
 build:macos --copt=-DCIVETWEB_API= --copt=-DCIVETWEB_CXX_API= --cxxopt=-DCIVETWEB_API= --cxxopt=-DCIVETWEB_CXX_API=
