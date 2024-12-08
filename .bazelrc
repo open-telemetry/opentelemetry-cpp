@@ -12,7 +12,7 @@ build --features=parse_headers
 build --dynamic_mode=off
 
 common --noenable_workspace
-common --remote_download_all
+common --remote_download_minimal
 
 # Avoid using c:\windows\system32\bash.exe
 common:windows --shell_executable="c:\\program files\\git\\usr\\bin\\bash.exe"
@@ -106,12 +106,12 @@ common --incompatible_config_setting_private_default_visibility
 common --incompatible_disable_native_repo_rules 
 common --incompatible_disable_non_executable_java_binary
 # For jetbrains bazel plugin
-# common --incompatible_disable_target_provider_fields
+common --incompatible_disable_target_provider_fields
 common --incompatible_disallow_empty_glob
 common --incompatible_disallow_struct_provider_syntax
 common --incompatible_strict_action_env
 # Enabled for the experimental JetBrains bazel plugin
-# common --incompatible_struct_has_no_methods
+common --incompatible_struct_has_no_methods
 common --incompatible_use_plus_in_repo_names
 
 

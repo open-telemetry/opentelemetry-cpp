@@ -372,12 +372,12 @@ void OtlpGrpcForwardProxy::Shutdown()
     impl->server->Shutdown();
 }
 
-void EnableDefaultHealthCheckService(bool enable)
+void OtlpGrpcForwardProxy::EnableDefaultHealthCheckService(bool enable)
 {
     grpc::EnableDefaultHealthCheckService(enable);  
 }
 
-void InitProtoReflectionServerBuilderPlugin()
+void OtlpGrpcForwardProxy::InitProtoReflectionServerBuilderPlugin()
 {
     grpc::reflection::InitProtoReflectionServerBuilderPlugin();
 }
