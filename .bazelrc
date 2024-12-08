@@ -48,21 +48,15 @@ build:linux --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
 #build:linux --fission=yes --copt=-g 
 build:linux --copt=-g --strip=never
 
-#build:macos --copt=-Wno-missing-template-arg-list-after-template-kw
-#build:macos --host_copt=-Wno-missing-template-arg-list-after-template-kw
 
 build:macos --copt=-DCIVETWEB_API= --copt=-DCIVETWEB_CXX_API= --cxxopt=-DCIVETWEB_API= --cxxopt=-DCIVETWEB_CXX_API=
 build:macos --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
-build:macos --strip=never --copt=-g --action_env=CC=/opt/homebrew/bin/clang --host_action_env=CC=/opt/homebrew/bin/clang 
-# https://github.com/Homebrew/homebrew-core/issues/178435#issuecomment-2250615995
-#build:macos --linkopt=-L/opt/homebrew/opt/llvm/lib/c++ --linkopt=-L/opt/homebrew/opt/llvm/lib/unwind --linkopt=-lunwind
-#build:macos --host_linkopt=-L/opt/homebrew/opt/llvm/lib/c++ --host_linkopt=-L/opt/homebrew/opt/llvm/lib/unwind --host_linkopt=-lunwind
-
-build:macos --linkopt=-L/opt/homebrew/opt/llvm/lib
-build:macos --host_linkopt=-L/opt/homebrew/opt/llvm/lib
-
-build:macos --copt="-I /opt/homebrew/opt/llvm/include"
-build:macos --host_copt="-I /opt/homebrew/opt/llvm/include"
+build:macos --strip=never --copt=-g --cxxopt=-g
+# Does not yet compoile with the Developer command-line tools, needs clang from homebrew
+#build:macos --action_env=/Library/Developer/CommandLineTools/usr/bin/clang
+#build:macos --host_action_env=/Library/Developer/CommandLineTools/usr/bin/clang
+build:macos --action_env=CC=/opt/homebrew/bin/clang
+build:macos --host_action_env=CC=/opt/homebrew/bin/clang
 
 # --config=asan : Address Sanitizer.
 common:asan --copt -DADDRESS_SANITIZER
