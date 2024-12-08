@@ -140,10 +140,11 @@ build:clang-cl --copt=-Wno-missing-template-arg-list-after-template-kw
 # allow newer protobuf to compile
 common --experimental_google_legacy_api
 
+common --force_pic
+
 ## This is what my ../top.bazelrc contains (not in the repo as local to my machine)
 # build --disk_cache=f:/b/d
 # common --repository_cache=f:/b/r
 # startup --output_user_root=f:/b/u
 try-import %workspace%/../top.bazelrc
 
-common --experimental_cc_static_library

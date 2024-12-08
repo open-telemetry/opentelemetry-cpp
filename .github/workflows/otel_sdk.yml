@@ -69,6 +69,8 @@ jobs:
       - uses: actions/cache/save@v4
         # Don't update cache on releases
         if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
+        env:
+          ZSTD_CLEVEL: 1 # 1 (fastest) .. 19 (slowest)
         with:
           path: d:/d.vhdx
           enableCrossOsArchive: true
