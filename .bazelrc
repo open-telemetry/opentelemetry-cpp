@@ -107,9 +107,9 @@ common --incompatible_disallow_empty_glob
 common --incompatible_disallow_struct_provider_syntax
 common --incompatible_strict_action_env
 # Enabled for the experimental JetBrains bazel plugin
-common --incompatible_struct_has_no_methods
+# common --incompatible_struct_has_no_methods
 common --incompatible_use_plus_in_repo_names
-common --incompatible_use_host_features
+# common --incompatible_use_host_features
 common --modify_execution_info=CppCompile=+supports-path-mapping
 common --legacy_important_outputs=false
 
