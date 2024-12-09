@@ -51,7 +51,7 @@ public:
    * Force flush the log records pushed into this log exporter.
    */
   virtual bool ForceFlush(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
 
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.

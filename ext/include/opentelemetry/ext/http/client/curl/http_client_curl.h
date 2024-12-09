@@ -170,13 +170,11 @@ class Session : public opentelemetry::ext::http::client::Session,
 {
 public:
   Session(HttpClient &http_client,
-          std::string scheme      = "http",
-          const std::string &host = "",
-          uint16_t port           = 80)
-      : http_client_(http_client)
-  {
-    host_ = scheme + "://" + host + ":" + std::to_string(port) + "/";
-  }
+          const std::string &scheme = "http",
+          const std::string &host   = "",
+          uint16_t port             = 80)
+      : host_{scheme + "://" + host + ":" + std::to_string(port) + "/"}, http_client_(http_client)
+  {}
 
   std::shared_ptr<opentelemetry::ext::http::client::Request> CreateRequest() noexcept override
   {
@@ -226,7 +224,7 @@ private:
   std::shared_ptr<Request> http_request_;
   std::string host_;
   std::unique_ptr<HttpOperation> curl_operation_;
-  uint64_t session_id_;
+  uint64_t session_id_ = 0UL;
   HttpClient &http_client_;
   std::atomic<bool> is_session_active_{false};
 };

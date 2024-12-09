@@ -95,7 +95,7 @@ public:
     resource_attributes["vec_uint64_value"]          = std::vector<uint64_t>{7, 8};
     resource_attributes["vec_double_value"]          = std::vector<double>{3.2, 3.3};
     resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
-    auto resource = resource::Resource::Create(resource_attributes);
+    auto resource = resource::Resource::Create(resource_attributes, "resource_url");
 
     auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
     processor_opts.max_export_batch_size = 5;
@@ -109,9 +109,17 @@ public:
 
     std::string report_trace_id;
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url",
+                                      {{ "scope_key",
+                                         "scope_value" }});
+#else
+    auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url");
+#endif
+
+    auto parent_span = tracer->StartSpan("Test parent span");
+
     char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
-    auto tracer                                      = provider->GetTracer("test");
-    auto parent_span                                 = tracer->StartSpan("Test parent span");
 
     trace_api::StartSpanOptions child_span_opts = {};
     child_span_opts.parent                      = parent_span->GetContext();
@@ -136,11 +144,22 @@ public:
       auto check_json = nlohmann::json::parse(check_json_text, nullptr, false);
       if (!check_json.is_discarded())
       {
-        auto resource_span     = *check_json["resourceSpans"].begin();
-        auto scope_span        = *resource_span["scopeSpans"].begin();
-        auto span              = *scope_span["spans"].begin();
-        auto received_trace_id = span["traceId"].get<std::string>();
-        EXPECT_EQ(received_trace_id, report_trace_id);
+        auto resource_span = *check_json["resourceSpans"].begin();
+        auto scope_span    = *resource_span["scopeSpans"].begin();
+        auto scope         = scope_span["scope"];
+        auto span          = *scope_span["spans"].begin();
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+        ASSERT_EQ(1, scope["attributes"].size());
+        const auto scope_attribute = scope["attributes"].front();
+        EXPECT_EQ("scope_key", scope_attribute["key"].get<std::string>());
+        EXPECT_EQ("scope_value", scope_attribute["value"]["stringValue"].get<std::string>());
+#endif
+        EXPECT_EQ("resource_url", resource_span["schemaUrl"].get<std::string>());
+        EXPECT_EQ("scope_url", scope_span["schemaUrl"].get<std::string>());
+        EXPECT_EQ("scope_name", scope["name"].get<std::string>());
+        EXPECT_EQ("scope_version", scope["version"].get<std::string>());
+        EXPECT_EQ(report_trace_id, span["traceId"].get<std::string>());
       }
       else
       {
