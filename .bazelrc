@@ -110,7 +110,8 @@ common --incompatible_strict_action_env
 common --incompatible_struct_has_no_methods
 common --incompatible_use_plus_in_repo_names
 common --incompatible_use_host_features
-
+common --modify_execution_info=CppCompile=+supports-path-mapping
+common --legacy_important_outputs=false
 
 build --@curl//:use_mbedtls=true 
 # build --@curl//:http_only=true
@@ -133,10 +134,7 @@ build:clang-cl --host_per_file_copt="c-ares\\+/.*@-Wno-macro-redefined"
 #    error: a template argument list is expected after a name prefixed by the template keyword [-Wmissing-template-arg-list-after-template-kw]
 #  detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set( 
 #                                                                                  ^
-build:clang-cl --copt=-Wno-missing-template-arg-list-after-template-kw
-
-# still does not work yet
-#common --incompatible_enable_proto_toolchain_resolution 
+#build:clang-cl --copt=-Wno-missing-template-arg-list-after-template-kw
 
 # allow newer protobuf to compile
 common --experimental_google_legacy_api
@@ -151,5 +149,3 @@ common:macos --force_pic
 try-import %workspace%/../top.bazelrc
 
 
-common --modify_execution_info=CppCompile=+supports-path-mapping
-common --legacy_important_outputs=false
