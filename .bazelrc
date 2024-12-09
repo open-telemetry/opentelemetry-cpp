@@ -109,6 +109,7 @@ common --incompatible_strict_action_env
 # Enabled for the experimental JetBrains bazel plugin
 common --incompatible_struct_has_no_methods
 common --incompatible_use_plus_in_repo_names
+common --incompatible_use_host_features
 
 
 build --@curl//:use_mbedtls=true 
@@ -149,3 +150,6 @@ common:macos --force_pic
 # startup --output_user_root=f:/b/u
 try-import %workspace%/../top.bazelrc
 
+
+common --modify_execution_info=CppCompile=+supports-path-mapping
+common --legacy_important_outputs=false
