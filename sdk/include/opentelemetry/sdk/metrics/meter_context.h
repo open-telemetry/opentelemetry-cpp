@@ -147,7 +147,7 @@ public:
   /**
    * Shutdown the Collectors associated with this meter provider.
    */
-  bool Shutdown() noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
 private:
   opentelemetry::sdk::resource::Resource resource_;
