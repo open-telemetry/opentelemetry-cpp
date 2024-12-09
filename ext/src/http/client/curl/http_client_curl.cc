@@ -21,6 +21,7 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
@@ -188,6 +189,17 @@ HttpClient::HttpClient()
     : multi_handle_(curl_multi_init()),
       next_session_id_{0},
       max_sessions_per_connection_{8},
+      background_thread_instrumentation_(nullptr),
+      scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
+      curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
+{}
+
+HttpClient::HttpClient(
+    const std::shared_ptr<sdk::common::ThreadInstrumentation> &thread_instrumentation)
+    : multi_handle_(curl_multi_init()),
+      next_session_id_{0},
+      max_sessions_per_connection_{8},
+      background_thread_instrumentation_(thread_instrumentation),
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
       curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
 {}
@@ -345,6 +357,11 @@ void HttpClient::MaybeSpawnBackgroundThread()
 
   background_thread_.reset(new std::thread(
       [](HttpClient *self) {
+        if (self->background_thread_instrumentation_ != nullptr)
+        {
+          self->background_thread_instrumentation_->OnStart();
+        }
+
         int still_running = 1;
         while (true)
         {
@@ -445,6 +462,11 @@ void HttpClient::MaybeSpawnBackgroundThread()
             {
               if (self->background_thread_)
               {
+                if (self->background_thread_instrumentation_ != nullptr)
+                {
+                  self->background_thread_instrumentation_->OnEnd();
+                  self->background_thread_instrumentation_.reset();
+                }
                 self->background_thread_->detach();
                 self->background_thread_.reset();
               }

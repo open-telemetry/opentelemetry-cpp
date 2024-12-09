@@ -20,6 +20,7 @@
 #include "opentelemetry/sdk/common/circular_buffer.h"
 #include "opentelemetry/sdk/common/circular_buffer_range.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #include "opentelemetry/sdk/trace/exporter.h"
@@ -46,8 +47,12 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
       max_export_batch_size_(options.max_export_batch_size),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_(&BatchSpanProcessor::DoBackgroundWork, this)
-{}
+      worker_thread_instrumentation_(options.thread_instrumentation),
+      worker_thread_()
+{
+  // Make sure the constructor is complete before giving 'this' to a thread.
+  worker_thread_ = std::thread(&BatchSpanProcessor::DoBackgroundWork, this);
+}
 
 std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
 {
@@ -149,10 +154,20 @@ bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 
 void BatchSpanProcessor::DoBackgroundWork()
 {
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->OnStart();
+  }
+
   auto timeout = schedule_delay_millis_;
 
   while (true)
   {
+    if (worker_thread_instrumentation_ != nullptr)
+    {
+      worker_thread_instrumentation_->BeforeWait();
+    }
+
     // Wait for `timeout` milliseconds
     std::unique_lock<std::mutex> lk(synchronization_data_->cv_m);
     synchronization_data_->cv.wait_for(lk, timeout, [this] {
@@ -165,6 +180,11 @@ void BatchSpanProcessor::DoBackgroundWork()
     });
     synchronization_data_->is_force_wakeup_background_worker.store(false,
                                                                    std::memory_order_release);
+
+    if (worker_thread_instrumentation_ != nullptr)
+    {
+      worker_thread_instrumentation_->AfterWait();
+    }
 
     if (synchronization_data_->is_shutdown.load() == true)
     {
@@ -180,10 +200,20 @@ void BatchSpanProcessor::DoBackgroundWork()
     // Subtract the duration of this export call from the next `timeout`.
     timeout = schedule_delay_millis_ - duration;
   }
+
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->OnEnd();
+  }
 }
 
 void BatchSpanProcessor::Export()
 {
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->BeforeLoad();
+  }
+
   do
   {
     std::vector<std::unique_ptr<Recordable>> spans_arr;
@@ -222,6 +252,11 @@ void BatchSpanProcessor::Export()
     exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
     NotifyCompletion(notify_force_flush, exporter_, synchronization_data_);
   } while (true);
+
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->AfterLoad();
+  }
 }
 
 void BatchSpanProcessor::NotifyCompletion(
