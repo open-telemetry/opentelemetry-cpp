@@ -356,9 +356,8 @@ private:
   std::unique_ptr<std::thread> background_thread_;
   std::chrono::milliseconds scheduled_delay_milliseconds_;
 
-  std::condition_variable background_thread_waiter_cv_;
-  std::mutex background_thread_waiter_lock_;
   std::chrono::milliseconds background_thread_wait_for_;
+  std::atomic<bool> is_shutdown;
 
   nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
 };
