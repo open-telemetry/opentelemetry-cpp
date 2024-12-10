@@ -328,19 +328,9 @@ public:
   void ScheduleAbortSession(uint64_t session_id);
   void ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource);
 
-  void WaitBackgroundThreadExit()
-  {
-    std::unique_ptr<std::thread> background_thread;
-    {
-      std::lock_guard<std::mutex> lock_guard{background_thread_m_};
-      background_thread.swap(background_thread_);
-    }
+  void SetBackgroundWaitFor(std::chrono::milliseconds ms);
 
-    if (background_thread && background_thread->joinable())
-    {
-      background_thread->join();
-    }
-  }
+  void WaitBackgroundThreadExit();
 
 private:
   void wakeupBackgroundThread();
@@ -365,6 +355,10 @@ private:
   std::mutex background_thread_m_;
   std::unique_ptr<std::thread> background_thread_;
   std::chrono::milliseconds scheduled_delay_milliseconds_;
+
+  std::condition_variable background_thread_waiter_cv_;
+  std::mutex background_thread_waiter_lock_;
+  std::chrono::milliseconds background_thread_wait_for_;
 
   nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
 };
