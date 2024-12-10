@@ -524,7 +524,6 @@ void HttpClient::ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource
 
 void HttpClient::SetBackgroundWaitFor(std::chrono::milliseconds ms)
 {
-  std::lock_guard<std::mutex> lock_guard{background_thread_m_};
   background_thread_wait_for_ = ms;
 }
 
