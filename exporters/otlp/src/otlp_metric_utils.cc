@@ -18,6 +18,7 @@
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
 // clang-format off

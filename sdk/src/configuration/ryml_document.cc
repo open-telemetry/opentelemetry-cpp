@@ -1,7 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <exception>
 #include <memory>
+#include <ostream>
 #include <ryml.hpp>
 #include <ryml_std.hpp>
 #include <string>

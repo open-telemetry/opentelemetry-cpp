@@ -1,7 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <exception>
 #include <memory>
+#include <ostream>
 
 #include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/provider.h"

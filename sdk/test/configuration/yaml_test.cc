@@ -3,8 +3,13 @@
 
 #include <gtest/gtest.h>
 #include <stdlib.h>
+#include <memory>
+#include <string>
 
+#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
+#include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
 
 std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(const std::string &yaml)
