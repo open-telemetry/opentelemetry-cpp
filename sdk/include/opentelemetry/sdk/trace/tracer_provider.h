@@ -113,7 +113,7 @@ public:
   /**
    * Shutdown the span processor associated with this tracer provider.
    */
-  bool Shutdown() noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
   /**
    * Force flush the span processor associated with this tracer provider.

@@ -61,11 +61,12 @@ TracerProvider::TracerProvider(
     std::unique_ptr<IdGenerator> id_generator,
     std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
         tracer_configurator) noexcept
-{
-  context_ =
-      std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
-                                      std::move(id_generator), std::move(tracer_configurator));
-}
+    : context_(std::make_shared<TracerContext>(std::move(processors),
+                                               resource,
+                                               std::move(sampler),
+                                               std::move(id_generator),
+                                               std::move(tracer_configurator)))
+{}
 
 TracerProvider::~TracerProvider()
 {
@@ -135,9 +136,9 @@ const resource::Resource &TracerProvider::GetResource() const noexcept
   return context_->GetResource();
 }
 
-bool TracerProvider::Shutdown() noexcept
+bool TracerProvider::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  return context_->Shutdown();
+  return context_->Shutdown(timeout);
 }
 
 bool TracerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
