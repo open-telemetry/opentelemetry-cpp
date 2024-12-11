@@ -11,6 +11,7 @@
 #include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/metrics/export/metric_filter.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
@@ -88,14 +89,20 @@ public:
   const sdk::resource::Resource &GetResource() const noexcept;
 
   /**
-   * Attaches a metric reader to list of configured readers for this Meter providers.
-   * @param reader The metric reader for this meter provider. This
-   * must not be a nullptr.
+   * Create a MetricCollector from a MetricReader using the MeterContext of this MeterProvider and
+   * add it to the list of configured collectors.
+   * @param reader The MetricReader for which a MetricCollector is to be created. This must not be a
+   * nullptr.
+   * @param metric_filter The optional MetricFilter used when creating the MetricCollector.
+   * @return The MetricCollector created.
    *
    * Note: This reader may not receive any in-flight meter data, but will get newly created meter
-   * data. Note: This method is not thread safe, and should ideally be called from main thread.
+   * data.
+   * Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  void AddMetricReader(std::shared_ptr<MetricReader> reader) noexcept;
+  std::weak_ptr<MetricCollector> AddMetricReader(
+      std::shared_ptr<MetricReader> reader,
+      std::unique_ptr<MetricFilter> metric_filter = nullptr) noexcept;
 
   /**
    * Attaches a View to list of configured Views for this Meter provider.
