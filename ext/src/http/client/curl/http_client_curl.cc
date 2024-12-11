@@ -358,13 +358,16 @@ void HttpClient::MaybeSpawnBackgroundThread()
           int queued;
           CURLMcode mc = curl_multi_perform(self->multi_handle_, &still_running);
 
-          std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-
-          auto wait_for = self->background_thread_wait_for_;
+          std::chrono::milliseconds wait_for;
+#if LIBCURL_VERSION_NUM >= 0x074200
+          // only avaliable with curl_multi_poll
+          wait_for = self->background_thread_wait_for_;
+#endif
           if (self->is_shutdown.load(std::memory_order_acquire))
           {
             wait_for = std::chrono::milliseconds{0};
           }
+
           // According to https://curl.se/libcurl/c/curl_multi_perform.html, when mc is not OK, we
           // can not curl_multi_perform it again
           if (mc != CURLM_OK)
