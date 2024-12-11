@@ -769,7 +769,7 @@ std::string PrometheusExporterUtils::AttributeValueToString(
  * Handle Counter.
  */
 template <typename T>
-void PrometheusExporterUtils::SetValue(std::vector<T> values,
+void PrometheusExporterUtils::SetValue(const std::vector<T> &values,
                                        prometheus_client::MetricType type,
                                        prometheus_client::ClientMetric *metric)
 {
@@ -807,7 +807,7 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
  * Handle Histogram
  */
 template <typename T>
-void PrometheusExporterUtils::SetValue(std::vector<T> values,
+void PrometheusExporterUtils::SetValue(const std::vector<T> &values,
                                        const std::vector<double> &boundaries,
                                        const std::vector<uint64_t> &counts,
                                        prometheus_client::ClientMetric *metric)

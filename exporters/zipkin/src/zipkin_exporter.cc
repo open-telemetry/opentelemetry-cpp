@@ -37,15 +37,18 @@ namespace zipkin
 // -------------------------------- Constructors --------------------------------
 
 ZipkinExporter::ZipkinExporter(const ZipkinExporterOptions &options)
-    : options_(options), url_parser_(options_.endpoint)
+    : options_(options),
+      http_client_(ext::http::client::HttpClientFactory::CreateSync()),
+      url_parser_(options_.endpoint)
 {
-  http_client_ = ext::http::client::HttpClientFactory::CreateSync();
   InitializeLocalEndpoint();
 }
 
-ZipkinExporter::ZipkinExporter() : options_(ZipkinExporterOptions()), url_parser_(options_.endpoint)
+ZipkinExporter::ZipkinExporter()
+    : options_(ZipkinExporterOptions()),
+      http_client_(ext::http::client::HttpClientFactory::CreateSync()),
+      url_parser_(options_.endpoint)
 {
-  http_client_ = ext::http::client::HttpClientFactory::CreateSync();
   InitializeLocalEndpoint();
 }
 
