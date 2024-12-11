@@ -65,7 +65,7 @@ static constexpr const char *kCloudRegion = "cloud.region";
  * startup, so it may be necessary to set @code cloud.resource_id @endcode as a span attribute
  * instead. <p> The exact value to use for @code cloud.resource_id @endcode depends on the cloud
  * provider. The following well-known definitions MUST be used if you set this attribute and they
- * apply: <p> <ul> <li><strong>AWS Lambda:</strong> The function <a
+ * apply: <ul> <li><strong>AWS Lambda:</strong> The function <a
  * href="https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html">ARN</a>. Take
  * care not to use the "invoked ARN" directly but replace any <a
  * href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html">alias suffix</a>
