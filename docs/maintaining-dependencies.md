@@ -513,8 +513,8 @@ git add third_party/opentelemetry-proto
 
 Same as git submodule, we will continue use `opentelemetry-proto` as example.
 
-All the bazel dependencies is defined in [repository.bzl](../bazel/repository.bzl)
-and [MODULE.bazel](../MODULE.bazel).
+All the bazel dependencies is defined in [repository.bzl](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/bazel/repository.bzl)
+and [MODULE.bazel](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/MODULE.bazel).
 
 ### Update the dependency in repository.bzl
 
@@ -595,7 +595,7 @@ index bac1e45b..508b95a3 100644
 
 #### Update MODULE.bazel
 
-> Remeber, the link is different in your case.
+> Remember, the link is different in your case.
 Replace `opentelemetry-proto` to correct target.
 
 Make sure the new tag is available in bazel central:
