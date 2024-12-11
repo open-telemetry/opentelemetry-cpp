@@ -80,7 +80,7 @@ int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *m
     *max = len;
   }
   strm->next_out  = temp.data();
-  strm->avail_out = std::min(static_cast<decltype(z_stream::avail_out)>(temp.size()), *max);
+  strm->avail_out = (std::min)(static_cast<decltype(z_stream::avail_out)>(temp.size()), *max);
   auto ret        = deflate(strm, Z_FINISH);
   if (ret == Z_STREAM_ERROR)
   {
@@ -90,7 +90,7 @@ int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *m
   // if we can, copy the temporary output data to the consumed portion of the input buffer, and then
   // continue to write up to the start of the consumed input for as long as possible
   auto have = strm->next_out - temp.data();  // number of bytes in temp[]
-  if (have <= (strm->avail_in ? len - strm->avail_in : *max))
+  if (have <= static_cast<decltype(have)>(strm->avail_in ? len - strm->avail_in : *max))
   {
     std::memcpy(buf, temp.data(), have);
     strm->next_out = buf + have;
