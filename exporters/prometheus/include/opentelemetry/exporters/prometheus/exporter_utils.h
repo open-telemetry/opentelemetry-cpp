@@ -204,7 +204,7 @@ private:
    * Handle Counter and Gauge.
    */
   template <typename T>
-  static void SetValue(std::vector<T> values,
+  static void SetValue(const std::vector<T> &values,
                        ::prometheus::MetricType type,
                        ::prometheus::ClientMetric *metric);
 
@@ -217,7 +217,7 @@ private:
    * Handle Histogram
    */
   template <typename T>
-  static void SetValue(std::vector<T> values,
+  static void SetValue(const std::vector<T> &values,
                        const std::vector<double> &boundaries,
                        const std::vector<uint64_t> &counts,
                        ::prometheus::ClientMetric *metric);
