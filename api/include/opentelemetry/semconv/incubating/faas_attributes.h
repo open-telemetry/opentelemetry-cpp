@@ -58,8 +58,8 @@ static constexpr const char *kFaasDocumentTime = "faas.document.time";
 
 /**
  * The execution environment ID as a string, that will be potentially reused for other invocations
- * to the same function/function version. <p> <ul> <li><strong>AWS Lambda:</strong> Use the (full)
- * log stream name.</li>
+ * to the same function/function version. <ul> <li><strong>AWS Lambda:</strong> Use the (full) log
+ * stream name.</li>
  * </ul>
  */
 static constexpr const char *kFaasInstance = "faas.instance";
@@ -109,7 +109,7 @@ static constexpr const char *kFaasMaxMemory = "faas.max_memory";
  * <a href="/docs/general/attributes.md#source-code-attributes">@code code.namespace @endcode/@code
  * code.function @endcode</a> span attributes). <p> For some cloud providers, the above definition
  * is ambiguous. The following definition of function name MUST be used for this attribute (and
- * consequently the span name) for the listed cloud providers/products: <p> <ul>
+ * consequently the span name) for the listed cloud providers/products: <ul>
  *   <li><strong>Azure:</strong>  The full name @code <FUNCAPP>/<FUNC> @endcode, i.e., function app
  * name followed by a forward slash followed by the function name (this form can also be seen in the
  * resource JSON for the function). This means that a span attribute MUST be used, as an Azure
@@ -135,7 +135,6 @@ static constexpr const char *kFaasTrigger = "faas.trigger";
  * The immutable version of the function being executed.
  * <p>
  * Depending on the cloud provider and platform, use:
- * <p>
  * <ul>
  *   <li><strong>AWS Lambda:</strong> The <a
  * href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html">function
