@@ -352,21 +352,12 @@ void HttpClient::MaybeSpawnBackgroundThread()
         int still_running = 1;
         std::chrono::system_clock::time_point last_free_job_timepoint =
             std::chrono::system_clock::now();
+        bool need_wait_more = false;
         while (true)
         {
           CURLMsg *msg;
           int queued;
           CURLMcode mc = curl_multi_perform(self->multi_handle_, &still_running);
-
-          std::chrono::milliseconds wait_for;
-#if LIBCURL_VERSION_NUM >= 0x074200
-          // only avaliable with curl_multi_poll
-          wait_for = self->background_thread_wait_for_;
-#endif
-          if (self->is_shutdown.load(std::memory_order_acquire))
-          {
-            wait_for = std::chrono::milliseconds{0};
-          }
 
           // According to https://curl.se/libcurl/c/curl_multi_perform.html, when mc is not OK, we
           // can not curl_multi_perform it again
@@ -374,7 +365,7 @@ void HttpClient::MaybeSpawnBackgroundThread()
           {
             self->resetMultiHandle();
           }
-          else if (still_running || now - last_free_job_timepoint < wait_for)
+          else if (still_running || need_wait_more)
           {
         // curl_multi_poll is added from libcurl 7.66.0, before 7.68.0, we can only wait util
         // timeout to do the rest jobs
@@ -433,13 +424,31 @@ void HttpClient::MaybeSpawnBackgroundThread()
             still_running = 1;
           }
 
+          std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
           if (still_running > 0)
           {
             last_free_job_timepoint = now;
+            need_wait_more          = false;
             continue;
           }
 
-          if (still_running == 0 && now - last_free_job_timepoint > wait_for)
+          std::chrono::milliseconds wait_for;
+#if LIBCURL_VERSION_NUM >= 0x074200
+          // only avaliable with curl_multi_poll
+          wait_for = self->background_thread_wait_for_;
+#endif
+          if (self->is_shutdown.load(std::memory_order_acquire))
+          {
+            wait_for = std::chrono::milliseconds{0};
+          }
+
+          if (now - last_free_job_timepoint < wait_for)
+          {
+            need_wait_more = true;
+            continue;
+          }
+
+          if (still_running == 0)
           {
             std::lock_guard<std::mutex> lock_guard{self->background_thread_m_};
             // Double check, make sure no more pending sessions after locking background thread
