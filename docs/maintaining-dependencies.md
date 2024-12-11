@@ -56,7 +56,8 @@ In this example, we upgrade from 1.3.1 to 1.3.2
 
 #### directory third_party/opentelemetry-proto
 
-You need to update the git submodule third_party/opentelemetry-proto, check [Upgrade a git submodule](#upgrade-a-git-submodule) for more details. 
+You need to update the git submodule third_party/opentelemetry-proto,
+check [Upgrade a git submodule](#upgrade-a-git-submodule) for more details.
 
 #### file third_party_release
 
@@ -87,7 +88,8 @@ index 0bbf67f3..7362473f 100644
 
 #### file bazel/repository.bzl
 
-Please follow the guide [Upgrade a bazel dependency](#upgrade-a-bazel-dependency) for more details. 
+Please follow the guide [Upgrade a bazel dependency](#upgrade-a-bazel-dependency)
+for more details.
 
 #### file cmake/opentelemetry-proto.cmake
 
@@ -138,7 +140,6 @@ In this case, it is better to:
 
 When the C++ code requires a newer minimum version of opentelemetry-proto,
 make sure to document this, including in the release notes.
-
 
 ### Known issues (opentelemetry-proto)
 
@@ -431,7 +432,10 @@ abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234  v1.2.4.tar.gz
 Update the `sha256`.
 
 ## Upgrade a git submodule
-All the git submodule is under the folder `third_party`. We will use `opentelemetry-propto` as example in this case. This is a `git submodule`, it needs to point to the new tag.
+
+All the git submodule is under the folder `third_party`.
+We will use `opentelemetry-propto` as example in this case.
+This is a `git submodule`, it needs to point to the new tag.
 
 ### Get current tag
 
@@ -509,7 +513,8 @@ git add third_party/opentelemetry-proto
 
 Same as git submodule, we will continue use `opentelemetry-proto` as example.
 
-All the bazel dependencies is defined in [repository.bzl](../bazel/repository.bzl) and [MODULE.bazel](../MODULE.bazel).
+All the bazel dependencies is defined in [repository.bzl](../bazel/repository.bzl)
+and [MODULE.bazel](../MODULE.bazel).
 
 ### Update the dependency in repository.bzl
 
@@ -590,15 +595,16 @@ index bac1e45b..508b95a3 100644
 
 #### Update MODULE.bazel
 
-> Remeber, the link is different in your case. Replace `opentelemetry-proto` to correct target.
+> Remeber, the link is different in your case.
+Replace `opentelemetry-proto` to correct target.
 
 Make sure the new tag is available in bazel central:
 
-* opentelemetry-proto bazel-central: https://registry.bazel.build/modules/opentelemetry-proto
+* [opentelemetry-proto bazel-central](https://registry.bazel.build/modules/opentelemetry-proto)
 
 If missing, file a PR to add it, or contact the maintainer:
 
-* opentelemetry-proto repository: https://github.com/bazelbuild/bazel-central-registry/tree/main/modules/opentelemetry-proto
+* [opentelemetry-proto repository](https://github.com/bazelbuild/bazel-central-registry/tree/main/modules/opentelemetry-proto)
 
 Update the `opentelemetry-proto` version to the new tag:
 
