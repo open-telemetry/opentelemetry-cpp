@@ -433,7 +433,7 @@ Update the `sha256`.
 
 ## Upgrade a git submodule
 
-All the git submodule is under the folder `third_party`.
+All the git submodule are under the folder `third_party`.
 We will use `opentelemetry-propto` as example in this case.
 This is a `git submodule`, it needs to point to the new tag.
 
@@ -454,7 +454,7 @@ Date:   Thu Apr 25 17:55:35 2024 +0200
     generate profiles proto for CI (#552)
 ```
 
-In this case we could know the current tag is `v.1.3.1`.
+In this case we can see the current tag is `v.1.3.1`.
 
 ### Upgrade to new tag
 
@@ -513,7 +513,7 @@ git add third_party/opentelemetry-proto
 
 Same as git submodule, we will continue use `opentelemetry-proto` as example.
 
-All the bazel dependencies is defined in [repository.bzl](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/bazel/repository.bzl)
+All the bazel dependencies are defined in [repository.bzl](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/bazel/repository.bzl)
 and [MODULE.bazel](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/MODULE.bazel).
 
 ### Update the dependency in repository.bzl
