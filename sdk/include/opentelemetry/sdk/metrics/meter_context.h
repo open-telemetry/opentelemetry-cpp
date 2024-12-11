@@ -14,6 +14,7 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/export/metric_filter.h"
 #include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
@@ -107,14 +108,20 @@ public:
   opentelemetry::common::SystemTimestamp GetSDKStartTime() noexcept;
 
   /**
-   * Attaches a metric reader to list of configured readers for this Meter context.
-   * @param reader The metric reader for this meter context. This
-   * must not be a nullptr.
+   * Create a MetricCollector from a MetricReader using this MeterContext and add it to the list of
+   * configured collectors.
+   * @param reader The MetricReader for which a MetricCollector is to be created. This must not be a
+   * nullptr.
+   * @param metric_filter The optional MetricFilter used when creating the MetricCollector.
+   * @return The MetricCollector created.
    *
    * Note: This reader may not receive any in-flight meter data, but will get newly created meter
-   * data. Note: This method is not thread safe, and should ideally be called from main thread.
+   * data.
+   * Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  void AddMetricReader(std::shared_ptr<MetricReader> reader) noexcept;
+  std::weak_ptr<MetricCollector> AddMetricReader(
+      std::shared_ptr<MetricReader> reader,
+      std::unique_ptr<MetricFilter> metric_filter = nullptr) noexcept;
 
   /**
    * Attaches a View to list of configured Views for this Meter context.

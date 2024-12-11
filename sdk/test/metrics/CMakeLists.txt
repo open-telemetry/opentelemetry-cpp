@@ -29,6 +29,7 @@ foreach(
   observer_result_test
   sync_instruments_test
   async_instruments_test
+  metric_collector_test
   metric_reader_test
   observable_registry_test
   periodic_exporting_metric_reader_test
