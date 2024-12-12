@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <curl/curlver.h>
 #include <gtest/gtest.h>
 #include <string.h>
 #include <atomic>
@@ -11,6 +12,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -546,4 +548,27 @@ TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
   ASSERT_TRUE(std::chrono::system_clock::now() - beg < std::chrono::milliseconds{20});
   ASSERT_TRUE(handler->is_called_);
   ASSERT_TRUE(handler->got_response_);
+}
+
+TEST_F(BasicCurlHttpTests, BackgroundThreadWaitMore)
+{
+  {
+    curl::HttpClient http_client;
+    http_client.MaybeSpawnBackgroundThread();
+    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+#if LIBCURL_VERSION_NUM >= 0x074200
+    ASSERT_FALSE(http_client.MaybeSpawnBackgroundThread());
+#else
+    // low version curl do not support delay quit, so old background would quit
+    ASSERT_TRUE(http_client.MaybeSpawnBackgroundThread());
+#endif
+  }
+  {
+    curl::HttpClient http_client;
+    http_client.SetBackgroundWaitFor(std::chrono::milliseconds::zero());
+    http_client.MaybeSpawnBackgroundThread();
+    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+    // we can disable delay quit by set wait for 0
+    ASSERT_TRUE(http_client.MaybeSpawnBackgroundThread());
+  }
 }

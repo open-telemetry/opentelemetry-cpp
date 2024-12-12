@@ -322,7 +322,8 @@ public:
 
   inline CURLM *GetMultiHandle() noexcept { return multi_handle_; }
 
-  void MaybeSpawnBackgroundThread();
+  // return true if create background thread, false is already exist background thread
+  bool MaybeSpawnBackgroundThread();
 
   void ScheduleAddSession(uint64_t session_id);
   void ScheduleAbortSession(uint64_t session_id);

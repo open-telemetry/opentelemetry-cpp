@@ -339,12 +339,12 @@ void HttpClient::CleanupSession(uint64_t session_id)
   }
 }
 
-void HttpClient::MaybeSpawnBackgroundThread()
+bool HttpClient::MaybeSpawnBackgroundThread()
 {
   std::lock_guard<std::mutex> lock_guard{background_thread_m_};
   if (background_thread_)
   {
-    return;
+    return false;
   }
 
   background_thread_.reset(new std::thread(
@@ -488,6 +488,7 @@ void HttpClient::MaybeSpawnBackgroundThread()
         }
       },
       this));
+  return true;
 }
 
 void HttpClient::ScheduleAddSession(uint64_t session_id)
