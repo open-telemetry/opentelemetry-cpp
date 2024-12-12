@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Do not frequently create and destroy http client threads
+  [#3198](https://github.com/open-telemetry/opentelemetry-cpp/pull/3198)
+
 ## [1.18 2024-11-25]
 
 * [EXPORTER] Fix crash in ElasticsearchLogRecordExporter
