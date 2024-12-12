@@ -215,6 +215,7 @@ HttpClient::~HttpClient()
     }
     if (background_thread->joinable())
     {
+      wakeupBackgroundThread();  // if delay quit, wake up first
       background_thread->join();
     }
   }

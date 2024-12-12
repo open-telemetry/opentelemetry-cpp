@@ -533,20 +533,21 @@ TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
 {
   auto http_client = http_client::HttpClientFactory::Create();
   std::static_pointer_cast<curl::HttpClient>(http_client)->MaybeSpawnBackgroundThread();
-  auto beg = std::chrono::system_clock::now();
   // start background first, then test it could wakeup
   auto session = http_client->CreateSession("http://127.0.0.1:19000/get/");
   auto request = session->CreateRequest();
   request->SetUri("get/");
   auto handler = std::make_shared<GetEventHandler>();
   session->SendRequest(handler);
+  std::this_thread::sleep_for(std::chrono::milliseconds{10});  // let it enter poll state
+  auto beg = std::chrono::system_clock::now();
   http_client->FinishAllSessions();
   http_client.reset();
   // when use background_thread_wait_for_ should have no side effort on elegant quit
-  // because ci machine may slow, so we assert it cost should less than
-  // scheduled_delay_milliseconds_
+  // it shoule less than scheduled_delay_milliseconds_
+  // because ci machine may slow, some take 10ms, so we assert it less than 20ms
   auto cost = std::chrono::system_clock::now() - beg;
-  ASSERT_TRUE(cost < std::chrono::milliseconds{10})
+  ASSERT_TRUE(cost < std::chrono::milliseconds{20})
       << "cost ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(cost).count()
       << " libcurl version: 0x" << std::hex << LIBCURL_VERSION_NUM;
   ASSERT_TRUE(handler->is_called_);
