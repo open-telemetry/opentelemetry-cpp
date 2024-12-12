@@ -433,10 +433,10 @@ bool HttpClient::MaybeSpawnBackgroundThread()
           }
 
           std::chrono::milliseconds wait_for = std::chrono::milliseconds::zero();
-          ;
-#if LIBCURL_VERSION_NUM >= 0x074200
-          // only avaliable with curl_multi_poll, because curl_multi_wait would cause CPU busy,
-          // curl_multi_wait+sleep could not wakeup quickly
+
+#if LIBCURL_VERSION_NUM >= 0x074400
+          // only available with curl_multi_poll+curl_multi_wakeup, because curl_multi_wait would
+          // cause CPU busy, curl_multi_wait+sleep could not wakeup quickly
           wait_for = self->background_thread_wait_for_;
 #endif
           if (self->is_shutdown_.load(std::memory_order_acquire))

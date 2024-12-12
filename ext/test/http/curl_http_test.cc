@@ -545,7 +545,10 @@ TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
   // when use background_thread_wait_for_ should have no side effort on elegant quit
   // because ci machine may slow, so we assert it cost should less than
   // scheduled_delay_milliseconds_
-  ASSERT_TRUE(std::chrono::system_clock::now() - beg < std::chrono::milliseconds{20});
+  auto cost = std::chrono::system_clock::now() - beg;
+  ASSERT_TRUE(cost < std::chrono::milliseconds{10})
+      << "cost ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(cost).count()
+      << " libcurl version: 0x" << std::hex << LIBCURL_VERSION_NUM;
   ASSERT_TRUE(handler->is_called_);
   ASSERT_TRUE(handler->got_response_);
 }
