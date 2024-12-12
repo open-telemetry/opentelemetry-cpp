@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <curl/curlver.h>
 #include <gtest/gtest.h>
 #include <string.h>
 #include <atomic>
@@ -11,6 +12,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -524,5 +526,52 @@ TEST_F(BasicCurlHttpTests, FinishInAsyncCallback)
       ASSERT_TRUE(handlers[i]->is_called_);
       ASSERT_TRUE(handlers[i]->got_response_);
     }
+  }
+}
+
+TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
+{
+  auto http_client = http_client::HttpClientFactory::Create();
+  std::static_pointer_cast<curl::HttpClient>(http_client)->MaybeSpawnBackgroundThread();
+  auto beg = std::chrono::system_clock::now();
+  // start background first, then test it could wakeup
+  auto session = http_client->CreateSession("http://127.0.0.1:19000/get/");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+  auto handler = std::make_shared<GetEventHandler>();
+  session->SendRequest(handler);
+  http_client->FinishAllSessions();
+  http_client.reset();
+  // when use background_thread_wait_for_ should have no side effort on elegant quit
+  // because ci machine may slow, so we assert it cost should less than
+  // scheduled_delay_milliseconds_
+  auto cost = std::chrono::system_clock::now() - beg;
+  ASSERT_TRUE(cost < std::chrono::milliseconds{10})
+      << "cost ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(cost).count()
+      << " libcurl version: 0x" << std::hex << LIBCURL_VERSION_NUM;
+  ASSERT_TRUE(handler->is_called_);
+  ASSERT_TRUE(handler->got_response_);
+}
+
+TEST_F(BasicCurlHttpTests, BackgroundThreadWaitMore)
+{
+  {
+    curl::HttpClient http_client;
+    http_client.MaybeSpawnBackgroundThread();
+    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+#if LIBCURL_VERSION_NUM >= 0x074200
+    ASSERT_FALSE(http_client.MaybeSpawnBackgroundThread());
+#else
+    // low version curl do not support delay quit, so old background would quit
+    ASSERT_TRUE(http_client.MaybeSpawnBackgroundThread());
+#endif
+  }
+  {
+    curl::HttpClient http_client;
+    http_client.SetBackgroundWaitFor(std::chrono::milliseconds::zero());
+    http_client.MaybeSpawnBackgroundThread();
+    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+    // we can disable delay quit by set wait for 0
+    ASSERT_TRUE(http_client.MaybeSpawnBackgroundThread());
   }
 }
