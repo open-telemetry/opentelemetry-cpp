@@ -357,7 +357,7 @@ private:
   std::chrono::milliseconds scheduled_delay_milliseconds_;
 
   std::chrono::milliseconds background_thread_wait_for_;
-  std::atomic<bool> is_shutdown;
+  std::atomic<bool> is_shutdown_;
 
   nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
 };

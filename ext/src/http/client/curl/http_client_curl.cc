@@ -192,12 +192,12 @@ HttpClient::HttpClient()
       background_thread_wait_for_{std::chrono::minutes{1}},
       curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
 {
-  is_shutdown.store(false);
+  is_shutdown_.store(false);
 }
 
 HttpClient::~HttpClient()
 {
-  is_shutdown.store(true, std::memory_order_release);
+  is_shutdown_.store(true, std::memory_order_release);
   while (true)
   {
     std::unique_ptr<std::thread> background_thread;
@@ -432,14 +432,16 @@ void HttpClient::MaybeSpawnBackgroundThread()
             continue;
           }
 
-          std::chrono::milliseconds wait_for;
+          std::chrono::milliseconds wait_for = std::chrono::milliseconds::zero();
+          ;
 #if LIBCURL_VERSION_NUM >= 0x074200
-          // only avaliable with curl_multi_poll
+          // only avaliable with curl_multi_poll, because curl_multi_wait would cause CPU busy,
+          // curl_multi_wait+sleep could not wakeup quickly
           wait_for = self->background_thread_wait_for_;
 #endif
-          if (self->is_shutdown.load(std::memory_order_acquire))
+          if (self->is_shutdown_.load(std::memory_order_acquire))
           {
-            wait_for = std::chrono::milliseconds{0};
+            wait_for = std::chrono::milliseconds::zero();
           }
 
           if (now - last_free_job_timepoint < wait_for)
@@ -541,7 +543,7 @@ void HttpClient::SetBackgroundWaitFor(std::chrono::milliseconds ms)
 
 void HttpClient::WaitBackgroundThreadExit()
 {
-  is_shutdown.store(true, std::memory_order_release);
+  is_shutdown_.store(true, std::memory_order_release);
   std::unique_ptr<std::thread> background_thread;
   {
     std::lock_guard<std::mutex> lock_guard{background_thread_m_};
@@ -552,7 +554,7 @@ void HttpClient::WaitBackgroundThreadExit()
   {
     background_thread->join();
   }
-  is_shutdown.store(false, std::memory_order_release);
+  is_shutdown_.store(false, std::memory_order_release);
 }
 
 void HttpClient::wakeupBackgroundThread()

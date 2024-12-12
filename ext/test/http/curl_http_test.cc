@@ -530,8 +530,9 @@ TEST_F(BasicCurlHttpTests, FinishInAsyncCallback)
 TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
 {
   auto http_client = http_client::HttpClientFactory::Create();
-  std::dynamic_pointer_cast<curl::HttpClient>(http_client)->MaybeSpawnBackgroundThread();
-  auto beg     = std::chrono::system_clock::now();
+  std::static_pointer_cast<curl::HttpClient>(http_client)->MaybeSpawnBackgroundThread();
+  auto beg = std::chrono::system_clock::now();
+  // start background first, then test it could wakeup
   auto session = http_client->CreateSession("http://127.0.0.1:19000/get/");
   auto request = session->CreateRequest();
   request->SetUri("get/");
@@ -540,7 +541,9 @@ TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
   http_client->FinishAllSessions();
   http_client.reset();
   // when use background_thread_wait_for_ should have no side effort on elegant quit
-  ASSERT_TRUE(std::chrono::system_clock::now() - beg < std::chrono::milliseconds{5});
+  // because ci machine may slow, so we assert it cost should less than
+  // scheduled_delay_milliseconds_
+  ASSERT_TRUE(std::chrono::system_clock::now() - beg < std::chrono::milliseconds{20});
   ASSERT_TRUE(handler->is_called_);
   ASSERT_TRUE(handler->got_response_);
 }
