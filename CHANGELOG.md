@@ -149,6 +149,9 @@ Increment the:
 * [bazel] Update opentelemetry-proto in MODULE.bazel
   [#3163](https://github.com/open-telemetry/opentelemetry-cpp/pull/3163)
 
+* [EXPORTER] Fix scope attributes missing from otlp traces metrics
+  [#3185](https://github.com/open-telemetry/opentelemetry-cpp/pull/3185)
+
 Important changes:
 
 * [API] Jaeger Propagator should not be deprecated

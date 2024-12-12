@@ -132,9 +132,9 @@ void MeterProvider::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filte
 /**
  * Shutdown the meter provider.
  */
-bool MeterProvider::Shutdown() noexcept
+bool MeterProvider::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  return context_->Shutdown();
+  return context_->Shutdown(timeout);
 }
 
 /**

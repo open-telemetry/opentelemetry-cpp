@@ -247,7 +247,7 @@ static constexpr const char *kAwsS3Bucket = "aws.s3.bucket";
  * The @code copy_source @endcode attribute applies to S3 copy operations and corresponds to the
  * @code --copy-source @endcode parameter of the <a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html">copy-object
- * operation within the S3 API</a>. This applies in particular to the following operations: <p> <ul>
+ * operation within the S3 API</a>. This applies in particular to the following operations: <ul>
  *   <li><a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html">copy-object</a></li>
  *   <li><a
@@ -273,7 +273,7 @@ static constexpr const char *kAwsS3Delete = "aws.s3.delete";
  * <a href="https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html">S3 API</a>
  * operations. <p> The @code key @endcode attribute is applicable to all object-related S3
  * operations, i.e. that require the object key as a mandatory parameter. This applies in particular
- * to the following operations: <p> <ul> <li><a
+ * to the following operations: <ul> <li><a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html">copy-object</a></li>
  *   <li><a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-object.html">delete-object</a></li>
@@ -323,7 +323,7 @@ static constexpr const char *kAwsS3PartNumber = "aws.s3.part_number";
  * The @code upload_id @endcode attribute applies to S3 multipart-upload operations and corresponds
  * to the @code --upload-id @endcode parameter of the <a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html">S3 API</a> multipart
- * operations. This applies in particular to the following operations: <p> <ul> <li><a
+ * operations. This applies in particular to the following operations: <ul> <li><a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/abort-multipart-upload.html">abort-multipart-upload</a></li>
  *   <li><a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/complete-multipart-upload.html">complete-multipart-upload</a></li>

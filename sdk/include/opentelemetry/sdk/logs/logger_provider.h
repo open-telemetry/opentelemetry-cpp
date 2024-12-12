@@ -93,7 +93,7 @@ public:
   /**
    * Shutdown the log processor associated with this log provider.
    */
-  bool Shutdown() noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
   /**
    * Force flush the log processor associated with this log provider.

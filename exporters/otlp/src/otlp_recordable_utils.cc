@@ -107,6 +107,9 @@ void OtlpRecordableUtils::PopulateRequest(
         proto::common::v1::InstrumentationScope instrumentation_scope_proto;
         instrumentation_scope_proto.set_name(input_scope_spans.first->GetName());
         instrumentation_scope_proto.set_version(input_scope_spans.first->GetVersion());
+        OtlpPopulateAttributeUtils::PopulateAttribute(&instrumentation_scope_proto,
+                                                      *input_scope_spans.first);
+
         *scope_spans->mutable_scope() = instrumentation_scope_proto;
         scope_spans->set_schema_url(input_scope_spans.first->GetSchemaURL());
       }
@@ -170,11 +173,7 @@ void OtlpRecordableUtils::PopulateRequest(
             proto_scope->set_name(input_scope_log.first->GetName());
             proto_scope->set_version(input_scope_log.first->GetVersion());
 
-            for (auto &scope_attribute : input_scope_log.first->GetAttributes())
-            {
-              OtlpPopulateAttributeUtils::PopulateAttribute(
-                  proto_scope->add_attributes(), scope_attribute.first, scope_attribute.second);
-            }
+            OtlpPopulateAttributeUtils::PopulateAttribute(proto_scope, *input_scope_log.first);
           }
           output_scope_log->set_schema_url(input_scope_log.first->GetSchemaURL());
         }
