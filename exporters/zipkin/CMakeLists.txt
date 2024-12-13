@@ -49,23 +49,6 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.
     TEST_LIST zipkin_recordable_test)
 
-  if(MSVC)
-    if(GMOCK_LIB)
-      unset(GMOCK_LIB CACHE)
-    endif()
-  endif()
-  if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-    find_library(GMOCK_LIB gmockd PATH_SUFFIXES lib)
-  else()
-    find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
-  endif()
-  # Reset GMOCK_LIB if it was not found, or some target may link
-  # GMOCK_LIB-NOTFOUND
-  if(NOT GMOCK_LIB)
-    unset(GMOCK_LIB)
-    unset(GMOCK_LIB CACHE)
-  endif()
-
   add_executable(zipkin_exporter_test test/zipkin_exporter_test.cc)
 
   target_link_libraries(
