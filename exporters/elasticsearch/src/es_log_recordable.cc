@@ -1,10 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <opentelemetry/version.h>
+
 #include <chrono>
 #include <ctime>
 #include <nlohmann/json.hpp>
 #include <string>
+
+#if defined(__cpp_lib_format)
+#  include <format>
+#endif
 
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
 #include "opentelemetry/logs/severity.h"
@@ -71,7 +77,7 @@ void ElasticSearchRecordable::SetTimestamp(
 
   // If built with with at least cpp 20 then use std::format
   // Otherwise use the old style to format the timestamp in UTC
-#if __cplusplus >= 202002L
+#if defined(__cpp_lib_format)
   const std::string dateStr = std::format("{:%FT%T%Ez}", timePoint);
 #else
   std::time_t time = std::chrono::system_clock::to_time_t(timePoint);

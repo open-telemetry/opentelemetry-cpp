@@ -26,6 +26,12 @@ if(${BUILD_TESTING})
   else()
     find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
   endif()
+  # Reset GMOCK_LIB if it was not found, or some target may link
+  # GMOCK_LIB-NOTFOUND
+  if(NOT GMOCK_LIB)
+    unset(GMOCK_LIB)
+    unset(GMOCK_LIB CACHE)
+  endif()
 
   target_link_libraries(
     opentelemetry_http_client_nosend opentelemetry_ext
