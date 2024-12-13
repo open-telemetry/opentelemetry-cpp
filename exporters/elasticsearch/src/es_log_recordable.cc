@@ -77,6 +77,7 @@ void ElasticSearchRecordable::SetTimestamp(
 
   // If built with with at least cpp 20 then use std::format
   // Otherwise use the old style to format the timestamp in UTC
+  // @see https://en.cppreference.com/w/cpp/feature_test#cpp_lib_format
 #if defined(__cpp_lib_format) && __cpp_lib_format >= 201907
   const std::string dateStr = std::format("{:%FT%T%Ez}", timePoint);
 #else
