@@ -63,7 +63,7 @@ nostd::shared_ptr<HttpCurlGlobalInitializer> HttpCurlGlobalInitializer::GetInsta
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 // Original source:
 // https://stackoverflow.com/questions/12398377/is-it-possible-to-have-zlib-read-from-and-write-to-the-same-memory-buffer/12412863#12412863
-int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *max)
+int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *max_len)
 {
   // must be large enough to hold zlib or gzip header (if any) and one more byte -- 11 works for the
   // worst case here, but if gzip encoding is used and a deflateSetHeader() call is inserted in this
@@ -75,12 +75,12 @@ int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *m
   // chunk of input data in order to make room for output data there
   strm->next_in  = buf;
   strm->avail_in = len;
-  if (*max < len)
+  if (*max_len < len)
   {
-    *max = len;
+    *max_len = len;
   }
   strm->next_out  = temp.data();
-  strm->avail_out = (std::min)(static_cast<decltype(z_stream::avail_out)>(temp.size()), *max);
+  strm->avail_out = (std::min)(static_cast<decltype(z_stream::avail_out)>(temp.size()), *max_len);
   auto ret        = deflate(strm, Z_FINISH);
   if (ret == Z_STREAM_ERROR)
   {
@@ -90,7 +90,7 @@ int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *m
   // if we can, copy the temporary output data to the consumed portion of the input buffer, and then
   // continue to write up to the start of the consumed input for as long as possible
   auto have = strm->next_out - temp.data();  // number of bytes in temp[]
-  if (have <= static_cast<decltype(have)>(strm->avail_in ? len - strm->avail_in : *max))
+  if (have <= static_cast<decltype(have)>(strm->avail_in ? len - strm->avail_in : *max_len))
   {
     std::memcpy(buf, temp.data(), have);
     strm->next_out = buf + have;
@@ -98,12 +98,12 @@ int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *m
     while (ret == Z_OK)
     {
       strm->avail_out =
-          strm->avail_in ? strm->next_in - strm->next_out : (buf + *max) - strm->next_out;
+          strm->avail_in ? strm->next_in - strm->next_out : (buf + *max_len) - strm->next_out;
       ret = deflate(strm, Z_FINISH);
     }
     if (ret != Z_BUF_ERROR || strm->avail_in == 0)
     {
-      *max = strm->next_out - buf;
+      *max_len = strm->next_out - buf;
       return ret == Z_STREAM_END ? Z_OK : ret;
     }
   }
@@ -111,8 +111,8 @@ int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *m
   // the output caught up with the input due to insufficiently compressible data -- copy the
   // remaining input data into an allocated buffer and complete the compression from there to the
   // now empty input buffer (this will only occur for long incompressible streams, more than ~20 MB
-  // for the default deflate memLevel of 8, or when *max is too small and less than the length of
-  // the header plus one byte)
+  // for the default deflate memLevel of 8, or when *max_len is too small and less than the length
+  // of the header plus one byte)
   auto hold = static_cast<std::remove_const_t<decltype(z_stream::next_in)>>(
       strm->zalloc(strm->opaque, strm->avail_in, 1));  // allocated buffer to hold input data
   if (hold == Z_NULL)
@@ -126,10 +126,10 @@ int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *m
     std::memcpy(buf, temp.data(), have);
     strm->next_out = buf + have;
   }
-  strm->avail_out = (buf + *max) - strm->next_out;
+  strm->avail_out = (buf + *max_len) - strm->next_out;
   ret             = deflate(strm, Z_FINISH);
   strm->zfree(strm->opaque, hold);
-  *max = strm->next_out - buf;
+  *max_len = strm->next_out - buf;
   return ret == Z_OK ? Z_BUF_ERROR : (ret == Z_STREAM_END ? Z_OK : ret);
 }
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
@@ -167,14 +167,14 @@ void Session::SendRequest(
 
     if (stream == Z_OK)
     {
-      auto size = static_cast<uInt>(http_request_->body_.size());
-      auto max  = size;
-      stream    = deflateInPlace(&zs, http_request_->body_.data(), size, &max);
+      auto size     = static_cast<uInt>(http_request_->body_.size());
+      auto max_size = size;
+      stream        = deflateInPlace(&zs, http_request_->body_.data(), size, &max_size);
 
       if (stream == Z_OK)
       {
         http_request_->AddHeader("Content-Encoding", "gzip");
-        http_request_->body_.resize(max);
+        http_request_->body_.resize(max_size);
       }
     }
 
