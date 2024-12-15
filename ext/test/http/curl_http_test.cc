@@ -34,7 +34,7 @@ class CustomEventHandler : public http_client::EventHandler
 public:
   void OnResponse(http_client::Response & /* response */) noexcept override
   {
-    got_response_ = true;
+    got_response_.store(true, std::memory_order_release);
   }
   void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
   {
@@ -42,16 +42,20 @@ public:
     {
       case http_client::SessionState::ConnectFailed:
       case http_client::SessionState::SendFailed: {
-        is_called_ = true;
+        is_called_.store(true, std::memory_order_release);
         break;
       }
       default:
         break;
     }
   }
+
+  CustomEventHandler() : is_called_(false), got_response_(false) {}
+
   ~CustomEventHandler() override = default;
-  bool is_called_                = false;
-  bool got_response_             = false;
+
+  std::atomic<bool> is_called_;
+  std::atomic<bool> got_response_;
 };
 
 class GetEventHandler : public CustomEventHandler
@@ -60,8 +64,8 @@ class GetEventHandler : public CustomEventHandler
   {
     ASSERT_EQ(200, response.GetStatusCode());
     ASSERT_EQ(response.GetBody().size(), 0);
-    is_called_    = true;
-    got_response_ = true;
+    is_called_.store(true, std::memory_order_release);
+    got_response_.store(true, std::memory_order_release);
   }
 };
 
@@ -72,8 +76,8 @@ class PostEventHandler : public CustomEventHandler
     ASSERT_EQ(200, response.GetStatusCode());
     std::string body(response.GetBody().begin(), response.GetBody().end());
     ASSERT_EQ(body, "{'k1':'v1', 'k2':'v2', 'k3':'v3'}");
-    is_called_    = true;
-    got_response_ = true;
+    is_called_.store(true, std::memory_order_release);
+    got_response_.store(true, std::memory_order_release);
   }
 };
 
@@ -88,8 +92,8 @@ public:
   {
     ASSERT_EQ(200, response.GetStatusCode());
     ASSERT_EQ(response.GetBody().size(), 0);
-    is_called_    = true;
-    got_response_ = true;
+    is_called_.store(true, std::memory_order_release);
+    got_response_.store(true, std::memory_order_release);
 
     if (session_)
     {
@@ -250,8 +254,8 @@ TEST_F(BasicCurlHttpTests, SendGetRequest)
   session->SendRequest(handler);
   ASSERT_TRUE(waitForRequests(30, 1));
   session->FinishSession();
-  ASSERT_TRUE(handler->is_called_);
-  ASSERT_TRUE(handler->got_response_);
+  ASSERT_TRUE(handler->is_called_.load(std::memory_order_acquire));
+  ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
 }
 
 TEST_F(BasicCurlHttpTests, SendPostRequest)
@@ -273,8 +277,8 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   session->SendRequest(handler);
   ASSERT_TRUE(waitForRequests(30, 1));
   session->FinishSession();
-  ASSERT_TRUE(handler->is_called_);
-  ASSERT_TRUE(handler->got_response_);
+  ASSERT_TRUE(handler->is_called_.load(std::memory_order_acquire));
+  ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
 
   session_manager->CancelAllSessions();
   session_manager->FinishAllSessions();
@@ -292,8 +296,8 @@ TEST_F(BasicCurlHttpTests, RequestTimeout)
   auto handler = std::make_shared<GetEventHandler>();
   session->SendRequest(handler);
   session->FinishSession();
-  ASSERT_TRUE(handler->is_called_);
-  ASSERT_FALSE(handler->got_response_);
+  ASSERT_TRUE(handler->is_called_.load(std::memory_order_acquire));
+  ASSERT_FALSE(handler->got_response_.load(std::memory_order_acquire));
 }
 
 TEST_F(BasicCurlHttpTests, CurlHttpOperations)
@@ -409,8 +413,8 @@ TEST_F(BasicCurlHttpTests, SendGetRequestAsync)
       sessions[i]->FinishSession();
       ASSERT_FALSE(sessions[i]->IsSessionActive());
 
-      ASSERT_TRUE(handlers[i]->is_called_);
-      ASSERT_TRUE(handlers[i]->got_response_);
+      ASSERT_TRUE(handlers[i]->is_called_.load(std::memory_order_acquire));
+      ASSERT_TRUE(handlers[i]->got_response_.load(std::memory_order_acquire));
     }
 
     http_client.WaitBackgroundThreadExit();
@@ -438,7 +442,8 @@ TEST_F(BasicCurlHttpTests, SendGetRequestAsyncTimeout)
     // Lock mtx_requests to prevent response, we will check IsSessionActive() in the end
     std::unique_lock<std::mutex> lock_requests(mtx_requests);
     sessions[i]->SendRequest(handlers[i]);
-    ASSERT_TRUE(sessions[i]->IsSessionActive() || handlers[i]->is_called_);
+    ASSERT_TRUE(sessions[i]->IsSessionActive() ||
+                handlers[i]->is_called_.load(std::memory_order_acquire));
   }
 
   for (unsigned i = 0; i < batch_count; ++i)
@@ -446,8 +451,8 @@ TEST_F(BasicCurlHttpTests, SendGetRequestAsyncTimeout)
     sessions[i]->FinishSession();
     ASSERT_FALSE(sessions[i]->IsSessionActive());
 
-    ASSERT_TRUE(handlers[i]->is_called_);
-    ASSERT_FALSE(handlers[i]->got_response_);
+    ASSERT_TRUE(handlers[i]->is_called_.load(std::memory_order_acquire));
+    ASSERT_FALSE(handlers[i]->got_response_.load(std::memory_order_acquire));
   }
 }
 
@@ -483,8 +488,8 @@ TEST_F(BasicCurlHttpTests, SendPostRequestAsync)
       ASSERT_FALSE(session->IsSessionActive());
     }
 
-    ASSERT_TRUE(handler->is_called_);
-    ASSERT_TRUE(handler->got_response_);
+    ASSERT_TRUE(handler->is_called_.load(std::memory_order_acquire));
+    ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
 
     http_client.WaitBackgroundThreadExit();
   }
@@ -522,12 +527,13 @@ TEST_F(BasicCurlHttpTests, FinishInAsyncCallback)
     {
       ASSERT_FALSE(sessions[i]->IsSessionActive());
 
-      ASSERT_TRUE(handlers[i]->is_called_);
-      ASSERT_TRUE(handlers[i]->got_response_);
+      ASSERT_TRUE(handlers[i]->is_called_.load(std::memory_order_acquire));
+      ASSERT_TRUE(handlers[i]->got_response_.load(std::memory_order_acquire));
     }
   }
 }
 
+#ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 struct GzipEventHandler : public CustomEventHandler
 {
   ~GzipEventHandler() override = default;
@@ -546,7 +552,6 @@ struct GzipEventHandler : public CustomEventHandler
   std::string reason_;
 };
 
-#ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 TEST_F(BasicCurlHttpTests, GzipCompressibleData)
 {
   received_requests_.clear();
