@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <numeric>
 #include <string>
 #include <utility>
 #include <vector>
@@ -526,3 +527,105 @@ TEST_F(BasicCurlHttpTests, FinishInAsyncCallback)
     }
   }
 }
+
+struct GzipEventHandler : public CustomEventHandler
+{
+  ~GzipEventHandler() override = default;
+
+  void OnResponse(http_client::Response &response) noexcept override {}
+
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  {
+    is_called_ = true;
+    state_     = state;
+    reason_    = std::string{reason};
+  }
+
+  bool is_called_                  = false;
+  http_client::SessionState state_ = static_cast<http_client::SessionState>(-1);
+  std::string reason_;
+};
+
+#ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
+TEST_F(BasicCurlHttpTests, GzipCompressibleData)
+{
+  received_requests_.clear();
+  auto session_manager = http_client::HttpClientFactory::Create();
+  EXPECT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("post/");
+  request->SetMethod(http_client::Method::Post);
+
+  const auto original_size = 1000UL;
+  http_client::Body body(original_size);
+  std::iota(body.begin(), body.end(), 0);
+  request->SetBody(body);
+  request->AddHeader("Content-Type", "text/plain");
+  request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
+  auto handler = std::make_shared<GzipEventHandler>();
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+  session->FinishSession();
+  ASSERT_TRUE(handler->is_called_);
+  ASSERT_EQ(handler->state_, http_client::SessionState::Response);
+  ASSERT_EQ(handler->reason_, "");
+
+  auto http_request =
+      dynamic_cast<opentelemetry::ext::http::client::curl::Request *>(request.get());
+  ASSERT_TRUE(http_request != nullptr);
+  ASSERT_LT(http_request->body_.size(), original_size);
+
+  session_manager->CancelAllSessions();
+  session_manager->FinishAllSessions();
+}
+
+TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
+{
+  received_requests_.clear();
+  auto session_manager = http_client::HttpClientFactory::Create();
+  EXPECT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("post/");
+  request->SetMethod(http_client::Method::Post);
+
+  http_client::Body body;
+
+  // Original source:
+  // http://blog.chenshuo.com/2014/05/incompressible-zlibdeflate-data.html
+  for (size_t step = 0; step <= 128; ++step)
+  {
+    for (size_t inc = 0; inc < step; ++inc)
+    {
+      for (size_t i = inc; i < 256; i += step)
+      {
+        body.push_back(i);
+      }
+    }
+  }
+
+  const auto original_size = body.size();
+
+  request->SetBody(body);
+  request->AddHeader("Content-Type", "text/plain");
+  request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
+  auto handler = std::make_shared<GzipEventHandler>();
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+  session->FinishSession();
+  ASSERT_TRUE(handler->is_called_);
+  ASSERT_EQ(handler->state_, http_client::SessionState::Response);
+  ASSERT_EQ(handler->reason_, "");
+
+  auto http_request =
+      dynamic_cast<opentelemetry::ext::http::client::curl::Request *>(request.get());
+  ASSERT_TRUE(http_request != nullptr);
+  ASSERT_EQ(http_request->body_.size(), original_size);
+
+  session_manager->CancelAllSessions();
+  session_manager->FinishAllSessions();
+}
+#endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
