@@ -16,8 +16,6 @@ common --remote_download_minimal
 # Avoid using c:\windows\system32\bash.exe
 common:windows --shell_executable="c:\\program files\\git\\usr\\bin\\bash.exe"
 
-build --nolegacy_important_outputs
-
 common --skip_incompatible_explicit_targets
 
 # Enable automatic configs based on platform
@@ -105,7 +103,6 @@ common --incompatible_disallow_struct_provider_syntax
 common --incompatible_strict_action_env
 # common --incompatible_use_host_features
 common --modify_execution_info=CppCompile=+supports-path-mapping
-common --legacy_important_outputs=false
 
 build --@curl//:use_mbedtls=true 
 # build --@curl//:http_only=true
