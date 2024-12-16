@@ -57,7 +57,7 @@ archive_override(
 # this rule is missing dependency declarations for the following files included by 'src/google/protobuf/any_lite.cc':
 #   'bazel-out/x64_windows-opt-exec-ST-d610928244b0/bin/external/protobuf+/src/google/protobuf/_virtual_includes/protobuf_lite/google/protobuf/port.h'
 bazel_dep(name = "protobuf", version = "29.1")
-bazel_dep(name = "opentelemetry-proto", version = "1.4.0")
+bazel_dep(name = "opentelemetry-proto", version = "1.4.0.bcr.1")
 archive_override(
     module_name = "opentelemetry-proto",
     integrity = "sha256-U80yztsndi6iBgqcjYPkuCLeE9c7XV03ots89VAY1pQ=",
