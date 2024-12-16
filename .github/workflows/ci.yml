@@ -359,7 +359,7 @@ jobs:
 
   cmake_test_cxx20_clang:
     name: CMake C++20 test(Clang with libc++)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -409,7 +409,7 @@ jobs:
 
   cmake_test_cxx23_clang:
     name: CMake C++23 test(Clang with libc++)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
