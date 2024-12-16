@@ -11,13 +11,11 @@ build --features=parse_headers
 # For some reason, with clang-cl, it also tried to do on Windows, where dynamic linking just does not support it.
 build --dynamic_mode=off
 
-common --noenable_workspace
 common --remote_download_minimal
 
 # Avoid using c:\windows\system32\bash.exe
 common:windows --shell_executable="c:\\program files\\git\\usr\\bin\\bash.exe"
 
-common --nolegacy_external_runfiles
 build --nolegacy_important_outputs
 
 common --skip_incompatible_explicit_targets
@@ -88,7 +86,7 @@ mod --charset=ascii
 
 # This doesn't work with 
 # ../com_github_opentelemetry_proto/opentelemetry/proto/collector/metrics/v1/metrics_service.proto: File does not reside within any path specified using --proto_path (or -I).  You must specify a --proto_path which encompasses this file.  Note that the proto_path must be a
-# common --experimental_sibling_repository_layout
+#common --experimental_sibling_repository_layout
 
 common --nobuild_runfile_links
 startup --windows_enable_symlinks
@@ -101,14 +99,10 @@ common --incompatible_auto_exec_groups
 common --incompatible_config_setting_private_default_visibility
 common --incompatible_disable_native_repo_rules 
 common --incompatible_disable_non_executable_java_binary
-# For jetbrains bazel plugin
+#common --incompatible_disable_target_default_provider_fields
 common --incompatible_disable_target_provider_fields
-common --incompatible_disallow_empty_glob
 common --incompatible_disallow_struct_provider_syntax
 common --incompatible_strict_action_env
-# Enabled for the experimental JetBrains bazel plugin
-# common --incompatible_struct_has_no_methods
-common --incompatible_use_plus_in_repo_names
 # common --incompatible_use_host_features
 common --modify_execution_info=CppCompile=+supports-path-mapping
 common --legacy_important_outputs=false
@@ -138,9 +132,23 @@ build:clang-cl --host_per_file_copt="c-ares\\+/.*@-Wno-macro-redefined"
 
 # allow newer protobuf to compile
 common --experimental_google_legacy_api
+common --experimental_enable_android_migration_apis
 
 common:linux --force_pic
 common:macos --force_pic
+
+startup --client_debug
+common --experimental_repository_cache_hardlinks 
+common --incompatible_enable_proto_toolchain_resolution
+#common --experimental_disable_external_package
+common --experimental_platforms_api
+common --incompatible_fail_on_unknown_attributes
+common --incompatible_merge_fixed_and_default_shell_env
+common --incompatible_no_implicit_file_export
+#common --incompatible_no_rule_outputs_param
+#common --incompatible_stop_exporting_language_modules
+common --incompatible_top_level_aspects_require_providers
+common --incompatible_use_cc_configure_from_rules_cc
 
 ## This is what my ../top.bazelrc contains (not in the repo as local to my machine)
 # build --disk_cache=f:/b/d
