@@ -858,22 +858,22 @@ jobs:
 
   code_coverage:
     name: Code coverage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
       run: |
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run tests and generate report
       env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
       uses: codecov/codecov-action@v5
