@@ -3,12 +3,11 @@ new file mode 100644
 index 0000000..07d6a90
 --- /dev/null
 +++ b/BUILD.bazel
-@@ -0,0 +1,151 @@
+@@ -0,0 +1,150 @@
 +# Copyright The OpenTelemetry Authors
 +# SPDX-License-Identifier: Apache-2.0
 +
 +load("@grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
-+load("@rules_proto//proto:defs.bzl", "proto_library")
 +
 +package(default_visibility = ["//visibility:public"])
 +
@@ -160,7 +159,7 @@ new file mode 100644
 index 0000000..a5a5e54
 --- /dev/null
 +++ b/MODULE.bazel
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,7 @@
 +module(
 +    name = "opentelemetry-proto",
 +    version = "1.4.0",
@@ -168,4 +167,3 @@ index 0000000..a5a5e54
 +)
 +
 +bazel_dep(name = "grpc", version = "1.68.0")
-+bazel_dep(name = "rules_proto", version = "6.0.2")

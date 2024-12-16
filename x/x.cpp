@@ -450,7 +450,7 @@ int main1()
   //pA.proxy->SetActive( false );
   
   printf("starting...\n");
-  proxy_thread proxy("127.0.0.1:43170", opentelemetry::exporter::otlp::GetOtlpDefaultGrpcEndpoint());
+  //proxy_thread proxy("127.0.0.1:43170", opentelemetry::exporter::otlp::GetOtlpDefaultGrpcEndpoint());
 //  proxy.proxy->SetActive(false);
   printf("started...\n");
 

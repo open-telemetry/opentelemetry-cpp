@@ -16,8 +16,6 @@ common --remote_download_minimal
 # Avoid using c:\windows\system32\bash.exe
 common:windows --shell_executable="c:\\program files\\git\\usr\\bin\\bash.exe"
 
-common --skip_incompatible_explicit_targets
-
 # Enable automatic configs based on platform
 common --enable_platform_specific_config
 common --enable_runfiles
@@ -89,20 +87,30 @@ mod --charset=ascii
 common --nobuild_runfile_links
 startup --windows_enable_symlinks
 
-# Ideally all of these should get uncommented for further bazel migrations
-# This list was taken from here https://github.com/bazelbuild/bazel/releases/tag/7.0.0
+# common --experimental_disable_external_package
 # common --incompatible_disable_starlark_host_transitions
+# common --incompatible_disable_target_default_provider_fields
+# common --incompatible_no_rule_outputs_param
 # common --incompatible_stop_exporting_language_modules
+# common --incompatible_use_host_features
+common --experimental_platforms_api
+common --experimental_repository_cache_hardlinks 
 common --incompatible_auto_exec_groups
 common --incompatible_config_setting_private_default_visibility
 common --incompatible_disable_native_repo_rules 
 common --incompatible_disable_non_executable_java_binary
-#common --incompatible_disable_target_default_provider_fields
 common --incompatible_disable_target_provider_fields
 common --incompatible_disallow_struct_provider_syntax
+common --incompatible_enable_proto_toolchain_resolution
+common --incompatible_fail_on_unknown_attributes
+common --incompatible_merge_fixed_and_default_shell_env
+common --incompatible_no_implicit_file_export
 common --incompatible_strict_action_env
-# common --incompatible_use_host_features
+common --incompatible_top_level_aspects_require_providers
+common --incompatible_use_cc_configure_from_rules_cc
+
 common --modify_execution_info=CppCompile=+supports-path-mapping
+common --skip_incompatible_explicit_targets
 
 build --@curl//:use_mbedtls=true 
 # build --@curl//:http_only=true
@@ -120,13 +128,6 @@ build:clang-cl --host_per_file_copt="protobuf\\+/.*@-Wno-invalid-offsetof"
 build:clang-cl --per_file_copt="c-ares\\+/.*@-Wno-macro-redefined"
 build:clang-cl --host_per_file_copt="c-ares\\+/.*@-Wno-macro-redefined"
 
-# LLVM 19.1.0
-# opentelemetry/logs/logger.h(76,89): 
-#    error: a template argument list is expected after a name prefixed by the template keyword [-Wmissing-template-arg-list-after-template-kw]
-#  detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set( 
-#                                                                                  ^
-#build:clang-cl --copt=-Wno-missing-template-arg-list-after-template-kw
-
 # allow newer protobuf to compile
 common --experimental_google_legacy_api
 common --experimental_enable_android_migration_apis
@@ -135,22 +136,9 @@ common:linux --force_pic
 common:macos --force_pic
 
 startup --client_debug
-common --experimental_repository_cache_hardlinks 
-common --incompatible_enable_proto_toolchain_resolution
-#common --experimental_disable_external_package
-common --experimental_platforms_api
-common --incompatible_fail_on_unknown_attributes
-common --incompatible_merge_fixed_and_default_shell_env
-common --incompatible_no_implicit_file_export
-#common --incompatible_no_rule_outputs_param
-#common --incompatible_stop_exporting_language_modules
-common --incompatible_top_level_aspects_require_providers
-common --incompatible_use_cc_configure_from_rules_cc
 
 ## This is what my ../top.bazelrc contains (not in the repo as local to my machine)
 # build --disk_cache=f:/b/d
 # common --repository_cache=f:/b/r
 # startup --output_user_root=f:/b/u
 try-import %workspace%/../top.bazelrc
-
-
