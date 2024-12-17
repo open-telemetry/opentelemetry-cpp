@@ -34,7 +34,7 @@ static constexpr const char *kDeploymentEnvironment = "deployment.environment";
  * @code deployment.environment.name @endcode does not affect the uniqueness constraints defined
  * through the @code service.namespace @endcode, @code service.name @endcode and @code
  * service.instance.id @endcode resource attributes. This implies that resources carrying the
- * following attribute combinations MUST be considered to be identifying the same service: <p> <ul>
+ * following attribute combinations MUST be considered to be identifying the same service: <ul>
  *   <li>@code service.name=frontend @endcode, @code deployment.environment.name=production
  * @endcode</li> <li>@code service.name=frontend @endcode, @code deployment.environment.name=staging
  * @endcode.</li>
