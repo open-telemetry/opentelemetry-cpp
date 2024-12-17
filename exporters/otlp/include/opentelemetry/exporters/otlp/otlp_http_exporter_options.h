@@ -4,12 +4,10 @@
 #pragma once
 
 #include <chrono>
-#include <memory>
 #include <string>
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
-#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -103,9 +101,6 @@ struct OPENTELEMETRY_EXPORT OtlpHttpExporterOptions
 
   /** Compression type. */
   std::string compression;
-
-  std::shared_ptr<sdk::common::ThreadInstrumentation> thread_instrumentation =
-      std::shared_ptr<sdk::common::ThreadInstrumentation>(nullptr);
 };
 
 }  // namespace otlp

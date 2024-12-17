@@ -22,6 +22,7 @@
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_runtime_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
@@ -60,7 +61,24 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(std::unique_ptr<LogRecordExport
       max_export_batch_size_(options.max_export_batch_size),
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_instrumentation_(options.thread_instrumentation),
+      worker_thread_instrumentation_(nullptr),
+      worker_thread_()
+{
+  // Make sure the constructor is complete before giving 'this' to a thread.
+  worker_thread_ = std::thread(&BatchLogRecordProcessor::DoBackgroundWork, this);
+}
+
+BatchLogRecordProcessor::BatchLogRecordProcessor(
+    std::unique_ptr<LogRecordExporter> &&exporter,
+    const BatchLogRecordProcessorOptions &options,
+    const BatchLogRecordProcessorRuntimeOptions &runtime_options)
+    : exporter_(std::move(exporter)),
+      max_queue_size_(options.max_queue_size),
+      scheduled_delay_millis_(options.schedule_delay_millis),
+      max_export_batch_size_(options.max_export_batch_size),
+      buffer_(options.max_queue_size),
+      synchronization_data_(std::make_shared<SynchronizationData>()),
+      worker_thread_instrumentation_(runtime_options.thread_instrumentation),
       worker_thread_()
 {
   // Make sure the constructor is complete before giving 'this' to a thread.

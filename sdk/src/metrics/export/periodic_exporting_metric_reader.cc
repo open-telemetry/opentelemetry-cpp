@@ -18,6 +18,7 @@
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_runtime_options.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/version.h"
@@ -41,12 +42,32 @@ namespace metrics
 
 PeriodicExportingMetricReader::PeriodicExportingMetricReader(
     std::unique_ptr<PushMetricExporter> exporter,
-    const PeriodicExportingMetricReaderOptions &option)
+    const PeriodicExportingMetricReaderOptions &options)
     : exporter_{std::move(exporter)},
-      export_interval_millis_{option.export_interval_millis},
-      export_timeout_millis_{option.export_timeout_millis},
-      worker_thread_instrumentation_(option.periodic_thread_instrumentation),
-      collect_thread_instrumentation_(option.collect_thread_instrumentation)
+      export_interval_millis_{options.export_interval_millis},
+      export_timeout_millis_{options.export_timeout_millis},
+      worker_thread_instrumentation_(nullptr),
+      collect_thread_instrumentation_(nullptr)
+{
+  if (export_interval_millis_ <= export_timeout_millis_)
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[Periodic Exporting Metric Reader] Invalid configuration: "
+        "export_timeout_millis_ should be less than export_interval_millis_, using default values");
+    export_interval_millis_ = kExportIntervalMillis;
+    export_timeout_millis_  = kExportTimeOutMillis;
+  }
+}
+
+PeriodicExportingMetricReader::PeriodicExportingMetricReader(
+    std::unique_ptr<PushMetricExporter> exporter,
+    const PeriodicExportingMetricReaderOptions &options,
+    const PeriodicExportingMetricReaderRuntimeOptions &runtime_options)
+    : exporter_{std::move(exporter)},
+      export_interval_millis_{options.export_interval_millis},
+      export_timeout_millis_{options.export_timeout_millis},
+      worker_thread_instrumentation_(runtime_options.periodic_thread_instrumentation),
+      collect_thread_instrumentation_(runtime_options.collect_thread_instrumentation)
 {
   if (export_interval_millis_ <= export_timeout_millis_)
   {

@@ -14,6 +14,7 @@
 
 #include "opentelemetry/sdk/common/circular_buffer.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_runtime_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
@@ -54,11 +55,23 @@ public:
    * Creates a batch log processor by configuring the specified exporter and other parameters
    * as per the official, language-agnostic opentelemetry specs.
    *
-   * @param exporter - The backend exporter to pass the logs to
-   * @param options - The batch SpanProcessor options.
+   * @param exporter The backend exporter to pass the logs to
+   * @param options The batch SpanProcessor configuration options.
    */
   explicit BatchLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
                                    const BatchLogRecordProcessorOptions &options);
+
+  /**
+   * Creates a batch log processor by configuring the specified exporter and other parameters
+   * as per the official, language-agnostic opentelemetry specs.
+   *
+   * @param exporter The backend exporter to pass the logs to
+   * @param options The batch SpanProcessor configuration options.
+   * @param runtime_options The batch SpanProcessor runtime options.
+   */
+  explicit BatchLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
+                                   const BatchLogRecordProcessorOptions &options,
+                                   const BatchLogRecordProcessorRuntimeOptions &runtime_options);
 
   /** Makes a new recordable **/
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;

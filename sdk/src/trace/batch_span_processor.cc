@@ -47,7 +47,23 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
       max_export_batch_size_(options.max_export_batch_size),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_instrumentation_(options.thread_instrumentation),
+      worker_thread_instrumentation_(nullptr),
+      worker_thread_()
+{
+  // Make sure the constructor is complete before giving 'this' to a thread.
+  worker_thread_ = std::thread(&BatchSpanProcessor::DoBackgroundWork, this);
+}
+
+BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
+                                       const BatchSpanProcessorOptions &options,
+                                       const BatchSpanProcessorRuntimeOptions &runtime_options)
+    : exporter_(std::move(exporter)),
+      max_queue_size_(options.max_queue_size),
+      schedule_delay_millis_(options.schedule_delay_millis),
+      max_export_batch_size_(options.max_export_batch_size),
+      buffer_(max_queue_size_),
+      synchronization_data_(std::make_shared<SynchronizationData>()),
+      worker_thread_instrumentation_(runtime_options.thread_instrumentation),
       worker_thread_()
 {
   // Make sure the constructor is complete before giving 'this' to a thread.

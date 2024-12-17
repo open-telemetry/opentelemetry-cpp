@@ -16,11 +16,22 @@ namespace sdk
 {
 namespace trace
 {
+
 std::unique_ptr<SpanProcessor> BatchSpanProcessorFactory::Create(
     std::unique_ptr<SpanExporter> &&exporter,
     const BatchSpanProcessorOptions &options)
 {
-  std::unique_ptr<SpanProcessor> processor(new BatchSpanProcessor(std::move(exporter), options));
+  BatchSpanProcessorRuntimeOptions runtime_options;
+  return Create(std::move(exporter), options, runtime_options);
+}
+
+std::unique_ptr<SpanProcessor> BatchSpanProcessorFactory::Create(
+    std::unique_ptr<SpanExporter> &&exporter,
+    const BatchSpanProcessorOptions &options,
+    const BatchSpanProcessorRuntimeOptions &runtime_options)
+{
+  std::unique_ptr<SpanProcessor> processor(
+      new BatchSpanProcessor(std::move(exporter), options, runtime_options));
   return processor;
 }
 

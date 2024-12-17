@@ -13,6 +13,7 @@
 
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_runtime_options.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
@@ -29,7 +30,11 @@ class PeriodicExportingMetricReader : public MetricReader
 
 public:
   PeriodicExportingMetricReader(std::unique_ptr<PushMetricExporter> exporter,
-                                const PeriodicExportingMetricReaderOptions &option);
+                                const PeriodicExportingMetricReaderOptions &options);
+
+  PeriodicExportingMetricReader(std::unique_ptr<PushMetricExporter> exporter,
+                                const PeriodicExportingMetricReaderOptions &options,
+                                const PeriodicExportingMetricReaderRuntimeOptions &runtime_options);
 
   AggregationTemporality GetAggregationTemporality(
       InstrumentType instrument_type) const noexcept override;

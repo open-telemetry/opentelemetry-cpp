@@ -6,7 +6,6 @@
 #include <chrono>
 #include <cstddef>
 
-#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -35,9 +34,6 @@ struct BatchLogRecordProcessorOptions
    * equal to max_queue_size.
    */
   size_t max_export_batch_size = 512;
-
-  std::shared_ptr<sdk::common::ThreadInstrumentation> thread_instrumentation =
-      std::shared_ptr<sdk::common::ThreadInstrumentation>(nullptr);
 };
 
 }  // namespace logs
