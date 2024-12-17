@@ -19,8 +19,6 @@ namespace configuration
 
 // YAML-SCHEMA: schema/meter_provider.json
 // YAML-NODE: PullMetricReader
-// FIXME:
-// https://github.com/open-telemetry/opentelemetry-configuration/issues/138
 class PullMetricReaderConfiguration : public MetricReaderConfiguration
 {
 public:
