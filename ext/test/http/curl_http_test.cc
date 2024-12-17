@@ -548,9 +548,9 @@ TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
   auto beg = std::chrono::system_clock::now();
   http_client->FinishAllSessions();
   http_client.reset();
-  // when use background_thread_wait_for_ should have no side effort on elegant quit
-  // it shoule less than scheduled_delay_milliseconds_
-  // because ci machine may slow, some take 10ms, so we assert it less than 20ms
+  // when background_thread_wait_for_ is used, it should have no side effect on elegant quit
+  // wait should be less than scheduled_delay_milliseconds_
+  // Due to load on CI hosts (some take 10ms), we assert it is less than 20ms
   auto cost = std::chrono::system_clock::now() - beg;
   ASSERT_TRUE(cost < std::chrono::milliseconds{20})
       << "cost ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(cost).count()
