@@ -538,7 +538,7 @@ struct GzipEventHandler : public CustomEventHandler
 {
   ~GzipEventHandler() override = default;
 
-  void OnResponse(http_client::Response &response) noexcept override {}
+  void OnResponse(http_client::Response & /* response */) noexcept override {}
 
   void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
   {
@@ -575,7 +575,7 @@ TEST_F(BasicCurlHttpTests, GzipCompressibleData)
   session->FinishSession();
   ASSERT_TRUE(handler->is_called_);
   ASSERT_EQ(handler->state_, http_client::SessionState::Response);
-  ASSERT_EQ(handler->reason_, "");
+  ASSERT_TRUE(handler->reason_.empty());
 
   auto http_request =
       dynamic_cast<opentelemetry::ext::http::client::curl::Request *>(request.get());
@@ -623,7 +623,7 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
   session->FinishSession();
   ASSERT_TRUE(handler->is_called_);
   ASSERT_EQ(handler->state_, http_client::SessionState::Response);
-  ASSERT_EQ(handler->reason_, "");
+  ASSERT_TRUE(handler->reason_.empty());
 
   auto http_request =
       dynamic_cast<opentelemetry::ext::http::client::curl::Request *>(request.get());
