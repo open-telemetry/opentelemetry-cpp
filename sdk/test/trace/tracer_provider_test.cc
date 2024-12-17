@@ -93,8 +93,8 @@ TEST(TracerProvider, GetTracer)
 
 TEST(TracerProvider, GetTracerEqualityCheck)
 {
-  auto provider =
-      TracerProviderFactory::Create(std::move(SimpleSpanProcessorFactory::Create(nullptr)));
+  auto processor = SimpleSpanProcessorFactory::Create(nullptr);
+  auto provider  = TracerProviderFactory::Create(std::move(processor));
 
   // providing the same scope names should return the same tracer
   auto tracer_1a = provider->GetTracer("library_name");
@@ -114,8 +114,9 @@ TEST(TracerProvider, GetTracerEqualityCheck)
 
 TEST(TracerProvider, GetTracerInequalityCheck)
 {
-  auto provider =
-      TracerProviderFactory::Create(std::move(SimpleSpanProcessorFactory::Create(nullptr)));
+  auto processor = SimpleSpanProcessorFactory::Create(nullptr);
+  auto provider  = TracerProviderFactory::Create(std::move(processor));
+
   auto tracer_library_1 = provider->GetTracer("library_1");
   auto tracer_library_2 = provider->GetTracer("library_2");
   auto tracer_version_1 = provider->GetTracer("library_1", "v1.0");
@@ -140,8 +141,8 @@ TEST(TracerProvider, GetTracerInequalityCheck)
 
 TEST(TracerProvider, GetTracerEqualityCheckAbiv2)
 {
-  auto provider =
-      TracerProviderFactory::Create(std::move(SimpleSpanProcessorFactory::Create(nullptr)));
+  auto processor = SimpleSpanProcessorFactory::Create(nullptr);
+  auto provider  = TracerProviderFactory::Create(std::move(processor));
 
   auto tracer_attribute1a = provider->GetTracer("library_name", "v1.0", "url", {{"key", "one"}});
   auto tracer_attribute1b = provider->GetTracer("library_name", "v1.0", "url", {{"key", "one"}});
@@ -152,8 +153,9 @@ TEST(TracerProvider, GetTracerEqualityCheckAbiv2)
 
 TEST(TracerProvider, GetTracerInequalityCheckAbiv2)
 {
-  auto provider =
-      TracerProviderFactory::Create(std::move(SimpleSpanProcessorFactory::Create(nullptr)));
+  auto processor = SimpleSpanProcessorFactory::Create(nullptr);
+  auto provider  = TracerProviderFactory::Create(std::move(processor));
+
   auto tracer_1          = provider->GetTracer("library_name", "v1.0", "url");
   auto tracer_attribute1 = provider->GetTracer("library_name", "v1.0", "url", {{"key", "one"}});
   auto tracer_attribute2 = provider->GetTracer("library_name", "v1.0", "url", {{"key", "two"}});
