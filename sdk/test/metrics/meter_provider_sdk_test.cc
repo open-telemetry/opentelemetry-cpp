@@ -249,7 +249,7 @@ TEST(MeterProvider, GetMeterEqualityCheck)
   auto meter_library_1a = provider->GetMeter("library_name");
   auto meter_library_1b = provider->GetMeter("library_name");
   EXPECT_EQ(meter_library_1a, meter_library_1b);
-  
+
   // providing the same scope name and version should return the same meter
   auto meter_version_1a = provider->GetMeter("library_name", "v1.0");
   auto meter_version_1b = provider->GetMeter("library_name", "v1.0");
@@ -264,27 +264,26 @@ TEST(MeterProvider, GetMeterEqualityCheck)
 TEST(MeterProvider, GetMeterInequalityCheck)
 {
   auto provider = MeterProviderFactory::Create();
-  
+
   auto meter_library_1 = provider->GetMeter("library_1");
   auto meter_library_2 = provider->GetMeter("library_2");
   auto meter_version_1 = provider->GetMeter("library_1", "v1.0");
-  auto meter_version_2 = provider->GetMeter("library_1", "v2.0");  
+  auto meter_version_2 = provider->GetMeter("library_1", "v2.0");
   auto meter_url_1     = provider->GetMeter("library_1", "v1.0", "url_1");
   auto meter_url_2     = provider->GetMeter("library_1", "v1.0", "url_2");
-  
+
   // different scope names should return distinct meters
   EXPECT_NE(meter_library_1, meter_library_2);
-  
+
   // different scope versions should return distinct meters
   EXPECT_NE(meter_version_1, meter_library_1);
   EXPECT_NE(meter_version_1, meter_version_2);
-  
+
   // different scope schema urls should return distinct meters
   EXPECT_NE(meter_url_1, meter_library_1);
   EXPECT_NE(meter_url_1, meter_version_1);
   EXPECT_NE(meter_url_1, meter_url_2);
 }
-
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
@@ -305,7 +304,7 @@ TEST(MeterProvider, GetMeterInequalityCheckAbiv2)
   auto meter_1           = provider->GetMeter("library_name", "v1.0", "url");
   auto meter_attribute_1 = provider->GetMeter("library_name", "v1.0", "url", {{"key", "one"}});
   auto meter_attribute_2 = provider->GetMeter("library_name", "v1.0", "url", {{"key", "two"}});
-  
+
   // different scope attributes should return distinct meters
   EXPECT_NE(meter_attribute_1, meter_1);
   EXPECT_NE(meter_attribute_1, meter_attribute_2);

@@ -93,32 +93,33 @@ TEST(TracerProvider, GetTracer)
 
 TEST(TracerProvider, GetTracerEqualityCheck)
 {
-  auto provider = TracerProviderFactory::Create(std::move(SimpleSpanProcessorFactory::Create(nullptr)));
+  auto provider =
+      TracerProviderFactory::Create(std::move(SimpleSpanProcessorFactory::Create(nullptr)));
 
   // providing the same scope names should return the same tracer
   auto tracer_1a = provider->GetTracer("library_name");
   auto tracer_1b = provider->GetTracer("library_name");
   EXPECT_EQ(tracer_1a, tracer_1b);
-  
+
   // providing the same scope name and version should return the same tracer
   auto tracer_version1a = provider->GetTracer("library_name", "v1.0");
   auto tracer_version1b = provider->GetTracer("library_name", "v1.0");
   EXPECT_EQ(tracer_version1a, tracer_version1b);
-  
+
   // providing the same name, version, and schema urls should return the same tracer
   auto tracer_urla = provider->GetTracer("library_name", "v1.0", "url");
   auto tracer_urlb = provider->GetTracer("library_name", "v1.0", "url");
   EXPECT_EQ(tracer_urla, tracer_urlb);
-  
 }
 
 TEST(TracerProvider, GetTracerInequalityCheck)
 {
-  auto provider = TracerProviderFactory::Create(std::move(SimpleSpanProcessorFactory::Create(nullptr)));
+  auto provider =
+      TracerProviderFactory::Create(std::move(SimpleSpanProcessorFactory::Create(nullptr)));
   auto tracer_library_1 = provider->GetTracer("library_1");
   auto tracer_library_2 = provider->GetTracer("library_2");
   auto tracer_version_1 = provider->GetTracer("library_1", "v1.0");
-  auto tracer_version_2 = provider->GetTracer("library_1", "v2.0");  
+  auto tracer_version_2 = provider->GetTracer("library_1", "v2.0");
   auto tracer_url_1     = provider->GetTracer("library_1", "v1.0", "url_1");
   auto tracer_url_2     = provider->GetTracer("library_1", "v1.0", "url_2");
 
@@ -128,19 +129,19 @@ TEST(TracerProvider, GetTracerInequalityCheck)
   // different scope versions should return distinct tracers
   EXPECT_NE(tracer_version_1, tracer_library_1);
   EXPECT_NE(tracer_version_1, tracer_version_2);
-  
+
   // different scope schema urls should return distinct tracers
   EXPECT_NE(tracer_url_1, tracer_library_1);
   EXPECT_NE(tracer_url_1, tracer_version_1);
   EXPECT_NE(tracer_url_1, tracer_url_2);
 }
 
-
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 TEST(TracerProvider, GetTracerEqualityCheckAbiv2)
 {
-  auto provider = TracerProviderFactory::Create(std::move(SimpleSpanProcessorFactory::Create(nullptr)));
+  auto provider =
+      TracerProviderFactory::Create(std::move(SimpleSpanProcessorFactory::Create(nullptr)));
 
   auto tracer_attribute1a = provider->GetTracer("library_name", "v1.0", "url", {{"key", "one"}});
   auto tracer_attribute1b = provider->GetTracer("library_name", "v1.0", "url", {{"key", "one"}});
@@ -151,7 +152,8 @@ TEST(TracerProvider, GetTracerEqualityCheckAbiv2)
 
 TEST(TracerProvider, GetTracerInequalityCheckAbiv2)
 {
-  auto provider = TracerProviderFactory::Create(std::move(SimpleSpanProcessorFactory::Create(nullptr)));
+  auto provider =
+      TracerProviderFactory::Create(std::move(SimpleSpanProcessorFactory::Create(nullptr)));
   auto tracer_1          = provider->GetTracer("library_name", "v1.0", "url");
   auto tracer_attribute1 = provider->GetTracer("library_name", "v1.0", "url", {{"key", "one"}});
   auto tracer_attribute2 = provider->GetTracer("library_name", "v1.0", "url", {{"key", "two"}});

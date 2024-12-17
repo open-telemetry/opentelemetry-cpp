@@ -211,36 +211,52 @@ TEST(InstrumentationScope, LegacyInstrumentationLibrary)
 
 TEST(InstrumentationScope, Equal)
 {
-  using Attributes = std::initializer_list<std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue>>;
-  Attributes attributes_empty           = {};
-  Attributes attributes_match           = {{"key0", "some value"}, {"key1", 1}, {"key2", 2.0}, {"key3", true}};
-  Attributes attributes_different       = {{"key42", "some other"}};
+  using Attributes = std::initializer_list<
+      std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue>>;
+  Attributes attributes_empty = {};
+  Attributes attributes_match = {
+      {"key0", "some value"}, {"key1", 1}, {"key2", 2.0}, {"key3", true}};
+  Attributes attributes_different = {{"key42", "some other"}};
 
-  auto kv_iterable_empty = opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_empty);
-  auto kv_iterable_match = opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_match);
-  auto kv_iterable_different = opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_different);
-  
+  auto kv_iterable_empty =
+      opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_empty);
+  auto kv_iterable_match =
+      opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_match);
+  auto kv_iterable_different =
+      opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_different);
+
   // try with no attributes added to the instrumentation scope
   auto instrumentation_scope =
-      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("library_name", "library_version", "schema_url");
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name", "library_version", "schema_url");
 
-  // the instrumentation scope is equal if all parameters are equal (must handle nullptr attributes or empty attributes) 
+  // the instrumentation scope is equal if all parameters are equal (must handle nullptr attributes
+  // or empty attributes)
   EXPECT_TRUE(instrumentation_scope->equal("library_name", "library_version", "schema_url"));
-  EXPECT_TRUE(instrumentation_scope->equal("library_name", "library_version", "schema_url", nullptr));
-  EXPECT_TRUE(instrumentation_scope->equal("library_name", "library_version", "schema_url", &kv_iterable_empty));
-  
+  EXPECT_TRUE(
+      instrumentation_scope->equal("library_name", "library_version", "schema_url", nullptr));
+  EXPECT_TRUE(instrumentation_scope->equal("library_name", "library_version", "schema_url",
+                                           &kv_iterable_empty));
+
   // the instrumentation scope is not equal if any parameter is different
   EXPECT_FALSE(instrumentation_scope->equal("library_name", ""));
   EXPECT_FALSE(instrumentation_scope->equal("library_name", "library_version", ""));
-  EXPECT_FALSE(instrumentation_scope->equal("library_name", "library_version", "schema_url", &kv_iterable_different));
-   
+  EXPECT_FALSE(instrumentation_scope->equal("library_name", "library_version", "schema_url",
+                                            &kv_iterable_different));
+
   // try with attributes added to the instrumentation scope
   auto instrumentation_scope_w_attributes =
-      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("library_name", "library_version", "schema_url", attributes_match);
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name", "library_version", "schema_url", attributes_match);
 
-  // the instrumentation scope is equal if all parameters including all attribute keys, types, and values are equal  
-  EXPECT_TRUE(instrumentation_scope_w_attributes->equal("library_name", "library_version", "schema_url", &kv_iterable_match));
-  EXPECT_FALSE(instrumentation_scope_w_attributes->equal("library_name", "library_version", "schema_url", nullptr));
-  EXPECT_FALSE(instrumentation_scope_w_attributes->equal("library_name", "library_version", "schema_url", &kv_iterable_empty));
-  EXPECT_FALSE(instrumentation_scope_w_attributes->equal("library_name", "library_version", "schema_url", &kv_iterable_different));
+  // the instrumentation scope is equal if all parameters including all attribute keys, types, and
+  // values are equal
+  EXPECT_TRUE(instrumentation_scope_w_attributes->equal("library_name", "library_version",
+                                                        "schema_url", &kv_iterable_match));
+  EXPECT_FALSE(instrumentation_scope_w_attributes->equal("library_name", "library_version",
+                                                         "schema_url", nullptr));
+  EXPECT_FALSE(instrumentation_scope_w_attributes->equal("library_name", "library_version",
+                                                         "schema_url", &kv_iterable_empty));
+  EXPECT_FALSE(instrumentation_scope_w_attributes->equal("library_name", "library_version",
+                                                         "schema_url", &kv_iterable_different));
 }
