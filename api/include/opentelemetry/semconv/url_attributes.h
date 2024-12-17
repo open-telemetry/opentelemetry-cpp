@@ -39,7 +39,6 @@ static constexpr const char *kUrlFragment = "url.fragment";
  *
  * Query string values for the following keys SHOULD be redacted by default and replaced by the
  * value @code REDACTED @endcode:
- * <p>
  * <ul>
  *   <li><a
  * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth">@code
@@ -73,7 +72,7 @@ static constexpr const char *kUrlPath = "url.path";
  * can identify it. <p>
  *
  * Query string values for the following keys SHOULD be redacted by default and replaced by the
- * value @code REDACTED @endcode: <p> <ul> <li><a
+ * value @code REDACTED @endcode: <ul> <li><a
  * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth">@code
  * AWSAccessKeyId @endcode</a></li> <li><a
  * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth">@code
