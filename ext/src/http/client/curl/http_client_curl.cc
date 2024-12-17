@@ -191,9 +191,7 @@ HttpClient::HttpClient()
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
       background_thread_wait_for_{std::chrono::minutes{1}},
       curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
-{
-  is_shutdown_.store(false);
-}
+{}
 
 HttpClient::~HttpClient()
 {
