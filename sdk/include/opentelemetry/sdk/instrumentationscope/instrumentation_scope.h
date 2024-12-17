@@ -117,9 +117,25 @@ public:
    */
   bool equal(const nostd::string_view name,
              const nostd::string_view version,
-             const nostd::string_view schema_url = "") const noexcept
+             const nostd::string_view schema_url = "", 
+             const opentelemetry::common::KeyValueIterable *attributes = nullptr) const noexcept
   {
-    return this->name_ == name && this->version_ == version && this->schema_url_ == schema_url;
+    
+    if (this->name_ != name || this->version_ != version || this->schema_url_ != schema_url)
+    {
+        return false;
+    }
+
+    if (attributes == nullptr) 
+    {
+      if (attributes_.empty())
+      {
+        return true;
+      }
+      return false;
+    }
+
+    return attributes_.EqualTo(*attributes);
   }
 
   const std::string &GetName() const noexcept { return name_; }
