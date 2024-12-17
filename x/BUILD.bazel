@@ -18,6 +18,20 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "m",
+    srcs = ["m.cpp"],
+    deps = ["@otel_sdk//:dll"],
+    local = True,
+    tags = ["manual", "external"],
+
+    # Minimal set of env vars for Visual Studio
+    env_inherit = [ 
+        "windir", # Mandatory
+        #"USERPROFILE", # In order to avoid creating %USERPROFILE%
+    ],
+)
+
 # copy_directory(
 #     name = "dashboards_dir",
 #     src = "dashboards",
