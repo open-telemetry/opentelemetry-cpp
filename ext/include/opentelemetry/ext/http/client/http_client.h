@@ -6,8 +6,10 @@
 #include <chrono>
 #include <cstring>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
+
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
@@ -242,6 +244,8 @@ public:
   virtual void SetTimeoutMs(std::chrono::milliseconds timeout_ms) noexcept = 0;
 
   virtual void SetCompression(const Compression &compression) noexcept = 0;
+
+  virtual void EnableLogging(bool is_log_enabled) noexcept = 0;
 
   virtual ~Request() = default;
 };

@@ -1,9 +1,34 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <gtest/gtest.h>
+#include <stdint.h>
+#include <algorithm>
+#include <chrono>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/trace_state.h"
+#include "opentelemetry/version.h"
 
 #if defined(__GNUC__)
 // GCC raises -Wsuggest-override warnings on GTest,
@@ -11,11 +36,12 @@
 #  pragma GCC diagnostic ignored "-Wsuggest-override"
 #endif
 
-#include <gtest/gtest.h>
-
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
+#include "opentelemetry/proto/common/v1/common.pb.h"
+#include "opentelemetry/proto/resource/v1/resource.pb.h"
+#include "opentelemetry/proto/trace/v1/trace.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
@@ -91,6 +117,29 @@ TEST(OtlpRecordable, SetInstrumentationLibraryWithSchemaURL)
   auto inst_lib = trace_sdk::InstrumentationScope::Create("test", "v1", expected_schema_url);
   rec.SetInstrumentationScope(*inst_lib);
   EXPECT_EQ(expected_schema_url, rec.GetInstrumentationLibrarySchemaURL());
+}
+
+TEST(OtlpRecordable, SetInstrumentationScopeWithAttributes)
+{
+  exporter::otlp::OtlpRecordable rec;
+
+  auto inst_lib = trace_sdk::InstrumentationScope::Create(
+      "test_scope_name", "test_version", "test_schema_url", {{"test_key", "test_value"}});
+
+  ASSERT_EQ(inst_lib->GetAttributes().size(), 1);
+
+  rec.SetInstrumentationScope(*inst_lib);
+
+  const auto proto_instr_libr = rec.GetProtoInstrumentationScope();
+  EXPECT_EQ("test_scope_name", proto_instr_libr.name());
+  EXPECT_EQ("test_version", proto_instr_libr.version());
+
+  ASSERT_EQ(proto_instr_libr.attributes_size(), 1);
+  const auto &proto_attributes = proto_instr_libr.attributes(0);
+  // Requires protoc 3.15.0
+  // ASSERT_TRUE(proto_attributes.value().has_string_value());
+  EXPECT_EQ("test_key", proto_attributes.key());
+  EXPECT_EQ("test_value", proto_attributes.value().string_value());
 }
 
 TEST(OtlpRecordable, SetStartTime)
@@ -216,7 +265,7 @@ TEST(OtlpRecordable, SetResource)
   bool found_service_name = false;
   for (int i = 0; i < proto_resource.attributes_size(); i++)
   {
-    auto attr = proto_resource.attributes(static_cast<int>(i));
+    const auto &attr = proto_resource.attributes(static_cast<int>(i));
     if (attr.key() == service_name_key && attr.value().string_value() == service_name)
     {
       found_service_name = true;
@@ -298,7 +347,8 @@ TEST(OtlpRecordable, PopulateRequest)
   auto rec1      = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
   auto resource1 = resource::Resource::Create({{"service.name", "one"}});
   rec1->SetResource(resource1);
-  auto inst_lib1 = trace_sdk::InstrumentationScope::Create("one", "1");
+  auto inst_lib1 = trace_sdk::InstrumentationScope::Create("one", "1", "scope_schema",
+                                                           {{"scope_key", "scope_value"}});
   rec1->SetInstrumentationScope(*inst_lib1);
 
   auto rec2      = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
@@ -322,14 +372,25 @@ TEST(OtlpRecordable, PopulateRequest)
   OtlpRecordableUtils::PopulateRequest(spans_span, &req);
 
   EXPECT_EQ(req.resource_spans().size(), 2);
-  for (auto resource_spans : req.resource_spans())
+  for (const auto &resource_spans : req.resource_spans())
   {
-    auto service_name     = resource_spans.resource().attributes(0).value().string_value();
-    auto scope_spans_size = resource_spans.scope_spans().size();
+    ASSERT_GT(resource_spans.resource().attributes_size(), 0);
+    const auto service_name     = resource_spans.resource().attributes(0).value().string_value();
+    const auto scope_spans_size = resource_spans.scope_spans().size();
     if (service_name == "one")
     {
+      ASSERT_GT(resource_spans.scope_spans_size(), 0);
+      const auto &scope_one = resource_spans.scope_spans(0).scope();
+
       EXPECT_EQ(scope_spans_size, 1);
-      EXPECT_EQ(resource_spans.scope_spans(0).scope().name(), "one");
+      EXPECT_EQ(scope_one.name(), "one");
+      EXPECT_EQ(scope_one.version(), "1");
+
+      ASSERT_EQ(scope_one.attributes_size(), 1);
+      const auto &scope_attribute = scope_one.attributes(0);
+
+      EXPECT_EQ(scope_attribute.key(), "scope_key");
+      EXPECT_EQ(scope_attribute.value().string_value(), "scope_value");
     }
     if (service_name == "two")
     {
@@ -359,7 +420,7 @@ TEST(OtlpRecordable, PopulateRequestMissing)
   OtlpRecordableUtils::PopulateRequest(spans_span, &req);
 
   EXPECT_EQ(req.resource_spans().size(), 2);
-  for (auto resource_spans : req.resource_spans())
+  for (const auto &resource_spans : req.resource_spans())
   {
     // Both should have scope spans
     EXPECT_EQ(resource_spans.scope_spans().size(), 1);

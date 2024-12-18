@@ -113,9 +113,10 @@ public:
     }
   }
 
-  static std::unique_ptr<Aggregation> CloneAggregation(AggregationType aggregation_type,
-                                                       InstrumentDescriptor instrument_descriptor,
-                                                       const Aggregation &to_copy)
+  static std::unique_ptr<Aggregation> CloneAggregation(
+      AggregationType aggregation_type,
+      const InstrumentDescriptor &instrument_descriptor,
+      const Aggregation &to_copy)
   {
     const PointType point_data = to_copy.ToPoint();
     bool is_monotonic          = true;
@@ -180,6 +181,7 @@ public:
         return AggregationType::kSum;
       case InstrumentType::kHistogram:
         return AggregationType::kHistogram;
+      case InstrumentType::kGauge:
       case InstrumentType::kObservableGauge:
         return AggregationType::kLastValue;
       default:

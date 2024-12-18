@@ -1,22 +1,32 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/trace/scope.h"
-#include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/span_context.h"
+#include <gtest/gtest.h>
+#include <stdint.h>
+#include <algorithm>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/composite_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/propagation/b3_propagator.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
-
-#include <map>
-#include <memory>
-#include <string>
-
-#include <gtest/gtest.h>
+#include "opentelemetry/trace/scope.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
 
 using namespace opentelemetry;
 
@@ -31,7 +41,7 @@ static std::string Hex(const T &id_item)
 class TextMapCarrierTest : public context::propagation::TextMapCarrier
 {
 public:
-  virtual nostd::string_view Get(nostd::string_view key) const noexcept override
+  nostd::string_view Get(nostd::string_view key) const noexcept override
   {
     auto it = headers_.find(std::string(key));
     if (it != headers_.end())
@@ -40,7 +50,7 @@ public:
     }
     return "";
   }
-  virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
+  void Set(nostd::string_view key, nostd::string_view value) noexcept override
   {
     headers_[std::string(key)] = std::string(value);
   }
@@ -66,7 +76,7 @@ public:
         new context::propagation::CompositePropagator(std::move(propogator_list));
   }
 
-  ~CompositePropagatorTest() { delete composite_propagator_; }
+  ~CompositePropagatorTest() override { delete composite_propagator_; }
 
 protected:
   context::propagation::CompositePropagator *composite_propagator_;

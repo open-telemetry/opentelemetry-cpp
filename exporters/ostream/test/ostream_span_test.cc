@@ -1,21 +1,35 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <gtest/gtest.h>
+#include <stdint.h>
+#include <array>
+#include <chrono>
+#include <initializer_list>
+#include <iostream>
+#include <string>
+#include <utility>
+
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/exporters/ostream/span_exporter.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
-#include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/trace/provider.h"
-
-#include "opentelemetry/sdk/trace/exporter.h"
-
-#include "opentelemetry/exporters/ostream/span_exporter.h"
-
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/trace_state.h"
 #include "ostream_capture.h"
-
-#include <gtest/gtest.h>
-#include <iostream>
 
 using namespace opentelemetry::exporter::ostream::test;
 
@@ -31,7 +45,7 @@ using Attributes = std::initializer_list<std::pair<nostd::string_view, common::A
 class TestResource : public resource::Resource
 {
 public:
-  TestResource(resource::ResourceAttributes attributes = resource::ResourceAttributes())
+  TestResource(const resource::ResourceAttributes &attributes = resource::ResourceAttributes())
       : resource::Resource(attributes)
   {}
 };

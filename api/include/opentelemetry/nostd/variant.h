@@ -54,7 +54,20 @@ OPENTELEMETRY_END_NAMESPACE
 #  ifdef HAVE_ABSEIL
 #    include "absl/types/variant.h"
 #  else
-#    include "./internal/absl/types/variant.h"
+#    include "opentelemetry/nostd/internal/absl/base/options.h"
+
+namespace absl
+{
+namespace OTABSL_OPTION_NAMESPACE_NAME
+{
+template <class T>
+struct variant_size;
+template <typename... Ts>
+class variant;
+}  // namespace OTABSL_OPTION_NAMESPACE_NAME
+}  // namespace absl
+
+#    include "opentelemetry/nostd/internal/absl/types/variant.h"
 #  endif
 
 #  ifdef _MSC_VER
@@ -66,7 +79,6 @@ namespace nostd
 {
 #  ifdef HAVE_ABSEIL
 using absl::bad_variant_access;
-#  endif
 using absl::get;
 using absl::get_if;
 using absl::holds_alternative;
@@ -75,6 +87,16 @@ using absl::variant;
 using absl::variant_alternative_t;
 using absl::variant_size;
 using absl::visit;
+#  else
+using absl::OTABSL_OPTION_NAMESPACE_NAME::get;
+using absl::OTABSL_OPTION_NAMESPACE_NAME::get_if;
+using absl::OTABSL_OPTION_NAMESPACE_NAME::holds_alternative;
+using absl::OTABSL_OPTION_NAMESPACE_NAME::monostate;
+using absl::OTABSL_OPTION_NAMESPACE_NAME::variant;
+using absl::OTABSL_OPTION_NAMESPACE_NAME::variant_alternative_t;
+using absl::OTABSL_OPTION_NAMESPACE_NAME::variant_size;
+using absl::OTABSL_OPTION_NAMESPACE_NAME::visit;
+#  endif
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 

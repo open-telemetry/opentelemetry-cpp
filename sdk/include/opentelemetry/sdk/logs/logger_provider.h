@@ -38,11 +38,11 @@ public:
    * @param resource  The resources for this logger provider.
    */
   explicit LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
-                          opentelemetry::sdk::resource::Resource resource =
+                          const opentelemetry::sdk::resource::Resource &resource =
                               opentelemetry::sdk::resource::Resource::Create({})) noexcept;
 
   explicit LoggerProvider(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
-                          opentelemetry::sdk::resource::Resource resource =
+                          const opentelemetry::sdk::resource::Resource &resource =
                               opentelemetry::sdk::resource::Resource::Create({})) noexcept;
 
   /**
@@ -93,7 +93,7 @@ public:
   /**
    * Shutdown the log processor associated with this log provider.
    */
-  bool Shutdown() noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
   /**
    * Force flush the log processor associated with this log provider.

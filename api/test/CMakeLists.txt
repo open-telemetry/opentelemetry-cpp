@@ -10,4 +10,7 @@ add_subdirectory(metrics)
 add_subdirectory(logs)
 add_subdirectory(common)
 add_subdirectory(baggage)
-add_subdirectory(singleton)
+
+if(NOT OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS)
+  add_subdirectory(singleton)
+endif()

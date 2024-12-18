@@ -7,36 +7,38 @@ on:
     branches: [ main ]
 
 jobs:
-  arm64_test:
-    name: CMake test arm64 (with modern protobuf,grpc and abseil)
-    runs-on: actuated-arm64-4cpu-16gb
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: setup
-      env:
-        PROTOBUF_VERSION: '23.3'
-        ABSEIL_CPP_VERSION: '20230125.3'
-        CXX_STANDARD: '14'
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
-      run: |
-        sudo -E ./ci/setup_gcc10.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/install_abseil.sh
-        sudo -E ./ci/install_protobuf.sh
-    - name: run otlp exporter tests
-      env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
-        WITH_ABSEIL: 'ON'
-        CXX_STANDARD: '14'
-      run: |
-        sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
-        ./ci/do_ci.sh cmake.exporter.otprotocol.test
+
+# Commented 2024-11-06, lack of workers in github causes CI failures
+#  arm64_test:
+#    name: CMake test arm64 (with modern protobuf,grpc and abseil)
+#    runs-on: actuated-arm64-4cpu-16gb
+#    steps:
+#    - uses: actions/checkout@v4
+#      with:
+#        submodules: 'recursive'
+#    - name: setup
+#      env:
+#        PROTOBUF_VERSION: '23.3'
+#        ABSEIL_CPP_VERSION: '20230125.3'
+#        CXX_STANDARD: '14'
+#        CC: /usr/bin/gcc-10
+#        CXX: /usr/bin/g++-10
+#      run: |
+#        sudo -E ./ci/setup_gcc10.sh
+#        sudo -E ./ci/setup_cmake.sh
+#        sudo -E ./ci/setup_ci_environment.sh
+#        sudo -E ./ci/setup_googletest.sh
+#        sudo -E ./ci/install_abseil.sh
+#        sudo -E ./ci/install_protobuf.sh
+#    - name: run otlp exporter tests
+#      env:
+#        CC: /usr/bin/gcc-10
+#        CXX: /usr/bin/g++-10
+#        WITH_ABSEIL: 'ON'
+#        CXX_STANDARD: '14'
+#      run: |
+#        sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
+#        ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   cmake_test:
     name: CMake test (without otlp-exporter)
@@ -47,15 +49,15 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
       run: |
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
       run: |
         ./ci/do_ci.sh cmake.test
 
@@ -261,15 +263,15 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
       run: |
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
       run: |
         ./ci/do_ci.sh cmake.with_async_export.test
 
@@ -357,7 +359,7 @@ jobs:
 
   cmake_test_cxx20_clang:
     name: CMake C++20 test(Clang with libc++)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -407,7 +409,7 @@ jobs:
 
   cmake_test_cxx23_clang:
     name: CMake C++23 test(Clang with libc++)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -536,15 +538,15 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
       run: |
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run tests
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
       run: ./ci/do_ci.sh cmake.test_example_plugin
 
   bazel_test:
@@ -856,7 +858,7 @@ jobs:
 
   code_coverage:
     name: Code coverage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -874,9 +876,9 @@ jobs:
         CXX: /usr/bin/g++-10
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
-        file: /home/runner/build/coverage.info
+        files: /home/runner/build/coverage.info
 
   markdown-lint:
     runs-on: ubuntu-latest
@@ -923,3 +925,42 @@ jobs:
     - name: run ./ci/docfx.cmd
       shell: cmd
       run: ./ci/docfx.cmd
+
+  w3c_trace_context_compliance_v1:
+    name: W3C Distributed Tracing Validation V1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout open-telemetry/opentelemetry-cpp
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+      - name: setup
+        env:
+          CC: /usr/bin/gcc-12
+          CXX: /usr/bin/g++-12
+        run: |
+          sudo -E ./ci/setup_googletest.sh
+          sudo -E ./ci/setup_ci_environment.sh
+      - name: run w3c trace-context test server (background)
+        env:
+          CXX_STANDARD: '14'
+        run: |
+          ./ci/do_ci.sh cmake.w3c.trace-context.build-server
+          cd $HOME/build/ext/test/w3c_tracecontext_http_test_server
+          ./w3c_tracecontext_http_test_server &
+      - name: Checkout w3c/trace-context repo
+        uses: actions/checkout@v4
+        with:
+          repository: w3c/trace-context
+          path: trace-context
+      - name: install dependencies
+        run: |
+          sudo apt update && sudo apt install python3-pip
+          sudo pip3 install aiohttp
+      - name: run w3c trace-context test suite
+        env:
+          SPEC_LEVEL: 1
+        run:
+          |
+          python ${GITHUB_WORKSPACE}/trace-context/test/test.py http://localhost:30000/test TraceContextTest AdvancedTest
+          curl http://localhost:30000/stop

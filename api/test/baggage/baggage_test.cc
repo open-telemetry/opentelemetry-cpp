@@ -1,15 +1,17 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/nostd/string_view.h"
-
+#include <assert.h>
 #include <gtest/gtest.h>
+#include <stddef.h>
 #include <string>
 #include <vector>
 
 #include "opentelemetry/baggage/baggage.h"
+#include "opentelemetry/common/kv_properties.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 
-using namespace opentelemetry;
 using namespace opentelemetry::baggage;
 
 std::string header_with_custom_entries(size_t num_entries)
@@ -19,7 +21,7 @@ std::string header_with_custom_entries(size_t num_entries)
   {
     std::string key   = "key" + std::to_string(i);
     std::string value = "value" + std::to_string(i);
-    header += key + "=" + value;
+    header.append(key).append("=").append(value);
     if (i != num_entries - 1)
     {
       header += ",";
@@ -82,7 +84,8 @@ TEST(BaggageTest, ValidateExtractHeader)
   {
     auto baggage = Baggage::FromHeader(testcase.input);
     size_t index = 0;
-    baggage->GetAllEntries([&testcase, &index](nostd::string_view key, nostd::string_view value) {
+    baggage->GetAllEntries([&testcase, &index](opentelemetry::nostd::string_view key,
+                                               opentelemetry::nostd::string_view value) {
       EXPECT_EQ(key, testcase.keys[index]);
       EXPECT_EQ(value, testcase.values[index]);
       index++;
@@ -97,7 +100,7 @@ TEST(BaggageTest, ValidateExtractHeader)
   // Entries beyond threshold are dropped
   auto baggage = Baggage::FromHeader(header_with_custom_entries(Baggage::kMaxKeyValuePairs + 1));
   auto header  = baggage->ToHeader();
-  common::KeyValueStringTokenizer kv_str_tokenizer(header);
+  opentelemetry::common::KeyValueStringTokenizer kv_str_tokenizer(header);
   int expected_tokens = Baggage::kMaxKeyValuePairs;
   EXPECT_EQ(kv_str_tokenizer.NumTokens(), expected_tokens);
 
@@ -126,7 +129,7 @@ TEST(BaggageTest, ValidateInjectHeader)
 
   for (auto &testcase : testcases)
   {
-    nostd::shared_ptr<Baggage> baggage(new Baggage{});
+    opentelemetry::nostd::shared_ptr<Baggage> baggage(new Baggage{});
     for (size_t i = 0; i < testcase.keys.size(); i++)
     {
       baggage = baggage->Set(testcase.keys[i], testcase.values[i]);
@@ -202,17 +205,17 @@ TEST(BaggageTest, BaggageRemove)
 
 TEST(BaggageTest, BaggageGetAll)
 {
-  std::string baggage_header           = "k1=v1,k2=v2,k3=v3";
-  auto baggage                         = Baggage::FromHeader(baggage_header);
-  const int kNumPairs                  = 3;
-  nostd::string_view keys[kNumPairs]   = {"k1", "k2", "k3"};
-  nostd::string_view values[kNumPairs] = {"v1", "v2", "v3"};
-  size_t index                         = 0;
-  baggage->GetAllEntries(
-      [&keys, &values, &index](nostd::string_view key, nostd::string_view value) {
-        EXPECT_EQ(key, keys[index]);
-        EXPECT_EQ(value, values[index]);
-        index++;
-        return true;
-      });
+  std::string baggage_header                          = "k1=v1,k2=v2,k3=v3";
+  auto baggage                                        = Baggage::FromHeader(baggage_header);
+  const int kNumPairs                                 = 3;
+  opentelemetry::nostd::string_view keys[kNumPairs]   = {"k1", "k2", "k3"};
+  opentelemetry::nostd::string_view values[kNumPairs] = {"v1", "v2", "v3"};
+  size_t index                                        = 0;
+  baggage->GetAllEntries([&keys, &values, &index](opentelemetry::nostd::string_view key,
+                                                  opentelemetry::nostd::string_view value) {
+    EXPECT_EQ(key, keys[index]);
+    EXPECT_EQ(value, values[index]);
+    index++;
+    return true;
+  });
 }

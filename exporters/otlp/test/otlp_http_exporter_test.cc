@@ -58,8 +58,7 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
   options.content_type  = content_type;
   options.console_debug = true;
   options.timeout       = std::chrono::system_clock::duration::zero();
-  options.http_headers.insert(
-      std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
+  options.http_headers.insert(std::make_pair("Custom-Header-Key", "Custom-Header-Value"));
   OtlpHttpClientOptions otlp_http_client_options(
       options.url, false,                 /* ssl_insecure_skip_verify */
       "", /* ssl_ca_cert_path */ "",      /* ssl_ca_cert_string */
@@ -158,34 +157,35 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session, report_trace_id](
-                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
-          auto check_json =
-              nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-          auto resource_span     = *check_json["resourceSpans"].begin();
-          auto scope_span        = *resource_span["scopeSpans"].begin();
-          auto span              = *scope_span["spans"].begin();
-          auto received_trace_id = span["traceId"].get<std::string>();
-          EXPECT_EQ(received_trace_id, report_trace_id);
+        .WillOnce(
+            [&mock_session, report_trace_id](
+                const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
+              auto check_json =
+                  nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
+              auto resource_span     = *check_json["resourceSpans"].begin();
+              auto scope_span        = *resource_span["scopeSpans"].begin();
+              auto span              = *scope_span["spans"].begin();
+              auto received_trace_id = span["traceId"].get<std::string>();
+              EXPECT_EQ(received_trace_id, report_trace_id);
 
-          auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
-          ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
-          if (custom_header != mock_session->GetRequest()->headers_.end())
-          {
-            EXPECT_EQ("Custom-Header-Value", custom_header->second);
-          }
+              auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
+              ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
+              if (custom_header != mock_session->GetRequest()->headers_.end())
+              {
+                EXPECT_EQ("Custom-Header-Value", custom_header->second);
+              }
 
-          auto user_agent_header = mock_session->GetRequest()->headers_.find("User-Agent");
-          ASSERT_TRUE(user_agent_header != mock_session->GetRequest()->headers_.end());
-          if (user_agent_header != mock_session->GetRequest()->headers_.end())
-          {
-            EXPECT_EQ(GetOtlpDefaultUserAgent(), user_agent_header->second);
-          }
+              auto user_agent_header = mock_session->GetRequest()->headers_.find("User-Agent");
+              ASSERT_TRUE(user_agent_header != mock_session->GetRequest()->headers_.end());
+              if (user_agent_header != mock_session->GetRequest()->headers_.end())
+              {
+                EXPECT_EQ(GetOtlpDefaultUserAgent(), user_agent_header->second);
+              }
 
-          // let the otlp_http_client to continue
-          http_client::nosend::Response response;
-          response.Finish(*callback.get());
-        });
+              // let the otlp_http_client to continue
+              http_client::nosend::Response response;
+              response.Finish(*callback.get());
+            });
 
     child_span->End();
     parent_span->End();
@@ -249,38 +249,39 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session, report_trace_id](
-                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
-          auto check_json =
-              nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-          auto resource_span     = *check_json["resourceSpans"].begin();
-          auto scope_span        = *resource_span["scopeSpans"].begin();
-          auto span              = *scope_span["spans"].begin();
-          auto received_trace_id = span["traceId"].get<std::string>();
-          EXPECT_EQ(received_trace_id, report_trace_id);
+        .WillOnce(
+            [&mock_session, report_trace_id](
+                const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
+              auto check_json =
+                  nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
+              auto resource_span     = *check_json["resourceSpans"].begin();
+              auto scope_span        = *resource_span["scopeSpans"].begin();
+              auto span              = *scope_span["spans"].begin();
+              auto received_trace_id = span["traceId"].get<std::string>();
+              EXPECT_EQ(received_trace_id, report_trace_id);
 
-          auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
-          ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
-          if (custom_header != mock_session->GetRequest()->headers_.end())
-          {
-            EXPECT_EQ("Custom-Header-Value", custom_header->second);
-          }
+              auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
+              ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
+              if (custom_header != mock_session->GetRequest()->headers_.end())
+              {
+                EXPECT_EQ("Custom-Header-Value", custom_header->second);
+              }
 
-          auto user_agent_header = mock_session->GetRequest()->headers_.find("User-Agent");
-          ASSERT_TRUE(user_agent_header != mock_session->GetRequest()->headers_.end());
-          if (user_agent_header != mock_session->GetRequest()->headers_.end())
-          {
-            EXPECT_EQ(GetOtlpDefaultUserAgent(), user_agent_header->second);
-          }
+              auto user_agent_header = mock_session->GetRequest()->headers_.find("User-Agent");
+              ASSERT_TRUE(user_agent_header != mock_session->GetRequest()->headers_.end());
+              if (user_agent_header != mock_session->GetRequest()->headers_.end())
+              {
+                EXPECT_EQ(GetOtlpDefaultUserAgent(), user_agent_header->second);
+              }
 
-          // let the otlp_http_client to continue
-          std::thread async_finish{[callback]() {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            http_client::nosend::Response response;
-            response.Finish(*callback.get());
-          }};
-          async_finish.detach();
-        });
+              // let the otlp_http_client to continue
+              std::thread async_finish{[callback]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                http_client::nosend::Response response;
+                response.Finish(*callback.get());
+              }};
+              async_finish.detach();
+            });
 
     child_span->End();
     parent_span->End();
@@ -343,25 +344,27 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session, report_trace_id](
-                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
-          opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
-          request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
-                                      static_cast<int>(mock_session->GetRequest()->body_.size()));
-          auto received_trace_id =
-              request_body.resource_spans(0).scope_spans(0).spans(0).trace_id();
-          EXPECT_EQ(received_trace_id, report_trace_id);
+        .WillOnce(
+            [&mock_session, report_trace_id](
+                const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
+              opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
+              request_body.ParseFromArray(
+                  &mock_session->GetRequest()->body_[0],
+                  static_cast<int>(mock_session->GetRequest()->body_.size()));
+              auto received_trace_id =
+                  request_body.resource_spans(0).scope_spans(0).spans(0).trace_id();
+              EXPECT_EQ(received_trace_id, report_trace_id);
 
-          auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
-          ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
-          if (custom_header != mock_session->GetRequest()->headers_.end())
-          {
-            EXPECT_EQ("Custom-Header-Value", custom_header->second);
-          }
+              auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
+              ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
+              if (custom_header != mock_session->GetRequest()->headers_.end())
+              {
+                EXPECT_EQ("Custom-Header-Value", custom_header->second);
+              }
 
-          http_client::nosend::Response response;
-          response.Finish(*callback.get());
-        });
+              http_client::nosend::Response response;
+              response.Finish(*callback.get());
+            });
 
     child_span->End();
     parent_span->End();
@@ -424,30 +427,32 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session, report_trace_id](
-                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
-          opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
-          request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
-                                      static_cast<int>(mock_session->GetRequest()->body_.size()));
-          auto received_trace_id =
-              request_body.resource_spans(0).scope_spans(0).spans(0).trace_id();
-          EXPECT_EQ(received_trace_id, report_trace_id);
+        .WillOnce(
+            [&mock_session, report_trace_id](
+                const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
+              opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
+              request_body.ParseFromArray(
+                  &mock_session->GetRequest()->body_[0],
+                  static_cast<int>(mock_session->GetRequest()->body_.size()));
+              auto received_trace_id =
+                  request_body.resource_spans(0).scope_spans(0).spans(0).trace_id();
+              EXPECT_EQ(received_trace_id, report_trace_id);
 
-          auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
-          ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
-          if (custom_header != mock_session->GetRequest()->headers_.end())
-          {
-            EXPECT_EQ("Custom-Header-Value", custom_header->second);
-          }
+              auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
+              ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
+              if (custom_header != mock_session->GetRequest()->headers_.end())
+              {
+                EXPECT_EQ("Custom-Header-Value", custom_header->second);
+              }
 
-          // let the otlp_http_client to continue
-          std::thread async_finish{[callback]() {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            http_client::nosend::Response response;
-            response.Finish(*callback.get());
-          }};
-          async_finish.detach();
-        });
+              // let the otlp_http_client to continue
+              std::thread async_finish{[callback]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                http_client::nosend::Response response;
+                response.Finish(*callback.get());
+              }};
+              async_finish.detach();
+            });
 
     child_span->End();
     parent_span->End();

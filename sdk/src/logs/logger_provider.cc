@@ -27,17 +27,17 @@ namespace logs
 {
 
 LoggerProvider::LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
-                               opentelemetry::sdk::resource::Resource resource) noexcept
+                               const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.emplace_back(std::move(processor));
-  context_ = std::make_shared<LoggerContext>(std::move(processors), std::move(resource));
+  context_ = std::make_shared<LoggerContext>(std::move(processors), resource);
   OTEL_INTERNAL_LOG_DEBUG("[LoggerProvider] LoggerProvider created.");
 }
 
 LoggerProvider::LoggerProvider(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
-                               opentelemetry::sdk::resource::Resource resource) noexcept
-    : context_{std::make_shared<LoggerContext>(std::move(processors), std::move(resource))}
+                               const opentelemetry::sdk::resource::Resource &resource) noexcept
+    : context_{std::make_shared<LoggerContext>(std::move(processors), resource)}
 {}
 
 LoggerProvider::LoggerProvider() noexcept
@@ -118,9 +118,9 @@ const opentelemetry::sdk::resource::Resource &LoggerProvider::GetResource() cons
   return context_->GetResource();
 }
 
-bool LoggerProvider::Shutdown() noexcept
+bool LoggerProvider::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  return context_->Shutdown();
+  return context_->Shutdown(timeout);
 }
 
 bool LoggerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept

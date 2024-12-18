@@ -3,8 +3,15 @@
 
 #pragma once
 
+#include <stddef.h>
 #include <functional>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
@@ -33,6 +40,15 @@ inline void GetHash(size_t &seed, const std::vector<T> &arg)
   {
     GetHash<T>(seed, v);
   }
+}
+
+// Specialization for const char*
+// this creates an intermediate string.
+template <>
+inline void GetHash<const char *>(size_t &seed, const char *const &arg)
+{
+  std::hash<std::string> hasher;
+  seed ^= hasher(std::string(arg)) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
 struct GetHashForAttributeValueVisitor
@@ -71,7 +87,7 @@ inline size_t GetHashForAttributeMap(
         {
           return true;
         }
-        GetHash(seed, key.data());
+        GetHash(seed, key);
         auto attr_val = nostd::visit(converter, value);
         nostd::visit(GetHashForAttributeValueVisitor(seed), attr_val);
         return true;

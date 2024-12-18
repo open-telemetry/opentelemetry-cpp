@@ -22,6 +22,7 @@
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/version.h"
 
@@ -240,7 +241,7 @@ int HttpOperation::OnProgressCallback(void *clientp,
 #endif
 
 void HttpOperation::DispatchEvent(opentelemetry::ext::http::client::SessionState type,
-                                  std::string reason)
+                                  const std::string &reason)
 {
   if (event_handle_ != nullptr)
   {
@@ -261,7 +262,8 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                              // Default connectivity and response size options
                              bool is_raw_response,
                              std::chrono::milliseconds http_conn_timeout,
-                             bool reuse_connection)
+                             bool reuse_connection,
+                             bool is_log_enabled)
     : is_aborted_(false),
       is_finished_(false),
       is_cleaned_(false),
@@ -273,7 +275,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       last_curl_result_(CURLE_OK),
       event_handle_(event_handle),
       method_(method),
-      url_(url),
+      url_(std::move(url)),
       ssl_options_(ssl_options),
       // Local vars
       request_headers_(request_headers),
@@ -281,6 +283,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       request_nwrite_(0),
       session_state_(opentelemetry::ext::http::client::SessionState::Created),
       compression_(compression),
+      is_log_enabled_(is_log_enabled),
       response_code_(0)
 {
   /* get a curl handle */
@@ -453,7 +456,7 @@ void HttpOperation::Cleanup()
 #  define HAVE_TLS_VERSION
 #endif
 
-static long parse_min_ssl_version(std::string version)
+static long parse_min_ssl_version(const std::string &version)
 {
 #ifdef HAVE_TLS_VERSION
   if (version == "1.2")
@@ -470,7 +473,7 @@ static long parse_min_ssl_version(std::string version)
   return 0;
 }
 
-static long parse_max_ssl_version(std::string version)
+static long parse_max_ssl_version(const std::string &version)
 {
 #ifdef HAVE_TLS_VERSION
   if (version == "1.2")
@@ -569,8 +572,77 @@ CURLcode HttpOperation::SetCurlOffOption(CURLoption option, curl_off_t value)
   return rc;
 }
 
+int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
+                                      curl_infotype type,
+                                      const char *data,
+                                      size_t size,
+                                      void * /* clientp */) noexcept
+{
+  nostd::string_view text_to_log{data, size};
+
+  if (!text_to_log.empty() && text_to_log[size - 1] == '\n')
+  {
+    text_to_log = text_to_log.substr(0, size - 1);
+  }
+
+  if (type == CURLINFO_TEXT)
+  {
+    static const auto kTlsInfo    = nostd::string_view("SSL connection using");
+    static const auto kFailureMsg = nostd::string_view("Recv failure:");
+
+    if (text_to_log.substr(0, kTlsInfo.size()) == kTlsInfo)
+    {
+      OTEL_INTERNAL_LOG_INFO(text_to_log);
+    }
+    else if (text_to_log.substr(0, kFailureMsg.size()) == kFailureMsg)
+    {
+      OTEL_INTERNAL_LOG_ERROR(text_to_log);
+    }
+// This guard serves as a catch-all block for all other less interesting output that should
+// remain available for maintainer internal use and for debugging purposes only.
+#ifdef OTEL_CURL_DEBUG
+    else
+    {
+      OTEL_INTERNAL_LOG_DEBUG(text_to_log);
+    }
+#endif  // OTEL_CURL_DEBUG
+  }
+// Same as above, this guard is meant only for internal use by maintainers, and should not be used
+// in production (information leak).
+#ifdef OTEL_CURL_DEBUG
+  else if (type == CURLINFO_HEADER_OUT)
+  {
+    static const auto kHeaderSent = nostd::string_view("Send header => ");
+
+    while (!text_to_log.empty() && !std::iscntrl(text_to_log[0]))
+    {
+      const auto pos = text_to_log.find('\n');
+
+      if (pos != nostd::string_view::npos)
+      {
+        OTEL_INTERNAL_LOG_DEBUG(kHeaderSent << text_to_log.substr(0, pos - 1));
+        text_to_log = text_to_log.substr(pos + 1);
+      }
+    }
+  }
+  else if (type == CURLINFO_HEADER_IN)
+  {
+    static const auto kHeaderRecv = nostd::string_view("Recv header => ");
+    OTEL_INTERNAL_LOG_DEBUG(kHeaderRecv << text_to_log);
+  }
+#endif  // OTEL_CURL_DEBUG
+
+  return 0;
+}
+
 CURLcode HttpOperation::Setup()
 {
+#ifdef ENABLE_CURL_LOGGING
+  static constexpr auto kEnableCurlLogging = true;
+#else
+  static constexpr auto kEnableCurlLogging = false;
+#endif  // ENABLE_CURL_LOGGING
+
   if (!curl_resource_.easy_handle)
   {
     return CURLE_FAILED_INIT;
@@ -581,11 +653,28 @@ CURLcode HttpOperation::Setup()
   curl_error_message_[0] = '\0';
   curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_ERRORBUFFER, curl_error_message_);
 
+// Support for custom debug function callback was added in version 7.9.6 so we guard against
+// exposing the default CURL output by keeping verbosity always disabled in lower versions.
+#if LIBCURL_VERSION_NUM < CURL_VERSION_BITS(7, 9, 6)
   rc = SetCurlLongOption(CURLOPT_VERBOSE, 0L);
   if (rc != CURLE_OK)
   {
     return rc;
   }
+#else
+  rc = SetCurlLongOption(CURLOPT_VERBOSE, (is_log_enabled_ && kEnableCurlLogging) ? 1L : 0L);
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
+
+  rc = SetCurlPtrOption(CURLOPT_DEBUGFUNCTION,
+                        reinterpret_cast<void *>(&HttpOperation::CurlLoggerCallback));
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
+#endif
 
   // Specify target URL
   rc = SetCurlStrOption(CURLOPT_URL, url_.c_str());

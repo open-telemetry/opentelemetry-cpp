@@ -1,24 +1,43 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <gtest/gtest.h>
+#include <stdint.h>
 #include <chrono>
 #include <string>
+#include <utility>
+#include <vector>
 
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/logs/event_logger.h"
+#include "opentelemetry/logs/event_logger_provider.h"
+#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/event_logger.h"
 #include "opentelemetry/sdk/logs/event_logger_provider.h"
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/scope.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer.h"
-
-#include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::logs;
 namespace logs_api = opentelemetry::logs;
@@ -172,7 +191,7 @@ private:
 public:
   // A processor used for testing that keeps a track of the recordable it received
   explicit MockProcessor(std::shared_ptr<MockLogRecordable> record_received) noexcept
-      : record_received_(record_received)
+      : record_received_(std::move(record_received))
   {}
 
   std::unique_ptr<opentelemetry::sdk::logs::Recordable> MakeRecordable() noexcept override

@@ -1,21 +1,28 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.10)
 
-# See https://cmake.org/cmake/help/v3.3/policy/CMP0057.html required by certain
-# versions of gtest
-cmake_policy(SET CMP0057 NEW)
-
-# See https://cmake.org/cmake/help/v3.12/policy/CMP0074.html required by certain
-# version of zlib which CURL depends on.
+# See https://cmake.org/cmake/help/latest/policy/CMP0074.html required by
+# certain version of zlib which CURL depends on.
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
   cmake_policy(SET CMP0074 NEW)
+endif()
+
+# Allow to use normal variable for option()
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13")
+  cmake_policy(SET CMP0077 NEW)
 endif()
 
 # Prefer CMAKE_MSVC_RUNTIME_LIBRARY if possible
 if(POLICY CMP0091)
   cmake_policy(SET CMP0091 NEW)
+endif()
+
+# MSVC RTTI flag /GR should not be not added to CMAKE_CXX_FLAGS by default. @see
+# https://cmake.org/cmake/help/latest/policy/CMP0117.html
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.20.0")
+  cmake_policy(SET CMP0117 NEW)
 endif()
 
 project(opentelemetry-cpp)
@@ -60,6 +67,13 @@ else()
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
       set(ARCH x86)
     endif()
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "powerpc")
+    # AIX will report the processor as 'powerpc' even if building in 64-bit mode
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(ARCH ppc64)
+    else()
+      set(ARCH ppc32)
+    endif()
   elseif(CMAKE_SYSTEM_PROCESSOR MATCHES
          "^(aarch64.*|AARCH64.*|arm64.*|ARM64.*)")
     set(ARCH arm64)
@@ -77,6 +91,8 @@ else()
     set(ARCH s390x)
   elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(sparc.*|SPARC.*)")
     set(ARCH sparc)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(loongarch.*|LOONGARCH.*)")
+    set(ARCH loongarch)
   else()
     message(
       FATAL_ERROR
@@ -159,14 +175,6 @@ message(STATUS "OPENTELEMETRY_VERSION=${OPENTELEMETRY_VERSION}")
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
 
-# This option is temporary, and will be removed. Set
-# WITH_DEPRECATED_SDK_FACTORY=OFF to migrate to the new SDK code.
-option(WITH_DEPRECATED_SDK_FACTORY "Use deprecated SDK provider factory" ON)
-
-if(WITH_DEPRECATED_SDK_FACTORY)
-  message(WARNING "WITH_DEPRECATED_SDK_FACTORY=ON is temporary and deprecated")
-endif()
-
 set(WITH_STL
     "OFF"
     CACHE STRING "Which version of the Standard Library for C++ to use")
@@ -204,13 +212,6 @@ if(NOT WITH_STL STREQUAL "OFF")
   endif()
 endif()
 
-if(DEFINED WITH_OTLP)
-  message(
-    FATAL_ERROR
-      "WITH_OTLP is deprecated. Please set either WITH_OTLP_GRPC=ON, WITH_OTLP_HTTP=ON, or both to ON."
-  )
-endif()
-
 option(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
        "Whether to enable mTLS support fro gRPC" OFF)
 
@@ -227,6 +228,9 @@ option(
   WITH_OTLP_HTTP_COMPRESSION
   "Whether to include gzip compression for the OTLP http exporter in the SDK"
   OFF)
+
+option(WITH_CURL_LOGGING "Whether to enable select CURL verbosity in OTel logs"
+       OFF)
 
 option(WITH_ZIPKIN "Whether to include the Zipkin exporter in the SDK" OFF)
 
@@ -263,10 +267,6 @@ if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
 endif()
 
-set(OTELCPP_PROTO_PATH
-    ""
-    CACHE PATH "Path to opentelemetry-proto")
-
 if(WIN32)
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
 else()
@@ -294,15 +294,15 @@ option(
 
 option(WITH_FUNC_TESTS "Whether to build functional tests" ON)
 
-if(DEFINED WITH_LOGS_PREVIEW)
-  message(WARNING "WITH_LOGS_PREVIEW is removed because logs signal is stable")
-endif()
-
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
 
 # Exemplar specs status is experimental, so behind feature flag by default
 option(WITH_METRICS_EXEMPLAR_PREVIEW
        "Whether to enable exemplar within metrics" OFF)
+
+option(OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS
+       "Whether to build test libraries that are always linked as shared libs"
+       OFF)
 
 #
 # Verify options dependencies
@@ -364,9 +364,12 @@ if(WITH_PROMETHEUS)
     message(STATUS "Trying to use local prometheus-cpp from submodule")
     if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/prometheus-cpp/.git)
       set(SAVED_ENABLE_TESTING ${ENABLE_TESTING})
+      set(SAVED_CMAKE_CXX_CLANG_TIDY ${CMAKE_CXX_CLANG_TIDY})
       set(ENABLE_TESTING OFF)
+      set(CMAKE_CXX_CLANG_TIDY "")
       add_subdirectory(third_party/prometheus-cpp)
       set(ENABLE_TESTING ${SAVED_ENABLE_TESTING})
+      set(CMAKE_CXX_CLANG_TIDY ${SAVED_CMAKE_CXX_CLANG_TIDY})
     else()
       message(
         FATAL_ERROR
@@ -389,19 +392,14 @@ if(WITH_OTLP_GRPC
    OR WITH_OTLP_HTTP
    OR WITH_OTLP_FILE)
   find_package(Protobuf)
-  if(Protobuf_VERSION AND Protobuf_VERSION VERSION_GREATER_EQUAL "3.22.0")
-    if(NOT WITH_ABSEIL)
-      message(
-        FATAL_ERROR
-          "Protobuf 3.22 or upper require abseil-cpp(Recommended version: 20230125 or upper)"
-      )
-    endif()
-  endif()
+  # Protobuf 3.22 or upper require abseil-cpp, we can find it in
+  # opentelemetry-cpp-config.cmake
 
   if(WITH_OTLP_GRPC)
     find_package(gRPC)
   endif()
-  if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (NOT gRPC_FOUND))
+  if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (WITH_OTLP_GRPC
+                                                     AND NOT gRPC_FOUND))
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
       install_windows_deps()
     endif()
@@ -430,12 +428,16 @@ if(WITH_OTLP_GRPC
   endif()
   # Latest Protobuf imported targets and without legacy module support
   if(TARGET protobuf::protoc)
-    project_build_tools_get_imported_location(PROTOBUF_PROTOC_EXECUTABLE
-                                              protobuf::protoc)
-    # If protobuf::protoc is not a imported target, then we use the target
-    # directly for fallback
-    if(NOT PROTOBUF_PROTOC_EXECUTABLE)
-      set(PROTOBUF_PROTOC_EXECUTABLE protobuf::protoc)
+    if(CMAKE_CROSSCOMPILING AND Protobuf_PROTOC_EXECUTABLE)
+      set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
+    else()
+      project_build_tools_get_imported_location(PROTOBUF_PROTOC_EXECUTABLE
+                                                protobuf::protoc)
+      # If protobuf::protoc is not a imported target, then we use the target
+      # directly for fallback
+      if(NOT PROTOBUF_PROTOC_EXECUTABLE)
+        set(PROTOBUF_PROTOC_EXECUTABLE protobuf::protoc)
+      endif()
     endif()
   elseif(Protobuf_PROTOC_EXECUTABLE)
     # Some versions of FindProtobuf.cmake uses mixed case instead of uppercase
@@ -444,7 +446,10 @@ if(WITH_OTLP_GRPC
   include(CMakeDependentOption)
 
   message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
+  set(SAVED_CMAKE_CXX_CLANG_TIDY ${CMAKE_CXX_CLANG_TIDY})
+  set(CMAKE_CXX_CLANG_TIDY "")
   include(cmake/opentelemetry-proto.cmake)
+  set(CMAKE_CXX_CLANG_TIDY ${SAVED_CMAKE_CXX_CLANG_TIDY})
 endif()
 
 #

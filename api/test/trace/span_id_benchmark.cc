@@ -1,10 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/trace/span_id.h"
-
 #include <benchmark/benchmark.h>
 #include <cstdint>
+
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/trace/span_id.h"
 
 namespace
 {

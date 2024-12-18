@@ -1,19 +1,42 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <ctype.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <algorithm>
+#include <atomic>
+#include <chrono>
+#include <initializer_list>
+#include <iostream>
+#include <map>
+#include <nlohmann/json.hpp>
+#include <string>
+#include <thread>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/context/context_value.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/exporters/ostream/span_exporter.h"
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
+#include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/server/http_server.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/scope.h"
-
-#include <algorithm>
-#include "nlohmann/json.hpp"
+#include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/trace/tracer_provider.h"
 
 namespace trace_api   = opentelemetry::trace;
 namespace http_client = opentelemetry::ext::http::client;
@@ -26,20 +49,38 @@ namespace
 {
 static trace_api::propagation::HttpTraceContext propagator_format;
 
+static bool equalsIgnoreCase(const std::string &str1, const std::string &str2)
+{
+  if (str1.length() != str2.length())
+  {
+    return false;
+  }
+  for (size_t i = 0; i < str1.length(); i++)
+  {
+    if (tolower(str1[i]) != tolower(str2[i]))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 class TextMapCarrierTest : public context::propagation::TextMapCarrier
 {
 public:
   TextMapCarrierTest(std::map<std::string, std::string> &headers) : headers_(headers) {}
-  virtual nostd::string_view Get(nostd::string_view key) const noexcept override
+  nostd::string_view Get(nostd::string_view key) const noexcept override
   {
-    auto it = headers_.find(std::string(key));
-    if (it != headers_.end())
+    for (const auto &elem : headers_)
     {
-      return nostd::string_view(it->second);
+      if (equalsIgnoreCase(elem.first, std::string(key)))
+      {
+        return nostd::string_view(elem.second);
+      }
     }
     return "";
   }
-  virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
+  void Set(nostd::string_view key, nostd::string_view value) noexcept override
   {
     headers_[std::string(key)] = std::string(value);
   }
@@ -66,7 +107,7 @@ void initTracer()
 nostd::shared_ptr<trace_api::Tracer> get_tracer()
 {
   auto provider = trace_api::Provider::GetTracerProvider();
-  return provider->GetTracer("w3c_tracecontext_test");
+  return provider->GetTracer("w3c_tracecontext_http_test_server");
 }
 
 struct Uri
@@ -75,10 +116,10 @@ struct Uri
   uint16_t port;
   std::string path;
 
-  Uri(std::string uri)
+  Uri(const std::string &uri)
   {
-    size_t host_end = uri.substr(7, std::string::npos).find(":");
-    size_t port_end = uri.substr(host_end + 1, std::string::npos).find("/");
+    size_t host_end = uri.substr(7, std::string::npos).find(':');
+    size_t port_end = uri.substr(host_end + 1, std::string::npos).find('/');
 
     host = uri.substr(0, host_end + 7);
     port = std::stoi(uri.substr(7 + host_end + 1, port_end));
@@ -142,6 +183,7 @@ int main(int argc, char *argv[])
   constexpr char default_host[]   = "localhost";
   constexpr uint16_t default_port = 30000;
   uint16_t port;
+  std::atomic_bool stop_server(false);
 
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
@@ -188,16 +230,28 @@ int main(int argc, char *argv[])
         return 0;
       }};
 
+  testing::HttpRequestCallback stop_cb{
+      [&](testing::HttpRequest const & /*req*/, testing::HttpResponse &resp) {
+        std::cout << "Received request to stop server \n";
+        stop_server.store(true);
+        resp.code = 200;
+        return 0;
+      }};
+
   server["/test"] = test_cb;
+  server["/stop"] = stop_cb;
 
   // Start server
   server.start();
 
   std::cout << "Listening at http://" << default_host << ":" << port << "/test\n";
 
-  // Wait for console input
-  std::cin.get();
-
-  // Stop server
+  // Wait for signal to stop server
+  while (!stop_server.load())
+  {
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+  // received signal to stop server
+  std::cout << "Stopping server \n";
   server.stop();
 }

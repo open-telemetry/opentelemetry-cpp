@@ -63,7 +63,7 @@ public:
       {
         log_message = BuildResponseLogMessage(response, body_);
 
-        OTEL_INTERNAL_LOG_ERROR("ES Log Exporter] Export failed, " << log_message);
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Export failed, " << log_message);
       }
 
       if (console_debug_)
@@ -288,7 +288,12 @@ private:
 #endif
 
 ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter()
-    : options_{ElasticsearchExporterOptions()},
+    : ElasticsearchLogRecordExporter(ElasticsearchExporterOptions())
+{}
+
+ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
+    const ElasticsearchExporterOptions &options)
+    : options_{options},
       http_client_{ext::http::client::HttpClientFactory::Create()}
 #ifdef ENABLE_ASYNC_EXPORT
       ,
@@ -300,11 +305,6 @@ ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter()
   synchronization_data_->session_counter_.store(0);
 #endif
 }
-
-ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
-    const ElasticsearchExporterOptions &options)
-    : options_{options}, http_client_{ext::http::client::HttpClientFactory::Create()}
-{}
 
 std::unique_ptr<sdklogs::Recordable> ElasticsearchLogRecordExporter::MakeRecordable() noexcept
 {
@@ -323,13 +323,20 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   }
 
   // Create a connection to the ElasticSearch instance
-  auto session = http_client_->CreateSession(options_.host_ + std::to_string(options_.port_));
+  auto session = http_client_->CreateSession(options_.host_ + ":" + std::to_string(options_.port_));
   auto request = session->CreateRequest();
 
   // Populate the request with headers and methods
   request->SetUri(options_.index_ + "/_bulk?pretty");
   request->SetMethod(http_client::Method::Post);
   request->AddHeader("Content-Type", "application/json");
+
+  // Add options headers
+  for (auto it = options_.http_headers_.cbegin(); it != options_.http_headers_.cend(); ++it)
+  {
+    request->AddHeader(it->first, it->second);
+  }
+
   request->SetTimeoutMs(std::chrono::milliseconds(1000 * options_.response_timeout_));
 
   // Create the request body

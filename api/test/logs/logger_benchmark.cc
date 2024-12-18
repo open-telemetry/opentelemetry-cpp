@@ -1,33 +1,29 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/logs/logger.h"
-#include "opentelemetry/logs/provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-
-#include <chrono>
+#include <benchmark/benchmark.h>
+#include <stdint.h>
+#include <algorithm>
 #include <condition_variable>
+#include <cstddef>
 #include <functional>
 #include <mutex>
 #include <thread>
 #include <vector>
 
-#include <benchmark/benchmark.h>
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/logs/event_id.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 
 using opentelemetry::logs::EventId;
-using opentelemetry::logs::Logger;
-using opentelemetry::logs::LoggerProvider;
 using opentelemetry::logs::Provider;
 using opentelemetry::logs::Severity;
-using opentelemetry::nostd::shared_ptr;
-using opentelemetry::nostd::span;
-using opentelemetry::nostd::string_view;
-
-namespace common  = opentelemetry::common;
-namespace nostd   = opentelemetry::nostd;
-namespace trace   = opentelemetry::trace;
-namespace log_api = opentelemetry::logs;
 
 namespace
 {
@@ -37,7 +33,7 @@ constexpr int64_t kMaxIterations = 1000000000;
 class Barrier
 {
 public:
-  explicit Barrier(std::size_t iCount) : mThreshold(iCount), mCount(iCount), mGeneration(0) {}
+  explicit Barrier(std::size_t iCount) : mThreshold(iCount), mCount(iCount) {}
 
   void Wait()
   {
@@ -60,13 +56,13 @@ private:
   std::condition_variable mCond;
   std::size_t mThreshold;
   std::size_t mCount;
-  std::size_t mGeneration;
+  std::size_t mGeneration{0};
 };
 
 static void ThreadRoutine(Barrier &barrier,
                           benchmark::State &state,
                           int thread_id,
-                          std::function<void()> func)
+                          const std::function<void()> &func)
 {
   barrier.Wait();
 
@@ -87,15 +83,16 @@ static void ThreadRoutine(Barrier &barrier,
   barrier.Wait();
 }
 
-void MultiThreadRunner(benchmark::State &state, std::function<void()> func)
+void MultiThreadRunner(benchmark::State &state, const std::function<void()> &func)
 {
-  int num_threads = std::thread::hardware_concurrency();
+  uint32_t num_threads = std::thread::hardware_concurrency();
 
   Barrier barrier(num_threads);
 
   std::vector<std::thread> threads;
 
-  for (int i = 0; i < num_threads; i++)
+  threads.reserve(num_threads);
+  for (uint32_t i = 0; i < num_threads; i++)
   {
     threads.emplace_back(ThreadRoutine, std::ref(barrier), std::ref(state), i, func);
   }

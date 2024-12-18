@@ -102,6 +102,8 @@ public:
     compression_ = compression;
   }
 
+  void EnableLogging(bool is_log_enabled) noexcept override { is_log_enabled_ = is_log_enabled; }
+
 public:
   opentelemetry::ext::http::client::Method method_;
   opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
@@ -111,6 +113,7 @@ public:
   std::chrono::milliseconds timeout_ms_{5000};  // ms
   opentelemetry::ext::http::client::Compression compression_{
       opentelemetry::ext::http::client::Compression::kNone};
+  bool is_log_enabled_{false};
 };
 
 class Response : public opentelemetry::ext::http::client::Response
@@ -166,13 +169,11 @@ class Session : public opentelemetry::ext::http::client::Session,
 {
 public:
   Session(HttpClient &http_client,
-          std::string scheme      = "http",
-          const std::string &host = "",
-          uint16_t port           = 80)
-      : http_client_(http_client)
-  {
-    host_ = scheme + "://" + host + ":" + std::to_string(port) + "/";
-  }
+          const std::string &scheme = "http",
+          const std::string &host   = "",
+          uint16_t port             = 80)
+      : host_{scheme + "://" + host + ":" + std::to_string(port) + "/"}, http_client_(http_client)
+  {}
 
   std::shared_ptr<opentelemetry::ext::http::client::Request> CreateRequest() noexcept override
   {
@@ -222,7 +223,7 @@ private:
   std::shared_ptr<Request> http_request_;
   std::string host_;
   std::unique_ptr<HttpOperation> curl_operation_;
-  uint64_t session_id_;
+  uint64_t session_id_ = 0UL;
   HttpClient &http_client_;
   std::atomic<bool> is_session_active_{false};
 };

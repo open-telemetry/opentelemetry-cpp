@@ -30,12 +30,18 @@ public:
    * @param populate_target_info whether to populate target_info
    * @param without_otel_scope whether to populate otel_scope_name and otel_scope_version
    * attributes
+   * @param without_units exporter configuration controlling whether to append unit suffix in
+   * the exported metrics.
+   * @param without_type_suffix exporter configuration controlling whether to append type suffix in
+   * the exported metrics.
    * @return a collection of translated metrics that is acceptable by Prometheus
    */
   static std::vector<::prometheus::MetricFamily> TranslateToPrometheus(
       const sdk::metrics::ResourceMetrics &data,
       bool populate_target_info = true,
-      bool without_otel_scope   = false);
+      bool without_otel_scope   = false,
+      bool without_units        = false,
+      bool without_type_suffix  = false);
 
 private:
   /**
@@ -61,7 +67,9 @@ private:
 
   static std::string MapToPrometheusName(const std::string &name,
                                          const std::string &unit,
-                                         ::prometheus::MetricType prometheus_type);
+                                         ::prometheus::MetricType prometheus_type,
+                                         bool without_units,
+                                         bool without_type_suffix);
 
   /**
    * A utility function that returns the equivalent Prometheus name for the provided OTLP metric
@@ -196,7 +204,7 @@ private:
    * Handle Counter and Gauge.
    */
   template <typename T>
-  static void SetValue(std::vector<T> values,
+  static void SetValue(const std::vector<T> &values,
                        ::prometheus::MetricType type,
                        ::prometheus::ClientMetric *metric);
 
@@ -209,7 +217,7 @@ private:
    * Handle Histogram
    */
   template <typename T>
-  static void SetValue(std::vector<T> values,
+  static void SetValue(const std::vector<T> &values,
                        const std::vector<double> &boundaries,
                        const std::vector<uint64_t> &counts,
                        ::prometheus::ClientMetric *metric);

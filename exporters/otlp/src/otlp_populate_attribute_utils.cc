@@ -15,6 +15,7 @@
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
@@ -72,7 +73,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   }
   else if (nostd::holds_alternative<uint64_t>(value))
   {
-    proto_value->set_int_value(nostd::get<uint64_t>(value));
+    proto_value->set_int_value(
+        nostd::get<uint64_t>(value));  // NOLINT(cppcoreguidelines-narrowing-conversions)
   }
   else if (nostd::holds_alternative<double>(value))
   {
@@ -132,7 +134,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<nostd::span<const uint64_t>>(value))
     {
-      array_value->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(
+          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
     }
   }
   else if (nostd::holds_alternative<nostd::span<const double>>(value))
@@ -186,7 +189,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   }
   else if (nostd::holds_alternative<uint64_t>(value))
   {
-    proto_value->set_int_value(nostd::get<uint64_t>(value));
+    proto_value->set_int_value(
+        nostd::get<uint64_t>(value));  // NOLINT(cppcoreguidelines-narrowing-conversions)
   }
   else if (nostd::holds_alternative<double>(value))
   {
@@ -217,7 +221,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<std::vector<uint32_t>>(value))
     {
-      array_value->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(
+          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
     }
   }
   else if (nostd::holds_alternative<std::vector<int64_t>>(value))
@@ -233,7 +238,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<std::vector<uint64_t>>(value))
     {
-      array_value->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(
+          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
     }
   }
   else if (nostd::holds_alternative<std::vector<double>>(value))
@@ -305,6 +311,17 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
   }
 
   for (const auto &kv : resource.GetAttributes())
+  {
+    OtlpPopulateAttributeUtils::PopulateAttribute(proto->add_attributes(), kv.first, kv.second);
+  }
+}
+
+void OtlpPopulateAttributeUtils::PopulateAttribute(
+    opentelemetry::proto::common::v1::InstrumentationScope *proto,
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+        &instrumentation_scope) noexcept
+{
+  for (const auto &kv : instrumentation_scope.GetAttributes())
   {
     OtlpPopulateAttributeUtils::PopulateAttribute(proto->add_attributes(), kv.first, kv.second);
   }

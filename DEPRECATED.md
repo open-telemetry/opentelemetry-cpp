@@ -46,127 +46,11 @@ N/A
 
 ## [opentelemetry-cpp API]
 
-### Jaeger propagator
-
-#### Announcement (Jaeger)
-
-* Version: 1.8.2
-* Date: 2023-01-31
-* PR: [DEPRECATION] Deprecate the Jaeger exporter
-  [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
-
-This PR also listed the Jaeger propagator as deprecated.
-
-#### Motivation (Jaeger)
-
-The Jaeger Exporter is now (July 2023) removed from the OpenTelemetry specification.
-
-The Jaeger Propagator remains, because changing propagation is a longer
-process compared to changing an export format.
-
-New deployments however are encouraged to use a W3C compliant propagator,
-and avoid the Jaeger propagator, which is now deprecated.
-
-#### Scope (Jaeger)
-
-The following are deprecated and planned for removal:
-
-* the API header `opentelemetry/trace/propagation/jaeger.h`, including:
-  * the C++ class `JaegerPropagator`
-
-#### Mitigation (Jaeger)
-
-Use a W3C compliant propagator instead.
-
-That is, use class HttpTraceContext and "traceparent" tags.
-
-Do not use class JaegerPropagator and "uber-trace-id" tags.
-
-#### Planned removal (Jaeger)
-
-No date set yet for the Jaeger Propagator.
+N/A
 
 ## [opentelemetry-cpp SDK]
 
-### SDK ProviderFactory cleanup
-
-#### Announcement (SDK ProviderFactory cleanup)
-
-* Version: 1.15.0
-* Date: 2024-06-03
-* PR: [API/SDK] Provider cleanup
-  [#2664](https://github.com/open-telemetry/opentelemetry-cpp/pull/2664)
-
-This PR introduces changes to SDK ProviderFactory methods.
-
-#### Motivation (SDK ProviderFactory cleanup)
-
-SDK Factory methods for signal providers, such as:
-
-* opentelemetry::sdk::trace::TracerProviderFactory
-* opentelemetry::sdk::metrics::MeterProviderFactory
-* opentelemetry::sdk::logs::LoggerProviderFactory
-* opentelemetry::sdk::logs::EventLoggerProviderFactory
-
-currently returns a unique pointer on a API class.
-
-This is incorrect, the proper return type should be
-a unique pointer on a SDK class instead.
-
-#### Scope (SDK ProviderFactory cleanup)
-
-All the current Create methods in:
-
-* class opentelemetry::sdk::trace::TracerProviderFactory
-* class opentelemetry::sdk::metrics::MeterProviderFactory
-* class opentelemetry::sdk::logs::LoggerProviderFactory
-* class opentelemetry::sdk::logs::EventLoggerProviderFactory
-
-are marked as deprecated, as they return an API object.
-
-Instead, another set of Create methods is provided,
-with a different return type, an SDK object.
-
-Both sets can not be exposed at the same time,
-as this would cause build breaks,
-so a compilation flag is defined to select which methods to use.
-
-When OPENTELEMETRY_DEPRECATED_SDK_FACTORY is defined,
-the old, deprecated, methods are available.
-
-When OPENTELEMETRY_DEPRECATED_SDK_FACTORY is not defined,
-the new methods are available.
-
-The scope of this deprecation and removal,
-is to remove the flag OPENTELEMETRY_DEPRECATED_SDK_FACTORY itself,
-which implies that only the new set of Create() methods,
-returning an SDK object, are supported.
-
-#### Mitigation (SDK ProviderFactory cleanup)
-
-Build without defining flag OPENTELEMETRY_DEPRECATED_SDK_FACTORY.
-
-Existing code, such as:
-
-```cpp
-  std::shared_ptr<opentelemetry::trace::TracerProvider> tracer_provider;
-  tracer_provider = opentelemetry::sdk::trace::TracerProviderFactory::Create(...);
-```
-
-should be adjusted to:
-
-```cpp
-  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> tracer_provider;
-  tracer_provider = opentelemetry::sdk::trace::TracerProviderFactory::Create(...);
-```
-
-#### Planned removal (SDK ProviderFactory cleanup)
-
-Flag OPENTELEMETRY_DEPRECATED_SDK_FACTORY is introduced in release 1.16.0,
-to provide a migration path.
-
-This flag is meant to be temporary, and short lived.
-Expect removal by release 1.17.0
+N/A
 
 ## [opentelemetry-cpp Exporter]
 
@@ -175,3 +59,81 @@ N/A
 ## [Documentation]
 
 N/A
+
+## Semantic conventions
+
+### Header files "semantic_conventions.h"
+
+#### Announcement (semantic_conventions.h)
+
+Deprecation is announced as part of the migration to weaver:
+
+* `Version:` release following opentelemetry-cpp 1.17.0
+* `Date:` Nov 9, 2024
+* `PR:` [PR 3105](https://github.com/open-telemetry/opentelemetry-cpp/pull/3105)
+
+#### Motivation (semantic_conventions.h)
+
+The header files for semantic conventions are generated automatically.
+The tooling to generate these files is changing:
+
+* before, the build-tool repository was used
+* now, the weaver repository is used
+
+Changes in tooling allows to generate code that is better organized,
+with dedicated header files per group of semantic conventions,
+instead of a single header file for everything.
+
+#### Scope (semantic_conventions.h)
+
+The following files:
+
+* `api/include/opentelemetry/trace/semantic_conventions.h`
+* `sdk/include/opentelemetry/sdk/resource/semantic_conventions.h`
+
+are now deprecated.
+
+They correspond to semantic conventions v1.27.0,
+and will no longer be maintained up to date.
+
+These files will be removed in the future.
+
+#### Mitigation (semantic_conventions.h)
+
+Two things have changed:
+
+* the header file to use
+* the symbol name to use.
+
+Before, the semantic convention for `url.full` was:
+
+* declared in file `semantic_conventions.h`
+* declared as symbol `SemanticConventions::kUrlFull`
+
+Now, the `url.full` convention, which is part or the `url` group, is:
+
+* declared in file `semconv/url_attributes.h`
+* declared as symbol `semconv::url::kUrlFull`
+
+Application code that uses semantic conventions must be adjusted
+accordingly.
+
+In addition, semantic conventions that are not marked as stable
+are generated in a different header file, placed under directory
+`incubating`, to better separate stable and non stable code.
+
+For example, file `semconv/incubating/url_attributes.h`
+defines `semconv::url::kUrlDomain`,
+which is not marked as stable in semconv v1.27.0
+
+#### Planned removal (semantic_conventions.h)
+
+The following files:
+
+* `api/include/opentelemetry/trace/semantic_conventions.h`
+* `sdk/include/opentelemetry/sdk/resource/semantic_conventions.h`
+
+will be removed.
+
+The removal date is planned for July 1, 2025.
+This allows more than six months for applications to adjust.

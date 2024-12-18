@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+// NOLINTNEXTLINE
 #define _WINSOCKAPI_  // stops including winsock.h
 
 #include <stdint.h>
@@ -9,6 +10,7 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include <utility>
 
 #include "nlohmann/json.hpp"
 
@@ -35,23 +37,28 @@ namespace zipkin
 // -------------------------------- Constructors --------------------------------
 
 ZipkinExporter::ZipkinExporter(const ZipkinExporterOptions &options)
-    : options_(options), url_parser_(options_.endpoint)
+    : options_(options),
+      http_client_(ext::http::client::HttpClientFactory::CreateSync()),
+      url_parser_(options_.endpoint)
 {
-  http_client_ = ext::http::client::HttpClientFactory::CreateSync();
   InitializeLocalEndpoint();
 }
 
-ZipkinExporter::ZipkinExporter() : options_(ZipkinExporterOptions()), url_parser_(options_.endpoint)
+ZipkinExporter::ZipkinExporter()
+    : options_(ZipkinExporterOptions()),
+      http_client_(ext::http::client::HttpClientFactory::CreateSync()),
+      url_parser_(options_.endpoint)
 {
-  http_client_ = ext::http::client::HttpClientFactory::CreateSync();
   InitializeLocalEndpoint();
 }
 
 ZipkinExporter::ZipkinExporter(
     std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> http_client)
-    : options_(ZipkinExporterOptions()), url_parser_(options_.endpoint)
+    : options_(ZipkinExporterOptions()),
+      http_client_(std::move(http_client)),
+      url_parser_(options_.endpoint)
 {
-  http_client_ = http_client;
+
   InitializeLocalEndpoint();
 }
 
@@ -105,7 +112,6 @@ sdk::common::ExportResult ZipkinExporter::Export(
     }
     return sdk::common::ExportResult::kFailure;
   }
-  return sdk::common::ExportResult::kSuccess;
 }
 
 void ZipkinExporter::InitializeLocalEndpoint()

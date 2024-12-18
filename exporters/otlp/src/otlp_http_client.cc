@@ -41,9 +41,11 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
-#include <google/protobuf/message.h>
+// clang-format on
 #include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
 #include <google/protobuf/stubs/port.h>
+// clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
@@ -434,6 +436,7 @@ static void ConvertListFieldToJson(nlohmann::json &value,
                                    const google::protobuf::FieldDescriptor *field_descriptor,
                                    const OtlpHttpClientOptions &options);
 
+// NOLINTBEGIN(misc-no-recursion)
 static void ConvertGenericMessageToJson(nlohmann::json &value,
                                         const google::protobuf::Message &message,
                                         const OtlpHttpClientOptions &options)
@@ -654,10 +657,17 @@ void ConvertListFieldToJson(nlohmann::json &value,
   }
 }
 
+// NOLINTEND(misc-no-recursion) suppressing for performance, if implemented iterative process needs
+// Dynamic memory allocation
+
 }  // namespace
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
-    : is_shutdown_(false), options_(options), http_client_(http_client::HttpClientFactory::Create())
+    : is_shutdown_(false),
+      options_(options),
+      http_client_(http_client::HttpClientFactory::Create()),
+      start_session_counter_(0),
+      finished_session_counter_(0)
 {
   http_client_->SetMaxSessionsPerConnection(options_.max_requests_per_connection);
 }
@@ -696,7 +706,11 @@ OtlpHttpClient::~OtlpHttpClient()
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
                                std::shared_ptr<ext::http::client::HttpClient> http_client)
-    : is_shutdown_(false), options_(options), http_client_(http_client)
+    : is_shutdown_(false),
+      options_(std::move(options)),
+      http_client_(std::move(http_client)),
+      start_session_counter_(0),
+      finished_session_counter_(0)
 {
   http_client_->SetMaxSessionsPerConnection(options_.max_requests_per_connection);
 }
@@ -739,13 +753,7 @@ sdk::common::ExportResult OtlpHttpClient::Export(
   auto session = createSession(message, std::move(result_callback));
   if (opentelemetry::nostd::holds_alternative<sdk::common::ExportResult>(session))
   {
-    sdk::common::ExportResult result =
-        opentelemetry::nostd::get<sdk::common::ExportResult>(session);
-    if (result_callback)
-    {
-      result_callback(result);
-    }
-    return result;
+    return opentelemetry::nostd::get<sdk::common::ExportResult>(session);
   }
 
   addSession(std::move(opentelemetry::nostd::get<HttpSessionData>(session)));
@@ -795,6 +803,8 @@ bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
     timeout_steady = (std::chrono::steady_clock::duration::max)();
   }
 
+  size_t wait_counter = start_session_counter_.load(std::memory_order_acquire);
+
   while (timeout_steady > std::chrono::steady_clock::duration::zero())
   {
     {
@@ -812,7 +822,7 @@ bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
     {
       cleanupGCSessions();
     }
-    else
+    else if (finished_session_counter_.load(std::memory_order_acquire) >= wait_counter)
     {
       break;
     }
@@ -825,20 +835,24 @@ bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
 
 bool OtlpHttpClient::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  is_shutdown_.store(true, std::memory_order_release);
+
+  bool force_flush_result = ForceFlush(timeout);
+
   {
     std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-    is_shutdown_ = true;
 
     // Shutdown the session manager
     http_client_->CancelAllSessions();
     http_client_->FinishAllSessions();
   }
 
-  ForceFlush(timeout);
-
+  // Wait util all sessions are canceled.
   while (cleanupGCSessions())
-    ;
-  return true;
+  {
+    ForceFlush(std::chrono::milliseconds{1});
+  }
+  return force_flush_result;
 }
 
 void OtlpHttpClient::ReleaseSession(
@@ -855,6 +869,7 @@ void OtlpHttpClient::ReleaseSession(
     gc_sessions_.emplace_back(std::move(session_iter->second));
     running_sessions_.erase(session_iter);
 
+    finished_session_counter_.fetch_add(1, std::memory_order_release);
     has_session = true;
   }
 
@@ -881,11 +896,13 @@ OtlpHttpClient::createSession(
       std::string error_message = "[OTLP HTTP Client] Export failed, invalid url: " + options_.url;
       if (options_.console_debug)
       {
-        std::cerr << error_message << std::endl;
+        std::cerr << error_message << '\n';
       }
-      OTEL_INTERNAL_LOG_ERROR(error_message.c_str());
+      OTEL_INTERNAL_LOG_ERROR(error_message);
 
-      return opentelemetry::sdk::common::ExportResult::kFailure;
+      const auto result = opentelemetry::sdk::common::ExportResult::kFailure;
+      result_callback(result);
+      return result;
     }
 
     if (!parse_url.path_.empty() && parse_url.path_[0] == '/')
@@ -917,7 +934,10 @@ OtlpHttpClient::createSession(
         OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Serialize body failed(Binary):"
                                 << message.InitializationErrorString());
       }
-      return opentelemetry::sdk::common::ExportResult::kFailure;
+
+      const auto result = opentelemetry::sdk::common::ExportResult::kFailure;
+      result_callback(result);
+      return result;
     }
     content_type = kHttpBinaryContentType;
   }
@@ -946,11 +966,13 @@ OtlpHttpClient::createSession(
     const char *error_message = "[OTLP HTTP Client] Export failed, exporter is shutdown";
     if (options_.console_debug)
     {
-      std::cerr << error_message << std::endl;
+      std::cerr << error_message << '\n';
     }
     OTEL_INTERNAL_LOG_ERROR(error_message);
 
-    return opentelemetry::sdk::common::ExportResult::kFailure;
+    const auto result = opentelemetry::sdk::common::ExportResult::kFailure;
+    result_callback(result);
+    return result;
   }
 
   auto session = http_client_->CreateSession(options_.url);
@@ -968,6 +990,7 @@ OtlpHttpClient::createSession(
   request->SetBody(body_vec);
   request->ReplaceHeader("Content-Type", content_type);
   request->ReplaceHeader("User-Agent", options_.user_agent);
+  request->EnableLogging(options_.console_debug);
 
   if (options_.compression == "gzip")
   {
@@ -999,6 +1022,7 @@ void OtlpHttpClient::addSession(HttpSessionData &&session_data) noexcept
     store_session_data                  = std::move(session_data);
   }
 
+  start_session_counter_.fetch_add(1, std::memory_order_release);
   // Send request after the session is added
   session->SendRequest(handle);
 }
@@ -1023,7 +1047,7 @@ bool OtlpHttpClient::cleanupGCSessions() noexcept
 
 bool OtlpHttpClient::IsShutdown() const noexcept
 {
-  return is_shutdown_;
+  return is_shutdown_.load(std::memory_order_acquire);
 }
 
 }  // namespace otlp

@@ -242,6 +242,8 @@ void OtlpMetricUtils::PopulateResourceMetrics(
   OtlpPopulateAttributeUtils::PopulateAttribute(resource_metrics->mutable_resource(),
                                                 *(data.resource_));
 
+  resource_metrics->set_schema_url(data.resource_->GetSchemaURL());
+
   for (auto &scope_metrics : data.scope_metric_data_)
   {
     if (scope_metrics.scope_ == nullptr)
@@ -252,7 +254,9 @@ void OtlpMetricUtils::PopulateResourceMetrics(
     proto::common::v1::InstrumentationScope *scope = scope_lib_metrics->mutable_scope();
     scope->set_name(scope_metrics.scope_->GetName());
     scope->set_version(scope_metrics.scope_->GetVersion());
-    resource_metrics->set_schema_url(scope_metrics.scope_->GetSchemaURL());
+    scope_lib_metrics->set_schema_url(scope_metrics.scope_->GetSchemaURL());
+
+    OtlpPopulateAttributeUtils::PopulateAttribute(scope, *scope_metrics.scope_);
 
     for (auto &metric_data : scope_metrics.metric_data_)
     {
@@ -297,6 +301,7 @@ sdk::metrics::AggregationTemporality OtlpMetricUtils::DeltaTemporalitySelector(
     case sdk::metrics::InstrumentType::kObservableCounter:
     case sdk::metrics::InstrumentType::kHistogram:
     case sdk::metrics::InstrumentType::kObservableGauge:
+    case sdk::metrics::InstrumentType::kGauge:
       return sdk::metrics::AggregationTemporality::kDelta;
     case sdk::metrics::InstrumentType::kUpDownCounter:
     case sdk::metrics::InstrumentType::kObservableUpDownCounter:
@@ -320,6 +325,7 @@ sdk::metrics::AggregationTemporality OtlpMetricUtils::LowMemoryTemporalitySelect
     case sdk::metrics::InstrumentType::kHistogram:
       return sdk::metrics::AggregationTemporality::kDelta;
     case sdk::metrics::InstrumentType::kObservableCounter:
+    case sdk::metrics::InstrumentType::kGauge:
     case sdk::metrics::InstrumentType::kObservableGauge:
     case sdk::metrics::InstrumentType::kUpDownCounter:
     case sdk::metrics::InstrumentType::kObservableUpDownCounter:

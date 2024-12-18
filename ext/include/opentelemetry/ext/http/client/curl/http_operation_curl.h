@@ -102,6 +102,12 @@ private:
 
   static size_t ReadMemoryCallback(char *buffer, size_t size, size_t nitems, void *userp);
 
+  static int CurlLoggerCallback(const CURL * /* handle */,
+                                curl_infotype type,
+                                const char *data,
+                                size_t size,
+                                void * /* clientp */) noexcept;
+
 #if LIBCURL_VERSION_NUM >= 0x075000
   static int PreRequestCallback(void *clientp,
                                 char *conn_primary_ip,
@@ -124,7 +130,8 @@ private:
                                 double ulnow);
 #endif
 public:
-  void DispatchEvent(opentelemetry::ext::http::client::SessionState type, std::string reason = "");
+  void DispatchEvent(opentelemetry::ext::http::client::SessionState type,
+                     const std::string &reason = "");
 
   /**
    * Create local CURL instance for url and body
@@ -151,7 +158,8 @@ public:
                 // Default connectivity and response size options
                 bool is_raw_response                        = false,
                 std::chrono::milliseconds http_conn_timeout = default_http_conn_timeout,
-                bool reuse_connection                       = false);
+                bool reuse_connection                       = false,
+                bool is_log_enabled                         = false);
 
   /**
    * Destroy CURL instance
@@ -298,6 +306,8 @@ private:
   opentelemetry::ext::http::client::SessionState session_state_;
 
   const opentelemetry::ext::http::client::Compression &compression_;
+
+  const bool is_log_enabled_;
 
   // Processed response headers and body
   long response_code_;

@@ -2,11 +2,20 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/baggage/propagation/baggage_propagator.h"
 #include <gtest/gtest.h>
 #include <map>
+#include <memory>
 #include <string>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/baggage/baggage_context.h"
+#include "opentelemetry/baggage/propagation/baggage_propagator.h"
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::baggage::propagation;
@@ -15,7 +24,7 @@ class BaggageCarrierTest : public context::propagation::TextMapCarrier
 {
 public:
   BaggageCarrierTest() = default;
-  virtual nostd::string_view Get(nostd::string_view key) const noexcept override
+  nostd::string_view Get(nostd::string_view key) const noexcept override
   {
     auto it = headers_.find(std::string(key));
     if (it != headers_.end())
@@ -24,7 +33,7 @@ public:
     }
     return "";
   }
-  virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
+  void Set(nostd::string_view key, nostd::string_view value) noexcept override
   {
     headers_[std::string(key)] = std::string(value);
   }
@@ -62,7 +71,7 @@ TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
       {"invalid_header", ""},                                 // invalid header
       {very_large_baggage_header, ""}};  // baggage header larger than allowed size.
 
-  for (auto baggage : baggages)
+  for (const auto &baggage : baggages)
   {
     BaggageCarrierTest carrier1;
     carrier1.headers_[baggage::kBaggageHeader.data()] = baggage.first;

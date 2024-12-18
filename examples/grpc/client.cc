@@ -15,12 +15,12 @@
 #include <memory>
 #include <string>
 
-#include "opentelemetry/trace/semantic_conventions.h"
+#include "opentelemetry/semconv/incubating/rpc_attributes.h"
+#include "opentelemetry/semconv/network_attributes.h"
 #include "tracer_common.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
-using grpc::ClientReader;
 using grpc::Status;
 
 using grpc_example::Greeter;
@@ -30,11 +30,12 @@ using grpc_example::GreetResponse;
 namespace
 {
 namespace context = opentelemetry::context;
+namespace semconv = opentelemetry::semconv;
 using namespace opentelemetry::trace;
 class GreeterClient
 {
 public:
-  GreeterClient(std::shared_ptr<Channel> channel) : stub_(Greeter::NewStub(channel)) {}
+  GreeterClient(const std::shared_ptr<Channel> &channel) : stub_(Greeter::NewStub(channel)) {}
 
   std::string Greet(std::string ip, uint16_t port)
   {
@@ -48,14 +49,14 @@ public:
     options.kind = SpanKind::kClient;
 
     std::string span_name = "GreeterClient/Greet";
-    auto span             = get_tracer("grpc")->StartSpan(
-        span_name,
-        {{SemanticConventions::kRpcSystem, "grpc"},
-                     {SemanticConventions::kRpcService, "grpc-example.GreetService"},
-                     {SemanticConventions::kRpcMethod, "Greet"},
-                     {SemanticConventions::kNetworkPeerAddress, ip},
-                     {SemanticConventions::kNetworkPeerPort, port}},
-        options);
+    auto span =
+        get_tracer("grpc")->StartSpan(span_name,
+                                      {{semconv::rpc::kRpcSystem, "grpc"},
+                                       {semconv::rpc::kRpcService, "grpc-example.GreetService"},
+                                       {semconv::rpc::kRpcMethod, "Greet"},
+                                       {semconv::network::kNetworkPeerAddress, ip},
+                                       {semconv::network::kNetworkPeerPort, port}},
+                                      options);
 
     auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
 
@@ -70,16 +71,16 @@ public:
     if (status.ok())
     {
       span->SetStatus(StatusCode::kOk);
-      span->SetAttribute(SemanticConventions::kRpcGrpcStatusCode, status.error_code());
+      span->SetAttribute(semconv::rpc::kRpcGrpcStatusCode, status.error_code());
       // Make sure to end your spans!
       span->End();
       return response.response();
     }
     else
     {
-      std::cout << status.error_code() << ": " << status.error_message() << std::endl;
+      std::cout << status.error_code() << ": " << status.error_message() << '\n';
       span->SetStatus(StatusCode::kError);
-      span->SetAttribute(SemanticConventions::kRpcGrpcStatusCode, status.error_code());
+      span->SetAttribute(semconv::rpc::kRpcGrpcStatusCode, status.error_code());
       // Make sure to end your spans!
       span->End();
       return "RPC failed";
@@ -95,7 +96,7 @@ void RunClient(uint16_t port)
   GreeterClient greeter(
       grpc::CreateChannel("0.0.0.0:" + std::to_string(port), grpc::InsecureChannelCredentials()));
   std::string response = greeter.Greet("0.0.0.0", port);
-  std::cout << "grpc_server says: " << response << std::endl;
+  std::cout << "grpc_server says: " << response << '\n';
 }
 }  // namespace
 

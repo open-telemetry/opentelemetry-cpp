@@ -27,7 +27,7 @@ namespace trace
 class ParentBasedSampler : public Sampler
 {
 public:
-  explicit ParentBasedSampler(std::shared_ptr<Sampler> delegate_sampler) noexcept;
+  explicit ParentBasedSampler(const std::shared_ptr<Sampler> &delegate_sampler) noexcept;
   /** The decision either respects the parent span's sampling decision or delegates to
    * delegateSampler for root spans
    * @return Returns DROP always

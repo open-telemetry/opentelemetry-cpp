@@ -1,13 +1,22 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/context/runtime_context.h"
-#include "opentelemetry/context/context.h"
-
+#include <gtest/gtest.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <algorithm>
 #include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include <gtest/gtest.h>
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context_value.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/variant.h"
 
 using namespace opentelemetry;
 
@@ -113,6 +122,7 @@ TEST(RuntimeContextTest, DetachOutOfOrder)
   indices.push_back(3);
 
   std::vector<context::Context> contexts;
+  contexts.reserve(indices.size());
   for (auto i : indices)
   {
     contexts.push_back(context::Context("index", static_cast<int64_t>(i)));
@@ -122,6 +132,7 @@ TEST(RuntimeContextTest, DetachOutOfOrder)
   {
     std::vector<nostd::unique_ptr<context::Token>> tokens;
 
+    tokens.reserve(contexts.size());
     for (auto &c : contexts)
     {
       tokens.push_back(context::RuntimeContext::Attach(c));

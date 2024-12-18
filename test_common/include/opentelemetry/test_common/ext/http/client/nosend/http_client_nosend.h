@@ -3,16 +3,18 @@
 
 #pragma once
 
-#include "opentelemetry/ext/http/client/http_client.h"
-#include "opentelemetry/ext/http/common/url_parser.h"
-#include "opentelemetry/version.h"
-
-#include <map>
+#include <gmock/gmock.h>
+#include <stdint.h>
+#include <chrono>
+#include <cstddef>
+#include <memory>
 #include <string>
-#include <vector>
+#include <utility>
 
-#include <gtest/gtest.h>
-#include "gmock/gmock.h"
+#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -67,6 +69,8 @@ public:
     compression_ = compression;
   }
 
+  void EnableLogging(bool is_log_enabled) noexcept override { is_log_enabled_ = is_log_enabled; }
+
 public:
   opentelemetry::ext::http::client::Method method_;
   opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
@@ -76,6 +80,7 @@ public:
   std::chrono::milliseconds timeout_ms_{5000};  // ms
   opentelemetry::ext::http::client::Compression compression_{
       opentelemetry::ext::http::client::Compression::kNone};
+  bool is_log_enabled_{false};
 };
 
 class Response : public opentelemetry::ext::http::client::Response
@@ -116,7 +121,7 @@ public:
   opentelemetry::ext::http::client::StatusCode status_code_;
 };
 
-class HttpClient;
+class HttpClient;  // IWYU pragma: keep
 
 class Session : public opentelemetry::ext::http::client::Session
 {

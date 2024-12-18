@@ -5,9 +5,12 @@
 
 #include <atomic>
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <memory>
 
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 #include "opentelemetry/sdk/common/circular_buffer_range.h"
 #include "opentelemetry/version.h"
@@ -113,7 +116,6 @@ public:
         data_[head_index].Swap(ptr);
       }
     }
-    return true;
   }
 
   bool Add(std::unique_ptr<T> &&ptr) noexcept

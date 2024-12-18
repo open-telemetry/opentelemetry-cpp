@@ -16,12 +16,9 @@
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/resource/semantic_conventions.h"
-#include "opentelemetry/trace/semantic_conventions.h"
-
-#include "opentelemetry/sdk/common/global_log_handler.h"
 
 namespace prometheus_client = ::prometheus;
 namespace metric_sdk        = opentelemetry::sdk::metrics;
@@ -88,7 +85,7 @@ inline std::string Sanitize(std::string name, const T &valid)
  */
 std::string SanitizeLabel(std::string label_key)
 {
-  return Sanitize(label_key, [](int i, char c) {
+  return Sanitize(std::move(label_key), [](int i, char c) {
     return (c >= 'a' && c <= 'z') ||  //
            (c >= 'A' && c <= 'Z') ||  //
            c == '_' ||                //
@@ -102,13 +99,15 @@ std::string SanitizeLabel(std::string label_key)
  * Helper function to convert OpenTelemetry metrics data collection
  * to Prometheus metrics data collection
  *
- * @param records a collection of metrics in OpenTelemetry
+ * @param data a collection of metrics in OpenTelemetry
  * @return a collection of translated metrics that is acceptable by Prometheus
  */
 std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateToPrometheus(
     const sdk::metrics::ResourceMetrics &data,
     bool populate_target_info,
-    bool without_otel_scope)
+    bool without_otel_scope,
+    bool without_units,
+    bool without_type_suffix)
 {
 
   // initialize output vector
@@ -150,7 +149,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
       }
       const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
       metric_family.name = MapToPrometheusName(metric_data.instrument_descriptor.name_,
-                                               metric_data.instrument_descriptor.unit_, type);
+                                               metric_data.instrument_descriptor.unit_, type,
+                                               without_units, without_type_suffix);
       metric_family.type = type;
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope =
           without_otel_scope ? nullptr : instrumentation_info.scope_;
@@ -284,11 +284,11 @@ std::string PrometheusExporterUtils::SanitizeNames(std::string name)
 }
 
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
-std::regex INVALID_CHARACTERS_PATTERN("[^a-zA-Z0-9]");
-std::regex CHARACTERS_BETWEEN_BRACES_PATTERN("\\{(.*?)\\}");
-std::regex SANITIZE_LEADING_UNDERSCORES("^_+");
-std::regex SANITIZE_TRAILING_UNDERSCORES("_+$");
-std::regex SANITIZE_CONSECUTIVE_UNDERSCORES("[_]{2,}");
+const std::regex INVALID_CHARACTERS_PATTERN("[^a-zA-Z0-9]");
+const std::regex CHARACTERS_BETWEEN_BRACES_PATTERN("\\{(.*?)\\}");
+const std::regex SANITIZE_LEADING_UNDERSCORES("^_+");
+const std::regex SANITIZE_TRAILING_UNDERSCORES("_+$");
+const std::regex SANITIZE_CONSECUTIVE_UNDERSCORES("[_]{2,}");
 #endif
 
 std::string PrometheusExporterUtils::GetEquivalentPrometheusUnit(
@@ -396,7 +396,7 @@ std::string PrometheusExporterUtils::RemoveUnitPortionInBraces(const std::string
 std::string PrometheusExporterUtils::ConvertRateExpressedToPrometheusUnit(
     const std::string &rate_expressed_unit)
 {
-  size_t pos = rate_expressed_unit.find("/");
+  size_t pos = rate_expressed_unit.find('/');
   if (pos == std::string::npos)
   {
     return rate_expressed_unit;
@@ -492,34 +492,43 @@ std::string PrometheusExporterUtils::CleanUpString(const std::string &str)
 std::string PrometheusExporterUtils::MapToPrometheusName(
     const std::string &name,
     const std::string &unit,
-    prometheus_client::MetricType prometheus_type)
+    prometheus_client::MetricType prometheus_type,
+    bool without_units,
+    bool without_type_suffix)
 {
-  auto sanitized_name                    = SanitizeNames(name);
-  std::string prometheus_equivalent_unit = GetEquivalentPrometheusUnit(unit);
-
-  // Append prometheus unit if not null or empty.
-  if (!prometheus_equivalent_unit.empty() &&
-      sanitized_name.find(prometheus_equivalent_unit) == std::string::npos)
+  auto sanitized_name = SanitizeNames(name);
+  // append unit suffixes
+  if (!without_units)
   {
-    sanitized_name += "_" + prometheus_equivalent_unit;
-  }
-
-  // Special case - counter
-  if (prometheus_type == prometheus_client::MetricType::Counter)
-  {
-    auto t_pos           = sanitized_name.rfind("_total");
-    bool ends_with_total = t_pos == sanitized_name.size() - 6;
-    if (!ends_with_total)
+    std::string prometheus_equivalent_unit = GetEquivalentPrometheusUnit(unit);
+    // Append prometheus unit if not null or empty.
+    if (!prometheus_equivalent_unit.empty() &&
+        sanitized_name.find(prometheus_equivalent_unit) == std::string::npos)
     {
-      sanitized_name += "_total";
+      sanitized_name += "_" + prometheus_equivalent_unit;
+    }
+    // Special case - gauge
+    if (unit == "1" && prometheus_type == prometheus_client::MetricType::Gauge &&
+        sanitized_name.find("ratio") == std::string::npos)
+    {
+      // this is replacing the unit name
+      sanitized_name += "_ratio";
     }
   }
 
-  // Special case - gauge
-  if (unit == "1" && prometheus_type == prometheus_client::MetricType::Gauge &&
-      sanitized_name.find("ratio") == std::string::npos)
+  // append type suffixes
+  if (!without_type_suffix)
   {
-    sanitized_name += "_ratio";
+    // Special case - counter
+    if (prometheus_type == prometheus_client::MetricType::Counter)
+    {
+      auto t_pos           = sanitized_name.rfind("_total");
+      bool ends_with_total = t_pos == sanitized_name.size() - 6;
+      if (!ends_with_total)
+      {
+        sanitized_name += "_total";
+      }
+    }
   }
 
   return CleanUpString(SanitizeNames(sanitized_name));
@@ -760,7 +769,7 @@ std::string PrometheusExporterUtils::AttributeValueToString(
  * Handle Counter.
  */
 template <typename T>
-void PrometheusExporterUtils::SetValue(std::vector<T> values,
+void PrometheusExporterUtils::SetValue(const std::vector<T> &values,
                                        prometheus_client::MetricType type,
                                        prometheus_client::ClientMetric *metric)
 {
@@ -798,7 +807,7 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
  * Handle Histogram
  */
 template <typename T>
-void PrometheusExporterUtils::SetValue(std::vector<T> values,
+void PrometheusExporterUtils::SetValue(const std::vector<T> &values,
                                        const std::vector<double> &boundaries,
                                        const std::vector<uint64_t> &counts,
                                        prometheus_client::ClientMetric *metric)

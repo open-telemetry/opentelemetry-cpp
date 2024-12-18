@@ -57,12 +57,7 @@ void InitMetrics(const std::string &name)
   auto reader =
       metrics_sdk::PeriodicExportingMetricReaderFactory::Create(std::move(exporter), options);
 
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-  auto u_provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
-  auto *provider  = static_cast<opentelemetry::sdk::metrics::MeterProvider *>(u_provider.get());
-#else
   auto provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
   provider->AddMetricReader(std::move(reader));
 
@@ -118,11 +113,7 @@ void InitMetrics(const std::string &name)
   provider->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
                     std::move(histogram_view));
 
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-  std::shared_ptr<opentelemetry::metrics::MeterProvider> api_provider(std::move(u_provider));
-#else
   std::shared_ptr<opentelemetry::metrics::MeterProvider> api_provider(std::move(provider));
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
   metrics_api::Provider::SetMeterProvider(api_provider);
 }
@@ -157,15 +148,46 @@ int main(int argc, char **argv)
   {
     foo_library::histogram_example(name);
   }
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  else if (example_type == "gauge")
+  {
+    foo_library::gauge_example(name);
+  }
+#endif
+  else if (example_type == "semconv_counter")
+  {
+    foo_library::semconv_counter_example();
+  }
+  else if (example_type == "semconv_observable_counter")
+  {
+    foo_library::semconv_observable_counter_example();
+  }
+  else if (example_type == "semconv_histogram")
+  {
+    foo_library::semconv_histogram_example();
+  }
   else
   {
     std::thread counter_example{&foo_library::counter_example, name};
     std::thread observable_counter_example{&foo_library::observable_counter_example, name};
     std::thread histogram_example{&foo_library::histogram_example, name};
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    std::thread gauge_example{&foo_library::gauge_example, name};
+#endif
+    std::thread semconv_counter_example{&foo_library::semconv_counter_example};
+    std::thread semconv_observable_counter_example{
+        &foo_library::semconv_observable_counter_example};
+    std::thread semconv_histogram_example{&foo_library::semconv_histogram_example};
 
     counter_example.join();
     observable_counter_example.join();
     histogram_example.join();
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    gauge_example.join();
+#endif
+    semconv_counter_example.join();
+    semconv_observable_counter_example.join();
+    semconv_histogram_example.join();
   }
 
   CleanupMetrics();

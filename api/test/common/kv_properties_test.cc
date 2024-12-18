@@ -3,11 +3,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <opentelemetry/common/kv_properties.h>
-
+#include <stddef.h>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <opentelemetry/common/kv_properties.h>
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 
 // ------------------------- Entry class tests ---------------------------------
 
@@ -31,7 +34,7 @@ TEST(EntryTest, KeyValueConstruction)
 TEST(EntryTest, Copy)
 {
   KeyValueProperties::Entry e("test_key", "test_value");
-  KeyValueProperties::Entry copy(e);
+  const KeyValueProperties::Entry &copy(e);
   EXPECT_EQ(copy.GetKey(), e.GetKey());
   EXPECT_EQ(copy.GetValue(), e.GetValue());
 }

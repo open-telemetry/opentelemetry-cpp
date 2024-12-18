@@ -1,8 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
 #include <gtest/gtest.h>
+#include <stddef.h>
+#include <string>
+#include <vector>
+
+#include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
 
 static std::string CreateVeryLargeString(size_t multiple)
 {
@@ -19,9 +23,9 @@ TEST(InstrumentMetadataValidator, TestName)
 {
   opentelemetry::sdk::metrics::InstrumentMetaDataValidator validator;
   std::vector<std::string> invalid_names = {
-      "",                                                             // empty string
-      "1sdf",                                                         // string starting with number
-      "\x31\x32\x33\xe2\x82\xac\x41\x41\x41\xe2\x82\xac\x42\x42\x42"  // unicode characters
+      "",      // empty string
+      "1sdf",  // string starting with number
+      "\x31\x32\x33\xe2\x82\xac\x41\x41\x41\xe2\x82\xac\x42\x42\x42",  // unicode characters
       "/\\sdsd",                        // string starting with special character
       "***sSSs",                        // string starting with special character
       "a\\broken\\path",                // contains backward slash

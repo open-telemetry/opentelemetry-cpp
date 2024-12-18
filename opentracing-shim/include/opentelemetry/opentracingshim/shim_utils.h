@@ -7,7 +7,7 @@
 
 #include "opentelemetry/opentracingshim/span_context_shim.h"
 
-#include "opentelemetry/trace/semantic_conventions.h"
+#include "opentelemetry/semconv/incubating/opentracing_attributes.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentracing/tracer.h"
 
@@ -29,7 +29,10 @@ static inline opentelemetry::common::AttributeValue attributeFromValue(
     AttributeValue operator()(int64_t v) { return v; }
     AttributeValue operator()(uint64_t v) { return v; }
     AttributeValue operator()(const std::string &v) { return nostd::string_view{v}; }
-    AttributeValue operator()(opentracing::string_view v) { return nostd::string_view{v.data()}; }
+    AttributeValue operator()(opentracing::string_view v)
+    {
+      return nostd::string_view{v.data(), v.size()};
+    }
     AttributeValue operator()(std::nullptr_t) { return nostd::string_view{}; }
     AttributeValue operator()(const char *v) { return v; }
     AttributeValue operator()(opentracing::util::recursive_wrapper<opentracing::Values>)
@@ -54,7 +57,7 @@ static inline std::string stringFromValue(const opentracing::Value &value)
     std::string operator()(int64_t v) { return std::to_string(v); }
     std::string operator()(uint64_t v) { return std::to_string(v); }
     std::string operator()(const std::string &v) { return v; }
-    std::string operator()(opentracing::string_view v) { return std::string{v.data()}; }
+    std::string operator()(opentracing::string_view v) { return std::string{v.data(), v.size()}; }
     std::string operator()(std::nullptr_t) { return std::string{}; }
     std::string operator()(const char *v) { return std::string{v}; }
     std::string operator()(opentracing::util::recursive_wrapper<opentracing::Values>)
@@ -93,7 +96,7 @@ public:
                            callback) const noexcept override
   {
     using opentracing::SpanReferenceType;
-    using namespace opentelemetry::trace::SemanticConventions;
+    using namespace opentelemetry::semconv;
     using LinksList = std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>;
 
     for (const auto &entry : refs_)
@@ -102,18 +105,18 @@ public:
 
       if (entry.first == SpanReferenceType::ChildOfRef)
       {
-        span_kind = OpentracingRefTypeValues::kChildOf;
+        span_kind = opentracing::OpentracingRefTypeValues::kChildOf;
       }
       else if (entry.first == SpanReferenceType::FollowsFromRef)
       {
-        span_kind = OpentracingRefTypeValues::kFollowsFrom;
+        span_kind = opentracing::OpentracingRefTypeValues::kFollowsFrom;
       }
 
       auto context_shim = SpanContextShim::extractFrom(entry.second);
 
       if (context_shim && !span_kind.empty() &&
           !callback(context_shim->context(), opentelemetry::common::KeyValueIterableView<LinksList>(
-                                                 {{kOpentracingRefType, span_kind}})))
+                                                 {{opentracing::kOpentracingRefType, span_kind}})))
       {
         return false;
       }

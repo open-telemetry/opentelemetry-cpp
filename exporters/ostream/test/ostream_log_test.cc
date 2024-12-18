@@ -1,20 +1,42 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <gtest/gtest.h>
+#include <array>
+#include <chrono>
+#include <initializer_list>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/ostream/log_record_exporter.h"
 #include "opentelemetry/exporters/ostream/log_record_exporter_factory.h"
+#include "opentelemetry/logs/event_id.h"
+#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/provider.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/logs/readable_log_record.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/version/version.h"
-
-#include <array>
-#include <iostream>
-
-#include <gtest/gtest.h>
+#include "opentelemetry/version.h"
 
 namespace sdklogs      = opentelemetry::sdk::logs;
 namespace logs_api     = opentelemetry::logs;
@@ -97,17 +119,17 @@ TEST(OstreamLogExporter, DefaultLogRecordToCout)
   std::cout.rdbuf(original);
 
   std::vector<std::string> expected_output{
-      "{\n"
+      "{\n",
       "  timestamp          : 0\n",
-      "  severity_num       : 0\n"
-      "  severity_text      : INVALID\n"
+      "  severity_num       : 0\n",
+      "  severity_text      : INVALID\n",
       "  body               : \n",
       "  resource           : \n",
       "    telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
       "    telemetry.sdk.name: opentelemetry\n",
       "    telemetry.sdk.language: cpp\n",
       "  attributes         : \n",
-      "  event_id           : 0\n"
+      "  event_id           : 0\n",
       "  event_name         : \n",
       "  trace_id           : 00000000000000000000000000000000\n",
       "  span_id            : 0000000000000000\n",
@@ -126,7 +148,7 @@ TEST(OstreamLogExporter, DefaultLogRecordToCout)
     std::string::size_type result = ostream_output.find(expected);
     if (result == std::string::npos)
     {
-      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << std::endl;
+      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << '\n';
     }
     ASSERT_NE(result, std::string::npos);
   }
@@ -167,9 +189,8 @@ TEST(OStreamLogRecordExporter, SimpleLogToCout)
   std::cout.rdbuf(original);
 
   std::vector<std::string> expected_output{
-      "{\n"
-      "  timestamp          : " +
-          std::to_string(now.time_since_epoch().count()) +
+      "{\n",
+      "  timestamp          : " + std::to_string(now.time_since_epoch().count()) +
           "\n"
           "  observed_timestamp : " +
           std::to_string(now.time_since_epoch().count()) +
@@ -182,7 +203,7 @@ TEST(OStreamLogRecordExporter, SimpleLogToCout)
       "    telemetry.sdk.name: opentelemetry\n",
       "    telemetry.sdk.language: cpp\n",
       "  attributes         : \n",
-      "  event_id           : 0\n"
+      "  event_id           : 0\n",
       "  event_name         : \n",
       "  trace_id           : 00000000000000000000000000000000\n",
       "  span_id            : 0000000000000000\n",
@@ -201,7 +222,7 @@ TEST(OStreamLogRecordExporter, SimpleLogToCout)
     std::string::size_type result = ostream_output.find(expected);
     if (result == std::string::npos)
     {
-      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << std::endl;
+      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << '\n';
     }
     ASSERT_NE(result, std::string::npos);
   }
@@ -243,10 +264,10 @@ TEST(OStreamLogRecordExporter, LogWithStringAttributesToCerr)
   std::cerr.rdbuf(original);
 
   std::vector<std::string> expected_output{
-      "{\n"
+      "{\n",
       "  timestamp          : 0\n",
-      "  severity_num       : 0\n"
-      "  severity_text      : INVALID\n"
+      "  severity_num       : 0\n",
+      "  severity_text      : INVALID\n",
       "  body               : \n",
       "  resource           : \n",
       "    telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
@@ -256,7 +277,7 @@ TEST(OStreamLogRecordExporter, LogWithStringAttributesToCerr)
       "    key1: val1\n",
       "  attributes         : \n",
       "    a: 1\n",
-      "  event_id           : 0\n"
+      "  event_id           : 0\n",
       "  event_name         : \n",
       "  trace_id           : 00000000000000000000000000000000\n",
       "  span_id            : 0000000000000000\n",
@@ -275,7 +296,7 @@ TEST(OStreamLogRecordExporter, LogWithStringAttributesToCerr)
     std::string::size_type result = ostream_output.find(expected);
     if (result == std::string::npos)
     {
-      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << std::endl;
+      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << '\n';
     }
     ASSERT_NE(result, std::string::npos);
   }
@@ -324,10 +345,10 @@ TEST(OStreamLogRecordExporter, LogWithVariantTypesToClog)
   std::clog.rdbuf(original);
 
   std::vector<std::string> expected_output{
-      "{\n"
+      "{\n",
       "  timestamp          : 0\n",
-      "  severity_num       : 0\n"
-      "  severity_text      : INVALID\n"
+      "  severity_num       : 0\n",
+      "  severity_text      : INVALID\n",
       "  body               : \n",
       "  resource           : \n",
       "    service.name: unknown_service\n",
@@ -337,7 +358,7 @@ TEST(OStreamLogRecordExporter, LogWithVariantTypesToClog)
       "    res1: [1,2,3]\n",
       "  attributes         : \n",
       "    attr1: [0,1,0]\n",
-      "  event_id           : 0\n"
+      "  event_id           : 0\n",
       "  event_name         : \n",
       "  trace_id           : 00000000000000000000000000000000\n",
       "  span_id            : 0000000000000000\n",
@@ -356,7 +377,7 @@ TEST(OStreamLogRecordExporter, LogWithVariantTypesToClog)
     std::string::size_type result = ostream_output.find(expected);
     if (result == std::string::npos)
     {
-      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << std::endl;
+      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << '\n';
     }
     ASSERT_NE(result, std::string::npos);
   }
@@ -398,11 +419,10 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
 
   // Compare actual vs expected outputs
   std::vector<std::string> expected_output{
-      "{\n"
-      "  timestamp          : " +
-          std::to_string(now.time_since_epoch().count()) + "\n",
-      "  severity_num       : 5\n"
-      "  severity_text      : DEBUG\n"
+      "{\n",
+      "  timestamp          : " + std::to_string(now.time_since_epoch().count()) + "\n",
+      "  severity_num       : 5\n",
+      "  severity_text      : DEBUG\n",
       "  body               : Hello\n",
       "  resource           : \n",
       "    telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
@@ -410,7 +430,7 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
       "    telemetry.sdk.name: opentelemetry\n",
       "    telemetry.sdk.language: cpp\n",
       "  attributes         : \n",
-      "  event_id           : 0\n"
+      "  event_id           : 0\n",
       "  event_name         : \n",
       "  trace_id           : 00000000000000000000000000000000\n",
       "  span_id            : 0000000000000000\n",
@@ -429,7 +449,7 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
     std::string::size_type result = ostream_output.find(expected);
     if (result == std::string::npos)
     {
-      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << std::endl;
+      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << '\n';
     }
     ASSERT_NE(result, std::string::npos);
   }
@@ -472,8 +492,8 @@ TEST(OStreamLogRecordExporter, IntegrationTestWithEventId)
 
   // Compare actual vs expected outputs
   std::vector<std::string> expected_output{
-      "  severity_num       : 5\n"
-      "  severity_text      : DEBUG\n"
+      "  severity_num       : 5\n",
+      "  severity_text      : DEBUG\n",
       "  body               : Hello {key1} {key2}\n",
       "  resource           : \n",
       "    telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
@@ -481,7 +501,7 @@ TEST(OStreamLogRecordExporter, IntegrationTestWithEventId)
       "    telemetry.sdk.name: opentelemetry\n",
       "    telemetry.sdk.language: cpp\n",
       "  attributes         : \n",
-      "  event_id           : 12345678\n"
+      "  event_id           : 12345678\n",
       "  event_name         : test_event_id\n",
       "  trace_id           : 00000000000000000000000000000000\n",
       "  span_id            : 0000000000000000\n",
@@ -500,7 +520,7 @@ TEST(OStreamLogRecordExporter, IntegrationTestWithEventId)
     std::string::size_type result = ostream_output.find(expected);
     if (result == std::string::npos)
     {
-      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << std::endl;
+      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << '\n';
     }
     ASSERT_NE(result, std::string::npos);
   }

@@ -3,13 +3,14 @@
 
 #pragma once
 
-#include <cstdint>
+#include <ctype.h>
+#include <cstddef>
 #include <string>
+#include <vector>
 
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
@@ -58,7 +59,8 @@ public:
     size_t cnt = kv_str_tokenizer.NumTokens();  // upper bound on number of kv pairs
     if (cnt > kMaxKeyValuePairs)
     {
-      cnt = kMaxKeyValuePairs;
+      // trace state should be discarded if count exceeds
+      return GetDefault();
     }
 
     nostd::shared_ptr<TraceState> ts(new TraceState(cnt));

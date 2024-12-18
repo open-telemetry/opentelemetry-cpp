@@ -1,12 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/trace/scope.h"
-#include "opentelemetry/context/context.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/trace/noop.h"
-
 #include <gtest/gtest.h>
+
+#include "opentelemetry/context/context_value.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/trace/noop.h"
+#include "opentelemetry/trace/scope.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_metadata.h"
 
 using opentelemetry::trace::kSpanKey;
 using opentelemetry::trace::NoopSpan;

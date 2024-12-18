@@ -1,18 +1,32 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/span_id.h"
-#include "opentelemetry/trace/trace_id.h"
-
 #include <gtest/gtest.h>
+#include <chrono>
+#include <cstdint>
+#include <map>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/trace_state.h"
 
 using opentelemetry::sdk::trace::SpanData;
 namespace trace_api = opentelemetry::trace;
 namespace common    = opentelemetry::common;
-namespace nostd     = opentelemetry::nostd;
 
 TEST(SpanData, DefaultValues)
 {
@@ -70,7 +84,7 @@ TEST(SpanData, Set)
   ASSERT_EQ(data.GetDescription(), "description");
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), now.time_since_epoch());
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(1000000));
-  ASSERT_EQ(nostd::get<int64_t>(data.GetAttributes().at("attr1")), 314159);
+  ASSERT_EQ(opentelemetry::nostd::get<int64_t>(data.GetAttributes().at("attr1")), 314159);
   ASSERT_EQ(data.GetEvents().at(0).GetName(), "event1");
   ASSERT_EQ(data.GetEvents().at(0).GetTimestamp(), now);
 }
@@ -89,15 +103,17 @@ TEST(SpanData, EventAttributes)
 
   for (int i = 0; i < kNumAttributes; i++)
   {
-    EXPECT_EQ(nostd::get<int64_t>(data.GetEvents().at(0).GetAttributes().at(keys[i])), values[i]);
+    EXPECT_EQ(
+        opentelemetry::nostd::get<int64_t>(data.GetEvents().at(0).GetAttributes().at(keys[i])),
+        values[i]);
   }
 }
 
 TEST(SpanData, Resources)
 {
   SpanData data;
-  auto resource   = opentelemetry::sdk::resource::Resource::Create({});
-  auto input_attr = resource.GetAttributes();
+  auto resource          = opentelemetry::sdk::resource::Resource::Create({});
+  const auto &input_attr = resource.GetAttributes();
   data.SetResource(resource);
   auto output_attr = data.GetResource().GetAttributes();
   EXPECT_EQ(input_attr, output_attr);
@@ -130,6 +146,7 @@ TEST(SpanData, Links)
   EXPECT_EQ(data.GetLinks().at(0).GetSpanContext(), span_context);
   for (int i = 0; i < kNumAttributes; i++)
   {
-    EXPECT_EQ(nostd::get<int64_t>(data.GetLinks().at(0).GetAttributes().at(keys[i])), values[i]);
+    EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.GetLinks().at(0).GetAttributes().at(keys[i])),
+              values[i]);
   }
 }

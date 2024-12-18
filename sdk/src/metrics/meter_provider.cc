@@ -37,7 +37,7 @@ MeterProvider::MeterProvider(std::unique_ptr<MeterContext> context) noexcept
 {}
 
 MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
-                             sdk::resource::Resource resource) noexcept
+                             const sdk::resource::Resource &resource) noexcept
     : context_(std::make_shared<MeterContext>(std::move(views), resource))
 {
   OTEL_INTERNAL_LOG_DEBUG("[MeterProvider] MeterProvider created.");
@@ -110,7 +110,7 @@ const resource::Resource &MeterProvider::GetResource() const noexcept
 
 void MeterProvider::AddMetricReader(std::shared_ptr<MetricReader> reader) noexcept
 {
-  context_->AddMetricReader(reader);
+  context_->AddMetricReader(std::move(reader));
 }
 
 void MeterProvider::AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
@@ -132,9 +132,9 @@ void MeterProvider::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filte
 /**
  * Shutdown the meter provider.
  */
-bool MeterProvider::Shutdown() noexcept
+bool MeterProvider::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  return context_->Shutdown();
+  return context_->Shutdown(timeout);
 }
 
 /**

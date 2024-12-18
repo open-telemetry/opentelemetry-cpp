@@ -2,13 +2,27 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <array>
+#include <map>
+#include <string>
+#include <utility>
 #include <vector>
 
-#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/logs/event_id.h"
+#include "opentelemetry/logs/event_logger.h"
+#include "opentelemetry/logs/event_logger_provider.h"
+#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/provider.h"
+#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/utility.h"
 
 using opentelemetry::logs::EventId;
 using opentelemetry::logs::Logger;
@@ -16,7 +30,6 @@ using opentelemetry::logs::LoggerProvider;
 using opentelemetry::logs::Provider;
 using opentelemetry::logs::Severity;
 using opentelemetry::nostd::shared_ptr;
-using opentelemetry::nostd::span;
 using opentelemetry::nostd::string_view;
 namespace common = opentelemetry::common;
 namespace nostd  = opentelemetry::nostd;

@@ -1,0 +1,69 @@
+
+name: cppcheck
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  cppcheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Set up dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install -y cppcheck
+
+      - name: Run cppcheck
+        run: |
+          cppcheck --version | tee cppcheck.log
+          cppcheck \
+            --force \
+            --enable=warning,performance,portability \
+            --inline-suppr \
+            --suppress=unknownMacro:exporters/etw/include/opentelemetry/exporters/etw/TraceLoggingDynamic.h \
+            --language=c++ \
+            --std=c++14 \
+            -I api/include \
+            -I exporters/elasticsearch/include \
+            -I exporters/etw/include \
+            -I exporters/memory/include \
+            -I exporters/ostream/include \
+            -I exporters/otlp/include \
+            -I exporters/prometheus/include \
+            -I exporters/zipkin/include \
+            -I ext/include \
+            -I opentracing-shim/include \
+            -I sdk/include \
+            -i build \
+            -i test \
+            -i third_party \
+            -j $(nproc) \
+            . 2>&1 | tee --append cppcheck.log
+
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: Logs (cppcheck)
+          path: ./cppcheck.log
+
+      - name: Count warnings
+        run: |
+          set +e
+          readonly WARNING_COUNT=`grep -c -E "\[.+\]" cppcheck.log`
+          echo "cppcheck reported ${WARNING_COUNT} warning(s)"
+          # Acceptable limit, to decrease over time down to 0
+          readonly WARNING_LIMIT=10
+          # FAIL the build if WARNING_COUNT > WARNING_LIMIT
+          if [ $WARNING_COUNT -gt $WARNING_LIMIT ] ; then
+            exit 1
+          # WARN in annotations if WARNING_COUNT > 0
+          elif [ $WARNING_COUNT -gt 0 ] ; then
+            echo "::warning::cppcheck reported ${WARNING_COUNT} warning(s)"
+          fi

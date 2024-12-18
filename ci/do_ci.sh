@@ -20,7 +20,7 @@ function install_prometheus_cpp_client
 function run_benchmarks
 {
   docker run -d --rm -it -p 4317:4317 -p 4318:4318 -v \
-    $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.38.0 \
+    $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.109.0 \
     --config=/cfg/opentelemetry-collector-config/config.dev.yaml
 
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
@@ -130,7 +130,6 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
-        -DWITH_DEPRECATED_SDK_FACTORY=OFF \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
         ${IWYU} \
         "${SRC_DIR}"
@@ -153,7 +152,6 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
-        -DWITH_DEPRECATED_SDK_FACTORY=OFF \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
         ${IWYU} \
         "${SRC_DIR}"
@@ -177,7 +175,6 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
-        -DWITH_DEPRECATED_SDK_FACTORY=OFF \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
         "${SRC_DIR}"
   make -k -j $(nproc)
@@ -199,7 +196,6 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
-        -DWITH_DEPRECATED_SDK_FACTORY=OFF \
         -DWITH_ABI_VERSION_1=OFF \
         -DWITH_ABI_VERSION_2=ON \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
@@ -397,6 +393,16 @@ elif [[ "$1" == "cmake.exporter.otprotocol.with_async_export.test" ]]; then
   make -j $(nproc)
   cd exporters/otlp && make test
   exit 0
+elif [[ "$1" == "cmake.w3c.trace-context.build-server" ]]; then
+  echo "Building w3c trace context test server"
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}"  \
+          -DBUILD_W3CTRACECONTEXT_TEST=ON \
+          -DCMAKE_CXX_STANDARD=${CXX_STANDARD} \
+          "${SRC_DIR}"
+  eval "$MAKE_COMMAND"
+  exit 0
 elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
@@ -488,8 +494,8 @@ elif [[ "$1" == "bazel.noexcept" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client
   # as well as Opentracing shim (due to some third party code in its Opentracing dependency)
   # that make this test always fail. Ignore these packages in the noexcept test here.
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test -//opentracing-shim/...
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test -//opentracing-shim/...
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/...
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/...
   exit 0
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client

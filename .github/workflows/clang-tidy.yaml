@@ -1,0 +1,81 @@
+name: clang-tidy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Environment
+        env:
+          PROTOBUF_VERSION: '23.3'
+          ABSEIL_CPP_VERSION: '20230125.3'
+          CXX_STANDARD: '14'
+        run: |
+          sudo apt update -y
+          sudo apt install -y --no-install-recommends --no-install-suggests \
+          build-essential \
+          iwyu \
+          cmake \
+          libssl-dev \
+          libcurl4-openssl-dev \
+          libprotobuf-dev \
+          protobuf-compiler \
+          libgmock-dev \
+          libgtest-dev \
+          libbenchmark-dev
+
+          if ! command -v clang-tidy &> /dev/null; then
+            echo "clang-tidy could not be found"
+            exit 1
+          fi
+          echo "Using clang-tidy version: $(clang-tidy --version)"
+          echo "clang-tidy installed at: $(which clang-tidy)"
+
+
+      - name: Prepare CMake
+        env:
+          CC: clang
+          CXX: clang++
+        run: |
+          echo "Running cmake..."
+          cmake -B build \
+            -DCMAKE_CXX_STANDARD=14 \
+            -DWITH_STL=CXX14 \
+            -DWITH_OTLP_HTTP=ON \
+            -DWITH_OTLP_FILE=ON \
+            -DWITH_PROMETHEUS=ON \
+            -DWITH_ZIPKIN=ON \
+            -DWITH_ELASTICSEARCH=ON \
+            -DWITH_OTLP_HTTP_COMPRESSION=ON \
+            -DWITH_EXAMPLES=ON \
+            -DWITH_EXAMPLES_HTTP=ON \
+            -DBUILD_W3CTRACECONTEXT_TEST=ON \
+            -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+            -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+      - name: Run clang-tidy
+        run: |
+          cmake --build build --target opentelemetry_proto
+          jq -r .[].file build/compile_commands.json | grep -vE '/(generated|third_party)/' | xargs -P $(nproc) -n 1 clang-tidy --quiet -p build 2>&1 | tee -a clang-tidy.log
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Logs (clang-tidy)
+          path: ./clang-tidy.log
+
+      - name: Count warnings
+        run: |
+          COUNT=$(grep -c "warning:" clang-tidy.log)
+          echo "clang-tidy reported ${COUNT} warning(s)"
+
+# TODO: include WITH_OTLP_GRPC and WITH_ABSEIL flags.

@@ -20,9 +20,9 @@ namespace metrics
 ObservableInstrument::ObservableInstrument(InstrumentDescriptor instrument_descriptor,
                                            std::unique_ptr<AsyncWritableMetricStorage> storage,
                                            std::shared_ptr<ObservableRegistry> observable_registry)
-    : instrument_descriptor_(instrument_descriptor),
+    : instrument_descriptor_(std::move(instrument_descriptor)),
       storage_(std::move(storage)),
-      observable_registry_{observable_registry}
+      observable_registry_{std::move(observable_registry)}
 
 {}
 

@@ -3,7 +3,6 @@
 
 #include <curl/curl.h>
 #include <curl/curlver.h>
-#include <zconf.h>
 #include <atomic>
 #include <chrono>
 #include <cstddef>
@@ -25,6 +24,7 @@
 #include "opentelemetry/version.h"
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
+#  include <zconf.h>
 #  include <zlib.h>
 #else
 #  include "opentelemetry/sdk/common/global_log_handler.h"
@@ -116,10 +116,10 @@ void Session::SendRequest(
 #endif
   }
 
-  curl_operation_.reset(new HttpOperation(http_request_->method_, url, http_request_->ssl_options_,
-                                          callback_ptr, http_request_->headers_,
-                                          http_request_->body_, http_request_->compression_, false,
-                                          http_request_->timeout_ms_, reuse_connection));
+  curl_operation_.reset(new HttpOperation(
+      http_request_->method_, url, http_request_->ssl_options_, callback_ptr,
+      http_request_->headers_, http_request_->body_, http_request_->compression_, false,
+      http_request_->timeout_ms_, reuse_connection, http_request_->is_log_enabled_));
   bool success =
       CURLE_OK == curl_operation_->SendAsync(this, [this, callback](HttpOperation &operation) {
         if (operation.WasAborted())
@@ -185,13 +185,12 @@ void Session::FinishOperation()
 }
 
 HttpClient::HttpClient()
-    : next_session_id_{0},
+    : multi_handle_(curl_multi_init()),
+      next_session_id_{0},
       max_sessions_per_connection_{8},
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
       curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
-{
-  multi_handle_ = curl_multi_init();
-}
+{}
 
 HttpClient::~HttpClient()
 {
@@ -562,7 +561,7 @@ bool HttpClient::doAbortSessions()
   }
 
   bool has_data = false;
-  for (auto session : pending_to_abort_sessions)
+  for (const auto &session : pending_to_abort_sessions)
   {
     if (!session.second)
     {

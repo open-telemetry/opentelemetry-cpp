@@ -1,10 +1,21 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/common/spin_lock_mutex.h"
-
 #include <benchmark/benchmark.h>
-#include <mutex>
+#include <stdint.h>
+#include <algorithm>
+#include <atomic>
+#include <thread>
+#include <vector>
+
+#if defined(__i386__) || defined(__x86_64__)
+#  if defined(__clang__) || defined(__INTEL_COMPILER)
+#    include <emmintrin.h>  // for _mm_pause
+#  endif
+#endif
+
+#include "opentelemetry/common/macros.h"
+#include "opentelemetry/common/spin_lock_mutex.h"
 
 namespace
 {
@@ -91,8 +102,10 @@ static void BM_ProcYieldSpinLockThrashing(benchmark::State &s)
 #  else
           __builtin_ia32_pause();
 #  endif
-#elif defined(__arm__)
-          __asm__ volatile("yield" ::: "memory");
+#elif defined(__armel__) || defined(__ARMEL__)
+          asm volatile("nop" ::: "memory");
+#elif defined(__arm__) || defined(__aarch64__)  // arm big endian / arm64
+          __asm__ __volatile__("yield" ::: "memory");
 #endif
         }
       },
