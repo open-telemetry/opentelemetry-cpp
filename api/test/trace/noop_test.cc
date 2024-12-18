@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/unique_ptr.h"

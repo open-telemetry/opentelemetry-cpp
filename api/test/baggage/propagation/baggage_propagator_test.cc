@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <initializer_list>
 #include <map>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -14,8 +14,9 @@
 #include "opentelemetry/baggage/propagation/baggage_propagator.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/utility.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::baggage::propagation;
