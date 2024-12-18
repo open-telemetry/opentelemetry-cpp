@@ -552,6 +552,7 @@ void HttpClient::WaitBackgroundThreadExit()
 
   if (background_thread && background_thread->joinable())
   {
+    wakeupBackgroundThread();
     background_thread->join();
   }
   is_shutdown_.store(false, std::memory_order_release);
