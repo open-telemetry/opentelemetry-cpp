@@ -191,6 +191,7 @@ HttpClient::HttpClient()
       max_sessions_per_connection_{8},
       background_thread_instrumentation_(nullptr),
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
+      background_thread_wait_for_{std::chrono::minutes{1}},
       curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
 {}
 
