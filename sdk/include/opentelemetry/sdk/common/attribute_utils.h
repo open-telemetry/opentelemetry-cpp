@@ -119,7 +119,7 @@ struct AttributeEqualToVisitor
     return false;
   }
 
-  // Compare the same arithmatic types
+  // Compare the same arithmetic types
   template <typename T>
   bool operator()(const T &owned_value, const T &value) const noexcept
   {
