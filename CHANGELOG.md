@@ -26,8 +26,10 @@ New features:
 * [SDK] Better control of threads executed by opentelemetry-cpp
   [#3175](https://github.com/open-telemetry/opentelemetry-cpp/pull/3175)
 
-  * This feature provides a way for applications, when configuring the SDK and exporters,
-    to participate in the execution path of internal opentelemetry-cpp threads.
+  * This feature provides a way for applications,
+    when configuring the SDK and exporters,
+    to participate in the execution path
+    of internal opentelemetry-cpp threads.
 
   * The opentelemetry-cpp library provides the following:
 
@@ -36,15 +38,18 @@ New features:
       * BatchSpanProcessorRuntimeOptions
       * PeriodicExportingMetricReaderRuntimeOptions
       * BatchLogRecordProcessorRuntimeOptions
-    * new runtime options structures, to optionally configure the OTLP HTTP exporters:
+    * new runtime options structures,
+      to optionally configure the OTLP HTTP exporters:
       * OtlpHttpExporterRuntimeOptions
       * OtlpHttpMetricExporterRuntimeOptions
       * OtlpHttpLogRecordExporterRuntimeOptions
-    * new ThreadInstrumentation parameters, to optionally configure the CURL HttpClient
+    * new ThreadInstrumentation parameters,
+      to optionally configure the CURL HttpClient
 
   * Using the optional runtime options structures,
     an application can subclass the ThreadInstrumentation interface,
-    and be notified of specific events of interest during the execution of an internal opentelemetry-cpp thread.
+    and be notified of specific events of interest during the execution
+    of an internal opentelemetry-cpp thread.
 
   * This allows an application to call, for example:
 
@@ -55,7 +60,8 @@ New features:
 
   * See the documentation for ThreadInstrumentation for details.
 
-  * A new example program, example_otlp_instrumented_http, shows how to use the feature,
+  * A new example program, example_otlp_instrumented_http,
+    shows how to use the feature,
     and add application logic in the thread execution code path.
 
 ## [1.18 2024-11-25]

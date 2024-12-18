@@ -58,6 +58,20 @@ namespace
 
 std::mutex serialize;
 
+/**
+ The purpose of MyThreadInstrumentation is to demonstrate
+ how notifications are delivered to the application.
+
+ Printing to std::cout is useful for debugging,
+ to understand the overall thread execution in the library.
+
+ In production, a real application would instead:
+ - set thread priorities / CPU affinity
+ - set thread local storage keys
+ - set a thread name to the operating system
+ - set network namespaces
+ in the OnXXX() code here.
+*/
 class MyThreadInstrumentation : public opentelemetry::sdk::common::ThreadInstrumentation
 {
 public:
@@ -272,8 +286,8 @@ void CleanupLogger()
 
 /*
   Usage:
-  - example_otlp_http
-  - example_otlp_http <TRACE_URL> <METRIC_URL> <LOG_URL>
+  - example_otlp_instrumented_http
+  - example_otlp_instrumented_http <TRACE_URL> <METRIC_URL> <LOG_URL>
 */
 int main(int argc, char *argv[])
 {
