@@ -301,9 +301,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
   {
     for (auto &kv : this->request_headers_)
     {
-      std::string header = std::string(kv.first);
-      header += ": ";
-      header += std::string(kv.second);
+      const auto header = std::string(kv.first).append(": ").append(kv.second);
       curl_resource_.headers_chunk =
           curl_slist_append(curl_resource_.headers_chunk, header.c_str());
     }
