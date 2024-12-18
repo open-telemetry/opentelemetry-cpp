@@ -208,3 +208,99 @@ TEST(InstrumentationScope, LegacyInstrumentationLibrary)
   EXPECT_EQ(instrumentation_library->GetVersion(), library_version);
   EXPECT_EQ(instrumentation_library->GetSchemaURL(), schema_url);
 }
+
+TEST(InstrumentationScope, Equal)
+{
+  using Attributes = std::initializer_list<
+      std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue>>;
+  Attributes attributes_empty = {};
+  Attributes attributes_match = {
+      {"key0", "some value"}, {"key1", 1}, {"key2", 2.0}, {"key3", true}};
+  Attributes attributes_different = {{"key42", "some other"}};
+
+  auto kv_iterable_empty =
+      opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_empty);
+  auto kv_iterable_match =
+      opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_match);
+  auto kv_iterable_different =
+      opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_different);
+
+  // try with no attributes added to the instrumentation scope
+  auto instrumentation_scope =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name", "library_version", "schema_url");
+
+  // the instrumentation scope is equal if all parameters are equal (must handle nullptr attributes
+  // or empty attributes)
+  EXPECT_TRUE(instrumentation_scope->equal("library_name", "library_version", "schema_url"));
+  EXPECT_TRUE(
+      instrumentation_scope->equal("library_name", "library_version", "schema_url", nullptr));
+  EXPECT_TRUE(instrumentation_scope->equal("library_name", "library_version", "schema_url",
+                                           &kv_iterable_empty));
+
+  // the instrumentation scope is not equal if any parameter is different
+  EXPECT_FALSE(instrumentation_scope->equal("library_name", ""));
+  EXPECT_FALSE(instrumentation_scope->equal("library_name", "library_version", ""));
+  EXPECT_FALSE(instrumentation_scope->equal("library_name", "library_version", "schema_url",
+                                            &kv_iterable_different));
+
+  // try with attributes added to the instrumentation scope
+  auto instrumentation_scope_w_attributes =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name", "library_version", "schema_url", attributes_match);
+
+  // the instrumentation scope is equal if all parameters including all attribute keys, types, and
+  // values are equal
+  EXPECT_TRUE(instrumentation_scope_w_attributes->equal("library_name", "library_version",
+                                                        "schema_url", &kv_iterable_match));
+  EXPECT_FALSE(instrumentation_scope_w_attributes->equal("library_name", "library_version",
+                                                         "schema_url", nullptr));
+  EXPECT_FALSE(instrumentation_scope_w_attributes->equal("library_name", "library_version",
+                                                         "schema_url", &kv_iterable_empty));
+  EXPECT_FALSE(instrumentation_scope_w_attributes->equal("library_name", "library_version",
+                                                         "schema_url", &kv_iterable_different));
+}
+
+TEST(InstrumentationScope, OperatorEqual)
+{
+  using Attributes = std::initializer_list<
+      std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue>>;
+  Attributes attributes_empty = {};
+  Attributes attributes_match = {
+      {"key0", "some value"}, {"key1", 1}, {"key2", 2.0}, {"key3", true}};
+  Attributes attributes_different = {{"key42", "some other"}};
+
+  auto instrumentation_scope_1a =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name", "library_version", "schema_url");
+
+  auto instrumentation_scope_1b =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name", "library_version", "schema_url");
+
+  auto instrumentation_scope_2a =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name_2", "library_version", "schema_url");
+
+  auto instrumentation_scope_2b =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name_2", "library_version", "schema_url", attributes_empty);
+
+  auto instrumentation_scope_3a =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name_2", "library_version", "schema_url", attributes_match);
+
+  auto instrumentation_scope_3b =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name_2", "library_version", "schema_url", attributes_match);
+
+  auto instrumentation_scope_4 =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name_2", "library_version", "schema_url", attributes_different);
+
+  EXPECT_EQ(*instrumentation_scope_1a, *instrumentation_scope_1b);
+  EXPECT_FALSE(*instrumentation_scope_1a == *instrumentation_scope_2a);
+  EXPECT_EQ(*instrumentation_scope_2a, *instrumentation_scope_2b);
+  EXPECT_EQ(*instrumentation_scope_3a, *instrumentation_scope_3b);
+  EXPECT_FALSE(*instrumentation_scope_3a == *instrumentation_scope_4);
+}
