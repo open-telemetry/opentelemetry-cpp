@@ -23,8 +23,10 @@ target_link_libraries(opentelemetry_otlp_recordable
 
 if(WITH_OTLP_GRPC)
   find_package(gRPC REQUIRED)
-  add_library(opentelemetry_exporter_otlp_grpc_client src/otlp_grpc_client.cc
-                                                      src/otlp_grpc_utils.cc)
+  add_library(
+    opentelemetry_exporter_otlp_grpc_client
+    src/otlp_grpc_client.cc src/otlp_grpc_client_factory.cc
+    src/otlp_grpc_utils.cc)
   set_target_properties(opentelemetry_exporter_otlp_grpc_client
                         PROPERTIES EXPORT_NAME otlp_grpc_client)
   set_target_version(opentelemetry_exporter_otlp_grpc_client)
@@ -45,7 +47,7 @@ if(WITH_OTLP_GRPC)
                       INTERFACE_INCLUDE_DIRECTORIES)
   if(GRPC_INCLUDE_DIRECTORY)
     target_include_directories(
-      opentelemetry_exporter_otlp_grpc_client
+      opentelemetry_exporter_otlp_grpc_client BEFORE
       PUBLIC "$<BUILD_INTERFACE:${GRPC_INCLUDE_DIRECTORY}>")
   endif()
   target_include_directories(
@@ -310,29 +312,6 @@ if(BUILD_TESTING)
     TARGET otlp_metrics_serialization_test
     TEST_PREFIX exporter.otlp.
     TEST_LIST otlp_metrics_serialization_test)
-
-  if(NOT GMOCK_LIB AND TARGET GTest::gmock)
-    set(GMOCK_LIB GTest::gmock)
-  elseif(MSVC)
-    # Explicitly specify that we consume GTest from shared library. The rest of
-    # code logic below determines whether we link Release or Debug flavor of the
-    # library. These flavors have different prefix on Windows, gmock and gmockd
-    # respectively.
-    add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
-    if(GMOCK_LIB)
-      # unset GMOCK_LIB to force find_library to redo the lookup, as the cached
-      # entry could cause linking to incorrect flavor of gmock and leading to
-      # runtime error.
-      unset(GMOCK_LIB CACHE)
-    endif()
-  endif()
-  if(NOT GMOCK_LIB)
-    if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-      find_library(GMOCK_LIB gmockd PATH_SUFFIXES lib)
-    else()
-      find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
-    endif()
-  endif()
 
   if(WITH_OTLP_GRPC)
     add_executable(otlp_grpc_exporter_test test/otlp_grpc_exporter_test.cc)

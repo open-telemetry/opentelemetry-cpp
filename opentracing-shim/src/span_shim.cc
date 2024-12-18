@@ -8,7 +8,7 @@
 #include "opentelemetry/opentracingshim/span_context_shim.h"
 #include "opentelemetry/opentracingshim/tracer_shim.h"
 
-#include "opentelemetry/trace/semantic_conventions.h"
+#include "opentelemetry/semconv/exception_attributes.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentracing/ext/tags.h"
 
@@ -45,7 +45,7 @@ void SpanShim::FinishWithOptions(const opentracing::FinishSpanOptions &finish_sp
 
 void SpanShim::SetOperationName(opentracing::string_view name) noexcept
 {
-  span_->UpdateName(name.data());
+  span_->UpdateName(nostd::string_view{name.data(), name.size()});
 }
 
 void SpanShim::SetTag(opentracing::string_view key, const opentracing::Value &value) noexcept
@@ -57,7 +57,8 @@ void SpanShim::SetTag(opentracing::string_view key, const opentracing::Value &va
   }
   else
   {
-    span_->SetAttribute(key.data(), utils::attributeFromValue(value));
+    auto key_view = nostd::string_view{key.data(), key.size()};
+    span_->SetAttribute(key_view, utils::attributeFromValue(value));
   }
 }
 
@@ -68,9 +69,11 @@ void SpanShim::SetBaggageItem(opentracing::string_view restricted_key,
   // Baggage key/value pair, and sets it as the current instance for this Span Shim.
   if (restricted_key.empty() || value.empty())
     return;
+  auto restricted_key_view = nostd::string_view{restricted_key.data(), restricted_key.size()};
+  auto value_view          = nostd::string_view{value.data(), value.size()};
   // This operation MUST be safe to be called concurrently.
   const std::lock_guard<decltype(context_lock_)> guard(context_lock_);
-  context_ = context_.newWithKeyValue(restricted_key.data(), value.data());
+  context_ = context_.newWithKeyValue(restricted_key_view, value_view);
 }
 
 std::string SpanShim::BaggageItem(opentracing::string_view restricted_key) const noexcept
@@ -82,7 +85,8 @@ std::string SpanShim::BaggageItem(opentracing::string_view restricted_key) const
   // This operation MUST be safe to be called concurrently.
   const std::lock_guard<decltype(context_lock_)> guard(context_lock_);
   std::string value;
-  return context_.BaggageItem(restricted_key.data(), value) ? value : "";
+  auto restricted_key_view = nostd::string_view{restricted_key.data(), restricted_key.size()};
+  return context_.BaggageItem(restricted_key_view, value) ? value : "";
 }
 
 void SpanShim::Log(std::initializer_list<EventEntry> fields) noexcept
@@ -128,21 +132,21 @@ void SpanShim::logImpl(nostd::span<const EventEntry> fields,
 
   for (const auto &entry : fields)
   {
-    nostd::string_view key = entry.first.data();
+    nostd::string_view key{entry.first.data(), entry.first.size()};
     // ... including mapping of the following key/value pairs:
     if (is_error)
     {
       if (key == "error.kind")  // - error.kind maps to exception.type.
       {
-        key = opentelemetry::trace::SemanticConventions::kExceptionType;
+        key = opentelemetry::semconv::exception::kExceptionType;
       }
       else if (key == "message")  // - message maps to exception.message.
       {
-        key = opentelemetry::trace::SemanticConventions::kExceptionMessage;
+        key = opentelemetry::semconv::exception::kExceptionMessage;
       }
       else if (key == "stack")  // - stack maps to exception.stacktrace.
       {
-        key = opentelemetry::trace::SemanticConventions::kExceptionStacktrace;
+        key = opentelemetry::semconv::exception::kExceptionStacktrace;
       }
     }
 

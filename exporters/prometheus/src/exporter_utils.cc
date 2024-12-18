@@ -16,12 +16,9 @@
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/resource/semantic_conventions.h"
-#include "opentelemetry/trace/semantic_conventions.h"
-
-#include "opentelemetry/sdk/common/global_log_handler.h"
 
 namespace prometheus_client = ::prometheus;
 namespace metric_sdk        = opentelemetry::sdk::metrics;
@@ -772,7 +769,7 @@ std::string PrometheusExporterUtils::AttributeValueToString(
  * Handle Counter.
  */
 template <typename T>
-void PrometheusExporterUtils::SetValue(std::vector<T> values,
+void PrometheusExporterUtils::SetValue(const std::vector<T> &values,
                                        prometheus_client::MetricType type,
                                        prometheus_client::ClientMetric *metric)
 {
@@ -810,7 +807,7 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
  * Handle Histogram
  */
 template <typename T>
-void PrometheusExporterUtils::SetValue(std::vector<T> values,
+void PrometheusExporterUtils::SetValue(const std::vector<T> &values,
                                        const std::vector<double> &boundaries,
                                        const std::vector<uint64_t> &counts,
                                        prometheus_client::ClientMetric *metric)

@@ -169,13 +169,11 @@ class Session : public opentelemetry::ext::http::client::Session,
 {
 public:
   Session(HttpClient &http_client,
-          std::string scheme      = "http",
-          const std::string &host = "",
-          uint16_t port           = 80)
-      : http_client_(http_client)
-  {
-    host_ = scheme + "://" + host + ":" + std::to_string(port) + "/";
-  }
+          const std::string &scheme = "http",
+          const std::string &host   = "",
+          uint16_t port             = 80)
+      : host_{scheme + "://" + host + ":" + std::to_string(port) + "/"}, http_client_(http_client)
+  {}
 
   std::shared_ptr<opentelemetry::ext::http::client::Request> CreateRequest() noexcept override
   {
@@ -225,7 +223,7 @@ private:
   std::shared_ptr<Request> http_request_;
   std::string host_;
   std::unique_ptr<HttpOperation> curl_operation_;
-  uint64_t session_id_;
+  uint64_t session_id_ = 0UL;
   HttpClient &http_client_;
   std::atomic<bool> is_session_active_{false};
 };
@@ -324,25 +322,16 @@ public:
 
   inline CURLM *GetMultiHandle() noexcept { return multi_handle_; }
 
-  void MaybeSpawnBackgroundThread();
+  // return true if create background thread, false is already exist background thread
+  bool MaybeSpawnBackgroundThread();
 
   void ScheduleAddSession(uint64_t session_id);
   void ScheduleAbortSession(uint64_t session_id);
   void ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource);
 
-  void WaitBackgroundThreadExit()
-  {
-    std::unique_ptr<std::thread> background_thread;
-    {
-      std::lock_guard<std::mutex> lock_guard{background_thread_m_};
-      background_thread.swap(background_thread_);
-    }
+  void SetBackgroundWaitFor(std::chrono::milliseconds ms);
 
-    if (background_thread && background_thread->joinable())
-    {
-      background_thread->join();
-    }
-  }
+  void WaitBackgroundThreadExit();
 
 private:
   void wakeupBackgroundThread();
@@ -367,6 +356,9 @@ private:
   std::mutex background_thread_m_;
   std::unique_ptr<std::thread> background_thread_;
   std::chrono::milliseconds scheduled_delay_milliseconds_;
+
+  std::chrono::milliseconds background_thread_wait_for_;
+  std::atomic<bool> is_shutdown_{false};
 
   nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
 };

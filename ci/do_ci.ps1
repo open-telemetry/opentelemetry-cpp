@@ -27,6 +27,8 @@ $PLUGIN_DIR = Join-Path "$SRC_DIR" "plugin"
 
 $VCPKG_DIR = Join-Path "$SRC_DIR" "tools" "vcpkg"
 
+$Env:CTEST_OUTPUT_ON_FAILURE = "1"
+
 switch ($action) {
   "bazel.build" {
     bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS --action_env=VCPKG_DIR=$VCPKG_DIR --deleted_packages=opentracing-shim -- //...

@@ -14,4 +14,7 @@ public:
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   static void gauge_example(const std::string &name);
 #endif
+  static void semconv_counter_example();
+  static void semconv_histogram_example();
+  static void semconv_observable_counter_example();
 };

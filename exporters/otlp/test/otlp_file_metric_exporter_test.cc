@@ -1,37 +1,39 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <chrono>
+#include <gtest/gtest.h>
+#include <cstdint>
 #include <cstdlib>
-#include <thread>
+#include <functional>
+#include <initializer_list>
+#include <memory>
+#include <nlohmann/json.hpp>
+#include <sstream>
+#include <string>
+#include <vector>
 
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_metric_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_factory.h"
-
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-
-#include "google/protobuf/message_lite.h"
-#include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
-
+#include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-
-#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-
-#include "nlohmann/json.hpp"
-
-#include <chrono>
-#include <sstream>
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "google/protobuf/message_lite.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
 
 using namespace testing;
 
@@ -83,11 +85,14 @@ public:
     opentelemetry::sdk::metrics::SumPointData sum_point_data2{};
     sum_point_data2.value_ = 20.0;
     opentelemetry::sdk::metrics::ResourceMetrics data;
+
     auto resource = opentelemetry::sdk::resource::Resource::Create(
-        opentelemetry::sdk::resource::ResourceAttributes{});
+        opentelemetry::sdk::resource::ResourceAttributes{}, "resource_url");
     data.resource_ = &resource;
-    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
-        "library_name", "1.5.0");
+
+    auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+        "library_name", "1.5.0", "scope_url", {{"scope_key", "scope_value"}});
+
     opentelemetry::sdk::metrics::MetricData metric_data{
         opentelemetry::sdk::metrics::InstrumentDescriptor{
             "metrics_library_name", "metrics_description", "metrics_unit",
@@ -98,6 +103,7 @@ public:
         std::vector<opentelemetry::sdk::metrics::PointDataAttributes>{
             {opentelemetry::sdk::metrics::PointAttributes{{"a1", "b1"}}, sum_point_data},
             {opentelemetry::sdk::metrics::PointAttributes{{"a2", "b2"}}, sum_point_data2}}};
+
     data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
         {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
 
@@ -109,6 +115,7 @@ public:
     output.flush();
     output.sync();
     auto check_json_text = output.str();
+
     if (!check_json_text.empty())
     {
       auto check_json = nlohmann::json::parse(check_json_text, nullptr, false);
@@ -116,8 +123,15 @@ public:
       auto resource_metrics = *check_json["resourceMetrics"].begin();
       auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
       auto scope            = scope_metrics["scope"];
+
+      EXPECT_EQ("resource_url", resource_metrics["schemaUrl"].get<std::string>());
       EXPECT_EQ("library_name", scope["name"].get<std::string>());
       EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
+      EXPECT_EQ("scope_url", scope_metrics["schemaUrl"].get<std::string>());
+      ASSERT_EQ(1, scope["attributes"].size());
+      const auto scope_attribute = scope["attributes"].front();
+      EXPECT_EQ("scope_key", scope_attribute["key"].get<std::string>());
+      EXPECT_EQ("scope_value", scope_attribute["value"]["stringValue"].get<std::string>());
 
       auto metric = *scope_metrics["metrics"].begin();
       EXPECT_EQ("metrics_library_name", metric["name"].get<std::string>());

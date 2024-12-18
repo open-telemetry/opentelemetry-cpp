@@ -1,10 +1,33 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
-#include "opentelemetry/proto/metrics/v1/metrics.pb.h"
-
 #include <gtest/gtest.h>
+#include <stddef.h>
+#include <algorithm>
+#include <chrono>
+#include <cstdint>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
+#include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
+
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
+#include "opentelemetry/proto/common/v1/common.pb.h"
+#include "opentelemetry/proto/metrics/v1/metrics.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -280,6 +303,41 @@ TEST(OtlpMetricSerializationTest, ObservableUpDownCounter)
   EXPECT_EQ(sum.data_points(2).as_double(), 2.34);
 
   EXPECT_EQ(1, 1);
+}
+
+TEST(OtlpMetricSerializationTest, PopulateExportMetricsServiceRequest)
+{
+  const auto resource =
+      resource::Resource::Create({{"service.name", "test_service_name"}}, "resource_schema_url");
+  const auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+      "scope_name", "scope_version", "scope_schema_url", {{"scope_key", "scope_value"}});
+
+  metrics_sdk::ScopeMetrics scope_metrics{scope.get(), CreateSumAggregationData()};
+  metrics_sdk::ResourceMetrics resource_metrics{&resource, scope_metrics};
+
+  proto::collector::metrics::v1::ExportMetricsServiceRequest request_proto;
+  otlp_exporter::OtlpMetricUtils::PopulateRequest(resource_metrics, &request_proto);
+
+  ASSERT_EQ(1, request_proto.resource_metrics_size());
+  const auto &resource_metrics_proto = request_proto.resource_metrics(0);
+  EXPECT_EQ("resource_schema_url", resource_metrics_proto.schema_url());
+
+  ASSERT_EQ(1, resource_metrics_proto.scope_metrics_size());
+  const auto &scope_metrics_proto = resource_metrics_proto.scope_metrics(0);
+  EXPECT_EQ("scope_schema_url", scope_metrics_proto.schema_url());
+
+  ASSERT_EQ(1, scope_metrics_proto.metrics_size());
+  const auto &metric_proto = scope_metrics_proto.metrics(0);
+  EXPECT_EQ("Counter", metric_proto.name());
+
+  const auto &scope_proto = scope_metrics_proto.scope();
+  EXPECT_EQ("scope_name", scope_proto.name());
+  EXPECT_EQ("scope_version", scope_proto.version());
+
+  ASSERT_EQ(1, scope_proto.attributes_size());
+  const auto &scope_attributes_proto = scope_proto.attributes(0);
+  EXPECT_EQ("scope_key", scope_attributes_proto.key());
+  EXPECT_EQ("scope_value", scope_attributes_proto.value().string_value());
 }
 
 }  // namespace otlp

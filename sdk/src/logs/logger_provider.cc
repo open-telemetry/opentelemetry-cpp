@@ -80,7 +80,7 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
   {
     auto &logger_lib = logger->GetInstrumentationScope();
     if (logger->GetName() == logger_name &&
-        logger_lib.equal(library_name, library_version, schema_url))
+        logger_lib.equal(library_name, library_version, schema_url, &attributes))
     {
       return opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger>{logger};
     }
@@ -118,9 +118,9 @@ const opentelemetry::sdk::resource::Resource &LoggerProvider::GetResource() cons
   return context_->GetResource();
 }
 
-bool LoggerProvider::Shutdown() noexcept
+bool LoggerProvider::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  return context_->Shutdown();
+  return context_->Shutdown(timeout);
 }
 
 bool LoggerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept

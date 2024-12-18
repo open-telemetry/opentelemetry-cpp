@@ -71,7 +71,7 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
   for (auto &meter : context_->GetMeters())
   {
     auto meter_lib = meter->GetInstrumentationScope();
-    if (meter_lib->equal(name, version, schema_url))
+    if (meter_lib->equal(name, version, schema_url, attributes))
     {
       return nostd::shared_ptr<metrics_api::Meter>{meter};
     }
@@ -132,9 +132,9 @@ void MeterProvider::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filte
 /**
  * Shutdown the meter provider.
  */
-bool MeterProvider::Shutdown() noexcept
+bool MeterProvider::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  return context_->Shutdown();
+  return context_->Shutdown(timeout);
 }
 
 /**
