@@ -169,14 +169,20 @@ TEST(AttributeMapTest, EqualTo)
   Attributes attributes_different_type = {
       {"key0", "some value"}, {"key1", 1.0}, {"key2", 2.0}, {"key3", true}};
   Attributes attributes_different_size = {{"key0", "some value"}};
+
+  Attributes attributes_different_all = {{"a", "b"}, {"c", "d"}, {"f", uint8_t(5)}};
+
   auto kv_iterable_different_value =
       opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_different_value);
   auto kv_iterable_different_type =
       opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_different_type);
   auto kv_iterable_different_size =
       opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_different_size);
+  auto kv_iterable_different_all =
+      opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_different_all);
 
   EXPECT_FALSE(attribute_map.EqualTo(kv_iterable_different_value));
   EXPECT_FALSE(attribute_map.EqualTo(kv_iterable_different_type));
   EXPECT_FALSE(attribute_map.EqualTo(kv_iterable_different_size));
+  EXPECT_FALSE(attribute_map.EqualTo(kv_iterable_different_all));
 }
