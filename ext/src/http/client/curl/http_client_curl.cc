@@ -269,11 +269,13 @@ HttpClient::HttpClient()
       next_session_id_{0},
       max_sessions_per_connection_{8},
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
+      background_thread_wait_for_{std::chrono::minutes{1}},
       curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
 {}
 
 HttpClient::~HttpClient()
 {
+  is_shutdown_.store(true, std::memory_order_release);
   while (true)
   {
     std::unique_ptr<std::thread> background_thread;
@@ -291,6 +293,7 @@ HttpClient::~HttpClient()
     }
     if (background_thread->joinable())
     {
+      wakeupBackgroundThread();  // if delay quit, wake up first
       background_thread->join();
     }
   }
@@ -415,29 +418,33 @@ void HttpClient::CleanupSession(uint64_t session_id)
   }
 }
 
-void HttpClient::MaybeSpawnBackgroundThread()
+bool HttpClient::MaybeSpawnBackgroundThread()
 {
   std::lock_guard<std::mutex> lock_guard{background_thread_m_};
   if (background_thread_)
   {
-    return;
+    return false;
   }
 
   background_thread_.reset(new std::thread(
       [](HttpClient *self) {
         int still_running = 1;
+        std::chrono::system_clock::time_point last_free_job_timepoint =
+            std::chrono::system_clock::now();
+        bool need_wait_more = false;
         while (true)
         {
           CURLMsg *msg;
           int queued;
           CURLMcode mc = curl_multi_perform(self->multi_handle_, &still_running);
+
           // According to https://curl.se/libcurl/c/curl_multi_perform.html, when mc is not OK, we
           // can not curl_multi_perform it again
           if (mc != CURLM_OK)
           {
             self->resetMultiHandle();
           }
-          else if (still_running)
+          else if (still_running || need_wait_more)
           {
         // curl_multi_poll is added from libcurl 7.66.0, before 7.68.0, we can only wait util
         // timeout to do the rest jobs
@@ -496,6 +503,32 @@ void HttpClient::MaybeSpawnBackgroundThread()
             still_running = 1;
           }
 
+          std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+          if (still_running > 0)
+          {
+            last_free_job_timepoint = now;
+            need_wait_more          = false;
+            continue;
+          }
+
+          std::chrono::milliseconds wait_for = std::chrono::milliseconds::zero();
+
+#if LIBCURL_VERSION_NUM >= 0x074400
+          // only available with curl_multi_poll+curl_multi_wakeup, because curl_multi_wait would
+          // cause CPU busy, curl_multi_wait+sleep could not wakeup quickly
+          wait_for = self->background_thread_wait_for_;
+#endif
+          if (self->is_shutdown_.load(std::memory_order_acquire))
+          {
+            wait_for = std::chrono::milliseconds::zero();
+          }
+
+          if (now - last_free_job_timepoint < wait_for)
+          {
+            need_wait_more = true;
+            continue;
+          }
+
           if (still_running == 0)
           {
             std::lock_guard<std::mutex> lock_guard{self->background_thread_m_};
@@ -534,6 +567,7 @@ void HttpClient::MaybeSpawnBackgroundThread()
         }
       },
       this));
+  return true;
 }
 
 void HttpClient::ScheduleAddSession(uint64_t session_id)
@@ -580,6 +614,28 @@ void HttpClient::ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource
   }
 
   wakeupBackgroundThread();
+}
+
+void HttpClient::SetBackgroundWaitFor(std::chrono::milliseconds ms)
+{
+  background_thread_wait_for_ = ms;
+}
+
+void HttpClient::WaitBackgroundThreadExit()
+{
+  is_shutdown_.store(true, std::memory_order_release);
+  std::unique_ptr<std::thread> background_thread;
+  {
+    std::lock_guard<std::mutex> lock_guard{background_thread_m_};
+    background_thread.swap(background_thread_);
+  }
+
+  if (background_thread && background_thread->joinable())
+  {
+    wakeupBackgroundThread();
+    background_thread->join();
+  }
+  is_shutdown_.store(false, std::memory_order_release);
 }
 
 void HttpClient::wakeupBackgroundThread()
