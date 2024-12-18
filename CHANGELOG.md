@@ -21,6 +21,43 @@ Increment the:
 * [SDK] Fix instrumentation scope attributes evaluated in equal method
   [#3214](https://github.com/open-telemetry/opentelemetry-cpp/pull/3214)
 
+New features:
+
+* [SDK] Better control of threads executed by opentelemetry-cpp
+  [#3175](https://github.com/open-telemetry/opentelemetry-cpp/pull/3175)
+
+  * This feature provides a way for applications, when configuring the SDK and exporters,
+    to participate in the execution path of internal opentelemetry-cpp threads.
+
+  * The opentelemetry-cpp library provides the following:
+
+    * a new ThreadInstrumentation interface,
+    * new runtime options structures, to optionally configure the SDK:
+      * BatchSpanProcessorRuntimeOptions
+      * PeriodicExportingMetricReaderRuntimeOptions
+      * BatchLogRecordProcessorRuntimeOptions
+    * new runtime options structures, to optionally configure the OTLP HTTP exporters:
+      * OtlpHttpExporterRuntimeOptions
+      * OtlpHttpMetricExporterRuntimeOptions
+      * OtlpHttpLogRecordExporterRuntimeOptions
+    * new ThreadInstrumentation parameters, to optionally configure the CURL HttpClient
+
+  * Using the optional runtime options structures,
+    an application can subclass the ThreadInstrumentation interface,
+    and be notified of specific events of interest during the execution of an internal opentelemetry-cpp thread.
+
+  * This allows an application to call, for example:
+
+    * pthread_setaffinity_np(), for better performances,
+    * setns(), to control the network namespace used by HTTP CURL connections
+    * pthread_setname_np(), for better observability from the operating system
+    * many more specific apis, as needed
+
+  * See the documentation for ThreadInstrumentation for details.
+
+  * A new example program, example_otlp_instrumented_http, shows how to use the feature,
+    and add application logic in the thread execution code path.
+
 ## [1.18 2024-11-25]
 
 * [EXPORTER] Fix crash in ElasticsearchLogRecordExporter
