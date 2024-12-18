@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <curl/curlver.h>
 #include <gtest/gtest.h>
 #include <string.h>
 #include <atomic>
@@ -11,6 +12,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -529,5 +531,53 @@ TEST_F(BasicCurlHttpTests, FinishInAsyncCallback)
       ASSERT_TRUE(handlers[i]->is_called_.load(std::memory_order_acquire));
       ASSERT_TRUE(handlers[i]->got_response_.load(std::memory_order_acquire));
     }
+  }
+}
+
+TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
+{
+  auto http_client = http_client::HttpClientFactory::Create();
+  std::static_pointer_cast<curl::HttpClient>(http_client)->MaybeSpawnBackgroundThread();
+  // start background first, then test it could wakeup
+  auto session = http_client->CreateSession("http://127.0.0.1:19000/get/");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+  auto handler = std::make_shared<GetEventHandler>();
+  session->SendRequest(handler);
+  std::this_thread::sleep_for(std::chrono::milliseconds{10});  // let it enter poll state
+  auto beg = std::chrono::system_clock::now();
+  http_client->FinishAllSessions();
+  http_client.reset();
+  // when background_thread_wait_for_ is used, it should have no side effect on elegant quit
+  // wait should be less than scheduled_delay_milliseconds_
+  // Due to load on CI hosts (some take 10ms), we assert it is less than 20ms
+  auto cost = std::chrono::system_clock::now() - beg;
+  ASSERT_TRUE(cost < std::chrono::milliseconds{20})
+      << "cost ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(cost).count()
+      << " libcurl version: 0x" << std::hex << LIBCURL_VERSION_NUM;
+  ASSERT_TRUE(handler->is_called_);
+  ASSERT_TRUE(handler->got_response_);
+}
+
+TEST_F(BasicCurlHttpTests, BackgroundThreadWaitMore)
+{
+  {
+    curl::HttpClient http_client;
+    http_client.MaybeSpawnBackgroundThread();
+    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+#if LIBCURL_VERSION_NUM >= 0x074200
+    ASSERT_FALSE(http_client.MaybeSpawnBackgroundThread());
+#else
+    // low version curl do not support delay quit, so old background would quit
+    ASSERT_TRUE(http_client.MaybeSpawnBackgroundThread());
+#endif
+  }
+  {
+    curl::HttpClient http_client;
+    http_client.SetBackgroundWaitFor(std::chrono::milliseconds::zero());
+    http_client.MaybeSpawnBackgroundThread();
+    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+    // we can disable delay quit by set wait for 0
+    ASSERT_TRUE(http_client.MaybeSpawnBackgroundThread());
   }
 }
