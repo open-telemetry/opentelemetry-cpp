@@ -260,3 +260,47 @@ TEST(InstrumentationScope, Equal)
   EXPECT_FALSE(instrumentation_scope_w_attributes->equal("library_name", "library_version",
                                                          "schema_url", &kv_iterable_different));
 }
+
+TEST(InstrumentationScope, OperatorEqual)
+{
+  using Attributes = std::initializer_list<
+      std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue>>;
+  Attributes attributes_empty = {};
+  Attributes attributes_match = {
+      {"key0", "some value"}, {"key1", 1}, {"key2", 2.0}, {"key3", true}};
+  Attributes attributes_different = {{"key42", "some other"}};
+
+  auto instrumentation_scope_1a =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name", "library_version", "schema_url");
+
+  auto instrumentation_scope_1b =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name", "library_version", "schema_url");
+
+  auto instrumentation_scope_2a =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name_2", "library_version", "schema_url");
+
+  auto instrumentation_scope_2b =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name_2", "library_version", "schema_url", attributes_empty);
+
+  auto instrumentation_scope_3a =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name_2", "library_version", "schema_url", attributes_match);
+
+  auto instrumentation_scope_3b =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name_2", "library_version", "schema_url", attributes_match);
+
+  auto instrumentation_scope_4 =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "library_name_2", "library_version", "schema_url", attributes_different);
+
+  EXPECT_EQ(*instrumentation_scope_1a, *instrumentation_scope_1b);
+  EXPECT_FALSE(*instrumentation_scope_1a == *instrumentation_scope_2a);
+  EXPECT_EQ(*instrumentation_scope_2a, *instrumentation_scope_2b);
+  EXPECT_EQ(*instrumentation_scope_3a, *instrumentation_scope_3b);
+  EXPECT_FALSE(*instrumentation_scope_3a == *instrumentation_scope_4);
+}

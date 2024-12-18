@@ -128,7 +128,7 @@ TEST(AttributeEqualToVisitorTest, AttributeValueNotEqualTo)
                                            AV{nostd::string_view("another string")}));
 
   // check different value types
-  EXPECT_FALSE(opentelemetry::nostd::visit(equal_to_visitor, OV{bool(true)}, AV{uint32_t(0)}));
+  EXPECT_FALSE(opentelemetry::nostd::visit(equal_to_visitor, OV{bool(true)}, AV{uint32_t(1)}));
   EXPECT_FALSE(opentelemetry::nostd::visit(equal_to_visitor, OV{int32_t(22)}, AV{uint32_t(22)}));
 
   // check containers of different element values
@@ -170,7 +170,8 @@ TEST(AttributeMapTest, EqualTo)
       {"key0", "some value"}, {"key1", 1.0}, {"key2", 2.0}, {"key3", true}};
   Attributes attributes_different_size = {{"key0", "some value"}};
 
-  Attributes attributes_different_all = {{"a", "b"}, {"c", "d"}, {"f", uint8_t(5)}};
+  // check for the case where the number of attributes is the same but all keys are different
+  Attributes attributes_different_all = {{"a", "b"}, {"c", "d"}, {"e", 4.0}, {"f", uint8_t(5)}};
 
   auto kv_iterable_different_value =
       opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_different_value);

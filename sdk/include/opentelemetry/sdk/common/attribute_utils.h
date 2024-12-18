@@ -216,6 +216,7 @@ public:
     (*this)[std::string(key)] = nostd::visit(converter_, value);
   }
 
+  // Compare the attributes of this map with another KeyValueIterable
   bool EqualTo(const opentelemetry::common::KeyValueIterable &attributes) const noexcept
   {
     if (attributes.size() != this->size())

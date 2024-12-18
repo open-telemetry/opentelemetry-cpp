@@ -103,7 +103,8 @@ public:
    */
   bool operator==(const InstrumentationScope &other) const noexcept
   {
-    return equal(other.name_, other.version_, other.schema_url_);
+    return this->name_ == other.name_ && this->version_ == other.version_ &&
+           this->schema_url_ == other.schema_url_ && this->attributes_ == other.attributes_;
   }
 
   /**
@@ -112,6 +113,7 @@ public:
    * @param name name of the instrumentation scope to compare.
    * @param version version of the instrumentation scope to compare.
    * @param schema_url schema url of the telemetry emitted by the scope.
+   * @param attributes attributes of the instrumentation scope to compare.
    * @returns true if name and version in this instrumentation scope are equal with the given name
    * and version.
    */
