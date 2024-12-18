@@ -324,25 +324,16 @@ public:
 
   inline CURLM *GetMultiHandle() noexcept { return multi_handle_; }
 
-  void MaybeSpawnBackgroundThread();
+  // return true if create background thread, false is already exist background thread
+  bool MaybeSpawnBackgroundThread();
 
   void ScheduleAddSession(uint64_t session_id);
   void ScheduleAbortSession(uint64_t session_id);
   void ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource);
 
-  void WaitBackgroundThreadExit()
-  {
-    std::unique_ptr<std::thread> background_thread;
-    {
-      std::lock_guard<std::mutex> lock_guard{background_thread_m_};
-      background_thread.swap(background_thread_);
-    }
+  void SetBackgroundWaitFor(std::chrono::milliseconds ms);
 
-    if (background_thread && background_thread->joinable())
-    {
-      background_thread->join();
-    }
-  }
+  void WaitBackgroundThreadExit();
 
 private:
   void wakeupBackgroundThread();
@@ -368,6 +359,9 @@ private:
   std::unique_ptr<std::thread> background_thread_;
   std::shared_ptr<sdk::common::ThreadInstrumentation> background_thread_instrumentation_;
   std::chrono::milliseconds scheduled_delay_milliseconds_;
+
+  std::chrono::milliseconds background_thread_wait_for_;
+  std::atomic<bool> is_shutdown_{false};
 
   nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
 };
