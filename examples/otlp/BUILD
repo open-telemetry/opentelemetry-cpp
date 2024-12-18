@@ -186,7 +186,6 @@ cc_binary(
         "//exporters/otlp:otlp_http_exporter",
         "//exporters/otlp:otlp_http_log_record_exporter",
         "//exporters/otlp:otlp_http_metric_exporter",
-        "//sdk/src/log",
         "//sdk/src/metrics",
         "//sdk/src/trace",
     ],
