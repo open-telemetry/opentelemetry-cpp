@@ -493,13 +493,13 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             // If there is no pending jobs, we can stop the background thread.
             if (still_running == 0)
             {
+              if (self->background_thread_instrumentation_ != nullptr)
+              {
+                self->background_thread_instrumentation_->OnEnd();
+              }
+
               if (self->background_thread_)
               {
-                if (self->background_thread_instrumentation_ != nullptr)
-                {
-                  self->background_thread_instrumentation_->OnEnd();
-                  self->background_thread_instrumentation_.reset();
-                }
                 self->background_thread_->detach();
                 self->background_thread_.reset();
               }

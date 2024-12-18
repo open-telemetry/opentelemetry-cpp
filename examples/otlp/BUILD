@@ -168,3 +168,26 @@ cc_binary(
         "//sdk/src/metrics",
     ],
 )
+
+cc_binary(
+    name = "example_otlp_instrumented_http",
+    srcs = [
+        "http_instrumented_main.cc",
+    ],
+    tags = [
+        "examples",
+        "otlp",
+        "otlp_http",
+    ],
+    deps = [
+        "//api",
+        "//examples/common/logs_foo_library:common_logs_foo_library",
+        "//examples/common/metrics_foo_library:common_metrics_foo_library",
+        "//exporters/otlp:otlp_http_exporter",
+        "//exporters/otlp:otlp_http_log_record_exporter",
+        "//exporters/otlp:otlp_http_metric_exporter",
+        "//sdk/src/log",
+        "//sdk/src/metrics",
+        "//sdk/src/trace",
+    ],
+)
