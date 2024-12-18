@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Do not frequently create and destroy http client threads
+  [#3198](https://github.com/open-telemetry/opentelemetry-cpp/pull/3198)
+
 * [SDK] Fix instrumentation scope attributes evaluated in equal method
   [#3214](https://github.com/open-telemetry/opentelemetry-cpp/pull/3214)
 
