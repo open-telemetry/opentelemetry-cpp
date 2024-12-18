@@ -46,10 +46,10 @@
 #include "opentelemetry/trace/tracer_provider.h"
 
 #ifdef BAZEL_BUILD
-#  include "examples/common/foo_library/foo_library.h"
+#  include "examples/common/logs_foo_library/foo_library.h"
 #  include "examples/common/metrics_foo_library/foo_library.h"
 #else
-#  include "foo_library/foo_library.h"
+#  include "logs_foo_library/foo_library.h"
 #  include "metrics_foo_library/foo_library.h"
 #endif
 

@@ -564,7 +564,7 @@ TEST_F(BasicCurlHttpTests, BackgroundThreadWaitMore)
   {
     curl::HttpClient http_client;
     http_client.MaybeSpawnBackgroundThread();
-    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+    std::this_thread::sleep_for(std::chrono::milliseconds{50});
 #if LIBCURL_VERSION_NUM >= 0x074200
     ASSERT_FALSE(http_client.MaybeSpawnBackgroundThread());
 #else
