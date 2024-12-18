@@ -149,7 +149,7 @@ struct AttributeEqualToVisitor
                       });
   }
 
-  // Compare nostd::span<const T> and std::vector<T> for arithmatic types
+  // Compare nostd::span<const T> and std::vector<T> for arithmetic types
   template <typename T>
   bool operator()(const std::vector<T> &owned_value,
                   const nostd::span<const T> &value) const noexcept
