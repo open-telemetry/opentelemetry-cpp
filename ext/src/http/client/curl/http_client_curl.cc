@@ -464,6 +464,11 @@ bool HttpClient::MaybeSpawnBackgroundThread()
           }
           else if (still_running || need_wait_more)
           {
+            if (self->background_thread_instrumentation_ != nullptr)
+            {
+              self->background_thread_instrumentation_->BeforeWait();
+            }
+
         // curl_multi_poll is added from libcurl 7.66.0, before 7.68.0, we can only wait util
         // timeout to do the rest jobs
 #if LIBCURL_VERSION_NUM >= 0x074200
@@ -476,6 +481,11 @@ bool HttpClient::MaybeSpawnBackgroundThread()
                                  static_cast<int>(self->scheduled_delay_milliseconds_.count()),
                                  nullptr);
 #endif
+
+            if (self->background_thread_instrumentation_ != nullptr)
+            {
+              self->background_thread_instrumentation_->AfterWait();
+            }
           }
 
           do
