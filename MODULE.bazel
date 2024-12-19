@@ -83,7 +83,7 @@ use_repo(
 #        '@com_google_protobuf_javalite//:protobuf_javalite' in attribute 'target' of tag 'override'.
 #      Is the module 'grpc-java' missing a bazel_dep or use_repo(..., "com_google_protobuf_javalite")?.
 #
-bazel_dep(name = "grpc-java", version = "1.67.1")
+bazel_dep(name = "grpc-java", version = "1.68.1")
 
 multitool = use_extension("@rules_multitool//multitool:extension.bzl", "multitool")
 multitool.hub(lockfile = "@otel_sdk//:multitool.lock.json")
