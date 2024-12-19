@@ -3,10 +3,9 @@
 
 #include "opentelemetry/trace/span_id.h"
 
+#include <gtest/gtest.h>
 #include <cstring>
 #include <string>
-
-#include <gtest/gtest.h>
 
 namespace
 {

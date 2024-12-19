@@ -8,6 +8,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"

@@ -6,6 +6,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/metrics/noop.h"

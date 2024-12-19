@@ -3,12 +3,12 @@
 
 #include <benchmark/benchmark.h>
 #include <stddef.h>
-#include <memory>
 #include <string>
 
 #include "opentelemetry/baggage/baggage.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/utility.h"
 
 using namespace opentelemetry::baggage;
 namespace nostd = opentelemetry::nostd;

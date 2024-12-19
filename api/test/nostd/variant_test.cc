@@ -3,10 +3,8 @@
 
 #include "opentelemetry/nostd/variant.h"
 
-#include <string>
-#include <type_traits>
-
 #include <gtest/gtest.h>
+#include <string>
 
 namespace nostd = opentelemetry::nostd;
 
