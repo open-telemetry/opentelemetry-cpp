@@ -1,9 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <gtest/gtest.h>
+#include <string>
+
 #include "opentelemetry/nostd/function_ref.h"
 
-#include <gtest/gtest.h>
 using namespace opentelemetry::nostd;
 
 int Call(function_ref<int()> f)

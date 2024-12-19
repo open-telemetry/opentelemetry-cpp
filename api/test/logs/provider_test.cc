@@ -12,7 +12,6 @@
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/utility.h"
 
 using opentelemetry::logs::EventLogger;
 using opentelemetry::logs::EventLoggerProvider;

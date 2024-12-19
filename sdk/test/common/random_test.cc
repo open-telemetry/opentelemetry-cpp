@@ -7,9 +7,11 @@
 #include <cstdint>
 #include <initializer_list>
 #include <iterator>
+#include <string>
 #include <thread>
 #include <vector>
 
+#include "opentelemetry/nostd/span.h"
 #include "src/common/random.h"
 
 using opentelemetry::sdk::common::Random;
