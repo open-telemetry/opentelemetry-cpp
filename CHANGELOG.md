@@ -21,6 +21,12 @@ Increment the:
 * [SDK] Fix instrumentation scope attributes evaluated in equal method
   [#3214](https://github.com/open-telemetry/opentelemetry-cpp/pull/3214)
 
+* [EXPORTER] Fix scope attributes missing from otlp traces metrics
+  [#3185](https://github.com/open-telemetry/opentelemetry-cpp/pull/3185)
+
+* [SDK] Better control of threads executed by opentelemetry-cpp
+  [#3175](https://github.com/open-telemetry/opentelemetry-cpp/pull/3175)
+
 New features:
 
 * [SDK] Better control of threads executed by opentelemetry-cpp
@@ -205,9 +211,6 @@ New features:
 
 * [bazel] Update opentelemetry-proto in MODULE.bazel
   [#3163](https://github.com/open-telemetry/opentelemetry-cpp/pull/3163)
-
-* [EXPORTER] Fix scope attributes missing from otlp traces metrics
-  [#3185](https://github.com/open-telemetry/opentelemetry-cpp/pull/3185)
 
 Important changes:
 
