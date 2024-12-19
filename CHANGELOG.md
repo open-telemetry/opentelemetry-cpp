@@ -158,6 +158,9 @@ Increment the:
 * [EXPORTER] Fix scope attributes missing from otlp traces metrics
   [#3185](https://github.com/open-telemetry/opentelemetry-cpp/pull/3185)
 
+* [SDK] Add tracer scope configurator
+  [#3137](https://github.com/open-telemetry/opentelemetry-cpp/pull/3137)
+
 Important changes:
 
 * [API] Jaeger Propagator should not be deprecated
