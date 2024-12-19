@@ -35,7 +35,15 @@ namespace otlp
 OtlpFileExporter::OtlpFileExporter() : OtlpFileExporter(OtlpFileExporterOptions()) {}
 
 OtlpFileExporter::OtlpFileExporter(const OtlpFileExporterOptions &options)
-    : options_(options), file_client_(new OtlpFileClient(OtlpFileClientOptions(options)))
+    : OtlpFileExporter(options, OtlpFileExporterRuntimeOptions())
+{}
+
+OtlpFileExporter::OtlpFileExporter(const OtlpFileExporterOptions &options,
+                                   const OtlpFileExporterRuntimeOptions &runtime_options)
+    : options_(options),
+      runtime_options_(runtime_options),
+      file_client_(new OtlpFileClient(OtlpFileClientOptions(options),
+                                      OtlpFileExporterRuntimeOptions(runtime_options)))
 {}
 
 // ----------------------------- Exporter methods ------------------------------

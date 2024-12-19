@@ -38,7 +38,16 @@ OtlpFileLogRecordExporter::OtlpFileLogRecordExporter()
 
 OtlpFileLogRecordExporter::OtlpFileLogRecordExporter(
     const OtlpFileLogRecordExporterOptions &options)
-    : options_(options), file_client_(new OtlpFileClient(OtlpFileClientOptions(options)))
+    : OtlpFileLogRecordExporter(options, OtlpFileLogRecordExporterRuntimeOptions())
+{}
+
+OtlpFileLogRecordExporter::OtlpFileLogRecordExporter(
+    const OtlpFileLogRecordExporterOptions &options,
+    const OtlpFileLogRecordExporterRuntimeOptions &runtime_options)
+    : options_(options),
+      runtime_options_(runtime_options),
+      file_client_(new OtlpFileClient(OtlpFileClientOptions(options),
+                                      OtlpFileLogRecordExporterRuntimeOptions(runtime_options)))
 {}
 // ----------------------------- Exporter methods ------------------------------
 

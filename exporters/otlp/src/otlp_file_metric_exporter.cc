@@ -37,10 +37,18 @@ OtlpFileMetricExporter::OtlpFileMetricExporter()
 {}
 
 OtlpFileMetricExporter::OtlpFileMetricExporter(const OtlpFileMetricExporterOptions &options)
+    : OtlpFileMetricExporter(options, OtlpFileMetricExporterRuntimeOptions())
+{}
+
+OtlpFileMetricExporter::OtlpFileMetricExporter(
+    const OtlpFileMetricExporterOptions &options,
+    const OtlpFileMetricExporterRuntimeOptions &runtime_options)
     : options_(options),
+      runtime_options_(runtime_options),
       aggregation_temporality_selector_{
           OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
-      file_client_(new OtlpFileClient(OtlpFileClientOptions(options)))
+      file_client_(new OtlpFileClient(OtlpFileClientOptions(options),
+                                      OtlpFileClientRuntimeOptions(runtime_options)))
 {}
 
 // ----------------------------- Exporter methods ------------------------------
