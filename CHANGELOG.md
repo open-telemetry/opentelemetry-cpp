@@ -45,6 +45,14 @@ New features:
       * OtlpHttpLogRecordExporterRuntimeOptions
     * new ThreadInstrumentation parameters,
       to optionally configure the CURL HttpClient
+    * new runtime options structures,
+      to optionally configure the OTLP FILE exporters:
+      * OtlpFileExporterRuntimeOptions
+      * OtlpFileMetricExporterRuntimeOptions
+      * OtlpFileLogRecordExporterRuntimeOptions
+    * new runtime options structure,
+      to optionally configure the OTLP FILE client:
+      * OtlpFileClientRuntimeOptions
 
   * Using the optional runtime options structures,
     an application can subclass the ThreadInstrumentation interface,
