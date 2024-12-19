@@ -14,9 +14,11 @@
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_runtime_options.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/version.h"
@@ -40,10 +42,32 @@ namespace metrics
 
 PeriodicExportingMetricReader::PeriodicExportingMetricReader(
     std::unique_ptr<PushMetricExporter> exporter,
-    const PeriodicExportingMetricReaderOptions &option)
+    const PeriodicExportingMetricReaderOptions &options)
     : exporter_{std::move(exporter)},
-      export_interval_millis_{option.export_interval_millis},
-      export_timeout_millis_{option.export_timeout_millis}
+      export_interval_millis_{options.export_interval_millis},
+      export_timeout_millis_{options.export_timeout_millis},
+      worker_thread_instrumentation_(nullptr),
+      collect_thread_instrumentation_(nullptr)
+{
+  if (export_interval_millis_ <= export_timeout_millis_)
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[Periodic Exporting Metric Reader] Invalid configuration: "
+        "export_timeout_millis_ should be less than export_interval_millis_, using default values");
+    export_interval_millis_ = kExportIntervalMillis;
+    export_timeout_millis_  = kExportTimeOutMillis;
+  }
+}
+
+PeriodicExportingMetricReader::PeriodicExportingMetricReader(
+    std::unique_ptr<PushMetricExporter> exporter,
+    const PeriodicExportingMetricReaderOptions &options,
+    const PeriodicExportingMetricReaderRuntimeOptions &runtime_options)
+    : exporter_{std::move(exporter)},
+      export_interval_millis_{options.export_interval_millis},
+      export_timeout_millis_{options.export_timeout_millis},
+      worker_thread_instrumentation_(runtime_options.periodic_thread_instrumentation),
+      collect_thread_instrumentation_(runtime_options.collect_thread_instrumentation)
 {
   if (export_interval_millis_ <= export_timeout_millis_)
   {
@@ -67,18 +91,42 @@ void PeriodicExportingMetricReader::OnInitialized() noexcept
 
 void PeriodicExportingMetricReader::DoBackgroundWork()
 {
-  std::unique_lock<std::mutex> lk(cv_m_);
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->OnStart();
+  }
+
   do
   {
-    auto start  = std::chrono::steady_clock::now();
+    auto start = std::chrono::steady_clock::now();
+
+    if (worker_thread_instrumentation_ != nullptr)
+    {
+      worker_thread_instrumentation_->BeforeLoad();
+    }
+
     auto status = CollectAndExportOnce();
+
+    if (worker_thread_instrumentation_ != nullptr)
+    {
+      worker_thread_instrumentation_->AfterLoad();
+    }
+
     if (!status)
     {
       OTEL_INTERNAL_LOG_ERROR("[Periodic Exporting Metric Reader]  Collect-Export Cycle Failure.")
     }
+
     auto end            = std::chrono::steady_clock::now();
     auto export_time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     auto remaining_wait_interval_ms = export_interval_millis_ - export_time_ms;
+
+    if (worker_thread_instrumentation_ != nullptr)
+    {
+      worker_thread_instrumentation_->BeforeWait();
+    }
+
+    std::unique_lock<std::mutex> lk(cv_m_);
     cv_.wait_for(lk, remaining_wait_interval_ms, [this]() {
       if (is_force_wakeup_background_worker_.load(std::memory_order_acquire))
       {
@@ -87,7 +135,18 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
       }
       return IsShutdown();
     });
+
+    if (worker_thread_instrumentation_ != nullptr)
+    {
+      worker_thread_instrumentation_->AfterWait();
+    }
+
   } while (IsShutdown() != true);
+
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->OnEnd();
+  }
 }
 
 bool PeriodicExportingMetricReader::CollectAndExportOnce()
@@ -106,6 +165,12 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
 
     task_thread.reset(
         new std::thread([this, &cancel_export_for_timeout, sender = std::move(sender)] {
+          if (collect_thread_instrumentation_ != nullptr)
+          {
+            collect_thread_instrumentation_->OnStart();
+            collect_thread_instrumentation_->BeforeLoad();
+          }
+
           this->Collect([this, &cancel_export_for_timeout](ResourceMetrics &metric_data) {
             if (cancel_export_for_timeout.load(std::memory_order_acquire))
             {
@@ -119,6 +184,12 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
           });
 
           const_cast<std::promise<void> &>(sender).set_value();
+
+          if (collect_thread_instrumentation_ != nullptr)
+          {
+            collect_thread_instrumentation_->AfterLoad();
+            collect_thread_instrumentation_->OnEnd();
+          }
         }));
 
     std::future_status status;
