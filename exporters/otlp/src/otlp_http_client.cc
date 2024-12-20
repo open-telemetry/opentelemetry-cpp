@@ -891,7 +891,7 @@ OtlpHttpClient::createSession(
   // Parse uri and store it to cache
   if (http_uri_.empty())
   {
-    auto parse_url = opentelemetry::ext::http::common::UrlParser(std::string(options_.url));
+    const auto parse_url = opentelemetry::ext::http::common::UrlParser(options_.url);
     if (!parse_url.success_)
     {
       std::string error_message = "[OTLP HTTP Client] Export failed, invalid url: " + options_.url;
