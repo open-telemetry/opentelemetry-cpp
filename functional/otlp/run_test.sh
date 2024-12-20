@@ -15,6 +15,19 @@ export CERT_DIR=../cert
 
 export TEST_BIN_DIR=${BUILD_DIR}/functional/otlp/
 
+# SELINUX
+# https://docs.docker.com/storage/bind-mounts/#configure-the-selinux-label
+
+USE_MOUNT_OPTION=""
+
+if [ -x "$(command -v getenforce)" ]; then
+  SELINUXSTATUS=$(getenforce);
+  if [ "${SELINUXSTATUS}" == "Enforcing" ]; then
+    echo "Detected SELINUX"
+    USE_MOUNT_OPTION=":z"
+  fi;
+fi
+
 ${TEST_BIN_DIR}/func_otlp_http --list > test_list.txt
 
 #
@@ -44,7 +57,7 @@ echo ""
 
 
 docker run -d \
-  -v `pwd`/otel-docker-config-http.yaml:/otel-cpp/otel-config.yaml \
+  -v `pwd`/otel-docker-config-http.yaml:/otel-cpp/otel-config.yaml${USE_MOUNT_OPTION} \
   -p 4318:4318 \
   --name otelcpp-test-http \
   otelcpp-func-test
@@ -74,10 +87,10 @@ echo "###############################################################"
 echo ""
 
 docker run -d \
-  -v `pwd`/otel-docker-config-https.yaml:/otel-cpp/otel-config.yaml \
-  -v `pwd`/../cert/ca.pem:/otel-cpp/ca.pem \
-  -v `pwd`/../cert/server_cert.pem:/otel-cpp/server_cert.pem \
-  -v `pwd`/../cert/server_cert-key.pem:/otel-cpp/server_cert-key.pem \
+  -v `pwd`/otel-docker-config-https.yaml:/otel-cpp/otel-config.yaml${USE_MOUNT_OPTION} \
+  -v `pwd`/../cert/ca.pem:/otel-cpp/ca.pem${USE_MOUNT_OPTION} \
+  -v `pwd`/../cert/server_cert.pem:/otel-cpp/server_cert.pem${USE_MOUNT_OPTION} \
+  -v `pwd`/../cert/server_cert-key.pem:/otel-cpp/server_cert-key.pem${USE_MOUNT_OPTION} \
   -p 4318:4318 \
   --name otelcpp-test-https \
   otelcpp-func-test

@@ -20,8 +20,8 @@ jobs:
         rm -rf third_party
     - name: Setup
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
         GOOGLETEST_VERSION: 1.12.1
       run: |
         sudo -E ./ci/setup_googletest.sh

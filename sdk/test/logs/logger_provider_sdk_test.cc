@@ -129,7 +129,7 @@ TEST(LoggerProviderSDK, EventLoggerProviderFactory)
   auto event_logger = elp->CreateEventLogger(logger1, "otel-cpp.test");
 }
 
-TEST(LoggerPviderSDK, LoggerEquityCheck)
+TEST(LoggerProviderSDK, LoggerEqualityCheck)
 {
   auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
   nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
@@ -141,6 +141,48 @@ TEST(LoggerPviderSDK, LoggerEquityCheck)
   auto logger3         = lp->GetLogger("logger3");
   auto another_logger3 = lp->GetLogger("logger3");
   EXPECT_EQ(logger3, another_logger3);
+
+  auto logger4         = lp->GetLogger("logger4", "opentelelemtry_library", "1.0.0", schema_url);
+  auto another_logger4 = lp->GetLogger("logger4", "opentelelemtry_library", "1.0.0", schema_url);
+  EXPECT_EQ(logger4, another_logger4);
+
+  auto logger5 =
+      lp->GetLogger("logger5", "opentelelemtry_library", "1.0.0", schema_url, {{"key", "value"}});
+  auto another_logger5 =
+      lp->GetLogger("logger5", "opentelelemtry_library", "1.0.0", schema_url, {{"key", "value"}});
+  EXPECT_EQ(logger5, another_logger5);
+}
+
+TEST(LoggerProviderSDK, GetLoggerInequalityCheck)
+{
+  auto lp               = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
+  auto logger_library_1 = lp->GetLogger("logger1", "library_1");
+  auto logger_library_2 = lp->GetLogger("logger1", "library_2");
+  auto logger_version_1 = lp->GetLogger("logger1", "library_1", "1.0.0");
+  auto logger_version_2 = lp->GetLogger("logger1", "library_1", "2.0.0");
+  auto logger_url_1     = lp->GetLogger("logger1", "library_1", "1.0.0", "url_1");
+  auto logger_url_2     = lp->GetLogger("logger1", "library_1", "1.0.0", "url_2");
+  auto logger_attribute_1 =
+      lp->GetLogger("logger1", "library_1", "1.0.0", "url_1", {{"key", "one"}});
+  auto logger_attribute_2 =
+      lp->GetLogger("logger1", "library_1", "1.0.0", "url_1", {{"key", "two"}});
+
+  // different scope names should return distinct loggers
+  EXPECT_NE(logger_library_1, logger_library_2);
+
+  // different scope versions should return distinct loggers
+  EXPECT_NE(logger_version_1, logger_library_1);
+  EXPECT_NE(logger_version_1, logger_version_2);
+
+  // different scope schema urls should return distinct loggers
+  EXPECT_NE(logger_url_1, logger_library_1);
+  EXPECT_NE(logger_url_1, logger_version_1);
+  EXPECT_NE(logger_url_1, logger_url_2);
+
+  // different scope attributes should return distinct loggers
+  EXPECT_NE(logger_attribute_1, logger_library_1);
+  EXPECT_NE(logger_attribute_1, logger_url_1);
+  EXPECT_NE(logger_attribute_1, logger_attribute_2);
 }
 
 class DummyLogRecordable final : public opentelemetry::sdk::logs::Recordable
