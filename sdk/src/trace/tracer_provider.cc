@@ -101,7 +101,7 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
   for (auto &tracer : tracers_)
   {
     auto &tracer_scope = tracer->GetInstrumentationScope();
-    if (tracer_scope.equal(name, version, schema_url))
+    if (tracer_scope.equal(name, version, schema_url, attributes))
     {
       return nostd::shared_ptr<trace_api::Tracer>{tracer};
     }
