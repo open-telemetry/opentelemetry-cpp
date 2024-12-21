@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/version.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
