@@ -54,17 +54,16 @@ archive_override(
 # this rule is missing dependency declarations for the following files included by 'src/google/protobuf/any_lite.cc':
 #   'bazel-out/x64_windows-opt-exec-ST-d610928244b0/bin/external/protobuf+/src/google/protobuf/_virtual_includes/protobuf_lite/google/protobuf/port.h'
 bazel_dep(name = "protobuf", version = "29.2")
-bazel_dep(name = "opentelemetry-proto", version = "1.4.0.bcr.1")
+bazel_dep(name = "opentelemetry-proto", version = "1.5.0")
 archive_override(
     module_name = "opentelemetry-proto",
-    integrity = "sha256-U80yztsndi6iBgqcjYPkuCLeE9c7XV03ots89VAY1pQ=",
+    integrity = "sha256-CPQGNq28XzPSCEvY57ZOSR3QI50alQIdv/vfHKjOpFQ=",
     patch_strip = 1,
-    # Copied from https://github.com/bazelbuild/bazel-central-registry/tree/main/modules/opentelemetry-proto/1.3.1/patches
     patches = [
         "bazel/opentelemetry-proto.patch",
     ],
-    strip_prefix = "opentelemetry-proto-1.4.0",
-    urls = ["https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.4.0.tar.gz"]
+    strip_prefix = "opentelemetry-proto-1.5.0",
+    urls = ["https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.5.0.tar.gz"]
 )
 
 bazel_dep(name = "prometheus-cpp", version = "1.3.0")
