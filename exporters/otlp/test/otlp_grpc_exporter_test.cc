@@ -17,17 +17,22 @@
 // That is because `std::result_of` has been removed in C++20.
 
 #  include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
-
+#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
 
+#  include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
 // Problematic code that pulls in Gmock and breaks with vs2019/c++latest :
 #  include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #  include "opentelemetry/sdk/trace/simple_processor.h"
+#  include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
+#  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/trace/provider.h"
+#  include "opentelemetry/trace/tracer_provider.h"
 
 #  include <grpcpp/grpcpp.h>
 #  include <gtest/gtest.h>
@@ -356,6 +361,198 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigUnknownInsecureFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE");
 }
 #  endif
+
+#  ifndef NO_GETENV
+TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryDefaultValues)
+{
+  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 5);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 1.5);
+}
+
+TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryValuesFromEnv)
+{
+  setenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_MAX_ATTEMPTS", "123", 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_INITIAL_BACKOFF", "4.5", 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF", "6.7", 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
+
+  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 123);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 8.9);
+
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_BACKOFF_MULTIPLIER");
+}
+
+TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryGenericValuesFromEnv)
+{
+  setenv("OTEL_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS", "321", 1);
+  setenv("OTEL_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF", "5.4", 1);
+  setenv("OTEL_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
+  setenv("OTEL_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
+
+  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 321);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 9.8);
+
+  unsetenv("OTEL_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_EXPORTER_OTLP_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
+}
+#  endif  // NO_GETENV
+
+struct TestTraceService : public opentelemetry::proto::collector::trace::v1::TraceService::Service
+{
+  TestTraceService(std::vector<grpc::StatusCode> status_codes) : status_codes_(status_codes) {}
+
+  inline grpc::Status Export(
+      grpc::ServerContext *context,
+      const opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest *request,
+      opentelemetry::proto::collector::trace::v1::ExportTraceServiceResponse *response) override
+  {
+    ++request_count_;
+    return grpc::Status(status_codes_.at(index_++ % status_codes_.size()), "TEST!");
+  }
+
+  size_t request_count_ = 0UL;
+  size_t index_         = 0UL;
+  std::vector<grpc::StatusCode> status_codes_;
+};
+
+class OtlpGrpcExporterRetryIntegrationTests
+    : public ::testing::TestWithParam<std::tuple<bool, std::vector<grpc::StatusCode>, std::size_t>>
+{};
+
+INSTANTIATE_TEST_SUITE_P(
+    StatusCodes,
+    OtlpGrpcExporterRetryIntegrationTests,
+    testing::Values(
+        // With retry policy enabled
+        std::make_tuple(true, std::vector{grpc::StatusCode::CANCELLED}, 5),
+        std::make_tuple(true, std::vector{grpc::StatusCode::UNKNOWN}, 1),
+        std::make_tuple(true, std::vector{grpc::StatusCode::INVALID_ARGUMENT}, 1),
+        std::make_tuple(true, std::vector{grpc::StatusCode::DEADLINE_EXCEEDED}, 5),
+        std::make_tuple(true, std::vector{grpc::StatusCode::NOT_FOUND}, 1),
+        std::make_tuple(true, std::vector{grpc::StatusCode::ALREADY_EXISTS}, 1),
+        std::make_tuple(true, std::vector{grpc::StatusCode::PERMISSION_DENIED}, 1),
+        std::make_tuple(true, std::vector{grpc::StatusCode::UNAUTHENTICATED}, 1),
+        std::make_tuple(true, std::vector{grpc::StatusCode::RESOURCE_EXHAUSTED}, 1),
+        std::make_tuple(true, std::vector{grpc::StatusCode::FAILED_PRECONDITION}, 1),
+        std::make_tuple(true, std::vector{grpc::StatusCode::ABORTED}, 5),
+        std::make_tuple(true, std::vector{grpc::StatusCode::OUT_OF_RANGE}, 5),
+        std::make_tuple(true, std::vector{grpc::StatusCode::UNIMPLEMENTED}, 1),
+        std::make_tuple(true, std::vector{grpc::StatusCode::INTERNAL}, 1),
+        std::make_tuple(true, std::vector{grpc::StatusCode::UNAVAILABLE}, 5),
+        std::make_tuple(true, std::vector{grpc::StatusCode::DATA_LOSS}, 5),
+        std::make_tuple(true, std::vector{grpc::StatusCode::OK}, 1),
+        std::make_tuple(true,
+                        std::vector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::ABORTED,
+                                    grpc::StatusCode::OUT_OF_RANGE, grpc::StatusCode::DATA_LOSS},
+                        5),
+        std::make_tuple(true,
+                        std::vector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::UNAVAILABLE,
+                                    grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::OK},
+                        4),
+        std::make_tuple(true,
+                        std::vector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::CANCELLED,
+                                    grpc::StatusCode::DEADLINE_EXCEEDED, grpc::StatusCode::OK},
+                        4),
+        // With retry policy disabled
+        std::make_tuple(false, std::vector{grpc::StatusCode::CANCELLED}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::UNKNOWN}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::INVALID_ARGUMENT}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::DEADLINE_EXCEEDED}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::NOT_FOUND}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::ALREADY_EXISTS}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::PERMISSION_DENIED}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::UNAUTHENTICATED}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::RESOURCE_EXHAUSTED}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::FAILED_PRECONDITION}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::ABORTED}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::OUT_OF_RANGE}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::UNIMPLEMENTED}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::INTERNAL}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::UNAVAILABLE}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::DATA_LOSS}, 1),
+        std::make_tuple(false, std::vector{grpc::StatusCode::OK}, 1),
+        std::make_tuple(false,
+                        std::vector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::ABORTED,
+                                    grpc::StatusCode::OUT_OF_RANGE, grpc::StatusCode::DATA_LOSS},
+                        1),
+        std::make_tuple(false,
+                        std::vector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::UNAVAILABLE,
+                                    grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::OK},
+                        1),
+        std::make_tuple(false,
+                        std::vector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::CANCELLED,
+                                    grpc::StatusCode::DEADLINE_EXCEEDED, grpc::StatusCode::OK},
+                        1)));
+
+TEST_P(OtlpGrpcExporterRetryIntegrationTests, StatusCodes)
+{
+  namespace otlp      = opentelemetry::exporter::otlp;
+  namespace trace_sdk = opentelemetry::sdk::trace;
+
+  const auto is_retry_enabled  = std::get<0>(GetParam());
+  const auto status_codes      = std::get<1>(GetParam());
+  const auto expected_attempts = std::get<2>(GetParam());
+  TestTraceService service(status_codes);
+  std::unique_ptr<grpc::Server> server;
+
+  std::thread server_thread([&server, &service]() {
+    std::string address("0.0.0.0:4317");
+    grpc::ServerBuilder builder;
+    builder.RegisterService(&service);
+    builder.AddListeningPort(address, grpc::InsecureServerCredentials());
+    server = builder.BuildAndStart();
+    server->Wait();
+  });
+
+  otlp::OtlpGrpcExporterOptions opts{};
+
+  if (is_retry_enabled)
+  {
+    opts.retry_policy_max_attempts       = 5;
+    opts.retry_policy_initial_backoff    = SecondsDecimal{0.1};
+    opts.retry_policy_max_backoff        = SecondsDecimal{5};
+    opts.retry_policy_backoff_multiplier = 1;
+  }
+  else
+  {
+    opts.retry_policy_max_attempts       = 0;
+    opts.retry_policy_initial_backoff    = SecondsDecimal{0};
+    opts.retry_policy_max_backoff        = SecondsDecimal{0};
+    opts.retry_policy_backoff_multiplier = 0;
+  }
+
+  auto exporter  = otlp::OtlpGrpcExporterFactory::Create(opts);
+  auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
+  auto provider  = trace_sdk::TracerProviderFactory::Create(std::move(processor));
+  provider->GetTracer("Test tracer")->StartSpan("Test span")->End();
+
+  ASSERT_TRUE(server);
+  server->Shutdown();
+
+  if (server_thread.joinable())
+  {
+    server_thread.join();
+  }
+
+  ASSERT_EQ(expected_attempts, service.request_count_);
+}
 
 }  // namespace otlp
 }  // namespace exporter
