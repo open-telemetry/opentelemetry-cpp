@@ -12,6 +12,7 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdio>
 #include <fstream>
 #include <iterator>
 #include <memory>
@@ -23,6 +24,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -345,6 +347,46 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
   if (options.compression == "gzip")
   {
     grpc_arguments.SetCompressionAlgorithm(GRPC_COMPRESS_GZIP);
+  }
+
+  if (options.retry_policy_max_attempts > 0U &&
+      options.retry_policy_initial_backoff > SecondsDecimal::zero() &&
+      options.retry_policy_max_backoff > SecondsDecimal::zero() &&
+      options.retry_policy_backoff_multiplier > 0.f)
+  {
+    static const auto kServiceConfigJson = opentelemetry::nostd::string_view{R"(
+    {
+      "methodConfig": [
+        {
+          "name": [{}],
+          "retryPolicy": {
+            "maxAttempts": %0000000000u,
+            "initialBackoff": "%.1fs",
+            "maxBackoff": "%.1fs",
+            "backoffMultiplier": %.1f,
+            "retryableStatusCodes": [
+              "CANCELLED",
+              "DEADLINE_EXCEEDED",
+              "ABORTED",
+              "OUT_OF_RANGE",
+              "DATA_LOSS",
+              "UNAVAILABLE"
+            ]
+          }
+        }
+      ]
+    })"};
+
+    // Allocate string with buffer large enough to hold the formatted json config
+    auto service_config = std::string(kServiceConfigJson.size(), '\0');
+    // Prior to C++17, need to explicitly cast away constness from `data()` buffer
+    std::snprintf(const_cast<decltype(service_config)::value_type *>(service_config.data()),
+                  service_config.size(), kServiceConfigJson.data(),
+                  options.retry_policy_max_attempts, options.retry_policy_initial_backoff.count(),
+                  options.retry_policy_max_backoff.count(),
+                  options.retry_policy_backoff_multiplier);
+
+    grpc_arguments.SetServiceConfigJSON(service_config);
   }
 
   if (options.use_ssl_credentials)
