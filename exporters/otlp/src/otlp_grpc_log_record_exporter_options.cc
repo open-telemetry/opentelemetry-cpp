@@ -34,6 +34,11 @@ OtlpGrpcLogRecordExporterOptions::OtlpGrpcLogRecordExporterOptions()
 #ifdef ENABLE_ASYNC_EXPORT
   max_concurrent_requests = 64;
 #endif
+
+  retry_policy_max_attempts       = GetOtlpDefaultLogsRetryMaxAttempts();
+  retry_policy_initial_backoff    = GetOtlpDefaultLogsRetryInitialBackoff();
+  retry_policy_max_backoff        = GetOtlpDefaultLogsRetryMaxBackoff();
+  retry_policy_backoff_multiplier = GetOtlpDefaultLogsRetryBackoffMultiplier();
 }
 
 OtlpGrpcLogRecordExporterOptions::~OtlpGrpcLogRecordExporterOptions() {}
