@@ -21,9 +21,10 @@
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 
-#  include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
 // Problematic code that pulls in Gmock and breaks with vs2019/c++latest :
 #  include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
+
+#  include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
@@ -432,8 +433,10 @@ struct TestTraceService : public opentelemetry::proto::collector::trace::v1::Tra
   std::vector<grpc::StatusCode> status_codes_;
 };
 
+using StatusCodeVector = std::vector<grpc::StatusCode>;
+
 class OtlpGrpcExporterRetryIntegrationTests
-    : public ::testing::TestWithParam<std::tuple<bool, std::vector<grpc::StatusCode>, std::size_t>>
+    : public ::testing::TestWithParam<std::tuple<bool, StatusCodeVector, std::size_t>>
 {};
 
 INSTANTIATE_TEST_SUITE_P(
@@ -441,64 +444,68 @@ INSTANTIATE_TEST_SUITE_P(
     OtlpGrpcExporterRetryIntegrationTests,
     testing::Values(
         // With retry policy enabled
-        std::make_tuple(true, std::vector{grpc::StatusCode::CANCELLED}, 5),
-        std::make_tuple(true, std::vector{grpc::StatusCode::UNKNOWN}, 1),
-        std::make_tuple(true, std::vector{grpc::StatusCode::INVALID_ARGUMENT}, 1),
-        std::make_tuple(true, std::vector{grpc::StatusCode::DEADLINE_EXCEEDED}, 5),
-        std::make_tuple(true, std::vector{grpc::StatusCode::NOT_FOUND}, 1),
-        std::make_tuple(true, std::vector{grpc::StatusCode::ALREADY_EXISTS}, 1),
-        std::make_tuple(true, std::vector{grpc::StatusCode::PERMISSION_DENIED}, 1),
-        std::make_tuple(true, std::vector{grpc::StatusCode::UNAUTHENTICATED}, 1),
-        std::make_tuple(true, std::vector{grpc::StatusCode::RESOURCE_EXHAUSTED}, 1),
-        std::make_tuple(true, std::vector{grpc::StatusCode::FAILED_PRECONDITION}, 1),
-        std::make_tuple(true, std::vector{grpc::StatusCode::ABORTED}, 5),
-        std::make_tuple(true, std::vector{grpc::StatusCode::OUT_OF_RANGE}, 5),
-        std::make_tuple(true, std::vector{grpc::StatusCode::UNIMPLEMENTED}, 1),
-        std::make_tuple(true, std::vector{grpc::StatusCode::INTERNAL}, 1),
-        std::make_tuple(true, std::vector{grpc::StatusCode::UNAVAILABLE}, 5),
-        std::make_tuple(true, std::vector{grpc::StatusCode::DATA_LOSS}, 5),
-        std::make_tuple(true, std::vector{grpc::StatusCode::OK}, 1),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::CANCELLED}, 5),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::UNKNOWN}, 1),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::INVALID_ARGUMENT}, 1),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::DEADLINE_EXCEEDED}, 5),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::NOT_FOUND}, 1),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::ALREADY_EXISTS}, 1),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::PERMISSION_DENIED}, 1),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::UNAUTHENTICATED}, 1),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::RESOURCE_EXHAUSTED}, 1),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::FAILED_PRECONDITION}, 1),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::ABORTED}, 5),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::OUT_OF_RANGE}, 5),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::UNIMPLEMENTED}, 1),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::INTERNAL}, 1),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::UNAVAILABLE}, 5),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::DATA_LOSS}, 5),
+        std::make_tuple(true, StatusCodeVector{grpc::StatusCode::OK}, 1),
         std::make_tuple(true,
-                        std::vector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::ABORTED,
-                                    grpc::StatusCode::OUT_OF_RANGE, grpc::StatusCode::DATA_LOSS},
+                        StatusCodeVector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::ABORTED,
+                                         grpc::StatusCode::OUT_OF_RANGE,
+                                         grpc::StatusCode::DATA_LOSS},
                         5),
         std::make_tuple(true,
-                        std::vector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::UNAVAILABLE,
-                                    grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::OK},
+                        StatusCodeVector{grpc::StatusCode::UNAVAILABLE,
+                                         grpc::StatusCode::UNAVAILABLE,
+                                         grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::OK},
                         4),
         std::make_tuple(true,
-                        std::vector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::CANCELLED,
-                                    grpc::StatusCode::DEADLINE_EXCEEDED, grpc::StatusCode::OK},
+                        StatusCodeVector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::CANCELLED,
+                                         grpc::StatusCode::DEADLINE_EXCEEDED, grpc::StatusCode::OK},
                         4),
         // With retry policy disabled
-        std::make_tuple(false, std::vector{grpc::StatusCode::CANCELLED}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::UNKNOWN}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::INVALID_ARGUMENT}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::DEADLINE_EXCEEDED}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::NOT_FOUND}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::ALREADY_EXISTS}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::PERMISSION_DENIED}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::UNAUTHENTICATED}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::RESOURCE_EXHAUSTED}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::FAILED_PRECONDITION}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::ABORTED}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::OUT_OF_RANGE}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::UNIMPLEMENTED}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::INTERNAL}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::UNAVAILABLE}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::DATA_LOSS}, 1),
-        std::make_tuple(false, std::vector{grpc::StatusCode::OK}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::CANCELLED}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::UNKNOWN}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::INVALID_ARGUMENT}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::DEADLINE_EXCEEDED}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::NOT_FOUND}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::ALREADY_EXISTS}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::PERMISSION_DENIED}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::UNAUTHENTICATED}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::RESOURCE_EXHAUSTED}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::FAILED_PRECONDITION}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::ABORTED}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::OUT_OF_RANGE}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::UNIMPLEMENTED}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::INTERNAL}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::UNAVAILABLE}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::DATA_LOSS}, 1),
+        std::make_tuple(false, StatusCodeVector{grpc::StatusCode::OK}, 1),
         std::make_tuple(false,
-                        std::vector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::ABORTED,
-                                    grpc::StatusCode::OUT_OF_RANGE, grpc::StatusCode::DATA_LOSS},
+                        StatusCodeVector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::ABORTED,
+                                         grpc::StatusCode::OUT_OF_RANGE,
+                                         grpc::StatusCode::DATA_LOSS},
                         1),
         std::make_tuple(false,
-                        std::vector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::UNAVAILABLE,
-                                    grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::OK},
+                        StatusCodeVector{grpc::StatusCode::UNAVAILABLE,
+                                         grpc::StatusCode::UNAVAILABLE,
+                                         grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::OK},
                         1),
         std::make_tuple(false,
-                        std::vector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::CANCELLED,
-                                    grpc::StatusCode::DEADLINE_EXCEEDED, grpc::StatusCode::OK},
+                        StatusCodeVector{grpc::StatusCode::UNAVAILABLE, grpc::StatusCode::CANCELLED,
+                                         grpc::StatusCode::DEADLINE_EXCEEDED, grpc::StatusCode::OK},
                         1)));
 
 TEST_P(OtlpGrpcExporterRetryIntegrationTests, StatusCodes)
@@ -513,7 +520,7 @@ TEST_P(OtlpGrpcExporterRetryIntegrationTests, StatusCodes)
   std::unique_ptr<grpc::Server> server;
 
   std::thread server_thread([&server, &service]() {
-    std::string address("0.0.0.0:4317");
+    std::string address("localhost:4317");
     grpc::ServerBuilder builder;
     builder.RegisterService(&service);
     builder.AddListeningPort(address, grpc::InsecureServerCredentials());
@@ -542,6 +549,7 @@ TEST_P(OtlpGrpcExporterRetryIntegrationTests, StatusCodes)
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
   auto provider  = trace_sdk::TracerProviderFactory::Create(std::move(processor));
   provider->GetTracer("Test tracer")->StartSpan("Test span")->End();
+  provider->ForceFlush();
 
   ASSERT_TRUE(server);
   server->Shutdown();
