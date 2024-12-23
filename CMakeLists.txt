@@ -774,17 +774,6 @@ if(OPENTELEMETRY_INSTALL)
       "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config-version.cmake"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-  # Export all components
-  export(
-    EXPORT "${PROJECT_NAME}-target"
-    NAMESPACE "${PROJECT_NAME}::"
-    FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-target.cmake"
-  )
-  install(
-    EXPORT "${PROJECT_NAME}-target"
-    NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
-
   if(BUILD_PACKAGE)
     include(cmake/package.cmake)
     include(CPack)

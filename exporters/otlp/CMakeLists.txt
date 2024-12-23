@@ -55,7 +55,7 @@ if(WITH_OTLP_GRPC)
     PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
            "$<INSTALL_INTERFACE:include>")
 
-  list(APPEND OPENTELEMETRY_OTLP_TARGETS
+  list(APPEND OPENTELEMETRY_OTLP_GRPC_TARGETS
        opentelemetry_exporter_otlp_grpc_client)
 
   add_library(
@@ -72,7 +72,7 @@ if(WITH_OTLP_GRPC)
     PUBLIC opentelemetry_otlp_recordable
            opentelemetry_exporter_otlp_grpc_client)
 
-  list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_grpc)
+  list(APPEND OPENTELEMETRY_OTLP_GRPC_TARGETS opentelemetry_exporter_otlp_grpc)
 
   add_library(
     opentelemetry_exporter_otlp_grpc_log
@@ -89,7 +89,8 @@ if(WITH_OTLP_GRPC)
     PUBLIC opentelemetry_otlp_recordable
            opentelemetry_exporter_otlp_grpc_client)
 
-  list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_grpc_log)
+  list(APPEND OPENTELEMETRY_OTLP_GRPC_TARGETS
+       opentelemetry_exporter_otlp_grpc_log)
 
   add_library(
     opentelemetry_exporter_otlp_grpc_metrics
@@ -105,7 +106,7 @@ if(WITH_OTLP_GRPC)
     PUBLIC opentelemetry_otlp_recordable
            opentelemetry_exporter_otlp_grpc_client)
 
-  list(APPEND OPENTELEMETRY_OTLP_TARGETS
+  list(APPEND OPENTELEMETRY_OTLP_GRPC_TARGETS
        opentelemetry_exporter_otlp_grpc_metrics)
 endif()
 
@@ -134,7 +135,7 @@ if(WITH_OTLP_HTTP)
     PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
            "$<INSTALL_INTERFACE:include>")
 
-  list(APPEND OPENTELEMETRY_OTLP_TARGETS
+  list(APPEND OPENTELEMETRY_OTLP_HTTP_TARGETS
        opentelemetry_exporter_otlp_http_client)
 
   add_library(
@@ -151,7 +152,7 @@ if(WITH_OTLP_HTTP)
     PUBLIC opentelemetry_otlp_recordable
            opentelemetry_exporter_otlp_http_client)
 
-  list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_http)
+  list(APPEND OPENTELEMETRY_OTLP_HTTP_TARGETS opentelemetry_exporter_otlp_http)
 
   add_library(
     opentelemetry_exporter_otlp_http_log
@@ -168,7 +169,8 @@ if(WITH_OTLP_HTTP)
     PUBLIC opentelemetry_otlp_recordable
            opentelemetry_exporter_otlp_http_client)
 
-  list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_http_log)
+  list(APPEND OPENTELEMETRY_OTLP_HTTP_TARGETS
+       opentelemetry_exporter_otlp_http_log)
 
   add_library(
     opentelemetry_exporter_otlp_http_metric
@@ -184,7 +186,7 @@ if(WITH_OTLP_HTTP)
     PUBLIC opentelemetry_otlp_recordable
            opentelemetry_exporter_otlp_http_client)
 
-  list(APPEND OPENTELEMETRY_OTLP_TARGETS
+  list(APPEND OPENTELEMETRY_OTLP_HTTP_TARGETS
        opentelemetry_exporter_otlp_http_metric)
 endif()
 
@@ -211,7 +213,7 @@ if(WITH_OTLP_FILE)
     PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
            "$<INSTALL_INTERFACE:include>")
 
-  list(APPEND OPENTELEMETRY_OTLP_TARGETS
+  list(APPEND OPENTELEMETRY_OTLP_FILE_TARGETS
        opentelemetry_exporter_otlp_file_client)
 
   add_library(
@@ -228,7 +230,7 @@ if(WITH_OTLP_FILE)
     PUBLIC opentelemetry_otlp_recordable
            opentelemetry_exporter_otlp_file_client)
 
-  list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_file)
+  list(APPEND OPENTELEMETRY_OTLP_FILE_TARGETS opentelemetry_exporter_otlp_file)
 
   add_library(
     opentelemetry_exporter_otlp_file_log
@@ -245,7 +247,8 @@ if(WITH_OTLP_FILE)
     PUBLIC opentelemetry_otlp_recordable
            opentelemetry_exporter_otlp_file_client)
 
-  list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_file_log)
+  list(APPEND OPENTELEMETRY_OTLP_FILE_TARGETS
+       opentelemetry_exporter_otlp_file_log)
 
   add_library(
     opentelemetry_exporter_otlp_file_metric
@@ -261,7 +264,7 @@ if(WITH_OTLP_FILE)
     PUBLIC opentelemetry_otlp_recordable
            opentelemetry_exporter_otlp_file_client)
 
-  list(APPEND OPENTELEMETRY_OTLP_TARGETS
+  list(APPEND OPENTELEMETRY_OTLP_FILE_TARGETS
        opentelemetry_exporter_otlp_file_metric)
 endif()
 
@@ -271,8 +274,8 @@ target_link_libraries(
 
 if(OPENTELEMETRY_INSTALL)
   install(
-    TARGETS ${OPENTELEMETRY_OTLP_TARGETS}
-    EXPORT "${PROJECT_NAME}-target"
+    TARGETS opentelemetry_otlp_recordable
+    EXPORT "${PROJECT_NAME}-exporters_otlp_common-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -282,6 +285,57 @@ if(OPENTELEMETRY_INSTALL)
     DESTINATION include/opentelemetry/exporters
     FILES_MATCHING
     PATTERN "*.h")
+
+  install(
+    EXPORT "${PROJECT_NAME}-exporters_otlp_common-target"
+    FILE "${PROJECT_NAME}-exporters_otlp_common-target.cmake"
+    NAMESPACE "${PROJECT_NAME}::"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+
+  if(WITH_OTLP_GRPC)
+    install(
+      TARGETS ${OPENTELEMETRY_OTLP_GRPC_TARGETS}
+      EXPORT "${PROJECT_NAME}-exporters_otlp_grpc-target"
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+    install(
+      EXPORT "${PROJECT_NAME}-exporters_otlp_grpc-target"
+      FILE "${PROJECT_NAME}-exporters_otlp_grpc-target.cmake"
+      NAMESPACE "${PROJECT_NAME}::"
+      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+  endif()
+
+  if(WITH_OTLP_FILE)
+    install(
+      TARGETS ${OPENTELEMETRY_OTLP_FILE_TARGETS}
+      EXPORT "${PROJECT_NAME}-exporters_otlp_file-target"
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+    install(
+      EXPORT "${PROJECT_NAME}-exporters_otlp_file-target"
+      FILE "${PROJECT_NAME}-exporters_otlp_file-target.cmake"
+      NAMESPACE "${PROJECT_NAME}::"
+      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+  endif()
+
+  if(WITH_OTLP_HTTP)
+    install(
+      TARGETS ${OPENTELEMETRY_OTLP_HTTP_TARGETS}
+      EXPORT "${PROJECT_NAME}-exporters_otlp_http-target"
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+    install(
+      EXPORT "${PROJECT_NAME}-exporters_otlp_http-target"
+      FILE "${PROJECT_NAME}-exporters_otlp_http-target.cmake"
+      NAMESPACE "${PROJECT_NAME}::"
+      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+  endif()
 endif()
 
 if(BUILD_TESTING)

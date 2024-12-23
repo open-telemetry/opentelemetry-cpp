@@ -12,7 +12,7 @@ set_target_properties(opentelemetry_sdk PROPERTIES EXPORT_NAME sdk)
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS opentelemetry_sdk
-    EXPORT "${PROJECT_NAME}-target"
+    EXPORT "${PROJECT_NAME}-sdk-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -28,6 +28,13 @@ if(OPENTELEMETRY_INSTALL)
     DESTINATION include/opentelemetry
     FILES_MATCHING
     PATTERN "*.h")
+
+  install(
+    EXPORT "${PROJECT_NAME}-sdk-target"
+    FILE "${PROJECT_NAME}-sdk-target.cmake"
+    NAMESPACE "${PROJECT_NAME}::"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+
 endif()
 
 add_subdirectory(src)

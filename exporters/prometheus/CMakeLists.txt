@@ -40,7 +40,7 @@ target_link_libraries(opentelemetry_exporter_prometheus
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS ${PROMETHEUS_EXPORTER_TARGETS}
-    EXPORT "${PROJECT_NAME}-target"
+    EXPORT "${PROJECT_NAME}-exporters_prometheus-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -50,6 +50,12 @@ if(OPENTELEMETRY_INSTALL)
     DESTINATION include/opentelemetry/exporters/
     FILES_MATCHING
     PATTERN "*.h")
+
+  install(
+    EXPORT "${PROJECT_NAME}-exporters_prometheus-target"
+    FILE "${PROJECT_NAME}-exporters_prometheus-target.cmake"
+    NAMESPACE "${PROJECT_NAME}::"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 endif()
 
 if(BUILD_TESTING)
