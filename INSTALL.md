@@ -147,9 +147,14 @@ target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
 
 #### Using opentelemetry-cpp package components
 
-> **Note:** `opentelemetry-cpp` CMake package components were introduced in `v.TODO`. **Status:** [`Development`](https://opentelemetry.io/docs/specs/otel/document-status/)
+> **Note:** `opentelemetry-cpp` CMake package components were introduced in `v.TODO`.
+> **Status:** [`Development`](https://opentelemetry.io/docs/specs/otel/document-status/)
 
-The `opentelemetry-cpp` package includes components to enable selective inclusion of its CMake targets and their dependencies using the `COMPONENTS` argument to `find_package`. The following example illustrates using this feature to include and link the `api` header only target to an instrumented `foo_lib` while only including and linking the `sdk` and `otlp_grpc_exporter` targets to the `foo_app`.
+The `opentelemetry-cpp` package includes components to enable selective inclusion
+of its CMake targets and their dependencies using the `COMPONENTS` argument to
+`find_package`. The following example illustrates using this feature to include
+and link the `api` header only target to an instrumented `foo_lib` while only including
+and linking the `sdk` and `otlp_grpc_exporter` targets to the `foo_app`.
 
 ```cmake
 # foo_lib/CMakeLists.txt
@@ -164,7 +169,10 @@ find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS api sdk exporters_otlp
 add_executable(foo_app main.cpp)
 target_link_libraries(foo_app PRIVATE foo_lib opentelemetry-cpp::api opentelemetry-cpp::sdk opentelemetry-cpp::otlp_grpc_exporter )
 ```
-The following table provides the mapping between components and targets. Components and targets available in the installation depends on the opentelemetry-cpp package build configuration.
+
+The following table provides the mapping between components and targets. Components
+and targets available in the installation depends on the opentelemetry-cpp package
+build configuration.
 
 | Component                  | Targets                                                                                           |
 |----------------------------|---------------------------------------------------------------------------------------------------|
@@ -204,9 +212,6 @@ The following table provides the mapping between components and targets. Compone
 | **exporters_etw**          | opentelemetry-cpp::etw_exporter                                                                  |
 | **exporters_zipkin**       | opentelemetry-cpp::zipkin_trace_exporter                                                         |
 | **shims_opentracing**      | opentelemetry-cpp::opentracing_shim                                                              |
-
-
-
 
 ## Build instructions using Bazel
 
