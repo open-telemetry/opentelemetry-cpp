@@ -291,9 +291,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
 }
-#  endif
 
-#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcExporterTestPeer, ConfigHttpsSecureFromEnv)
 {
@@ -309,9 +307,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigHttpsSecureFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE");
 }
-#  endif
 
-#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcExporterTestPeer, ConfigHttpInsecureFromEnv)
 {
@@ -327,9 +323,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigHttpInsecureFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE");
 }
-#  endif
 
-#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcExporterTestPeer, ConfigUnknownSecureFromEnv)
 {
@@ -344,9 +338,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigUnknownSecureFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE");
 }
-#  endif
 
-#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcExporterTestPeer, ConfigUnknownInsecureFromEnv)
 {
@@ -361,9 +353,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigUnknownInsecureFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE");
 }
-#  endif
 
-#  ifndef NO_GETENV
 TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryDefaultValues)
 {
   std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
