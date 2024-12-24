@@ -38,7 +38,7 @@ if(WITH_OTLP_GRPC)
   # targets that depend on opentelemetry_proto_grpc.
   target_link_libraries(
     opentelemetry_exporter_otlp_grpc_client
-    PUBLIC opentelemetry_sdk opentelemetry_common opentelemetry_ext
+    PUBLIC opentelemetry_sdk opentelemetry_common
            # gRPC::grpc++ must be linked before opentelemetry_proto_grpc.
            opentelemetry_proto_grpc
     PRIVATE gRPC::grpc++)
