@@ -748,7 +748,56 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, DefaultEndpoint)
   EXPECT_EQ("http://localhost:4317", GetOtlpDefaultGrpcEndpoint());
 }
 
-#  endif
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigRetryDefaultValues)
+{
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 5);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 1.5);
+}
+
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigRetryValuesFromEnv)
+{
+  setenv("OTEL_EXPORTER_OTLP_LOGS_RETRY_MAX_ATTEMPTS", "123", 1);
+  setenv("OTEL_EXPORTER_OTLP_LOGS_RETRY_INITIAL_BACKOFF", "4.5", 1);
+  setenv("OTEL_EXPORTER_OTLP_LOGS_RETRY_MAX_BACKOFF", "6.7", 1);
+  setenv("OTEL_EXPORTER_OTLP_LOGS_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
+
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 123);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 8.9);
+
+  unsetenv("OTEL_EXPORTER_OTLP_LOGS_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_EXPORTER_OTLP_LOGS_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_EXPORTER_OTLP_LOGS_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_EXPORTER_OTLP_LOGS_RETRY_BACKOFF_MULTIPLIER");
+}
+
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigRetryGenericValuesFromEnv)
+{
+  setenv("OTEL_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS", "321", 1);
+  setenv("OTEL_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF", "5.4", 1);
+  setenv("OTEL_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
+  setenv("OTEL_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
+
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 321);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 9.8);
+
+  unsetenv("OTEL_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_EXPORTER_OTLP_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
+}
+#  endif  // NO_GETENV
 
 }  // namespace otlp
 }  // namespace exporter
