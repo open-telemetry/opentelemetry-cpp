@@ -191,11 +191,24 @@ alias(
     "otel_sdk_rd",
 ]]
 
+# Expose the debug .pdb file
+[filegroup(
+    name = otel_sdk_binary + "_dsym_file",
+    srcs = [otel_sdk_binary],
+    output_group = "dsyms",
+    visibility = ["//visibility:private"],
+) for otel_sdk_binary in [
+    "otel_sdk_r",
+    "otel_sdk_d",
+    "otel_sdk_rd",
+]]
+
 # Import the otel_sdk.dll, and the two exposed otel_sdk.lib and otel_sdk.pdb files as one target
 [otel_cc_import(
     name = otel_sdk_binary + "_dll",  #"_import",
     data = select({
         "@platforms//os:windows": [otel_sdk_binary + "_pdb_file"],
+        "@platforms//os:macos": [otel_sdk_binary + "_dsym_file"],
         "//conditions:default": None,
     }),
     interface_library = otel_sdk_binary + "_lib_file",
@@ -322,12 +335,12 @@ pkg_files(
 
 [run_binary(
     name = otel_sdk_binary + "_make_src_bundle_non_windows",
-    srcs = [otel_sdk_binary + "_lib_file"],
+    srcs = [otel_sdk_binary + "_dsym_file"],
     outs = ["lib" + otel_sdk_binary + ".src.zip"],
     args = [
         "debug-files",
         "bundle-sources",
-        "$(location " + otel_sdk_binary + "_lib_file" + ")",
+        "$(location " + otel_sdk_binary + "_dsym_file" + ")",
     ],
     tags = [
         "manual",
