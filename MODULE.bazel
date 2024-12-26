@@ -19,6 +19,12 @@ bazel_dep(name = "curl", version = "8.8.0.bcr.2")
 bazel_dep(name = "depend_on_what_you_use", version = "0.6.0")
 bazel_dep(name = "google_benchmark", version = "1.8.5")
 bazel_dep(name = "googletest", version = "1.15.2")
+bazel_dep(name = "rules_apple", version = "3.16.1")
+bazel_dep(name = "re2", version = "2024-07-02.bcr.1")
+bazel_dep(name = "rules_go", version = "0.51.0")
+bazel_dep(name = "gazelle", version = "0.40.0")
+bazel_dep(name = "stardoc", version = "0.7.2")
+bazel_dep(name = "rules_android", version = "0.6.0")
 
 bazel_dep(name = "grpc", version = "1.69.0")
 
