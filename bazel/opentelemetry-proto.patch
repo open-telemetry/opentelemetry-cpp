@@ -3,9 +3,10 @@ new file mode 100644
 index 0000000..be1bc02
 --- /dev/null
 +++ b/BUILD.bazel
-@@ -0,0 +1,279 @@
+@@ -0,0 +1,280 @@
 +load("@grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
-+load("@grpc//bazel:python_rules.bzl", "py_proto_library", "py_grpc_library")
++load("@grpc//bazel:python_rules.bzl", "py_grpc_library")
++load("@rules_python//python:proto.bzl", "py_proto_library")
 +load("@rules_go//proto:def.bzl", "go_proto_library", "go_grpc_library")
 +
 +package(default_visibility = ["//visibility:public"])
@@ -288,12 +289,13 @@ new file mode 100644
 index 0000000..8b1a510
 --- /dev/null
 +++ b/MODULE.bazel
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,9 @@
 +module(
 +    name = "opentelemetry-proto",
 +    version = "1.5.0",
 +    compatibility_level = 0,
 +)
 +
-+bazel_dep(name = "grpc", version = "1.68.0")
++bazel_dep(name = "grpc", version = "1.69.0")
 +bazel_dep(name = "rules_go", version = "0.51.0")
++bazel_dep(name = "rules_python", version = "1.0.0")
