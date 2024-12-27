@@ -315,18 +315,20 @@ pkg_files(
     ("otel_sdk_rd", "fastbuild"),
 ]]
 
-# Collect all sources in a .src.zip bundle using sentry-cli - https://docs.sentry.io/product/cli/dif/
 [run_binary(
-    name = otel_sdk_binary + "_make_src_bundle_windows",
+    name = otel_sdk_binary + "_make_src_bundle" + "_windows",
     srcs = [otel_sdk_binary + "_pdb_file"],
     outs = [otel_sdk_binary + ".src.zip"],
     args = [
         "debug-files",
         "bundle-sources",
-        "$(location " + otel_sdk_binary + "_pdb_file" + ")",
+        "$(execpath " + otel_sdk_binary + "_pdb_file" + ")"
     ],
-    tags = ["manual"],
     tool = "@multitool//tools/sentry-cli",
+    target_compatible_with = select({
+        "@platforms//os:windows": None,
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 ) for otel_sdk_binary in [
     "otel_sdk_r",
     "otel_sdk_d",
@@ -334,20 +336,25 @@ pkg_files(
 ]]
 
 [run_binary(
-    name = otel_sdk_binary + "_make_src_bundle_non_windows",
-    srcs = [otel_sdk_binary + "_dsym_file"],
+    name = otel_sdk_binary + "_make_src_bundle" + "_non_windows",
+    srcs = select({
+        "@platforms//os:macos": [otel_sdk_binary + "_dsym_file"],
+        "//conditions:default": [otel_sdk_binary],
+    }),
     outs = ["lib" + otel_sdk_binary + ".src.zip"],
     args = [
         "debug-files",
         "bundle-sources",
-        "$(location " + otel_sdk_binary + "_dsym_file" + ")",
-    ],
-    tags = [
-        "manual",
-        # TODO - Fix this to work in the sandbox, by using sentry-cli's -o folder
-        "no-sandbox",
-    ],
+    ] + select({
+        "@platforms//os:macos": ["$(execpath " + otel_sdk_binary + "_dsym_file" + ")"],
+        "//conditions:default": ["$(execpath " + otel_sdk_binary + ")"],
+    }),
+    tags = ["no-sandbox"],
     tool = "@multitool//tools/sentry-cli",
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": None,
+    }),
 ) for otel_sdk_binary in [
     "otel_sdk_r",
     "otel_sdk_d",
@@ -357,8 +364,8 @@ pkg_files(
 [alias(
     name = otel_sdk_binary + "_make_src_bundle",
     actual = select({
-        "@platforms//os:windows": otel_sdk_binary + "_make_src_bundle_windows",
-        "//conditions:default": otel_sdk_binary + "_make_src_bundle_non_windows",
+        "@platforms//os:windows": otel_sdk_binary + "_make_src_bundle" + "_windows",
+        "//conditions:default": otel_sdk_binary + "_make_src_bundle" + "_non_windows"
     }),
 ) for otel_sdk_binary in [
     "otel_sdk_r",
@@ -459,7 +466,7 @@ write_source_file(
     name = "dll_deps_update_run_" + os,
     srcs = [":otel_sdk_all_deps_" + os],
     outs = ["dll_deps_generated_internally_" + os + ".bzl"],
-    args = ["$(location dll_deps_generated_internally_" + os + ".bzl)"],
+    args = ["$(execpath dll_deps_generated_internally_" + os + ".bzl)"],
     tool = "dll_deps_update_binary_" + os,
 ) for os in [
     "non_windows",
