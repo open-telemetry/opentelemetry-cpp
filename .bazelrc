@@ -92,9 +92,11 @@ startup --windows_enable_symlinks
 # common --incompatible_disable_target_default_provider_fields
 # common --incompatible_no_rule_outputs_param
 # common --incompatible_stop_exporting_language_modules
+
 common --experimental_disable_external_package
 common --experimental_platforms_api
 common --experimental_repository_cache_hardlinks 
+
 common --incompatible_auto_exec_groups
 common --incompatible_config_setting_private_default_visibility
 common --incompatible_disable_native_repo_rules 
@@ -109,11 +111,17 @@ common --incompatible_strict_action_env
 common --incompatible_top_level_aspects_require_providers
 common --incompatible_use_cc_configure_from_rules_cc
 
+common --incompatible_modify_execution_info_additive
 common --modify_execution_info=CppCompile=+supports-path-mapping
 common --skip_incompatible_explicit_targets
 
 build --@curl//:use_mbedtls=true 
 # build --@curl//:http_only=true
+
+
+# build --experimental_save_feature_state
+# saves .s and .ii files but tends to be super slow
+# build --save_temps
 
 mod --lockfile_mode=refresh
 
@@ -128,8 +136,6 @@ build:clang-cl --host_per_file_copt="protobuf\\+/.*@-Wno-invalid-offsetof"
 build:clang-cl --per_file_copt="c-ares\\+/.*@-Wno-macro-redefined"
 build:clang-cl --host_per_file_copt="c-ares\\+/.*@-Wno-macro-redefined"
 
-# allow newer protobuf to compile
-common --experimental_google_legacy_api
 common --experimental_enable_android_migration_apis
 
 common:linux --force_pic
