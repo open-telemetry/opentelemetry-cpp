@@ -5,7 +5,7 @@
 startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
 
 build --features=parse_headers
-#build --features=layering_check
+build --features=layering_check
 
 # Don't try to build .so and .dylib shared libs (instead of static) libs on Linux/OSX
 # For some reason, with clang-cl, it also tried to do on Windows, where dynamic linking just does not support it.
@@ -27,6 +27,7 @@ build --experimental_convenience_symlinks=clean
 
 build:windows      --copt="/Brepro"      --copt="/guard:cf"      --copt="/guard:ehcont"      --copt="/Z7"      --copt="/JMC-"      --copt="/sdl" 
 build:windows      --linkopt="/Brepro"      --linkopt="/guard:cf"      --linkopt="/guard:ehcont" --linkopt="/DEBUG:FULL" --linkopt="/CETCOMPAT" --linkopt="/SWAPRUN:NET,CD" --linkopt="/OPT:REF,ICF" --linkopt="/RELEASE" --linkopt="/DEBUGTYPE:CV,PDATA,FIXUP" 
+build:windows --copt="/Zc:strictStrings"
 build:windows --host_linkopt="shell32.lib" 
 # Requires Visual Studio 2019 Build Tools installed in default location with the latest compiler (14.29.30133) for x64
 build:windows      --action_env=BAZEL_VC_FULL_VERSION=14.29.30133      --action_env=BAZEL_WINSDK_FULL_VERSION=10.0.22621.0
@@ -43,7 +44,6 @@ build:linux --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
 build:linux --copt=-g --strip=never
 build:linux --action_env=CC=/usr/bin/clang-19
 build:linux --host_action_env=CC=/usr/bin/clang-19
-
 
 build:macos --copt=-DCIVETWEB_API= --copt=-DCIVETWEB_CXX_API= --cxxopt=-DCIVETWEB_API= --cxxopt=-DCIVETWEB_CXX_API=
 build:macos --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
@@ -88,12 +88,11 @@ mod --charset=ascii
 common --nobuild_runfile_links
 startup --windows_enable_symlinks
 
-# common --experimental_disable_external_package
 # common --incompatible_disable_starlark_host_transitions
 # common --incompatible_disable_target_default_provider_fields
 # common --incompatible_no_rule_outputs_param
 # common --incompatible_stop_exporting_language_modules
-# common --incompatible_use_host_features
+common --experimental_disable_external_package
 common --experimental_platforms_api
 common --experimental_repository_cache_hardlinks 
 common --incompatible_auto_exec_groups
