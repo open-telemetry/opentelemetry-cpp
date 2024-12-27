@@ -143,6 +143,8 @@ common:macos --force_pic
 
 startup --client_debug
 
+common --flag_alias=dll=@otel_sdk//:with_dll
+
 ## This is what my ../top.bazelrc contains (not in the repo as local to my machine)
 # build --disk_cache=f:/b/d
 # common --repository_cache=f:/b/r
