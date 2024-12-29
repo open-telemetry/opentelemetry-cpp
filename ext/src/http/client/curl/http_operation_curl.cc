@@ -5,6 +5,7 @@
 #include <curl/curlver.h>
 #include <curl/system.h>
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <cstdint>
@@ -263,7 +264,8 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                              bool is_raw_response,
                              std::chrono::milliseconds http_conn_timeout,
                              bool reuse_connection,
-                             bool is_log_enabled)
+                             bool is_log_enabled,
+                             const RetryPolicy &retry_policy)
     : is_aborted_(false),
       is_finished_(false),
       is_cleaned_(false),
@@ -284,6 +286,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       session_state_(opentelemetry::ext::http::client::SessionState::Created),
       compression_(compression),
       is_log_enabled_(is_log_enabled),
+      retry_policy_(retry_policy),
       response_code_(0)
 {
   /* get a curl handle */
@@ -424,6 +427,29 @@ void HttpOperation::Cleanup()
     curl_slist_free_all(curl_resource_.headers_chunk);
     curl_resource_.headers_chunk = nullptr;
   }
+}
+
+bool HttpOperation::IsRetryable()
+{
+  static constexpr auto kRetryableStatusCodes = std::array<decltype(response_code_), 4>{
+      429,  // Too Many Requests
+      502,  // Bad Gateway
+      503,  // Service Unavailable
+      504   // Gateway Timeout
+  };
+
+  const auto is_retryable = std::find(kRetryableStatusCodes.cbegin(), kRetryableStatusCodes.cend(),
+                                      response_code_) != kRetryableStatusCodes.cend();
+
+  return is_retryable && (retry_policy_.max_attempts > 0) &&
+         (retry_policy_.backoff_multiplier > 0.f) &&
+         (retry_policy_.initial_backoff > SecondsDecimal::zero()) &&
+         (retry_policy_.max_backoff > SecondsDecimal::zero());
+}
+
+std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
+{
+  return last_attempt_time_ + std::chrono::seconds(1);
 }
 
 /*
@@ -1198,11 +1224,6 @@ CURLcode HttpOperation::Send()
 
   CURLcode code = curl_easy_perform(curl_resource_.easy_handle);
   PerformCurlMessage(code);
-  if (CURLE_OK != code)
-  {
-    return code;
-  }
-
   return code;
 }
 
@@ -1248,7 +1269,7 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   async_data_->callback = std::move(callback);
 
   session->GetHttpClient().ScheduleAddSession(session->GetSessionId());
-  return code;
+  return CURLE_OK;
 }
 
 Headers HttpOperation::GetResponseHeaders()
@@ -1306,7 +1327,10 @@ void HttpOperation::Abort()
 
 void HttpOperation::PerformCurlMessage(CURLcode code)
 {
-  last_curl_result_ = code;
+  retry_policy_.max_attempts--;
+  last_attempt_time_ = std::chrono::system_clock::now();
+  last_curl_result_  = code;
+
   if (code != CURLE_OK)
   {
     switch (GetSessionState())
@@ -1352,8 +1376,17 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
     DispatchEvent(opentelemetry::ext::http::client::SessionState::Response);
   }
 
-  // Cleanup and unbind easy handle from multi handle, and finish callback
-  Cleanup();
+  if (IsRetryable())
+  {
+    // Clear any request offset and response data received in previous attempt
+    ReleaseResponse();
+    request_nwrite_ = 0;
+  }
+  else
+  {
+    // Cleanup and unbind easy handle from multi handle, and finish callback
+    Cleanup();
+  }
 }
 
 }  // namespace curl

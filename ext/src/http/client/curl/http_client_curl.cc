@@ -196,10 +196,11 @@ void Session::SendRequest(
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
   }
 
-  curl_operation_.reset(new HttpOperation(
-      http_request_->method_, url, http_request_->ssl_options_, callback_ptr,
-      http_request_->headers_, http_request_->body_, http_request_->compression_, false,
-      http_request_->timeout_ms_, reuse_connection, http_request_->is_log_enabled_));
+  curl_operation_.reset(
+      new HttpOperation(http_request_->method_, url, http_request_->ssl_options_, callback_ptr,
+                        http_request_->headers_, http_request_->body_, http_request_->compression_,
+                        false, http_request_->timeout_ms_, reuse_connection,
+                        http_request_->is_log_enabled_, http_request_->retry_policy_));
   bool success =
       CURLE_OK == curl_operation_->SendAsync(this, [this, callback](HttpOperation &operation) {
         if (operation.WasAborted())
@@ -222,8 +223,8 @@ void Session::SendRequest(
 
   if (success)
   {
-    // We will try to create a background to poll events.But when the background is running, we will
-    // reuse it instead of creating a new one.
+    // We will try to create a background to poll events. But when the background is running, we
+    // will reuse it instead of creating a new one.
     http_client_.MaybeSpawnBackgroundThread();
   }
   else
@@ -319,7 +320,7 @@ std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSes
   std::lock_guard<std::mutex> lock_guard{sessions_m_};
   sessions_.insert({session_id, session});
 
-  // FIXME: Session may leak if it do not call SendRequest
+  // FIXME: Session may leak if it does not call SendRequest
   return session;
 }
 
@@ -428,16 +429,15 @@ bool HttpClient::MaybeSpawnBackgroundThread()
 
   background_thread_.reset(new std::thread(
       [](HttpClient *self) {
-        int still_running = 1;
-        std::chrono::system_clock::time_point last_free_job_timepoint =
-            std::chrono::system_clock::now();
-        bool need_wait_more = false;
+        auto still_running           = 1;
+        auto last_free_job_timepoint = std::chrono::system_clock::now();
+        auto need_wait_more          = false;
+
         while (true)
         {
-          CURLMsg *msg;
-          int queued;
+          CURLMsg *msg = nullptr;
+          int queued   = 0;
           CURLMcode mc = curl_multi_perform(self->multi_handle_, &still_running);
-
           // According to https://curl.se/libcurl/c/curl_multi_perform.html, when mc is not OK, we
           // can not curl_multi_perform it again
           if (mc != CURLM_OK)
@@ -446,8 +446,8 @@ bool HttpClient::MaybeSpawnBackgroundThread()
           }
           else if (still_running || need_wait_more)
           {
-        // curl_multi_poll is added from libcurl 7.66.0, before 7.68.0, we can only wait util
-        // timeout to do the rest jobs
+        // curl_multi_poll is added from libcurl 7.66.0, before 7.68.0, we can only wait until
+        // timeout to do the remaining jobs
 #if LIBCURL_VERSION_NUM >= 0x074200
             /* wait for activity, timeout or "nothing" */
             mc = curl_multi_poll(self->multi_handle_, nullptr, 0,
@@ -474,13 +474,20 @@ bool HttpClient::MaybeSpawnBackgroundThread()
               CURLcode result   = msg->data.result;
               Session *session  = nullptr;
               curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &session);
-              // If it's already moved into pending_to_remove_session_handles_, we just ingore this
+              const auto operation = (nullptr != session) ? session->GetOperation().get() : nullptr;
+
+              // If it's already moved into pending_to_remove_session_handles_, we just ignore this
               // message.
-              if (nullptr != session && session->GetOperation())
+              if (operation)
               {
                 // Session can not be destroyed when calling PerformCurlMessage
                 auto hold_session = session->shared_from_this();
-                session->GetOperation()->PerformCurlMessage(result);
+                operation->PerformCurlMessage(result);
+
+                if (operation->IsRetryable())
+                {
+                  self->pending_to_retry_sessions_.push_front(session);
+                }
               }
             }
           } while (true);
@@ -499,6 +506,12 @@ bool HttpClient::MaybeSpawnBackgroundThread()
 
           // Add all pending easy handles
           if (self->doAddSessions())
+          {
+            still_running = 1;
+          }
+
+          // Check if pending easy handles can be retried
+          if (self->doRetrySessions())
           {
             still_running = 1;
           }
@@ -549,6 +562,12 @@ bool HttpClient::MaybeSpawnBackgroundThread()
 
             // Add all pending easy handles
             if (self->doAddSessions())
+            {
+              still_running = 1;
+            }
+
+            // Check if pending easy handles can be retried
+            if (self->doRetrySessions())
             {
               still_running = 1;
             }
@@ -765,6 +784,39 @@ bool HttpClient::doRemoveSessions()
       has_data = true;
     }
   } while (should_continue);
+
+  return has_data;
+}
+
+bool HttpClient::doRetrySessions()
+{
+  auto has_data = false;
+
+  for (auto it = pending_to_retry_sessions_.crbegin(); it != pending_to_retry_sessions_.crend();)
+  {
+    const auto session   = *it;
+    const auto operation = (nullptr != session) ? session->GetOperation().get() : nullptr;
+
+    if (operation)
+    {
+      const auto now             = std::chrono::system_clock::now();
+      const auto next_retry_time = operation->NextRetryTime();
+
+      if (next_retry_time > (now - scheduled_delay_milliseconds_) &&
+          next_retry_time < (now + scheduled_delay_milliseconds_))
+      {
+        auto easy_handle = operation->GetCurlEasyHandle();
+        curl_multi_remove_handle(multi_handle_, easy_handle);
+        curl_multi_add_handle(multi_handle_, easy_handle);
+        has_data = true;
+        it       = decltype(it)(pending_to_retry_sessions_.erase(std::next(it).base()));
+      }
+      else
+      {
+        ++it;
+      }
+    }
+  }
 
   return has_data;
 }

@@ -57,7 +57,11 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
                                                             options.use_json_name,
                                                             options.console_debug,
                                                             options.timeout,
-                                                            options.http_headers
+                                                            options.http_headers,
+                                                            options.retry_policy_max_attempts,
+                                                            options.retry_policy_initial_backoff,
+                                                            options.retry_policy_max_backoff,
+                                                            options.retry_policy_backoff_multiplier
 #ifdef ENABLE_ASYNC_EXPORT
                                                             ,
                                                             options.max_concurrent_requests,

@@ -135,14 +135,17 @@ public:
 
   /**
    * Create local CURL instance for url and body
-   * @param method // HTTP Method
-   * @param url    // HTTP URL
+   * @param method   HTTP Method
+   * @param url   HTTP URL
    * @param callback
-   * @param request_mode // sync or async
-   * @param request  Request Headers
-   * @param body  Reques Body
-   * @param raw_response whether to parse the response
-   * @param httpConnTimeout   HTTP connection timeout in seconds
+   * @param request_mode   Sync or async
+   * @param request   Request Headers
+   * @param body   Request Body
+   * @param raw_response   Whether to parse the response
+   * @param http_conn_timeout   HTTP connection timeout in seconds
+   * @param reuse_connection   Whether connection should be reused or closed
+   * @param is_log_enabled   To intercept some information from cURL request
+   * @param retry_policy   Retry policy for select failure status codes
    */
   HttpOperation(opentelemetry::ext::http::client::Method method,
                 std::string url,
@@ -159,7 +162,8 @@ public:
                 bool is_raw_response                        = false,
                 std::chrono::milliseconds http_conn_timeout = default_http_conn_timeout,
                 bool reuse_connection                       = false,
-                bool is_log_enabled                         = false);
+                bool is_log_enabled                         = false,
+                const opentelemetry::ext::http::client::RetryPolicy &retry_policy = {});
 
   /**
    * Destroy CURL instance
@@ -175,6 +179,16 @@ public:
    * Cleanup all resource of curl
    */
   void Cleanup();
+
+  /**
+   * Determine if operation is retryable
+   */
+  bool IsRetryable();
+
+  /**
+   * Calculate next time to retry request
+   */
+  std::chrono::system_clock::time_point NextRetryTime();
 
   /**
    * Setup request
@@ -216,7 +230,7 @@ public:
   bool WasAborted() { return is_aborted_.load(std::memory_order_acquire); }
 
   /**
-   * Return a copy of resposne headers
+   * Return a copy of response headers
    *
    * @return
    */
@@ -308,6 +322,9 @@ private:
   const opentelemetry::ext::http::client::Compression &compression_;
 
   const bool is_log_enabled_;
+
+  RetryPolicy retry_policy_;
+  std::chrono::system_clock::time_point last_attempt_time_;
 
   // Processed response headers and body
   long response_code_;

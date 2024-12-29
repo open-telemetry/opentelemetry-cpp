@@ -991,6 +991,7 @@ OtlpHttpClient::createSession(
   request->ReplaceHeader("Content-Type", content_type);
   request->ReplaceHeader("User-Agent", options_.user_agent);
   request->EnableLogging(options_.console_debug);
+  request->SetRetryPolicy(options_.retry_policy);
 
   if (options_.compression == "gzip")
   {

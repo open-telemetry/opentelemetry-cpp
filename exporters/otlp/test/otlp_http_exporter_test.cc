@@ -75,7 +75,8 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
       "",                                 /* ssl_cipher */
       "",                                 /* ssl_cipher_suite */
       options.content_type, options.json_bytes_mapping, options.compression, options.use_json_name,
-      options.console_debug, options.timeout, options.http_headers);
+      options.console_debug, options.timeout, options.http_headers, 0, SecondsDecimal::zero(),
+      SecondsDecimal::zero(), 0);
   if (!async_mode)
   {
     otlp_http_client_options.max_concurrent_requests = 0;
@@ -725,9 +726,9 @@ INSTANTIATE_TEST_SUITE_P(StatusCodes,
                              std::make_tuple(false, StatusCodeVector{502}, 1),
                              std::make_tuple(false, StatusCodeVector{503}, 1),
                              std::make_tuple(false, StatusCodeVector{504}, 1),
-                             std::make_tuple(true, StatusCodeVector{429, 502, 503, 504}, 1),
-                             std::make_tuple(true, StatusCodeVector{503, 503, 503, 200}, 1),
-                             std::make_tuple(true, StatusCodeVector{429, 503, 504, 200}, 1)));
+                             std::make_tuple(false, StatusCodeVector{429, 502, 503, 504}, 1),
+                             std::make_tuple(false, StatusCodeVector{503, 503, 503, 200}, 1),
+                             std::make_tuple(false, StatusCodeVector{429, 503, 504, 200}, 1)));
 
 TEST_P(OtlpHttpExporterRetryIntegrationTests, StatusCodes)
 {
@@ -748,6 +749,7 @@ TEST_P(OtlpHttpExporterRetryIntegrationTests, StatusCodes)
       }};
   HTTP_SERVER_NS::HttpServer server;
   server.setKeepalive(false);
+  server.setServerName("test_server");
   server.addHandler("/v1/traces", request_handler);
   ASSERT_EQ(server.addListeningPort(4318), 4318);
   server.start();
