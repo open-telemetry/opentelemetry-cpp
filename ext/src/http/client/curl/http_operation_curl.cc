@@ -8,6 +8,7 @@
 #include <array>
 #include <atomic>
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <cstring>
 #include <functional>
@@ -15,6 +16,7 @@
 #include <istream>
 #include <map>
 #include <memory>
+#include <random>
 #include <string>
 #include <thread>
 #include <utility>
@@ -287,6 +289,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       compression_(compression),
       is_log_enabled_(is_log_enabled),
       retry_policy_(retry_policy),
+      retry_attempts_(0),
       response_code_(0)
 {
   /* get a curl handle */
@@ -441,15 +444,27 @@ bool HttpOperation::IsRetryable()
   const auto is_retryable = std::find(kRetryableStatusCodes.cbegin(), kRetryableStatusCodes.cend(),
                                       response_code_) != kRetryableStatusCodes.cend();
 
-  return is_retryable && (retry_policy_.max_attempts > 0) &&
-         (retry_policy_.backoff_multiplier > 0.f) &&
-         (retry_policy_.initial_backoff > SecondsDecimal::zero()) &&
-         (retry_policy_.max_backoff > SecondsDecimal::zero());
+  return is_retryable && retry_attempts_ < retry_policy_.max_attempts;
 }
 
 std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
 {
-  return last_attempt_time_ + std::chrono::seconds(1);
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
+  static std::uniform_real_distribution<float> dis(0.8, 1.2);
+
+  SecondsDecimal backoff = retry_policy_.initial_backoff * dis(gen);
+
+  if (retry_attempts_ > 1)
+  {
+    backoff = std::min(retry_policy_.initial_backoff *
+                           std::pow(retry_policy_.backoff_multiplier,
+                                    static_cast<SecondsDecimal::rep>(retry_attempts_ - 1)),
+                       retry_policy_.max_backoff) *
+              dis(gen);
+  }
+
+  return last_attempt_time_ + std::chrono::duration_cast<std::chrono::milliseconds>(backoff);
 }
 
 /*
@@ -1327,7 +1342,7 @@ void HttpOperation::Abort()
 
 void HttpOperation::PerformCurlMessage(CURLcode code)
 {
-  retry_policy_.max_attempts--;
+  ++retry_attempts_;
   last_attempt_time_ = std::chrono::system_clock::now();
   last_curl_result_  = code;
 

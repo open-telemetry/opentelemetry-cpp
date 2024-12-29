@@ -13,6 +13,7 @@
 #  include <future>
 #endif
 
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <regex>
@@ -323,7 +324,8 @@ private:
 
   const bool is_log_enabled_;
 
-  RetryPolicy retry_policy_;
+  const RetryPolicy retry_policy_;
+  std::uint32_t retry_attempts_;
   std::chrono::system_clock::time_point last_attempt_time_;
 
   // Processed response headers and body

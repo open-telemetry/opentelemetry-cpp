@@ -799,11 +799,7 @@ bool HttpClient::doRetrySessions()
 
     if (operation)
     {
-      const auto now             = std::chrono::system_clock::now();
-      const auto next_retry_time = operation->NextRetryTime();
-
-      if (next_retry_time > (now - scheduled_delay_milliseconds_) &&
-          next_retry_time < (now + scheduled_delay_milliseconds_))
+      if (operation->NextRetryTime() < std::chrono::system_clock::now())
       {
         auto easy_handle = operation->GetCurlEasyHandle();
         curl_multi_remove_handle(multi_handle_, easy_handle);
