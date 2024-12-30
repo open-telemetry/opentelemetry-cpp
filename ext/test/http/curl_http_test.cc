@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <curl/curlver.h>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <string.h>
 #include <atomic>
@@ -108,6 +109,17 @@ private:
   std::shared_ptr<http_client::Session> session_;
 };
 
+class RetryEventHandler : public CustomEventHandler
+{
+  void OnResponse(http_client::Response &response) noexcept override
+  {
+    ASSERT_EQ(429, response.GetStatusCode());
+    ASSERT_EQ(response.GetBody().size(), 0);
+    is_called_.store(true, std::memory_order_release);
+    got_response_.store(true, std::memory_order_release);
+  }
+};
+
 class BasicCurlHttpTests : public ::testing::Test, public HTTP_SERVER_NS::HttpRequestCallback
 {
 protected:
@@ -139,6 +151,7 @@ public:
     server_.addHandler("/simple/", *this);
     server_.addHandler("/get/", *this);
     server_.addHandler("/post/", *this);
+    server_.addHandler("/retry/", *this);
     server_.start();
     is_running_ = true;
   }
@@ -169,6 +182,13 @@ public:
       response.headers["Content-Type"] = "application/json";
       response.body                    = "{'k1':'v1', 'k2':'v2', 'k3':'v3'}";
       response_status                  = 200;
+    }
+    else if (request.uri == "/retry/")
+    {
+      std::unique_lock<std::mutex> lk1(mtx_requests);
+      received_requests_.push_back(request);
+      response.headers["Content-Type"] = "text/plain";
+      response_status                  = 429;
     }
 
     cv_got_events.notify_one();
@@ -328,6 +348,52 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
                                        body, compression, false);
   http_operations3.Send();
   delete handler;
+}
+
+TEST_F(BasicCurlHttpTests, ExponentialBackoffRetry)
+{
+  using ::testing::AllOf;
+  using ::testing::Gt;
+  using ::testing::Lt;
+
+  RetryEventHandler handler;
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::Compression compression  = http_client::Compression::kNone;
+  http_client::RetryPolicy retry_policy = {4, 1.0f, 5.0f, 2.0f};
+
+  curl::HttpOperation operation(http_client::Method::Post, "http://127.0.0.1:19000/retry/", no_ssl,
+                                &handler, headers, body, compression, false,
+                                curl::kDefaultHttpConnTimeout, false, false, retry_policy);
+
+  auto first_attempt_time = std::chrono::system_clock::now();
+  ASSERT_EQ(CURLE_OK, operation.Send());
+  ASSERT_TRUE(operation.IsRetryable());
+  ASSERT_THAT(
+      operation.NextRetryTime().time_since_epoch().count(),
+      AllOf(Gt((first_attempt_time + std::chrono::milliseconds{750}).time_since_epoch().count()),
+            Lt((first_attempt_time + std::chrono::milliseconds{1250}).time_since_epoch().count())));
+
+  auto second_attempt_time = std::chrono::system_clock::now();
+  ASSERT_EQ(CURLE_OK, operation.Send());
+  ASSERT_TRUE(operation.IsRetryable());
+  ASSERT_THAT(
+      operation.NextRetryTime().time_since_epoch().count(),
+      AllOf(
+          Gt((second_attempt_time + std::chrono::milliseconds{1550}).time_since_epoch().count()),
+          Lt((second_attempt_time + std::chrono::milliseconds{2450}).time_since_epoch().count())));
+
+  auto third_attempt_time = std::chrono::system_clock::now();
+  ASSERT_EQ(CURLE_OK, operation.Send());
+  ASSERT_TRUE(operation.IsRetryable());
+  ASSERT_THAT(
+      operation.NextRetryTime().time_since_epoch().count(),
+      AllOf(Gt((third_attempt_time + std::chrono::milliseconds{3150}).time_since_epoch().count()),
+            Lt((third_attempt_time + std::chrono::milliseconds{4850}).time_since_epoch().count())));
+
+  ASSERT_EQ(CURLE_OK, operation.Send());
+  ASSERT_FALSE(operation.IsRetryable());
 }
 
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
@@ -559,6 +625,7 @@ TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
   ASSERT_TRUE(handler->is_called_);
   ASSERT_TRUE(handler->got_response_);
 }
+
 TEST_F(BasicCurlHttpTests, BackgroundThreadWaitMore)
 {
   {

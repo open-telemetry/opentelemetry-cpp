@@ -1305,7 +1305,7 @@ Headers HttpOperation::GetResponseHeaders()
     // switching to string comparison. Need to debug and revert back.
 
     /*std::smatch match;
-    std::regex http_headers_regex(http_header_regexp);
+    std::regex http_headers_regex(kHttpHeaderRegexp);
     if (std::regex_search(header, match, http_headers_regex))
       result.insert(std::pair<nostd::string_view, nostd::string_view>(
           static_cast<nostd::string_view>(match[1]), static_cast<nostd::string_view>(match[2])));

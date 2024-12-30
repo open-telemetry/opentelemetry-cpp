@@ -39,9 +39,9 @@ namespace client
 {
 namespace curl
 {
-const std::chrono::milliseconds default_http_conn_timeout(5000);  // ms
-const std::string http_status_regexp = "HTTP\\/\\d\\.\\d (\\d+)\\ .*";
-const std::string http_header_regexp = "(.*)\\: (.*)\\n*";
+const std::chrono::milliseconds kDefaultHttpConnTimeout(5000);  // ms
+const std::string kHttpStatusRegexp = "HTTP\\/\\d\\.\\d (\\d+)\\ .*";
+const std::string kHttpHeaderRegexp = "(.*)\\: (.*)\\n*";
 
 class HttpClient;
 class Session;
@@ -161,7 +161,7 @@ public:
                     opentelemetry::ext::http::client::Compression::kNone,
                 // Default connectivity and response size options
                 bool is_raw_response                        = false,
-                std::chrono::milliseconds http_conn_timeout = default_http_conn_timeout,
+                std::chrono::milliseconds http_conn_timeout = kDefaultHttpConnTimeout,
                 bool reuse_connection                       = false,
                 bool is_log_enabled                         = false,
                 const opentelemetry::ext::http::client::RetryPolicy &retry_policy = {});
