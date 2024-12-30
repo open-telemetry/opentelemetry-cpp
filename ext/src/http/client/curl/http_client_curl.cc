@@ -801,7 +801,7 @@ bool HttpClient::doRetrySessions()
        retry_it != pending_to_retry_sessions_.crend();)
   {
     const auto session   = *retry_it;
-    const auto operation = (nullptr != session) ? session->GetOperation().get() : nullptr;
+    const auto operation = session ? session->GetOperation().get() : nullptr;
 
     if (!operation)
     {

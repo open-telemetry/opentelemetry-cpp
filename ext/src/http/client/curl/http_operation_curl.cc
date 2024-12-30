@@ -444,7 +444,8 @@ bool HttpOperation::IsRetryable()
   const auto is_retryable = std::find(kRetryableStatusCodes.cbegin(), kRetryableStatusCodes.cend(),
                                       response_code_) != kRetryableStatusCodes.cend();
 
-  return is_retryable && retry_attempts_ < retry_policy_.max_attempts;
+  return is_retryable && (last_curl_result_ == CURLE_OK) &&
+         (retry_attempts_ < retry_policy_.max_attempts);
 }
 
 std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
@@ -1404,6 +1405,8 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
     ReleaseResponse();
     // Rewind request data so that read callback can re-transfer the payload
     request_nwrite_ = 0;
+    // Reset session state
+    DispatchEvent(opentelemetry::ext::http::client::SessionState::Connecting);
   }
   else
   {

@@ -747,7 +747,7 @@ TEST_P(OtlpHttpExporterRetryIntegrationTests, StatusCodes)
         return response.code;
       }};
   HTTP_SERVER_NS::HttpServer server;
-  server.setKeepalive(false);
+  server.setKeepalive(true);
   server.setServerName("test_server");
   server.addHandler("/v1/traces", request_handler);
   ASSERT_EQ(server.addListeningPort(4318), 4318);
