@@ -453,8 +453,11 @@ std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
   static std::mt19937 gen(rd());
   static std::uniform_real_distribution<float> dis(0.8, 1.2);
 
+  // The initial retry attempt will occur after initialBackoff * random(0.8, 1.2)
   auto backoff = retry_policy_.initial_backoff;
 
+  // After that, the n-th attempt will occur after
+  // min(initialBackoff*backoffMultiplier**(n-1), maxBackoff) * random(0.8, 1.2))
   if (retry_attempts_ > 1)
   {
     backoff = std::min(retry_policy_.initial_backoff *
@@ -463,7 +466,11 @@ std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
                        retry_policy_.max_backoff);
   }
 
+  // Jitter of plus or minus 0.2 is applied to the backoff delay to avoid hammering servers at the
+  // same time from a large number of clients. Note that this means that the backoff delay may
+  // actually be slightly lower than initialBackoff or slightly higher than maxBackoff
   backoff *= dis(gen);
+
   return last_attempt_time_ + std::chrono::duration_cast<std::chrono::milliseconds>(backoff);
 }
 
@@ -1393,8 +1400,9 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
 
   if (IsRetryable())
   {
-    // Clear any request offset and response data received in previous attempt
+    // Clear any response data received in previous attempt
     ReleaseResponse();
+    // Rewind request data so that read callback can re-transfer the payload
     request_nwrite_ = 0;
   }
   else

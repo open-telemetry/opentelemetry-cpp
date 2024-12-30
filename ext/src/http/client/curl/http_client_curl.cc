@@ -794,8 +794,9 @@ bool HttpClient::doRetrySessions()
 
   // Assumptions:
   // - This is a FIFO list so older sessions, pushed at the front, always end up at the tail
-  // - Retry policy is not changed once HTTP client is initialized, so same settings apply to all
-  // - Iterating backwards should result in removing those items that are due for a retry attempt
+  // - Locking not required because only the background thread would be pushing to this container
+  // - Retry policy is not changed once HTTP client is initialized, so same settings for everyone
+  // - Iterating backwards should result in removing items with minimal or no compacting required
   for (auto retry_it = pending_to_retry_sessions_.crbegin();
        retry_it != pending_to_retry_sessions_.crend();)
   {
