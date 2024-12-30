@@ -349,10 +349,8 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
     grpc_arguments.SetCompressionAlgorithm(GRPC_COMPRESS_GZIP);
   }
 
-  if (options.retry_policy_max_attempts > 0U &&
-      options.retry_policy_initial_backoff > SecondsDecimal::zero() &&
-      options.retry_policy_max_backoff > SecondsDecimal::zero() &&
-      options.retry_policy_backoff_multiplier > 0.f)
+  if (options.retry_policy_max_attempts > 0U && options.retry_policy_initial_backoff > 0.0f &&
+      options.retry_policy_max_backoff > 0.0f && options.retry_policy_backoff_multiplier > 0.0f)
   {
     static const auto kServiceConfigJson = opentelemetry::nostd::string_view{R"(
     {
@@ -382,9 +380,8 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
     // Prior to C++17, need to explicitly cast away constness from `data()` buffer
     std::snprintf(const_cast<decltype(service_config)::value_type *>(service_config.data()),
                   service_config.size(), kServiceConfigJson.data(),
-                  options.retry_policy_max_attempts, options.retry_policy_initial_backoff.count(),
-                  options.retry_policy_max_backoff.count(),
-                  options.retry_policy_backoff_multiplier);
+                  options.retry_policy_max_attempts, options.retry_policy_initial_backoff,
+                  options.retry_policy_max_backoff, options.retry_policy_backoff_multiplier);
 
     grpc_arguments.SetServiceConfigJSON(service_config);
   }
