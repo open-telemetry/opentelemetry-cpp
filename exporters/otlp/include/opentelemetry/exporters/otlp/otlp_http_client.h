@@ -74,14 +74,14 @@ struct OtlpHttpClientOptions
   // Additional HTTP headers
   OtlpHeaders http_headers;
 
+  // Retry policy for select failure codes
+  ext::http::client::RetryPolicy retry_policy;
+
   // Concurrent requests
   std::size_t max_concurrent_requests = 64;
 
   // Requests per connections
   std::size_t max_requests_per_connection = 8;
-
-  // Retry policy for select failure codes
-  ext::http::client::RetryPolicy retry_policy;
 
   // User agent
   std::string user_agent;

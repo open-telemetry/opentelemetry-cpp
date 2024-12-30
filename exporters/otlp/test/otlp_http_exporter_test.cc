@@ -741,7 +741,7 @@ TEST_P(OtlpHttpExporterRetryIntegrationTests, StatusCodes)
 
   size_t request_count = 0UL;
   HTTP_SERVER_NS::HttpRequestCallback request_handler{
-      [&request_count, &status_codes](HTTP_SERVER_NS::HttpRequest const &request,
+      [&request_count, &status_codes](HTTP_SERVER_NS::HttpRequest const & /* request */,
                                       HTTP_SERVER_NS::HttpResponse &response) {
         response.body = "TEST!";
         response.code = status_codes.at(request_count++ % status_codes.size());

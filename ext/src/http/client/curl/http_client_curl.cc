@@ -792,9 +792,14 @@ bool HttpClient::doRetrySessions()
 {
   auto has_data = false;
 
-  for (auto it = pending_to_retry_sessions_.crbegin(); it != pending_to_retry_sessions_.crend();)
+  // Assumptions:
+  // - This is a FIFO list so older sessions, pushed at the front, always end up at the tail
+  // - Retry policy is not changed once HTTP client is initialized, so same settings apply to all
+  // - Iterating backwards should result in removing those items that are due for a retry attempt
+  for (auto retry_it = pending_to_retry_sessions_.crbegin();
+       retry_it != pending_to_retry_sessions_.crend();)
   {
-    const auto session   = *it;
+    const auto session   = *retry_it;
     const auto operation = (nullptr != session) ? session->GetOperation().get() : nullptr;
 
     if (operation)
@@ -805,11 +810,11 @@ bool HttpClient::doRetrySessions()
         curl_multi_remove_handle(multi_handle_, easy_handle);
         curl_multi_add_handle(multi_handle_, easy_handle);
         has_data = true;
-        it       = decltype(it)(pending_to_retry_sessions_.erase(std::next(it).base()));
+        retry_it = decltype(retry_it){pending_to_retry_sessions_.erase(std::next(retry_it).base())};
       }
       else
       {
-        ++it;
+        ++retry_it;
       }
     }
   }
