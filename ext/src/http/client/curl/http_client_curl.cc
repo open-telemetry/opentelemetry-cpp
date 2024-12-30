@@ -802,20 +802,21 @@ bool HttpClient::doRetrySessions()
     const auto session   = *retry_it;
     const auto operation = (nullptr != session) ? session->GetOperation().get() : nullptr;
 
-    if (operation)
+    if (!operation)
     {
-      if (operation->NextRetryTime() < std::chrono::system_clock::now())
-      {
-        auto easy_handle = operation->GetCurlEasyHandle();
-        curl_multi_remove_handle(multi_handle_, easy_handle);
-        curl_multi_add_handle(multi_handle_, easy_handle);
-        has_data = true;
-        retry_it = decltype(retry_it){pending_to_retry_sessions_.erase(std::next(retry_it).base())};
-      }
-      else
-      {
-        ++retry_it;
-      }
+      retry_it = decltype(retry_it){pending_to_retry_sessions_.erase(std::next(retry_it).base())};
+    }
+    else if (operation->NextRetryTime() < std::chrono::system_clock::now())
+    {
+      auto easy_handle = operation->GetCurlEasyHandle();
+      curl_multi_remove_handle(multi_handle_, easy_handle);
+      curl_multi_add_handle(multi_handle_, easy_handle);
+      retry_it = decltype(retry_it){pending_to_retry_sessions_.erase(std::next(retry_it).base())};
+      has_data = true;
+    }
+    else
+    {
+      ++retry_it;
     }
   }
 
