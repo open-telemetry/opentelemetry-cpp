@@ -18,8 +18,6 @@ namespace exporter
 namespace otlp
 {
 
-using SecondsDecimal = std::chrono::duration<float, std::ratio<1>>;
-
 inline std::string GetOtlpDefaultUserAgent()
 {
   return "OTel-OTLP-Exporter-Cpp/" OPENTELEMETRY_SDK_VERSION;
@@ -158,13 +156,13 @@ std::uint32_t GetOtlpDefaultTracesRetryMaxAttempts();
 std::uint32_t GetOtlpDefaultMetricsRetryMaxAttempts();
 std::uint32_t GetOtlpDefaultLogsRetryMaxAttempts();
 
-SecondsDecimal GetOtlpDefaultTracesRetryInitialBackoff();
-SecondsDecimal GetOtlpDefaultMetricsRetryInitialBackoff();
-SecondsDecimal GetOtlpDefaultLogsRetryInitialBackoff();
+float GetOtlpDefaultTracesRetryInitialBackoff();
+float GetOtlpDefaultMetricsRetryInitialBackoff();
+float GetOtlpDefaultLogsRetryInitialBackoff();
 
-SecondsDecimal GetOtlpDefaultTracesRetryMaxBackoff();
-SecondsDecimal GetOtlpDefaultMetricsRetryMaxBackoff();
-SecondsDecimal GetOtlpDefaultLogsRetryMaxBackoff();
+float GetOtlpDefaultTracesRetryMaxBackoff();
+float GetOtlpDefaultMetricsRetryMaxBackoff();
+float GetOtlpDefaultLogsRetryMaxBackoff();
 
 float GetOtlpDefaultTracesRetryBackoffMultiplier();
 float GetOtlpDefaultMetricsRetryBackoffMultiplier();

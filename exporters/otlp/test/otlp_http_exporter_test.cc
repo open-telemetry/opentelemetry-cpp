@@ -75,8 +75,7 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
       "",                                 /* ssl_cipher */
       "",                                 /* ssl_cipher_suite */
       options.content_type, options.json_bytes_mapping, options.compression, options.use_json_name,
-      options.console_debug, options.timeout, options.http_headers, 0, SecondsDecimal::zero(),
-      SecondsDecimal::zero(), 0);
+      options.console_debug, options.timeout, options.http_headers, 0, 0.0, 0.0, 0);
   if (!async_mode)
   {
     otlp_http_client_options.max_concurrent_requests = 0;
@@ -632,8 +631,8 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigRetryDefaultValues)
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 5);
-  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1);
-  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff, 1.0);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff, 5.0);
   ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 1.5);
 }
 
@@ -647,8 +646,8 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigRetryValuesFromEnv)
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 123);
-  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5);
-  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff, 4.5);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff, 6.7);
   ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 8.9);
 
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_MAX_ATTEMPTS");
@@ -667,8 +666,8 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 321);
-  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4);
-  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff, 5.4);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff, 7.6);
   ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 9.8);
 
   unsetenv("OTEL_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS");
@@ -759,16 +758,16 @@ TEST_P(OtlpHttpExporterRetryIntegrationTests, StatusCodes)
   if (is_retry_enabled)
   {
     opts.retry_policy_max_attempts       = 5;
-    opts.retry_policy_initial_backoff    = SecondsDecimal{0.1};
-    opts.retry_policy_max_backoff        = SecondsDecimal{5};
-    opts.retry_policy_backoff_multiplier = 1;
+    opts.retry_policy_initial_backoff    = 0.1f;
+    opts.retry_policy_max_backoff        = 5.0f;
+    opts.retry_policy_backoff_multiplier = 1.0f;
   }
   else
   {
     opts.retry_policy_max_attempts       = 0;
-    opts.retry_policy_initial_backoff    = SecondsDecimal{0};
-    opts.retry_policy_max_backoff        = SecondsDecimal{0};
-    opts.retry_policy_backoff_multiplier = 0;
+    opts.retry_policy_initial_backoff    = 0.0f;
+    opts.retry_policy_max_backoff        = 0.0f;
+    opts.retry_policy_backoff_multiplier = 0.0f;
   }
 
   auto exporter  = otlp::OtlpHttpExporterFactory::Create(opts);

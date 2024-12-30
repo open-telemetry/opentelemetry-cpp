@@ -1174,46 +1174,46 @@ std::uint32_t GetOtlpDefaultLogsRetryMaxAttempts()
   return GetUintEnvVarOrDefault(kSignalEnv, kGenericEnv, 5U);
 }
 
-SecondsDecimal GetOtlpDefaultTracesRetryInitialBackoff()
+float GetOtlpDefaultTracesRetryInitialBackoff()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_RETRY_INITIAL_BACKOFF";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF";
-  return SecondsDecimal{GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 1.0)};
+  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 1.0);
 }
 
-SecondsDecimal GetOtlpDefaultMetricsRetryInitialBackoff()
+float GetOtlpDefaultMetricsRetryInitialBackoff()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_RETRY_INITIAL_BACKOFF";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF";
-  return SecondsDecimal{GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 1.0)};
+  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 1.0);
 }
 
-SecondsDecimal GetOtlpDefaultLogsRetryInitialBackoff()
+float GetOtlpDefaultLogsRetryInitialBackoff()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_RETRY_INITIAL_BACKOFF";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF";
-  return SecondsDecimal{GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 1.0)};
+  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 1.0);
 }
 
-SecondsDecimal GetOtlpDefaultTracesRetryMaxBackoff()
+float GetOtlpDefaultTracesRetryMaxBackoff()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_MAX_BACKOFF";
-  return SecondsDecimal{GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 5.0)};
+  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 5.0);
 }
 
-SecondsDecimal GetOtlpDefaultMetricsRetryMaxBackoff()
+float GetOtlpDefaultMetricsRetryMaxBackoff()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_RETRY_MAX_BACKOFF";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_MAX_BACKOFF";
-  return SecondsDecimal{GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 5.0)};
+  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 5.0);
 }
 
-SecondsDecimal GetOtlpDefaultLogsRetryMaxBackoff()
+float GetOtlpDefaultLogsRetryMaxBackoff()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_RETRY_MAX_BACKOFF";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_MAX_BACKOFF";
-  return SecondsDecimal{GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 5.0)};
+  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 5.0);
 }
 
 float GetOtlpDefaultTracesRetryBackoffMultiplier()

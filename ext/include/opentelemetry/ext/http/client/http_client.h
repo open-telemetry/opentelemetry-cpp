@@ -233,8 +233,8 @@ struct RetryPolicy
   RetryPolicy() = default;
 
   RetryPolicy(std::uint32_t input_max_attempts,
-              SecondsDecimal input_initial_backoff,
-              SecondsDecimal input_max_backoff,
+              SecondsDecimal::rep input_initial_backoff,
+              SecondsDecimal::rep input_max_backoff,
               float input_backoff_multiplier)
       : max_attempts(input_max_attempts),
         initial_backoff(input_initial_backoff),

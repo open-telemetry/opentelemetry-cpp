@@ -453,17 +453,17 @@ std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
   static std::mt19937 gen(rd());
   static std::uniform_real_distribution<float> dis(0.8, 1.2);
 
-  SecondsDecimal backoff = retry_policy_.initial_backoff * dis(gen);
+  auto backoff = retry_policy_.initial_backoff;
 
   if (retry_attempts_ > 1)
   {
     backoff = std::min(retry_policy_.initial_backoff *
                            std::pow(retry_policy_.backoff_multiplier,
                                     static_cast<SecondsDecimal::rep>(retry_attempts_ - 1)),
-                       retry_policy_.max_backoff) *
-              dis(gen);
+                       retry_policy_.max_backoff);
   }
 
+  backoff *= dis(gen);
   return last_attempt_time_ + std::chrono::duration_cast<std::chrono::milliseconds>(backoff);
 }
 
