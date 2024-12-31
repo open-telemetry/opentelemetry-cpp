@@ -350,6 +350,40 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   delete handler;
 }
 
+TEST_F(BasicCurlHttpTests, RetryPolicyEnabled)
+{
+  RetryEventHandler handler;
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::Compression compression  = http_client::Compression::kNone;
+  http_client::RetryPolicy retry_policy = {5, 1.0f, 5.0f, 1.5f};
+
+  curl::HttpOperation operation(http_client::Method::Post, "http://127.0.0.1:19000/retry/", no_ssl,
+                                &handler, headers, body, compression, false,
+                                curl::kDefaultHttpConnTimeout, false, false, retry_policy);
+
+  ASSERT_EQ(CURLE_OK, operation.Send());
+  ASSERT_TRUE(operation.IsRetryable());
+}
+
+TEST_F(BasicCurlHttpTests, RetryPolicyDisabled)
+{
+  RetryEventHandler handler;
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::Compression compression     = http_client::Compression::kNone;
+  http_client::RetryPolicy no_retry_policy = {0, 0.0f, 0.0f, 0.0f};
+
+  curl::HttpOperation operation(http_client::Method::Post, "http://127.0.0.1:19000/retry/", no_ssl,
+                                &handler, headers, body, compression, false,
+                                curl::kDefaultHttpConnTimeout, false, false, no_retry_policy);
+
+  ASSERT_EQ(CURLE_OK, operation.Send());
+  ASSERT_FALSE(operation.IsRetryable());
+}
+
 TEST_F(BasicCurlHttpTests, ExponentialBackoffRetry)
 {
   using ::testing::AllOf;

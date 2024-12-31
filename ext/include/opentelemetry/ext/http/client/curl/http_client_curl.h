@@ -361,7 +361,7 @@ private:
   std::unordered_map<uint64_t, std::shared_ptr<Session>> pending_to_abort_sessions_;
   std::unordered_map<uint64_t, HttpCurlEasyResource> pending_to_remove_session_handles_;
   std::list<std::shared_ptr<Session>> pending_to_remove_sessions_;
-  std::deque<Session *> pending_to_retry_sessions_;
+  std::deque<std::shared_ptr<Session>> pending_to_retry_sessions_;
 
   std::mutex background_thread_m_;
   std::unique_ptr<std::thread> background_thread_;

@@ -486,7 +486,7 @@ bool HttpClient::MaybeSpawnBackgroundThread()
 
                 if (operation->IsRetryable())
                 {
-                  self->pending_to_retry_sessions_.push_front(session);
+                  self->pending_to_retry_sessions_.push_front(hold_session);
                 }
               }
             }
@@ -790,7 +790,8 @@ bool HttpClient::doRemoveSessions()
 
 bool HttpClient::doRetrySessions()
 {
-  auto has_data = false;
+  const auto now = std::chrono::system_clock::now();
+  auto has_data  = false;
 
   // Assumptions:
   // - This is a FIFO list so older sessions, pushed at the front, always end up at the tail
@@ -807,7 +808,7 @@ bool HttpClient::doRetrySessions()
     {
       retry_it = decltype(retry_it){pending_to_retry_sessions_.erase(std::next(retry_it).base())};
     }
-    else if (operation->NextRetryTime() < std::chrono::system_clock::now())
+    else if (operation->NextRetryTime() < now)
     {
       auto easy_handle = operation->GetCurlEasyHandle();
       curl_multi_remove_handle(multi_handle_, easy_handle);

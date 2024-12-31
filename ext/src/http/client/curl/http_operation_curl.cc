@@ -289,7 +289,12 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       compression_(compression),
       is_log_enabled_(is_log_enabled),
       retry_policy_(retry_policy),
-      retry_attempts_(0),
+      retry_attempts_((retry_policy.max_attempts > 0U &&
+                       retry_policy.initial_backoff > SecondsDecimal::zero() &&
+                       retry_policy.max_backoff > SecondsDecimal::zero() &&
+                       retry_policy.backoff_multiplier > 0.0f)
+                          ? 0
+                          : retry_policy.max_attempts),
       response_code_(0)
 {
   /* get a curl handle */
