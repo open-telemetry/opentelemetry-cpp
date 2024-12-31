@@ -93,15 +93,36 @@ public:
  */
 class GlobalLogHandler
 {
+private:
+  struct GlobalLogHandlerData
+  {
+    nostd::shared_ptr<LogHandler> handler;
+    LogLevel log_level;
+    bool destroyed;
+
+    ~GlobalLogHandlerData();
+
+    GlobalLogHandlerData(const GlobalLogHandlerData &) = delete;
+    GlobalLogHandlerData(GlobalLogHandlerData &&)      = delete;
+
+    GlobalLogHandlerData &operator=(const GlobalLogHandlerData &) = delete;
+    GlobalLogHandlerData &operator=(GlobalLogHandlerData &&)      = delete;
+  };
+
 public:
   /**
    * Returns the singleton LogHandler.
    *
    * By default, a default LogHandler is returned.
    */
-  static inline const nostd::shared_ptr<LogHandler> &GetLogHandler() noexcept
+  static inline nostd::shared_ptr<LogHandler> GetLogHandler() noexcept
   {
-    return GetHandlerAndLevel().first;
+    if OPENTELEMETRY_UNLIKELY_CONDITION (GetHandlerAndLevel().destroyed)
+    {
+      return nostd::shared_ptr<LogHandler>();
+    }
+
+    return GetHandlerAndLevel().handler;
   }
 
   /**
@@ -111,7 +132,12 @@ public:
    */
   static inline void SetLogHandler(const nostd::shared_ptr<LogHandler> &eh) noexcept
   {
-    GetHandlerAndLevel().first = eh;
+    if OPENTELEMETRY_UNLIKELY_CONDITION (GetHandlerAndLevel().destroyed)
+    {
+      return;
+    }
+
+    GetHandlerAndLevel().handler = eh;
   }
 
   /**
@@ -119,17 +145,20 @@ public:
    *
    * By default, a default log level is returned.
    */
-  static inline LogLevel GetLogLevel() noexcept { return GetHandlerAndLevel().second; }
+  static inline LogLevel GetLogLevel() noexcept { return GetHandlerAndLevel().log_level; }
 
   /**
    * Changes the singleton Log level.
    * This should be called once at the start of application before creating any Provider
    * instance.
    */
-  static inline void SetLogLevel(LogLevel level) noexcept { GetHandlerAndLevel().second = level; }
+  static inline void SetLogLevel(LogLevel level) noexcept
+  {
+    GetHandlerAndLevel().log_level = level;
+  }
 
 private:
-  static std::pair<nostd::shared_ptr<LogHandler>, LogLevel> &GetHandlerAndLevel() noexcept;
+  static GlobalLogHandlerData &GetHandlerAndLevel() noexcept;
 };
 
 }  // namespace internal_log
