@@ -57,6 +57,12 @@ void NoopLogHandler::Handle(LogLevel,
                             const sdk::common::AttributeMap &) noexcept
 {}
 
+GlobalLogHandler::GlobalLogHandlerData::GlobalLogHandlerData()
+    : handler(nostd::shared_ptr<LogHandler>(new DefaultLogHandler)),
+      log_level(LogLevel::Warning),
+      destroyed(false)
+{}
+
 GlobalLogHandler::GlobalLogHandlerData::~GlobalLogHandlerData()
 {
   destroyed = true;
@@ -64,8 +70,7 @@ GlobalLogHandler::GlobalLogHandlerData::~GlobalLogHandlerData()
 
 GlobalLogHandler::GlobalLogHandlerData &GlobalLogHandler::GetHandlerAndLevel() noexcept
 {
-  static GlobalLogHandlerData handler_and_level{
-      nostd::shared_ptr<LogHandler>(new DefaultLogHandler), LogLevel::Warning, false};
+  static GlobalLogHandlerData handler_and_level;
   return handler_and_level;
 }
 

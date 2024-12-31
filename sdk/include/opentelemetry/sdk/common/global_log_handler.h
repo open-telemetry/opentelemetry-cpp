@@ -100,6 +100,7 @@ private:
     LogLevel log_level;
     bool destroyed;
 
+    GlobalLogHandlerData();
     ~GlobalLogHandlerData();
 
     GlobalLogHandlerData(const GlobalLogHandlerData &) = delete;
