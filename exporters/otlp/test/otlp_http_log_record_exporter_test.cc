@@ -58,18 +58,26 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
   options.content_type  = content_type;
   options.console_debug = true;
   options.http_headers.insert(std::make_pair("Custom-Header-Key", "Custom-Header-Value"));
+  options.retry_policy_max_attempts       = 0U;
+  options.retry_policy_initial_backoff    = 0.0f;
+  options.retry_policy_max_backoff        = 0.0f;
+  options.retry_policy_backoff_multiplier = 0.0f;
   OtlpHttpClientOptions otlp_http_client_options(
-      options.url, false,                 /* ssl_insecure_skip_verify */
-      "", /* ssl_ca_cert_path */ "",      /* ssl_ca_cert_string */
-      "",                                 /* ssl_client_key_path */
-      "", /* ssl_client_key_string */ "", /* ssl_client_cert_path */
-      "",                                 /* ssl_client_cert_string */
-      "",                                 /* ssl_min_tls */
-      "",                                 /* ssl_max_tls */
-      "",                                 /* ssl_cipher */
-      "",                                 /* ssl_cipher_suite */
+      options.url, false, /* ssl_insecure_skip_verify */
+      "",                 /* ssl_ca_cert_path */
+      "",                 /* ssl_ca_cert_string */
+      "",                 /* ssl_client_key_path */
+      "",                 /* ssl_client_key_string */
+      "",                 /* ssl_client_cert_path */
+      "",                 /* ssl_client_cert_string */
+      "",                 /* ssl_min_tls */
+      "",                 /* ssl_max_tls */
+      "",                 /* ssl_cipher */
+      "",                 /* ssl_cipher_suite */
       options.content_type, options.json_bytes_mapping, options.compression, options.use_json_name,
-      options.console_debug, options.timeout, options.http_headers, 0, 0.0, 0.0, 0);
+      options.console_debug, options.timeout, options.http_headers,
+      options.retry_policy_max_attempts, options.retry_policy_initial_backoff,
+      options.retry_policy_max_backoff, options.retry_policy_backoff_multiplier);
   if (!async_mode)
   {
     otlp_http_client_options.max_concurrent_requests = 0;
