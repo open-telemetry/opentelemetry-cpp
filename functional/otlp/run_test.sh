@@ -130,7 +130,7 @@ echo "###############################################################"
 echo ""
 
 docker run -d \
-  -v `pwd`/otel-docker-config-https-mtls.yaml:/otel-cpp/otel-config-mtls.yaml${USE_MOUNT_OPTION} \
+  -v `pwd`/otel-docker-config-https-mtls.yaml:/otel-cpp/otel-config.yaml${USE_MOUNT_OPTION} \
   -v `pwd`/../cert/ca.pem:/otel-cpp/ca.pem${USE_MOUNT_OPTION} \
   -v `pwd`/../cert/client_cert.pem:/otel-cpp/client_cert.pem${USE_MOUNT_OPTION} \
   -v `pwd`/../cert/server_cert.pem:/otel-cpp/server_cert.pem${USE_MOUNT_OPTION} \

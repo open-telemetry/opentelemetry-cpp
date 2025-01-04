@@ -30,6 +30,8 @@ export CERT_DIR=../cert
 
 export TEST_BIN_DIR=${BUILD_DIR}/functional/otlp/
 
+[ ! -f "${TEST_BIN_DIR}/${TEST_EXECUTABLE}" ] && echo "${TEST_EXECUTABLE} not built in this configuration" && exit 0
+
 ${TEST_BIN_DIR}/${TEST_EXECUTABLE} --list > test_list.txt
 
 export TEST_FULL_NAME=""

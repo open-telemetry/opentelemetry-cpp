@@ -326,11 +326,14 @@ int test_mtls_no_client_cert();
 int test_mtls_no_client_key();
 int test_mtls_wrong_client_key();
 
-static const test_case all_tests[] = {{"mtls-ok", test_mtls_ok},
-                                      {"mtls-no-ca-cert", test_mtls_no_ca_cert},
-                                      {"mtls-no-client-cert", test_mtls_no_client_cert},
-                                      {"mtls-no-client-key", test_mtls_no_client_key},
-                                      {"", nullptr}};
+static const test_case all_tests[] = {
+#ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
+    {"mtls-ok", test_mtls_ok},
+    {"mtls-no-ca-cert", test_mtls_no_ca_cert},
+    {"mtls-no-client-cert", test_mtls_no_client_cert},
+    {"mtls-no-client-key", test_mtls_no_client_key},
+#endif  // ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
+    {"", nullptr}};
 
 void list_test_cases()
 {
@@ -454,6 +457,7 @@ int expect_export_failed()
   return TEST_FAILED;
 }
 
+#ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
 int test_mtls_ok()
 {
   otlp::OtlpGrpcExporterOptions opts;
@@ -586,3 +590,4 @@ int test_mtls_no_client_key()
 
   return expect_connection_failed();
 }
+#endif  // ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW

@@ -452,8 +452,7 @@ jobs:
       run: |
         sudo ./ci/setup_grpc.sh
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
-        - name: generate test cert
-    - name: generate test cert      
+    - name: generate test cert
       env:
         CFSSL_VERSION: 1.6.3
       run: |
