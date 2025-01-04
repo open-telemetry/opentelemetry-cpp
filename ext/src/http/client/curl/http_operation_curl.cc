@@ -466,10 +466,10 @@ std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
   // min(initialBackoff*backoffMultiplier**(n-1), maxBackoff) * random(0.8, 1.2))
   if (retry_attempts_ > 1)
   {
-    backoff = std::min(retry_policy_.initial_backoff *
-                           std::pow(retry_policy_.backoff_multiplier,
-                                    static_cast<SecondsDecimal::rep>(retry_attempts_ - 1)),
-                       retry_policy_.max_backoff);
+    backoff = (std::min)(retry_policy_.initial_backoff *
+                             std::pow(retry_policy_.backoff_multiplier,
+                                      static_cast<SecondsDecimal::rep>(retry_attempts_ - 1)),
+                         retry_policy_.max_backoff);
   }
 
   // Jitter of plus or minus 0.2 is applied to the backoff delay to avoid hammering servers at the
