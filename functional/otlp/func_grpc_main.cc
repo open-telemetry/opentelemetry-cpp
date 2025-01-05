@@ -320,20 +320,36 @@ struct test_case
   test_func_t m_func;
 };
 
-int test_mtls_ok();
-int test_mtls_no_ca_cert();
-int test_mtls_no_client_cert();
-int test_mtls_no_client_key();
-int test_mtls_wrong_client_key();
+int test_basic();
 
-static const test_case all_tests[] = {
+int test_cert_not_found();
+int test_cert_invalid();
+int test_cert_unreadable();
+int test_client_cert_not_found();
+int test_client_cert_invalid();
+int test_client_cert_unreadable();
+int test_client_cert_no_key();
+int test_client_key_not_found();
+int test_client_key_invalid();
+int test_client_key_unreadable();
+
+int test_mtls_ok();
+
+static const test_case all_tests[] = {{"basic", test_basic},
+                                      {"cert-not-found", test_cert_not_found},
+                                      {"cert-invalid", test_cert_invalid},
+                                      {"cert-unreadable", test_cert_unreadable},
 #ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
-    {"mtls-ok", test_mtls_ok},
-    {"mtls-no-ca-cert", test_mtls_no_ca_cert},
-    {"mtls-no-client-cert", test_mtls_no_client_cert},
-    {"mtls-no-client-key", test_mtls_no_client_key},
+                                      {"client-cert-not-found", test_client_cert_not_found},
+                                      {"client-cert-invalid", test_client_cert_invalid},
+                                      {"client-cert-unreadable", test_client_cert_unreadable},
+                                      {"client-cert-no-key", test_client_cert_no_key},
+                                      {"client-key-not-found", test_client_key_not_found},
+                                      {"client-key-invalid", test_client_key_invalid},
+                                      {"client-key-unreadable", test_client_key_unreadable},
+                                      {"mtls-ok", test_mtls_ok},
 #endif  // ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
-    {"", nullptr}};
+                                      {"", nullptr}};
 
 void list_test_cases()
 {
@@ -457,7 +473,318 @@ int expect_export_failed()
   return TEST_FAILED;
 }
 
+int test_basic()
+{
+  otlp::OtlpGrpcExporterOptions opts;
+
+  set_common_opts(opts);
+
+  instrumented_payload(opts);
+
+  if (opt_mode == TestMode::kNone)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttp))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttps))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == TestMode::kHttp))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_connection_failed();
+}
+
+int test_cert_not_found()
+{
+  otlp::OtlpGrpcExporterOptions opts;
+
+  set_common_opts(opts);
+  opts.ssl_credentials_cacert_path = opt_cert_dir + "/no-such-file.pem";
+
+  instrumented_payload(opts);
+
+  if (opt_mode == TestMode::kNone)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttp))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttps))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
+}
+
+int test_cert_invalid()
+{
+  otlp::OtlpGrpcExporterOptions opts;
+
+  set_common_opts(opts);
+  opts.ssl_credentials_cacert_path = opt_cert_dir + "/garbage.pem";
+
+  instrumented_payload(opts);
+
+  if (opt_mode == TestMode::kNone)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttp))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttps))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
+}
+
+int test_cert_unreadable()
+{
+  otlp::OtlpGrpcExporterOptions opts;
+
+  set_common_opts(opts);
+  opts.ssl_credentials_cacert_path = opt_cert_dir + "/unreadable.pem";
+
+  instrumented_payload(opts);
+
+  if (opt_mode == TestMode::kNone)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttp))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttps))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
+}
+
 #ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
+int test_client_cert_not_found()
+{
+  otlp::OtlpGrpcExporterOptions opts;
+
+  set_common_opts(opts);
+  opts.ssl_credentials_cacert_path = opt_cert_dir + "/ca.pem";
+  opts.ssl_client_cert_path        = opt_cert_dir + "/no-such-file.pem";
+
+  instrumented_payload(opts);
+
+  if (opt_mode == TestMode::kNone)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttp))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttps))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
+}
+
+int test_client_cert_invalid()
+{
+  otlp::OtlpGrpcExporterOptions opts;
+
+  set_common_opts(opts);
+  opts.ssl_credentials_cacert_path = opt_cert_dir + "/ca.pem";
+  opts.ssl_client_cert_path        = opt_cert_dir + "/garbage.pem";
+
+  instrumented_payload(opts);
+
+  if (opt_mode == TestMode::kNone)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttp))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttps))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
+}
+
+int test_client_cert_unreadable()
+{
+  otlp::OtlpGrpcExporterOptions opts;
+
+  set_common_opts(opts);
+  opts.ssl_credentials_cacert_path = opt_cert_dir + "/ca.pem";
+  opts.ssl_client_cert_path        = opt_cert_dir + "/unreadable.pem";
+
+  instrumented_payload(opts);
+
+  if (opt_mode == TestMode::kNone)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttp))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttps))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
+}
+
+int test_client_cert_no_key()
+{
+  otlp::OtlpGrpcExporterOptions opts;
+
+  set_common_opts(opts);
+  opts.ssl_credentials_cacert_path = opt_cert_dir + "/ca.pem";
+  opts.ssl_client_cert_path        = opt_cert_dir + "/client_cert.pem";
+
+  instrumented_payload(opts);
+
+  if (opt_mode == TestMode::kNone)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttp))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttps))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
+}
+
+int test_client_key_not_found()
+{
+  otlp::OtlpGrpcExporterOptions opts;
+
+  set_common_opts(opts);
+  opts.ssl_credentials_cacert_path = opt_cert_dir + "/ca.pem";
+  opts.ssl_client_cert_path        = opt_cert_dir + "/client_cert.pem";
+  opts.ssl_client_key_path         = opt_cert_dir + "/no-such-file.pem";
+
+  instrumented_payload(opts);
+
+  if (opt_mode == TestMode::kNone)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttp))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttps))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
+}
+
+int test_client_key_invalid()
+{
+  otlp::OtlpGrpcExporterOptions opts;
+
+  set_common_opts(opts);
+  opts.ssl_credentials_cacert_path = opt_cert_dir + "/ca.pem";
+  opts.ssl_client_cert_path        = opt_cert_dir + "/client_cert.pem";
+  opts.ssl_client_key_path         = opt_cert_dir + "/garbage.pem";
+
+  instrumented_payload(opts);
+
+  if (opt_mode == TestMode::kNone)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttp))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttps))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
+}
+
+int test_client_key_unreadable()
+{
+  otlp::OtlpGrpcExporterOptions opts;
+
+  set_common_opts(opts);
+  opts.ssl_credentials_cacert_path = opt_cert_dir + "/ca.pem";
+  opts.ssl_client_cert_path        = opt_cert_dir + "/client_cert.pem";
+  opts.ssl_client_key_path         = opt_cert_dir + "/unreadable.pem";
+
+  instrumented_payload(opts);
+
+  if (opt_mode == TestMode::kNone)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttp))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == TestMode::kHttps))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
+}
+
 int test_mtls_ok()
 {
   otlp::OtlpGrpcExporterOptions opts;
@@ -490,104 +817,5 @@ int test_mtls_ok()
   }
 
   return expect_success();
-}
-
-int test_mtls_no_ca_cert()
-{
-  otlp::OtlpGrpcExporterOptions opts;
-
-  set_common_opts(opts);
-  opts.ssl_client_cert_path = opt_cert_dir + "/client_cert.pem";
-  opts.ssl_client_key_path  = opt_cert_dir + "/client_cert-key.pem";
-
-  instrumented_payload(opts);
-
-  if (opt_mode == TestMode::kNone)
-  {
-    return expect_connection_failed();
-  }
-
-  if (!opt_secure && (opt_mode == TestMode::kHttp))
-  {
-    return expect_connection_failed();
-  }
-
-  if (!opt_secure && (opt_mode == TestMode::kHttps))
-  {
-    return expect_connection_failed();
-  }
-
-  if (opt_secure && (opt_mode == TestMode::kHttp))
-  {
-    return expect_connection_failed();
-  }
-
-  return expect_connection_failed();
-}
-
-int test_mtls_no_client_cert()
-{
-  otlp::OtlpGrpcExporterOptions opts;
-
-  set_common_opts(opts);
-  opts.ssl_credentials_cacert_path = opt_cert_dir + "/ca.pem";
-  opts.ssl_client_key_path         = opt_cert_dir + "/client_cert-key.pem";
-
-  instrumented_payload(opts);
-
-  if (opt_mode == TestMode::kNone)
-  {
-    return expect_connection_failed();
-  }
-
-  if (!opt_secure && (opt_mode == TestMode::kHttp))
-  {
-    return expect_connection_failed();
-  }
-
-  if (!opt_secure && (opt_mode == TestMode::kHttps))
-  {
-    return expect_connection_failed();
-  }
-
-  if (opt_secure && (opt_mode == TestMode::kHttp))
-  {
-    return expect_connection_failed();
-  }
-
-  return expect_connection_failed();
-}
-
-int test_mtls_no_client_key()
-{
-  otlp::OtlpGrpcExporterOptions opts;
-
-  set_common_opts(opts);
-  opts.ssl_credentials_cacert_path = opt_cert_dir + "/ca.pem";
-  opts.ssl_client_cert_path        = opt_cert_dir + "/client_cert.pem";
-
-  instrumented_payload(opts);
-
-  if (opt_mode == TestMode::kNone)
-  {
-    return expect_connection_failed();
-  }
-
-  if (!opt_secure && (opt_mode == TestMode::kHttp))
-  {
-    return expect_connection_failed();
-  }
-
-  if (!opt_secure && (opt_mode == TestMode::kHttps))
-  {
-    return expect_connection_failed();
-  }
-
-  if (opt_secure && (opt_mode == TestMode::kHttp))
-  {
-    return expect_connection_failed();
-  }
-
-  return expect_connection_failed();
 }
 #endif  // ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW

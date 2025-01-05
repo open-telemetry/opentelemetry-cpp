@@ -9,14 +9,11 @@ set -e
 # - make sure docker is running
 # - set BUILD_DIR to the top level build directory,
 
-[ -z "${BUILD_DIR}" ] && export BUILD_DIR=$HOME/build
+[ -z "${BUILD_DIR}" ] && export BUILD_DIR="${HOME}/build"
 
 export CERT_DIR=../cert
 
-export TEST_BIN_DIR=${BUILD_DIR}/functional/otlp/
-
-export TEST_EXECUTABLE="func_otlp_http"
-export TEST_URL="localhost:4318/v1/traces"
+export TEST_BIN_DIR="${BUILD_DIR}/functional/otlp/"
 
 # SELINUX
 # https://docs.docker.com/storage/bind-mounts/#configure-the-selinux-label
@@ -31,8 +28,6 @@ if [ -x "$(command -v getenforce)" ]; then
   fi;
 fi
 
-${TEST_BIN_DIR}/func_otlp_http --list > test_list.txt
-
 #
 # Prepare docker image
 #
@@ -40,6 +35,13 @@ ${TEST_BIN_DIR}/func_otlp_http --list > test_list.txt
 docker build -t otelcpp-func-test .
 
 echo "REPORT:" > report.log
+
+#
+# Exercising HTTP functional tests
+#
+
+export TEST_EXECUTABLE="func_otlp_http"
+export TEST_URL="localhost:4318/v1/traces"
 
 #
 # MODE 'NONE'
@@ -112,9 +114,8 @@ echo ""
 docker stop otelcpp-test-https
 docker rm otelcpp-test-https
 
-
 #
-# Switch to exercising gRPC functional tests
+# Exercising gRPC functional tests
 #
 export TEST_EXECUTABLE="func_otlp_grpc"
 export TEST_URL="localhost:4317"
@@ -170,7 +171,7 @@ echo "TEST VERDICT: ${PASSED_COUNT} PASSED, ${FAILED_COUNT} FAILED"
 echo "###############################################################"
 echo ""
 
-if [ ${FAILED_COUNT} != "0" ]; then
+if [ "${FAILED_COUNT}" != "0" ]; then
   #
   # CI FAILED
   #

@@ -28,11 +28,11 @@ set -e
 
 export CERT_DIR=../cert
 
-export TEST_BIN_DIR=${BUILD_DIR}/functional/otlp/
+export TEST_BIN_DIR="${BUILD_DIR}/functional/otlp/"
 
-[ ! -f "${TEST_BIN_DIR}/${TEST_EXECUTABLE}" ] && echo "${TEST_EXECUTABLE} not built in this configuration" && exit 0
+[ ! -f "${TEST_BIN_DIR}/${TEST_EXECUTABLE}" ] && echo "::notice::Executable ${TEST_EXECUTABLE} not built in this configuration" && exit 0
 
-${TEST_BIN_DIR}/${TEST_EXECUTABLE} --list > test_list.txt
+"${TEST_BIN_DIR}/${TEST_EXECUTABLE}" --list > test_list.txt
 
 export TEST_FULL_NAME=""
 
@@ -48,7 +48,7 @@ do
   echo "====================================================================="
   echo "Running test ${T} on ${TEST_RUN} ${TEST_ENDPOINT} with server ${SERVER_MODE}"
   TEST_FULL_NAME="${T}-${TEST_RUN}-${SERVER_MODE}"
-  ${TEST_BIN_DIR}/${TEST_EXECUTABLE} --debug --mode ${SERVER_MODE} --cert-dir ${CERT_DIR} --endpoint ${TEST_ENDPOINT} ${T}
+  "${TEST_BIN_DIR}/${TEST_EXECUTABLE}" --debug --mode ${SERVER_MODE} --cert-dir ${CERT_DIR} --endpoint ${TEST_ENDPOINT} ${T}
   RC=$?
   if [ ${RC} -eq 0 ]; then
     echo "TEST ${TEST_FULL_NAME}: PASSED" | tee -a report.log
@@ -69,7 +69,7 @@ do
   echo "====================================================================="
   echo "Running test ${T} on ${TEST_RUN} ${TEST_ENDPOINT} with server ${SERVER_MODE}"
   TEST_FULL_NAME="${T}-${TEST_RUN}-${SERVER_MODE}"
-  ${TEST_BIN_DIR}/${TEST_EXECUTABLE} --debug --mode ${SERVER_MODE} --cert-dir ${CERT_DIR} --endpoint ${TEST_ENDPOINT} ${T}
+  "${TEST_BIN_DIR}/${TEST_EXECUTABLE}" --debug --mode ${SERVER_MODE} --cert-dir ${CERT_DIR} --endpoint ${TEST_ENDPOINT} ${T}
   RC=$?
   if [ ${RC} -eq 0 ]; then
     echo "TEST ${TEST_FULL_NAME}: PASSED" | tee -a report.log
