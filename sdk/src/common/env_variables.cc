@@ -10,8 +10,12 @@
 #  include <strings.h>
 #endif
 
+#include <cctype>
+#include <cmath>
 #include <cstdlib>
+#include <limits>
 #include <ostream>
+#include <type_traits>
 
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -22,6 +26,117 @@ namespace sdk
 {
 namespace common
 {
+
+template <typename T, typename U, std::enable_if_t<std::is_integral<U>::value, bool> = true>
+constexpr bool ParseNumber(T &&input, U &output)
+{
+  constexpr auto max_value = std::numeric_limits<U>::max();
+
+  // Skip spaces
+  for (; *input && std::isspace(*input); ++input)
+    ;
+
+  const auto is_negative = (*input && *input == '-');
+
+  if (is_negative)
+  {
+    ++input;
+
+    // Reject negative when expecting unsigned
+    if (std::is_unsigned<U>::value)
+    {
+      return false;
+    }
+  }
+
+  const auto pos = input;
+  U result       = 0;
+  U temp         = 0;
+
+  for (; *input && std::isdigit(*input); ++input)
+  {
+    temp = result * 10 + (*input - '0');
+
+    if (max_value - temp > max_value - result)
+    {
+      return false;  // Overflow protection
+    }
+
+    result = temp;
+  }
+
+  result *= (is_negative) ? -1 : 1;
+
+  // Reject if nothing parsed
+  if (pos != input)
+  {
+    output = result;
+    return true;
+  }
+
+  return false;
+}
+
+template <typename T, typename U, std::enable_if_t<std::is_floating_point<U>::value, bool> = true>
+constexpr bool ParseNumber(T &&input, U &output)
+{
+  // Skip spaces
+  for (; *input && std::isspace(*input); ++input)
+    ;
+
+  const auto is_negative = (*input && *input == '-');
+
+  if (is_negative)
+  {
+    ++input;
+  }
+
+  const auto pos  = input;
+  U result        = 0;
+  U temp          = 0;
+  U decimal_mul   = 0.1f;
+  bool is_decimal = false;
+
+  for (; *input && (std::isdigit(*input) || !is_decimal); ++input)
+  {
+    if (*input == '.' && !is_decimal)
+    {
+      is_decimal = true;
+      continue;
+    }
+    else if (*input == '.' && is_decimal)
+    {
+      break;
+    }
+    else if (is_decimal)
+    {
+      temp = result + decimal_mul * (*input - '0');
+      decimal_mul *= 0.1f;
+    }
+    else
+    {
+      temp = result * 10 + (*input - '0');
+    }
+
+    if (std::isinf(temp))
+    {
+      return false;  // Overflow protection
+    }
+
+    result = temp;
+  }
+
+  result *= (is_negative) ? -1.0f : 1.0f;
+
+  // Reject if nothing parsed
+  if (pos != input && !std::isnan(output) && !std::isinf(output))
+  {
+    output = result;
+    return true;
+  }
+
+  return false;
+}
 
 bool GetRawEnvironmentVariable(const char *env_var_name, std::string &value)
 {
@@ -88,16 +203,7 @@ static bool GetTimeoutFromString(const char *input, std::chrono::system_clock::d
 {
   std::chrono::system_clock::duration::rep result = 0;
 
-  // Skip spaces
-  for (; *input && (' ' == *input || '\t' == *input || '\r' == *input || '\n' == *input); ++input)
-    ;
-
-  for (; *input && (*input >= '0' && *input <= '9'); ++input)
-  {
-    result = result * 10 + (*input - '0');
-  }
-
-  if (result == 0)
+  if (!ParseNumber(input, result))
   {
     // Rejecting duration 0 as invalid.
     return false;
@@ -190,6 +296,52 @@ bool GetStringEnvironmentVariable(const char *env_var_name, std::string &value)
   {
     return false;
   }
+  return true;
+}
+
+bool GetUintEnvironmentVariable(const char *env_var_name, std::uint32_t &value)
+{
+  static constexpr auto kDefaultValue = 0U;
+  std::string raw_value;
+  bool exists = GetRawEnvironmentVariable(env_var_name, raw_value);
+  if (!exists || raw_value.empty())
+  {
+    value = kDefaultValue;
+    return false;
+  }
+
+  if (!ParseNumber(raw_value.c_str(), value))
+  {
+    OTEL_INTERNAL_LOG_WARN("Environment variable <" << env_var_name << "> has an invalid value <"
+                                                    << raw_value << ">, defaulting to "
+                                                    << kDefaultValue);
+    value = kDefaultValue;
+    return false;
+  }
+
+  return true;
+}
+
+bool GetFloatEnvironmentVariable(const char *env_var_name, float &value)
+{
+  static constexpr auto kDefaultValue = 0.0f;
+  std::string raw_value;
+  bool exists = GetRawEnvironmentVariable(env_var_name, raw_value);
+  if (!exists || raw_value.empty())
+  {
+    value = kDefaultValue;
+    return false;
+  }
+
+  if (!ParseNumber(raw_value.c_str(), value))
+  {
+    OTEL_INTERNAL_LOG_WARN("Environment variable <" << env_var_name << "> has an invalid value <"
+                                                    << raw_value << ">, defaulting to "
+                                                    << kDefaultValue);
+    value = kDefaultValue;
+    return false;
+  }
+
   return true;
 }
 

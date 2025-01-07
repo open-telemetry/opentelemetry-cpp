@@ -80,32 +80,36 @@ static bool GetStringDualEnvVar(const char *signal_name,
   return exists;
 }
 
-static std::uint32_t GetUintEnvVarOrDefault(opentelemetry::nostd::string_view signal_env,
-                                            opentelemetry::nostd::string_view generic_env,
-                                            std::uint32_t default_value)
+static bool GetUintDualEnvVar(const char *signal_name,
+                              const char *generic_name,
+                              std::uint32_t &value)
 {
-  std::string value;
+  bool exists;
 
-  if (GetStringDualEnvVar(signal_env.data(), generic_env.data(), value))
+  exists = sdk_common::GetUintEnvironmentVariable(signal_name, value);
+  if (exists)
   {
-    return static_cast<std::uint32_t>(std::strtoul(value.c_str(), nullptr, 10));
+    return true;
   }
 
-  return default_value;
+  exists = sdk_common::GetUintEnvironmentVariable(generic_name, value);
+
+  return exists;
 }
 
-static float GetFloatEnvVarOrDefault(opentelemetry::nostd::string_view signal_env,
-                                     opentelemetry::nostd::string_view generic_env,
-                                     float default_value)
+static float GetFloatDualEnvVar(const char *signal_name, const char *generic_name, float &value)
 {
-  std::string value;
+  bool exists;
 
-  if (GetStringDualEnvVar(signal_env.data(), generic_env.data(), value))
+  exists = sdk_common::GetFloatEnvironmentVariable(signal_name, value);
+  if (exists)
   {
-    return std::strtof(value.c_str(), nullptr);
+    return true;
   }
 
-  return default_value;
+  exists = sdk_common::GetFloatEnvironmentVariable(generic_name, value);
+
+  return exists;
 }
 
 std::string GetOtlpDefaultGrpcTracesEndpoint()
@@ -1157,84 +1161,168 @@ std::uint32_t GetOtlpDefaultTracesRetryMaxAttempts()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_RETRY_MAX_ATTEMPTS";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS";
-  return GetUintEnvVarOrDefault(kSignalEnv, kGenericEnv, 5U);
+  std::uint32_t value{};
+
+  if (GetUintDualEnvVar(kSignalEnv, kGenericEnv, value))
+  {
+    return value;
+  }
+
+  return 5U;
 }
 
 std::uint32_t GetOtlpDefaultMetricsRetryMaxAttempts()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_RETRY_MAX_ATTEMPTS";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS";
-  return GetUintEnvVarOrDefault(kSignalEnv, kGenericEnv, 5U);
+  std::uint32_t value{};
+
+  if (GetUintDualEnvVar(kSignalEnv, kGenericEnv, value))
+  {
+    return value;
+  }
+
+  return 5U;
 }
 
 std::uint32_t GetOtlpDefaultLogsRetryMaxAttempts()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_RETRY_MAX_ATTEMPTS";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS";
-  return GetUintEnvVarOrDefault(kSignalEnv, kGenericEnv, 5U);
+  std::uint32_t value{};
+
+  if (GetUintDualEnvVar(kSignalEnv, kGenericEnv, value))
+  {
+    return value;
+  }
+
+  return 5U;
 }
 
 float GetOtlpDefaultTracesRetryInitialBackoff()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_RETRY_INITIAL_BACKOFF";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF";
-  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 1.0);
+  float value{};
+
+  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  {
+    return value;
+  }
+
+  return 1.0f;
 }
 
 float GetOtlpDefaultMetricsRetryInitialBackoff()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_RETRY_INITIAL_BACKOFF";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF";
-  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 1.0);
+  float value{};
+
+  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  {
+    return value;
+  }
+
+  return 1.0f;
 }
 
 float GetOtlpDefaultLogsRetryInitialBackoff()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_RETRY_INITIAL_BACKOFF";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF";
-  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 1.0);
+  float value{};
+
+  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  {
+    return value;
+  }
+
+  return 1.0f;
 }
 
 float GetOtlpDefaultTracesRetryMaxBackoff()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_MAX_BACKOFF";
-  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 5.0);
+  float value{};
+
+  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  {
+    return value;
+  }
+
+  return 5.0f;
 }
 
 float GetOtlpDefaultMetricsRetryMaxBackoff()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_RETRY_MAX_BACKOFF";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_MAX_BACKOFF";
-  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 5.0);
+  float value{};
+
+  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  {
+    return value;
+  }
+
+  return 5.0f;
 }
 
 float GetOtlpDefaultLogsRetryMaxBackoff()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_RETRY_MAX_BACKOFF";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_MAX_BACKOFF";
-  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 5.0);
+  float value{};
+
+  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  {
+    return value;
+  }
+
+  return 5.0f;
 }
 
 float GetOtlpDefaultTracesRetryBackoffMultiplier()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_RETRY_BACKOFF_MULTIPLIER";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER";
-  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 1.5f);
+  float value{};
+
+  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  {
+    return value;
+  }
+
+  return 1.5f;
 }
 
 float GetOtlpDefaultMetricsRetryBackoffMultiplier()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_RETRY_BACKOFF_MULTIPLIER";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER";
-  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 1.5f);
+  float value{};
+
+  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  {
+    return value;
+  }
+
+  return 1.5f;
 }
 
 float GetOtlpDefaultLogsRetryBackoffMultiplier()
 {
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_RETRY_BACKOFF_MULTIPLIER";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER";
-  return GetFloatEnvVarOrDefault(kSignalEnv, kGenericEnv, 1.5f);
+  float value{};
+
+  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  {
+    return value;
+  }
+
+  return 1.5f;
 }
 
 }  // namespace otlp
