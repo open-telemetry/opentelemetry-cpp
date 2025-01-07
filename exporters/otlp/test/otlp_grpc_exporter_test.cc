@@ -19,7 +19,6 @@
 #  include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 #  include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
 
 // Problematic code that pulls in Gmock and breaks with vs2019/c++latest :
 #  include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
@@ -28,6 +27,7 @@
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
+#  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
 #  include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
