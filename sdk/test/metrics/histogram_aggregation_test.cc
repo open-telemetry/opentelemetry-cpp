@@ -3,18 +3,14 @@
 
 #include <gtest/gtest.h>
 #include <algorithm>
-#include <memory>
 #include <utility>
 #include <vector>
 #include "common.h"
 
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/sync_instruments.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"

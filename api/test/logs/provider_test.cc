@@ -5,9 +5,9 @@
 #include <string>
 
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/logs/event_logger.h"
+#include "opentelemetry/logs/event_logger.h"  // IWYU pragma: keep
 #include "opentelemetry/logs/event_logger_provider.h"
-#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/logger.h"  // IWYU pragma: keep
 #include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
