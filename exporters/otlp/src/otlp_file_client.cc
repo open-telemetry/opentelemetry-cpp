@@ -1453,10 +1453,12 @@ private:
             std::chrono::system_clock::now();
         std::size_t last_record_count = 0;
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
         if (thread_instrumentation != nullptr)
         {
           thread_instrumentation->OnStart();
         }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
         while (true)
         {
@@ -1472,20 +1474,24 @@ private:
             break;
           }
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
           if (thread_instrumentation != nullptr)
           {
             thread_instrumentation->BeforeWait();
           }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
           {
             std::unique_lock<std::mutex> lk(concurrency_file->background_thread_waker_lock);
             concurrency_file->background_thread_waker_cv.wait_for(lk, flush_interval);
           }
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
           if (thread_instrumentation != nullptr)
           {
             thread_instrumentation->AfterWait();
           }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
           {
             std::size_t current_record_count =
@@ -1516,10 +1522,12 @@ private:
           background_flush_thread.swap(concurrency_file->background_flush_thread);
         }
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
         if (thread_instrumentation != nullptr)
         {
           thread_instrumentation->OnEnd();
         }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
         if (background_flush_thread && background_flush_thread->joinable())
         {

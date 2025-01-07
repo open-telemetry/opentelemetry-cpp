@@ -91,26 +91,32 @@ void PeriodicExportingMetricReader::OnInitialized() noexcept
 
 void PeriodicExportingMetricReader::DoBackgroundWork()
 {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   if (worker_thread_instrumentation_ != nullptr)
   {
     worker_thread_instrumentation_->OnStart();
   }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
   do
   {
     auto start = std::chrono::steady_clock::now();
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
     if (worker_thread_instrumentation_ != nullptr)
     {
       worker_thread_instrumentation_->BeforeLoad();
     }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
     auto status = CollectAndExportOnce();
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
     if (worker_thread_instrumentation_ != nullptr)
     {
       worker_thread_instrumentation_->AfterLoad();
     }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
     if (!status)
     {
@@ -121,10 +127,12 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
     auto export_time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     auto remaining_wait_interval_ms = export_interval_millis_ - export_time_ms;
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
     if (worker_thread_instrumentation_ != nullptr)
     {
       worker_thread_instrumentation_->BeforeWait();
     }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
     std::unique_lock<std::mutex> lk(cv_m_);
     cv_.wait_for(lk, remaining_wait_interval_ms, [this]() {
@@ -136,17 +144,21 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
       return IsShutdown();
     });
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
     if (worker_thread_instrumentation_ != nullptr)
     {
       worker_thread_instrumentation_->AfterWait();
     }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
   } while (IsShutdown() != true);
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   if (worker_thread_instrumentation_ != nullptr)
   {
     worker_thread_instrumentation_->OnEnd();
   }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 }
 
 bool PeriodicExportingMetricReader::CollectAndExportOnce()
@@ -165,11 +177,13 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
 
     task_thread.reset(
         new std::thread([this, &cancel_export_for_timeout, sender = std::move(sender)] {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
           if (collect_thread_instrumentation_ != nullptr)
           {
             collect_thread_instrumentation_->OnStart();
             collect_thread_instrumentation_->BeforeLoad();
           }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
           this->Collect([this, &cancel_export_for_timeout](ResourceMetrics &metric_data) {
             if (cancel_export_for_timeout.load(std::memory_order_acquire))
@@ -185,11 +199,13 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
 
           const_cast<std::promise<void> &>(sender).set_value();
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
           if (collect_thread_instrumentation_ != nullptr)
           {
             collect_thread_instrumentation_->AfterLoad();
             collect_thread_instrumentation_->OnEnd();
           }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
         }));
 
     std::future_status status;

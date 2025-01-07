@@ -126,6 +126,11 @@ if(WITH_METRICS_EXEMPLAR_PREVIEW)
                              INTERFACE ENABLE_METRICS_EXEMPLAR_PREVIEW)
 endif()
 
+if(WITH_THREAD_INSTRUMENTATION_PREVIEW)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_THREAD_INSTRUMENTATION_PREVIEW)
+endif()
+
 if(WITH_OTLP_HTTP_COMPRESSION)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_OTLP_COMPRESSION_PREVIEW)

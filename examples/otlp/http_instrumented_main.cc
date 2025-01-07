@@ -58,6 +58,8 @@ namespace
 
 std::mutex serialize;
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+
 /**
  The purpose of MyThreadInstrumentation is to demonstrate
  how notifications are delivered to the application.
@@ -143,6 +145,8 @@ private:
   std::string priority_;
 };
 
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
 opentelemetry::exporter::otlp::OtlpHttpExporterOptions tracer_opts;
 opentelemetry::exporter::otlp::OtlpHttpMetricExporterOptions meter_opts;
 opentelemetry::exporter::otlp::OtlpHttpLogRecordExporterOptions logger_opts;
@@ -155,19 +159,23 @@ void InitTracer()
 {
   // Create OTLP exporter instance
   opentelemetry::exporter::otlp::OtlpHttpExporterRuntimeOptions exp_rt_opts;
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   auto exp_instr = std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation>(
       new MyThreadInstrumentation("OtlpHttpExporter", "trace-net", "high"));
   exp_rt_opts.thread_instrumentation = exp_instr;
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
   auto exporter =
       opentelemetry::exporter::otlp::OtlpHttpExporterFactory::Create(tracer_opts, exp_rt_opts);
 
   // Create Processor instance
   opentelemetry::sdk::trace::BatchSpanProcessorOptions pro_opts;
   opentelemetry::sdk::trace::BatchSpanProcessorRuntimeOptions pro_rt_opts;
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   auto pro_instr = std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation>(
       new MyThreadInstrumentation("BatchSpanProcessor", "", "high"));
   pro_rt_opts.thread_instrumentation = pro_instr;
-  auto processor                     = opentelemetry::sdk::trace::BatchSpanProcessorFactory::Create(
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+  auto processor = opentelemetry::sdk::trace::BatchSpanProcessorFactory::Create(
       std::move(exporter), pro_opts, pro_rt_opts);
 
   // Create Provider instance
@@ -196,9 +204,11 @@ void InitMetrics()
 {
   // Create OTLP exporter instance
   opentelemetry::exporter::otlp::OtlpHttpMetricExporterRuntimeOptions exp_rt_opts;
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   auto exp_instr = std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation>(
       new MyThreadInstrumentation("OtlpHttpMetricExporter", "metric-net", "medium"));
   exp_rt_opts.thread_instrumentation = exp_instr;
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
   auto exporter =
       opentelemetry::exporter::otlp::OtlpHttpMetricExporterFactory::Create(meter_opts, exp_rt_opts);
 
@@ -211,12 +221,14 @@ void InitMetrics()
   reader_options.export_timeout_millis  = std::chrono::milliseconds(500);
 
   opentelemetry::sdk::metrics::PeriodicExportingMetricReaderRuntimeOptions reader_rt_opts;
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   auto reader_periodic_instr = std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation>(
       new MyThreadInstrumentation("PeriodicExportingMetricReader(periodic)", "", "medium"));
   auto reader_collect_instr = std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation>(
       new MyThreadInstrumentation("PeriodicExportingMetricReader(collect)", "", "medium"));
   reader_rt_opts.periodic_thread_instrumentation = reader_periodic_instr;
   reader_rt_opts.collect_thread_instrumentation  = reader_collect_instr;
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
   auto reader = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
       std::move(exporter), reader_options, reader_rt_opts);
 
@@ -247,18 +259,22 @@ void InitLogger()
 {
   // Create OTLP exporter instance
   opentelemetry::exporter::otlp::OtlpHttpLogRecordExporterRuntimeOptions exp_rt_opts;
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   auto exp_instr = std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation>(
       new MyThreadInstrumentation("OtlpHttpLogRecordExporter", "log-net", "low"));
   exp_rt_opts.thread_instrumentation = exp_instr;
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
   auto exporter = opentelemetry::exporter::otlp::OtlpHttpLogRecordExporterFactory::Create(
       logger_opts, exp_rt_opts);
 
   // Create Processor instance
   opentelemetry::sdk::logs::BatchLogRecordProcessorOptions pro_opts;
   opentelemetry::sdk::logs::BatchLogRecordProcessorRuntimeOptions pro_rt_opts;
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   auto pro_instr = std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation>(
       new MyThreadInstrumentation("BatchLogRecordProcessor", "", "low"));
   pro_rt_opts.thread_instrumentation = pro_instr;
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
   auto processor = opentelemetry::sdk::logs::BatchLogRecordProcessorFactory::Create(
       std::move(exporter), pro_opts, pro_rt_opts);
 

@@ -441,10 +441,12 @@ bool HttpClient::MaybeSpawnBackgroundThread()
 
   background_thread_.reset(new std::thread(
       [](HttpClient *self) {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
         if (self->background_thread_instrumentation_ != nullptr)
         {
           self->background_thread_instrumentation_->OnStart();
         }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
         int still_running = 1;
         std::chrono::system_clock::time_point last_free_job_timepoint =
@@ -464,10 +466,12 @@ bool HttpClient::MaybeSpawnBackgroundThread()
           }
           else if (still_running || need_wait_more)
           {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
             if (self->background_thread_instrumentation_ != nullptr)
             {
               self->background_thread_instrumentation_->BeforeWait();
             }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
         // curl_multi_poll is added from libcurl 7.66.0, before 7.68.0, we can only wait util
         // timeout to do the rest jobs
@@ -482,10 +486,12 @@ bool HttpClient::MaybeSpawnBackgroundThread()
                                  nullptr);
 #endif
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
             if (self->background_thread_instrumentation_ != nullptr)
             {
               self->background_thread_instrumentation_->AfterWait();
             }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
           }
 
           do
@@ -584,10 +590,12 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             // If there is no pending jobs, we can stop the background thread.
             if (still_running == 0)
             {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
               if (self->background_thread_instrumentation_ != nullptr)
               {
                 self->background_thread_instrumentation_->OnEnd();
               }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
               if (self->background_thread_)
               {

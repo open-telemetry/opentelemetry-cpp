@@ -74,12 +74,17 @@ public:
   ThreadInstrumentation()          = default;
   virtual ~ThreadInstrumentation() = default;
 
+/*
+ * This feature is experimental, protected by a _PREVIEW flag.
+ */
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   virtual void OnStart() {}
   virtual void OnEnd() {}
   virtual void BeforeWait() {}
   virtual void AfterWait() {}
   virtual void BeforeLoad() {}
   virtual void AfterLoad() {}
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 };
 
 }  // namespace common

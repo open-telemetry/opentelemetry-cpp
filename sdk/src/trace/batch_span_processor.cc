@@ -171,19 +171,23 @@ bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 
 void BatchSpanProcessor::DoBackgroundWork()
 {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   if (worker_thread_instrumentation_ != nullptr)
   {
     worker_thread_instrumentation_->OnStart();
   }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
   auto timeout = schedule_delay_millis_;
 
   while (true)
   {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
     if (worker_thread_instrumentation_ != nullptr)
     {
       worker_thread_instrumentation_->BeforeWait();
     }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
     // Wait for `timeout` milliseconds
     std::unique_lock<std::mutex> lk(synchronization_data_->cv_m);
@@ -198,10 +202,12 @@ void BatchSpanProcessor::DoBackgroundWork()
     synchronization_data_->is_force_wakeup_background_worker.store(false,
                                                                    std::memory_order_release);
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
     if (worker_thread_instrumentation_ != nullptr)
     {
       worker_thread_instrumentation_->AfterWait();
     }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
     if (synchronization_data_->is_shutdown.load() == true)
     {
@@ -218,18 +224,22 @@ void BatchSpanProcessor::DoBackgroundWork()
     timeout = schedule_delay_millis_ - duration;
   }
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   if (worker_thread_instrumentation_ != nullptr)
   {
     worker_thread_instrumentation_->OnEnd();
   }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 }
 
 void BatchSpanProcessor::Export()
 {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   if (worker_thread_instrumentation_ != nullptr)
   {
     worker_thread_instrumentation_->BeforeLoad();
   }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
   do
   {
@@ -270,10 +280,12 @@ void BatchSpanProcessor::Export()
     NotifyCompletion(notify_force_flush, exporter_, synchronization_data_);
   } while (true);
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   if (worker_thread_instrumentation_ != nullptr)
   {
     worker_thread_instrumentation_->AfterLoad();
   }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 }
 
 void BatchSpanProcessor::NotifyCompletion(

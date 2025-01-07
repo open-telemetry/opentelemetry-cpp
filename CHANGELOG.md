@@ -78,6 +78,12 @@ New features:
     shows how to use the feature,
     and add application logic in the thread execution code path.
 
+  * Note that this feature is experimental,
+    protected by a WITH_THREAD_INSTRUMENTATION_PREVIEW
+    flag in CMake. Various runtime options structures,
+    as well as the thread instrumentation interface,
+    may change without notice before this feature is declared stable.
+
 ## [1.18 2024-11-25]
 
 * [EXPORTER] Fix crash in ElasticsearchLogRecordExporter
