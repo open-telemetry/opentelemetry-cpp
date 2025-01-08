@@ -11,6 +11,7 @@
 #endif
 
 #include <cctype>
+#include <cerrno>
 #include <cstdlib>
 #include <limits>
 #include <ostream>
