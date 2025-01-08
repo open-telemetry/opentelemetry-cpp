@@ -41,7 +41,7 @@ if(WITH_OTLP_GRPC)
     PUBLIC opentelemetry_sdk opentelemetry_common
            # gRPC::grpc++ must be linked before opentelemetry_proto_grpc.
            opentelemetry_proto_grpc
-    PRIVATE gRPC::grpc++)
+    PRIVATE gRPC::grpc++ opentelemetry_ext)
 
   get_target_property(GRPC_INCLUDE_DIRECTORY gRPC::grpc++
                       INTERFACE_INCLUDE_DIRECTORIES)
