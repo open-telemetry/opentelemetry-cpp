@@ -818,7 +818,7 @@ bool HttpClient::doRetrySessions()
     }
     else
     {
-      ++retry_it;
+      break;
     }
   }
 
