@@ -26,7 +26,7 @@ namespace gen_ai
  * histogram
  */
 static constexpr const char *kMetricGenAiClientOperationDuration =
-    "metric.gen_ai.client.operation.duration";
+    "gen_ai.client.operation.duration";
 static constexpr const char *descrMetricGenAiClientOperationDuration = "GenAI operation duration";
 static constexpr const char *unitMetricGenAiClientOperationDuration  = "s";
 
@@ -51,7 +51,7 @@ CreateSyncDoubleMetricGenAiClientOperationDuration(metrics::Meter *meter)
  * <p>
  * histogram
  */
-static constexpr const char *kMetricGenAiClientTokenUsage = "metric.gen_ai.client.token.usage";
+static constexpr const char *kMetricGenAiClientTokenUsage = "gen_ai.client.token.usage";
 static constexpr const char *descrMetricGenAiClientTokenUsage =
     "Measures number of input and output tokens used";
 static constexpr const char *unitMetricGenAiClientTokenUsage = "{token}";
@@ -77,8 +77,7 @@ CreateSyncDoubleMetricGenAiClientTokenUsage(metrics::Meter *meter)
  * <p>
  * histogram
  */
-static constexpr const char *kMetricGenAiServerRequestDuration =
-    "metric.gen_ai.server.request.duration";
+static constexpr const char *kMetricGenAiServerRequestDuration = "gen_ai.server.request.duration";
 static constexpr const char *descrMetricGenAiServerRequestDuration =
     "Generative AI server request duration such as time-to-last byte or last output token";
 static constexpr const char *unitMetricGenAiServerRequestDuration = "s";
@@ -105,7 +104,7 @@ CreateSyncDoubleMetricGenAiServerRequestDuration(metrics::Meter *meter)
  * histogram
  */
 static constexpr const char *kMetricGenAiServerTimePerOutputToken =
-    "metric.gen_ai.server.time_per_output_token";
+    "gen_ai.server.time_per_output_token";
 static constexpr const char *descrMetricGenAiServerTimePerOutputToken =
     "Time per output token generated after the first token for successful responses";
 static constexpr const char *unitMetricGenAiServerTimePerOutputToken = "s";
@@ -132,7 +131,7 @@ CreateSyncDoubleMetricGenAiServerTimePerOutputToken(metrics::Meter *meter)
  * histogram
  */
 static constexpr const char *kMetricGenAiServerTimeToFirstToken =
-    "metric.gen_ai.server.time_to_first_token";
+    "gen_ai.server.time_to_first_token";
 static constexpr const char *descrMetricGenAiServerTimeToFirstToken =
     "Time to generate first token for successful responses";
 static constexpr const char *unitMetricGenAiServerTimeToFirstToken = "s";

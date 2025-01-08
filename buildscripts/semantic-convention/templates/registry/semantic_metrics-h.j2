@@ -142,7 +142,7 @@ OPENTELEMETRY_DEPRECATED
     {% else %}
 {{ [metric.brief, "\n", metric.note, "\n", metric.instrument] | comment(ident=2) }}
     {% endif %}
-static constexpr const char *{{v_metric_name}} = "{{metric.id}}";
+static constexpr const char *{{v_metric_name}} = "{{metric.metric_name}}";
     {% if metric is deprecated %}
 OPENTELEMETRY_DEPRECATED
     {% endif %}

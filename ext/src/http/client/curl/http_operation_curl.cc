@@ -9,14 +9,13 @@
 #include <atomic>
 #include <chrono>
 #include <cmath>
-#include <cstdint>
 #include <cstring>
 #include <functional>
 #include <future>
-#include <istream>
 #include <map>
 #include <memory>
 #include <random>
+#include <sstream>
 #include <string>
 #include <thread>
 #include <utility>

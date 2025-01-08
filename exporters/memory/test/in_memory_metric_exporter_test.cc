@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "opentelemetry/exporters/memory/in_memory_metric_data.h"

@@ -17,10 +17,10 @@
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/meter_context_factory.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
-#include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/metrics_foo_library/foo_library.h"
@@ -122,4 +122,5 @@ int main(int argc, char *argv[])
   }
 
   CleanupMetrics();
+  return 0;
 }
