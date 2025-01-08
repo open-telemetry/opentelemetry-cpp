@@ -25,8 +25,7 @@ namespace http
  * <p>
  * histogram
  */
-static constexpr const char *kMetricHttpClientRequestDuration =
-    "metric.http.client.request.duration";
+static constexpr const char *kMetricHttpClientRequestDuration = "http.client.request.duration";
 static constexpr const char *descrMetricHttpClientRequestDuration =
     "Duration of HTTP client requests.";
 static constexpr const char *unitMetricHttpClientRequestDuration = "s";
@@ -52,8 +51,7 @@ CreateSyncDoubleMetricHttpClientRequestDuration(metrics::Meter *meter)
  * <p>
  * histogram
  */
-static constexpr const char *kMetricHttpServerRequestDuration =
-    "metric.http.server.request.duration";
+static constexpr const char *kMetricHttpServerRequestDuration = "http.server.request.duration";
 static constexpr const char *descrMetricHttpServerRequestDuration =
     "Duration of HTTP server requests.";
 static constexpr const char *unitMetricHttpServerRequestDuration = "s";

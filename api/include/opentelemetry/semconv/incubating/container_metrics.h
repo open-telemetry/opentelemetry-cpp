@@ -27,7 +27,7 @@ namespace container
  * <p>
  * counter
  */
-static constexpr const char *kMetricContainerCpuTime     = "metric.container.cpu.time";
+static constexpr const char *kMetricContainerCpuTime     = "container.cpu.time";
 static constexpr const char *descrMetricContainerCpuTime = "Total CPU time consumed";
 static constexpr const char *unitMetricContainerCpuTime  = "s";
 
@@ -66,7 +66,7 @@ CreateAsyncDoubleMetricContainerCpuTime(metrics::Meter *meter)
  * <p>
  * gauge
  */
-static constexpr const char *kMetricContainerCpuUsage = "metric.container.cpu.usage";
+static constexpr const char *kMetricContainerCpuUsage = "container.cpu.usage";
 static constexpr const char *descrMetricContainerCpuUsage =
     "Container's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs";
 static constexpr const char *unitMetricContainerCpuUsage = "{cpu}";
@@ -109,7 +109,7 @@ CreateAsyncDoubleMetricContainerCpuUsage(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricContainerDiskIo     = "metric.container.disk.io";
+static constexpr const char *kMetricContainerDiskIo     = "container.disk.io";
 static constexpr const char *descrMetricContainerDiskIo = "Disk bytes for the container.";
 static constexpr const char *unitMetricContainerDiskIo  = "By";
 
@@ -148,7 +148,7 @@ CreateAsyncDoubleMetricContainerDiskIo(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricContainerMemoryUsage     = "metric.container.memory.usage";
+static constexpr const char *kMetricContainerMemoryUsage     = "container.memory.usage";
 static constexpr const char *descrMetricContainerMemoryUsage = "Memory usage of the container.";
 static constexpr const char *unitMetricContainerMemoryUsage  = "By";
 
@@ -187,7 +187,7 @@ CreateAsyncDoubleMetricContainerMemoryUsage(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricContainerNetworkIo     = "metric.container.network.io";
+static constexpr const char *kMetricContainerNetworkIo     = "container.network.io";
 static constexpr const char *descrMetricContainerNetworkIo = "Network bytes for the container.";
 static constexpr const char *unitMetricContainerNetworkIo  = "By";
 
@@ -226,7 +226,7 @@ CreateAsyncDoubleMetricContainerNetworkIo(metrics::Meter *meter)
  * as a floating point number with the highest precision available. The actual accuracy would depend
  * on the instrumentation and operating system. <p> gauge
  */
-static constexpr const char *kMetricContainerUptime     = "metric.container.uptime";
+static constexpr const char *kMetricContainerUptime     = "container.uptime";
 static constexpr const char *descrMetricContainerUptime = "The time the container has been running";
 static constexpr const char *unitMetricContainerUptime  = "s";
 

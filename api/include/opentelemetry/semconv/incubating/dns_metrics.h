@@ -25,7 +25,7 @@ namespace dns
  * <p>
  * histogram
  */
-static constexpr const char *kMetricDnsLookupDuration = "metric.dns.lookup.duration";
+static constexpr const char *kMetricDnsLookupDuration = "dns.lookup.duration";
 static constexpr const char *descrMetricDnsLookupDuration =
     "Measures the time taken to perform a DNS lookup.";
 static constexpr const char *unitMetricDnsLookupDuration = "s";

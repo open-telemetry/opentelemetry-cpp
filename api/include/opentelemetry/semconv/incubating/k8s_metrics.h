@@ -27,7 +27,7 @@ namespace k8s
  * <p>
  * counter
  */
-static constexpr const char *kMetricK8sNodeCpuTime     = "metric.k8s.node.cpu.time";
+static constexpr const char *kMetricK8sNodeCpuTime     = "k8s.node.cpu.time";
 static constexpr const char *descrMetricK8sNodeCpuTime = "Total CPU time consumed";
 static constexpr const char *unitMetricK8sNodeCpuTime  = "s";
 
@@ -66,7 +66,7 @@ CreateAsyncDoubleMetricK8sNodeCpuTime(metrics::Meter *meter)
  * <p>
  * gauge
  */
-static constexpr const char *kMetricK8sNodeCpuUsage = "metric.k8s.node.cpu.usage";
+static constexpr const char *kMetricK8sNodeCpuUsage = "k8s.node.cpu.usage";
 static constexpr const char *descrMetricK8sNodeCpuUsage =
     "Node's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs";
 static constexpr const char *unitMetricK8sNodeCpuUsage = "{cpu}";
@@ -109,7 +109,7 @@ CreateAsyncDoubleMetricK8sNodeCpuUsage(metrics::Meter *meter)
  * <p>
  * gauge
  */
-static constexpr const char *kMetricK8sNodeMemoryUsage     = "metric.k8s.node.memory.usage";
+static constexpr const char *kMetricK8sNodeMemoryUsage     = "k8s.node.memory.usage";
 static constexpr const char *descrMetricK8sNodeMemoryUsage = "Memory usage of the Node";
 static constexpr const char *unitMetricK8sNodeMemoryUsage  = "By";
 
@@ -149,7 +149,7 @@ CreateAsyncDoubleMetricK8sNodeMemoryUsage(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricK8sNodeNetworkErrors     = "metric.k8s.node.network.errors";
+static constexpr const char *kMetricK8sNodeNetworkErrors     = "k8s.node.network.errors";
 static constexpr const char *descrMetricK8sNodeNetworkErrors = "Node network errors";
 static constexpr const char *unitMetricK8sNodeNetworkErrors  = "{error}";
 
@@ -186,7 +186,7 @@ CreateAsyncDoubleMetricK8sNodeNetworkErrors(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricK8sNodeNetworkIo     = "metric.k8s.node.network.io";
+static constexpr const char *kMetricK8sNodeNetworkIo     = "k8s.node.network.io";
 static constexpr const char *descrMetricK8sNodeNetworkIo = "Network bytes for the Node";
 static constexpr const char *unitMetricK8sNodeNetworkIo  = "By";
 
@@ -225,7 +225,7 @@ CreateAsyncDoubleMetricK8sNodeNetworkIo(metrics::Meter *meter)
  * as a floating point number with the highest precision available. The actual accuracy would depend
  * on the instrumentation and operating system. <p> gauge
  */
-static constexpr const char *kMetricK8sNodeUptime     = "metric.k8s.node.uptime";
+static constexpr const char *kMetricK8sNodeUptime     = "k8s.node.uptime";
 static constexpr const char *descrMetricK8sNodeUptime = "The time the Node has been running";
 static constexpr const char *unitMetricK8sNodeUptime  = "s";
 
@@ -267,7 +267,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  * <p>
  * counter
  */
-static constexpr const char *kMetricK8sPodCpuTime     = "metric.k8s.pod.cpu.time";
+static constexpr const char *kMetricK8sPodCpuTime     = "k8s.pod.cpu.time";
 static constexpr const char *descrMetricK8sPodCpuTime = "Total CPU time consumed";
 static constexpr const char *unitMetricK8sPodCpuTime  = "s";
 
@@ -306,7 +306,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  * <p>
  * gauge
  */
-static constexpr const char *kMetricK8sPodCpuUsage = "metric.k8s.pod.cpu.usage";
+static constexpr const char *kMetricK8sPodCpuUsage = "k8s.pod.cpu.usage";
 static constexpr const char *descrMetricK8sPodCpuUsage =
     "Pod's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs";
 static constexpr const char *unitMetricK8sPodCpuUsage = "{cpu}";
@@ -349,7 +349,7 @@ CreateAsyncDoubleMetricK8sPodCpuUsage(metrics::Meter *meter)
  * <p>
  * gauge
  */
-static constexpr const char *kMetricK8sPodMemoryUsage     = "metric.k8s.pod.memory.usage";
+static constexpr const char *kMetricK8sPodMemoryUsage     = "k8s.pod.memory.usage";
 static constexpr const char *descrMetricK8sPodMemoryUsage = "Memory usage of the Pod";
 static constexpr const char *unitMetricK8sPodMemoryUsage  = "By";
 
@@ -389,7 +389,7 @@ CreateAsyncDoubleMetricK8sPodMemoryUsage(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricK8sPodNetworkErrors     = "metric.k8s.pod.network.errors";
+static constexpr const char *kMetricK8sPodNetworkErrors     = "k8s.pod.network.errors";
 static constexpr const char *descrMetricK8sPodNetworkErrors = "Pod network errors";
 static constexpr const char *unitMetricK8sPodNetworkErrors  = "{error}";
 
@@ -426,7 +426,7 @@ CreateAsyncDoubleMetricK8sPodNetworkErrors(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricK8sPodNetworkIo     = "metric.k8s.pod.network.io";
+static constexpr const char *kMetricK8sPodNetworkIo     = "k8s.pod.network.io";
 static constexpr const char *descrMetricK8sPodNetworkIo = "Network bytes for the Pod";
 static constexpr const char *unitMetricK8sPodNetworkIo  = "By";
 
@@ -465,7 +465,7 @@ CreateAsyncDoubleMetricK8sPodNetworkIo(metrics::Meter *meter)
  * as a floating point number with the highest precision available. The actual accuracy would depend
  * on the instrumentation and operating system. <p> gauge
  */
-static constexpr const char *kMetricK8sPodUptime     = "metric.k8s.pod.uptime";
+static constexpr const char *kMetricK8sPodUptime     = "k8s.pod.uptime";
 static constexpr const char *descrMetricK8sPodUptime = "The time the Pod has been running";
 static constexpr const char *unitMetricK8sPodUptime  = "s";
 

@@ -25,7 +25,7 @@ namespace process
  * <p>
  * counter
  */
-static constexpr const char *kMetricProcessContextSwitches = "metric.process.context_switches";
+static constexpr const char *kMetricProcessContextSwitches = "process.context_switches";
 static constexpr const char *descrMetricProcessContextSwitches =
     "Number of times the process has been context switched.";
 static constexpr const char *unitMetricProcessContextSwitches = "{count}";
@@ -67,7 +67,7 @@ CreateAsyncDoubleMetricProcessContextSwitches(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricProcessCpuTime = "metric.process.cpu.time";
+static constexpr const char *kMetricProcessCpuTime = "process.cpu.time";
 static constexpr const char *descrMetricProcessCpuTime =
     "Total CPU seconds broken down by different states.";
 static constexpr const char *unitMetricProcessCpuTime = "s";
@@ -104,7 +104,7 @@ CreateAsyncDoubleMetricProcessCpuTime(metrics::Meter *meter)
  * Difference in process.cpu.time since the last measurement, divided by the elapsed time and number
  * of CPUs available to the process. <p> gauge
  */
-static constexpr const char *kMetricProcessCpuUtilization = "metric.process.cpu.utilization";
+static constexpr const char *kMetricProcessCpuUtilization = "process.cpu.utilization";
 static constexpr const char *descrMetricProcessCpuUtilization =
     "Difference in process.cpu.time since the last measurement, divided by the elapsed time and "
     "number of CPUs available to the process.";
@@ -148,7 +148,7 @@ CreateAsyncDoubleMetricProcessCpuUtilization(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricProcessDiskIo     = "metric.process.disk.io";
+static constexpr const char *kMetricProcessDiskIo     = "process.disk.io";
 static constexpr const char *descrMetricProcessDiskIo = "Disk bytes transferred.";
 static constexpr const char *unitMetricProcessDiskIo  = "By";
 
@@ -185,7 +185,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricProcessMemoryUsage = "metric.process.memory.usage";
+static constexpr const char *kMetricProcessMemoryUsage = "process.memory.usage";
 static constexpr const char *descrMetricProcessMemoryUsage =
     "The amount of physical memory in use.";
 static constexpr const char *unitMetricProcessMemoryUsage = "By";
@@ -223,7 +223,7 @@ CreateAsyncDoubleMetricProcessMemoryUsage(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricProcessMemoryVirtual = "metric.process.memory.virtual";
+static constexpr const char *kMetricProcessMemoryVirtual = "process.memory.virtual";
 static constexpr const char *descrMetricProcessMemoryVirtual =
     "The amount of committed virtual memory.";
 static constexpr const char *unitMetricProcessMemoryVirtual = "By";
@@ -261,7 +261,7 @@ CreateAsyncDoubleMetricProcessMemoryVirtual(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricProcessNetworkIo     = "metric.process.network.io";
+static constexpr const char *kMetricProcessNetworkIo     = "process.network.io";
 static constexpr const char *descrMetricProcessNetworkIo = "Network bytes transferred.";
 static constexpr const char *unitMetricProcessNetworkIo  = "By";
 
@@ -299,7 +299,7 @@ CreateAsyncDoubleMetricProcessNetworkIo(metrics::Meter *meter)
  * updowncounter
  */
 static constexpr const char *kMetricProcessOpenFileDescriptorCount =
-    "metric.process.open_file_descriptor.count";
+    "process.open_file_descriptor.count";
 static constexpr const char *descrMetricProcessOpenFileDescriptorCount =
     "Number of file descriptors in use by the process.";
 static constexpr const char *unitMetricProcessOpenFileDescriptorCount = "{count}";
@@ -341,7 +341,7 @@ CreateAsyncDoubleMetricProcessOpenFileDescriptorCount(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricProcessPagingFaults = "metric.process.paging.faults";
+static constexpr const char *kMetricProcessPagingFaults = "process.paging.faults";
 static constexpr const char *descrMetricProcessPagingFaults =
     "Number of page faults the process has made.";
 static constexpr const char *unitMetricProcessPagingFaults = "{fault}";
@@ -379,7 +379,7 @@ CreateAsyncDoubleMetricProcessPagingFaults(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricProcessThreadCount     = "metric.process.thread.count";
+static constexpr const char *kMetricProcessThreadCount     = "process.thread.count";
 static constexpr const char *descrMetricProcessThreadCount = "Process threads count.";
 static constexpr const char *unitMetricProcessThreadCount  = "{thread}";
 
@@ -418,7 +418,7 @@ CreateAsyncDoubleMetricProcessThreadCount(metrics::Meter *meter)
  * as a floating point number with the highest precision available. The actual accuracy would depend
  * on the instrumentation and operating system. <p> gauge
  */
-static constexpr const char *kMetricProcessUptime     = "metric.process.uptime";
+static constexpr const char *kMetricProcessUptime     = "process.uptime";
 static constexpr const char *descrMetricProcessUptime = "The time the process has been running.";
 static constexpr const char *unitMetricProcessUptime  = "s";
 

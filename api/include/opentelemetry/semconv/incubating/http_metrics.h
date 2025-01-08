@@ -25,7 +25,7 @@ namespace http
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricHttpClientActiveRequests = "metric.http.client.active_requests";
+static constexpr const char *kMetricHttpClientActiveRequests = "http.client.active_requests";
 static constexpr const char *descrMetricHttpClientActiveRequests =
     "Number of active HTTP requests.";
 static constexpr const char *unitMetricHttpClientActiveRequests = "{request}";
@@ -68,7 +68,7 @@ CreateAsyncDoubleMetricHttpClientActiveRequests(metrics::Meter *meter)
  * histogram
  */
 static constexpr const char *kMetricHttpClientConnectionDuration =
-    "metric.http.client.connection.duration";
+    "http.client.connection.duration";
 static constexpr const char *descrMetricHttpClientConnectionDuration =
     "The duration of the successfully established outbound HTTP connections.";
 static constexpr const char *unitMetricHttpClientConnectionDuration = "s";
@@ -94,8 +94,7 @@ CreateSyncDoubleMetricHttpClientConnectionDuration(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricHttpClientOpenConnections =
-    "metric.http.client.open_connections";
+static constexpr const char *kMetricHttpClientOpenConnections = "http.client.open_connections";
 static constexpr const char *descrMetricHttpClientOpenConnections =
     "Number of outbound HTTP connections that are currently active or idle on the client.";
 static constexpr const char *unitMetricHttpClientOpenConnections = "{connection}";
@@ -140,8 +139,7 @@ CreateAsyncDoubleMetricHttpClientOpenConnections(metrics::Meter *meter)
  * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
  * header. For requests using transport encoding, this should be the compressed size. <p> histogram
  */
-static constexpr const char *kMetricHttpClientRequestBodySize =
-    "metric.http.client.request.body.size";
+static constexpr const char *kMetricHttpClientRequestBodySize = "http.client.request.body.size";
 static constexpr const char *descrMetricHttpClientRequestBodySize =
     "Size of HTTP client request bodies.";
 static constexpr const char *unitMetricHttpClientRequestBodySize = "By";
@@ -167,8 +165,7 @@ CreateSyncDoubleMetricHttpClientRequestBodySize(metrics::Meter *meter)
  * <p>
  * histogram
  */
-static constexpr const char *kMetricHttpClientRequestDuration =
-    "metric.http.client.request.duration";
+static constexpr const char *kMetricHttpClientRequestDuration = "http.client.request.duration";
 static constexpr const char *descrMetricHttpClientRequestDuration =
     "Duration of HTTP client requests.";
 static constexpr const char *unitMetricHttpClientRequestDuration = "s";
@@ -197,8 +194,7 @@ CreateSyncDoubleMetricHttpClientRequestDuration(metrics::Meter *meter)
  * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
  * header. For requests using transport encoding, this should be the compressed size. <p> histogram
  */
-static constexpr const char *kMetricHttpClientResponseBodySize =
-    "metric.http.client.response.body.size";
+static constexpr const char *kMetricHttpClientResponseBodySize = "http.client.response.body.size";
 static constexpr const char *descrMetricHttpClientResponseBodySize =
     "Size of HTTP client response bodies.";
 static constexpr const char *unitMetricHttpClientResponseBodySize = "By";
@@ -224,7 +220,7 @@ CreateSyncDoubleMetricHttpClientResponseBodySize(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricHttpServerActiveRequests = "metric.http.server.active_requests";
+static constexpr const char *kMetricHttpServerActiveRequests = "http.server.active_requests";
 static constexpr const char *descrMetricHttpServerActiveRequests =
     "Number of active HTTP server requests.";
 static constexpr const char *unitMetricHttpServerActiveRequests = "{request}";
@@ -269,8 +265,7 @@ CreateAsyncDoubleMetricHttpServerActiveRequests(metrics::Meter *meter)
  * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
  * header. For requests using transport encoding, this should be the compressed size. <p> histogram
  */
-static constexpr const char *kMetricHttpServerRequestBodySize =
-    "metric.http.server.request.body.size";
+static constexpr const char *kMetricHttpServerRequestBodySize = "http.server.request.body.size";
 static constexpr const char *descrMetricHttpServerRequestBodySize =
     "Size of HTTP server request bodies.";
 static constexpr const char *unitMetricHttpServerRequestBodySize = "By";
@@ -296,8 +291,7 @@ CreateSyncDoubleMetricHttpServerRequestBodySize(metrics::Meter *meter)
  * <p>
  * histogram
  */
-static constexpr const char *kMetricHttpServerRequestDuration =
-    "metric.http.server.request.duration";
+static constexpr const char *kMetricHttpServerRequestDuration = "http.server.request.duration";
 static constexpr const char *descrMetricHttpServerRequestDuration =
     "Duration of HTTP server requests.";
 static constexpr const char *unitMetricHttpServerRequestDuration = "s";
@@ -326,8 +320,7 @@ CreateSyncDoubleMetricHttpServerRequestDuration(metrics::Meter *meter)
  * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
  * header. For requests using transport encoding, this should be the compressed size. <p> histogram
  */
-static constexpr const char *kMetricHttpServerResponseBodySize =
-    "metric.http.server.response.body.size";
+static constexpr const char *kMetricHttpServerResponseBodySize = "http.server.response.body.size";
 static constexpr const char *descrMetricHttpServerResponseBodySize =
     "Size of HTTP server response bodies.";
 static constexpr const char *unitMetricHttpServerResponseBodySize = "By";

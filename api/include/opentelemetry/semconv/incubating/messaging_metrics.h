@@ -30,7 +30,7 @@ namespace messaging
  * processed. <p> counter
  */
 static constexpr const char *kMetricMessagingClientConsumedMessages =
-    "metric.messaging.client.consumed.messages";
+    "messaging.client.consumed.messages";
 static constexpr const char *descrMetricMessagingClientConsumedMessages =
     "Number of messages that were delivered to the application.";
 static constexpr const char *unitMetricMessagingClientConsumedMessages = "{message}";
@@ -74,7 +74,7 @@ CreateAsyncDoubleMetricMessagingClientConsumedMessages(metrics::Meter *meter)
  * @code messaging.process.duration @endcode metric. <p> histogram
  */
 static constexpr const char *kMetricMessagingClientOperationDuration =
-    "metric.messaging.client.operation.duration";
+    "messaging.client.operation.duration";
 static constexpr const char *descrMetricMessagingClientOperationDuration =
     "Duration of messaging operation initiated by a producer or consumer client.";
 static constexpr const char *unitMetricMessagingClientOperationDuration = "s";
@@ -105,7 +105,7 @@ CreateSyncDoubleMetricMessagingClientOperationDuration(metrics::Meter *meter)
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kMetricMessagingClientPublishedMessages =
-    "metric.messaging.client.published.messages";
+    "messaging.client.published.messages";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricMessagingClientPublishedMessages =
     "Deprecated. Use `messaging.client.sent.messages` instead.";
@@ -155,8 +155,7 @@ CreateAsyncDoubleMetricMessagingClientPublishedMessages(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricMessagingClientSentMessages =
-    "metric.messaging.client.sent.messages";
+static constexpr const char *kMetricMessagingClientSentMessages = "messaging.client.sent.messages";
 static constexpr const char *descrMetricMessagingClientSentMessages =
     "Number of messages producer attempted to send to the broker.";
 static constexpr const char *unitMetricMessagingClientSentMessages = "{message}";
@@ -199,7 +198,7 @@ CreateAsyncDoubleMetricMessagingClientSentMessages(metrics::Meter *meter)
  * This metric MUST be reported for operations with @code messaging.operation.type @endcode that
  * matches @code process @endcode. <p> histogram
  */
-static constexpr const char *kMetricMessagingProcessDuration = "metric.messaging.process.duration";
+static constexpr const char *kMetricMessagingProcessDuration = "messaging.process.duration";
 static constexpr const char *descrMetricMessagingProcessDuration =
     "Duration of processing operation.";
 static constexpr const char *unitMetricMessagingProcessDuration = "s";
@@ -229,7 +228,7 @@ CreateSyncDoubleMetricMessagingProcessDuration(metrics::Meter *meter)
  * counter
  */
 OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMetricMessagingProcessMessages = "metric.messaging.process.messages";
+static constexpr const char *kMetricMessagingProcessMessages = "messaging.process.messages";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricMessagingProcessMessages =
     "Deprecated. Use `messaging.client.consumed.messages` instead.";
@@ -281,7 +280,7 @@ CreateAsyncDoubleMetricMessagingProcessMessages(metrics::Meter *meter)
  * histogram
  */
 OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMetricMessagingPublishDuration = "metric.messaging.publish.duration";
+static constexpr const char *kMetricMessagingPublishDuration = "messaging.publish.duration";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricMessagingPublishDuration =
     "Deprecated. Use `messaging.client.operation.duration` instead.";
@@ -315,7 +314,7 @@ CreateSyncDoubleMetricMessagingPublishDuration(metrics::Meter *meter)
  * counter
  */
 OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMetricMessagingPublishMessages = "metric.messaging.publish.messages";
+static constexpr const char *kMetricMessagingPublishMessages = "messaging.publish.messages";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricMessagingPublishMessages =
     "Deprecated. Use `messaging.client.produced.messages` instead.";
@@ -367,7 +366,7 @@ CreateAsyncDoubleMetricMessagingPublishMessages(metrics::Meter *meter)
  * histogram
  */
 OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMetricMessagingReceiveDuration = "metric.messaging.receive.duration";
+static constexpr const char *kMetricMessagingReceiveDuration = "messaging.receive.duration";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricMessagingReceiveDuration =
     "Deprecated. Use `messaging.client.operation.duration` instead.";
@@ -401,7 +400,7 @@ CreateSyncDoubleMetricMessagingReceiveDuration(metrics::Meter *meter)
  * counter
  */
 OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMetricMessagingReceiveMessages = "metric.messaging.receive.messages";
+static constexpr const char *kMetricMessagingReceiveMessages = "messaging.receive.messages";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricMessagingReceiveMessages =
     "Deprecated. Use `messaging.client.consumed.messages` instead.";

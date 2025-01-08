@@ -24,7 +24,7 @@ namespace vcs
  * The number of changes (pull requests/merge requests/changelists) in a repository, categorized by
  * their state (e.g. open or merged) <p> updowncounter
  */
-static constexpr const char *kMetricVcsChangeCount = "metric.vcs.change.count";
+static constexpr const char *kMetricVcsChangeCount = "vcs.change.count";
 static constexpr const char *descrMetricVcsChangeCount =
     "The number of changes (pull requests/merge requests/changelists) in a repository, categorized "
     "by their state (e.g. open or merged)";
@@ -63,7 +63,7 @@ CreateAsyncDoubleMetricVcsChangeCount(metrics::Meter *meter)
  * <p>
  * gauge
  */
-static constexpr const char *kMetricVcsChangeDuration = "metric.vcs.change.duration";
+static constexpr const char *kMetricVcsChangeDuration = "vcs.change.duration";
 static constexpr const char *descrMetricVcsChangeDuration =
     "The time duration a change (pull request/merge request/changelist) has been in a given state.";
 static constexpr const char *unitMetricVcsChangeDuration = "s";
@@ -103,7 +103,7 @@ CreateAsyncDoubleMetricVcsChangeDuration(metrics::Meter *meter)
  * The amount of time since its creation it took a change (pull request/merge request/changelist) to
  * get the first approval <p> gauge
  */
-static constexpr const char *kMetricVcsChangeTimeToApproval = "metric.vcs.change.time_to_approval";
+static constexpr const char *kMetricVcsChangeTimeToApproval = "vcs.change.time_to_approval";
 static constexpr const char *descrMetricVcsChangeTimeToApproval =
     "The amount of time since its creation it took a change (pull request/merge "
     "request/changelist) to get the first approval";
@@ -148,7 +148,7 @@ CreateAsyncDoubleMetricVcsChangeTimeToApproval(metrics::Meter *meter)
  * <p>
  * gauge
  */
-static constexpr const char *kMetricVcsContributorCount = "metric.vcs.contributor.count";
+static constexpr const char *kMetricVcsContributorCount = "vcs.contributor.count";
 static constexpr const char *descrMetricVcsContributorCount =
     "The number of unique contributors to a repository";
 static constexpr const char *unitMetricVcsContributorCount = "{contributor}";
@@ -189,7 +189,7 @@ CreateAsyncDoubleMetricVcsContributorCount(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricVcsRefCount = "metric.vcs.ref.count";
+static constexpr const char *kMetricVcsRefCount = "vcs.ref.count";
 static constexpr const char *descrMetricVcsRefCount =
     "The number of refs of type branch or tag in a repository";
 static constexpr const char *unitMetricVcsRefCount = "{ref}";
@@ -230,7 +230,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  * If number of lines added/removed should be calculated from the start of time, then @code
  * vcs.ref.base.name @endcode SHOULD be set to an empty string. <p> gauge
  */
-static constexpr const char *kMetricVcsRefLinesDelta = "metric.vcs.ref.lines_delta";
+static constexpr const char *kMetricVcsRefLinesDelta = "vcs.ref.lines_delta";
 static constexpr const char *descrMetricVcsRefLinesDelta =
     "The number of lines added/removed in a ref (branch) relative to the ref from the "
     "`vcs.ref.base.name` attribute";
@@ -275,7 +275,7 @@ CreateAsyncDoubleMetricVcsRefLinesDelta(metrics::Meter *meter)
  * measurements: 3 and 2 (both positive numbers) and @code vcs.ref.base.name @endcode is set to
  * @code trunk @endcode. <p> gauge
  */
-static constexpr const char *kMetricVcsRefRevisionsDelta = "metric.vcs.ref.revisions_delta";
+static constexpr const char *kMetricVcsRefRevisionsDelta = "vcs.ref.revisions_delta";
 static constexpr const char *descrMetricVcsRefRevisionsDelta =
     "The number of revisions (commits) a ref (branch) is ahead/behind the branch from the "
     "`vcs.ref.base.name` attribute";
@@ -316,7 +316,7 @@ CreateAsyncDoubleMetricVcsRefRevisionsDelta(metrics::Meter *meter)
  * Time a ref (branch) created from the default branch (trunk) has existed. The @code ref.type
  * @endcode attribute will always be @code branch @endcode <p> gauge
  */
-static constexpr const char *kMetricVcsRefTime = "metric.vcs.ref.time";
+static constexpr const char *kMetricVcsRefTime = "vcs.ref.time";
 static constexpr const char *descrMetricVcsRefTime =
     "Time a ref (branch) created from the default branch (trunk) has existed. The `ref.type` "
     "attribute will always be `branch`";
@@ -356,7 +356,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricVcsRepositoryCount = "metric.vcs.repository.count";
+static constexpr const char *kMetricVcsRepositoryCount = "vcs.repository.count";
 static constexpr const char *descrMetricVcsRepositoryCount =
     "The number of repositories in an organization";
 static constexpr const char *unitMetricVcsRepositoryCount = "{repository}";

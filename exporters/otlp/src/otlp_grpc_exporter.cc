@@ -150,6 +150,7 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   else
   {
 #endif
+    const auto resource_spans_size = request->resource_spans_size();
     grpc::Status status =
         OtlpGrpcClient::DelegateExport(trace_service_stub_.get(), std::move(context),
                                        std::move(arena), std::move(*request), response);
@@ -159,6 +160,11 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
                               << grpc_utils::grpc_status_code_to_string(status.error_code())
                               << "\" error_message: \"" << status.error_message() << "\"");
       return sdk::common::ExportResult::kFailure;
+    }
+    else
+    {
+      OTEL_INTERNAL_LOG_DEBUG("[OTLP TRACE GRPC Exporter] Export " << resource_spans_size
+                                                                   << " trace span(s) success");
     }
 #ifdef ENABLE_ASYNC_EXPORT
   }

@@ -24,7 +24,7 @@ namespace db
  * The number of connections that are currently in state described by the @code state @endcode
  * attribute <p> updowncounter
  */
-static constexpr const char *kMetricDbClientConnectionCount = "metric.db.client.connection.count";
+static constexpr const char *kMetricDbClientConnectionCount = "db.client.connection.count";
 static constexpr const char *descrMetricDbClientConnectionCount =
     "The number of connections that are currently in state described by the `state` attribute";
 static constexpr const char *unitMetricDbClientConnectionCount = "{connection}";
@@ -67,7 +67,7 @@ CreateAsyncDoubleMetricDbClientConnectionCount(metrics::Meter *meter)
  * histogram
  */
 static constexpr const char *kMetricDbClientConnectionCreateTime =
-    "metric.db.client.connection.create_time";
+    "db.client.connection.create_time";
 static constexpr const char *descrMetricDbClientConnectionCreateTime =
     "The time it took to create a new connection";
 static constexpr const char *unitMetricDbClientConnectionCreateTime = "s";
@@ -93,8 +93,7 @@ CreateSyncDoubleMetricDbClientConnectionCreateTime(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricDbClientConnectionIdleMax =
-    "metric.db.client.connection.idle.max";
+static constexpr const char *kMetricDbClientConnectionIdleMax = "db.client.connection.idle.max";
 static constexpr const char *descrMetricDbClientConnectionIdleMax =
     "The maximum number of idle open connections allowed";
 static constexpr const char *unitMetricDbClientConnectionIdleMax = "{connection}";
@@ -136,8 +135,7 @@ CreateAsyncDoubleMetricDbClientConnectionIdleMax(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricDbClientConnectionIdleMin =
-    "metric.db.client.connection.idle.min";
+static constexpr const char *kMetricDbClientConnectionIdleMin = "db.client.connection.idle.min";
 static constexpr const char *descrMetricDbClientConnectionIdleMin =
     "The minimum number of idle open connections allowed";
 static constexpr const char *unitMetricDbClientConnectionIdleMin = "{connection}";
@@ -179,7 +177,7 @@ CreateAsyncDoubleMetricDbClientConnectionIdleMin(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricDbClientConnectionMax = "metric.db.client.connection.max";
+static constexpr const char *kMetricDbClientConnectionMax = "db.client.connection.max";
 static constexpr const char *descrMetricDbClientConnectionMax =
     "The maximum number of open connections allowed";
 static constexpr const char *unitMetricDbClientConnectionMax = "{connection}";
@@ -222,7 +220,7 @@ CreateAsyncDoubleMetricDbClientConnectionMax(metrics::Meter *meter)
  * updowncounter
  */
 static constexpr const char *kMetricDbClientConnectionPendingRequests =
-    "metric.db.client.connection.pending_requests";
+    "db.client.connection.pending_requests";
 static constexpr const char *descrMetricDbClientConnectionPendingRequests =
     "The number of current pending requests for an open connection";
 static constexpr const char *unitMetricDbClientConnectionPendingRequests = "{request}";
@@ -264,8 +262,7 @@ CreateAsyncDoubleMetricDbClientConnectionPendingRequests(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricDbClientConnectionTimeouts =
-    "metric.db.client.connection.timeouts";
+static constexpr const char *kMetricDbClientConnectionTimeouts = "db.client.connection.timeouts";
 static constexpr const char *descrMetricDbClientConnectionTimeouts =
     "The number of connection timeouts that have occurred trying to obtain a connection from the "
     "pool";
@@ -308,8 +305,7 @@ CreateAsyncDoubleMetricDbClientConnectionTimeouts(metrics::Meter *meter)
  * <p>
  * histogram
  */
-static constexpr const char *kMetricDbClientConnectionUseTime =
-    "metric.db.client.connection.use_time";
+static constexpr const char *kMetricDbClientConnectionUseTime = "db.client.connection.use_time";
 static constexpr const char *descrMetricDbClientConnectionUseTime =
     "The time between borrowing a connection and returning it to the pool";
 static constexpr const char *unitMetricDbClientConnectionUseTime = "s";
@@ -335,8 +331,7 @@ CreateSyncDoubleMetricDbClientConnectionUseTime(metrics::Meter *meter)
  * <p>
  * histogram
  */
-static constexpr const char *kMetricDbClientConnectionWaitTime =
-    "metric.db.client.connection.wait_time";
+static constexpr const char *kMetricDbClientConnectionWaitTime = "db.client.connection.wait_time";
 static constexpr const char *descrMetricDbClientConnectionWaitTime =
     "The time it took to obtain an open connection from the pool";
 static constexpr const char *unitMetricDbClientConnectionWaitTime = "s";
@@ -366,7 +361,7 @@ CreateSyncDoubleMetricDbClientConnectionWaitTime(metrics::Meter *meter)
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kMetricDbClientConnectionsCreateTime =
-    "metric.db.client.connections.create_time";
+    "db.client.connections.create_time";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricDbClientConnectionsCreateTime =
     "Deprecated, use `db.client.connection.create_time` instead. Note: the unit also changed from "
@@ -401,8 +396,7 @@ CreateSyncDoubleMetricDbClientConnectionsCreateTime(metrics::Meter *meter)
  * updowncounter
  */
 OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMetricDbClientConnectionsIdleMax =
-    "metric.db.client.connections.idle.max";
+static constexpr const char *kMetricDbClientConnectionsIdleMax = "db.client.connections.idle.max";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricDbClientConnectionsIdleMax =
     "Deprecated, use `db.client.connection.idle.max` instead.";
@@ -454,8 +448,7 @@ CreateAsyncDoubleMetricDbClientConnectionsIdleMax(metrics::Meter *meter)
  * updowncounter
  */
 OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMetricDbClientConnectionsIdleMin =
-    "metric.db.client.connections.idle.min";
+static constexpr const char *kMetricDbClientConnectionsIdleMin = "db.client.connections.idle.min";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricDbClientConnectionsIdleMin =
     "Deprecated, use `db.client.connection.idle.min` instead.";
@@ -507,7 +500,7 @@ CreateAsyncDoubleMetricDbClientConnectionsIdleMin(metrics::Meter *meter)
  * updowncounter
  */
 OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMetricDbClientConnectionsMax = "metric.db.client.connections.max";
+static constexpr const char *kMetricDbClientConnectionsMax = "db.client.connections.max";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricDbClientConnectionsMax =
     "Deprecated, use `db.client.connection.max` instead.";
@@ -560,7 +553,7 @@ CreateAsyncDoubleMetricDbClientConnectionsMax(metrics::Meter *meter)
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kMetricDbClientConnectionsPendingRequests =
-    "metric.db.client.connections.pending_requests";
+    "db.client.connections.pending_requests";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricDbClientConnectionsPendingRequests =
     "Deprecated, use `db.client.connection.pending_requests` instead.";
@@ -612,8 +605,7 @@ CreateAsyncDoubleMetricDbClientConnectionsPendingRequests(metrics::Meter *meter)
  * counter
  */
 OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMetricDbClientConnectionsTimeouts =
-    "metric.db.client.connections.timeouts";
+static constexpr const char *kMetricDbClientConnectionsTimeouts = "db.client.connections.timeouts";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricDbClientConnectionsTimeouts =
     "Deprecated, use `db.client.connection.timeouts` instead.";
@@ -665,7 +657,7 @@ CreateAsyncDoubleMetricDbClientConnectionsTimeouts(metrics::Meter *meter)
  * updowncounter
  */
 OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMetricDbClientConnectionsUsage = "metric.db.client.connections.usage";
+static constexpr const char *kMetricDbClientConnectionsUsage = "db.client.connections.usage";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricDbClientConnectionsUsage =
     "Deprecated, use `db.client.connection.count` instead.";
@@ -716,8 +708,7 @@ CreateAsyncDoubleMetricDbClientConnectionsUsage(metrics::Meter *meter)
  * ms @endcode to @code s @endcode. <p> histogram
  */
 OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMetricDbClientConnectionsUseTime =
-    "metric.db.client.connections.use_time";
+static constexpr const char *kMetricDbClientConnectionsUseTime = "db.client.connections.use_time";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricDbClientConnectionsUseTime =
     "Deprecated, use `db.client.connection.use_time` instead. Note: the unit also changed from "
@@ -751,8 +742,7 @@ CreateSyncDoubleMetricDbClientConnectionsUseTime(metrics::Meter *meter)
  * ms @endcode to @code s @endcode. <p> histogram
  */
 OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMetricDbClientConnectionsWaitTime =
-    "metric.db.client.connections.wait_time";
+static constexpr const char *kMetricDbClientConnectionsWaitTime = "db.client.connections.wait_time";
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricDbClientConnectionsWaitTime =
     "Deprecated, use `db.client.connection.wait_time` instead. Note: the unit also changed from "
@@ -784,7 +774,7 @@ CreateSyncDoubleMetricDbClientConnectionsWaitTime(metrics::Meter *meter)
  * updowncounter
  */
 static constexpr const char *kMetricDbClientCosmosdbActiveInstanceCount =
-    "metric.db.client.cosmosdb.active_instance.count";
+    "db.client.cosmosdb.active_instance.count";
 static constexpr const char *descrMetricDbClientCosmosdbActiveInstanceCount =
     "Number of active client instances";
 static constexpr const char *unitMetricDbClientCosmosdbActiveInstanceCount = "{instance}";
@@ -826,7 +816,7 @@ CreateAsyncDoubleMetricDbClientCosmosdbActiveInstanceCount(metrics::Meter *meter
  * by the operation <p> histogram
  */
 static constexpr const char *kMetricDbClientCosmosdbOperationRequestCharge =
-    "metric.db.client.cosmosdb.operation.request_charge";
+    "db.client.cosmosdb.operation.request_charge";
 static constexpr const char *descrMetricDbClientCosmosdbOperationRequestCharge =
     "[Request charge](https://learn.microsoft.com/azure/cosmos-db/request-units) consumed by the "
     "operation";
@@ -855,8 +845,7 @@ CreateSyncDoubleMetricDbClientCosmosdbOperationRequestCharge(metrics::Meter *met
  * <p>
  * histogram
  */
-static constexpr const char *kMetricDbClientOperationDuration =
-    "metric.db.client.operation.duration";
+static constexpr const char *kMetricDbClientOperationDuration = "db.client.operation.duration";
 static constexpr const char *descrMetricDbClientOperationDuration =
     "Duration of database client operations.";
 static constexpr const char *unitMetricDbClientOperationDuration = "s";
@@ -883,7 +872,7 @@ CreateSyncDoubleMetricDbClientOperationDuration(metrics::Meter *meter)
  * histogram
  */
 static constexpr const char *kMetricDbClientResponseReturnedRows =
-    "metric.db.client.response.returned_rows";
+    "db.client.response.returned_rows";
 static constexpr const char *descrMetricDbClientResponseReturnedRows =
     "The actual number of records returned by the database operation.";
 static constexpr const char *unitMetricDbClientResponseReturnedRows = "{row}";
