@@ -357,7 +357,8 @@ TEST_F(BasicCurlHttpTests, RetryPolicyEnabled)
   http_client::Body body;
   http_client::Headers headers;
   http_client::Compression compression  = http_client::Compression::kNone;
-  http_client::RetryPolicy retry_policy = {5, 1.0f, 5.0f, 1.5f};
+  http_client::RetryPolicy retry_policy = {5, std::chrono::duration<float>{1.0f},
+                                           std::chrono::duration<float>{5.0f}, 1.5f};
 
   curl::HttpOperation operation(http_client::Method::Post, "http://127.0.0.1:19000/retry/", no_ssl,
                                 &handler, headers, body, compression, false,
@@ -374,7 +375,8 @@ TEST_F(BasicCurlHttpTests, RetryPolicyDisabled)
   http_client::Body body;
   http_client::Headers headers;
   http_client::Compression compression     = http_client::Compression::kNone;
-  http_client::RetryPolicy no_retry_policy = {0, 0.0f, 0.0f, 0.0f};
+  http_client::RetryPolicy no_retry_policy = {0, std::chrono::duration<float>::zero(),
+                                              std::chrono::duration<float>::zero(), 0.0f};
 
   curl::HttpOperation operation(http_client::Method::Post, "http://127.0.0.1:19000/retry/", no_ssl,
                                 &handler, headers, body, compression, false,
@@ -395,7 +397,8 @@ TEST_F(BasicCurlHttpTests, ExponentialBackoffRetry)
   http_client::Body body;
   http_client::Headers headers;
   http_client::Compression compression  = http_client::Compression::kNone;
-  http_client::RetryPolicy retry_policy = {4, 1.0f, 5.0f, 2.0f};
+  http_client::RetryPolicy retry_policy = {4, std::chrono::duration<float>{1.0f},
+                                           std::chrono::duration<float>{5.0f}, 2.0f};
 
   curl::HttpOperation operation(http_client::Method::Post, "http://127.0.0.1:19000/retry/", no_ssl,
                                 &handler, headers, body, compression, false,

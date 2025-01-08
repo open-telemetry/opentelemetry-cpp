@@ -89,9 +89,8 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(std::unique_ptr<OtlpHttpClient> h
   options.timeout                        = http_client_->GetOptions().timeout;
   options.http_headers                   = http_client_->GetOptions().http_headers;
   options.retry_policy_max_attempts      = http_client_->GetOptions().retry_policy.max_attempts;
-  options.retry_policy_initial_backoff =
-      http_client_->GetOptions().retry_policy.initial_backoff.count();
-  options.retry_policy_max_backoff = http_client_->GetOptions().retry_policy.max_backoff.count();
+  options.retry_policy_initial_backoff   = http_client_->GetOptions().retry_policy.initial_backoff;
+  options.retry_policy_max_backoff       = http_client_->GetOptions().retry_policy.max_backoff;
   options.retry_policy_backoff_multiplier =
       http_client_->GetOptions().retry_policy.backoff_multiplier;
 #ifdef ENABLE_ASYNC_EXPORT

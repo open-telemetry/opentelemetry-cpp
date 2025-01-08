@@ -73,18 +73,17 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
 OtlpHttpExporter::OtlpHttpExporter(std::unique_ptr<OtlpHttpClient> http_client)
     : options_(OtlpHttpExporterOptions()), http_client_(std::move(http_client))
 {
-  OtlpHttpExporterOptions &options  = const_cast<OtlpHttpExporterOptions &>(options_);
-  options.url                       = http_client_->GetOptions().url;
-  options.content_type              = http_client_->GetOptions().content_type;
-  options.json_bytes_mapping        = http_client_->GetOptions().json_bytes_mapping;
-  options.use_json_name             = http_client_->GetOptions().use_json_name;
-  options.console_debug             = http_client_->GetOptions().console_debug;
-  options.timeout                   = http_client_->GetOptions().timeout;
-  options.http_headers              = http_client_->GetOptions().http_headers;
-  options.retry_policy_max_attempts = http_client_->GetOptions().retry_policy.max_attempts;
-  options.retry_policy_initial_backoff =
-      http_client_->GetOptions().retry_policy.initial_backoff.count();
-  options.retry_policy_max_backoff = http_client_->GetOptions().retry_policy.max_backoff.count();
+  OtlpHttpExporterOptions &options     = const_cast<OtlpHttpExporterOptions &>(options_);
+  options.url                          = http_client_->GetOptions().url;
+  options.content_type                 = http_client_->GetOptions().content_type;
+  options.json_bytes_mapping           = http_client_->GetOptions().json_bytes_mapping;
+  options.use_json_name                = http_client_->GetOptions().use_json_name;
+  options.console_debug                = http_client_->GetOptions().console_debug;
+  options.timeout                      = http_client_->GetOptions().timeout;
+  options.http_headers                 = http_client_->GetOptions().http_headers;
+  options.retry_policy_max_attempts    = http_client_->GetOptions().retry_policy.max_attempts;
+  options.retry_policy_initial_backoff = http_client_->GetOptions().retry_policy.initial_backoff;
+  options.retry_policy_max_backoff     = http_client_->GetOptions().retry_policy.max_backoff;
   options.retry_policy_backoff_multiplier =
       http_client_->GetOptions().retry_policy.backoff_multiplier;
 #ifdef ENABLE_ASYNC_EXPORT
