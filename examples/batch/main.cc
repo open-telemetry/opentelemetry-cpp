@@ -81,7 +81,7 @@ void StartAndEndSpans()
 
 }  // namespace
 
-int main()
+int main(int /* argc */, char ** /* argv */)
 {
   // Removing this line will leave the default noop TracerProvider in place.
   InitTracer();
@@ -107,4 +107,5 @@ int main()
   // which in turn invokes the processor Shutdown(), which finally drains the queue of ALL
   // its spans.
   CleanupTracer();
+  return 0;
 }

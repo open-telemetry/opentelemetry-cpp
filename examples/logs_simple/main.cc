@@ -80,11 +80,12 @@ void CleanupLogger()
 
 }  // namespace
 
-int main()
+int main(int /* argc */, char ** /* argv */)
 {
   InitTracer();
   InitLogger();
   foo_library();
   CleanupTracer();
   CleanupLogger();
+  return 0;
 }

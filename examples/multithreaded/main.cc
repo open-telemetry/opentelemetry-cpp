@@ -70,7 +70,7 @@ void run_threads()
   std::for_each(threads.begin(), threads.end(), [](std::thread &th) { th.join(); });
 }
 
-int main()
+int main(int /* argc */, char ** /* argv */)
 {
   InitTracer();
 
@@ -82,4 +82,5 @@ int main()
   }
 
   CleanupTracer();
+  return 0;
 }

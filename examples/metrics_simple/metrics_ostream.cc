@@ -190,4 +190,5 @@ int main(int argc, char **argv)
   }
 
   CleanupMetrics();
+  return 0;
 }
