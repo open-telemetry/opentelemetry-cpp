@@ -9,7 +9,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/shared_ptr.h"

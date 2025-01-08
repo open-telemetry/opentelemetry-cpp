@@ -14,10 +14,10 @@
 #include <vector>
 #include "common.h"
 
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
