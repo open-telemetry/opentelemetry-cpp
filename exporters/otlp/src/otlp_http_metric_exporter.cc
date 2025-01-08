@@ -10,7 +10,6 @@
 #include <utility>
 #include <vector>
 
-#include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"

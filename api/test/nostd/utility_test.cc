@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <initializer_list>
+#include <string>
 #include <tuple>
 #include <type_traits>
 #include <vector>

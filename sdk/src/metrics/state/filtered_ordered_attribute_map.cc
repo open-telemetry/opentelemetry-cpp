@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

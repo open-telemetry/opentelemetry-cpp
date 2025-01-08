@@ -11,12 +11,11 @@
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
-#include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 

@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stddef.h>
-#include <stdint.h>
 #include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <ratio>
@@ -27,7 +27,6 @@
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
-#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 
 using opentelemetry::sdk::common::AtomicUniquePtr;

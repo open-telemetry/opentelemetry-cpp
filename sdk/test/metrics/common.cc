@@ -4,8 +4,6 @@
 #include "common.h"
 #include <utility>
 
-#include "opentelemetry/sdk/metrics/data/point_data.h"
-
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::common;

@@ -7,7 +7,6 @@
 #include <ctime>
 #include <fstream>
 #include <functional>
-#include <initializer_list>
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <sstream>
