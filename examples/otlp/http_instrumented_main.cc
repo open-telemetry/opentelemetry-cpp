@@ -354,4 +354,5 @@ int main(int argc, char *argv[])
   CleanupTracer();
 
   std::cout << "Done" << std::endl << std::flush;
+  return 0;
 }
