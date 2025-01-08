@@ -25,7 +25,7 @@ namespace hw
  * <p>
  * counter
  */
-static constexpr const char *kMetricHwEnergy     = "metric.hw.energy";
+static constexpr const char *kMetricHwEnergy     = "hw.energy";
 static constexpr const char *descrMetricHwEnergy = "Energy consumed by the component";
 static constexpr const char *unitMetricHwEnergy  = "J";
 
@@ -60,7 +60,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  * <p>
  * counter
  */
-static constexpr const char *kMetricHwErrors     = "metric.hw.errors";
+static constexpr const char *kMetricHwErrors     = "hw.errors";
 static constexpr const char *descrMetricHwErrors = "Number of errors encountered by the component";
 static constexpr const char *unitMetricHwErrors  = "{error}";
 
@@ -96,7 +96,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  * It is recommended to report @code hw.energy @endcode instead of @code hw.power @endcode when
  * possible. <p> gauge
  */
-static constexpr const char *kMetricHwPower     = "metric.hw.power";
+static constexpr const char *kMetricHwPower     = "hw.power";
 static constexpr const char *descrMetricHwPower = "Instantaneous power consumed by the component";
 static constexpr const char *unitMetricHwPower  = "W";
 
@@ -132,13 +132,13 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  * states <p>
  * @code hw.status @endcode is currently specified as an <em>UpDownCounter</em> but would ideally be
  * represented using a <a
- * href="https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#stateset"><em>StateSet</em>
+ * href="https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#stateset"><em>StateSet</em>
  * as defined in OpenMetrics</a>. This semantic convention will be updated once <em>StateSet</em> is
  * specified in OpenTelemetry. This planned change is not expected to have any consequence on the
  * way users query their timeseries backend to retrieve the values of @code hw.status @endcode over
  * time. <p> updowncounter
  */
-static constexpr const char *kMetricHwStatus = "metric.hw.status";
+static constexpr const char *kMetricHwStatus = "hw.status";
 static constexpr const char *descrMetricHwStatus =
     "Operational status: `1` (true) or `0` (false) for each of the possible states";
 static constexpr const char *unitMetricHwStatus = "1";

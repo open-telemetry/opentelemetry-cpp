@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <random>
 #include <set>
+#include <string>
 #include <utility>
 
 #include "src/common/fast_random_number_generator.h"

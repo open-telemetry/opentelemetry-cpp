@@ -15,6 +15,18 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add tracer scope configurator
+  [#3137](https://github.com/open-telemetry/opentelemetry-cpp/pull/3137)
+
+* [SDK] Do not frequently create and destroy http client threads
+  [#3198](https://github.com/open-telemetry/opentelemetry-cpp/pull/3198)
+
+* [SDK] Fix instrumentation scope attributes evaluated in equal method
+  [#3214](https://github.com/open-telemetry/opentelemetry-cpp/pull/3214)
+
+* [EXPORTER] Fix scope attributes missing from otlp traces metrics
+  [#3185](https://github.com/open-telemetry/opentelemetry-cpp/pull/3185)
+
 ## [1.18 2024-11-25]
 
 * [EXPORTER] Fix crash in ElasticsearchLogRecordExporter
@@ -148,12 +160,6 @@ Increment the:
 
 * [bazel] Update opentelemetry-proto in MODULE.bazel
   [#3163](https://github.com/open-telemetry/opentelemetry-cpp/pull/3163)
-
-* [EXPORTER] Fix scope attributes missing from otlp traces metrics
-  [#3185](https://github.com/open-telemetry/opentelemetry-cpp/pull/3185)
-
-* [SDK] Add tracer scope configurator
-  [#3137](https://github.com/open-telemetry/opentelemetry-cpp/pull/3137)
 
 Important changes:
 

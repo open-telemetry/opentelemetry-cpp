@@ -49,15 +49,15 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
       run: |
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
       run: |
         ./ci/do_ci.sh cmake.test
 
@@ -263,15 +263,15 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
       run: |
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
       run: |
         ./ci/do_ci.sh cmake.with_async_export.test
 
@@ -359,7 +359,7 @@ jobs:
 
   cmake_test_cxx20_clang:
     name: CMake C++20 test(Clang with libc++)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -409,7 +409,7 @@ jobs:
 
   cmake_test_cxx23_clang:
     name: CMake C++23 test(Clang with libc++)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -452,6 +452,15 @@ jobs:
       run: |
         sudo ./ci/setup_grpc.sh
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
+    - name: generate test cert
+      env:
+        CFSSL_VERSION: 1.6.3
+      run: |
+        sudo -E ./tools/setup-cfssl.sh
+        (cd ./functional/cert; ./generate_cert.sh)
+    - name: run func test
+      run: |
+        (cd ./functional/otlp; ./run_test.sh)
 
   cmake_modern_protobuf_grpc_with_abseil_test:
     name: CMake test (with modern protobuf,grpc and abseil)
@@ -538,15 +547,15 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
       run: |
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run tests
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
       run: ./ci/do_ci.sh cmake.test_example_plugin
 
   bazel_test:
@@ -858,7 +867,7 @@ jobs:
 
   code_coverage:
     name: Code coverage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -936,8 +945,8 @@ jobs:
           submodules: 'recursive'
       - name: setup
         env:
-          CC: /usr/bin/gcc-10
-          CXX: /usr/bin/g++-10
+          CC: /usr/bin/gcc-12
+          CXX: /usr/bin/g++-12
         run: |
           sudo -E ./ci/setup_googletest.sh
           sudo -E ./ci/setup_ci_environment.sh

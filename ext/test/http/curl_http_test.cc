@@ -1,16 +1,20 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <curl/curlver.h>
 #include <gtest/gtest.h>
 #include <string.h>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
-#include <fstream>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <numeric>
+#include <ratio>
+#include <sstream>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -33,7 +37,7 @@ class CustomEventHandler : public http_client::EventHandler
 public:
   void OnResponse(http_client::Response & /* response */) noexcept override
   {
-    got_response_ = true;
+    got_response_.store(true, std::memory_order_release);
   }
   void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
   {
@@ -41,16 +45,20 @@ public:
     {
       case http_client::SessionState::ConnectFailed:
       case http_client::SessionState::SendFailed: {
-        is_called_ = true;
+        is_called_.store(true, std::memory_order_release);
         break;
       }
       default:
         break;
     }
   }
+
+  CustomEventHandler() : is_called_(false), got_response_(false) {}
+
   ~CustomEventHandler() override = default;
-  bool is_called_                = false;
-  bool got_response_             = false;
+
+  std::atomic<bool> is_called_;
+  std::atomic<bool> got_response_;
 };
 
 class GetEventHandler : public CustomEventHandler
@@ -59,8 +67,8 @@ class GetEventHandler : public CustomEventHandler
   {
     ASSERT_EQ(200, response.GetStatusCode());
     ASSERT_EQ(response.GetBody().size(), 0);
-    is_called_    = true;
-    got_response_ = true;
+    is_called_.store(true, std::memory_order_release);
+    got_response_.store(true, std::memory_order_release);
   }
 };
 
@@ -71,8 +79,8 @@ class PostEventHandler : public CustomEventHandler
     ASSERT_EQ(200, response.GetStatusCode());
     std::string body(response.GetBody().begin(), response.GetBody().end());
     ASSERT_EQ(body, "{'k1':'v1', 'k2':'v2', 'k3':'v3'}");
-    is_called_    = true;
-    got_response_ = true;
+    is_called_.store(true, std::memory_order_release);
+    got_response_.store(true, std::memory_order_release);
   }
 };
 
@@ -87,8 +95,8 @@ public:
   {
     ASSERT_EQ(200, response.GetStatusCode());
     ASSERT_EQ(response.GetBody().size(), 0);
-    is_called_    = true;
-    got_response_ = true;
+    is_called_.store(true, std::memory_order_release);
+    got_response_.store(true, std::memory_order_release);
 
     if (session_)
     {
@@ -249,8 +257,8 @@ TEST_F(BasicCurlHttpTests, SendGetRequest)
   session->SendRequest(handler);
   ASSERT_TRUE(waitForRequests(30, 1));
   session->FinishSession();
-  ASSERT_TRUE(handler->is_called_);
-  ASSERT_TRUE(handler->got_response_);
+  ASSERT_TRUE(handler->is_called_.load(std::memory_order_acquire));
+  ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
 }
 
 TEST_F(BasicCurlHttpTests, SendPostRequest)
@@ -272,8 +280,8 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   session->SendRequest(handler);
   ASSERT_TRUE(waitForRequests(30, 1));
   session->FinishSession();
-  ASSERT_TRUE(handler->is_called_);
-  ASSERT_TRUE(handler->got_response_);
+  ASSERT_TRUE(handler->is_called_.load(std::memory_order_acquire));
+  ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
 
   session_manager->CancelAllSessions();
   session_manager->FinishAllSessions();
@@ -291,8 +299,8 @@ TEST_F(BasicCurlHttpTests, RequestTimeout)
   auto handler = std::make_shared<GetEventHandler>();
   session->SendRequest(handler);
   session->FinishSession();
-  ASSERT_TRUE(handler->is_called_);
-  ASSERT_FALSE(handler->got_response_);
+  ASSERT_TRUE(handler->is_called_.load(std::memory_order_acquire));
+  ASSERT_FALSE(handler->got_response_.load(std::memory_order_acquire));
 }
 
 TEST_F(BasicCurlHttpTests, CurlHttpOperations)
@@ -408,8 +416,8 @@ TEST_F(BasicCurlHttpTests, SendGetRequestAsync)
       sessions[i]->FinishSession();
       ASSERT_FALSE(sessions[i]->IsSessionActive());
 
-      ASSERT_TRUE(handlers[i]->is_called_);
-      ASSERT_TRUE(handlers[i]->got_response_);
+      ASSERT_TRUE(handlers[i]->is_called_.load(std::memory_order_acquire));
+      ASSERT_TRUE(handlers[i]->got_response_.load(std::memory_order_acquire));
     }
 
     http_client.WaitBackgroundThreadExit();
@@ -437,7 +445,8 @@ TEST_F(BasicCurlHttpTests, SendGetRequestAsyncTimeout)
     // Lock mtx_requests to prevent response, we will check IsSessionActive() in the end
     std::unique_lock<std::mutex> lock_requests(mtx_requests);
     sessions[i]->SendRequest(handlers[i]);
-    ASSERT_TRUE(sessions[i]->IsSessionActive() || handlers[i]->is_called_);
+    ASSERT_TRUE(sessions[i]->IsSessionActive() ||
+                handlers[i]->is_called_.load(std::memory_order_acquire));
   }
 
   for (unsigned i = 0; i < batch_count; ++i)
@@ -445,8 +454,8 @@ TEST_F(BasicCurlHttpTests, SendGetRequestAsyncTimeout)
     sessions[i]->FinishSession();
     ASSERT_FALSE(sessions[i]->IsSessionActive());
 
-    ASSERT_TRUE(handlers[i]->is_called_);
-    ASSERT_FALSE(handlers[i]->got_response_);
+    ASSERT_TRUE(handlers[i]->is_called_.load(std::memory_order_acquire));
+    ASSERT_FALSE(handlers[i]->got_response_.load(std::memory_order_acquire));
   }
 }
 
@@ -482,8 +491,8 @@ TEST_F(BasicCurlHttpTests, SendPostRequestAsync)
       ASSERT_FALSE(session->IsSessionActive());
     }
 
-    ASSERT_TRUE(handler->is_called_);
-    ASSERT_TRUE(handler->got_response_);
+    ASSERT_TRUE(handler->is_called_.load(std::memory_order_acquire));
+    ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
 
     http_client.WaitBackgroundThreadExit();
   }
@@ -521,8 +530,180 @@ TEST_F(BasicCurlHttpTests, FinishInAsyncCallback)
     {
       ASSERT_FALSE(sessions[i]->IsSessionActive());
 
-      ASSERT_TRUE(handlers[i]->is_called_);
-      ASSERT_TRUE(handlers[i]->got_response_);
+      ASSERT_TRUE(handlers[i]->is_called_.load(std::memory_order_acquire));
+      ASSERT_TRUE(handlers[i]->got_response_.load(std::memory_order_acquire));
     }
   }
 }
+
+TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
+{
+  auto http_client = http_client::HttpClientFactory::Create();
+  std::static_pointer_cast<curl::HttpClient>(http_client)->MaybeSpawnBackgroundThread();
+  // start background first, then test it could wakeup
+  auto session = http_client->CreateSession("http://127.0.0.1:19000/get/");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+  auto handler = std::make_shared<GetEventHandler>();
+  session->SendRequest(handler);
+  std::this_thread::sleep_for(std::chrono::milliseconds{10});  // let it enter poll state
+  auto beg = std::chrono::system_clock::now();
+  http_client->FinishAllSessions();
+  http_client.reset();
+  // when background_thread_wait_for_ is used, it should have no side effect on elegant quit
+  // wait should be less than scheduled_delay_milliseconds_
+  // Due to load on CI hosts (some take 10ms), we assert it is less than 20ms
+  auto cost = std::chrono::system_clock::now() - beg;
+  ASSERT_TRUE(cost < std::chrono::milliseconds{20})
+      << "cost ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(cost).count()
+      << " libcurl version: 0x" << std::hex << LIBCURL_VERSION_NUM;
+  ASSERT_TRUE(handler->is_called_);
+  ASSERT_TRUE(handler->got_response_);
+}
+TEST_F(BasicCurlHttpTests, BackgroundThreadWaitMore)
+{
+  {
+    curl::HttpClient http_client;
+    http_client.MaybeSpawnBackgroundThread();
+    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+#if LIBCURL_VERSION_NUM >= 0x074200
+    ASSERT_FALSE(http_client.MaybeSpawnBackgroundThread());
+#else
+    // low version curl do not support delay quit, so old background would quit
+    ASSERT_TRUE(http_client.MaybeSpawnBackgroundThread());
+#endif
+  }
+  {
+    curl::HttpClient http_client;
+    http_client.SetBackgroundWaitFor(std::chrono::milliseconds::zero());
+    http_client.MaybeSpawnBackgroundThread();
+    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+    // we can disable delay quit by set wait for 0
+    ASSERT_TRUE(http_client.MaybeSpawnBackgroundThread());
+  }
+}
+
+#ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
+struct GzipEventHandler : public CustomEventHandler
+{
+  ~GzipEventHandler() override = default;
+
+  void OnResponse(http_client::Response & /* response */) noexcept override {}
+
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  {
+    is_called_ = true;
+    state_     = state;
+    reason_    = std::string{reason};
+  }
+
+  bool is_called_                  = false;
+  http_client::SessionState state_ = static_cast<http_client::SessionState>(-1);
+  std::string reason_;
+};
+
+TEST_F(BasicCurlHttpTests, GzipCompressibleData)
+{
+  received_requests_.clear();
+  auto session_manager = http_client::HttpClientFactory::Create();
+  EXPECT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("post/");
+  request->SetMethod(http_client::Method::Post);
+
+  const auto original_size = 500UL;
+  http_client::Body body(original_size);
+  std::iota(body.begin(), body.end(), 0);
+  request->SetBody(body);
+  request->AddHeader("Content-Type", "text/plain");
+  request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
+  auto handler = std::make_shared<GzipEventHandler>();
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+  session->FinishSession();
+  ASSERT_TRUE(handler->is_called_);
+  ASSERT_EQ(handler->state_, http_client::SessionState::Response);
+  ASSERT_TRUE(handler->reason_.empty());
+
+  auto http_request =
+      dynamic_cast<opentelemetry::ext::http::client::curl::Request *>(request.get());
+  ASSERT_TRUE(http_request != nullptr);
+  ASSERT_LT(http_request->body_.size(), original_size);
+
+  session_manager->CancelAllSessions();
+  session_manager->FinishAllSessions();
+}
+
+TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
+{
+  received_requests_.clear();
+  auto session_manager = http_client::HttpClientFactory::Create();
+  EXPECT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("post/");
+  request->SetMethod(http_client::Method::Post);
+
+  // Random data generated using code snippet below.
+  //   const auto original_size = 500UL;
+  //   http_client::Body body(original_size);
+  //   std::random_device rd;
+  //   std::mt19937 gen(rd());
+  //   std::uniform_int_distribution<> uid(1, 255);
+  //   std::generate(body.begin(), body.end(), [&]() { return uid(gen); });
+
+  // The input values are fixed to make the test repeatable in the event that some distributions
+  // might yield results that are, in fact, compressible.
+  http_client::Body body = {
+      140, 198, 12,  56,  165, 185, 173, 20,  13,  83,  127, 223, 77,  38,  224, 43,  236, 10,  178,
+      75,  169, 157, 136, 199, 74,  30,  148, 195, 51,  30,  225, 21,  121, 219, 7,   155, 198, 121,
+      205, 102, 80,  38,  132, 202, 45,  229, 206, 90,  150, 202, 53,  221, 54,  37,  172, 90,  238,
+      248, 191, 240, 109, 227, 248, 41,  251, 121, 35,  226, 107, 122, 15,  242, 203, 45,  64,  195,
+      186, 23,  1,   158, 61,  196, 182, 26,  201, 47,  211, 241, 251, 209, 255, 170, 181, 192, 89,
+      133, 176, 60,  178, 97,  168, 223, 152, 9,   118, 98,  169, 240, 170, 15,  13,  161, 24,  57,
+      123, 117, 230, 30,  244, 117, 238, 255, 198, 232, 95,  148, 37,  61,  67,  103, 31,  240, 52,
+      21,  145, 175, 201, 86,  19,  61,  228, 76,  131, 185, 111, 149, 203, 143, 16,  142, 95,  173,
+      42,  106, 39,  203, 116, 235, 20,  162, 112, 173, 112, 70,  126, 191, 210, 219, 90,  145, 126,
+      118, 43,  241, 101, 66,  175, 179, 5,   233, 208, 164, 180, 83,  214, 194, 173, 29,  179, 149,
+      75,  202, 17,  152, 139, 130, 94,  247, 142, 249, 159, 224, 205, 131, 93,  82,  186, 226, 210,
+      84,  17,  212, 155, 61,  226, 103, 152, 37,  3,   193, 216, 219, 203, 101, 99,  33,  59,  38,
+      106, 62,  232, 127, 44,  125, 90,  169, 148, 238, 34,  106, 12,  221, 90,  173, 67,  122, 232,
+      161, 89,  198, 43,  241, 195, 248, 219, 35,  47,  200, 11,  227, 168, 246, 243, 103, 38,  17,
+      203, 237, 203, 158, 204, 89,  231, 19,  24,  25,  199, 160, 233, 43,  117, 144, 196, 117, 152,
+      42,  121, 189, 217, 202, 221, 250, 157, 237, 47,  29,  64,  32,  10,  32,  243, 28,  114, 158,
+      228, 102, 36,  191, 139, 217, 161, 162, 186, 19,  141, 212, 49,  1,   239, 153, 107, 249, 31,
+      235, 138, 73,  80,  58,  152, 15,  149, 50,  42,  84,  75,  95,  82,  56,  86,  143, 45,  214,
+      11,  184, 164, 181, 249, 74,  184, 26,  207, 165, 162, 240, 154, 90,  56,  175, 72,  4,   166,
+      188, 78,  232, 87,  243, 50,  59,  62,  175, 213, 210, 182, 31,  123, 91,  118, 98,  249, 23,
+      170, 240, 228, 236, 121, 87,  132, 129, 250, 41,  227, 204, 250, 147, 145, 109, 149, 210, 21,
+      174, 165, 127, 234, 64,  211, 52,  93,  126, 117, 231, 216, 210, 15,  16,  2,   167, 215, 178,
+      104, 245, 119, 211, 235, 120, 135, 202, 117, 150, 101, 94,  201, 136, 179, 205, 167, 212, 236,
+      7,   178, 132, 228, 65,  230, 90,  171, 109, 31,  83,  31,  210, 123, 136, 76,  186, 81,  205,
+      63,  35,  21,  121, 152, 22,  242, 199, 106, 217, 199, 211, 206, 165, 88,  77,  112, 108, 193,
+      122, 8,   193, 74,  91,  50,  6,   156, 185, 165, 15,  92,  116, 3,   18,  244, 165, 191, 2,
+      183, 9,   164, 116, 75,  127};
+  const auto original_size = body.size();
+
+  request->SetBody(body);
+  request->AddHeader("Content-Type", "text/plain");
+  request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
+  auto handler = std::make_shared<GzipEventHandler>();
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+  session->FinishSession();
+  ASSERT_TRUE(handler->is_called_);
+  ASSERT_EQ(handler->state_, http_client::SessionState::Response);
+  ASSERT_TRUE(handler->reason_.empty());
+
+  auto http_request =
+      dynamic_cast<opentelemetry::ext::http::client::curl::Request *>(request.get());
+  ASSERT_TRUE(http_request != nullptr);
+  ASSERT_EQ(http_request->body_.size(), original_size);
+
+  session_manager->CancelAllSessions();
+  session_manager->FinishAllSessions();
+}
+#endif  // ENABLE_OTLP_COMPRESSION_PREVIEW

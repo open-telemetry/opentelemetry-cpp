@@ -2,16 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <memory>
 #include <utility>
 #include "common.h"
 
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
+#include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
@@ -238,4 +239,75 @@ TEST(MeterProvider, RemoveMeter)
   mp.ForceFlush();
   mp.Shutdown();
 }
+#endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
+
+TEST(MeterProvider, GetMeterEqualityCheck)
+{
+  auto provider = MeterProviderFactory::Create();
+
+  // providing the same scope names should return the same Meter
+  auto meter_library_1a = provider->GetMeter("library_name");
+  auto meter_library_1b = provider->GetMeter("library_name");
+  EXPECT_EQ(meter_library_1a, meter_library_1b);
+
+  // providing the same scope name and version should return the same meter
+  auto meter_version_1a = provider->GetMeter("library_name", "v1.0");
+  auto meter_version_1b = provider->GetMeter("library_name", "v1.0");
+  EXPECT_EQ(meter_version_1a, meter_version_1b);
+
+  // providing the same name, version, and schema urls should return the same meter
+  auto meter_urla = provider->GetMeter("library_name", "v1.0", "url");
+  auto meter_urlb = provider->GetMeter("library_name", "v1.0", "url");
+  EXPECT_EQ(meter_urla, meter_urlb);
+}
+
+TEST(MeterProvider, GetMeterInequalityCheck)
+{
+  auto provider = MeterProviderFactory::Create();
+
+  auto meter_library_1 = provider->GetMeter("library_1");
+  auto meter_library_2 = provider->GetMeter("library_2");
+  auto meter_version_1 = provider->GetMeter("library_1", "v1.0");
+  auto meter_version_2 = provider->GetMeter("library_1", "v2.0");
+  auto meter_url_1     = provider->GetMeter("library_1", "v1.0", "url_1");
+  auto meter_url_2     = provider->GetMeter("library_1", "v1.0", "url_2");
+
+  // different scope names should return distinct meters
+  EXPECT_NE(meter_library_1, meter_library_2);
+
+  // different scope versions should return distinct meters
+  EXPECT_NE(meter_version_1, meter_library_1);
+  EXPECT_NE(meter_version_1, meter_version_2);
+
+  // different scope schema urls should return distinct meters
+  EXPECT_NE(meter_url_1, meter_library_1);
+  EXPECT_NE(meter_url_1, meter_version_1);
+  EXPECT_NE(meter_url_1, meter_url_2);
+}
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+TEST(MeterProvider, GetMeterEqualityCheckAbiv2)
+{
+  auto provider = MeterProviderFactory::Create();
+
+  // providing the same name, version, schema url and attributes should return the same meter
+  auto meter_attribute1a = provider->GetMeter("library_name", "v1.0", "url", {{"key", "one"}});
+  auto meter_attribute1b = provider->GetMeter("library_name", "v1.0", "url", {{"key", "one"}});
+  EXPECT_EQ(meter_attribute1a, meter_attribute1b);
+}
+
+TEST(MeterProvider, GetMeterInequalityCheckAbiv2)
+{
+  auto provider = MeterProviderFactory::Create();
+
+  auto meter_1           = provider->GetMeter("library_name", "v1.0", "url");
+  auto meter_attribute_1 = provider->GetMeter("library_name", "v1.0", "url", {{"key", "one"}});
+  auto meter_attribute_2 = provider->GetMeter("library_name", "v1.0", "url", {{"key", "two"}});
+
+  // different scope attributes should return distinct meters
+  EXPECT_NE(meter_attribute_1, meter_1);
+  EXPECT_NE(meter_attribute_1, meter_attribute_2);
+}
+
 #endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */

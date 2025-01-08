@@ -21,7 +21,6 @@
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 
@@ -111,7 +110,7 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
   for (auto &tracer : tracers_)
   {
     auto &tracer_scope = tracer->GetInstrumentationScope();
-    if (tracer_scope.equal(name, version, schema_url))
+    if (tracer_scope.equal(name, version, schema_url, attributes))
     {
       return nostd::shared_ptr<trace_api::Tracer>{tracer};
     }
