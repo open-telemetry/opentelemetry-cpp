@@ -7,13 +7,12 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
-#include <cstdint>
 #include <cstring>
 #include <functional>
 #include <future>
-#include <istream>
 #include <map>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <thread>
 #include <utility>

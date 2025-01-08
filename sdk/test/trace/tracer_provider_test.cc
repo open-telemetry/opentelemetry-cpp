@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <algorithm>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -15,7 +16,6 @@
 #include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/random_id_generator.h"
-#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
@@ -24,6 +24,7 @@
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/tracer.h"
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;

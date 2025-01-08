@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <string>
 
 #include "opentelemetry/context/context_value.h"
 #include "opentelemetry/context/runtime_context.h"

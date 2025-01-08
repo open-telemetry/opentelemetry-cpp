@@ -13,7 +13,6 @@
 #include <vector>
 #include "benchmark/benchmark.h"
 
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 #include "opentelemetry/sdk/common/circular_buffer.h"
 #include "opentelemetry/sdk/common/circular_buffer_range.h"

@@ -9,7 +9,6 @@
 #include <string>
 #include <utility>
 
-#include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"

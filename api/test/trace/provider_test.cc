@@ -6,7 +6,6 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/provider.h"
-#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
 using opentelemetry::trace::Provider;
