@@ -209,7 +209,7 @@ bool GetUintEnvironmentVariable(const char *env_var_name, std::uint32_t &value)
 
   const char *end  = raw_value.c_str() + raw_value.length();
   char *actual_end = nullptr;
-  const auto temp  = std::strtoul(raw_value.c_str(), &actual_end, 10);
+  const auto temp  = std::strtoull(raw_value.c_str(), &actual_end, 10);
 
   if (errno == ERANGE)
   {
