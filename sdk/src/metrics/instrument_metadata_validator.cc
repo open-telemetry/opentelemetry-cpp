@@ -1,10 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <map>
-#include <sstream>
 #include <string>
-#include <vector>
 
 #include "opentelemetry/version.h"
 #include "opentelemetry/nostd/string_view.h"

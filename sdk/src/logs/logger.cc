@@ -6,7 +6,6 @@
 #include <utility>
 
 #include "opentelemetry/version.h"
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/context_value.h"
 #include "opentelemetry/context/runtime_context.h"

@@ -10,7 +10,6 @@
 #include <string>
 
 #include "opentelemetry/version.h"
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio.h"

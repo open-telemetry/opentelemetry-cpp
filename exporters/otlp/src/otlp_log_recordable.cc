@@ -4,9 +4,9 @@
 #include <chrono>
 
 #include "opentelemetry/version.h"
+#include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"

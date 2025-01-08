@@ -4,7 +4,6 @@
 #include <chrono>
 #include <map>
 #include <string>
-#include <type_traits>
 #include <unordered_set>
 #include <utility>
 
@@ -12,7 +11,6 @@
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 
 namespace sdk_common = opentelemetry::sdk::common;

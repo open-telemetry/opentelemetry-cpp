@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include <stdlib.h>
 #include <chrono>
+#include <string>
 
 #include "opentelemetry/common/timestamp.h"
 

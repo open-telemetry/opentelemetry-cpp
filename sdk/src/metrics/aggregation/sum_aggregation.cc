@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <memory>
 #include <mutex>
+#include <ostream>
 
 #include "opentelemetry/version.h"
 #include "opentelemetry/common/spin_lock_mutex.h"

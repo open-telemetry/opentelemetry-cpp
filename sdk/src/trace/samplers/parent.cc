@@ -6,7 +6,6 @@
 #include <string>
 
 #include "opentelemetry/version.h"
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/sampler.h"

@@ -4,7 +4,6 @@
 // NOLINTNEXTLINE
 #define _WINSOCKAPI_  // stops including winsock.h
 
-#include <stdint.h>
 #include <atomic>
 #include <chrono>
 #include <memory>

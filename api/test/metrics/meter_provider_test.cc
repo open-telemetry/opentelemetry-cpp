@@ -3,7 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
