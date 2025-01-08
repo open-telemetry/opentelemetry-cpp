@@ -125,4 +125,5 @@ int main(int argc, char *argv[])
   foo_library();
   CleanupTracer();
   CleanupLogger();
+  return 0;
 }

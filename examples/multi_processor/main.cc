@@ -98,7 +98,7 @@ void dumpSpans(std::vector<std::unique_ptr<trace_sdk::SpanData>> &spans)
 }
 }  // namespace
 
-int main()
+int main(int /* argc */, char ** /* argv */)
 {
   // Removing this line will leave the default noop TracerProvider in place.
   std::shared_ptr<InMemorySpanData> data = InitTracer();
@@ -108,4 +108,5 @@ int main()
   dumpSpans(memory_spans);
 
   CleanupTracer();
+  return 0;
 }

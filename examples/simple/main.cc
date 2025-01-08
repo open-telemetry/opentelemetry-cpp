@@ -45,7 +45,7 @@ void CleanupTracer()
 }
 }  // namespace
 
-int main()
+int main(int /* argc */, char ** /* argv */)
 {
   // Removing this line will leave the default noop TracerProvider in place.
   InitTracer();
@@ -53,4 +53,5 @@ int main()
   foo_library();
 
   CleanupTracer();
+  return 0;
 }
