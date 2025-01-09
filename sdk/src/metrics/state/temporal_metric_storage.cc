@@ -51,6 +51,36 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   AggregationTemporality aggregation_temporarily =
       collector->GetAggregationTemporality(instrument_descriptor_.type_);
 
+  // Fast path for single collector with delta temporality and counter, updown-counter, histogram
+  if (collectors.size() == 1 && collector->GetAggregationTemporality(
+                                    instrument_descriptor_.type_) == AggregationTemporality::kDelta)
+  {
+    // If no metrics, early return
+    if (delta_metrics->Size() == 0)
+    {
+      return true;
+    }
+
+    // Create MetricData directly
+    MetricData metric_data;
+    metric_data.instrument_descriptor   = instrument_descriptor_;
+    metric_data.aggregation_temporality = AggregationTemporality::kDelta;
+    metric_data.start_ts                = sdk_start_ts;
+    metric_data.end_ts                  = collection_ts;
+
+    // Direct conversion of delta metrics to point data
+    delta_metrics->GetAllEnteries(
+        [&metric_data](const MetricAttributes &attributes, Aggregation &aggregation) {
+          PointDataAttributes point_data_attr;
+          point_data_attr.point_data = aggregation.ToPoint();
+          point_data_attr.attributes = attributes;
+          metric_data.point_data_attr_.emplace_back(std::move(point_data_attr));
+          return true;
+        });
+
+    return callback(metric_data);
+  }
+
   if (delta_metrics->Size())
   {
     for (auto &col : collectors)
