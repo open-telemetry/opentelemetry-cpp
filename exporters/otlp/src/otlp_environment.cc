@@ -96,7 +96,7 @@ static bool GetUintDualEnvVar(const char *signal_name,
   return exists;
 }
 
-static float GetFloatDualEnvVar(const char *signal_name, const char *generic_name, float &value)
+static bool GetFloatDualEnvVar(const char *signal_name, const char *generic_name, float &value)
 {
   bool exists;
 
