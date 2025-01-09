@@ -13,6 +13,7 @@
 #include <memory>
 #include <mutex>
 #include <ratio>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -26,12 +27,12 @@
 
 #include "nlohmann/json.hpp"
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/base64.h"
@@ -890,7 +891,7 @@ OtlpHttpClient::createSession(
   // Parse uri and store it to cache
   if (http_uri_.empty())
   {
-    auto parse_url = opentelemetry::ext::http::common::UrlParser(std::string(options_.url));
+    const auto parse_url = opentelemetry::ext::http::common::UrlParser(options_.url);
     if (!parse_url.success_)
     {
       std::string error_message = "[OTLP HTTP Client] Export failed, invalid url: " + options_.url;

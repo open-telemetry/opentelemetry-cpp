@@ -29,6 +29,7 @@
   { "include": ["<gtest/gtest-param-test.h>", "private", "<gtest/gtest.h>", "public"] },
   { "include": ["<gtest/gtest_pred_impl.h>", "private", "<gtest/gtest.h>", "public"] },
   { "include": ["<gtest/gtest-typed-test.h>", "private", "<gtest/gtest.h>", "public"] },
+  { "include": ["<gtest/gtest-assertion-result.h>", "private", "<gtest/gtest.h>", "public"] },
 
   # We prefer to include <gmock/gmock.h> for simplicity
   { "include": ["<gmock/gmock-function-mocker.h>", "private", "<gmock/gmock.h>", "public"] },

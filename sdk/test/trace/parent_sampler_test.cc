@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
-#include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/sampler.h"

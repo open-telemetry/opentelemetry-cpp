@@ -8,13 +8,12 @@
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
+#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
-#include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
 #ifdef BAZEL_BUILD
@@ -73,4 +72,5 @@ int main(int argc, char *argv[])
   foo_library();
 
   CleanupTracer();
+  return 0;
 }

@@ -659,6 +659,37 @@ if(BUILD_TESTING)
   endif()
   message(STATUS "GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
   message(STATUS "GTEST_BOTH_LIBRARIES = ${GTEST_BOTH_LIBRARIES}")
+
+  # Try to find gmock
+  if(NOT GMOCK_LIB AND TARGET GTest::gmock)
+    set(GMOCK_LIB GTest::gmock)
+  elseif(MSVC)
+    # Explicitly specify that we consume GTest from shared library. The rest of
+    # code logic below determines whether we link Release or Debug flavor of the
+    # library. These flavors have different prefix on Windows, gmock and gmockd
+    # respectively.
+    add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
+    if(GMOCK_LIB)
+      # unset GMOCK_LIB to force find_library to redo the lookup, as the cached
+      # entry could cause linking to incorrect flavor of gmock and leading to
+      # runtime error.
+      unset(GMOCK_LIB CACHE)
+    endif()
+  endif()
+  if(NOT GMOCK_LIB)
+    if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+      find_library(GMOCK_LIB gmockd PATH_SUFFIXES lib)
+    else()
+      find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
+    endif()
+    # Reset GMOCK_LIB if it was not found, or some target may link
+    # GMOCK_LIB-NOTFOUND
+    if(NOT GMOCK_LIB)
+      unset(GMOCK_LIB)
+      unset(GMOCK_LIB CACHE)
+    endif()
+  endif()
+
   enable_testing()
   if(WITH_BENCHMARK)
     # Benchmark respects the CMAKE_PREFIX_PATH
