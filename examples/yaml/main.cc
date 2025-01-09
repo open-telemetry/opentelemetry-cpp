@@ -10,6 +10,7 @@
 #include "opentelemetry/exporters/ostream/console_push_metric_builder.h"
 #include "opentelemetry/exporters/ostream/console_span_builder.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
 #include "opentelemetry/sdk/init/configured_sdk.h"
 #include "opentelemetry/sdk/init/registry.h"
@@ -205,4 +206,5 @@ int main(int argc, char *argv[])
   foo_library::histogram_example("yaml");
 
   CleanupOtel();
+  return 0;
 }

@@ -18,6 +18,7 @@
   { "include": ["<c4/yml/parse.hpp>", "private", "<ryml.hpp>", "public"] },
   { "include": ["<c4/yml/parse_engine.hpp>", "private", "<ryml.hpp>", "public"] },
   { "include": ["<c4/yml/tree.hpp>", "private", "<ryml.hpp>", "public"] },
+  { "include": ["<c4/yml/event_handler_tree.hpp>", "private", "<ryml.hpp>", "public"] },
   { "include": ["<c4/substr.hpp>", "private", "<ryml.hpp>", "public"] },
   { "include": ["<c4/substr_fwd.hpp>", "private", "<ryml.hpp>", "public"] },
 

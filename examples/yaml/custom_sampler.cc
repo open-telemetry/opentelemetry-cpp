@@ -4,7 +4,6 @@
 #include <map>
 #include <memory>
 
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/trace_state.h"
 

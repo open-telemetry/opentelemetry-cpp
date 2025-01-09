@@ -3,6 +3,7 @@
 
 #include <cctype>
 #include <cstdlib>
+#include <ostream>
 #include <string>
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
