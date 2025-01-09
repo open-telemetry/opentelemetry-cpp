@@ -6,7 +6,6 @@
 #include <chrono>
 #include <cstdint>
 #include <functional>
-#include <initializer_list>
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
@@ -31,7 +30,6 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_startoptions.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer.h"

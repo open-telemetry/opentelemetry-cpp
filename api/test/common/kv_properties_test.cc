@@ -9,8 +9,8 @@
 #include <vector>
 
 #include <opentelemetry/common/kv_properties.h>
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/utility.h"
 
 // ------------------------- Entry class tests ---------------------------------
 

@@ -25,7 +25,7 @@ namespace system
  * <p>
  * gauge
  */
-static constexpr const char *kMetricSystemCpuFrequency = "metric.system.cpu.frequency";
+static constexpr const char *kMetricSystemCpuFrequency = "system.cpu.frequency";
 static constexpr const char *descrMetricSystemCpuFrequency =
     "Reports the current frequency of the CPU in Hz";
 static constexpr const char *unitMetricSystemCpuFrequency = "{Hz}";
@@ -65,7 +65,7 @@ CreateAsyncDoubleMetricSystemCpuFrequency(metrics::Meter *meter)
  * Reports the number of logical (virtual) processor cores created by the operating system to manage
  * multitasking <p> updowncounter
  */
-static constexpr const char *kMetricSystemCpuLogicalCount = "metric.system.cpu.logical.count";
+static constexpr const char *kMetricSystemCpuLogicalCount = "system.cpu.logical.count";
 static constexpr const char *descrMetricSystemCpuLogicalCount =
     "Reports the number of logical (virtual) processor cores created by the operating system to "
     "manage multitasking";
@@ -108,7 +108,7 @@ CreateAsyncDoubleMetricSystemCpuLogicalCount(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricSystemCpuPhysicalCount = "metric.system.cpu.physical.count";
+static constexpr const char *kMetricSystemCpuPhysicalCount = "system.cpu.physical.count";
 static constexpr const char *descrMetricSystemCpuPhysicalCount =
     "Reports the number of actual physical processor cores on the hardware";
 static constexpr const char *unitMetricSystemCpuPhysicalCount = "{cpu}";
@@ -150,7 +150,7 @@ CreateAsyncDoubleMetricSystemCpuPhysicalCount(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricSystemCpuTime = "metric.system.cpu.time";
+static constexpr const char *kMetricSystemCpuTime = "system.cpu.time";
 static constexpr const char *descrMetricSystemCpuTime =
     "Seconds each logical CPU spent on each mode";
 static constexpr const char *unitMetricSystemCpuTime = "s";
@@ -187,7 +187,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  * Difference in system.cpu.time since the last measurement, divided by the elapsed time and number
  * of logical CPUs <p> gauge
  */
-static constexpr const char *kMetricSystemCpuUtilization = "metric.system.cpu.utilization";
+static constexpr const char *kMetricSystemCpuUtilization = "system.cpu.utilization";
 static constexpr const char *descrMetricSystemCpuUtilization =
     "Difference in system.cpu.time since the last measurement, divided by the elapsed time and "
     "number of logical CPUs";
@@ -227,7 +227,7 @@ CreateAsyncDoubleMetricSystemCpuUtilization(metrics::Meter *meter)
 /**
  * counter
  */
-static constexpr const char *kMetricSystemDiskIo     = "metric.system.disk.io";
+static constexpr const char *kMetricSystemDiskIo     = "system.disk.io";
 static constexpr const char *descrMetricSystemDiskIo = "";
 static constexpr const char *unitMetricSystemDiskIo  = "By";
 
@@ -272,7 +272,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  * </ul>
  * counter
  */
-static constexpr const char *kMetricSystemDiskIoTime     = "metric.system.disk.io_time";
+static constexpr const char *kMetricSystemDiskIoTime     = "system.disk.io_time";
 static constexpr const char *descrMetricSystemDiskIoTime = "Time disk spent activated";
 static constexpr const char *unitMetricSystemDiskIoTime  = "s";
 
@@ -309,7 +309,7 @@ CreateAsyncDoubleMetricSystemDiskIoTime(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricSystemDiskLimit     = "metric.system.disk.limit";
+static constexpr const char *kMetricSystemDiskLimit     = "system.disk.limit";
 static constexpr const char *descrMetricSystemDiskLimit = "The total storage capacity of the disk";
 static constexpr const char *unitMetricSystemDiskLimit  = "By";
 
@@ -344,7 +344,7 @@ CreateAsyncDoubleMetricSystemDiskLimit(metrics::Meter *meter)
 /**
  * counter
  */
-static constexpr const char *kMetricSystemDiskMerged     = "metric.system.disk.merged";
+static constexpr const char *kMetricSystemDiskMerged     = "system.disk.merged";
 static constexpr const char *descrMetricSystemDiskMerged = "";
 static constexpr const char *unitMetricSystemDiskMerged  = "{operation}";
 
@@ -387,7 +387,7 @@ CreateAsyncDoubleMetricSystemDiskMerged(metrics::Meter *meter)
  * </ul>
  * counter
  */
-static constexpr const char *kMetricSystemDiskOperationTime = "metric.system.disk.operation_time";
+static constexpr const char *kMetricSystemDiskOperationTime = "system.disk.operation_time";
 static constexpr const char *descrMetricSystemDiskOperationTime =
     "Sum of the time each operation took to complete";
 static constexpr const char *unitMetricSystemDiskOperationTime = "s";
@@ -427,7 +427,7 @@ CreateAsyncDoubleMetricSystemDiskOperationTime(metrics::Meter *meter)
 /**
  * counter
  */
-static constexpr const char *kMetricSystemDiskOperations     = "metric.system.disk.operations";
+static constexpr const char *kMetricSystemDiskOperations     = "system.disk.operations";
 static constexpr const char *descrMetricSystemDiskOperations = "";
 static constexpr const char *unitMetricSystemDiskOperations  = "{operation}";
 
@@ -464,7 +464,7 @@ CreateAsyncDoubleMetricSystemDiskOperations(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricSystemFilesystemLimit = "metric.system.filesystem.limit";
+static constexpr const char *kMetricSystemFilesystemLimit = "system.filesystem.limit";
 static constexpr const char *descrMetricSystemFilesystemLimit =
     "The total storage capacity of the filesystem";
 static constexpr const char *unitMetricSystemFilesystemLimit = "By";
@@ -508,7 +508,7 @@ CreateAsyncDoubleMetricSystemFilesystemLimit(metrics::Meter *meter)
  * system.filesystem.state @endcode attributes SHOULD equal the total storage capacity of the
  * filesystem, that is @code system.filesystem.limit @endcode. <p> updowncounter
  */
-static constexpr const char *kMetricSystemFilesystemUsage = "metric.system.filesystem.usage";
+static constexpr const char *kMetricSystemFilesystemUsage = "system.filesystem.usage";
 static constexpr const char *descrMetricSystemFilesystemUsage =
     "Reports a filesystem's space usage across different states.";
 static constexpr const char *unitMetricSystemFilesystemUsage = "By";
@@ -548,8 +548,7 @@ CreateAsyncDoubleMetricSystemFilesystemUsage(metrics::Meter *meter)
 /**
  * gauge
  */
-static constexpr const char *kMetricSystemFilesystemUtilization =
-    "metric.system.filesystem.utilization";
+static constexpr const char *kMetricSystemFilesystemUtilization = "system.filesystem.utilization";
 static constexpr const char *descrMetricSystemFilesystemUtilization = "";
 static constexpr const char *unitMetricSystemFilesystemUtilization  = "1";
 
@@ -597,8 +596,7 @@ CreateAsyncDoubleMetricSystemFilesystemUtilization(metrics::Meter *meter)
  * href="https://superuser.com/a/980821">here</a>. See also @code MemAvailable @endcode in <a
  * href="https://man7.org/linux/man-pages/man5/proc.5.html">/proc/meminfo</a>. <p> updowncounter
  */
-static constexpr const char *kMetricSystemLinuxMemoryAvailable =
-    "metric.system.linux.memory.available";
+static constexpr const char *kMetricSystemLinuxMemoryAvailable = "system.linux.memory.available";
 static constexpr const char *descrMetricSystemLinuxMemoryAvailable =
     "An estimate of how much memory is available for starting new applications, without causing "
     "swapping";
@@ -646,8 +644,7 @@ CreateAsyncDoubleMetricSystemLinuxMemoryAvailable(metrics::Meter *meter)
  * allocator</a> and @code Slab @endcode in <a
  * href="https://man7.org/linux/man-pages/man5/proc.5.html">/proc/meminfo</a>. <p> updowncounter
  */
-static constexpr const char *kMetricSystemLinuxMemorySlabUsage =
-    "metric.system.linux.memory.slab.usage";
+static constexpr const char *kMetricSystemLinuxMemorySlabUsage = "system.linux.memory.slab.usage";
 static constexpr const char *descrMetricSystemLinuxMemorySlabUsage =
     "Reports the memory used by the Linux kernel for managing caches of frequently used objects.";
 static constexpr const char *unitMetricSystemLinuxMemorySlabUsage = "By";
@@ -691,7 +688,7 @@ CreateAsyncDoubleMetricSystemLinuxMemorySlabUsage(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricSystemMemoryLimit     = "metric.system.memory.limit";
+static constexpr const char *kMetricSystemMemoryLimit     = "system.memory.limit";
 static constexpr const char *descrMetricSystemMemoryLimit = "Total memory available in the system.";
 static constexpr const char *unitMetricSystemMemoryLimit  = "By";
 
@@ -731,7 +728,7 @@ CreateAsyncDoubleMetricSystemMemoryLimit(metrics::Meter *meter)
  * @code Shmem @endcode from <a href="https://man7.org/linux/man-pages/man5/proc.5.html">@code
  * /proc/meminfo @endcode</a>" <p> updowncounter
  */
-static constexpr const char *kMetricSystemMemoryShared = "metric.system.memory.shared";
+static constexpr const char *kMetricSystemMemoryShared = "system.memory.shared";
 static constexpr const char *descrMetricSystemMemoryShared =
     "Shared memory used (mostly by tmpfs).";
 static constexpr const char *unitMetricSystemMemoryShared = "By";
@@ -772,7 +769,7 @@ CreateAsyncDoubleMetricSystemMemoryShared(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricSystemMemoryUsage     = "metric.system.memory.usage";
+static constexpr const char *kMetricSystemMemoryUsage     = "system.memory.usage";
 static constexpr const char *descrMetricSystemMemoryUsage = "Reports memory in use by state.";
 static constexpr const char *unitMetricSystemMemoryUsage  = "By";
 
@@ -807,7 +804,7 @@ CreateAsyncDoubleMetricSystemMemoryUsage(metrics::Meter *meter)
 /**
  * gauge
  */
-static constexpr const char *kMetricSystemMemoryUtilization = "metric.system.memory.utilization";
+static constexpr const char *kMetricSystemMemoryUtilization     = "system.memory.utilization";
 static constexpr const char *descrMetricSystemMemoryUtilization = "";
 static constexpr const char *unitMetricSystemMemoryUtilization  = "1";
 
@@ -848,7 +845,7 @@ CreateAsyncDoubleMetricSystemMemoryUtilization(metrics::Meter *meter)
 /**
  * updowncounter
  */
-static constexpr const char *kMetricSystemNetworkConnections = "metric.system.network.connections";
+static constexpr const char *kMetricSystemNetworkConnections     = "system.network.connections";
 static constexpr const char *descrMetricSystemNetworkConnections = "";
 static constexpr const char *unitMetricSystemNetworkConnections  = "{connection}";
 
@@ -899,7 +896,7 @@ CreateAsyncDoubleMetricSystemNetworkConnections(metrics::Meter *meter)
  * </ul>
  * counter
  */
-static constexpr const char *kMetricSystemNetworkDropped = "metric.system.network.dropped";
+static constexpr const char *kMetricSystemNetworkDropped = "system.network.dropped";
 static constexpr const char *descrMetricSystemNetworkDropped =
     "Count of packets that are dropped or discarded even though there was no error";
 static constexpr const char *unitMetricSystemNetworkDropped = "{packet}";
@@ -947,7 +944,7 @@ CreateAsyncDoubleMetricSystemNetworkDropped(metrics::Meter *meter)
  * </ul>
  * counter
  */
-static constexpr const char *kMetricSystemNetworkErrors     = "metric.system.network.errors";
+static constexpr const char *kMetricSystemNetworkErrors     = "system.network.errors";
 static constexpr const char *descrMetricSystemNetworkErrors = "Count of network errors detected";
 static constexpr const char *unitMetricSystemNetworkErrors  = "{error}";
 
@@ -982,7 +979,7 @@ CreateAsyncDoubleMetricSystemNetworkErrors(metrics::Meter *meter)
 /**
  * counter
  */
-static constexpr const char *kMetricSystemNetworkIo     = "metric.system.network.io";
+static constexpr const char *kMetricSystemNetworkIo     = "system.network.io";
 static constexpr const char *descrMetricSystemNetworkIo = "";
 static constexpr const char *unitMetricSystemNetworkIo  = "By";
 
@@ -1017,7 +1014,7 @@ CreateAsyncDoubleMetricSystemNetworkIo(metrics::Meter *meter)
 /**
  * counter
  */
-static constexpr const char *kMetricSystemNetworkPackets     = "metric.system.network.packets";
+static constexpr const char *kMetricSystemNetworkPackets     = "system.network.packets";
 static constexpr const char *descrMetricSystemNetworkPackets = "";
 static constexpr const char *unitMetricSystemNetworkPackets  = "{packet}";
 
@@ -1052,7 +1049,7 @@ CreateAsyncDoubleMetricSystemNetworkPackets(metrics::Meter *meter)
 /**
  * counter
  */
-static constexpr const char *kMetricSystemPagingFaults     = "metric.system.paging.faults";
+static constexpr const char *kMetricSystemPagingFaults     = "system.paging.faults";
 static constexpr const char *descrMetricSystemPagingFaults = "";
 static constexpr const char *unitMetricSystemPagingFaults  = "{fault}";
 
@@ -1087,7 +1084,7 @@ CreateAsyncDoubleMetricSystemPagingFaults(metrics::Meter *meter)
 /**
  * counter
  */
-static constexpr const char *kMetricSystemPagingOperations     = "metric.system.paging.operations";
+static constexpr const char *kMetricSystemPagingOperations     = "system.paging.operations";
 static constexpr const char *descrMetricSystemPagingOperations = "";
 static constexpr const char *unitMetricSystemPagingOperations  = "{operation}";
 
@@ -1128,7 +1125,7 @@ CreateAsyncDoubleMetricSystemPagingOperations(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricSystemPagingUsage     = "metric.system.paging.usage";
+static constexpr const char *kMetricSystemPagingUsage     = "system.paging.usage";
 static constexpr const char *descrMetricSystemPagingUsage = "Unix swap or windows pagefile usage";
 static constexpr const char *unitMetricSystemPagingUsage  = "By";
 
@@ -1163,7 +1160,7 @@ CreateAsyncDoubleMetricSystemPagingUsage(metrics::Meter *meter)
 /**
  * gauge
  */
-static constexpr const char *kMetricSystemPagingUtilization = "metric.system.paging.utilization";
+static constexpr const char *kMetricSystemPagingUtilization     = "system.paging.utilization";
 static constexpr const char *descrMetricSystemPagingUtilization = "";
 static constexpr const char *unitMetricSystemPagingUtilization  = "1";
 
@@ -1206,7 +1203,7 @@ CreateAsyncDoubleMetricSystemPagingUtilization(metrics::Meter *meter)
  * <p>
  * updowncounter
  */
-static constexpr const char *kMetricSystemProcessCount = "metric.system.process.count";
+static constexpr const char *kMetricSystemProcessCount = "system.process.count";
 static constexpr const char *descrMetricSystemProcessCount =
     "Total number of processes in each state";
 static constexpr const char *unitMetricSystemProcessCount = "{process}";
@@ -1244,7 +1241,7 @@ CreateAsyncDoubleMetricSystemProcessCount(metrics::Meter *meter)
  * <p>
  * counter
  */
-static constexpr const char *kMetricSystemProcessCreated = "metric.system.process.created";
+static constexpr const char *kMetricSystemProcessCreated = "system.process.created";
 static constexpr const char *descrMetricSystemProcessCreated =
     "Total number of processes created over uptime of the host";
 static constexpr const char *unitMetricSystemProcessCreated = "{process}";
@@ -1284,7 +1281,7 @@ CreateAsyncDoubleMetricSystemProcessCreated(metrics::Meter *meter)
  * as a floating point number with the highest precision available. The actual accuracy would depend
  * on the instrumentation and operating system. <p> gauge
  */
-static constexpr const char *kMetricSystemUptime     = "metric.system.uptime";
+static constexpr const char *kMetricSystemUptime     = "system.uptime";
 static constexpr const char *descrMetricSystemUptime = "The time the system has been running";
 static constexpr const char *unitMetricSystemUptime  = "s";
 

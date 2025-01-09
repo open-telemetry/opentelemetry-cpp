@@ -5,13 +5,14 @@
 #include <stdint.h>
 #include <chrono>
 #include <cstdlib>
+#include <initializer_list>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
@@ -20,7 +21,6 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/logs/read_write_log_record.h"
 #include "opentelemetry/sdk/resource/resource.h"

@@ -3,14 +3,18 @@
 
 #include <curl/curl.h>
 #include <curl/curlver.h>
+#include <algorithm>
+#include <array>
 #include <atomic>
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
+#include <cstring>
+#include <functional>
 #include <list>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -57,11 +61,85 @@ nostd::shared_ptr<HttpCurlGlobalInitializer> HttpCurlGlobalInitializer::GetInsta
   return shared_initializer;
 }
 
+#ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
+// Original source:
+// https://stackoverflow.com/questions/12398377/is-it-possible-to-have-zlib-read-from-and-write-to-the-same-memory-buffer/12412863#12412863
+int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *max_len)
+{
+  // must be large enough to hold zlib or gzip header (if any) and one more byte -- 11 works for the
+  // worst case here, but if gzip encoding is used and a deflateSetHeader() call is inserted in this
+  // code after the deflateReset(), then the 11 needs to be increased to accommodate the resulting
+  // gzip header size plus one
+  std::array<unsigned char, 11> temp{};
+
+  // kick start the process with a temporary output buffer -- this allows deflate to consume a large
+  // chunk of input data in order to make room for output data there
+  strm->next_in  = buf;
+  strm->avail_in = len;
+  if (*max_len < len)
+  {
+    *max_len = len;
+  }
+  strm->next_out  = temp.data();
+  strm->avail_out = (std::min)(static_cast<decltype(z_stream::avail_out)>(temp.size()), *max_len);
+  auto ret        = deflate(strm, Z_FINISH);
+  if (ret == Z_STREAM_ERROR)
+  {
+    return ret;
+  }
+
+  // if we can, copy the temporary output data to the consumed portion of the input buffer, and then
+  // continue to write up to the start of the consumed input for as long as possible
+  auto have = strm->next_out - temp.data();  // number of bytes in temp[]
+  if (have <= static_cast<decltype(have)>(strm->avail_in ? len - strm->avail_in : *max_len))
+  {
+    std::memcpy(buf, temp.data(), have);
+    strm->next_out = buf + have;
+    have           = 0;
+    while (ret == Z_OK)
+    {
+      strm->avail_out =
+          strm->avail_in ? strm->next_in - strm->next_out : (buf + *max_len) - strm->next_out;
+      ret = deflate(strm, Z_FINISH);
+    }
+    if (ret != Z_BUF_ERROR || strm->avail_in == 0)
+    {
+      *max_len = strm->next_out - buf;
+      return ret == Z_STREAM_END ? Z_OK : ret;
+    }
+  }
+
+  // the output caught up with the input due to insufficiently compressible data -- copy the
+  // remaining input data into an allocated buffer and complete the compression from there to the
+  // now empty input buffer (this will only occur for long incompressible streams, more than ~20 MB
+  // for the default deflate memLevel of 8, or when *max_len is too small and less than the length
+  // of the header plus one byte)
+  auto hold = static_cast<std::remove_const_t<decltype(z_stream::next_in)>>(
+      strm->zalloc(strm->opaque, strm->avail_in, 1));  // allocated buffer to hold input data
+  if (hold == Z_NULL)
+  {
+    return Z_MEM_ERROR;
+  }
+  std::memcpy(hold, strm->next_in, strm->avail_in);
+  strm->next_in = hold;
+  if (have)
+  {
+    std::memcpy(buf, temp.data(), have);
+    strm->next_out = buf + have;
+  }
+  strm->avail_out = (buf + *max_len) - strm->next_out;
+  ret             = deflate(strm, Z_FINISH);
+  strm->zfree(strm->opaque, hold);
+  *max_len = strm->next_out - buf;
+  return ret == Z_OK ? Z_BUF_ERROR : (ret == Z_STREAM_END ? Z_OK : ret);
+}
+#endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
+
 void Session::SendRequest(
     std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) noexcept
 {
   is_session_active_.store(true, std::memory_order_release);
-  std::string url       = host_ + std::string(http_request_->uri_);
+  const auto &url       = host_ + http_request_->uri_;
   auto callback_ptr     = callback.get();
   bool reuse_connection = false;
 
@@ -76,44 +154,47 @@ void Session::SendRequest(
   if (http_request_->compression_ == opentelemetry::ext::http::client::Compression::kGzip)
   {
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
-    http_request_->AddHeader("Content-Encoding", "gzip");
-
-    opentelemetry::ext::http::client::Body compressed_body(http_request_->body_.size());
-    z_stream zs;
-    zs.zalloc    = Z_NULL;
-    zs.zfree     = Z_NULL;
-    zs.opaque    = Z_NULL;
-    zs.avail_in  = static_cast<uInt>(http_request_->body_.size());
-    zs.next_in   = http_request_->body_.data();
-    zs.avail_out = static_cast<uInt>(compressed_body.size());
-    zs.next_out  = compressed_body.data();
+    z_stream zs{};
+    zs.zalloc = Z_NULL;
+    zs.zfree  = Z_NULL;
+    zs.opaque = Z_NULL;
 
     // ZLIB: Have to maually specify 16 bits for the Gzip headers
-    const int window_bits = 15 + 16;
+    static constexpr int kWindowBits = MAX_WBITS + 16;
+    static constexpr int kMemLevel   = MAX_MEM_LEVEL;
 
-    int stream =
-        deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, window_bits, 8, Z_DEFAULT_STRATEGY);
+    auto stream = deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, kWindowBits, kMemLevel,
+                               Z_DEFAULT_STRATEGY);
 
     if (stream == Z_OK)
     {
-      deflate(&zs, Z_FINISH);
-      deflateEnd(&zs);
-      compressed_body.resize(zs.total_out);
-      http_request_->SetBody(compressed_body);
+      auto size     = static_cast<uInt>(http_request_->body_.size());
+      auto max_size = size;
+      stream        = deflateInPlace(&zs, http_request_->body_.data(), size, &max_size);
+
+      if (stream == Z_OK)
+      {
+        http_request_->AddHeader("Content-Encoding", "gzip");
+        http_request_->body_.resize(max_size);
+      }
     }
-    else
+
+    if (stream != Z_OK)
     {
       if (callback)
       {
-        callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed, "");
+        callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
+                          zs.msg ? zs.msg : "");
       }
       is_session_active_.store(false, std::memory_order_release);
     }
+
+    deflateEnd(&zs);
 #else
     OTEL_INTERNAL_LOG_ERROR(
         "[HTTP Client Curl] Set WITH_OTLP_HTTP_COMPRESSION=ON to use gzip compression with the "
         "OTLP HTTP Exporter");
-#endif
+#endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
   }
 
   curl_operation_.reset(new HttpOperation(
@@ -189,11 +270,13 @@ HttpClient::HttpClient()
       next_session_id_{0},
       max_sessions_per_connection_{8},
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
+      background_thread_wait_for_{std::chrono::minutes{1}},
       curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
 {}
 
 HttpClient::~HttpClient()
 {
+  is_shutdown_.store(true, std::memory_order_release);
   while (true)
   {
     std::unique_ptr<std::thread> background_thread;
@@ -211,6 +294,7 @@ HttpClient::~HttpClient()
     }
     if (background_thread->joinable())
     {
+      wakeupBackgroundThread();  // if delay quit, wake up first
       background_thread->join();
     }
   }
@@ -223,7 +307,7 @@ HttpClient::~HttpClient()
 std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSession(
     nostd::string_view url) noexcept
 {
-  auto parsedUrl = common::UrlParser(std::string(url));
+  const auto parsedUrl = common::UrlParser(std::string(url));
   if (!parsedUrl.success_)
   {
     return std::make_shared<Session>(*this);
@@ -335,29 +419,33 @@ void HttpClient::CleanupSession(uint64_t session_id)
   }
 }
 
-void HttpClient::MaybeSpawnBackgroundThread()
+bool HttpClient::MaybeSpawnBackgroundThread()
 {
   std::lock_guard<std::mutex> lock_guard{background_thread_m_};
   if (background_thread_)
   {
-    return;
+    return false;
   }
 
   background_thread_.reset(new std::thread(
       [](HttpClient *self) {
         int still_running = 1;
+        std::chrono::system_clock::time_point last_free_job_timepoint =
+            std::chrono::system_clock::now();
+        bool need_wait_more = false;
         while (true)
         {
           CURLMsg *msg;
           int queued;
           CURLMcode mc = curl_multi_perform(self->multi_handle_, &still_running);
+
           // According to https://curl.se/libcurl/c/curl_multi_perform.html, when mc is not OK, we
           // can not curl_multi_perform it again
           if (mc != CURLM_OK)
           {
             self->resetMultiHandle();
           }
-          else if (still_running)
+          else if (still_running || need_wait_more)
           {
         // curl_multi_poll is added from libcurl 7.66.0, before 7.68.0, we can only wait util
         // timeout to do the rest jobs
@@ -416,6 +504,32 @@ void HttpClient::MaybeSpawnBackgroundThread()
             still_running = 1;
           }
 
+          std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+          if (still_running > 0)
+          {
+            last_free_job_timepoint = now;
+            need_wait_more          = false;
+            continue;
+          }
+
+          std::chrono::milliseconds wait_for = std::chrono::milliseconds::zero();
+
+#if LIBCURL_VERSION_NUM >= 0x074400
+          // only available with curl_multi_poll+curl_multi_wakeup, because curl_multi_wait would
+          // cause CPU busy, curl_multi_wait+sleep could not wakeup quickly
+          wait_for = self->background_thread_wait_for_;
+#endif
+          if (self->is_shutdown_.load(std::memory_order_acquire))
+          {
+            wait_for = std::chrono::milliseconds::zero();
+          }
+
+          if (now - last_free_job_timepoint < wait_for)
+          {
+            need_wait_more = true;
+            continue;
+          }
+
           if (still_running == 0)
           {
             std::lock_guard<std::mutex> lock_guard{self->background_thread_m_};
@@ -454,6 +568,7 @@ void HttpClient::MaybeSpawnBackgroundThread()
         }
       },
       this));
+  return true;
 }
 
 void HttpClient::ScheduleAddSession(uint64_t session_id)
@@ -500,6 +615,28 @@ void HttpClient::ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource
   }
 
   wakeupBackgroundThread();
+}
+
+void HttpClient::SetBackgroundWaitFor(std::chrono::milliseconds ms)
+{
+  background_thread_wait_for_ = ms;
+}
+
+void HttpClient::WaitBackgroundThreadExit()
+{
+  is_shutdown_.store(true, std::memory_order_release);
+  std::unique_ptr<std::thread> background_thread;
+  {
+    std::lock_guard<std::mutex> lock_guard{background_thread_m_};
+    background_thread.swap(background_thread_);
+  }
+
+  if (background_thread && background_thread->joinable())
+  {
+    wakeupBackgroundThread();
+    background_thread->join();
+  }
+  is_shutdown_.store(false, std::memory_order_release);
 }
 
 void HttpClient::wakeupBackgroundThread()
