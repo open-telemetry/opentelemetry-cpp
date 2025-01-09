@@ -24,6 +24,9 @@ Increment the:
 * [EXPORTER] Fix scope attributes missing from otlp traces metrics
   [#3185](https://github.com/open-telemetry/opentelemetry-cpp/pull/3185)
 
+  [EXPORTER] Support handling retry-able errors for OTLP/HTTP
+  [#3223](https://github.com/open-telemetry/opentelemetry-cpp/pull/3223)
+
 ## [1.18 2024-11-25]
 
 * [EXPORTER] Fix crash in ElasticsearchLogRecordExporter
