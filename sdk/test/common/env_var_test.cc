@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdlib.h>
+
 #include <chrono>
+#include <cstdint>
+#include <cstdlib>
 #include <string>
 
 #include "opentelemetry/sdk/common/env_variables.h"

@@ -14,6 +14,7 @@
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"

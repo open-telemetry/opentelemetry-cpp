@@ -15,6 +15,7 @@
 #include <map>
 #include <memory>
 #include <random>
+#include <ratio>
 #include <sstream>
 #include <string>
 #include <thread>

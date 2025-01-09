@@ -1,10 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <curl/curl.h>
 #include <curl/curlver.h>
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
+
 #include <string.h>
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>

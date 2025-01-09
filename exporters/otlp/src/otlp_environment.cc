@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <chrono>
+#include <cstdint>
 #include <map>
 #include <string>
 #include <unordered_set>
