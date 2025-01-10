@@ -1,7 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <grpcpp/grpcpp.h>
 #include <grpcpp/security/server_credentials.h>
 #include <grpcpp/server.h>
 #include <grpcpp/server_builder.h>
@@ -23,7 +22,7 @@
 #include "opentelemetry/semconv/incubating/rpc_attributes.h"
 #include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/span_context_kv_iterable_view.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/span_startoptions.h"
 #include "opentelemetry/trace/tracer.h"

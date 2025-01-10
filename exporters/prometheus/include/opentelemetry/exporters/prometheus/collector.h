@@ -8,7 +8,6 @@
 #include <mutex>
 #include <vector>
 
-#include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/version.h"
 

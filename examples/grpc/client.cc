@@ -5,6 +5,8 @@
 // ambiguity with `nostd::variant` if compiled with Visual Studio 2015. Other
 // modern compilers are unaffected.
 #include <grpcpp/grpcpp.h>
+#include <grpcpp/security/credentials.h>
+#include <grpcpp/support/status.h>
 
 #include <stdint.h>
 #include <stdlib.h>

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <grpcpp/grpcpp.h>
+#include <grpcpp/support/status.h>
 
 #include "opentelemetry/version.h"
 

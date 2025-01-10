@@ -1,6 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <prometheus/exposer.h>
+#include <exception>
+#include <ostream>
+#include <string>
+
 #include "opentelemetry/exporters/prometheus/exporter.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 

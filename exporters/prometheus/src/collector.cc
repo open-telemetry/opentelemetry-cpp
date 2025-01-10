@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/prometheus/collector.h"
+#include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 namespace metric_sdk = opentelemetry::sdk::metrics;
