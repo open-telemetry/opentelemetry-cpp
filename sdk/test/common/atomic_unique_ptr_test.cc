@@ -4,6 +4,8 @@
 #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 
 #include <gtest/gtest.h>
+#include <string>
+
 using opentelemetry::sdk::common::AtomicUniquePtr;
 
 TEST(AtomicUniquePtrTest, SwapIfNullWithNull)

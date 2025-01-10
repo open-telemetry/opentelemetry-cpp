@@ -13,9 +13,9 @@
 #include <vector>
 #include "common.h"
 
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"

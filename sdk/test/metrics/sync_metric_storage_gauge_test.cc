@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <string>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/utility.h"
-#include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -15,6 +15,7 @@
 
 #  include "opentelemetry/common/key_value_iterable_view.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/sdk/metrics/data/point_data.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #endif

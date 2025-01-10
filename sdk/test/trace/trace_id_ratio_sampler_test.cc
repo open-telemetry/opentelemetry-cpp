@@ -8,7 +8,6 @@
 #include <utility>
 #include <vector>
 
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/sampler.h"

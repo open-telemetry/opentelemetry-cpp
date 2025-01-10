@@ -3,9 +3,10 @@
 
 #include <gtest/gtest.h>
 #include <stddef.h>
-#include <memory>
 #include <string>
 
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/trace_state.h"
 
