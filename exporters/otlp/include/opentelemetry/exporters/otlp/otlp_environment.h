@@ -156,13 +156,13 @@ std::uint32_t GetOtlpDefaultTracesRetryMaxAttempts();
 std::uint32_t GetOtlpDefaultMetricsRetryMaxAttempts();
 std::uint32_t GetOtlpDefaultLogsRetryMaxAttempts();
 
-float GetOtlpDefaultTracesRetryInitialBackoff();
-float GetOtlpDefaultMetricsRetryInitialBackoff();
-float GetOtlpDefaultLogsRetryInitialBackoff();
+std::chrono::duration<float> GetOtlpDefaultTracesRetryInitialBackoff();
+std::chrono::duration<float> GetOtlpDefaultMetricsRetryInitialBackoff();
+std::chrono::duration<float> GetOtlpDefaultLogsRetryInitialBackoff();
 
-float GetOtlpDefaultTracesRetryMaxBackoff();
-float GetOtlpDefaultMetricsRetryMaxBackoff();
-float GetOtlpDefaultLogsRetryMaxBackoff();
+std::chrono::duration<float> GetOtlpDefaultTracesRetryMaxBackoff();
+std::chrono::duration<float> GetOtlpDefaultMetricsRetryMaxBackoff();
+std::chrono::duration<float> GetOtlpDefaultLogsRetryMaxBackoff();
 
 float GetOtlpDefaultTracesRetryBackoffMultiplier();
 float GetOtlpDefaultMetricsRetryBackoffMultiplier();

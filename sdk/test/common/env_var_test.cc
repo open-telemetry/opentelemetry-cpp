@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdlib.h>
+
 #include <chrono>
+#include <cstdint>
+#include <cstdlib>
 #include <string>
 
 #include "opentelemetry/sdk/common/env_variables.h"
@@ -224,6 +226,8 @@ TEST(EnvVarTest, UintEnvVar)
   setenv("UINT_ENV_VAR_POSITIVE_OVERFLOW", "4294967296", 1);
   setenv("UINT_ENV_VAR_NEGATIVE_INT_MIN", "-2147483648", 1);
   setenv("UINT_ENV_VAR_NEGATIVE_OVERFLOW", "-4294967296", 1);
+  setenv("UINT_ENV_VAR_TOO_LARGE_INT", "99999999999999999999", 1);
+  setenv("UINT_ENV_VAR_TOO_LARGE_DEC", "3.9999e+99", 1);
   setenv("UINT_ENV_VAR_WITH_NOISE", "   \t \n 9.12345678.9", 1);
   setenv("UINT_ENV_VAR_ONLY_SPACES", "   ", 1);
 
@@ -238,8 +242,7 @@ TEST(EnvVarTest, UintEnvVar)
 
   ASSERT_FALSE(GetUintEnvironmentVariable("UINT_ENV_VAR_NEGATIVE_INT", value));
 
-  ASSERT_TRUE(GetUintEnvironmentVariable("UINT_ENV_VAR_POSITIVE_DEC", value));
-  ASSERT_EQ(12, value);
+  ASSERT_FALSE(GetUintEnvironmentVariable("UINT_ENV_VAR_POSITIVE_DEC", value));
 
   ASSERT_FALSE(GetUintEnvironmentVariable("UINT_ENV_VAR_NEGATIVE_DEC", value));
 
@@ -252,8 +255,11 @@ TEST(EnvVarTest, UintEnvVar)
 
   ASSERT_FALSE(GetUintEnvironmentVariable("UINT_ENV_VAR_NEGATIVE_OVERFLOW", value));
 
-  ASSERT_TRUE(GetUintEnvironmentVariable("UINT_ENV_VAR_WITH_NOISE", value));
-  ASSERT_EQ(9, value);
+  ASSERT_FALSE(GetUintEnvironmentVariable("UINT_ENV_VAR_TOO_LARGE_INT", value));
+
+  ASSERT_FALSE(GetUintEnvironmentVariable("UINT_ENV_VAR_TOO_LARGE_DEC", value));
+
+  ASSERT_FALSE(GetUintEnvironmentVariable("UINT_ENV_VAR_WITH_NOISE", value));
 
   ASSERT_FALSE(GetUintEnvironmentVariable("UINT_ENV_VAR_ONLY_SPACES", value));
 
@@ -266,6 +272,8 @@ TEST(EnvVarTest, UintEnvVar)
   unsetenv("UINT_ENV_VAR_POSITIVE_OVERFLOW");
   unsetenv("UINT_ENV_VAR_NEGATIVE_INT_MIN");
   unsetenv("UINT_ENV_VAR_NEGATIVE_OVERFLOW");
+  unsetenv("UINT_ENV_VAR_TOO_LARGE_INT");
+  unsetenv("UINT_ENV_VAR_TOO_LARGE_DEC");
   unsetenv("UINT_ENV_VAR_WITH_NOISE");
   unsetenv("UINT_ENV_VAR_ONLY_SPACES");
 }
@@ -282,6 +290,8 @@ TEST(EnvVarTest, FloatEnvVar)
   setenv("FLOAT_ENV_VAR_POSITIVE_OVERFLOW", "4294967296", 1);
   setenv("FLOAT_ENV_VAR_NEGATIVE_INT_MIN", "-2147483648", 1);
   setenv("FLOAT_ENV_VAR_NEGATIVE_OVERFLOW", "-4294967296", 1);
+  setenv("FLOAT_ENV_VAR_TOO_LARGE_INT", "99999999999999999999", 1);
+  setenv("FLOAT_ENV_VAR_TOO_LARGE_DEC", "3.9999e+99", 1);
   setenv("FLOAT_ENV_VAR_WITH_NOISE", "   \t \n 9.12345678.9", 1);
   setenv("FLOAT_ENV_VAR_ONLY_SPACES", "   ", 1);
 
@@ -315,8 +325,12 @@ TEST(EnvVarTest, FloatEnvVar)
   ASSERT_TRUE(GetFloatEnvironmentVariable("FLOAT_ENV_VAR_NEGATIVE_OVERFLOW", value));
   ASSERT_FLOAT_EQ(-4294967296.f, value);
 
-  ASSERT_TRUE(GetFloatEnvironmentVariable("FLOAT_ENV_VAR_WITH_NOISE", value));
-  ASSERT_FLOAT_EQ(9.12345678f, value);
+  ASSERT_TRUE(GetFloatEnvironmentVariable("FLOAT_ENV_VAR_TOO_LARGE_INT", value));
+  ASSERT_FLOAT_EQ(99999999999999999999.f, value);
+
+  ASSERT_FALSE(GetFloatEnvironmentVariable("FLOAT_ENV_VAR_TOO_LARGE_DEC", value));
+
+  ASSERT_FALSE(GetFloatEnvironmentVariable("FLOAT_ENV_VAR_WITH_NOISE", value));
 
   ASSERT_FALSE(GetFloatEnvironmentVariable("FLOAT_ENV_VAR_ONLY_SPACES", value));
 
@@ -329,6 +343,8 @@ TEST(EnvVarTest, FloatEnvVar)
   unsetenv("FLOAT_ENV_VAR_POSITIVE_OVERFLOW");
   unsetenv("FLOAT_ENV_VAR_NEGATIVE_INT_MIN");
   unsetenv("FLOAT_ENV_VAR_NEGATIVE_OVERFLOW");
+  unsetenv("FLOAT_ENV_VAR_TOO_LARGE_INT");
+  unsetenv("FLOAT_ENV_VAR_TOO_LARGE_DEC");
   unsetenv("FLOAT_ENV_VAR_WITH_NOISE");
   unsetenv("FLOAT_ENV_VAR_ONLY_SPACES");
 }
