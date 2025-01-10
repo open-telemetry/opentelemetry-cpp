@@ -1,4 +1,7 @@
-#include "stress.h"  // Project-specific header
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+#include "stress.h"
 
 #include <chrono>
 #include <csignal>
@@ -26,8 +29,6 @@
 #include "opentelemetry/sdk/metrics/view/meter_selector_factory.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_factory.h"
-
-#include "stress.h"
 
 Stress *globalStressTest = nullptr;
 
