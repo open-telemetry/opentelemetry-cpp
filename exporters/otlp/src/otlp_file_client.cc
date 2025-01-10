@@ -20,6 +20,8 @@
 #include <utility>
 #include <vector>
 
+// IWYU pragma: no_include <features.h>
+
 #if defined(HAVE_GSL)
 #  include <gsl/gsl>
 #else
@@ -60,6 +62,7 @@
 
 #  include <fcntl.h>
 #  include <sys/stat.h>
+#  include <sys/types.h>
 #  include <unistd.h>
 
 #  define FS_ACCESS(x) access(x, F_OK)

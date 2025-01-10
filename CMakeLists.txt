@@ -365,11 +365,16 @@ if(WITH_PROMETHEUS)
     if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/prometheus-cpp/.git)
       set(SAVED_ENABLE_TESTING ${ENABLE_TESTING})
       set(SAVED_CMAKE_CXX_CLANG_TIDY ${CMAKE_CXX_CLANG_TIDY})
+      set(SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE
+          ${CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
       set(ENABLE_TESTING OFF)
       set(CMAKE_CXX_CLANG_TIDY "")
+      set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "")
       add_subdirectory(third_party/prometheus-cpp)
       set(ENABLE_TESTING ${SAVED_ENABLE_TESTING})
       set(CMAKE_CXX_CLANG_TIDY ${SAVED_CMAKE_CXX_CLANG_TIDY})
+      set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE
+          ${SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
     else()
       message(
         FATAL_ERROR

@@ -16,6 +16,8 @@
 #include <utility>
 #include <vector>
 
+// IWYU pragma: no_include <features.h>
+
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
