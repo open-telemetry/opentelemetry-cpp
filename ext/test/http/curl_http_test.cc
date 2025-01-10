@@ -1,10 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <curl/curl.h>
 #include <curl/curlver.h>
-#include "gmock/gmock.h"
 #include "gtest/gtest.h"
+
+#ifdef ENABLE_OTLP_RETRY_PREVIEW
+#  include <curl/curl.h>
+#  include "gmock/gmock.h"
+#endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 #include <string.h>
 #include <algorithm>
