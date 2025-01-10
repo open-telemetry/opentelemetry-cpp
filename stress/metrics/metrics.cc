@@ -1,13 +1,11 @@
 #include "stress.h"  // Project-specific header
 
-
 #include <chrono>
 #include <csignal>
 #include <iostream>
 #include <string>
 #include <thread>
 #include <vector>
-
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/metrics/meter_provider.h"
@@ -31,17 +29,18 @@
 
 #include "stress.h"
 
-Stress* globalStressTest = nullptr;
+Stress *globalStressTest = nullptr;
 
-void signalHandler(int) {
-    if (globalStressTest) {
-        globalStressTest->stop();
-    }
+void signalHandler(int)
+{
+  if (globalStressTest)
+  {
+    globalStressTest->stop();
+  }
 }
 
 namespace metrics_sdk = opentelemetry::sdk::metrics;
 namespace metrics_api = opentelemetry::metrics;
-
 
 namespace
 {
@@ -59,7 +58,6 @@ public:
   {
     return true;  // No-op
   }
-
 
   bool Shutdown(std::chrono::microseconds /*timeout*/) noexcept override
   {
@@ -122,7 +120,6 @@ void CounterExample(opentelemetry::nostd::unique_ptr<metrics_api::Counter<double
 }
 }  // namespace
 
-
 int main(int argc, char *argv[])
 {
   std::srand(std::time(nullptr));  // Seed the random numbe
@@ -130,12 +127,11 @@ int main(int argc, char *argv[])
   size_t attribute_count = 1000;  // Number of attribute sets to pre-generate
   auto attributes_set    = GenerateAttributeSet(attribute_count);
 
-
   InitMetrics("metrics_stress_test");
   auto provider = metrics_api::Provider::GetMeterProvider();
   auto meter    = provider->GetMeter("metrics_stress_test", "1.0.0");
   auto counter  = meter->CreateDoubleCounter("metrics_stress_test_counter");
-  auto func = [&counter, &attributes_set]() { CounterExample(counter, attributes_set); };
+  auto func     = [&counter, &attributes_set]() { CounterExample(counter, attributes_set); };
   Stress stressTest(func, std::thread::hardware_concurrency());
   globalStressTest = &stressTest;
   std::signal(SIGINT, signalHandler);
