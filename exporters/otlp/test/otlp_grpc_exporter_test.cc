@@ -359,52 +359,53 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryDefaultValues)
   std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 5);
-  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff, 1.0);
-  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff, 5.0);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5.0);
   ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 1.5);
 }
 
 TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryValuesFromEnv)
 {
-  setenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_MAX_ATTEMPTS", "123", 1);
-  setenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_INITIAL_BACKOFF", "4.5", 1);
-  setenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF", "6.7", 1);
-  setenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_ATTEMPTS", "123", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_INITIAL_BACKOFF", "4.5", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF", "6.7", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
 
   std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 123);
-  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff, 4.5);
-  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff, 6.7);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7);
   ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 8.9);
 
-  unsetenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_MAX_ATTEMPTS");
-  unsetenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_INITIAL_BACKOFF");
-  unsetenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF");
-  unsetenv("OTEL_EXPORTER_OTLP_TRACES_RETRY_BACKOFF_MULTIPLIER");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_BACKOFF_MULTIPLIER");
 }
 
 TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryGenericValuesFromEnv)
 {
-  setenv("OTEL_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS", "321", 1);
-  setenv("OTEL_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF", "5.4", 1);
-  setenv("OTEL_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
-  setenv("OTEL_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS", "321", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF", "5.4", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
 
   std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 321);
-  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff, 5.4);
-  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff, 7.6);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6);
   ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 9.8);
 
-  unsetenv("OTEL_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS");
-  unsetenv("OTEL_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF");
-  unsetenv("OTEL_EXPORTER_OTLP_RETRY_MAX_BACKOFF");
-  unsetenv("OTEL_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
 }
 #  endif  // NO_GETENV
 
+#  ifdef ENABLE_OTLP_RETRY_PREVIEW
 struct TestTraceService : public opentelemetry::proto::collector::trace::v1::TraceService::Service
 {
   TestTraceService(std::vector<grpc::StatusCode> status_codes) : status_codes_(status_codes) {}
@@ -523,15 +524,15 @@ TEST_P(OtlpGrpcExporterRetryIntegrationTests, StatusCodes)
   if (is_retry_enabled)
   {
     opts.retry_policy_max_attempts       = 5;
-    opts.retry_policy_initial_backoff    = 0.1f;
-    opts.retry_policy_max_backoff        = 5.0f;
+    opts.retry_policy_initial_backoff    = std::chrono::duration<float>{0.1f};
+    opts.retry_policy_max_backoff        = std::chrono::duration<float>{5.0f};
     opts.retry_policy_backoff_multiplier = 1.0f;
   }
   else
   {
     opts.retry_policy_max_attempts       = 0;
-    opts.retry_policy_initial_backoff    = 0.0f;
-    opts.retry_policy_max_backoff        = 0.0f;
+    opts.retry_policy_initial_backoff    = std::chrono::duration<float>::zero();
+    opts.retry_policy_max_backoff        = std::chrono::duration<float>::zero();
     opts.retry_policy_backoff_multiplier = 0.0f;
   }
 
@@ -551,6 +552,7 @@ TEST_P(OtlpGrpcExporterRetryIntegrationTests, StatusCodes)
 
   ASSERT_EQ(expected_attempts, service.request_count_);
 }
+#  endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 }  // namespace otlp
 }  // namespace exporter
