@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "opentelemetry/version.h"
 #include "opentelemetry/nostd/string_view.h"
 
