@@ -354,6 +354,7 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   delete handler;
 }
 
+#ifdef ENABLE_OTLP_RETRY_PREVIEW
 TEST_F(BasicCurlHttpTests, RetryPolicyEnabled)
 {
   RetryEventHandler handler;
@@ -436,6 +437,7 @@ TEST_F(BasicCurlHttpTests, ExponentialBackoffRetry)
   ASSERT_EQ(CURLE_OK, operation.Send());
   ASSERT_FALSE(operation.IsRetryable());
 }
+#endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 {

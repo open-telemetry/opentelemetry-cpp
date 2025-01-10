@@ -116,6 +116,11 @@ target_compile_definitions(
   opentelemetry_api
   INTERFACE OPENTELEMETRY_ABI_VERSION_NO=${OPENTELEMETRY_ABI_VERSION_NO})
 
+if(WITH_OTLP_RETRY_PREVIEW)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_OTLP_RETRY_PREVIEW)
+endif()
+
 if(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW)

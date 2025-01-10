@@ -685,6 +685,7 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigRetryGenericValuesFromEnv)
 }
 #  endif  // NO_GETENV
 
+#  ifdef ENABLE_OTLP_RETRY_PREVIEW
 using StatusCodeVector = std::vector<int>;
 
 class OtlpHttpExporterRetryIntegrationTests
@@ -787,6 +788,7 @@ TEST_P(OtlpHttpExporterRetryIntegrationTests, StatusCodes)
 
   ASSERT_EQ(expected_attempts, request_count);
 }
+#  endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 }  // namespace otlp
 }  // namespace exporter
