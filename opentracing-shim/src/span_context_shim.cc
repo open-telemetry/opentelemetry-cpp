@@ -3,7 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <new>
+
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/opentracingshim/span_context_shim.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_id.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim

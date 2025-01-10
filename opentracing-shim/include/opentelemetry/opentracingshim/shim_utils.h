@@ -30,6 +30,7 @@
 #include "opentracing/propagation.h"
 #include "opentracing/span.h"
 #include "opentracing/string_view.h"
+#include "opentracing/tracer.h"
 #include "opentracing/value.h"
 #include "opentracing/variant/recursive_wrapper.hpp"
 
