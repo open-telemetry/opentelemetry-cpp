@@ -5,8 +5,14 @@
 
 #pragma once
 
+#include <functional>
+#include <string>
+
 #include "opentelemetry/baggage/baggage.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/version.h"
 #include "opentracing/span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

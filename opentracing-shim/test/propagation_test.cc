@@ -3,11 +3,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "shim_mocks.h"
-
-#include "opentelemetry/opentracingshim/propagation.h"
-
 #include <gtest/gtest.h>
+#include <algorithm>
+#include <string>
+#include <system_error>
+#include <unordered_map>
+#include <vector>
+
+#include "opentelemetry/baggage/baggage.h"
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/opentracingshim/propagation.h"
+#include "opentracing/expected/expected.hpp"
+#include "opentracing/propagation.h"
+#include "opentracing/string_view.h"
+#include "opentracing/util.h"
+#include "shim_mocks.h"
 
 namespace baggage = opentelemetry::baggage;
 namespace common  = opentelemetry::common;
