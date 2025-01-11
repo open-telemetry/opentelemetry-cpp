@@ -28,7 +28,6 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/opentracingshim/shim_utils.h"
 #include "opentelemetry/opentracingshim/span_context_shim.h"
-#include "opentelemetry/opentracingshim/span_shim.h"
 #include "opentelemetry/opentracingshim/tracer_shim.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/provider.h"
