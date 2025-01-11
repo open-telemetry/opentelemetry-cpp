@@ -1,7 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "gmock/gmock.h"
 #include <gtest/gtest.h>
 #include <algorithm>
 #include <chrono>
@@ -13,6 +12,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "gmock/gmock.h"
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
