@@ -11,7 +11,6 @@
 #include <cstring>
 #include <deque>
 #include <functional>
-#include <iterator>
 #include <list>
 #include <mutex>
 #include <string>
