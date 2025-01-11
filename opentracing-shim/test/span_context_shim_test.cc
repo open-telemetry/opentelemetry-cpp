@@ -9,13 +9,14 @@
 #include <utility>
 #include <vector>
 
+#include "opentracing/noop.h"
+#include "opentracing/tracer.h"
+#include "opentracing/value.h"
+
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/opentracingshim/span_context_shim.h"
 #include "opentelemetry/trace/span_context.h"
-#include "opentracing/noop.h"
-#include "opentracing/tracer.h"
-#include "opentracing/value.h"
 
 namespace trace_api = opentelemetry::trace;
 namespace baggage   = opentelemetry::baggage;

@@ -10,6 +10,12 @@
 #include <utility>
 #include <vector>
 
+#include "opentracing/span.h"
+#include "opentracing/string_view.h"
+#include "opentracing/tracer.h"
+#include "opentracing/util.h"
+#include "opentracing/value.h"
+
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
@@ -17,11 +23,6 @@
 #include "opentelemetry/opentracingshim/tracer_shim.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/version.h"
-#include "opentracing/span.h"
-#include "opentracing/string_view.h"
-#include "opentracing/tracer.h"
-#include "opentracing/util.h"
-#include "opentracing/value.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim

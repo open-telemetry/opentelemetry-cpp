@@ -8,6 +8,8 @@
 #include <new>
 #include <string>
 
+#include "opentracing/span.h"
+
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -16,7 +18,6 @@
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
-#include "opentracing/span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim

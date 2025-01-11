@@ -12,6 +12,14 @@
 #include <utility>
 #include <vector>
 
+#include "opentracing/expected/expected.hpp"
+#include "opentracing/noop.h"
+#include "opentracing/propagation.h"
+#include "opentracing/span.h"
+#include "opentracing/tracer.h"
+#include "opentracing/util.h"
+#include "opentracing/value.h"
+
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
@@ -34,13 +42,6 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
-#include "opentracing/expected/expected.hpp"
-#include "opentracing/noop.h"
-#include "opentracing/propagation.h"
-#include "opentracing/span.h"
-#include "opentracing/tracer.h"
-#include "opentracing/util.h"
-#include "opentracing/value.h"
 
 #include "shim_mocks.h"
 

@@ -13,6 +13,14 @@
 #include <utility>
 #include <vector>
 
+#include "opentracing/propagation.h"
+#include "opentracing/span.h"
+#include "opentracing/string_view.h"
+#include "opentracing/tracer.h"
+#include "opentracing/util.h"
+#include "opentracing/value.h"
+#include "opentracing/variant/recursive_wrapper.hpp"
+
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/baggage/baggage_context.h"
 #include "opentelemetry/common/attribute_value.h"
@@ -27,13 +35,7 @@
 #include "opentelemetry/opentracingshim/span_context_shim.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_startoptions.h"
-#include "opentracing/propagation.h"
-#include "opentracing/span.h"
-#include "opentracing/string_view.h"
-#include "opentracing/tracer.h"
-#include "opentracing/util.h"
-#include "opentracing/value.h"
-#include "opentracing/variant/recursive_wrapper.hpp"
+
 #include "shim_mocks.h"
 
 namespace trace_api = opentelemetry::trace;

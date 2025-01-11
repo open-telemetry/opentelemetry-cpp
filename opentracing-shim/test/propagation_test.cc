@@ -10,15 +10,17 @@
 #include <unordered_map>
 #include <vector>
 
+#include "opentracing/expected/expected.hpp"
+#include "opentracing/propagation.h"
+#include "opentracing/string_view.h"
+#include "opentracing/util.h"
+
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/opentracingshim/propagation.h"
-#include "opentracing/expected/expected.hpp"
-#include "opentracing/propagation.h"
-#include "opentracing/string_view.h"
-#include "opentracing/util.h"
+
 #include "shim_mocks.h"
 
 namespace baggage = opentelemetry::baggage;

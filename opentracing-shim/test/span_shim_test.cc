@@ -16,6 +16,11 @@
 #include <utility>
 #include <vector>
 
+#include "opentracing/span.h"
+#include "opentracing/string_view.h"
+#include "opentracing/util.h"
+#include "opentracing/value.h"
+
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
@@ -27,10 +32,7 @@
 #include "opentelemetry/opentracingshim/tracer_shim.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_metadata.h"
-#include "opentracing/span.h"
-#include "opentracing/string_view.h"
-#include "opentracing/util.h"
-#include "opentracing/value.h"
+
 #include "shim_mocks.h"
 
 namespace trace_api = opentelemetry::trace;

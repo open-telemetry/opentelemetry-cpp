@@ -8,17 +8,18 @@
 #include <iosfwd>
 #include <new>
 
+#include "opentracing/expected/expected.hpp"
+#include "opentracing/propagation.h"
+#include "opentracing/span.h"
+#include "opentracing/string_view.h"
+#include "opentracing/tracer.h"
+
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
-#include "opentracing/expected/expected.hpp"
-#include "opentracing/propagation.h"
-#include "opentracing/span.h"
-#include "opentracing/string_view.h"
-#include "opentracing/tracer.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim
