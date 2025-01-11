@@ -489,7 +489,7 @@ bool HttpClient::MaybeSpawnBackgroundThread()
 
                 if (operation->IsRetryable())
                 {
-                  self->pending_to_retry_sessions_.push_front(hold_session);
+                  self->pending_to_retry_sessions_.push_back(hold_session);
                 }
               }
             }
@@ -797,26 +797,25 @@ bool HttpClient::doRetrySessions()
   auto has_data  = false;
 
   // Assumptions:
-  // - This is a FIFO list so older sessions, pushed at the front, always end up at the tail
+  // - This is a FIFO list so older sessions, pushed at the back, always end up at the front
   // - Locking not required because only the background thread would be pushing to this container
   // - Retry policy is not changed once HTTP client is initialized, so same settings for everyone
-  // - Iterating backwards should result in removing items with minimal or no compacting required
-  for (auto retry_it = pending_to_retry_sessions_.crbegin();
-       retry_it != pending_to_retry_sessions_.crend();)
+  for (auto retry_it = pending_to_retry_sessions_.cbegin();
+       retry_it != pending_to_retry_sessions_.cend();)
   {
     const auto session   = *retry_it;
     const auto operation = session ? session->GetOperation().get() : nullptr;
 
     if (!operation)
     {
-      retry_it = decltype(retry_it){pending_to_retry_sessions_.erase(std::next(retry_it).base())};
+      retry_it = pending_to_retry_sessions_.erase(retry_it);
     }
     else if (operation->NextRetryTime() < now)
     {
       auto easy_handle = operation->GetCurlEasyHandle();
       curl_multi_remove_handle(multi_handle_, easy_handle);
       curl_multi_add_handle(multi_handle_, easy_handle);
-      retry_it = decltype(retry_it){pending_to_retry_sessions_.erase(std::next(retry_it).base())};
+      retry_it = pending_to_retry_sessions_.erase(retry_it);
       has_data = true;
     }
     else
