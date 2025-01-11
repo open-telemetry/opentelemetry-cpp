@@ -6,6 +6,7 @@
 #include "opentelemetry/opentracingshim/shim_utils.h"
 
 #include "opentelemetry/baggage/baggage_context.h"
+#include "opentelemetry/context/runtime_context.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim
