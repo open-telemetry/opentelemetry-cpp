@@ -3,14 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "opentelemetry/opentracingshim/span_context_shim.h"
+#include <gtest/gtest.h>
+#include <algorithm>
+#include <initializer_list>
+#include <utility>
+#include <vector>
 
 #include "opentelemetry/baggage/baggage.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/opentracingshim/span_context_shim.h"
 #include "opentelemetry/trace/span_context.h"
-
 #include "opentracing/noop.h"
-
-#include <gtest/gtest.h>
+#include "opentracing/tracer.h"
+#include "opentracing/value.h"
 
 namespace trace_api = opentelemetry::trace;
 namespace baggage   = opentelemetry::baggage;

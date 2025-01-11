@@ -3,16 +3,46 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "shim_mocks.h"
+#include <gtest/gtest.h>
+#include <stdint.h>
+#include <iostream>
+#include <string>
+#include <system_error>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
+#include "opentelemetry/baggage/baggage.h"
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/opentracingshim/shim_utils.h"
 #include "opentelemetry/opentracingshim/span_context_shim.h"
 #include "opentelemetry/opentracingshim/span_shim.h"
 #include "opentelemetry/opentracingshim/tracer_shim.h"
-
+#include "opentelemetry/trace/default_span.h"
+#include "opentelemetry/trace/provider.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_context_kv_iterable.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/span_startoptions.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/trace/tracer_provider.h"
+#include "opentracing/expected/expected.hpp"
 #include "opentracing/noop.h"
+#include "opentracing/propagation.h"
+#include "opentracing/span.h"
+#include "opentracing/tracer.h"
+#include "opentracing/util.h"
+#include "opentracing/value.h"
 
-#include <gtest/gtest.h>
+#include "shim_mocks.h"
 
 namespace trace_api = opentelemetry::trace;
 namespace nostd     = opentelemetry::nostd;

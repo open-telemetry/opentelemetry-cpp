@@ -25,7 +25,6 @@
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/span_startoptions.h"
-#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 #include "opentracing/propagation.h"
 #include "opentracing/span.h"
