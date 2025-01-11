@@ -11,6 +11,9 @@
   { "include": ["<bits/types/struct_tm.h>", "private", "<time.h>", "public"] },
   { "include": ["<bits/types/struct_FILE.h>", "private", "<stdio.h>", "public"] },
 
+  # Work around for google protobuf
+  { "include": ["<net/proto2/public/repeated_field.h>", "private", "<google/protobuf/repeated_field.h>", "public"] },
+
   # Local opentelemetry-cpp style
 
   # We prefer to include <gtest/gtest.h> for simplicity
