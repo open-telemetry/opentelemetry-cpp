@@ -3,14 +3,28 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <algorithm>
 #include <functional>
+#include <string>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
+#include "opentracing/propagation.h"
+#include "opentracing/span.h"
+#include "opentracing/tracer.h"
+
+#include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/baggage/baggage_context.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/opentracingshim/shim_utils.h"
+#include "opentelemetry/opentracingshim/span_context_shim.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_startoptions.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim
