@@ -362,9 +362,9 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
           "name": [{}],
           "retryPolicy": {
             "maxAttempts": %0000000000u,
-            "initialBackoff": "%.1fs",
-            "maxBackoff": "%.1fs",
-            "backoffMultiplier": %.1f,
+            "initialBackoff": "%0000000000.1fs",
+            "maxBackoff": "%0000000000.1fs",
+            "backoffMultiplier": %0000000000.1f,
             "retryableStatusCodes": [
               "CANCELLED",
               "DEADLINE_EXCEEDED",
@@ -381,11 +381,12 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
     // Allocate string with buffer large enough to hold the formatted json config
     auto service_config = std::string(kServiceConfigJson.size(), '\0');
     // Prior to C++17, need to explicitly cast away constness from `data()` buffer
-    std::snprintf(const_cast<decltype(service_config)::value_type *>(service_config.data()),
-                  service_config.size(), kServiceConfigJson.data(),
-                  options.retry_policy_max_attempts, options.retry_policy_initial_backoff.count(),
-                  options.retry_policy_max_backoff.count(),
-                  options.retry_policy_backoff_multiplier);
+    std::snprintf(
+        const_cast<decltype(service_config)::value_type *>(service_config.data()),
+        service_config.size(), kServiceConfigJson.data(), options.retry_policy_max_attempts,
+        std::min(std::max(options.retry_policy_initial_backoff.count(), 0.f), 999999999.f),
+        std::min(std::max(options.retry_policy_max_backoff.count(), 0.f), 999999999.f),
+        std::min(std::max(options.retry_policy_backoff_multiplier, 0.f), 999999999.f));
 
     grpc_arguments.SetServiceConfigJSON(service_config);
   }
