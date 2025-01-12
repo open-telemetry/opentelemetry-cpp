@@ -30,7 +30,7 @@ namespace rpc
  * <p>
  * histogram
  */
-static constexpr const char *kMetricRpcClientDuration = "metric.rpc.client.duration";
+static constexpr const char *kMetricRpcClientDuration = "rpc.client.duration";
 static constexpr const char *descrMetricRpcClientDuration =
     "Measures the duration of outbound RPC.";
 static constexpr const char *unitMetricRpcClientDuration = "ms";
@@ -56,7 +56,7 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
  * <p>
  * histogram
  */
-static constexpr const char *kMetricRpcClientRequestSize = "metric.rpc.client.request.size";
+static constexpr const char *kMetricRpcClientRequestSize = "rpc.client.request.size";
 static constexpr const char *descrMetricRpcClientRequestSize =
     "Measures the size of RPC request messages (uncompressed).";
 static constexpr const char *unitMetricRpcClientRequestSize = "By";
@@ -84,7 +84,7 @@ CreateSyncDoubleMetricRpcClientRequestSize(metrics::Meter *meter)
  * <p>
  * histogram
  */
-static constexpr const char *kMetricRpcClientRequestsPerRpc = "metric.rpc.client.requests_per_rpc";
+static constexpr const char *kMetricRpcClientRequestsPerRpc = "rpc.client.requests_per_rpc";
 static constexpr const char *descrMetricRpcClientRequestsPerRpc =
     "Measures the number of messages received per RPC.";
 static constexpr const char *unitMetricRpcClientRequestsPerRpc = "{count}";
@@ -112,7 +112,7 @@ CreateSyncDoubleMetricRpcClientRequestsPerRpc(metrics::Meter *meter)
  * <p>
  * histogram
  */
-static constexpr const char *kMetricRpcClientResponseSize = "metric.rpc.client.response.size";
+static constexpr const char *kMetricRpcClientResponseSize = "rpc.client.response.size";
 static constexpr const char *descrMetricRpcClientResponseSize =
     "Measures the size of RPC response messages (uncompressed).";
 static constexpr const char *unitMetricRpcClientResponseSize = "By";
@@ -142,8 +142,7 @@ CreateSyncDoubleMetricRpcClientResponseSize(metrics::Meter *meter)
  * <p>
  * histogram
  */
-static constexpr const char *kMetricRpcClientResponsesPerRpc =
-    "metric.rpc.client.responses_per_rpc";
+static constexpr const char *kMetricRpcClientResponsesPerRpc = "rpc.client.responses_per_rpc";
 static constexpr const char *descrMetricRpcClientResponsesPerRpc =
     "Measures the number of messages sent per RPC.";
 static constexpr const char *unitMetricRpcClientResponsesPerRpc = "{count}";
@@ -174,7 +173,7 @@ CreateSyncDoubleMetricRpcClientResponsesPerRpc(metrics::Meter *meter)
  * <p>
  * histogram
  */
-static constexpr const char *kMetricRpcServerDuration     = "metric.rpc.server.duration";
+static constexpr const char *kMetricRpcServerDuration     = "rpc.server.duration";
 static constexpr const char *descrMetricRpcServerDuration = "Measures the duration of inbound RPC.";
 static constexpr const char *unitMetricRpcServerDuration  = "ms";
 
@@ -199,7 +198,7 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
  * <p>
  * histogram
  */
-static constexpr const char *kMetricRpcServerRequestSize = "metric.rpc.server.request.size";
+static constexpr const char *kMetricRpcServerRequestSize = "rpc.server.request.size";
 static constexpr const char *descrMetricRpcServerRequestSize =
     "Measures the size of RPC request messages (uncompressed).";
 static constexpr const char *unitMetricRpcServerRequestSize = "By";
@@ -227,7 +226,7 @@ CreateSyncDoubleMetricRpcServerRequestSize(metrics::Meter *meter)
  * <p>
  * histogram
  */
-static constexpr const char *kMetricRpcServerRequestsPerRpc = "metric.rpc.server.requests_per_rpc";
+static constexpr const char *kMetricRpcServerRequestsPerRpc = "rpc.server.requests_per_rpc";
 static constexpr const char *descrMetricRpcServerRequestsPerRpc =
     "Measures the number of messages received per RPC.";
 static constexpr const char *unitMetricRpcServerRequestsPerRpc = "{count}";
@@ -255,7 +254,7 @@ CreateSyncDoubleMetricRpcServerRequestsPerRpc(metrics::Meter *meter)
  * <p>
  * histogram
  */
-static constexpr const char *kMetricRpcServerResponseSize = "metric.rpc.server.response.size";
+static constexpr const char *kMetricRpcServerResponseSize = "rpc.server.response.size";
 static constexpr const char *descrMetricRpcServerResponseSize =
     "Measures the size of RPC response messages (uncompressed).";
 static constexpr const char *unitMetricRpcServerResponseSize = "By";
@@ -285,8 +284,7 @@ CreateSyncDoubleMetricRpcServerResponseSize(metrics::Meter *meter)
  * <p>
  * histogram
  */
-static constexpr const char *kMetricRpcServerResponsesPerRpc =
-    "metric.rpc.server.responses_per_rpc";
+static constexpr const char *kMetricRpcServerResponsesPerRpc = "rpc.server.responses_per_rpc";
 static constexpr const char *descrMetricRpcServerResponsesPerRpc =
     "Measures the number of messages sent per RPC.";
 static constexpr const char *unitMetricRpcServerResponsesPerRpc = "{count}";

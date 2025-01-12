@@ -6,6 +6,7 @@
 #include "opentelemetry/trace/trace_id.h"
 
 #include <gtest/gtest.h>
+#include <string>
 
 using opentelemetry::trace::SpanContext;
 namespace trace_api = opentelemetry::trace;

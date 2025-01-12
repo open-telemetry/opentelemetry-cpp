@@ -4,7 +4,6 @@
 #include <benchmark/benchmark.h>
 #include <algorithm>
 #include <map>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -12,10 +11,10 @@
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/context/context_value.h"  // IWYU pragma: keep
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
