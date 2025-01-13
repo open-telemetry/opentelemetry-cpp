@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_runtime_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/version.h"
 
@@ -31,6 +32,13 @@ public:
    */
   static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create(
       const OtlpFileLogRecordExporterOptions &options);
+
+  /**
+   * Create an OtlpFileExporter using the given options.
+   */
+  static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create(
+      const OtlpFileLogRecordExporterOptions &options,
+      const OtlpFileLogRecordExporterRuntimeOptions &runtime_options);
 };
 
 }  // namespace otlp

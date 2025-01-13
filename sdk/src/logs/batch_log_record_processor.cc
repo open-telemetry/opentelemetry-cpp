@@ -19,8 +19,10 @@
 #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 #include "opentelemetry/sdk/common/circular_buffer.h"
 #include "opentelemetry/sdk/common/circular_buffer_range.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_runtime_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
@@ -44,8 +46,12 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(
       max_export_batch_size_(max_export_batch_size),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_(&BatchLogRecordProcessor::DoBackgroundWork, this)
-{}
+      worker_thread_instrumentation_(nullptr),
+      worker_thread_()
+{
+  // Make sure the constructor is complete before giving 'this' to a thread.
+  worker_thread_ = std::thread(&BatchLogRecordProcessor::DoBackgroundWork, this);
+}
 
 BatchLogRecordProcessor::BatchLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
                                                  const BatchLogRecordProcessorOptions &options)
@@ -55,8 +61,29 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(std::unique_ptr<LogRecordExport
       max_export_batch_size_(options.max_export_batch_size),
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_(&BatchLogRecordProcessor::DoBackgroundWork, this)
-{}
+      worker_thread_instrumentation_(nullptr),
+      worker_thread_()
+{
+  // Make sure the constructor is complete before giving 'this' to a thread.
+  worker_thread_ = std::thread(&BatchLogRecordProcessor::DoBackgroundWork, this);
+}
+
+BatchLogRecordProcessor::BatchLogRecordProcessor(
+    std::unique_ptr<LogRecordExporter> &&exporter,
+    const BatchLogRecordProcessorOptions &options,
+    const BatchLogRecordProcessorRuntimeOptions &runtime_options)
+    : exporter_(std::move(exporter)),
+      max_queue_size_(options.max_queue_size),
+      scheduled_delay_millis_(options.schedule_delay_millis),
+      max_export_batch_size_(options.max_export_batch_size),
+      buffer_(options.max_queue_size),
+      synchronization_data_(std::make_shared<SynchronizationData>()),
+      worker_thread_instrumentation_(runtime_options.thread_instrumentation),
+      worker_thread_()
+{
+  // Make sure the constructor is complete before giving 'this' to a thread.
+  worker_thread_ = std::thread(&BatchLogRecordProcessor::DoBackgroundWork, this);
+}
 
 std::unique_ptr<Recordable> BatchLogRecordProcessor::MakeRecordable() noexcept
 {
@@ -151,10 +178,24 @@ bool BatchLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noex
 
 void BatchLogRecordProcessor::DoBackgroundWork()
 {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->OnStart();
+  }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
   auto timeout = scheduled_delay_millis_;
 
   while (true)
   {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+    if (worker_thread_instrumentation_ != nullptr)
+    {
+      worker_thread_instrumentation_->BeforeWait();
+    }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
     // Wait for `timeout` milliseconds
     std::unique_lock<std::mutex> lk(synchronization_data_->cv_m);
     synchronization_data_->cv.wait_for(lk, timeout, [this] {
@@ -167,6 +208,13 @@ void BatchLogRecordProcessor::DoBackgroundWork()
     });
     synchronization_data_->is_force_wakeup_background_worker.store(false,
                                                                    std::memory_order_release);
+
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+    if (worker_thread_instrumentation_ != nullptr)
+    {
+      worker_thread_instrumentation_->AfterWait();
+    }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
     if (synchronization_data_->is_shutdown.load() == true)
     {
@@ -182,10 +230,24 @@ void BatchLogRecordProcessor::DoBackgroundWork()
     // Subtract the duration of this export call from the next `timeout`.
     timeout = scheduled_delay_millis_ - duration;
   }
+
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->OnEnd();
+  }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 }
 
 void BatchLogRecordProcessor::Export()
 {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->BeforeLoad();
+  }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
   do
   {
     std::vector<std::unique_ptr<Recordable>> records_arr;
@@ -224,6 +286,13 @@ void BatchLogRecordProcessor::Export()
         nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
     NotifyCompletion(notify_force_flush, exporter_, synchronization_data_);
   } while (true);
+
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->AfterLoad();
+  }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 }
 
 void BatchLogRecordProcessor::NotifyCompletion(
