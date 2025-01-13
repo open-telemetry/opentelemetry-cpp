@@ -667,7 +667,7 @@ void ConvertListFieldToJson(nlohmann::json &value,
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
     : is_shutdown_(false),
       options_(options),
-      http_client_(http_client::HttpClientFactory::Create()),
+      http_client_(http_client::HttpClientFactory::Create(options.thread_instrumentation)),
       start_session_counter_(0),
       finished_session_counter_(0)
 {

@@ -21,6 +21,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 
 // forward declare google::protobuf::Message
 namespace google
@@ -83,28 +84,33 @@ struct OtlpHttpClientOptions
   // User agent
   std::string user_agent;
 
-  inline OtlpHttpClientOptions(nostd::string_view input_url,
-                               bool input_ssl_insecure_skip_verify,
-                               nostd::string_view input_ssl_ca_cert_path,
-                               nostd::string_view input_ssl_ca_cert_string,
-                               nostd::string_view input_ssl_client_key_path,
-                               nostd::string_view input_ssl_client_key_string,
-                               nostd::string_view input_ssl_client_cert_path,
-                               nostd::string_view input_ssl_client_cert_string,
-                               nostd::string_view input_ssl_min_tls,
-                               nostd::string_view input_ssl_max_tls,
-                               nostd::string_view input_ssl_cipher,
-                               nostd::string_view input_ssl_cipher_suite,
-                               HttpRequestContentType input_content_type,
-                               JsonBytesMappingKind input_json_bytes_mapping,
-                               nostd::string_view input_compression,
-                               bool input_use_json_name,
-                               bool input_console_debug,
-                               std::chrono::system_clock::duration input_timeout,
-                               const OtlpHeaders &input_http_headers,
-                               std::size_t input_concurrent_sessions         = 64,
-                               std::size_t input_max_requests_per_connection = 8,
-                               nostd::string_view input_user_agent = GetOtlpDefaultUserAgent())
+  std::shared_ptr<sdk::common::ThreadInstrumentation> thread_instrumentation =
+      std::shared_ptr<sdk::common::ThreadInstrumentation>(nullptr);
+
+  inline OtlpHttpClientOptions(
+      nostd::string_view input_url,
+      bool input_ssl_insecure_skip_verify,
+      nostd::string_view input_ssl_ca_cert_path,
+      nostd::string_view input_ssl_ca_cert_string,
+      nostd::string_view input_ssl_client_key_path,
+      nostd::string_view input_ssl_client_key_string,
+      nostd::string_view input_ssl_client_cert_path,
+      nostd::string_view input_ssl_client_cert_string,
+      nostd::string_view input_ssl_min_tls,
+      nostd::string_view input_ssl_max_tls,
+      nostd::string_view input_ssl_cipher,
+      nostd::string_view input_ssl_cipher_suite,
+      HttpRequestContentType input_content_type,
+      JsonBytesMappingKind input_json_bytes_mapping,
+      nostd::string_view input_compression,
+      bool input_use_json_name,
+      bool input_console_debug,
+      std::chrono::system_clock::duration input_timeout,
+      const OtlpHeaders &input_http_headers,
+      const std::shared_ptr<sdk::common::ThreadInstrumentation> &input_thread_instrumentation,
+      std::size_t input_concurrent_sessions         = 64,
+      std::size_t input_max_requests_per_connection = 8,
+      nostd::string_view input_user_agent           = GetOtlpDefaultUserAgent())
       : url(input_url),
         ssl_options(input_url,
                     input_ssl_insecure_skip_verify,
@@ -127,7 +133,8 @@ struct OtlpHttpClientOptions
         http_headers(input_http_headers),
         max_concurrent_requests(input_concurrent_sessions),
         max_requests_per_connection(input_max_requests_per_connection),
-        user_agent(input_user_agent)
+        user_agent(input_user_agent),
+        thread_instrumentation(input_thread_instrumentation)
   {}
 };
 

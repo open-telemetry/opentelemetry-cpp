@@ -26,6 +26,7 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 #  include <zconf.h>
@@ -269,6 +270,18 @@ HttpClient::HttpClient()
     : multi_handle_(curl_multi_init()),
       next_session_id_{0},
       max_sessions_per_connection_{8},
+      background_thread_instrumentation_(nullptr),
+      scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
+      background_thread_wait_for_{std::chrono::minutes{1}},
+      curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
+{}
+
+HttpClient::HttpClient(
+    const std::shared_ptr<sdk::common::ThreadInstrumentation> &thread_instrumentation)
+    : multi_handle_(curl_multi_init()),
+      next_session_id_{0},
+      max_sessions_per_connection_{8},
+      background_thread_instrumentation_(thread_instrumentation),
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
       background_thread_wait_for_{std::chrono::minutes{1}},
       curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
@@ -429,6 +442,13 @@ bool HttpClient::MaybeSpawnBackgroundThread()
 
   background_thread_.reset(new std::thread(
       [](HttpClient *self) {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+        if (self->background_thread_instrumentation_ != nullptr)
+        {
+          self->background_thread_instrumentation_->OnStart();
+        }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
         int still_running = 1;
         std::chrono::system_clock::time_point last_free_job_timepoint =
             std::chrono::system_clock::now();
@@ -447,6 +467,13 @@ bool HttpClient::MaybeSpawnBackgroundThread()
           }
           else if (still_running || need_wait_more)
           {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+            if (self->background_thread_instrumentation_ != nullptr)
+            {
+              self->background_thread_instrumentation_->BeforeWait();
+            }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
         // curl_multi_poll is added from libcurl 7.66.0, before 7.68.0, we can only wait util
         // timeout to do the rest jobs
 #if LIBCURL_VERSION_NUM >= 0x074200
@@ -459,6 +486,13 @@ bool HttpClient::MaybeSpawnBackgroundThread()
                                  static_cast<int>(self->scheduled_delay_milliseconds_.count()),
                                  nullptr);
 #endif
+
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+            if (self->background_thread_instrumentation_ != nullptr)
+            {
+              self->background_thread_instrumentation_->AfterWait();
+            }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
           }
 
           do
@@ -557,6 +591,13 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             // If there is no pending jobs, we can stop the background thread.
             if (still_running == 0)
             {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+              if (self->background_thread_instrumentation_ != nullptr)
+              {
+                self->background_thread_instrumentation_->OnEnd();
+              }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
               if (self->background_thread_)
               {
                 self->background_thread_->detach();

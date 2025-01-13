@@ -9,6 +9,7 @@
 #include "opentelemetry/version.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_file_exporter_runtime_options.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/trace/exporter.h"
@@ -35,6 +36,12 @@ public:
    * Create an OtlpFileExporter using the given options.
    */
   explicit OtlpFileExporter(const OtlpFileExporterOptions &options);
+
+  /**
+   * Create an OtlpFileExporter using the given options.
+   */
+  explicit OtlpFileExporter(const OtlpFileExporterOptions &options,
+                            const OtlpFileExporterRuntimeOptions &runtime_options);
 
   /**
    * Create a span recordable.
@@ -70,6 +77,8 @@ public:
 private:
   // The configuration options associated with this exporter.
   const OtlpFileExporterOptions options_;
+  // The runtime options associated with this exporter.
+  const OtlpFileExporterRuntimeOptions runtime_options_;
 
   // Object that stores the file context.
   std::unique_ptr<OtlpFileClient> file_client_;

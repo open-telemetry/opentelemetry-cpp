@@ -7,6 +7,7 @@
 
 #include "opentelemetry/version.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_runtime_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -31,6 +32,13 @@ public:
    */
   static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create(
       const OtlpHttpLogRecordExporterOptions &options);
+
+  /**
+   * Create a OtlpHttpLogRecordExporter.
+   */
+  static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create(
+      const OtlpHttpLogRecordExporterOptions &options,
+      const OtlpHttpLogRecordExporterRuntimeOptions &runtime_options);
 };
 
 }  // namespace otlp
