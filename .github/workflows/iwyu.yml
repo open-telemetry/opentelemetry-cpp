@@ -50,6 +50,7 @@ jobs:
             -DWITH_OTLP_FILE=ON \
             -DWITH_OPENTRACING=ON \
             -DWITH_OTLP_HTTP_COMPRESSION=ON \
+            -DWITH_THREAD_INSTRUMENTATION=ON \
             -DWITH_ZIPKIN=ON \
             -DWITH_PROMETHEUS=ON \
             ..
