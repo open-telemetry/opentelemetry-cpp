@@ -123,7 +123,7 @@ void CounterExample(opentelemetry::nostd::unique_ptr<metrics_api::Counter<double
 
 int main(int /*argc*/, char ** /*argv[]*/)
 {
-  std::srand(std::time(nullptr));  // Seed the random numbe
+  std::srand(static_cast<unsigned int>(std::time(nullptr)));  // Seed the random number generator
   // Pre-generate a set of random attributes
   size_t attribute_count = 1000;  // Number of attribute sets to pre-generate
   auto attributes_set    = GenerateAttributeSet(attribute_count);
