@@ -97,4 +97,3 @@ private:
   // Helper function to format numbers with commas for readability
   static std::string formatNumber(uint64_t num);
 };
-
