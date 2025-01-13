@@ -98,7 +98,3 @@ private:
   static std::string formatNumber(uint64_t num);
 };
 
-// Signal handler to set the STOP flag when receiving a termination signal
-void signal_handler(int);
-
-#endif  // STRESS_TEST_H
