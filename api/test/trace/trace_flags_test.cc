@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <string>
 
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/trace/trace_flags.h"
 
 namespace

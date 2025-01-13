@@ -1,7 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/scope.h"
