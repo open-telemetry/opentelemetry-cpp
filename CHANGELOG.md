@@ -24,6 +24,9 @@ Increment the:
 * [EXPORTER] Fix scope attributes missing from otlp traces metrics
   [#3185](https://github.com/open-telemetry/opentelemetry-cpp/pull/3185)
 
+* [EXPORTER] Fix throw in OtlpGrpcMetricExporter with shared grpc client
+  [#3243](https://github.com/open-telemetry/opentelemetry-cpp/pull/3243)
+
 ## [1.18 2024-11-25]
 
 * [EXPORTER] Fix crash in ElasticsearchLogRecordExporter
