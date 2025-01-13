@@ -20,6 +20,8 @@
 #include <utility>
 #include <vector>
 
+// IWYU pragma: no_include <features.h>
+
 #if defined(HAVE_GSL)
 #  include <gsl/gsl>
 #else
@@ -60,6 +62,7 @@
 
 #  include <fcntl.h>
 #  include <sys/stat.h>
+#  include <sys/types.h>
 #  include <unistd.h>
 
 #  define FS_ACCESS(x) access(x, F_OK)
@@ -111,6 +114,7 @@
 #include "opentelemetry/sdk/common/base64.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
 // clang-format off

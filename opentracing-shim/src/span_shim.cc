@@ -3,14 +3,32 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "opentelemetry/opentracingshim/span_shim.h"
+#include <algorithm>
+#include <initializer_list>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "opentracing/ext/tags.h"
+#include "opentracing/span.h"
+#include "opentracing/string_view.h"
+#include "opentracing/util.h"
+#include "opentracing/value.h"
+
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/opentracingshim/shim_utils.h"
 #include "opentelemetry/opentracingshim/span_context_shim.h"
-#include "opentelemetry/opentracingshim/tracer_shim.h"
-
+#include "opentelemetry/opentracingshim/span_shim.h"
 #include "opentelemetry/semconv/exception_attributes.h"
+#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_metadata.h"
-#include "opentracing/ext/tags.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim
