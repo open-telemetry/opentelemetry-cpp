@@ -87,7 +87,7 @@ std::vector<std::map<std::string, uint32_t>> GenerateAttributeSet(size_t count)
   return attributes_set;
 }
 
-void InitMetrics(const std::string &name)
+void InitMetrics(const std::string /*&name*/)
 {
   metrics_sdk::PeriodicExportingMetricReaderOptions options;
   options.export_interval_millis = std::chrono::milliseconds(1000);
@@ -121,7 +121,7 @@ void CounterExample(opentelemetry::nostd::unique_ptr<metrics_api::Counter<double
 }
 }  // namespace
 
-int main(int argc, char *argv[])
+int main(int /*argc*/, char ** /*argv[]*/)
 {
   std::srand(std::time(nullptr));  // Seed the random numbe
   // Pre-generate a set of random attributes

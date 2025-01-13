@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 add_library(stress STATIC stress.cc)
 
 # Include directory for the throughput library
