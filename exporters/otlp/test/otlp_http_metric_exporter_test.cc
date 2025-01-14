@@ -1,9 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
@@ -13,6 +11,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "gmock/gmock.h"
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
@@ -40,6 +39,7 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+// IWYU pragma: no_include "net/proto2/public/repeated_field.h"
 #include <google/protobuf/message_lite.h>
 #include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"

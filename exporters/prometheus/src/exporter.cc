@@ -1,8 +1,19 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <prometheus/exposer.h>
+#include <chrono>
+#include <exception>
+#include <memory>
+#include <ostream>
+#include <string>
+
+#include "opentelemetry/exporters/prometheus/collector.h"
 #include "opentelemetry/exporters/prometheus/exporter.h"
+#include "opentelemetry/exporters/prometheus/exporter_options.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 

@@ -531,6 +531,8 @@ otel_cc_test(
         ":otlp_grpc_exporter",
         "//api",
         "@googletest//:gtest_main",
+        "@opentelemetry-proto//:metrics_service_grpc_cc",
+        "@opentelemetry-proto//:logs_service_grpc_cc",
         "@opentelemetry-proto//:trace_service_grpc_cc",
     ]),
 )
@@ -736,6 +738,8 @@ otel_cc_test(
         "//api",
         "@googletest//:gtest_main",
         "@opentelemetry-proto//:metrics_service_grpc_cc",
+        "@opentelemetry-proto//:logs_service_grpc_cc",
+        "@opentelemetry-proto//:trace_service_grpc_cc",
     ]),
 )
 

@@ -3,18 +3,15 @@
 
 #pragma once
 
+#include <prometheus/exposer.h>
+#include <chrono>
 #include <memory>
-#include <string>
-#include <vector>
 
 #include "opentelemetry/version.h"
 #include "opentelemetry/exporters/prometheus/collector.h"
 #include "opentelemetry/exporters/prometheus/exporter_options.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/sdk/common/env_variables.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
-
-#include <prometheus/exposer.h>
 
 /**
  * This class is an implementation of the MetricsExporter interface and
