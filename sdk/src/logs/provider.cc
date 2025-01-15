@@ -4,8 +4,8 @@
 #include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/logs/logger_provider.h"
-#include "opentelemetry/logs/provider.h"
 #include "opentelemetry/logs/noop.h"
+#include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/disabled.h"
 #include "opentelemetry/sdk/logs/provider.h"
@@ -30,7 +30,7 @@ void Provider::SetEventLoggerProvider(const nostd::shared_ptr<EventLoggerProvide
   opentelemetry::sdk::logs::Provider::SetEventLoggerProvider(lp);
 }
 
-}  // namespace metrics
+}  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -65,6 +65,6 @@ void Provider::SetEventLoggerProvider(
   }
 }
 
-}  // namespace metrics
+}  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

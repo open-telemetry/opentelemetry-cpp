@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"
@@ -21,7 +20,6 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 
 using opentelemetry::logs::EventId;
 using opentelemetry::logs::Logger;
@@ -191,4 +189,3 @@ TEST(Logger, EventLogMethodOverloads)
   event_logger->EmitEvent("event name", Severity::kDebug,
                           opentelemetry::common::MakeAttributes(vec));
 }
-

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <string>
+#include <stdlib.h>
 
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/logs/event_logger.h"  // IWYU pragma: keep
@@ -140,4 +140,3 @@ TEST(Provider, MultipleEventLoggerProviders)
 
   ASSERT_NE(Provider::GetEventLoggerProvider(), tf);
 }
-

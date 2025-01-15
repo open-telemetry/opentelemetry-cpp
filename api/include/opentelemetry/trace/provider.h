@@ -7,6 +7,7 @@
 
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
@@ -16,7 +17,7 @@ namespace sdk
 {
 namespace trace
 {
-class Provider;
+class Provider;  // IWYU pragma: keep
 }
 }  // namespace sdk
 

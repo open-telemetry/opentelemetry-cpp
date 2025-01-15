@@ -9,16 +9,19 @@
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/event_logger.h"
 #include "opentelemetry/logs/event_logger_provider.h"
+#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
-#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/logs/provider.h"
+#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/event_logger_provider.h"
@@ -323,11 +326,12 @@ class TestLogger : public opentelemetry::logs::Logger
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
 class TestProvider : public opentelemetry::logs::LoggerProvider
 {
-  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(nostd::string_view /* logger_name */,
-                                      nostd::string_view /* library_name */,
-                                      nostd::string_view /* library_version */,
-                                      nostd::string_view /* schema_url */,
-                                      const opentelemetry::common::KeyValueIterable & /* attributes */) override
+  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
+      nostd::string_view /* logger_name */,
+      nostd::string_view /* library_name */,
+      nostd::string_view /* library_version */,
+      nostd::string_view /* schema_url */,
+      const opentelemetry::common::KeyValueIterable & /* attributes */) override
   {
     return nostd::shared_ptr<opentelemetry::logs::Logger>(new TestLogger());
   }
@@ -346,4 +350,3 @@ TEST(Logger, PushLoggerImplementation)
   auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
   ASSERT_EQ("test logger", logger->GetName());
 }
-

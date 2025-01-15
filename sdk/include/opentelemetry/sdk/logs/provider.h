@@ -34,6 +34,6 @@ public:
       const nostd::shared_ptr<opentelemetry::logs::EventLoggerProvider> &lp) noexcept;
 };
 
-}  // namespace metrics
+}  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

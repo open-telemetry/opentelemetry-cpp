@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stdlib.h>
 
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/metrics/provider.h"

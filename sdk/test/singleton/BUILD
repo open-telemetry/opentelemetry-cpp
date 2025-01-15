@@ -159,15 +159,15 @@ cc_binary(
 
 #
 # To build this test alone:
-# - bazel build //api/test/singleton:singleton_test
-# - bazel build //api/test/singleton:component_g
-# - bazel build //api/test/singleton:component_h
+# - bazel build //sdk/test/singleton:singleton_test
+# - bazel build //sdk/test/singleton:component_g
+# - bazel build //sdk/test/singleton:component_h
 #
 # Note that singleton_test does not depend on
 # component_g and component_h, on purpose.
 #
 # To run this test:
-# bazel test //api/test/singleton:singleton_test
+# bazel test //sdk/test/singleton:singleton_test
 #
 
 cc_test(
@@ -196,6 +196,8 @@ cc_test(
         "component_e",
         "component_f",
         "//api",
+        "//sdk/src/common",
+        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
