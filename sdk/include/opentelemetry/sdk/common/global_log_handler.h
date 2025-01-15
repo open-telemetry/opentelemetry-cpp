@@ -93,73 +93,34 @@ public:
  */
 class GlobalLogHandler
 {
-private:
-  struct GlobalLogHandlerData
-  {
-    nostd::shared_ptr<LogHandler> handler;
-    LogLevel log_level;
-
-    GlobalLogHandlerData();
-    ~GlobalLogHandlerData();
-
-    GlobalLogHandlerData(const GlobalLogHandlerData &) = delete;
-    GlobalLogHandlerData(GlobalLogHandlerData &&)      = delete;
-
-    GlobalLogHandlerData &operator=(const GlobalLogHandlerData &) = delete;
-    GlobalLogHandlerData &operator=(GlobalLogHandlerData &&)      = delete;
-  };
-
 public:
   /**
    * Returns the singleton LogHandler.
    *
    * By default, a default LogHandler is returned.
    */
-  static inline nostd::shared_ptr<LogHandler> GetLogHandler() noexcept
-  {
-    if OPENTELEMETRY_UNLIKELY_CONDITION (IsHandlerAndLevelDestroyed())
-    {
-      return nostd::shared_ptr<LogHandler>();
-    }
-
-    return GetHandlerAndLevel().handler;
-  }
+  static nostd::shared_ptr<LogHandler> GetLogHandler() noexcept;
 
   /**
    * Changes the singleton LogHandler.
    * This should be called once at the start of application before creating any Provider
    * instance.
    */
-  static inline void SetLogHandler(const nostd::shared_ptr<LogHandler> &eh) noexcept
-  {
-    if OPENTELEMETRY_UNLIKELY_CONDITION (IsHandlerAndLevelDestroyed())
-    {
-      return;
-    }
-
-    GetHandlerAndLevel().handler = eh;
-  }
+  static void SetLogHandler(const nostd::shared_ptr<LogHandler> &eh) noexcept;
 
   /**
    * Returns the singleton log level.
    *
    * By default, a default log level is returned.
    */
-  static inline LogLevel GetLogLevel() noexcept { return GetHandlerAndLevel().log_level; }
+  static LogLevel GetLogLevel() noexcept;
 
   /**
    * Changes the singleton Log level.
    * This should be called once at the start of application before creating any Provider
    * instance.
    */
-  static inline void SetLogLevel(LogLevel level) noexcept
-  {
-    GetHandlerAndLevel().log_level = level;
-  }
-
-private:
-  static GlobalLogHandlerData &GetHandlerAndLevel() noexcept;
-  static bool IsHandlerAndLevelDestroyed() noexcept;
+  static void SetLogLevel(LogLevel level) noexcept;
 };
 
 }  // namespace internal_log

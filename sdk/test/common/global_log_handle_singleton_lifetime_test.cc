@@ -49,7 +49,7 @@ static GlobalLogHandlerChecker &ConstructChecker()
 class CustomLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
 {
 public:
-  ~CustomLogHandler()
+  ~CustomLogHandler() override
   {
     GlobalLogHandlerChecker::custom_handler_destroyed = true;
     std::cout << "Custom Gobal Log Handle destroyed\n";
