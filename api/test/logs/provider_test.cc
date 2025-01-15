@@ -40,23 +40,6 @@ TEST(Provider, GetLoggerProviderDefault)
   EXPECT_NE(nullptr, tf);
 }
 
-TEST(Provider, SetLoggerProvider)
-{
-  auto tf = shared_ptr<LoggerProvider>(new TestProvider());
-  Provider::SetLoggerProvider(tf);
-  ASSERT_EQ(tf, Provider::GetLoggerProvider());
-}
-
-TEST(Provider, MultipleLoggerProviders)
-{
-  auto tf = shared_ptr<LoggerProvider>(new TestProvider());
-  Provider::SetLoggerProvider(tf);
-  auto tf2 = shared_ptr<LoggerProvider>(new TestProvider());
-  Provider::SetLoggerProvider(tf2);
-
-  ASSERT_NE(Provider::GetLoggerProvider(), tf);
-}
-
 TEST(Provider, GetLogger)
 {
   auto tf = shared_ptr<LoggerProvider>(new TestProvider());
@@ -86,23 +69,6 @@ TEST(Provider, GetEventLoggerProviderDefault)
 {
   auto tf = Provider::GetEventLoggerProvider();
   EXPECT_NE(nullptr, tf);
-}
-
-TEST(Provider, SetEventLoggerProvider)
-{
-  auto tf = nostd::shared_ptr<EventLoggerProvider>(new TestEventLoggerProvider());
-  Provider::SetEventLoggerProvider(tf);
-  ASSERT_EQ(tf, Provider::GetEventLoggerProvider());
-}
-
-TEST(Provider, MultipleEventLoggerProviders)
-{
-  auto tf = nostd::shared_ptr<EventLoggerProvider>(new TestEventLoggerProvider());
-  Provider::SetEventLoggerProvider(tf);
-  auto tf2 = nostd::shared_ptr<EventLoggerProvider>(new TestEventLoggerProvider());
-  Provider::SetEventLoggerProvider(tf2);
-
-  ASSERT_NE(Provider::GetEventLoggerProvider(), tf);
 }
 
 TEST(Provider, CreateEventLogger)

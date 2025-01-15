@@ -12,6 +12,14 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace metrics
+{
+class Provider;
+}
+}  // namespace sdk
+
 namespace metrics
 {
 
@@ -37,14 +45,18 @@ public:
 
   /**
    * Changes the singleton MeterProvider.
+   * While declared in the API class opentelemetry::metrics::Provider,
+   * this method is actually part of the SDK, not API.
+   * An application **MUST** link with the opentelemetry-cpp SDK,
+   * to install a metrics provider, when configuring OpenTelemetry.
+   * An instrumented library does not need to invoke this method.
    */
-  static void SetMeterProvider(const nostd::shared_ptr<MeterProvider> &tp) noexcept
-  {
-    std::lock_guard<common::SpinLockMutex> guard(GetLock());
-    GetProvider() = tp;
-  }
+  static void SetMeterProvider(const nostd::shared_ptr<MeterProvider> &mp) noexcept;
 
 private:
+  /* The SDK is allowed to change the singleton in the API. */
+  friend class opentelemetry::sdk::metrics::Provider;
+
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<MeterProvider> &GetProvider() noexcept
   {
     static nostd::shared_ptr<MeterProvider> provider(new NoopMeterProvider);

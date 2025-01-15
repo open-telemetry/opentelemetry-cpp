@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 foreach(testname
-        logger_provider_sdk_test logger_sdk_test log_record_test
+        logger_provider_set_test logger_provider_sdk_test logger_sdk_test log_record_test
         simple_log_record_processor_test batch_log_record_processor_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(

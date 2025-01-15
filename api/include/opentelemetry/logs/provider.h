@@ -12,6 +12,14 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace logs
+{
+class Provider;
+}
+}  // namespace sdk
+
 namespace logs
 {
 
@@ -38,12 +46,13 @@ public:
 
   /**
    * Changes the singleton LoggerProvider.
+   * While declared in the API class opentelemetry::logs::Provider,
+   * this method is actually part of the SDK, not API.
+   * An application **MUST** link with the opentelemetry-cpp SDK,
+   * to install a logs provider, when configuring OpenTelemetry.
+   * An instrumented library does not need to invoke this method.
    */
-  static void SetLoggerProvider(const nostd::shared_ptr<LoggerProvider> &tp) noexcept
-  {
-    std::lock_guard<common::SpinLockMutex> guard(GetLock());
-    GetProvider() = tp;
-  }
+  static void SetLoggerProvider(const nostd::shared_ptr<LoggerProvider> &lp) noexcept;
 
   /**
    * Returns the singleton EventLoggerProvider.
@@ -59,14 +68,18 @@ public:
 
   /**
    * Changes the singleton EventLoggerProvider.
+   * While declared in the API class opentelemetry::logs::Provider,
+   * this method is actually part of the SDK, not API.
+   * An application **MUST** link with the opentelemetry-cpp SDK,
+   * to install an event logs provider, when configuring OpenTelemetry.
+   * An instrumented library does not need to invoke this method.
    */
-  static void SetEventLoggerProvider(const nostd::shared_ptr<EventLoggerProvider> &tp) noexcept
-  {
-    std::lock_guard<common::SpinLockMutex> guard(GetLock());
-    GetEventProvider() = tp;
-  }
+  static void SetEventLoggerProvider(const nostd::shared_ptr<EventLoggerProvider> &lp) noexcept;
 
 private:
+  /* The SDK is allowed to change the singleton in the API. */
+  friend class opentelemetry::sdk::logs::Provider;
+
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<LoggerProvider> &GetProvider() noexcept
   {
     static nostd::shared_ptr<LoggerProvider> provider(new NoopLoggerProvider);

@@ -12,6 +12,14 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace trace
+{
+class Provider;
+}
+}  // namespace sdk
+
 namespace trace
 {
 
@@ -35,14 +43,18 @@ public:
 
   /**
    * Changes the singleton TracerProvider.
+   * While declared in the API class opentelemetry::trace::Provider,
+   * this method is actually part of the SDK, not API.
+   * An application **MUST** link with the opentelemetry-cpp SDK,
+   * to install a tracer provider, when configuring OpenTelemetry.
+   * An instrumented library does not need to invoke this method.
    */
-  static void SetTracerProvider(const nostd::shared_ptr<TracerProvider> &tp) noexcept
-  {
-    std::lock_guard<common::SpinLockMutex> guard(GetLock());
-    GetProvider() = tp;
-  }
+  static void SetTracerProvider(const nostd::shared_ptr<TracerProvider> &tp) noexcept;
 
 private:
+  /* The SDK is allowed to change the singleton in the API. */
+  friend class opentelemetry::sdk::trace::Provider;
+
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<TracerProvider> &GetProvider() noexcept
   {
     static nostd::shared_ptr<TracerProvider> provider(new NoopTracerProvider);

@@ -47,7 +47,8 @@ target_link_libraries(
   ${GTEST_BOTH_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT}
   ${CMAKE_DL_LIBS}
-  opentelemetry_api)
+  opentelemetry_api
+  opentelemetry_trace)
 
 gtest_add_tests(
   TARGET singleton_test

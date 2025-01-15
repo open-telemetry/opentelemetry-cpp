@@ -6,6 +6,7 @@ target_link_libraries(metrics_common_test_utils opentelemetry_metrics)
 
 foreach(
   testname
+  meter_provider_set_test
   meter_provider_sdk_test
   meter_test
   view_registry_test
