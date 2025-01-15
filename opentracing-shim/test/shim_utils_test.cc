@@ -3,13 +3,40 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "shim_mocks.h"
-
-#include "opentelemetry/opentracingshim/shim_utils.h"
-
-#include "opentracing/tracer.h"
-
 #include <gtest/gtest.h>
+#include <stdint.h>
+#include <algorithm>
+#include <chrono>
+#include <map>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+
+#include "opentracing/propagation.h"
+#include "opentracing/span.h"
+#include "opentracing/string_view.h"
+#include "opentracing/tracer.h"
+#include "opentracing/util.h"
+#include "opentracing/value.h"
+#include "opentracing/variant/recursive_wrapper.hpp"
+
+#include "opentelemetry/baggage/baggage.h"
+#include "opentelemetry/baggage/baggage_context.h"
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/opentracingshim/shim_utils.h"
+#include "opentelemetry/opentracingshim/span_context_shim.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_startoptions.h"
+
+#include "shim_mocks.h"
 
 namespace trace_api = opentelemetry::trace;
 namespace baggage   = opentelemetry::baggage;

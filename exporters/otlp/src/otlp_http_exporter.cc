@@ -12,12 +12,14 @@
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_runtime_options.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/version.h"
 
@@ -38,6 +40,40 @@ OtlpHttpExporter::OtlpHttpExporter() : OtlpHttpExporter(OtlpHttpExporterOptions(
 
 OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
     : options_(options),
+      runtime_options_(),
+      http_client_(new OtlpHttpClient(OtlpHttpClientOptions(
+          options.url,
+          options.ssl_insecure_skip_verify,
+          options.ssl_ca_cert_path,
+          options.ssl_ca_cert_string,
+          options.ssl_client_key_path,
+          options.ssl_client_key_string,
+          options.ssl_client_cert_path,
+          options.ssl_client_cert_string,
+          options.ssl_min_tls,
+          options.ssl_max_tls,
+          options.ssl_cipher,
+          options.ssl_cipher_suite,
+          options.content_type,
+          options.json_bytes_mapping,
+          options.compression,
+          options.use_json_name,
+          options.console_debug,
+          options.timeout,
+          options.http_headers,
+          std::shared_ptr<sdk::common::ThreadInstrumentation>{nullptr}
+#ifdef ENABLE_ASYNC_EXPORT
+          ,
+          options.max_concurrent_requests,
+          options.max_requests_per_connection
+#endif
+          )))
+{}
+
+OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
+                                   const OtlpHttpExporterRuntimeOptions &runtime_options)
+    : options_(options),
+      runtime_options_(runtime_options),
       http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
                                                             options.ssl_insecure_skip_verify,
                                                             options.ssl_ca_cert_path,
@@ -56,7 +92,8 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
                                                             options.use_json_name,
                                                             options.console_debug,
                                                             options.timeout,
-                                                            options.http_headers
+                                                            options.http_headers,
+                                                            runtime_options.thread_instrumentation
 #ifdef ENABLE_ASYNC_EXPORT
                                                             ,
                                                             options.max_concurrent_requests,
@@ -68,18 +105,18 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
 OtlpHttpExporter::OtlpHttpExporter(std::unique_ptr<OtlpHttpClient> http_client)
     : options_(OtlpHttpExporterOptions()), http_client_(std::move(http_client))
 {
-  OtlpHttpExporterOptions &options = const_cast<OtlpHttpExporterOptions &>(options_);
-  options.url                      = http_client_->GetOptions().url;
-  options.content_type             = http_client_->GetOptions().content_type;
-  options.json_bytes_mapping       = http_client_->GetOptions().json_bytes_mapping;
-  options.use_json_name            = http_client_->GetOptions().use_json_name;
-  options.console_debug            = http_client_->GetOptions().console_debug;
-  options.timeout                  = http_client_->GetOptions().timeout;
-  options.http_headers             = http_client_->GetOptions().http_headers;
+  options_.url                = http_client_->GetOptions().url;
+  options_.content_type       = http_client_->GetOptions().content_type;
+  options_.json_bytes_mapping = http_client_->GetOptions().json_bytes_mapping;
+  options_.use_json_name      = http_client_->GetOptions().use_json_name;
+  options_.console_debug      = http_client_->GetOptions().console_debug;
+  options_.timeout            = http_client_->GetOptions().timeout;
+  options_.http_headers       = http_client_->GetOptions().http_headers;
 #ifdef ENABLE_ASYNC_EXPORT
-  options.max_concurrent_requests     = http_client_->GetOptions().max_concurrent_requests;
-  options.max_requests_per_connection = http_client_->GetOptions().max_requests_per_connection;
+  options_.max_concurrent_requests     = http_client_->GetOptions().max_concurrent_requests;
+  options_.max_requests_per_connection = http_client_->GetOptions().max_requests_per_connection;
 #endif
+  runtime_options_.thread_instrumentation = http_client_->GetOptions().thread_instrumentation;
 }
 // ----------------------------- Exporter methods ------------------------------
 
