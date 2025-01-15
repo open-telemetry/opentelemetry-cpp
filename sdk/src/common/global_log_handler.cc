@@ -13,6 +13,15 @@ namespace common
 namespace internal_log
 {
 
+namespace
+{
+bool &InternalHandlerAndLevelDestroyedFlag() noexcept
+{
+  static bool destroyed = false;
+  return destroyed;
+}
+}  // namespace
+
 LogHandler::~LogHandler() {}
 
 void DefaultLogHandler::Handle(LogLevel level,
@@ -58,20 +67,23 @@ void NoopLogHandler::Handle(LogLevel,
 {}
 
 GlobalLogHandler::GlobalLogHandlerData::GlobalLogHandlerData()
-    : handler(nostd::shared_ptr<LogHandler>(new DefaultLogHandler)),
-      log_level(LogLevel::Warning),
-      destroyed(false)
+    : handler(nostd::shared_ptr<LogHandler>(new DefaultLogHandler)), log_level(LogLevel::Warning)
 {}
 
 GlobalLogHandler::GlobalLogHandlerData::~GlobalLogHandlerData()
 {
-  destroyed = true;
+  InternalHandlerAndLevelDestroyedFlag() = true;
 }
 
 GlobalLogHandler::GlobalLogHandlerData &GlobalLogHandler::GetHandlerAndLevel() noexcept
 {
   static GlobalLogHandlerData handler_and_level;
   return handler_and_level;
+}
+
+bool GlobalLogHandler::IsHandlerAndLevelDestroyed() noexcept
+{
+  return InternalHandlerAndLevelDestroyedFlag();
 }
 
 }  // namespace internal_log

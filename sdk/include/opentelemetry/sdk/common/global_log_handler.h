@@ -98,7 +98,6 @@ private:
   {
     nostd::shared_ptr<LogHandler> handler;
     LogLevel log_level;
-    bool destroyed;
 
     GlobalLogHandlerData();
     ~GlobalLogHandlerData();
@@ -118,7 +117,7 @@ public:
    */
   static inline nostd::shared_ptr<LogHandler> GetLogHandler() noexcept
   {
-    if OPENTELEMETRY_UNLIKELY_CONDITION (GetHandlerAndLevel().destroyed)
+    if OPENTELEMETRY_UNLIKELY_CONDITION (IsHandlerAndLevelDestroyed())
     {
       return nostd::shared_ptr<LogHandler>();
     }
@@ -133,7 +132,7 @@ public:
    */
   static inline void SetLogHandler(const nostd::shared_ptr<LogHandler> &eh) noexcept
   {
-    if OPENTELEMETRY_UNLIKELY_CONDITION (GetHandlerAndLevel().destroyed)
+    if OPENTELEMETRY_UNLIKELY_CONDITION (IsHandlerAndLevelDestroyed())
     {
       return;
     }
@@ -160,6 +159,7 @@ public:
 
 private:
   static GlobalLogHandlerData &GetHandlerAndLevel() noexcept;
+  static bool IsHandlerAndLevelDestroyed() noexcept;
 };
 
 }  // namespace internal_log
