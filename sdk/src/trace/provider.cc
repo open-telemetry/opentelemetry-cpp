@@ -6,7 +6,6 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/disabled.h"
 #include "opentelemetry/sdk/trace/provider.h"
-#include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 

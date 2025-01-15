@@ -11,6 +11,10 @@
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
+// The friend declaration is sufficient,
+// we do not want a API -> SDK dependency.
+// IWYU pragma: no_include "opentelemetry/sdk/trace/provider.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {

@@ -196,7 +196,7 @@ cc_test(
         "component_e",
         "component_f",
         "//api",
-        "//sdk/src/common",
+        "//sdk/src/common:disabled",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
