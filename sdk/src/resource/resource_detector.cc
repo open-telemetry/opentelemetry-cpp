@@ -39,7 +39,7 @@ Resource OTELResourceDetector::Detect() noexcept
 
   if (!attributes_exists && !service_name_exists)
   {
-    return Create({});
+    return ResourceDetector::Create({});
   }
 
   ResourceAttributes attributes;
@@ -65,7 +65,7 @@ Resource OTELResourceDetector::Detect() noexcept
     attributes[semconv::service::kServiceName] = service_name;
   }
 
-  return Create(attributes);
+  return ResourceDetector::Create(attributes);
 }
 
 }  // namespace resource

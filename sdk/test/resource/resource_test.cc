@@ -276,6 +276,8 @@ TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
 
+#endif
+
 TEST(ResourceTest, DerivedResourceDetector)
 {
   TestResourceDetector detector;
@@ -289,4 +291,3 @@ TEST(ResourceTest, DerivedResourceDetector)
   EXPECT_EQ(resource.GetSchemaURL(), detector.schema_url);
   EXPECT_TRUE(received_attributes.find("key") != received_attributes.end());
 }
-#endif
