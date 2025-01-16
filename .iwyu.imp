@@ -11,6 +11,17 @@
   { "include": ["<bits/types/struct_tm.h>", "private", "<time.h>", "public"] },
   { "include": ["<bits/types/struct_FILE.h>", "private", "<stdio.h>", "public"] },
 
+  # Work around for ryml
+  { "include": ["<c4/std/string.hpp>", "private", "<ryml_std.hpp>", "public"] },
+
+  { "include": ["<c4/yml/node.hpp>", "private", "<ryml.hpp>", "public"] },
+  { "include": ["<c4/yml/parse.hpp>", "private", "<ryml.hpp>", "public"] },
+  { "include": ["<c4/yml/parse_engine.hpp>", "private", "<ryml.hpp>", "public"] },
+  { "include": ["<c4/yml/tree.hpp>", "private", "<ryml.hpp>", "public"] },
+  { "include": ["<c4/yml/event_handler_tree.hpp>", "private", "<ryml.hpp>", "public"] },
+  { "include": ["<c4/substr.hpp>", "private", "<ryml.hpp>", "public"] },
+  { "include": ["<c4/substr_fwd.hpp>", "private", "<ryml.hpp>", "public"] },
+
   # Local opentelemetry-cpp style
 
   # We prefer to include <gtest/gtest.h> for simplicity
