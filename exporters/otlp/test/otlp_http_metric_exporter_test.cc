@@ -1,9 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
@@ -13,6 +11,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "gmock/gmock.h"
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
@@ -26,6 +25,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
@@ -39,6 +39,7 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+// IWYU pragma: no_include "net/proto2/public/repeated_field.h"
 #include <google/protobuf/message_lite.h>
 #include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
@@ -74,6 +75,7 @@ static IntegerType JsonToInteger(nlohmann::json value)
 OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_type,
                                                 bool async_mode)
 {
+  std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation> not_instrumented;
   OtlpHttpMetricExporterOptions options;
   options.content_type  = content_type;
   options.console_debug = true;
@@ -97,7 +99,7 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
       options.content_type, options.json_bytes_mapping, options.compression, options.use_json_name,
       options.console_debug, options.timeout, options.http_headers,
       options.retry_policy_max_attempts, options.retry_policy_initial_backoff,
-      options.retry_policy_max_backoff, options.retry_policy_backoff_multiplier);
+      options.retry_policy_max_backoff, options.retry_policy_backoff_multiplier, not_instrumented);
   if (!async_mode)
   {
     otlp_http_client_options.max_concurrent_requests = 0;

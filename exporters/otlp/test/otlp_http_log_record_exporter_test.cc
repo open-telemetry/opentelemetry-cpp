@@ -54,6 +54,7 @@ static nostd::span<T, N> MakeSpan(T (&array)[N])
 OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_type,
                                                 bool async_mode)
 {
+  std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation> not_instrumented;
   OtlpHttpLogRecordExporterOptions options;
   options.content_type  = content_type;
   options.console_debug = true;
@@ -77,7 +78,7 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
       options.content_type, options.json_bytes_mapping, options.compression, options.use_json_name,
       options.console_debug, options.timeout, options.http_headers,
       options.retry_policy_max_attempts, options.retry_policy_initial_backoff,
-      options.retry_policy_max_backoff, options.retry_policy_backoff_multiplier);
+      options.retry_policy_max_backoff, options.retry_policy_backoff_multiplier, not_instrumented);
   if (!async_mode)
   {
     otlp_http_client_options.max_concurrent_requests = 0;

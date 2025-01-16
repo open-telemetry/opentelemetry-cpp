@@ -1,0 +1,28 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+FROM otel/cpp_format_tools
+
+ARG GRPC_VERSION=v1.55.0
+ARG PROTOBUF_VERSION=23.4
+ARG ABSEIL_CPP_VERSION=20240116.1
+
+ENV PROTOBUF_VERSION=${PROTOBUF_VERSION}
+ENV ABSEIL_CPP_VERSION=${ABSEIL_CPP_VERSION}
+
+COPY ci /opt/ci
+
+RUN apt update && apt install -y wget \
+	ninja-build \
+	libcurl4-openssl-dev \
+	markdownlint
+
+RUN cd /opt/ci && bash setup_cmake.sh
+RUN cd /opt/ci && bash setup_ci_environment.sh
+RUN cd /opt && bash ci/setup_googletest.sh \
+	&& bash ci/setup_grpc.sh -r ${GRPC_VERSION}
+
+ADD https://github.com/bazelbuild/bazelisk/releases/download/v1.22.1/bazelisk-linux-amd64 /usr/local/bin
+	
+RUN git config --global core.autocrlf input \
+	&& chmod +x /usr/local/bin/bazelisk-linux-amd64

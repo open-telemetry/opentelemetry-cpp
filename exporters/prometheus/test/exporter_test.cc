@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <string>
 
-#include "opentelemetry/exporters/prometheus/collector.h"
 #include "opentelemetry/exporters/prometheus/exporter.h"
+#include "opentelemetry/exporters/prometheus/exporter_options.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/version.h"
-#include "prometheus_test_helper.h"
 
 /**
  * PrometheusExporterTest is a friend class of PrometheusExporter.

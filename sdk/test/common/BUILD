@@ -161,6 +161,20 @@ cc_test(
 )
 
 cc_test(
+    name = "global_log_handle_singleton_lifetime_test",
+    srcs = [
+        "global_log_handle_singleton_lifetime_test.cc",
+    ],
+    tags = ["test"],
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/common:global_log_handler",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "attributemap_hash_test",
     srcs = [
         "attributemap_hash_test.cc",

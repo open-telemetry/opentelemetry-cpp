@@ -6,3 +6,8 @@ updates:
       interval: "daily"
     labels:
       - "GHA"
+
+  - package-ecosystem: "devcontainers"
+    directory: "/"
+    schedule:
+     interval: daily
