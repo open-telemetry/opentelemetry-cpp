@@ -173,7 +173,7 @@ otel_cc_test(
         "//api",
         "//sdk:headers",
         "//sdk/src/common:global_log_handler",
-        "@com_google_googletest//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )
 
