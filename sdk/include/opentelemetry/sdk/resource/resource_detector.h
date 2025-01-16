@@ -15,7 +15,7 @@ namespace resource
 /**
  * Interface for a Resource Detector
  */
-class ResourceDetector
+class OPENTELEMETRY_EXPORT_TYPE ResourceDetector
 {
 public:
   ResourceDetector()          = default;
