@@ -22,6 +22,12 @@ namespace resource
 const char *OTEL_RESOURCE_ATTRIBUTES = "OTEL_RESOURCE_ATTRIBUTES";
 const char *OTEL_SERVICE_NAME        = "OTEL_SERVICE_NAME";
 
+Resource ResourceDetector::Create(const ResourceAttributes &attributes,
+                                  const std::string &schema_url)
+{
+  return Resource(attributes, schema_url);
+}
+
 Resource OTELResourceDetector::Detect() noexcept
 {
   std::string attributes_str, service_name;
@@ -33,7 +39,7 @@ Resource OTELResourceDetector::Detect() noexcept
 
   if (!attributes_exists && !service_name_exists)
   {
-    return Resource();
+    return Create({});
   }
 
   ResourceAttributes attributes;
@@ -59,7 +65,7 @@ Resource OTELResourceDetector::Detect() noexcept
     attributes[semconv::service::kServiceName] = service_name;
   }
 
-  return Resource(attributes);
+  return Create(attributes);
 }
 
 }  // namespace resource
