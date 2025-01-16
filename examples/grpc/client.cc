@@ -5,15 +5,31 @@
 // ambiguity with `nostd::variant` if compiled with Visual Studio 2015. Other
 // modern compilers are unaffected.
 #include <grpcpp/grpcpp.h>
+#include <grpcpp/security/credentials.h>
+#include <grpcpp/support/status.h>
+
+#include <stdint.h>
+#include <stdlib.h>
+#include <iostream>
+#include <string>
+#include <utility>
+#include "opentelemetry/context/propagation/global_propagator.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/trace/propagation/http_trace_context.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/span_startoptions.h"
+#include "opentelemetry/trace/tracer.h"
+
 #ifdef BAZEL_BUILD
 #  include "examples/grpc/protos/messages.grpc.pb.h"
+#  include "examples/grpc/protos/messages.pb.h"
 #else
 #  include "messages.grpc.pb.h"
+#  include "messages.pb.h"
 #endif
-
-#include <iostream>
-#include <memory>
-#include <string>
 
 #include "opentelemetry/semconv/incubating/rpc_attributes.h"
 #include "opentelemetry/semconv/network_attributes.h"
