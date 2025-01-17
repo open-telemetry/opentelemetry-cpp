@@ -105,7 +105,7 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   google::protobuf::ArenaOptions arena_options;
   // It's easy to allocate datas larger than 1024 when we populate basic resource and attributes
   arena_options.initial_block_size = 1024;
-  // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
+  // When in batch mode, it's easy to export a large number of spans at once, we can alloc a larger
   // block to reduce memory fragments.
   arena_options.max_block_size = 65536;
   std::unique_ptr<google::protobuf::Arena> arena{new google::protobuf::Arena{arena_options}};

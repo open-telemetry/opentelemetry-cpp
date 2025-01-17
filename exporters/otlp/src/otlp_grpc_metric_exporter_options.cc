@@ -35,6 +35,11 @@ OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions()
 #ifdef ENABLE_ASYNC_EXPORT
   max_concurrent_requests = 64;
 #endif
+
+  retry_policy_max_attempts       = GetOtlpDefaultMetricsRetryMaxAttempts();
+  retry_policy_initial_backoff    = GetOtlpDefaultMetricsRetryInitialBackoff();
+  retry_policy_max_backoff        = GetOtlpDefaultMetricsRetryMaxBackoff();
+  retry_policy_backoff_multiplier = GetOtlpDefaultMetricsRetryBackoffMultiplier();
 }
 
 OtlpGrpcMetricExporterOptions::~OtlpGrpcMetricExporterOptions() {}
