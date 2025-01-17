@@ -46,7 +46,7 @@ OPENTELEMETRY_EXPORT bool GetStringEnvironmentVariable(const char *env_var_name,
   @param [out] value Variable value, if it exists
   @return true if the variable exists
 */
-bool GetUintEnvironmentVariable(const char *env_var_name, std::uint32_t &value);
+OPENTELEMETRY_EXPORT bool GetUintEnvironmentVariable(const char *env_var_name, std::uint32_t &value);
 
 /**
   Read a float environment variable.
@@ -54,7 +54,7 @@ bool GetUintEnvironmentVariable(const char *env_var_name, std::uint32_t &value);
   @param [out] value Variable value, if it exists
   @return true if the variable exists
 */
-bool GetFloatEnvironmentVariable(const char *env_var_name, float &value);
+OPENTELEMETRY_EXPORT bool GetFloatEnvironmentVariable(const char *env_var_name, float &value);
 
 #if defined(_MSC_VER)
 inline int setenv(const char *name, const char *value, int)
