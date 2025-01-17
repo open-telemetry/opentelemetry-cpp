@@ -15,6 +15,7 @@
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_runtime_options.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
@@ -61,6 +62,10 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
           options.console_debug,
           options.timeout,
           options.http_headers,
+          options.retry_policy_max_attempts,
+          options.retry_policy_initial_backoff,
+          options.retry_policy_max_backoff,
+          options.retry_policy_backoff_multiplier,
           std::shared_ptr<sdk::common::ThreadInstrumentation>{nullptr}
 #ifdef ENABLE_ASYNC_EXPORT
           ,
@@ -93,6 +98,10 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
                                                             options.console_debug,
                                                             options.timeout,
                                                             options.http_headers,
+                                                            options.retry_policy_max_attempts,
+                                                            options.retry_policy_initial_backoff,
+                                                            options.retry_policy_max_backoff,
+                                                            options.retry_policy_backoff_multiplier,
                                                             runtime_options.thread_instrumentation
 #ifdef ENABLE_ASYNC_EXPORT
                                                             ,
@@ -105,13 +114,18 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
 OtlpHttpExporter::OtlpHttpExporter(std::unique_ptr<OtlpHttpClient> http_client)
     : options_(OtlpHttpExporterOptions()), http_client_(std::move(http_client))
 {
-  options_.url                = http_client_->GetOptions().url;
-  options_.content_type       = http_client_->GetOptions().content_type;
-  options_.json_bytes_mapping = http_client_->GetOptions().json_bytes_mapping;
-  options_.use_json_name      = http_client_->GetOptions().use_json_name;
-  options_.console_debug      = http_client_->GetOptions().console_debug;
-  options_.timeout            = http_client_->GetOptions().timeout;
-  options_.http_headers       = http_client_->GetOptions().http_headers;
+  options_.url                          = http_client_->GetOptions().url;
+  options_.content_type                 = http_client_->GetOptions().content_type;
+  options_.json_bytes_mapping           = http_client_->GetOptions().json_bytes_mapping;
+  options_.use_json_name                = http_client_->GetOptions().use_json_name;
+  options_.console_debug                = http_client_->GetOptions().console_debug;
+  options_.timeout                      = http_client_->GetOptions().timeout;
+  options_.http_headers                 = http_client_->GetOptions().http_headers;
+  options_.retry_policy_max_attempts    = http_client_->GetOptions().retry_policy.max_attempts;
+  options_.retry_policy_initial_backoff = http_client_->GetOptions().retry_policy.initial_backoff;
+  options_.retry_policy_max_backoff     = http_client_->GetOptions().retry_policy.max_backoff;
+  options_.retry_policy_backoff_multiplier =
+      http_client_->GetOptions().retry_policy.backoff_multiplier;
 #ifdef ENABLE_ASYNC_EXPORT
   options_.max_concurrent_requests     = http_client_->GetOptions().max_concurrent_requests;
   options_.max_requests_per_connection = http_client_->GetOptions().max_requests_per_connection;

@@ -30,6 +30,12 @@ Increment the:
 * [SDK] Better control of threads executed by opentelemetry-cpp
   [#3175](https://github.com/open-telemetry/opentelemetry-cpp/pull/3175)
 
+* [SDK] Enable deriving from ResourceDetector to create a Resource
+  [#3247](https://github.com/open-telemetry/opentelemetry-cpp/pull/3247)
+
+* [EXPORTER] Support handling retry-able errors for OTLP/HTTP
+  [#3223](https://github.com/open-telemetry/opentelemetry-cpp/pull/3223)
+
 New features:
 
 * [SDK] Better control of threads executed by opentelemetry-cpp
