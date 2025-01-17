@@ -30,11 +30,11 @@ namespace logs
  *
  * This class is thread-compatible.
  */
-class ReadWriteLogRecord final : public ReadableLogRecord
+class LogRecordData final : public ReadableLogRecord
 {
 public:
-  ReadWriteLogRecord();
-  ~ReadWriteLogRecord() override;
+  LogRecordData();
+  ~LogRecordData() override;
 
   /**
    * Set the timestamp for this log.
@@ -187,9 +187,9 @@ private:
   const opentelemetry::sdk::resource::Resource *resource_;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_;
 
-  std::unordered_map<std::string, opentelemetry::common::AttributeValue> attributes_map_;
+  common::MixedAttributeMap attributes_map_;
   // We resue the same utility functions of MixedAttributeMap with key="" for the body field
-  opentelemetry::common::AttributeValue body_;
+  common::MixedAttributeMap body_;
   opentelemetry::common::SystemTimestamp timestamp_;
   opentelemetry::common::SystemTimestamp observed_timestamp_;
 
