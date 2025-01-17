@@ -75,6 +75,9 @@ struct OtlpHttpClientOptions
   // Additional HTTP headers
   OtlpHeaders http_headers;
 
+  // Retry policy for select failure codes
+  ext::http::client::RetryPolicy retry_policy;
+
   // Concurrent requests
   std::size_t max_concurrent_requests = 64;
 
@@ -107,6 +110,10 @@ struct OtlpHttpClientOptions
       bool input_console_debug,
       std::chrono::system_clock::duration input_timeout,
       const OtlpHeaders &input_http_headers,
+      std::uint32_t input_retry_policy_max_attempts,
+      std::chrono::duration<float> input_retry_policy_initial_backoff,
+      std::chrono::duration<float> input_retry_policy_max_backoff,
+      float input_retry_policy_backoff_multiplier,
       const std::shared_ptr<sdk::common::ThreadInstrumentation> &input_thread_instrumentation,
       std::size_t input_concurrent_sessions         = 64,
       std::size_t input_max_requests_per_connection = 8,
@@ -131,6 +138,8 @@ struct OtlpHttpClientOptions
         console_debug(input_console_debug),
         timeout(input_timeout),
         http_headers(input_http_headers),
+        retry_policy{input_retry_policy_max_attempts, input_retry_policy_initial_backoff,
+                     input_retry_policy_max_backoff, input_retry_policy_backoff_multiplier},
         max_concurrent_requests(input_concurrent_sessions),
         max_requests_per_connection(input_max_requests_per_connection),
         user_agent(input_user_agent),
