@@ -103,7 +103,7 @@ public:
     OtlpMockTraceServiceStub *stub_;
   };
 
-  async_interface_base *async() { return &async_interface_; }
+  async_interface_base *async() override { return &async_interface_; }
   async_interface_base *experimental_async() { return &async_interface_; }
 
   ::grpc::Status GetLastAsyncStatus() const noexcept { return last_async_status_; }
