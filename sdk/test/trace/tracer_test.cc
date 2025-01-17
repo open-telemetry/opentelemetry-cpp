@@ -25,6 +25,8 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
@@ -37,8 +39,10 @@
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/trace/context.h"
+#include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
@@ -50,8 +54,11 @@
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/trace/tracer.h"
 
+#include <src/trace/span.h>
+
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;
+using namespace opentelemetry::sdk::instrumentationscope;
 using opentelemetry::common::SteadyTimestamp;
 using opentelemetry::common::SystemTimestamp;
 namespace nostd     = opentelemetry::nostd;
@@ -103,7 +110,7 @@ public:
 };
 
 /**
- * A Mock Custom Id Generator
+ * A Mock Custom ID Generator
  */
 class MockIdGenerator : public IdGenerator
 {
@@ -138,16 +145,20 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     std::unique_ptr<SpanExporter> &&exporter,
     // For testing, just shove a pointer over, we'll take it over.
     Sampler *sampler,
-    IdGenerator *id_generator = new RandomIdGenerator)
+    IdGenerator *id_generator = new RandomIdGenerator,
+    const ScopeConfigurator<TracerConfig> &tracer_configurator =
+        ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default()).Build(),
+    std::unique_ptr<InstrumentationScope> scope = InstrumentationScope::Create(""))
 {
   auto processor = std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(std::move(exporter)));
   std::vector<std::unique_ptr<SpanProcessor>> processors;
   processors.push_back(std::move(processor));
   auto resource = Resource::Create({});
-  auto context  = std::make_shared<TracerContext>(std::move(processors), resource,
-                                                  std::unique_ptr<Sampler>(sampler),
-                                                  std::unique_ptr<IdGenerator>(id_generator));
-  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
+  auto context  = std::make_shared<TracerContext>(
+      std::move(processors), resource, std::unique_ptr<Sampler>(sampler),
+      std::unique_ptr<IdGenerator>(id_generator),
+      std::make_unique<ScopeConfigurator<TracerConfig>>(tracer_configurator));
+  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context, std::move(scope)));
 }
 
 }  // namespace
@@ -482,6 +493,137 @@ TEST(Tracer, SpanSetEvents)
   ASSERT_EQ(0, span_data_events[0].GetAttributes().size());
   ASSERT_EQ(0, span_data_events[1].GetAttributes().size());
   ASSERT_EQ(1, span_data_events[2].GetAttributes().size());
+}
+
+TEST(Tracer, StartSpanWithDisabledConfig)
+{
+#ifdef OPENTELEMETRY_RTTI_ENABLED
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  ScopeConfigurator<TracerConfig> disable_tracer =
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Disabled()).Build();
+  auto tracer    = initTracer(std::unique_ptr<SpanExporter>{exporter}, new AlwaysOnSampler(),
+                              new RandomIdGenerator(), disable_tracer);
+  auto span      = tracer->StartSpan("span 1");
+  auto &span_ref = *span.get();
+
+  EXPECT_NE(typeid(span_ref), typeid(trace_api::Span));
+  EXPECT_EQ(typeid(span_ref), typeid(trace_api::NoopSpan));
+#else
+  GTEST_SKIP() << "cannot use 'typeid' with '-fno-rtti'";
+#endif
+}
+
+TEST(Tracer, StartSpanWithEnabledConfig)
+{
+#ifdef OPENTELEMETRY_RTTI_ENABLED
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  ScopeConfigurator<TracerConfig> enable_tracer =
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Enabled()).Build();
+  auto tracer    = initTracer(std::unique_ptr<SpanExporter>{exporter}, new AlwaysOnSampler(),
+                              new RandomIdGenerator(), enable_tracer);
+  auto span      = tracer->StartSpan("span 1");
+  auto &span_ref = *span.get();
+
+  EXPECT_EQ(typeid(span_ref), typeid(Span));
+#else
+  GTEST_SKIP() << "cannot use 'typeid' with '-fno-rtti'";
+#endif
+}
+
+TEST(Tracer, StartSpanWithCustomConfig)
+{
+#ifdef OPENTELEMETRY_RTTI_ENABLED
+  auto check_if_version_present = [](const InstrumentationScope &scope_info) {
+    return !scope_info.GetVersion().empty();
+  };
+  ScopeConfigurator<TracerConfig> custom_configurator =
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Enabled())
+          .AddCondition(check_if_version_present, TracerConfig::Enabled())
+          .AddConditionNameEquals("foo_library", TracerConfig::Disabled())
+          .AddConditionNameEquals("", TracerConfig::Disabled())
+          .Build();
+
+  const auto tracer_default_scope =
+      initTracer(std::unique_ptr<SpanExporter>{new InMemorySpanExporter()}, new AlwaysOnSampler(),
+                 new RandomIdGenerator(), custom_configurator);
+  const auto span_default_scope      = tracer_default_scope->StartSpan("span 1");
+  const auto &span_default_scope_ref = *span_default_scope.get();
+  EXPECT_EQ(typeid(span_default_scope_ref), typeid(trace_api::NoopSpan));
+
+  auto foo_scope = InstrumentationScope::Create("foo_library");
+  const auto tracer_foo_scope =
+      initTracer(std::unique_ptr<SpanExporter>{new InMemorySpanExporter()}, new AlwaysOnSampler(),
+                 new RandomIdGenerator(), custom_configurator, std::move(foo_scope));
+  const auto span_foo_scope = tracer_foo_scope->StartSpan("span 1");
+  auto &span_foo_scope_ref  = *span_foo_scope.get();
+  EXPECT_EQ(typeid(span_foo_scope_ref), typeid(trace_api::NoopSpan));
+
+  auto foo_scope_with_version = InstrumentationScope::Create("foo_library", "1.0.0");
+  const auto tracer_foo_scope_with_version =
+      initTracer(std::unique_ptr<SpanExporter>{new InMemorySpanExporter()}, new AlwaysOnSampler(),
+                 new RandomIdGenerator(), custom_configurator, std::move(foo_scope_with_version));
+  const auto span_foo_scope_with_version = tracer_foo_scope_with_version->StartSpan("span 1");
+  auto &span_foo_scope_with_version_ref  = *span_foo_scope_with_version.get();
+  EXPECT_EQ(typeid(span_foo_scope_with_version_ref), typeid(opentelemetry::sdk::trace::Span));
+
+  auto bar_scope = InstrumentationScope::Create("bar_library");
+  auto tracer_bar_scope =
+      initTracer(std::unique_ptr<SpanExporter>{new InMemorySpanExporter()}, new AlwaysOnSampler(),
+                 new RandomIdGenerator(), custom_configurator, std::move(bar_scope));
+  auto span_bar_scope      = tracer_bar_scope->StartSpan("span 1");
+  auto &span_bar_scope_ref = *span_bar_scope.get();
+  EXPECT_EQ(typeid(span_bar_scope_ref), typeid(opentelemetry::sdk::trace::Span));
+#else
+  GTEST_SKIP() << "cannot use 'typeid' with '-fno-rtti'";
+#endif
+}
+
+TEST(Tracer, StartSpanWithCustomConfigDifferingConditionOrder)
+{
+#ifdef OPENTELEMETRY_RTTI_ENABLED
+  auto check_if_version_present = [](const InstrumentationScope &scope_info) {
+    return !scope_info.GetVersion().empty();
+  };
+
+  // 2 configurators with same conditions, but different order
+  ScopeConfigurator<TracerConfig> custom_configurator_1 =
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Enabled())
+          .AddCondition(check_if_version_present, TracerConfig::Enabled())
+          .AddConditionNameEquals("foo_library", TracerConfig::Disabled())
+          .Build();
+  ScopeConfigurator<TracerConfig> custom_configurator_2 =
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Enabled())
+          .AddConditionNameEquals("foo_library", TracerConfig::Disabled())
+          .AddCondition(check_if_version_present, TracerConfig::Enabled())
+          .Build();
+
+  auto foo_scope_with_version_1 = InstrumentationScope::Create("foo_library", "1.0.0");
+  auto foo_scope_with_version_2 = InstrumentationScope::Create("foo_library", "1.0.0");
+
+  const auto tracer_foo_scope_with_version_1 = initTracer(
+      std::unique_ptr<SpanExporter>{new InMemorySpanExporter()}, new AlwaysOnSampler(),
+      new RandomIdGenerator(), custom_configurator_1, std::move(foo_scope_with_version_1));
+
+  const auto tracer_foo_scope_with_version_2 = initTracer(
+      std::unique_ptr<SpanExporter>{new InMemorySpanExporter()}, new AlwaysOnSampler(),
+      new RandomIdGenerator(), custom_configurator_2, std::move(foo_scope_with_version_2));
+
+  // Custom configurator 1 evaluates version first and enables the tracer
+  const auto span_foo_scope_with_version_1 = tracer_foo_scope_with_version_1->StartSpan("span 1");
+  auto &span_foo_scope_with_version_ref_1  = *span_foo_scope_with_version_1.get();
+  EXPECT_EQ(typeid(span_foo_scope_with_version_ref_1), typeid(opentelemetry::sdk::trace::Span));
+
+  // Custom configurator 2 evaluates the name first and therefore disables the tracer without
+  // evaluating other condition
+  const auto span_foo_scope_with_version_2 = tracer_foo_scope_with_version_2->StartSpan("span 1");
+  auto &span_foo_scope_with_version_ref_2  = *span_foo_scope_with_version_2.get();
+  EXPECT_EQ(typeid(span_foo_scope_with_version_ref_2), typeid(trace_api::NoopSpan));
+
+#else
+  GTEST_SKIP() << "cannot use 'typeid' with '-fno-rtti'";
+#endif
 }
 
 TEST(Tracer, SpanSetLinks)

@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add tracer scope configurator
+  [#3137](https://github.com/open-telemetry/opentelemetry-cpp/pull/3137)
+
 * [SDK] Do not frequently create and destroy http client threads
   [#3198](https://github.com/open-telemetry/opentelemetry-cpp/pull/3198)
 
