@@ -12,7 +12,7 @@ set_target_properties(opentelemetry_api PROPERTIES EXPORT_NAME api)
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS opentelemetry_api
-    EXPORT "${PROJECT_NAME}-target"
+    EXPORT "${PROJECT_NAME}-api-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -22,6 +22,12 @@ if(OPENTELEMETRY_INSTALL)
     DESTINATION include
     FILES_MATCHING
     PATTERN "*.h")
+
+  install(
+    EXPORT "${PROJECT_NAME}-api-target"
+    FILE "${PROJECT_NAME}-api-target.cmake"
+    NAMESPACE "${PROJECT_NAME}::"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
   unset(TARGET_DEPS)
 endif()

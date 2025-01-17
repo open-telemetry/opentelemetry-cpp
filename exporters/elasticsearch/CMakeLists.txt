@@ -21,7 +21,7 @@ target_link_libraries(
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS opentelemetry_exporter_elasticsearch_logs
-    EXPORT "${PROJECT_NAME}-target"
+    EXPORT "${PROJECT_NAME}-exporters_elasticsearch-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -32,6 +32,13 @@ if(OPENTELEMETRY_INSTALL)
     FILES_MATCHING
     PATTERN "*.h"
     PATTERN "es_log_recordable.h" EXCLUDE)
+
+  install(
+    EXPORT "${PROJECT_NAME}-exporters_elasticsearch-target"
+    FILE "${PROJECT_NAME}-exporters_elasticsearch-target.cmake"
+    NAMESPACE "${PROJECT_NAME}::"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+
 endif()
 
 if(BUILD_TESTING)
