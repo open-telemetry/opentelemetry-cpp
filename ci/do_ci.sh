@@ -120,6 +120,7 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
         -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
@@ -142,6 +143,7 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
         -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
@@ -165,6 +167,7 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
         -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         "${SRC_DIR}"
   make -k -j $(nproc)
@@ -189,6 +192,7 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
         -DWITH_ABI_VERSION_1=OFF \
         -DWITH_ABI_VERSION_2=ON \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
         -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
