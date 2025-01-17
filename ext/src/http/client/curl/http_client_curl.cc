@@ -9,6 +9,7 @@
 #include <chrono>
 #include <cstdint>
 #include <cstring>
+#include <deque>
 #include <functional>
 #include <list>
 #include <mutex>
@@ -25,6 +26,7 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
@@ -197,10 +199,11 @@ void Session::SendRequest(
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
   }
 
-  curl_operation_.reset(new HttpOperation(
-      http_request_->method_, url, http_request_->ssl_options_, callback_ptr,
-      http_request_->headers_, http_request_->body_, http_request_->compression_, false,
-      http_request_->timeout_ms_, reuse_connection, http_request_->is_log_enabled_));
+  curl_operation_.reset(
+      new HttpOperation(http_request_->method_, url, http_request_->ssl_options_, callback_ptr,
+                        http_request_->headers_, http_request_->body_, http_request_->compression_,
+                        false, http_request_->timeout_ms_, reuse_connection,
+                        http_request_->is_log_enabled_, http_request_->retry_policy_));
   bool success =
       CURLE_OK == curl_operation_->SendAsync(this, [this, callback](HttpOperation &operation) {
         if (operation.WasAborted())
@@ -223,8 +226,8 @@ void Session::SendRequest(
 
   if (success)
   {
-    // We will try to create a background to poll events.But when the background is running, we will
-    // reuse it instead of creating a new one.
+    // We will try to create a background to poll events. But when the background is running, we
+    // will reuse it instead of creating a new one.
     http_client_.MaybeSpawnBackgroundThread();
   }
   else
@@ -269,6 +272,18 @@ HttpClient::HttpClient()
     : multi_handle_(curl_multi_init()),
       next_session_id_{0},
       max_sessions_per_connection_{8},
+      background_thread_instrumentation_(nullptr),
+      scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
+      background_thread_wait_for_{std::chrono::minutes{1}},
+      curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
+{}
+
+HttpClient::HttpClient(
+    const std::shared_ptr<sdk::common::ThreadInstrumentation> &thread_instrumentation)
+    : multi_handle_(curl_multi_init()),
+      next_session_id_{0},
+      max_sessions_per_connection_{8},
+      background_thread_instrumentation_(thread_instrumentation),
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
       background_thread_wait_for_{std::chrono::minutes{1}},
       curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
@@ -320,7 +335,7 @@ std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSes
   std::lock_guard<std::mutex> lock_guard{sessions_m_};
   sessions_.insert({session_id, session});
 
-  // FIXME: Session may leak if it do not call SendRequest
+  // FIXME: Session may leak if it does not call SendRequest
   return session;
 }
 
@@ -429,16 +444,21 @@ bool HttpClient::MaybeSpawnBackgroundThread()
 
   background_thread_.reset(new std::thread(
       [](HttpClient *self) {
-        int still_running = 1;
-        std::chrono::system_clock::time_point last_free_job_timepoint =
-            std::chrono::system_clock::now();
-        bool need_wait_more = false;
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+        if (self->background_thread_instrumentation_ != nullptr)
+        {
+          self->background_thread_instrumentation_->OnStart();
+        }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
+        auto still_running           = 1;
+        auto last_free_job_timepoint = std::chrono::system_clock::now();
+        auto need_wait_more          = false;
         while (true)
         {
-          CURLMsg *msg;
-          int queued;
+          CURLMsg *msg = nullptr;
+          int queued   = 0;
           CURLMcode mc = curl_multi_perform(self->multi_handle_, &still_running);
-
           // According to https://curl.se/libcurl/c/curl_multi_perform.html, when mc is not OK, we
           // can not curl_multi_perform it again
           if (mc != CURLM_OK)
@@ -447,7 +467,14 @@ bool HttpClient::MaybeSpawnBackgroundThread()
           }
           else if (still_running || need_wait_more)
           {
-        // curl_multi_poll is added from libcurl 7.66.0, before 7.68.0, we can only wait util
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+            if (self->background_thread_instrumentation_ != nullptr)
+            {
+              self->background_thread_instrumentation_->BeforeWait();
+            }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
+        // curl_multi_poll is added from libcurl 7.66.0, before 7.68.0, we can only wait until
         // timeout to do the rest jobs
 #if LIBCURL_VERSION_NUM >= 0x074200
             /* wait for activity, timeout or "nothing" */
@@ -459,6 +486,13 @@ bool HttpClient::MaybeSpawnBackgroundThread()
                                  static_cast<int>(self->scheduled_delay_milliseconds_.count()),
                                  nullptr);
 #endif
+
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+            if (self->background_thread_instrumentation_ != nullptr)
+            {
+              self->background_thread_instrumentation_->AfterWait();
+            }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
           }
 
           do
@@ -475,13 +509,20 @@ bool HttpClient::MaybeSpawnBackgroundThread()
               CURLcode result   = msg->data.result;
               Session *session  = nullptr;
               curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &session);
-              // If it's already moved into pending_to_remove_session_handles_, we just ingore this
+              const auto operation = (nullptr != session) ? session->GetOperation().get() : nullptr;
+
+              // If it's already moved into pending_to_remove_session_handles_, we just ignore this
               // message.
-              if (nullptr != session && session->GetOperation())
+              if (operation)
               {
                 // Session can not be destroyed when calling PerformCurlMessage
                 auto hold_session = session->shared_from_this();
-                session->GetOperation()->PerformCurlMessage(result);
+                operation->PerformCurlMessage(result);
+
+                if (operation->IsRetryable())
+                {
+                  self->pending_to_retry_sessions_.push_back(hold_session);
+                }
               }
             }
           } while (true);
@@ -500,6 +541,12 @@ bool HttpClient::MaybeSpawnBackgroundThread()
 
           // Add all pending easy handles
           if (self->doAddSessions())
+          {
+            still_running = 1;
+          }
+
+          // Check if pending easy handles can be retried
+          if (self->doRetrySessions(false))
           {
             still_running = 1;
           }
@@ -554,9 +601,22 @@ bool HttpClient::MaybeSpawnBackgroundThread()
               still_running = 1;
             }
 
+            // Check if pending easy handles can be retried
+            if (self->doRetrySessions(true))
+            {
+              still_running = 1;
+            }
+
             // If there is no pending jobs, we can stop the background thread.
             if (still_running == 0)
             {
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+              if (self->background_thread_instrumentation_ != nullptr)
+              {
+                self->background_thread_instrumentation_->OnEnd();
+              }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
               if (self->background_thread_)
               {
                 self->background_thread_->detach();
@@ -769,6 +829,50 @@ bool HttpClient::doRemoveSessions()
 
   return has_data;
 }
+
+#ifdef ENABLE_OTLP_RETRY_PREVIEW
+bool HttpClient::doRetrySessions(bool report_all)
+{
+  const auto now = std::chrono::system_clock::now();
+  auto has_data  = false;
+
+  // Assumptions:
+  // - This is a FIFO list so older sessions, pushed at the back, always end up at the front
+  // - Locking not required because only the background thread would be pushing to this container
+  // - Retry policy is not changed once HTTP client is initialized, so same settings for everyone
+  for (auto retry_it = pending_to_retry_sessions_.cbegin();
+       retry_it != pending_to_retry_sessions_.cend();)
+  {
+    const auto session   = *retry_it;
+    const auto operation = session ? session->GetOperation().get() : nullptr;
+
+    if (!operation)
+    {
+      retry_it = pending_to_retry_sessions_.erase(retry_it);
+    }
+    else if (operation->NextRetryTime() < now)
+    {
+      auto easy_handle = operation->GetCurlEasyHandle();
+      curl_multi_remove_handle(multi_handle_, easy_handle);
+      curl_multi_add_handle(multi_handle_, easy_handle);
+      retry_it = pending_to_retry_sessions_.erase(retry_it);
+      has_data = true;
+    }
+    else
+    {
+      break;
+    }
+  }
+
+  report_all = report_all && !pending_to_retry_sessions_.empty();
+  return has_data || report_all;
+}
+#else
+bool HttpClient::doRetrySessions(bool /* report_all */)
+{
+  return false;
+}
+#endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 void HttpClient::resetMultiHandle()
 {

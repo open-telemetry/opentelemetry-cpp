@@ -25,6 +25,9 @@
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
+#  include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
+
 #  include "opentelemetry/sdk/trace/simple_processor.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/trace/provider.h"
@@ -50,10 +53,32 @@ class OtlpGrpcMetricExporterTestPeer : public ::testing::Test
 {
 public:
   std::unique_ptr<sdk::metrics::PushMetricExporter> GetExporter(
-      std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> &stub_interface)
+      const OtlpGrpcMetricExporterOptions &options)
+  {
+    return std::unique_ptr<sdk::metrics::PushMetricExporter>(new OtlpGrpcMetricExporter(options));
+  }
+
+  std::unique_ptr<sdk::metrics::PushMetricExporter> GetExporter(
+      std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub_interface)
   {
     return std::unique_ptr<sdk::metrics::PushMetricExporter>(
         new OtlpGrpcMetricExporter(std::move(stub_interface)));
+  }
+
+  std::unique_ptr<sdk::metrics::PushMetricExporter> GetExporter(
+      std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub_interface,
+      std::shared_ptr<OtlpGrpcClient> client)
+  {
+    return std::unique_ptr<sdk::metrics::PushMetricExporter>(
+        new OtlpGrpcMetricExporter(std::move(stub_interface), std::move(client)));
+  }
+
+  std::unique_ptr<sdk::metrics::PushMetricExporter> GetExporter(
+      const OtlpGrpcMetricExporterOptions &options,
+      std::shared_ptr<OtlpGrpcClient> client)
+  {
+    return std::unique_ptr<sdk::metrics::PushMetricExporter>(
+        new OtlpGrpcMetricExporter(options, std::move(client)));
   }
 
   // Get the options associated with the given exporter.
@@ -245,6 +270,35 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
 }
 #  endif  // NO_GETENV
+
+TEST_F(OtlpGrpcMetricExporterTestPeer, CheckGetAggregationTemporality)
+{
+  auto options                    = OtlpGrpcMetricExporterOptions();
+  options.aggregation_temporality = PreferredAggregationTemporality::kCumulative;
+
+  auto client = OtlpGrpcClientFactory::Create(options);
+
+  auto exporter0 = GetExporter(options);
+  auto exporter1 = GetExporter(client->MakeMetricsServiceStub());
+  auto exporter2 = GetExporter(options, client);
+  auto exporter3 = GetExporter(client->MakeMetricsServiceStub(), client);
+
+  EXPECT_EQ(
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+      exporter0->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kCounter));
+
+  EXPECT_EQ(
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+      exporter1->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kCounter));
+
+  EXPECT_EQ(
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+      exporter2->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kCounter));
+
+  EXPECT_EQ(
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+      exporter3->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kCounter));
+}
 
 }  // namespace otlp
 }  // namespace exporter

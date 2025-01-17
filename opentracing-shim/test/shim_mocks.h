@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include <tuple>
+#include <unordered_map>
+
+#include "opentracing/propagation.h"
+
 #include "opentelemetry/baggage/baggage_context.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/trace/span.h"
@@ -12,10 +17,6 @@
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
-#include "opentracing/propagation.h"
-
-#include <tuple>
-#include <unordered_map>
 
 namespace trace_api = opentelemetry::trace;
 namespace baggage   = opentelemetry::baggage;
