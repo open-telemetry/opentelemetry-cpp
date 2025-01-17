@@ -546,7 +546,7 @@ bool HttpClient::MaybeSpawnBackgroundThread()
           }
 
           // Check if pending easy handles can be retried
-          if (self->doRetrySessions())
+          if (self->doRetrySessions(false))
           {
             still_running = 1;
           }
@@ -602,7 +602,7 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             }
 
             // Check if pending easy handles can be retried
-            if (self->doRetrySessions())
+            if (self->doRetrySessions(true))
             {
               still_running = 1;
             }
@@ -830,7 +830,7 @@ bool HttpClient::doRemoveSessions()
   return has_data;
 }
 
-bool HttpClient::doRetrySessions()
+bool HttpClient::doRetrySessions(bool report_all)
 {
   const auto now = std::chrono::system_clock::now();
   auto has_data  = false;
@@ -863,7 +863,7 @@ bool HttpClient::doRetrySessions()
     }
   }
 
-  return has_data;
+  return report_all ? !pending_to_retry_sessions_.empty() : has_data;
 }
 
 void HttpClient::resetMultiHandle()

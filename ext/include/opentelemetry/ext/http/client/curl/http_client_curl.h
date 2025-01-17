@@ -348,7 +348,7 @@ private:
   bool doAddSessions();
   bool doAbortSessions();
   bool doRemoveSessions();
-  bool doRetrySessions();
+  bool doRetrySessions(bool report_all);
   void resetMultiHandle();
 
   std::mutex multi_handle_m_;
