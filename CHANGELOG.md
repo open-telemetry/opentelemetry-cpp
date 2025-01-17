@@ -96,7 +96,6 @@ New features:
     as well as the thread instrumentation interface,
     may change without notice before this feature is declared stable.
 
-
 ## [1.18 2024-11-25]
 
 * [EXPORTER] Fix crash in ElasticsearchLogRecordExporter
