@@ -69,7 +69,7 @@ public:
   public:
     async_interface(OtlpMockTraceServiceStub *owner) : stub_(owner) {}
 
-    virtual ~async_interface() {}
+    virtual ~async_interface() override = default;
 
     void Export(
         ::grpc::ClientContext *context,
@@ -132,7 +132,7 @@ public:
   public:
     async_interface(OtlpMockLogsServiceStub *owner) : stub_(owner) {}
 
-    virtual ~async_interface() {}
+    virtual ~async_interface() override = default;
 
     void Export(
         ::grpc::ClientContext *context,
