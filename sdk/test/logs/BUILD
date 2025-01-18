@@ -18,6 +18,22 @@ cc_test(
 )
 
 cc_test(
+    name = "logger_provider_set_test",
+    srcs = [
+        "logger_provider_set_test.cc",
+    ],
+    tags = [
+        "logs",
+        "test",
+    ],
+    deps = [
+        "//api",
+        "//sdk/src/logs",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "logger_sdk_test",
     srcs = [
         "logger_sdk_test.cc",

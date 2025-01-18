@@ -19,6 +19,7 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/provider.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector_factory.h"
@@ -114,13 +115,13 @@ void InitMetrics(const std::string &name)
 
   std::shared_ptr<opentelemetry::metrics::MeterProvider> api_provider(std::move(provider));
 
-  metrics_api::Provider::SetMeterProvider(api_provider);
+  metrics_sdk::Provider::SetMeterProvider(api_provider);
 }
 
 void CleanupMetrics()
 {
   std::shared_ptr<metrics_api::MeterProvider> none;
-  metrics_api::Provider::SetMeterProvider(none);
+  metrics_sdk::Provider::SetMeterProvider(none);
 }
 }  // namespace
 

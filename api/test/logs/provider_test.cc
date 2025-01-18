@@ -40,6 +40,7 @@ TEST(Provider, GetLoggerProviderDefault)
   EXPECT_NE(nullptr, tf);
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
 TEST(Provider, SetLoggerProvider)
 {
   auto tf = shared_ptr<LoggerProvider>(new TestProvider());
@@ -56,6 +57,7 @@ TEST(Provider, MultipleLoggerProviders)
 
   ASSERT_NE(Provider::GetLoggerProvider(), tf);
 }
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 TEST(Provider, GetLogger)
 {
@@ -88,6 +90,7 @@ TEST(Provider, GetEventLoggerProviderDefault)
   EXPECT_NE(nullptr, tf);
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
 TEST(Provider, SetEventLoggerProvider)
 {
   auto tf = nostd::shared_ptr<EventLoggerProvider>(new TestEventLoggerProvider());
@@ -104,6 +107,7 @@ TEST(Provider, MultipleEventLoggerProviders)
 
   ASSERT_NE(Provider::GetEventLoggerProvider(), tf);
 }
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 TEST(Provider, CreateEventLogger)
 {

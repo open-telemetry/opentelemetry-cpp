@@ -25,6 +25,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
@@ -97,7 +98,7 @@ void initTracer()
   auto provider = nostd::shared_ptr<trace_api::TracerProvider>(
       new trace_sdk::TracerProvider(std::move(context)));
   // Set the global trace provider
-  trace_api::Provider::SetTracerProvider(provider);
+  trace_sdk::Provider::SetTracerProvider(provider);
 }
 
 nostd::shared_ptr<trace_api::Tracer> get_tracer()

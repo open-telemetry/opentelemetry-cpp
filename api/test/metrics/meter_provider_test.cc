@@ -17,6 +17,7 @@ TEST(Provider, GetMeterProviderDefault)
   EXPECT_NE(nullptr, tf);
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
 TEST(Provider, SetMeterProvider)
 {
   auto tf = opentelemetry::nostd::shared_ptr<MeterProvider>(new NoopMeterProvider());
@@ -33,3 +34,4 @@ TEST(Provider, MultipleMeterProviders)
 
   ASSERT_NE(Provider::GetMeterProvider(), tf);
 }
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */

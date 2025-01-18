@@ -20,6 +20,7 @@
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/provider.h"
@@ -325,11 +326,11 @@ void setup_otel()
   std::shared_ptr<opentelemetry::trace::TracerProvider> provider = MyTracerProvider::Create();
 
   // The whole point of this test is to make sure
-  // that the API singleton behind SetTracerProvider()
+  // that the API singleton behind GetTracerProvider()
   // works for all components, static and dynamic.
 
   // Set the global tracer provider
-  trace_api::Provider::SetTracerProvider(provider);
+  opentelemetry::sdk::trace::Provider::SetTracerProvider(provider);
 }
 
 void cleanup_otel()
@@ -338,7 +339,7 @@ void cleanup_otel()
       new opentelemetry::trace::NoopTracerProvider());
 
   // Set the global tracer provider
-  trace_api::Provider::SetTracerProvider(provider);
+  opentelemetry::sdk::trace::Provider::SetTracerProvider(provider);
 }
 
 // TODO: Remove once windows api singletons are supported.

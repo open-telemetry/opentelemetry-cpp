@@ -34,6 +34,18 @@ cc_library(
 )
 
 cc_library(
+    name = "disabled",
+    srcs = [
+        "disabled.cc",
+    ],
+    include_prefix = "src/common",
+    deps = [
+        "//api",
+        "//sdk:headers",
+    ],
+)
+
+cc_library(
     name = "env_variables",
     srcs = [
         "env_variables.cc",
