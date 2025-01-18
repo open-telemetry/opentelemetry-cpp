@@ -47,19 +47,6 @@ public:
     return nostd::shared_ptr<LoggerProvider>(GetProvider());
   }
 
-#if OPENTELEMETRY_ABI_VERSION_NO == 1
-
-  /**
-   * Changes the singleton LoggerProvider.
-   */
-  static void SetLoggerProvider(const nostd::shared_ptr<LoggerProvider> &tp) noexcept
-  {
-    std::lock_guard<common::SpinLockMutex> guard(GetLock());
-    GetProvider() = tp;
-  }
-
-#endif /* OPENTELEMETRY_ABI_VERSION_NO */
-
   /**
    * Returns the singleton EventLoggerProvider.
    *
@@ -72,7 +59,18 @@ public:
     return nostd::shared_ptr<EventLoggerProvider>(GetEventProvider());
   }
 
-#if OPENTELEMETRY_ABI_VERSION_NO == 1
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+private:
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
+
+  /**
+   * Changes the singleton LoggerProvider.
+   */
+  static void SetLoggerProvider(const nostd::shared_ptr<LoggerProvider> &tp) noexcept
+  {
+    std::lock_guard<common::SpinLockMutex> guard(GetLock());
+    GetProvider() = tp;
+  }
 
   /**
    * Changes the singleton EventLoggerProvider.
@@ -82,8 +80,6 @@ public:
     std::lock_guard<common::SpinLockMutex> guard(GetLock());
     GetEventProvider() = tp;
   }
-
-#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 private:
   /* The SDK is allowed to change the singleton in the API. */

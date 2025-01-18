@@ -22,9 +22,7 @@ void Provider::SetTracerProvider(
 
   if (!disabled)
   {
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(
-        opentelemetry::trace::Provider::GetLock());
-    opentelemetry::trace::Provider::GetProvider() = tp;
+    opentelemetry::trace::Provider::SetTracerProvider(tp);
   }
 }
 

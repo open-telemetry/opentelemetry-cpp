@@ -23,9 +23,7 @@ void Provider::SetMeterProvider(
 
   if (!disabled)
   {
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(
-        opentelemetry::metrics::Provider::GetLock());
-    opentelemetry::metrics::Provider::GetProvider() = mp;
+    opentelemetry::metrics::Provider::SetMeterProvider(mp);
   }
 }
 

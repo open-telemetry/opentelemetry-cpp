@@ -24,9 +24,7 @@ void Provider::SetLoggerProvider(
 
   if (!disabled)
   {
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(
-        opentelemetry::logs::Provider::GetLock());
-    opentelemetry::logs::Provider::GetProvider() = lp;
+    opentelemetry::logs::Provider::SetLoggerProvider(lp);
   }
 }
 
@@ -37,9 +35,7 @@ void Provider::SetEventLoggerProvider(
 
   if (!disabled)
   {
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(
-        opentelemetry::logs::Provider::GetLock());
-    opentelemetry::logs::Provider::GetEventProvider() = lp;
+    opentelemetry::logs::Provider::SetEventLoggerProvider(lp);
   }
 }
 

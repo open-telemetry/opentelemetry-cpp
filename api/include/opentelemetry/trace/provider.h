@@ -44,7 +44,9 @@ public:
     return nostd::shared_ptr<TracerProvider>(GetProvider());
   }
 
-#if OPENTELEMETRY_ABI_VERSION_NO == 1
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+private:
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
   /**
    * Changes the singleton TracerProvider.
@@ -54,8 +56,6 @@ public:
     std::lock_guard<common::SpinLockMutex> guard(GetLock());
     GetProvider() = tp;
   }
-
-#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 private:
   /* The SDK is allowed to change the singleton in the API. */

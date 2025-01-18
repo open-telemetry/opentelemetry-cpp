@@ -23,6 +23,9 @@ AddMetricReader@MeterContext@metrics@sdk@v1@opentelemetry
 AddMetricReader@MeterProvider@metrics@sdk@v1@opentelemetry
 MeterProvider@metrics@sdk@v1@opentelemetry
 AddView@MeterProvider@metrics@sdk@v1@opentelemetry
+Provider@trace@sdk@v1@opentelemetry
+Provider@metrics@sdk@v1@opentelemetry
+Provider@logs@sdk@v1@opentelemetry
 
 #if defined(WITH_OTLP_GRPC) || defined(WITH_OTLP_HTTP)
 GetOtlpDefaultTracesTimeout@otlp@exporter@v1@opentelemetry
