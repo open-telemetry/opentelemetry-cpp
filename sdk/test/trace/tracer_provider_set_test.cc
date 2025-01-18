@@ -6,7 +6,9 @@
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/trace/provider.h"
+#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
 #if defined(_MSC_VER)
@@ -15,11 +17,12 @@ using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
 #endif
 
-using opentelemetry::trace::Provider;
 using opentelemetry::trace::Tracer;
 using opentelemetry::trace::TracerProvider;
 
-namespace nostd = opentelemetry::nostd;
+namespace nostd     = opentelemetry::nostd;
+namespace trace_api = opentelemetry::trace;
+namespace trace_sdk = opentelemetry::sdk::trace;
 
 class TestProvider : public TracerProvider
 {
@@ -50,8 +53,8 @@ TEST(Provider, SetTracerProviderDefault)
 #endif
 
   auto tf = nostd::shared_ptr<TracerProvider>(new TestProvider());
-  Provider::SetTracerProvider(tf);
-  ASSERT_EQ(tf, Provider::GetTracerProvider());
+  trace_sdk::Provider::SetTracerProvider(tf);
+  ASSERT_EQ(tf, trace_api::Provider::GetTracerProvider());
 }
 
 #ifndef NO_GETENV
@@ -60,8 +63,8 @@ TEST(Provider, SetTracerProviderEnabled)
   setenv("OTEL_SDK_DISABLED", "false", 1);
 
   auto tf = nostd::shared_ptr<TracerProvider>(new TestProvider());
-  Provider::SetTracerProvider(tf);
-  ASSERT_EQ(tf, Provider::GetTracerProvider());
+  trace_sdk::Provider::SetTracerProvider(tf);
+  ASSERT_EQ(tf, trace_api::Provider::GetTracerProvider());
 
   unsetenv("OTEL_SDK_DISABLED");
 }
@@ -71,8 +74,8 @@ TEST(Provider, SetTracerProviderDisabled)
   setenv("OTEL_SDK_DISABLED", "true", 1);
 
   auto tf = nostd::shared_ptr<TracerProvider>(new TestProvider());
-  Provider::SetTracerProvider(tf);
-  ASSERT_NE(tf, Provider::GetTracerProvider());
+  trace_sdk::Provider::SetTracerProvider(tf);
+  ASSERT_NE(tf, trace_api::Provider::GetTracerProvider());
 
   unsetenv("OTEL_SDK_DISABLED");
 }

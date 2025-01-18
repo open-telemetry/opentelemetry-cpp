@@ -11,23 +11,6 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace metrics
-{
-
-/*
- * Note:
- * This method is declared in the API namespace (for backward compatibility),
- * but part of the SDK.
- */
-void Provider::SetMeterProvider(const nostd::shared_ptr<MeterProvider> &mp) noexcept
-{
-  opentelemetry::sdk::metrics::Provider::SetMeterProvider(mp);
-}
-
-}  // namespace metrics
-OPENTELEMETRY_END_NAMESPACE
-
-OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics

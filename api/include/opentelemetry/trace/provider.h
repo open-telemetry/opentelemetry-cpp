@@ -11,17 +11,16 @@
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
-// The friend declaration is sufficient,
-// we do not want a API -> SDK dependency.
-// IWYU pragma: no_include "opentelemetry/sdk/trace/provider.h"
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace trace
 {
+// The forward declaration is sufficient,
+// we do not want a API -> SDK dependency.
+// IWYU pragma: no_include "opentelemetry/sdk/trace/provider.h"
 class Provider;  // IWYU pragma: keep
-}
+}  // namespace trace
 }  // namespace sdk
 
 namespace trace
@@ -45,15 +44,18 @@ public:
     return nostd::shared_ptr<TracerProvider>(GetProvider());
   }
 
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
+
   /**
    * Changes the singleton TracerProvider.
-   * While declared in the API class opentelemetry::trace::Provider,
-   * this method is actually part of the SDK, not API.
-   * An application **MUST** link with the opentelemetry-cpp SDK,
-   * to install a tracer provider, when configuring OpenTelemetry.
-   * An instrumented library does not need to invoke this method.
    */
-  static void SetTracerProvider(const nostd::shared_ptr<TracerProvider> &tp) noexcept;
+  static void SetTracerProvider(const nostd::shared_ptr<TracerProvider> &tp) noexcept
+  {
+    std::lock_guard<common::SpinLockMutex> guard(GetLock());
+    GetProvider() = tp;
+  }
+
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 private:
   /* The SDK is allowed to change the singleton in the API. */

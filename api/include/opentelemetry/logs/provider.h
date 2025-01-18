@@ -16,8 +16,11 @@ namespace sdk
 {
 namespace logs
 {
+// The forward declaration is sufficient,
+// we do not want a API -> SDK dependency.
+// IWYU pragma: no_include "opentelemetry/sdk/logs/provider.h"
 class Provider;
-}
+}  // namespace logs
 }  // namespace sdk
 
 namespace logs
@@ -44,15 +47,18 @@ public:
     return nostd::shared_ptr<LoggerProvider>(GetProvider());
   }
 
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
+
   /**
    * Changes the singleton LoggerProvider.
-   * While declared in the API class opentelemetry::logs::Provider,
-   * this method is actually part of the SDK, not API.
-   * An application **MUST** link with the opentelemetry-cpp SDK,
-   * to install a logs provider, when configuring OpenTelemetry.
-   * An instrumented library does not need to invoke this method.
    */
-  static void SetLoggerProvider(const nostd::shared_ptr<LoggerProvider> &lp) noexcept;
+  static void SetLoggerProvider(const nostd::shared_ptr<LoggerProvider> &tp) noexcept
+  {
+    std::lock_guard<common::SpinLockMutex> guard(GetLock());
+    GetProvider() = tp;
+  }
+
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
   /**
    * Returns the singleton EventLoggerProvider.
@@ -66,15 +72,18 @@ public:
     return nostd::shared_ptr<EventLoggerProvider>(GetEventProvider());
   }
 
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
+
   /**
    * Changes the singleton EventLoggerProvider.
-   * While declared in the API class opentelemetry::logs::Provider,
-   * this method is actually part of the SDK, not API.
-   * An application **MUST** link with the opentelemetry-cpp SDK,
-   * to install an event logs provider, when configuring OpenTelemetry.
-   * An instrumented library does not need to invoke this method.
    */
-  static void SetEventLoggerProvider(const nostd::shared_ptr<EventLoggerProvider> &lp) noexcept;
+  static void SetEventLoggerProvider(const nostd::shared_ptr<EventLoggerProvider> &tp) noexcept
+  {
+    std::lock_guard<common::SpinLockMutex> guard(GetLock());
+    GetEventProvider() = tp;
+  }
+
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 private:
   /* The SDK is allowed to change the singleton in the API. */

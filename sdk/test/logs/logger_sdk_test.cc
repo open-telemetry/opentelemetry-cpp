@@ -28,6 +28,7 @@
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/provider.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -43,6 +44,7 @@
 
 using namespace opentelemetry::sdk::logs;
 namespace logs_api = opentelemetry::logs;
+namespace logs_sdk = opentelemetry::sdk::logs;
 namespace nostd    = opentelemetry::nostd;
 
 TEST(LoggerSDK, LogToNullProcessor)
@@ -341,9 +343,9 @@ TEST(Logger, PushLoggerImplementation)
 {
   // Push the new loggerprovider class into the global singleton
   auto test_provider = nostd::shared_ptr<opentelemetry::logs::LoggerProvider>(new TestProvider());
-  opentelemetry::logs::Provider::SetLoggerProvider(test_provider);
+  logs_sdk::Provider::SetLoggerProvider(test_provider);
 
-  auto lp = opentelemetry::logs::Provider::GetLoggerProvider();
+  auto lp = logs_api::Provider::GetLoggerProvider();
 
   // Check that the implementation was pushed by calling TestLogger's GetName()
   nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};

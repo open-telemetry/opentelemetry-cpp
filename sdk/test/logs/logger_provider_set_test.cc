@@ -12,6 +12,7 @@
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/logs/provider.h"
 
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
@@ -25,7 +26,10 @@ using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
 using opentelemetry::logs::Provider;
 using opentelemetry::nostd::shared_ptr;
-namespace nostd = opentelemetry::nostd;
+
+namespace nostd    = opentelemetry::nostd;
+namespace logs_api = opentelemetry::logs;
+namespace logs_sdk = opentelemetry::sdk::logs;
 
 class TestProvider : public LoggerProvider
 {
@@ -47,8 +51,8 @@ TEST(Provider, SetLoggerProviderDefault)
 #endif
 
   auto tf = shared_ptr<LoggerProvider>(new TestProvider());
-  Provider::SetLoggerProvider(tf);
-  ASSERT_EQ(tf, Provider::GetLoggerProvider());
+  logs_sdk::Provider::SetLoggerProvider(tf);
+  ASSERT_EQ(tf, logs_api::Provider::GetLoggerProvider());
 }
 
 #ifndef NO_GETENV
@@ -57,8 +61,8 @@ TEST(Provider, SetLoggerProviderEnabled)
   setenv("OTEL_SDK_DISABLED", "false", 1);
 
   auto tf = shared_ptr<LoggerProvider>(new TestProvider());
-  Provider::SetLoggerProvider(tf);
-  ASSERT_EQ(tf, Provider::GetLoggerProvider());
+  logs_sdk::Provider::SetLoggerProvider(tf);
+  ASSERT_EQ(tf, logs_api::Provider::GetLoggerProvider());
 
   unsetenv("OTEL_SDK_DISABLED");
 }
@@ -68,8 +72,8 @@ TEST(Provider, SetLoggerProviderDisabled)
   setenv("OTEL_SDK_DISABLED", "true", 1);
 
   auto tf = shared_ptr<LoggerProvider>(new TestProvider());
-  Provider::SetLoggerProvider(tf);
-  ASSERT_NE(tf, Provider::GetLoggerProvider());
+  logs_sdk::Provider::SetLoggerProvider(tf);
+  ASSERT_NE(tf, logs_api::Provider::GetLoggerProvider());
 
   unsetenv("OTEL_SDK_DISABLED");
 }
@@ -78,11 +82,11 @@ TEST(Provider, SetLoggerProviderDisabled)
 TEST(Provider, MultipleLoggerProviders)
 {
   auto tf = shared_ptr<LoggerProvider>(new TestProvider());
-  Provider::SetLoggerProvider(tf);
+  logs_sdk::Provider::SetLoggerProvider(tf);
   auto tf2 = shared_ptr<LoggerProvider>(new TestProvider());
-  Provider::SetLoggerProvider(tf2);
+  logs_sdk::Provider::SetLoggerProvider(tf2);
 
-  ASSERT_NE(Provider::GetLoggerProvider(), tf);
+  ASSERT_NE(logs_api::Provider::GetLoggerProvider(), tf);
 }
 
 class TestEventLoggerProvider : public EventLoggerProvider
@@ -103,8 +107,8 @@ TEST(Provider, SetEventLoggerProviderDefault)
 #endif
 
   auto tf = nostd::shared_ptr<EventLoggerProvider>(new TestEventLoggerProvider());
-  Provider::SetEventLoggerProvider(tf);
-  ASSERT_EQ(tf, Provider::GetEventLoggerProvider());
+  logs_sdk::Provider::SetEventLoggerProvider(tf);
+  ASSERT_EQ(tf, logs_api::Provider::GetEventLoggerProvider());
 }
 
 #ifndef NO_GETENV
@@ -113,8 +117,8 @@ TEST(Provider, SetEventLoggerProviderEnabled)
   setenv("OTEL_SDK_DISABLED", "false", 1);
 
   auto tf = nostd::shared_ptr<EventLoggerProvider>(new TestEventLoggerProvider());
-  Provider::SetEventLoggerProvider(tf);
-  ASSERT_EQ(tf, Provider::GetEventLoggerProvider());
+  logs_sdk::Provider::SetEventLoggerProvider(tf);
+  ASSERT_EQ(tf, logs_api::Provider::GetEventLoggerProvider());
 
   unsetenv("OTEL_SDK_DISABLED");
 }
@@ -124,8 +128,8 @@ TEST(Provider, SetEventLoggerProviderDisabled)
   setenv("OTEL_SDK_DISABLED", "true", 1);
 
   auto tf = nostd::shared_ptr<EventLoggerProvider>(new TestEventLoggerProvider());
-  Provider::SetEventLoggerProvider(tf);
-  ASSERT_NE(tf, Provider::GetEventLoggerProvider());
+  logs_sdk::Provider::SetEventLoggerProvider(tf);
+  ASSERT_NE(tf, logs_api::Provider::GetEventLoggerProvider());
 
   unsetenv("OTEL_SDK_DISABLED");
 }
@@ -134,9 +138,9 @@ TEST(Provider, SetEventLoggerProviderDisabled)
 TEST(Provider, MultipleEventLoggerProviders)
 {
   auto tf = nostd::shared_ptr<EventLoggerProvider>(new TestEventLoggerProvider());
-  Provider::SetEventLoggerProvider(tf);
+  logs_sdk::Provider::SetEventLoggerProvider(tf);
   auto tf2 = nostd::shared_ptr<EventLoggerProvider>(new TestEventLoggerProvider());
-  Provider::SetEventLoggerProvider(tf2);
+  logs_sdk::Provider::SetEventLoggerProvider(tf2);
 
-  ASSERT_NE(Provider::GetEventLoggerProvider(), tf);
+  ASSERT_NE(logs_api::Provider::GetEventLoggerProvider(), tf);
 }

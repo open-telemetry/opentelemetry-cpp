@@ -12,28 +12,6 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace logs
-{
-
-/*
- * Note:
- * This method is declared in the API namespace (for backward compatibility),
- * but part of the SDK.
- */
-void Provider::SetLoggerProvider(const nostd::shared_ptr<LoggerProvider> &lp) noexcept
-{
-  opentelemetry::sdk::logs::Provider::SetLoggerProvider(lp);
-}
-
-void Provider::SetEventLoggerProvider(const nostd::shared_ptr<EventLoggerProvider> &lp) noexcept
-{
-  opentelemetry::sdk::logs::Provider::SetEventLoggerProvider(lp);
-}
-
-}  // namespace logs
-OPENTELEMETRY_END_NAMESPACE
-
-OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs

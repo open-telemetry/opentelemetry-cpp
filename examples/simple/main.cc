@@ -7,6 +7,7 @@
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
@@ -35,13 +36,13 @@ void InitTracer()
 
   // Set the global trace provider
   const std::shared_ptr<opentelemetry::trace::TracerProvider> &api_provider = sdk_provider;
-  trace_api::Provider::SetTracerProvider(api_provider);
+  trace_sdk::Provider::SetTracerProvider(api_provider);
 }
 
 void CleanupTracer()
 {
   std::shared_ptr<opentelemetry::trace::TracerProvider> noop;
-  trace_api::Provider::SetTracerProvider(noop);
+  trace_sdk::Provider::SetTracerProvider(noop);
 }
 }  // namespace
 

@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"
@@ -20,6 +21,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 
 using opentelemetry::logs::EventId;
 using opentelemetry::logs::Logger;
@@ -189,3 +191,47 @@ TEST(Logger, EventLogMethodOverloads)
   event_logger->EmitEvent("event name", Severity::kDebug,
                           opentelemetry::common::MakeAttributes(vec));
 }
+
+// Define a basic Logger class
+class TestLogger : public Logger
+{
+  const nostd::string_view GetName() noexcept override { return "test logger"; }
+
+  nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override
+  {
+    return nullptr;
+  }
+
+  using Logger::EmitLogRecord;
+
+  void EmitLogRecord(nostd::unique_ptr<opentelemetry::logs::LogRecord> &&) noexcept override {}
+};
+
+// Define a basic LoggerProvider class that returns an instance of the logger class defined above
+class TestProvider : public LoggerProvider
+{
+  nostd::shared_ptr<Logger> GetLogger(nostd::string_view /* logger_name */,
+                                      nostd::string_view /* library_name */,
+                                      nostd::string_view /* library_version */,
+                                      nostd::string_view /* schema_url */,
+                                      const common::KeyValueIterable & /* attributes */) override
+  {
+    return nostd::shared_ptr<Logger>(new TestLogger());
+  }
+};
+
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
+TEST(Logger, PushLoggerImplementation)
+{
+  // Push the new loggerprovider class into the global singleton
+  auto test_provider = shared_ptr<LoggerProvider>(new TestProvider());
+  Provider::SetLoggerProvider(test_provider);
+
+  auto lp = Provider::GetLoggerProvider();
+
+  // Check that the implementation was pushed by calling TestLogger's GetName()
+  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
+  ASSERT_EQ("test logger", logger->GetName());
+}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */

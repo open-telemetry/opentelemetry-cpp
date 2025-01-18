@@ -16,8 +16,11 @@ namespace sdk
 {
 namespace metrics
 {
+// The forward declaration is sufficient,
+// we do not want a API -> SDK dependency.
+// IWYU pragma: no_include "opentelemetry/sdk/metrics/provider.h"
 class Provider;  // IWYU pragma: keep
-}
+}  // namespace metrics
 }  // namespace sdk
 
 namespace metrics
@@ -43,15 +46,18 @@ public:
     return nostd::shared_ptr<MeterProvider>(GetProvider());
   }
 
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
+
   /**
    * Changes the singleton MeterProvider.
-   * While declared in the API class opentelemetry::metrics::Provider,
-   * this method is actually part of the SDK, not API.
-   * An application **MUST** link with the opentelemetry-cpp SDK,
-   * to install a metrics provider, when configuring OpenTelemetry.
-   * An instrumented library does not need to invoke this method.
    */
-  static void SetMeterProvider(const nostd::shared_ptr<MeterProvider> &mp) noexcept;
+  static void SetMeterProvider(const nostd::shared_ptr<MeterProvider> &tp) noexcept
+  {
+    std::lock_guard<common::SpinLockMutex> guard(GetLock());
+    GetProvider() = tp;
+  }
+
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 private:
   /* The SDK is allowed to change the singleton in the API. */

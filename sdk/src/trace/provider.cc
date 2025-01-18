@@ -10,24 +10,6 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace trace
-{
-
-/*
- * Note:
- * This method is declared in the API namespace (for backward compatibility),
- * but part of the SDK.
- */
-void Provider::SetTracerProvider(
-    const nostd::shared_ptr<opentelemetry::trace::TracerProvider> &tp) noexcept
-{
-  opentelemetry::sdk::trace::Provider::SetTracerProvider(tp);
-}
-
-}  // namespace trace
-OPENTELEMETRY_END_NAMESPACE
-
-OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace trace
