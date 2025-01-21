@@ -411,9 +411,9 @@ struct TestTraceService : public opentelemetry::proto::collector::trace::v1::Tra
   TestTraceService(std::vector<grpc::StatusCode> status_codes) : status_codes_(status_codes) {}
 
   inline grpc::Status Export(
-      grpc::ServerContext *context,
-      const opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest *request,
-      opentelemetry::proto::collector::trace::v1::ExportTraceServiceResponse *response) override
+      grpc::ServerContext *,
+      const opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest *,
+      opentelemetry::proto::collector::trace::v1::ExportTraceServiceResponse *) override
   {
     ++request_count_;
     return grpc::Status(status_codes_.at(index_++ % status_codes_.size()), "TEST!");
