@@ -69,7 +69,7 @@ public:
   public:
     async_interface(OtlpMockTraceServiceStub *owner) : stub_(owner) {}
 
-    virtual ~async_interface() {}
+    virtual ~async_interface() override = default;
 
     void Export(
         ::grpc::ClientContext *context,
@@ -103,7 +103,7 @@ public:
     OtlpMockTraceServiceStub *stub_;
   };
 
-  async_interface_base *async() { return &async_interface_; }
+  async_interface_base *async() override { return &async_interface_; }
   async_interface_base *experimental_async() { return &async_interface_; }
 
   ::grpc::Status GetLastAsyncStatus() const noexcept { return last_async_status_; }
@@ -132,7 +132,7 @@ public:
   public:
     async_interface(OtlpMockLogsServiceStub *owner) : stub_(owner) {}
 
-    virtual ~async_interface() {}
+    virtual ~async_interface() override = default;
 
     void Export(
         ::grpc::ClientContext *context,
@@ -166,7 +166,7 @@ public:
     OtlpMockLogsServiceStub *stub_;
   };
 
-  async_interface_base *async() { return &async_interface_; }
+  async_interface_base *async() override { return &async_interface_; }
   async_interface_base *experimental_async() { return &async_interface_; }
 
   ::grpc::Status GetLastAsyncStatus() const noexcept { return last_async_status_; }
