@@ -15,26 +15,121 @@ Increment the:
 
 ## [Unreleased]
 
+## [1.19 2025-01-22]
+
+* [PROMETHEUS_EXPORTER] Fix default for emitting otel_scope attributes
+  [#3171](https://github.com/open-telemetry/opentelemetry-cpp/pull/3171)
+
+* [Code health] Include what you use cleanup, part 5
+  [#3140](https://github.com/open-telemetry/opentelemetry-cpp/pull/3140)
+
+* [BUILD] Upgrade cmake
+  [#3167](https://github.com/open-telemetry/opentelemetry-cpp/pull/3167)
+
+* [SHIM] Fix string_view mappings between OT and OTel
+  [#3181](https://github.com/open-telemetry/opentelemetry-cpp/pull/3181)
+
+* [EXPORTER] Refactor ElasticSearchRecordable
+  [#3164](https://github.com/open-telemetry/opentelemetry-cpp/pull/3164)
+
+* [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.29.0
+  [#3182](https://github.com/open-telemetry/opentelemetry-cpp/pull/3182)
+
+* [BUILD] Fix cross-compilation with protoc
+  [#3186](https://github.com/open-telemetry/opentelemetry-cpp/pull/3186)
+
+* [Code health] Perform cppcheck cleanup
+  [#3150](https://github.com/open-telemetry/opentelemetry-cpp/pull/3150)
+
+* [EXPORTER] add instrumentation scope attributes to otlp proto messages for traces and metrics
+  [#3185](https://github.com/open-telemetry/opentelemetry-cpp/pull/3185)
+
+* [SDK] Tracer provider shutdown blocks in-definitively
+  [#3191](https://github.com/open-telemetry/opentelemetry-cpp/pull/3191)
+
+* [SEMANTIC CONVENTIONS] Upgrade to weaver 0.11.0
+  [#3194](https://github.com/open-telemetry/opentelemetry-cpp/pull/3194)
+
+* [DOC] Update existing maintaining dependencies doc
+  [#3195](https://github.com/open-telemetry/opentelemetry-cpp/pull/3195)
+
+* [TEST] Change is_called_ and got_response_ to use atomic
+  [#3204](https://github.com/open-telemetry/opentelemetry-cpp/pull/3204)
+
+* [SEMANTIC CONVENTIONS] update links to openmetrics to reference the v1.0.0 release
+  [#3205](https://github.com/open-telemetry/opentelemetry-cpp/pull/3205)
+
+* [CI] Fix CI on ubuntu-latest
+  [#3207](https://github.com/open-telemetry/opentelemetry-cpp/pull/3207)
+
+* [BUILD] Build break using protoc 3.14
+  [#3211](https://github.com/open-telemetry/opentelemetry-cpp/pull/3211)
+
+* [TEST] Build the singleton test on windows
+  [#3183](https://github.com/open-telemetry/opentelemetry-cpp/pull/3183)
+
+* [BUILD] Add cxx feature detections
+  [#3203](https://github.com/open-telemetry/opentelemetry-cpp/pull/3203)
+
 * [SDK] Do not frequently create and destroy http client threads
   [#3198](https://github.com/open-telemetry/opentelemetry-cpp/pull/3198)
 
-* [SDK] Fix instrumentation scope attributes evaluated in equal method
+* [EXPORTER] Optimize OTLP HTTP compression
+  [#3178](https://github.com/open-telemetry/opentelemetry-cpp/pull/3178)
+
+* [SDK] Fix include instrumentation scope attributes in equal method
   [#3214](https://github.com/open-telemetry/opentelemetry-cpp/pull/3214)
 
-* [EXPORTER] Fix scope attributes missing from otlp traces metrics
-  [#3185](https://github.com/open-telemetry/opentelemetry-cpp/pull/3185)
+* Upgrade to opentelemetry-proto 1.5.0
+  [#3210](https://github.com/open-telemetry/opentelemetry-cpp/pull/3210)
 
-* [EXPORTER] Fix throw in OtlpGrpcMetricExporter with shared grpc client
+* [TEST] Added support for SELINUX in functional tests
+  [#3212](https://github.com/open-telemetry/opentelemetry-cpp/pull/3212)
+
+* [EDITORIAL] fix changelog entry for PR 3185
+  [#3217](https://github.com/open-telemetry/opentelemetry-cpp/pull/3217)
+
+* [TEST] Functional tests for OTLP/gRPC with mutual TLS
+  [#3227](https://github.com/open-telemetry/opentelemetry-cpp/pull/3227)
+
+* [SEMCONV] Metrics are incorrectly prefixed with 'metric'
+  [#3228](https://github.com/open-telemetry/opentelemetry-cpp/pull/3228)
+
+* [BUILD] Add OTLP/file exporter for dll and examples
+  [#3231](https://github.com/open-telemetry/opentelemetry-cpp/pull/3231)
+
+* [Code Health] Include what you use, part 6
+  [#3216](https://github.com/open-telemetry/opentelemetry-cpp/pull/3216)
+
+* [CI] Spurious test failures
+  [#3233](https://github.com/open-telemetry/opentelemetry-cpp/pull/3233)
+
+* [BUILD] Fix error ‘uint8_t’ does not name a type with gcc-15
+  [#3240](https://github.com/open-telemetry/opentelemetry-cpp/pull/3240)
+
+* [EXPORTER] fix throw in OtlpGrpcMetricExporter with shared grpc client
   [#3243](https://github.com/open-telemetry/opentelemetry-cpp/pull/3243)
 
 * [SDK] Better control of threads executed by opentelemetry-cpp
   [#3175](https://github.com/open-telemetry/opentelemetry-cpp/pull/3175)
 
-* [SDK] Enable deriving from ResourceDetector to create a Resource
+* [Code Health] Include what you use, part 7
+  [#3238](https://github.com/open-telemetry/opentelemetry-cpp/pull/3238)
+
+* [SDK] Fix lifetime of GlobalLogHandler
+  [#3221](https://github.com/open-telemetry/opentelemetry-cpp/pull/3221)
+
+* [MAINTAINER] Add devcontainer
+  [#3123](https://github.com/open-telemetry/opentelemetry-cpp/pull/3123)
+
+* [SDK] enable deriving from ResourceDetector to create a Resource
   [#3247](https://github.com/open-telemetry/opentelemetry-cpp/pull/3247)
 
 * [EXPORTER] Support handling retry-able errors for OTLP/HTTP
   [#3223](https://github.com/open-telemetry/opentelemetry-cpp/pull/3223)
+
+* [CI] Add GRPC in maintainer CI
+  [#3248](https://github.com/open-telemetry/opentelemetry-cpp/pull/3248)
 
 * [EXPORTER] Support handling retry-able errors for OTLP/gRPC
   [#3219](https://github.com/open-telemetry/opentelemetry-cpp/pull/3219)
@@ -95,6 +190,20 @@ New features:
     flag in CMake. Various runtime options structures,
     as well as the thread instrumentation interface,
     may change without notice before this feature is declared stable.
+
+* [EXPORTER] Support handling retry-able errors for OTLP/HTTP
+  [#3223](https://github.com/open-telemetry/opentelemetry-cpp/pull/3223)
+
+  * This feature is experimental,
+    protected by a WITH_OTLP_RETRY_PREVIEW
+    flag in CMake.
+
+* [EXPORTER] Support handling retry-able errors for OTLP/gRPC
+  [#3219](https://github.com/open-telemetry/opentelemetry-cpp/pull/3219)
+
+  * This feature is experimental,
+    protected by a WITH_OTLP_RETRY_PREVIEW
+    flag in CMake.
 
 ## [1.18 2024-11-25]
 
