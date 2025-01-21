@@ -41,7 +41,8 @@ Increment the:
 * [Code health] Perform cppcheck cleanup
   [#3150](https://github.com/open-telemetry/opentelemetry-cpp/pull/3150)
 
-* [EXPORTER] add instrumentation scope attributes to otlp proto messages for traces and metrics
+* [EXPORTER] add instrumentation scope attributes
+  to otlp proto messages for traces and metrics
   [#3185](https://github.com/open-telemetry/opentelemetry-cpp/pull/3185)
 
 * [SDK] Tracer provider shutdown blocks in-definitively
