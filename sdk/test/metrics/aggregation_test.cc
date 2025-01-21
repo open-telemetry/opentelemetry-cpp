@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
+#include <string>
 #include <vector>
 
 #include "opentelemetry/nostd/shared_ptr.h"

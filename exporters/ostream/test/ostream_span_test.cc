@@ -7,6 +7,7 @@
 #include <chrono>
 #include <initializer_list>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <utility>
 
@@ -17,7 +18,6 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"

@@ -8,6 +8,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_runtime_options.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/logs/exporter.h"
@@ -36,6 +37,14 @@ public:
    * @param options An object containing the user's configuration options.
    */
   OtlpHttpLogRecordExporter(const OtlpHttpLogRecordExporterOptions &options);
+
+  /**
+   * Create an OtlpHttpLogRecordExporter with user specified options.
+   * @param options An object containing the user's configuration options.
+   * @param runtime_options An object containing the user's runtime options.
+   */
+  OtlpHttpLogRecordExporter(const OtlpHttpLogRecordExporterOptions &options,
+                            const OtlpHttpLogRecordExporterRuntimeOptions &runtime_options);
 
   /**
    * Creates a recordable that stores the data in a JSON object
@@ -68,7 +77,9 @@ public:
 
 private:
   // Configuration options for the exporter
-  const OtlpHttpLogRecordExporterOptions options_;
+  OtlpHttpLogRecordExporterOptions options_;
+  // Runtime options for the exporter
+  OtlpHttpLogRecordExporterRuntimeOptions runtime_options_;
 
   // Object that stores the HTTP sessions that have been created
   std::unique_ptr<OtlpHttpClient> http_client_;

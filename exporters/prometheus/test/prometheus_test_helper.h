@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
 namespace metric_sdk      = opentelemetry::sdk::metrics;

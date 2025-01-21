@@ -13,6 +13,7 @@
 #include <memory>
 #include <mutex>
 #include <ratio>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -26,12 +27,12 @@
 
 #include "nlohmann/json.hpp"
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/base64.h"
@@ -665,7 +666,7 @@ void ConvertListFieldToJson(nlohmann::json &value,
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
     : is_shutdown_(false),
       options_(options),
-      http_client_(http_client::HttpClientFactory::Create()),
+      http_client_(http_client::HttpClientFactory::Create(options.thread_instrumentation)),
       start_session_counter_(0),
       finished_session_counter_(0)
 {
@@ -991,6 +992,7 @@ OtlpHttpClient::createSession(
   request->ReplaceHeader("Content-Type", content_type);
   request->ReplaceHeader("User-Agent", options_.user_agent);
   request->EnableLogging(options_.console_debug);
+  request->SetRetryPolicy(options_.retry_policy);
 
   if (options_.compression == "gzip")
   {

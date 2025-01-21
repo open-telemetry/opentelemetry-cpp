@@ -1,7 +1,10 @@
 # Building and running tests as a developer
 
 CI tests can be run on docker by invoking the script `./ci/run_docker.sh
-./ci/do_ci.sh {TARGET}` where the targets are:
+./ci/do_ci.sh {TARGET}`or inside
+[devcontainer](../CONTRIBUTING.md#devcontainer-setup-for-project)
+by invoking the script
+`./ci/do_ci.sh {TARGET}` where the targets are:
 
 * `cmake.test`: build cmake targets and run tests.
 * `cmake.maintainer.test`: build with cmake and test, in maintainer mode.

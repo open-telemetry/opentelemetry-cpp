@@ -3,16 +3,13 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-#include <vector>
-
 #include <prometheus/exposer.h>
+#include <chrono>
+#include <memory>
 
 #include "opentelemetry/exporters/prometheus/collector.h"
 #include "opentelemetry/exporters/prometheus/exporter_options.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/sdk/common/env_variables.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/version.h"
 

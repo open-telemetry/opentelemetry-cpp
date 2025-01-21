@@ -116,6 +116,11 @@ target_compile_definitions(
   opentelemetry_api
   INTERFACE OPENTELEMETRY_ABI_VERSION_NO=${OPENTELEMETRY_ABI_VERSION_NO})
 
+if(WITH_OTLP_RETRY_PREVIEW)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_OTLP_RETRY_PREVIEW)
+endif()
+
 if(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW)
@@ -124,6 +129,11 @@ endif()
 if(WITH_METRICS_EXEMPLAR_PREVIEW)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_METRICS_EXEMPLAR_PREVIEW)
+endif()
+
+if(WITH_THREAD_INSTRUMENTATION_PREVIEW)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_THREAD_INSTRUMENTATION_PREVIEW)
 endif()
 
 if(WITH_OTLP_HTTP_COMPRESSION)

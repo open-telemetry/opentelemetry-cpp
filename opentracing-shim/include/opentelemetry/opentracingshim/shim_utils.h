@@ -5,11 +5,34 @@
 
 #pragma once
 
-#include "opentelemetry/opentracingshim/span_context_shim.h"
+#include <stdint.h>
+#include <algorithm>
+#include <cstddef>
+#include <initializer_list>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include "opentelemetry/semconv/incubating/opentracing_attributes.h"
-#include "opentelemetry/trace/tracer.h"
+#include "opentracing/propagation.h"
+#include "opentracing/span.h"
+#include "opentracing/string_view.h"
 #include "opentracing/tracer.h"
+#include "opentracing/value.h"
+#include "opentracing/variant/recursive_wrapper.hpp"
+
+#include "opentelemetry/baggage/baggage.h"
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/opentracingshim/span_context_shim.h"
+#include "opentelemetry/semconv/incubating/opentracing_attributes.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_context_kv_iterable.h"
+#include "opentelemetry/trace/span_startoptions.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim

@@ -5,17 +5,15 @@
 
 #include <memory>
 
+#include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
-#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace otlp
 {
-
-class OtlpGrpcClientReferenceGuard;
-class OtlpGrpcClient;
 
 /**
  * Factory class for OtlpGrpcClient.

@@ -4,14 +4,13 @@
 #include <gtest/gtest.h>
 #include <cstdint>
 #include <iostream>
-#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/ostream/metric_exporter.h"
-#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"

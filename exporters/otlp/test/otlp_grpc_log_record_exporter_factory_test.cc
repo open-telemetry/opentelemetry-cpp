@@ -3,7 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h"
 
@@ -15,6 +14,10 @@
 #  error "protobuf should not be included"
 #endif
 
+/*
+  Implementation, this requires protobuf.
+*/
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

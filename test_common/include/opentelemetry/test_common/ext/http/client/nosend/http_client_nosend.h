@@ -71,6 +71,12 @@ public:
 
   void EnableLogging(bool is_log_enabled) noexcept override { is_log_enabled_ = is_log_enabled; }
 
+  void SetRetryPolicy(
+      const opentelemetry::ext::http::client::RetryPolicy &retry_policy) noexcept override
+  {
+    retry_policy_ = retry_policy;
+  }
+
 public:
   opentelemetry::ext::http::client::Method method_;
   opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
@@ -81,6 +87,7 @@ public:
   opentelemetry::ext::http::client::Compression compression_{
       opentelemetry::ext::http::client::Compression::kNone};
   bool is_log_enabled_{false};
+  opentelemetry::ext::http::client::RetryPolicy retry_policy_;
 };
 
 class Response : public opentelemetry::ext::http::client::Response

@@ -9,9 +9,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/version/version.h"
@@ -35,6 +33,15 @@ public:
                const std::string &schema_url        = {})
       : Resource(attributes, schema_url)
   {}
+};
+
+class TestResourceDetector : public ResourceDetector
+{
+public:
+  TestResourceDetector() = default;
+  Resource Detect() noexcept override { return Create(attributes, schema_url); }
+  ResourceAttributes attributes;
+  std::string schema_url;
 };
 
 TEST(ResourceTest, create_without_servicename)
@@ -268,4 +275,19 @@ TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
+
 #endif
+
+TEST(ResourceTest, DerivedResourceDetector)
+{
+  TestResourceDetector detector;
+
+  detector.attributes            = {{"key", "value"}};
+  detector.schema_url            = "https://opentelemetry.io/schemas/v3.1.4";
+  const auto resource            = detector.Detect();
+  const auto received_attributes = resource.GetAttributes();
+
+  EXPECT_EQ(received_attributes.size(), 1);
+  EXPECT_EQ(resource.GetSchemaURL(), detector.schema_url);
+  EXPECT_TRUE(received_attributes.find("key") != received_attributes.end());
+}

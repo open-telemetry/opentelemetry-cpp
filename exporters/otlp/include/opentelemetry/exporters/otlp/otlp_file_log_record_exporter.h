@@ -8,6 +8,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_file_client.h"
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_runtime_options.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/logs/exporter.h"
@@ -36,6 +37,14 @@ public:
    * @param options An object containing the user's configuration options.
    */
   OtlpFileLogRecordExporter(const OtlpFileLogRecordExporterOptions &options);
+
+  /**
+   * Create an OtlpFileLogRecordExporter with user specified options.
+   * @param options An object containing the user's configuration options.
+   * @param runtime_options An object containing the user's runtime options.
+   */
+  OtlpFileLogRecordExporter(const OtlpFileLogRecordExporterOptions &options,
+                            const OtlpFileLogRecordExporterRuntimeOptions &runtime_options);
 
   /**
    * Creates a recordable that stores the data in a JSON object
@@ -69,6 +78,8 @@ public:
 private:
   // Configuration options for the exporter
   const OtlpFileLogRecordExporterOptions options_;
+  // Runtime options for the exporter
+  const OtlpFileLogRecordExporterRuntimeOptions runtime_options_;
 
   // Object that stores the file context.
   std::unique_ptr<OtlpFileClient> file_client_;

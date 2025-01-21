@@ -33,7 +33,11 @@ OtlpHttpMetricExporterOptions::OtlpHttpMetricExporterOptions()
       ssl_max_tls(GetOtlpDefaultMetricsSslTlsMaxVersion()),
       ssl_cipher(GetOtlpDefaultMetricsSslTlsCipher()),
       ssl_cipher_suite(GetOtlpDefaultMetricsSslTlsCipherSuite()),
-      compression(GetOtlpDefaultMetricsCompression())
+      compression(GetOtlpDefaultMetricsCompression()),
+      retry_policy_max_attempts(GetOtlpDefaultMetricsRetryMaxAttempts()),
+      retry_policy_initial_backoff(GetOtlpDefaultMetricsRetryInitialBackoff()),
+      retry_policy_max_backoff(GetOtlpDefaultMetricsRetryMaxBackoff()),
+      retry_policy_backoff_multiplier(GetOtlpDefaultMetricsRetryBackoffMultiplier())
 {
 #ifdef ENABLE_ASYNC_EXPORT
   max_concurrent_requests     = 64;

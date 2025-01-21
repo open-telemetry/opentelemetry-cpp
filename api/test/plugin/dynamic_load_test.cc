@@ -5,6 +5,7 @@
 #include <string>
 
 #include "opentelemetry/plugin/dynamic_load.h"
+#include "opentelemetry/plugin/factory.h"
 
 TEST(LoadFactoryTest, FailureTest)
 {

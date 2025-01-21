@@ -6,12 +6,10 @@
 #include <stdint.h>
 #include <chrono>
 #include <functional>
-#include <initializer_list>
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"

@@ -31,7 +31,11 @@ OtlpHttpLogRecordExporterOptions::OtlpHttpLogRecordExporterOptions()
       ssl_max_tls(GetOtlpDefaultLogsSslTlsMaxVersion()),
       ssl_cipher(GetOtlpDefaultLogsSslTlsCipher()),
       ssl_cipher_suite(GetOtlpDefaultLogsSslTlsCipherSuite()),
-      compression(GetOtlpDefaultLogsCompression())
+      compression(GetOtlpDefaultLogsCompression()),
+      retry_policy_max_attempts(GetOtlpDefaultLogsRetryMaxAttempts()),
+      retry_policy_initial_backoff(GetOtlpDefaultLogsRetryInitialBackoff()),
+      retry_policy_max_backoff(GetOtlpDefaultLogsRetryMaxBackoff()),
+      retry_policy_backoff_multiplier(GetOtlpDefaultLogsRetryBackoffMultiplier())
 {
 #ifdef ENABLE_ASYNC_EXPORT
   max_concurrent_requests     = 64;

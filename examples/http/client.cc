@@ -95,4 +95,5 @@ int main(int argc, char *argv[])
                     std::string(default_path);
   sendRequest(url);
   CleanupTracer();
+  return 0;
 }

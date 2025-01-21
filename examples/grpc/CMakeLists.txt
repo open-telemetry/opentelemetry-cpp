@@ -25,6 +25,9 @@ add_library(example_grpc_proto ${example_grpc_srcs} ${example_grpc_hdrs}
 
 patch_protobuf_targets(example_grpc_proto)
 
+# Disable include-what-you-use on generated code.
+set_target_properties(example_grpc_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "")
+
 include_directories(
   ${CMAKE_SOURCE_DIR}/exporters/ostream/include ${CMAKE_SOURCE_DIR}/ext/include
   ${CMAKE_SOURCE_DIR}/api/include/ ${CMAKE_SOURCE_DIR/})

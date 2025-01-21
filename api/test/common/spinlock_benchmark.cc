@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <benchmark/benchmark.h>
-#include <stdint.h>
 #include <algorithm>
 #include <atomic>
+#include <cstdint>
 #include <thread>
 #include <vector>
 

@@ -11,6 +11,7 @@ foreach(
   attribute_utils_test
   attributemap_hash_test
   global_log_handle_test
+  global_log_handle_singleton_lifetime_test
   env_var_test)
 
   add_executable(${testname} "${testname}.cc")

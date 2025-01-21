@@ -342,6 +342,9 @@ if(WITH_OTLP_GRPC)
     ${LOGS_SERVICE_GRPC_PB_CPP_FILE} ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
   set_target_version(opentelemetry_proto_grpc)
 
+  # Disable include-what-you-use on generated code.
+  set_target_properties(opentelemetry_proto_grpc PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "")
+
   list(APPEND OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto_grpc)
   target_link_libraries(opentelemetry_proto_grpc PUBLIC opentelemetry_proto)
 

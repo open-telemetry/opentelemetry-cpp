@@ -22,6 +22,12 @@ if(WITH_OTLP_HTTP)
                         PRIVATE opentelemetry_exporter_otlp_http)
 endif()
 
+if(WITH_OTLP_FILE)
+  add_compile_definitions(WITH_OTLP_FILE)
+  target_link_libraries(opentelemetry_cpp
+                        PRIVATE opentelemetry_exporter_otlp_file)
+endif()
+
 target_link_libraries(
   opentelemetry_cpp PRIVATE opentelemetry_metrics
                             opentelemetry_exporter_ostream_metrics)
@@ -36,6 +42,11 @@ if(WITH_OTLP_HTTP)
                         PRIVATE opentelemetry_exporter_otlp_http_metric)
 endif()
 
+if(WITH_OTLP_FILE)
+  target_link_libraries(opentelemetry_cpp
+                        PRIVATE opentelemetry_exporter_otlp_file_metric)
+endif()
+
 target_link_libraries(
   opentelemetry_cpp PRIVATE opentelemetry_logs
                             opentelemetry_exporter_ostream_logs)
@@ -48,6 +59,11 @@ endif()
 if(WITH_OTLP_HTTP)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_http_log)
+endif()
+
+if(WITH_OTLP_FILE)
+  target_link_libraries(opentelemetry_cpp
+                        PRIVATE opentelemetry_exporter_otlp_file_log)
 endif()
 
 find_program(

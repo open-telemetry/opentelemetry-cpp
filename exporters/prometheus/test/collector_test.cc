@@ -1,15 +1,19 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <gtest/gtest.h>
+#include <prometheus/metric_family.h>
+#include <stddef.h>
+#include <chrono>
+#include <thread>
+#include <vector>
+
 #include "opentelemetry/exporters/prometheus/collector.h"
 #include "opentelemetry/metrics/meter_provider.h"
-#include "opentelemetry/version.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "prometheus_test_helper.h"
-
-#include <gtest/gtest.h>
-#include <future>
-#include <map>
-#include <thread>
 
 using opentelemetry::exporter::metrics::PrometheusCollector;
 using opentelemetry::sdk::metrics::MetricProducer;

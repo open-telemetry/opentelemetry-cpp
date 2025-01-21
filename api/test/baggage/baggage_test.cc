@@ -9,6 +9,7 @@
 
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/common/kv_properties.h"
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 
