@@ -25,6 +25,9 @@
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
+#  include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
+
 #  include "opentelemetry/sdk/trace/simple_processor.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/trace/provider.h"
@@ -50,10 +53,32 @@ class OtlpGrpcMetricExporterTestPeer : public ::testing::Test
 {
 public:
   std::unique_ptr<sdk::metrics::PushMetricExporter> GetExporter(
-      std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> &stub_interface)
+      const OtlpGrpcMetricExporterOptions &options)
+  {
+    return std::unique_ptr<sdk::metrics::PushMetricExporter>(new OtlpGrpcMetricExporter(options));
+  }
+
+  std::unique_ptr<sdk::metrics::PushMetricExporter> GetExporter(
+      std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub_interface)
   {
     return std::unique_ptr<sdk::metrics::PushMetricExporter>(
         new OtlpGrpcMetricExporter(std::move(stub_interface)));
+  }
+
+  std::unique_ptr<sdk::metrics::PushMetricExporter> GetExporter(
+      std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub_interface,
+      std::shared_ptr<OtlpGrpcClient> client)
+  {
+    return std::unique_ptr<sdk::metrics::PushMetricExporter>(
+        new OtlpGrpcMetricExporter(std::move(stub_interface), std::move(client)));
+  }
+
+  std::unique_ptr<sdk::metrics::PushMetricExporter> GetExporter(
+      const OtlpGrpcMetricExporterOptions &options,
+      std::shared_ptr<OtlpGrpcClient> client)
+  {
+    return std::unique_ptr<sdk::metrics::PushMetricExporter>(
+        new OtlpGrpcMetricExporter(options, std::move(client)));
   }
 
   // Get the options associated with the given exporter.
@@ -132,9 +157,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_METRICS_HEADERS");
 }
-#  endif
 
-#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigHttpsSecureFromEnv)
 {
@@ -150,9 +173,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigHttpsSecureFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE");
 }
-#  endif
 
-#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigHttpInsecureFromEnv)
 {
@@ -168,9 +189,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigHttpInsecureFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE");
 }
-#  endif
 
-#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigUnknownSecureFromEnv)
 {
@@ -185,9 +204,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigUnknownSecureFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE");
 }
-#  endif
 
-#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigUnknownInsecureFromEnv)
 {
@@ -202,7 +219,86 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigUnknownInsecureFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE");
 }
-#  endif
+
+TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryDefaultValues)
+{
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 5);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5.0);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 1.5);
+}
+
+TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryValuesFromEnv)
+{
+  setenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_MAX_ATTEMPTS", "123", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_INITIAL_BACKOFF", "4.5", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_MAX_BACKOFF", "6.7", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
+
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 123);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 8.9);
+
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_BACKOFF_MULTIPLIER");
+}
+
+TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryGenericValuesFromEnv)
+{
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS", "321", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF", "5.4", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
+
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 321);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 9.8);
+
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
+}
+#  endif  // NO_GETENV
+
+TEST_F(OtlpGrpcMetricExporterTestPeer, CheckGetAggregationTemporality)
+{
+  auto options                    = OtlpGrpcMetricExporterOptions();
+  options.aggregation_temporality = PreferredAggregationTemporality::kCumulative;
+
+  auto client = OtlpGrpcClientFactory::Create(options);
+
+  auto exporter0 = GetExporter(options);
+  auto exporter1 = GetExporter(client->MakeMetricsServiceStub());
+  auto exporter2 = GetExporter(options, client);
+  auto exporter3 = GetExporter(client->MakeMetricsServiceStub(), client);
+
+  EXPECT_EQ(
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+      exporter0->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kCounter));
+
+  EXPECT_EQ(
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+      exporter1->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kCounter));
+
+  EXPECT_EQ(
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+      exporter2->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kCounter));
+
+  EXPECT_EQ(
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+      exporter3->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kCounter));
+}
 
 }  // namespace otlp
 }  // namespace exporter

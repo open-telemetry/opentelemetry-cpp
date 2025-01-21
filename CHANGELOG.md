@@ -24,6 +24,78 @@ Increment the:
 * [EXPORTER] Fix scope attributes missing from otlp traces metrics
   [#3185](https://github.com/open-telemetry/opentelemetry-cpp/pull/3185)
 
+* [EXPORTER] Fix throw in OtlpGrpcMetricExporter with shared grpc client
+  [#3243](https://github.com/open-telemetry/opentelemetry-cpp/pull/3243)
+
+* [SDK] Better control of threads executed by opentelemetry-cpp
+  [#3175](https://github.com/open-telemetry/opentelemetry-cpp/pull/3175)
+
+* [SDK] Enable deriving from ResourceDetector to create a Resource
+  [#3247](https://github.com/open-telemetry/opentelemetry-cpp/pull/3247)
+
+* [EXPORTER] Support handling retry-able errors for OTLP/HTTP
+  [#3223](https://github.com/open-telemetry/opentelemetry-cpp/pull/3223)
+
+* [EXPORTER] Support handling retry-able errors for OTLP/gRPC
+  [#3219](https://github.com/open-telemetry/opentelemetry-cpp/pull/3219)
+
+New features:
+
+* [SDK] Better control of threads executed by opentelemetry-cpp
+  [#3175](https://github.com/open-telemetry/opentelemetry-cpp/pull/3175)
+
+  * This feature provides a way for applications,
+    when configuring the SDK and exporters,
+    to participate in the execution path
+    of internal opentelemetry-cpp threads.
+
+  * The opentelemetry-cpp library provides the following:
+
+    * a new ThreadInstrumentation interface,
+    * new runtime options structures, to optionally configure the SDK:
+      * BatchSpanProcessorRuntimeOptions
+      * PeriodicExportingMetricReaderRuntimeOptions
+      * BatchLogRecordProcessorRuntimeOptions
+    * new runtime options structures,
+      to optionally configure the OTLP HTTP exporters:
+      * OtlpHttpExporterRuntimeOptions
+      * OtlpHttpMetricExporterRuntimeOptions
+      * OtlpHttpLogRecordExporterRuntimeOptions
+    * new ThreadInstrumentation parameters,
+      to optionally configure the CURL HttpClient
+    * new runtime options structures,
+      to optionally configure the OTLP FILE exporters:
+      * OtlpFileExporterRuntimeOptions
+      * OtlpFileMetricExporterRuntimeOptions
+      * OtlpFileLogRecordExporterRuntimeOptions
+    * new runtime options structure,
+      to optionally configure the OTLP FILE client:
+      * OtlpFileClientRuntimeOptions
+
+  * Using the optional runtime options structures,
+    an application can subclass the ThreadInstrumentation interface,
+    and be notified of specific events of interest during the execution
+    of an internal opentelemetry-cpp thread.
+
+  * This allows an application to call, for example:
+
+    * pthread_setaffinity_np(), for better performances,
+    * setns(), to control the network namespace used by HTTP CURL connections
+    * pthread_setname_np(), for better observability from the operating system
+    * many more specific apis, as needed
+
+  * See the documentation for ThreadInstrumentation for details.
+
+  * A new example program, example_otlp_instrumented_http,
+    shows how to use the feature,
+    and add application logic in the thread execution code path.
+
+  * Note that this feature is experimental,
+    protected by a WITH_THREAD_INSTRUMENTATION_PREVIEW
+    flag in CMake. Various runtime options structures,
+    as well as the thread instrumentation interface,
+    may change without notice before this feature is declared stable.
+
 ## [1.18 2024-11-25]
 
 * [EXPORTER] Fix crash in ElasticsearchLogRecordExporter

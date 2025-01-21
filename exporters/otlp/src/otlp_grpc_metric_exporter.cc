@@ -51,7 +51,9 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptio
                                                const std::shared_ptr<OtlpGrpcClient> &client)
     : options_(options),
       client_(client),
-      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard())
+      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
+      aggregation_temporality_selector_{
+          OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)}
 {
   client_->AddReference(*client_reference_guard_, options_);
 
@@ -64,6 +66,8 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
     : options_(OtlpGrpcMetricExporterOptions()),
       client_(client),
       client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
+      aggregation_temporality_selector_{
+          OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
       metrics_service_stub_(std::move(stub))
 {
   client_->AddReference(*client_reference_guard_, options_);

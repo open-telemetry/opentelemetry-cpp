@@ -212,6 +212,9 @@ if(NOT WITH_STL STREQUAL "OFF")
   endif()
 endif()
 
+option(WITH_OTLP_RETRY_PREVIEW
+       "Whether to enable experimental retry functionality" OFF)
+
 option(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
        "Whether to enable mTLS support fro gRPC" OFF)
 
@@ -300,6 +303,10 @@ option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
 option(WITH_METRICS_EXEMPLAR_PREVIEW
        "Whether to enable exemplar within metrics" OFF)
 
+# Experimental, so behind feature flag by default
+option(WITH_THREAD_INSTRUMENTATION_PREVIEW
+       "Whether to enable thread instrumentation" OFF)
+
 option(OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS
        "Whether to build test libraries that are always linked as shared libs"
        OFF)
@@ -365,11 +372,16 @@ if(WITH_PROMETHEUS)
     if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/prometheus-cpp/.git)
       set(SAVED_ENABLE_TESTING ${ENABLE_TESTING})
       set(SAVED_CMAKE_CXX_CLANG_TIDY ${CMAKE_CXX_CLANG_TIDY})
+      set(SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE
+          ${CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
       set(ENABLE_TESTING OFF)
       set(CMAKE_CXX_CLANG_TIDY "")
+      set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "")
       add_subdirectory(third_party/prometheus-cpp)
       set(ENABLE_TESTING ${SAVED_ENABLE_TESTING})
       set(CMAKE_CXX_CLANG_TIDY ${SAVED_CMAKE_CXX_CLANG_TIDY})
+      set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE
+          ${SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
     else()
       message(
         FATAL_ERROR
@@ -711,8 +723,13 @@ if(WITH_OPENTRACING)
     if(EXISTS "${PROJECT_SOURCE_DIR}/${OPENTRACING_DIR}/.git")
       set(SAVED_BUILD_TESTING ${BUILD_TESTING})
       set(BUILD_TESTING OFF)
+      set(SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE
+          ${CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
+      set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "")
       add_subdirectory(${OPENTRACING_DIR})
       set(BUILD_TESTING ${SAVED_BUILD_TESTING})
+      set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE
+          ${SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
     else()
       message(
         FATAL_ERROR

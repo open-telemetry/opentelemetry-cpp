@@ -666,7 +666,7 @@ void ConvertListFieldToJson(nlohmann::json &value,
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
     : is_shutdown_(false),
       options_(options),
-      http_client_(http_client::HttpClientFactory::Create()),
+      http_client_(http_client::HttpClientFactory::Create(options.thread_instrumentation)),
       start_session_counter_(0),
       finished_session_counter_(0)
 {
@@ -992,6 +992,7 @@ OtlpHttpClient::createSession(
   request->ReplaceHeader("Content-Type", content_type);
   request->ReplaceHeader("User-Agent", options_.user_agent);
   request->EnableLogging(options_.console_debug);
+  request->SetRetryPolicy(options_.retry_policy);
 
   if (options_.compression == "gzip")
   {
