@@ -36,6 +36,9 @@ Increment the:
 * [EXPORTER] Support handling retry-able errors for OTLP/HTTP
   [#3223](https://github.com/open-telemetry/opentelemetry-cpp/pull/3223)
 
+* [EXPORTER] Support handling retry-able errors for OTLP/gRPC
+  [#3219](https://github.com/open-telemetry/opentelemetry-cpp/pull/3219)
+
 New features:
 
 * [SDK] Better control of threads executed by opentelemetry-cpp
