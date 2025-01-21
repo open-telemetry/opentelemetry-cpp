@@ -5,7 +5,6 @@
 
 #include <sstream>  // IWYU pragma: keep
 #include <string>
-#include <utility>
 
 #include "opentelemetry/version.h"
 #include "opentelemetry/nostd/shared_ptr.h"

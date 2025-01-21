@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "opentelemetry/version.h"
 #include "opentelemetry/sdk/resource/resource.h"
 
