@@ -135,6 +135,9 @@ Increment the:
 * [EXPORTER] Support handling retry-able errors for OTLP/gRPC
   [#3219](https://github.com/open-telemetry/opentelemetry-cpp/pull/3219)
 
+* [SDK] Optimize Metric Processing for Single Collector with Delta Temporality
+  [#3236](https://github.com/open-telemetry/opentelemetry-cpp/pull/3236)
+
 New features:
 
 * [SDK] Better control of threads executed by opentelemetry-cpp
