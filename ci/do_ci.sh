@@ -108,6 +108,7 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
@@ -131,6 +132,7 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
@@ -178,6 +180,7 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
@@ -344,6 +347,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_FILE=ON \
         -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
   proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
