@@ -51,16 +51,16 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   AggregationTemporality aggregation_temporarily =
       collector->GetAggregationTemporality(instrument_descriptor_.type_);
 
-  // If no metrics, early return
-  if (delta_metrics->Size() == 0)
-  {
-    return true;
-  }
-
   // Fast path for single collector with delta temporality and counter, updown-counter, histogram
+  // This path doesn't need to aggregated-with/contribute-to the unreported_metric_, as there is 
+  // no other reader configured to collect those data.
   if (collectors.size() == 1 && aggregation_temporarily == AggregationTemporality::kDelta)
   {
-
+    // If no metrics, early return
+    if (delta_metrics->Size() == 0)
+    {
+      return true;
+    }
     // Create MetricData directly
     MetricData metric_data;
     metric_data.instrument_descriptor   = instrument_descriptor_;
@@ -77,12 +77,10 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
           metric_data.point_data_attr_.emplace_back(std::move(point_data_attr));
           return true;
         });
-
     return callback(metric_data);
   }
 
-  if (delta_metrics->Size())
-  {
+  if (delta_metrics->Size()) {
     for (auto &col : collectors)
     {
       unreported_metrics_[col.get()].push_back(delta_metrics);
