@@ -4,7 +4,7 @@
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include <gtest/gtest.h>
 #include <array>
-#include <type_traits>
+#include <string>
 #include <utility>
 #include <vector>
 #include "opentelemetry/common/attribute_value.h"
@@ -38,33 +38,40 @@ TEST(TracerConfig, CheckDefaultConfigWorksAccToSpec)
 
 /** Tests to verify the behavior of trace_sdk::TracerConfig::DefaultConfigurator */
 
-std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> attr1 = {
+static std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> attr1 = {
     "accept_single_attr", true};
-std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> attr2 = {
+static std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> attr2 = {
     "accept_second_attr", "some other attr"};
-std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> attr3 = {
+static std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> attr3 = {
     "accept_third_attr", 3};
 
-const std::array<instrumentation_scope::InstrumentationScope *, 5> instrumentation_scopes = {
-    std::move(instrumentation_scope::InstrumentationScope::Create("test_scope_1")).get(),
-    std::move(instrumentation_scope::InstrumentationScope::Create("test_scope_2", "1.0")).get(),
+static instrumentation_scope::InstrumentationScope *test_scope_1 =
+    std::move(instrumentation_scope::InstrumentationScope::Create("test_scope_1")).get();
+static instrumentation_scope::InstrumentationScope *test_scope_2 =
+    std::move(instrumentation_scope::InstrumentationScope::Create("test_scope_2", "1.0")).get();
+static instrumentation_scope::InstrumentationScope *test_scope_3 =
     std::move(instrumentation_scope::InstrumentationScope::Create(
                   "test_scope_3",
                   "0",
                   "https://opentelemetry.io/schemas/v1.18.0"))
-        .get(),
-    std::move(instrumentation_scope::InstrumentationScope::Create(
-                  "test_scope_3",
-                  "0",
-                  "https://opentelemetry.io/schemas/v1.18.0",
-                  {attr1}))
-        .get(),
+        .get();
+static instrumentation_scope::InstrumentationScope *test_scope_4 =
     std::move(instrumentation_scope::InstrumentationScope::Create(
                   "test_scope_4",
                   "0",
                   "https://opentelemetry.io/schemas/v1.18.0",
+                  {attr1}))
+        .get();
+static instrumentation_scope::InstrumentationScope *test_scope_5 =
+    std::move(instrumentation_scope::InstrumentationScope::Create(
+                  "test_scope_5",
+                  "0",
+                  "https://opentelemetry.io/schemas/v1.18.0",
                   {attr1, attr2, attr3}))
-        .get(),
+        .get();
+
+const std::array<instrumentation_scope::InstrumentationScope *, 5> instrumentation_scopes = {
+    test_scope_1, test_scope_2, test_scope_3, test_scope_4, test_scope_5,
 };
 
 // Test fixture for VerifyDefaultConfiguratorBehavior
