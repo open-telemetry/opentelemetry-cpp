@@ -55,8 +55,6 @@
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/trace/tracer.h"
 
-#include <src/trace/span.h>
-
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;
 using namespace opentelemetry::sdk::instrumentationscope;
