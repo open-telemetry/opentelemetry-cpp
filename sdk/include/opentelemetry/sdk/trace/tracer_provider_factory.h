@@ -55,7 +55,7 @@ public:
       std::unique_ptr<IdGenerator> id_generator,
       std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator);
 
-  /* Series of creator methods with a single processor. */
+  /* Series of creator methods with a vector of processors. */
 
   static std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors);
