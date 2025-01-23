@@ -63,20 +63,9 @@ mkdir -p "${BUILD_DIR}"
 [ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
 mkdir -p "${PLUGIN_DIR}"
 
-IWYU=""
 MAKE_COMMAND="make -k -j \$(nproc)"
 
-# Temporarily disable the IWYU build.
-# It fails in Ubuntu 24-04 CI with:
-#    Error running 'iwyu': Segmentation fault
-#
-# if [[ "${CXX}" == *clang* ]]; then
-#   MAKE_COMMAND="make -k CXX=include-what-you-use CXXFLAGS=\"-Xiwyu --error_always\" -j \$(nproc)"
-#   IWYU="-DCMAKE_CXX_INCLUDE_WHAT_YOU_USE=iwyu"
-# fi
-
 echo "make command: ${MAKE_COMMAND}"
-echo "IWYU option: ${IWYU}"
 
 BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
 BAZEL_OPTIONS="$BAZEL_OPTIONS_DEFAULT"
@@ -119,6 +108,7 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
@@ -131,8 +121,8 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
         -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
-        ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -142,6 +132,7 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
@@ -154,8 +145,8 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
         -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
-        ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -178,6 +169,7 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
         -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         "${SRC_DIR}"
   make -k -j $(nproc)
@@ -188,6 +180,7 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
@@ -202,8 +195,8 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
         -DWITH_ABI_VERSION_1=OFF \
         -DWITH_ABI_VERSION_2=ON \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
         -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
-        ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -251,7 +244,6 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=CXX20 \
-        ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -263,7 +255,6 @@ elif [[ "$1" == "cmake.c++23.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=CXX23 \
-        ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -276,7 +267,6 @@ elif [[ "$1" == "cmake.c++14.stl.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=CXX14 \
-        ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -289,7 +279,6 @@ elif [[ "$1" == "cmake.c++17.stl.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=CXX17 \
-        ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -302,7 +291,6 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=CXX20 \
-        ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -315,7 +303,6 @@ elif [[ "$1" == "cmake.c++23.stl.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=CXX23 \
-        ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -360,6 +347,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_FILE=ON \
         -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
   proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"

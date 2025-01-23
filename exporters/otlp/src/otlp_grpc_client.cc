@@ -12,6 +12,7 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdio>
 #include <fstream>
 #include <iterator>
 #include <memory>
@@ -23,6 +24,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -346,6 +348,49 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
   {
     grpc_arguments.SetCompressionAlgorithm(GRPC_COMPRESS_GZIP);
   }
+
+#ifdef ENABLE_OTLP_RETRY_PREVIEW
+  if (options.retry_policy_max_attempts > 0U &&
+      options.retry_policy_initial_backoff > std::chrono::duration<float>::zero() &&
+      options.retry_policy_max_backoff > std::chrono::duration<float>::zero() &&
+      options.retry_policy_backoff_multiplier > 0.0f)
+  {
+    static const auto kServiceConfigJson = opentelemetry::nostd::string_view{R"(
+    {
+      "methodConfig": [
+        {
+          "name": [{}],
+          "retryPolicy": {
+            "maxAttempts": %0000000000u,
+            "initialBackoff": "%0000000000.1fs",
+            "maxBackoff": "%0000000000.1fs",
+            "backoffMultiplier": %0000000000.1f,
+            "retryableStatusCodes": [
+              "CANCELLED",
+              "DEADLINE_EXCEEDED",
+              "ABORTED",
+              "OUT_OF_RANGE",
+              "DATA_LOSS",
+              "UNAVAILABLE"
+            ]
+          }
+        }
+      ]
+    })"};
+
+    // Allocate string with buffer large enough to hold the formatted json config
+    auto service_config = std::string(kServiceConfigJson.size(), '\0');
+    // Prior to C++17, need to explicitly cast away constness from `data()` buffer
+    std::snprintf(
+        const_cast<decltype(service_config)::value_type *>(service_config.data()),
+        service_config.size(), kServiceConfigJson.data(), options.retry_policy_max_attempts,
+        std::min(std::max(options.retry_policy_initial_backoff.count(), 0.f), 999999999.f),
+        std::min(std::max(options.retry_policy_max_backoff.count(), 0.f), 999999999.f),
+        std::min(std::max(options.retry_policy_backoff_multiplier, 0.f), 999999999.f));
+
+    grpc_arguments.SetServiceConfigJSON(service_config);
+  }
+#endif  // ENABLE_OTLP_RETRY_PREVIEW
 
   if (options.use_ssl_credentials)
   {
