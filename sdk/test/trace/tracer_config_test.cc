@@ -45,33 +45,32 @@ static std::pair<opentelemetry::nostd::string_view, opentelemetry::common::Attri
 static std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> attr3 = {
     "accept_third_attr", 3};
 
-static instrumentation_scope::InstrumentationScope *test_scope_1 =
-    std::move(instrumentation_scope::InstrumentationScope::Create("test_scope_1")).get();
-static instrumentation_scope::InstrumentationScope *test_scope_2 =
-    std::move(instrumentation_scope::InstrumentationScope::Create("test_scope_2", "1.0")).get();
-static instrumentation_scope::InstrumentationScope *test_scope_3 =
-    std::move(instrumentation_scope::InstrumentationScope::Create(
-                  "test_scope_3",
-                  "0",
-                  "https://opentelemetry.io/schemas/v1.18.0"))
-        .get();
-static instrumentation_scope::InstrumentationScope *test_scope_4 =
-    std::move(instrumentation_scope::InstrumentationScope::Create(
-                  "test_scope_4",
-                  "0",
-                  "https://opentelemetry.io/schemas/v1.18.0",
-                  {attr1}))
-        .get();
-static instrumentation_scope::InstrumentationScope *test_scope_5 =
-    std::move(instrumentation_scope::InstrumentationScope::Create(
-                  "test_scope_5",
-                  "0",
-                  "https://opentelemetry.io/schemas/v1.18.0",
-                  {attr1, attr2, attr3}))
-        .get();
+static instrumentation_scope::InstrumentationScope test_scope_1 =
+    *instrumentation_scope::InstrumentationScope::Create("test_scope_1");
+static instrumentation_scope::InstrumentationScope test_scope_2 =
+    *instrumentation_scope::InstrumentationScope::Create("test_scope_2", "1.0");
+static instrumentation_scope::InstrumentationScope test_scope_3 =
+    *instrumentation_scope::InstrumentationScope::Create(
+        "test_scope_3",
+        "0",
+        "https://opentelemetry.io/schemas/v1.18.0");
+static instrumentation_scope::InstrumentationScope test_scope_4 =
+    *instrumentation_scope::InstrumentationScope::Create("test_scope_4",
+                                                         "0",
+                                                         "https://opentelemetry.io/schemas/v1.18.0",
+                                                         {attr1});
+static instrumentation_scope::InstrumentationScope test_scope_5 =
+    *instrumentation_scope::InstrumentationScope::Create("test_scope_5",
+                                                         "0",
+                                                         "https://opentelemetry.io/schemas/v1.18.0",
+                                                         {attr1, attr2, attr3});
 
+// This array could also directly contain the reference types, but that  leads to 'uninitialized
+// value was created by heap allocation' errors in Valgrind memcheck. This is a bug in Googletest
+// library, see https://github.com/google/googletest/issues/3805#issuecomment-1397301790 for more
+// details. Using pointers is a workaround to prevent the Valgrind warnings.
 const std::array<instrumentation_scope::InstrumentationScope *, 5> instrumentation_scopes = {
-    test_scope_1, test_scope_2, test_scope_3, test_scope_4, test_scope_5,
+    &test_scope_1, &test_scope_2, &test_scope_3, &test_scope_4, &test_scope_5,
 };
 
 // Test fixture for VerifyDefaultConfiguratorBehavior
