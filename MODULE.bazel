@@ -4,7 +4,7 @@ module(
     compatibility_level = 0,
 )
 
-bazel_dep(name = "abseil-cpp", version = "20240722.0.bcr.2")
+bazel_dep(name = "abseil-cpp", version = "20240722.1")
 single_version_override(
     module_name = "abseil-cpp",
     patch_strip = 1,
