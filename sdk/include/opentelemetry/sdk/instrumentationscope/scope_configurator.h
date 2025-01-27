@@ -45,8 +45,8 @@ public:
      * @param scope_config the scope configuration to return for the matched scope.
      * @return this
      */
-    Builder AddCondition(std::function<bool(const InstrumentationScope &)> scope_matcher,
-                         T scope_config)
+    Builder &AddCondition(std::function<bool(const InstrumentationScope &)> scope_matcher,
+                          T scope_config)
     {
       conditions_.emplace_back(scope_matcher, scope_config);
       return *this;
@@ -60,7 +60,7 @@ public:
      * @param scope_config The scope config for the matching scopes.
      * @return this
      */
-    Builder AddConditionNameEquals(nostd::string_view scope_name, T scope_config)
+    Builder &AddConditionNameEquals(nostd::string_view scope_name, T scope_config)
     {
       std::function<bool(const InstrumentationScope &)> name_equals_matcher =
           [scope_name = std::string(scope_name)](const InstrumentationScope &scope_info) {
@@ -75,7 +75,7 @@ public:
      * on the instrumentation scope.
      * @return a configured scope configurator.
      */
-    ScopeConfigurator<T> Build()
+    ScopeConfigurator<T> Build() const
     {
       if (conditions_.size() == 0)
       {
