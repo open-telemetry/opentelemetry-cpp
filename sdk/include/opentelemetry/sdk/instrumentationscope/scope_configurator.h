@@ -48,7 +48,7 @@ public:
     Builder AddCondition(std::function<bool(const InstrumentationScope &)> scope_matcher,
                          T scope_config)
     {
-      conditions_.push_back(Condition{scope_matcher, scope_config});
+      conditions_.emplace_back(scope_matcher, scope_config);
       return *this;
     }
 
@@ -63,10 +63,10 @@ public:
     Builder AddConditionNameEquals(nostd::string_view scope_name, T scope_config)
     {
       std::function<bool(const InstrumentationScope &)> name_equals_matcher =
-          [scope_name](const InstrumentationScope &scope_info) {
+          [scope_name = std::string(scope_name)](const InstrumentationScope &scope_info) {
             return scope_info.GetName() == scope_name;
           };
-      conditions_.push_back(Condition{name_equals_matcher, scope_config});
+      conditions_.emplace_back(name_equals_matcher, scope_config);
       return *this;
     }
 
@@ -103,13 +103,17 @@ public:
   private:
     /**
      * An internal struct to encapsulate 'conditions' that can be applied to a
-     * ScopeConfiguratorBuilder. The applied conditions influence the behavior of the generatred
+     * ScopeConfiguratorBuilder. The applied conditions influence the behavior of the generated
      * ScopeConfigurator.
      */
     struct Condition
     {
       std::function<bool(const InstrumentationScope &)> scope_matcher;
       T scope_config;
+
+      Condition(const std::function<bool(const InstrumentationScope &)> &matcher, const T &config)
+          : scope_matcher(matcher), scope_config(config)
+      {}
     };
 
     T default_scope_config_;
