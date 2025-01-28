@@ -3,7 +3,6 @@
 
 #include <curl/curl.h>
 #include <curl/curlver.h>
-#include <curl/system.h>
 
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
 #  include <array>
