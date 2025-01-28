@@ -23,7 +23,6 @@
 #include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/noop.h"
-#include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_context_kv_iterable.h"

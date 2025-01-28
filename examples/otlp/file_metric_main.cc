@@ -12,7 +12,6 @@
 #include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_options.h"
 #include "opentelemetry/metrics/meter_provider.h"
-#include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"

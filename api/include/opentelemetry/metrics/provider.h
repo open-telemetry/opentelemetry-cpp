@@ -26,8 +26,6 @@ class Provider;  // IWYU pragma: keep
 namespace metrics
 {
 
-class MeterProvider;
-
 /**
  * Stores the singleton global MeterProvider.
  */
