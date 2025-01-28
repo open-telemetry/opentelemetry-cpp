@@ -101,12 +101,12 @@ CreateAsyncDoubleMetricVcsChangeDuration(metrics::Meter *meter)
 
 /**
  * The amount of time since its creation it took a change (pull request/merge request/changelist) to
- * get the first approval <p> gauge
+ * get the first approval. <p> gauge
  */
 static constexpr const char *kMetricVcsChangeTimeToApproval = "vcs.change.time_to_approval";
 static constexpr const char *descrMetricVcsChangeTimeToApproval =
     "The amount of time since its creation it took a change (pull request/merge "
-    "request/changelist) to get the first approval";
+    "request/changelist) to get the first approval.";
 static constexpr const char *unitMetricVcsChangeTimeToApproval = "s";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -141,6 +141,47 @@ CreateAsyncDoubleMetricVcsChangeTimeToApproval(metrics::Meter *meter)
   return meter->CreateDoubleObservableGauge(kMetricVcsChangeTimeToApproval,
                                             descrMetricVcsChangeTimeToApproval,
                                             unitMetricVcsChangeTimeToApproval);
+}
+
+/**
+ * The amount of time since its creation it took a change (pull request/merge request/changelist) to
+ * get merged into the target(base) ref. <p> gauge
+ */
+static constexpr const char *kMetricVcsChangeTimeToMerge = "vcs.change.time_to_merge";
+static constexpr const char *descrMetricVcsChangeTimeToMerge =
+    "The amount of time since its creation it took a change (pull request/merge "
+    "request/changelist) to get merged into the target(base) ref.";
+static constexpr const char *unitMetricVcsChangeTimeToMerge = "s";
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>> CreateSyncInt64MetricVcsChangeTimeToMerge(
+    metrics::Meter *meter)
+{
+  return meter->CreateInt64Gauge(kMetricVcsChangeTimeToMerge, descrMetricVcsChangeTimeToMerge,
+                                 unitMetricVcsChangeTimeToMerge);
+}
+
+static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricVcsChangeTimeToMerge(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleGauge(kMetricVcsChangeTimeToMerge, descrMetricVcsChangeTimeToMerge,
+                                  unitMetricVcsChangeTimeToMerge);
+}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricVcsChangeTimeToMerge(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableGauge(
+      kMetricVcsChangeTimeToMerge, descrMetricVcsChangeTimeToMerge, unitMetricVcsChangeTimeToMerge);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricVcsChangeTimeToMerge(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableGauge(
+      kMetricVcsChangeTimeToMerge, descrMetricVcsChangeTimeToMerge, unitMetricVcsChangeTimeToMerge);
 }
 
 /**
@@ -185,13 +226,13 @@ CreateAsyncDoubleMetricVcsContributorCount(metrics::Meter *meter)
 }
 
 /**
- * The number of refs of type branch or tag in a repository
+ * The number of refs of type branch or tag in a repository.
  * <p>
  * updowncounter
  */
 static constexpr const char *kMetricVcsRefCount = "vcs.ref.count";
 static constexpr const char *descrMetricVcsRefCount =
-    "The number of refs of type branch or tag in a repository";
+    "The number of refs of type branch or tag in a repository.";
 static constexpr const char *unitMetricVcsRefCount = "{ref}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>> CreateSyncInt64MetricVcsRefCount(
@@ -224,7 +265,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 
 /**
  * The number of lines added/removed in a ref (branch) relative to the ref from the @code
- * vcs.ref.base.name @endcode attribute <p> This metric should be reported for each @code
+ * vcs.ref.base.name @endcode attribute. <p> This metric should be reported for each @code
  * vcs.line_change.type @endcode value. For example if a ref added 3 lines and removed 2 lines,
  * instrumentation SHOULD report two measurements: 3 and 2 (both positive numbers).
  * If number of lines added/removed should be calculated from the start of time, then @code
@@ -233,7 +274,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 static constexpr const char *kMetricVcsRefLinesDelta = "vcs.ref.lines_delta";
 static constexpr const char *descrMetricVcsRefLinesDelta =
     "The number of lines added/removed in a ref (branch) relative to the ref from the "
-    "`vcs.ref.base.name` attribute";
+    "`vcs.ref.base.name` attribute.";
 static constexpr const char *unitMetricVcsRefLinesDelta = "{line}";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -352,13 +393,13 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * The number of repositories in an organization
+ * The number of repositories in an organization.
  * <p>
  * updowncounter
  */
 static constexpr const char *kMetricVcsRepositoryCount = "vcs.repository.count";
 static constexpr const char *descrMetricVcsRepositoryCount =
-    "The number of repositories in an organization";
+    "The number of repositories in an organization.";
 static constexpr const char *unitMetricVcsRepositoryCount = "{repository}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>

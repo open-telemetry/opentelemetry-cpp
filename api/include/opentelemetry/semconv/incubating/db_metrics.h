@@ -769,16 +769,23 @@ CreateSyncDoubleMetricDbClientConnectionsWaitTime(metrics::Meter *meter)
 }
 
 /**
- * Number of active client instances
+ * Deprecated, use @code azure.cosmosdb.client.active_instance.count @endcode instead.
+ * <p>
+ * @deprecated
+ * Replaced by @code azure.cosmosdb.client.active_instance.count @endcode.
  * <p>
  * updowncounter
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kMetricDbClientCosmosdbActiveInstanceCount =
     "db.client.cosmosdb.active_instance.count";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricDbClientCosmosdbActiveInstanceCount =
-    "Number of active client instances";
+    "Deprecated, use `azure.cosmosdb.client.active_instance.count` instead.";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *unitMetricDbClientCosmosdbActiveInstanceCount = "{instance}";
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricDbClientCosmosdbActiveInstanceCount(metrics::Meter *meter)
 {
@@ -787,6 +794,7 @@ CreateSyncInt64MetricDbClientCosmosdbActiveInstanceCount(metrics::Meter *meter)
                                          unitMetricDbClientCosmosdbActiveInstanceCount);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricDbClientCosmosdbActiveInstanceCount(metrics::Meter *meter)
 {
@@ -795,6 +803,7 @@ CreateSyncDoubleMetricDbClientCosmosdbActiveInstanceCount(metrics::Meter *meter)
                                           unitMetricDbClientCosmosdbActiveInstanceCount);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricDbClientCosmosdbActiveInstanceCount(metrics::Meter *meter)
 {
@@ -803,6 +812,7 @@ CreateAsyncInt64MetricDbClientCosmosdbActiveInstanceCount(metrics::Meter *meter)
                                                    unitMetricDbClientCosmosdbActiveInstanceCount);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricDbClientCosmosdbActiveInstanceCount(metrics::Meter *meter)
 {
@@ -812,16 +822,23 @@ CreateAsyncDoubleMetricDbClientCosmosdbActiveInstanceCount(metrics::Meter *meter
 }
 
 /**
- * <a href="https://learn.microsoft.com/azure/cosmos-db/request-units">Request charge</a> consumed
- * by the operation <p> histogram
+ * Deprecated, use @code azure.cosmosdb.client.operation.request_charge @endcode instead.
+ * <p>
+ * @deprecated
+ * Replaced by @code azure.cosmosdb.client.operation.request_charge @endcode.
+ * <p>
+ * histogram
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kMetricDbClientCosmosdbOperationRequestCharge =
     "db.client.cosmosdb.operation.request_charge";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *descrMetricDbClientCosmosdbOperationRequestCharge =
-    "[Request charge](https://learn.microsoft.com/azure/cosmos-db/request-units) consumed by the "
-    "operation";
+    "Deprecated, use `azure.cosmosdb.client.operation.request_charge` instead.";
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *unitMetricDbClientCosmosdbOperationRequestCharge = "{request_unit}";
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
 CreateSyncInt64MetricDbClientCosmosdbOperationRequestCharge(metrics::Meter *meter)
 {
@@ -830,6 +847,7 @@ CreateSyncInt64MetricDbClientCosmosdbOperationRequestCharge(metrics::Meter *mete
                                       unitMetricDbClientCosmosdbOperationRequestCharge);
 }
 
+OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<metrics::Histogram<double>>
 CreateSyncDoubleMetricDbClientCosmosdbOperationRequestCharge(metrics::Meter *meter)
 {

@@ -43,57 +43,72 @@ static constexpr const char *kVcsLineChangeType = "vcs.line_change.type";
 
 /**
  * The name of the <a href="https://git-scm.com/docs/gitglossary#def_ref">reference</a> such as
- * <strong>branch</strong> or <strong>tag</strong> in the repository.
+ * <strong>branch</strong> or <strong>tag</strong> in the repository. <p>
+ * @code base @endcode refers to the starting point of a change. For example, @code main @endcode
+ * would be the base reference of type branch if you've created a new
+ * reference of type branch from it and created new commits.
  */
 static constexpr const char *kVcsRefBaseName = "vcs.ref.base.name";
 
 /**
  * The revision, literally <a href="https://www.merriam-webster.com/dictionary/revision">revised
  * version</a>, The revision most often refers to a commit object in Git, or a revision number in
- * SVN. <p> The revision can be a full <a
- * href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf">hash value (see glossary)</a>,
- * of the recorded change to a ref within a repository pointing to a
+ * SVN. <p>
+ * @code base @endcode refers to the starting point of a change. For example, @code main @endcode
+ * would be the base reference of type branch if you've created a new
+ * reference of type branch from it and created new commits. The
+ * revision can be a full <a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf">hash
+ * value (see glossary)</a>, of the recorded change to a ref within a repository pointing to a
  * commit <a href="https://git-scm.com/docs/git-commit">commit</a> object. It does
- * not necessarily have to be a hash; it can simply define a
- * <a href="https://svnbook.red-bean.com/en/1.7/svn.tour.revs.specifiers.html">revision number</a>
+ * not necessarily have to be a hash; it can simply define a <a
+ * href="https://svnbook.red-bean.com/en/1.7/svn.tour.revs.specifiers.html">revision number</a>
  * which is an integer that is monotonically increasing. In cases where
- * it is identical to the @code ref.base.name @endcode, it SHOULD still be included. It is
- * up to the implementer to decide which value to set as the revision
- * based on the VCS system and situational context.
+ * it is identical to the @code ref.base.name @endcode, it SHOULD still be included.
+ * It is up to the implementer to decide which value to set as the
+ * revision based on the VCS system and situational context.
  */
 static constexpr const char *kVcsRefBaseRevision = "vcs.ref.base.revision";
 
 /**
  * The type of the <a href="https://git-scm.com/docs/gitglossary#def_ref">reference</a> in the
- * repository.
+ * repository. <p>
+ * @code base @endcode refers to the starting point of a change. For example, @code main @endcode
+ * would be the base reference of type branch if you've created a new
+ * reference of type branch from it and created new commits.
  */
 static constexpr const char *kVcsRefBaseType = "vcs.ref.base.type";
 
 /**
  * The name of the <a href="https://git-scm.com/docs/gitglossary#def_ref">reference</a> such as
- * <strong>branch</strong> or <strong>tag</strong> in the repository.
+ * <strong>branch</strong> or <strong>tag</strong> in the repository. <p>
+ * @code head @endcode refers to where you are right now; the current reference at a
+ * given time.
  */
 static constexpr const char *kVcsRefHeadName = "vcs.ref.head.name";
 
 /**
  * The revision, literally <a href="https://www.merriam-webster.com/dictionary/revision">revised
  * version</a>, The revision most often refers to a commit object in Git, or a revision number in
- * SVN. <p> The revision can be a full <a
+ * SVN. <p>
+ * @code head @endcode refers to where you are right now; the current reference at a
+ * given time.The revision can be a full <a
  * href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf">hash value (see glossary)</a>,
  * of the recorded change to a ref within a repository pointing to a
  * commit <a href="https://git-scm.com/docs/git-commit">commit</a> object. It does
- * not necessarily have to be a hash; it can simply define a
- * <a href="https://svnbook.red-bean.com/en/1.7/svn.tour.revs.specifiers.html">revision number</a>
+ * not necessarily have to be a hash; it can simply define a <a
+ * href="https://svnbook.red-bean.com/en/1.7/svn.tour.revs.specifiers.html">revision number</a>
  * which is an integer that is monotonically increasing. In cases where
- * it is identical to the @code ref.head.name @endcode, it SHOULD still be included. It is
- * up to the implementer to decide which value to set as the revision
- * based on the VCS system and situational context.
+ * it is identical to the @code ref.head.name @endcode, it SHOULD still be included.
+ * It is up to the implementer to decide which value to set as the
+ * revision based on the VCS system and situational context.
  */
 static constexpr const char *kVcsRefHeadRevision = "vcs.ref.head.revision";
 
 /**
  * The type of the <a href="https://git-scm.com/docs/gitglossary#def_ref">reference</a> in the
- * repository.
+ * repository. <p>
+ * @code head @endcode refers to where you are right now; the current reference at a
+ * given time.
  */
 static constexpr const char *kVcsRefHeadType = "vcs.ref.head.type";
 
@@ -120,6 +135,14 @@ static constexpr const char *kVcsRepositoryChangeId = "vcs.repository.change.id"
  */
 OPENTELEMETRY_DEPRECATED
 static constexpr const char *kVcsRepositoryChangeTitle = "vcs.repository.change.title";
+
+/**
+ * The human readable name of the repository. It SHOULD NOT include any additional identifier like
+ * Group/SubGroup in GitLab or organization in GitHub. <p> Due to it only being the name, it can
+ * clash with forks of the same repository if collecting telemetry across multiple orgs or groups in
+ * the same backends.
+ */
+static constexpr const char *kVcsRepositoryName = "vcs.repository.name";
 
 /**
  * Deprecated, use @code vcs.ref.head.name @endcode instead.
@@ -149,8 +172,11 @@ OPENTELEMETRY_DEPRECATED
 static constexpr const char *kVcsRepositoryRefType = "vcs.repository.ref.type";
 
 /**
- * The <a href="https://wikipedia.org/wiki/URL">URL</a> of the repository providing the complete
- * address in order to locate and identify the repository.
+ * The <a
+ * href="https://support.google.com/webmasters/answer/10347851?hl=en#:~:text=A%20canonical%20URL%20is%20the,Google%20chooses%20one%20as%20canonical.">canonical
+ * URL</a> of the repository providing the complete HTTP(S) address in order to locate and identify
+ * the repository through a browser. <p> In Git Version Control Systems, the canonical URL SHOULD
+ * NOT include the @code .git @endcode extension.
  */
 static constexpr const char *kVcsRepositoryUrlFull = "vcs.repository.url.full";
 

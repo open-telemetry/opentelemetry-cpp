@@ -70,6 +70,7 @@ static constexpr const char *kUrlFragment = "url.fragment";
  * href="https://cloud.google.com/storage/docs/access-control/signed-urls">@code X-Goog-Signature
  * @endcode</a></li>
  * </ul>
+ * <p>
  * This list is subject to change over time.
  * <p>
  * When a query string value is redacted, the query string key SHOULD still be preserved, e.g.
@@ -119,6 +120,7 @@ static constexpr const char *kUrlPort = "url.port";
  * href="https://cloud.google.com/storage/docs/access-control/signed-urls">@code X-Goog-Signature
  * @endcode</a></li>
  * </ul>
+ * <p>
  * This list is subject to change over time.
  * <p>
  * When a query string value is redacted, the query string key SHOULD still be preserved, e.g.
