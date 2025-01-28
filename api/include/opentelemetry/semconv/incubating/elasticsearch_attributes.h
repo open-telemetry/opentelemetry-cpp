@@ -5,7 +5,7 @@
 
 /*
  * DO NOT EDIT, this is an Auto-generated file from:
- * buildscripts/semantic-convention/templates/registry/schema_url-h.j2
+ * buildscripts/semantic-convention/templates/registry/semantic_attributes-h.j2
  */
 
 #pragma once
@@ -16,9 +16,14 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace semconv
 {
+namespace elasticsearch
+{
+
 /**
- * The URL of the OpenTelemetry schema for these keys and values.
+ * Represents the human-readable identifier of the node/instance to which a request was routed.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.30.0";
+static constexpr const char *kElasticsearchNodeName = "elasticsearch.node.name";
+
+}  // namespace elasticsearch
 }  // namespace semconv
 OPENTELEMETRY_END_NAMESPACE
