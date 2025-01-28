@@ -74,6 +74,11 @@ static constexpr const char *kRuby = "ruby";
  */
 static constexpr const char *kV8js = "v8js";
 
+/**
+ * <a href="https://en.wikipedia.org/wiki/BEAM_(Erlang_virtual_machine)">Erlang</a>
+ */
+static constexpr const char *kBeam = "beam";
+
 }  // namespace ProfileFrameTypeValues
 
 }  // namespace profile
