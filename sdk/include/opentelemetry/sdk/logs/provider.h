@@ -26,12 +26,6 @@ public:
    */
   static void SetLoggerProvider(
       const nostd::shared_ptr<opentelemetry::logs::LoggerProvider> &lp) noexcept;
-
-  /**
-   * Changes the singleton EventLoggerProvider.
-   */
-  static void SetEventLoggerProvider(
-      const nostd::shared_ptr<opentelemetry::logs::EventLoggerProvider> &lp) noexcept;
 };
 
 }  // namespace logs

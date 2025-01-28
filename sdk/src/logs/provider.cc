@@ -28,17 +28,6 @@ void Provider::SetLoggerProvider(
   }
 }
 
-void Provider::SetEventLoggerProvider(
-    const nostd::shared_ptr<opentelemetry::logs::EventLoggerProvider> &lp) noexcept
-{
-  bool disabled = opentelemetry::sdk::common::GetSdkDisabled();
-
-  if (!disabled)
-  {
-    opentelemetry::logs::Provider::SetEventLoggerProvider(lp);
-  }
-}
-
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
