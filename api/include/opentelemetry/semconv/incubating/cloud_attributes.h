@@ -212,6 +212,16 @@ static constexpr const char *kGcpOpenshift = "gcp_openshift";
 static constexpr const char *kIbmCloudOpenshift = "ibm_cloud_openshift";
 
 /**
+ * Compute on Oracle Cloud Infrastructure (OCI)
+ */
+static constexpr const char *kOracleCloudCompute = "oracle_cloud_compute";
+
+/**
+ * Kubernetes Engine (OKE) on Oracle Cloud Infrastructure (OCI)
+ */
+static constexpr const char *kOracleCloudOke = "oracle_cloud_oke";
+
+/**
  * Tencent Cloud Cloud Virtual Machine (CVM)
  */
 static constexpr const char *kTencentCloudCvm = "tencent_cloud_cvm";
@@ -259,6 +269,11 @@ static constexpr const char *kHeroku = "heroku";
  * IBM Cloud
  */
 static constexpr const char *kIbmCloud = "ibm_cloud";
+
+/**
+ * Oracle Cloud Infrastructure (OCI)
+ */
+static constexpr const char *kOracleCloud = "oracle_cloud";
 
 /**
  * Tencent Cloud
