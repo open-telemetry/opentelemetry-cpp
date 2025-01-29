@@ -40,14 +40,11 @@ static constexpr const char *kK8sClusterName = "k8s.cluster.name";
  * change if the cluster is rebuilt. Furthermore, Kubernetes UIDs are
  * UUIDs as standardized by
  * <a href="https://www.itu.int/ITU-T/studygroups/com17/oid.html">ISO/IEC 9834-8 and ITU-T
- * X.667</a>. Which states: <p> <blockquote> If generated according to one of the mechanisms defined
- * in Rec. ITU-T X.667 | ISO/IEC 9834-8, a UUID is either guaranteed to be different from all other
+ * X.667</a>. Which states: <blockquote> If generated according to one of the mechanisms defined in
+ * Rec. ITU-T X.667 | ISO/IEC 9834-8, a UUID is either guaranteed to be different from all other
  * UUIDs generated before 3603 A.D., or is extremely likely to be different (depending on the
- * mechanism chosen).</blockquote>
- *
- * <p>
- * Therefore, UIDs between clusters should be extremely unlikely to
- * conflict.
+ * mechanism chosen).</blockquote> <p> Therefore, UIDs between clusters should be extremely unlikely
+ * to conflict.
  */
 static constexpr const char *kK8sClusterUid = "k8s.cluster.uid";
 
@@ -113,6 +110,16 @@ static constexpr const char *kK8sJobUid = "k8s.job.uid";
  * The name of the namespace that the pod is running in.
  */
 static constexpr const char *kK8sNamespaceName = "k8s.namespace.name";
+
+/**
+ * The phase of the K8s namespace.
+ * <p>
+ * This attribute aligns with the @code phase @endcode field of the
+ * <a
+ * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#namespacestatus-v1-core">K8s
+ * NamespaceStatus</a>
+ */
+static constexpr const char *kK8sNamespacePhase = "k8s.namespace.phase";
 
 /**
  * The name of the Node.
@@ -185,44 +192,60 @@ static constexpr const char *kK8sVolumeName = "k8s.volume.name";
  */
 static constexpr const char *kK8sVolumeType = "k8s.volume.type";
 
+namespace K8sNamespacePhaseValues
+{
+/**
+ * Active namespace phase as described by <a
+ * href="https://pkg.go.dev/k8s.io/api@v0.31.3/core/v1#NamespacePhase">K8s API</a>
+ */
+static constexpr const char *kActive = "active";
+
+/**
+ * Terminating namespace phase as described by <a
+ * href="https://pkg.go.dev/k8s.io/api@v0.31.3/core/v1#NamespacePhase">K8s API</a>
+ */
+static constexpr const char *kTerminating = "terminating";
+
+}  // namespace K8sNamespacePhaseValues
+
 namespace K8sVolumeTypeValues
 {
 /**
  * A <a
- * href="https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#persistentvolumeclaim">persistentVolumeClaim</a>
+ * href="https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#persistentvolumeclaim">persistentVolumeClaim</a>
  * volume
  */
 static constexpr const char *kPersistentVolumeClaim = "persistentVolumeClaim";
 
 /**
  * A <a
- * href="https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#configmap">configMap</a>
+ * href="https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#configmap">configMap</a>
  * volume
  */
 static constexpr const char *kConfigMap = "configMap";
 
 /**
  * A <a
- * href="https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#downwardapi">downwardAPI</a>
+ * href="https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#downwardapi">downwardAPI</a>
  * volume
  */
 static constexpr const char *kDownwardApi = "downwardAPI";
 
 /**
  * An <a
- * href="https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#emptydir">emptyDir</a>
+ * href="https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#emptydir">emptyDir</a>
  * volume
  */
 static constexpr const char *kEmptyDir = "emptyDir";
 
 /**
- * A <a href="https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#secret">secret</a>
+ * A <a href="https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#secret">secret</a>
  * volume
  */
 static constexpr const char *kSecret = "secret";
 
 /**
- * A <a href="https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#local">local</a>
+ * A <a href="https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#local">local</a>
  * volume
  */
 static constexpr const char *kLocal = "local";

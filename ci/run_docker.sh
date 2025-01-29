@@ -7,7 +7,7 @@ set -e
 
 BUILD_IMAGE=opentelemetry-cpp-build
 docker image inspect "$BUILD_IMAGE" &> /dev/null || {
-  docker build -t "$BUILD_IMAGE" ci
+  docker build -t "$BUILD_IMAGE" -f .devcontainer/Dockerfile.dev .
 }
 
 if [[ $# -ge 1 ]]; then

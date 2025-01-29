@@ -78,6 +78,9 @@ jobs:
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
+    - name: setup grpc
+      run: |
+        sudo ./ci/setup_grpc.sh
     - name: run cmake gcc (maintainer mode, sync)
       env:
         CC: /usr/bin/gcc-14
@@ -111,6 +114,9 @@ jobs:
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
+    - name: setup grpc
+      run: |
+        sudo ./ci/setup_grpc.sh
     - name: run cmake gcc (maintainer mode, async)
       env:
         CC: /usr/bin/gcc-14
@@ -144,6 +150,9 @@ jobs:
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
+    - name: setup grpc
+      run: |
+        sudo ./ci/setup_grpc.sh
     - name: run cmake clang (maintainer mode, sync)
       env:
         CC: /usr/bin/clang-18
@@ -211,6 +220,9 @@ jobs:
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
+    - name: setup grpc
+      run: |
+        sudo ./ci/setup_grpc.sh
     - name: run cmake clang (maintainer mode, async)
       env:
         CC: /usr/bin/clang-18
@@ -244,6 +256,9 @@ jobs:
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
+    - name: setup grpc
+      run: |
+        sudo ./ci/setup_grpc.sh
     - name: run cmake clang (maintainer mode, abiv2)
       env:
         CC: /usr/bin/clang-18

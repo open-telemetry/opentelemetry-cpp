@@ -64,8 +64,12 @@ static constexpr const char *kSystemFilesystemType = "system.filesystem.type";
 static constexpr const char *kSystemMemoryState = "system.memory.state";
 
 /**
- * A stateless protocol MUST NOT set this attribute
+ * Deprecated, use @code network.connection.state @endcode instead.
+ * <p>
+ * @deprecated
+ * Removed, report network connection state with @code network.connection.state @endcode attribute
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kSystemNetworkState = "system.network.state";
 
 /**
