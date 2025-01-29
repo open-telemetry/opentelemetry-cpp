@@ -15,6 +15,47 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Support OTEL_SDK_DISABLED environment variable
+  [#3245](https://github.com/open-telemetry/opentelemetry-cpp/pull/3245)
+
+Important changes:
+
+* [SDK] Support OTEL_SDK_DISABLED environment variable
+  [#3245](https://github.com/open-telemetry/opentelemetry-cpp/pull/3245)
+
+  * The SDK now exposes the following new methods:
+
+    * opentelemetry::sdk::trace::Provider::SetTracerProvider()
+    * opentelemetry::sdk::metrics::Provider::SetMeterProvider()
+    * opentelemetry::sdk::logs::Provider::SetLoggerProvider()
+
+  * These methods do support the `OTEL_SDK_DISABLED` environment variable,
+    unlike the corresponding existing API Provider classes.
+
+  * Applications are encouraged to migrate from the API to the SDK
+    `Provider` classes, to benefit from this feature.
+
+  * Note that the API methods will no longer be public starting
+    with OPENTELEMETRY_ABI_VERSION >= 2, only the SDK methods will
+    be available then.
+
+  * All the example code has been updated to reflect the new usage.
+
+Breaking changes:
+
+* [SDK] Support OTEL_SDK_DISABLED environment variable
+  [#3245](https://github.com/open-telemetry/opentelemetry-cpp/pull/3245)
+
+  * The following existing API methods are no longer public
+    starting with OPENTELEMETRY_ABI_VERSION >= 2.
+
+    * opentelemetry::trace::Provider::SetTracerProvider()
+    * opentelemetry::metrics::Provider::SetMeterProvider()
+    * opentelemetry::logs::Provider::SetLoggerProvider()
+
+  * Applications should use the corresponding SDK methods,
+    already available in every ABI version.
+
 ## [1.19 2025-01-22]
 
 * [PROMETHEUS_EXPORTER] Fix default for emitting otel_scope attributes

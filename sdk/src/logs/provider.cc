@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/metrics/provider.h"
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/logs/logger_provider.h"
-#include "opentelemetry/logs/noop.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/disabled.h"
