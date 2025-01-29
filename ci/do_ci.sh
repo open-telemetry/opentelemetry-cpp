@@ -218,8 +218,9 @@ elif [[ "$1" == "cmake.maintainer.yaml.test" ]]; then
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
+        -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         -DWITH_CONFIGURATION=ON \
-        ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
