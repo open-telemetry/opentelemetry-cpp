@@ -112,9 +112,9 @@ static constexpr const char *kRpcMessageUncompressedSize = "rpc.message.uncompre
 /**
  * The name of the (logical) method being called, must be equal to the $method part in the span
  * name. <p> This is the logical name of the method from the RPC interface perspective, which can be
- * different from the name of any implementing method/function. The @code code.function @endcode
- * attribute may be used to store the latter (e.g., method actually executing the call on the server
- * side, RPC client stub method on the client side).
+ * different from the name of any implementing method/function. The @code code.function.name
+ * @endcode attribute may be used to store the latter (e.g., method actually executing the call on
+ * the server side, RPC client stub method on the client side).
  */
 static constexpr const char *kRpcMethod = "rpc.method";
 

@@ -20,11 +20,6 @@ namespace network
 {
 
 /**
- * The network interface name.
- */
-static constexpr const char *kNetworkInterfaceName = "network.interface.name";
-
-/**
  * Local address of the network connection - IP address or Unix domain socket name.
  */
 static constexpr const char *kNetworkLocalAddress = "network.local.address";

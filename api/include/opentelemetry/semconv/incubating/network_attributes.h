@@ -40,6 +40,14 @@ static constexpr const char *kNetworkCarrierMnc = "network.carrier.mnc";
 static constexpr const char *kNetworkCarrierName = "network.carrier.name";
 
 /**
+ * The state of network connection
+ * <p>
+ * Connection states are defined as part of the <a
+ * href="https://datatracker.ietf.org/doc/html/rfc9293#section-3.3.2">rfc9293</a>
+ */
+static constexpr const char *kNetworkConnectionState = "network.connection.state";
+
+/**
  * This describes more details regarding the connection.type. It may be the type of cell technology
  * connection, but it could be used for describing details about a wifi connection.
  */
@@ -112,6 +120,65 @@ static constexpr const char *kNetworkTransport = "network.transport";
  * The value SHOULD be normalized to lowercase.
  */
 static constexpr const char *kNetworkType = "network.type";
+
+namespace NetworkConnectionStateValues
+{
+/**
+ * none
+ */
+static constexpr const char *kClosed = "closed";
+
+/**
+ * none
+ */
+static constexpr const char *kCloseWait = "close_wait";
+
+/**
+ * none
+ */
+static constexpr const char *kClosing = "closing";
+
+/**
+ * none
+ */
+static constexpr const char *kEstablished = "established";
+
+/**
+ * none
+ */
+static constexpr const char *kFinWait1 = "fin_wait_1";
+
+/**
+ * none
+ */
+static constexpr const char *kFinWait2 = "fin_wait_2";
+
+/**
+ * none
+ */
+static constexpr const char *kLastAck = "last_ack";
+
+/**
+ * none
+ */
+static constexpr const char *kListen = "listen";
+
+/**
+ * none
+ */
+static constexpr const char *kSynReceived = "syn_received";
+
+/**
+ * none
+ */
+static constexpr const char *kSynSent = "syn_sent";
+
+/**
+ * none
+ */
+static constexpr const char *kTimeWait = "time_wait";
+
+}  // namespace NetworkConnectionStateValues
 
 namespace NetworkConnectionSubtypeValues
 {

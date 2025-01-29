@@ -35,8 +35,12 @@ static constexpr const char *kGenAiOpenaiRequestResponseFormat =
     "gen_ai.openai.request.response_format";
 
 /**
- * Requests with same seed value more likely to return same result.
+ * Deprecated, use @code gen_ai.request.seed @endcode.
+ * <p>
+ * @deprecated
+ * Replaced by @code gen_ai.request.seed @endcode attribute.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kGenAiOpenaiRequestSeed = "gen_ai.openai.request.seed";
 
 /**
@@ -104,6 +108,11 @@ static constexpr const char *kGenAiRequestModel = "gen_ai.request.model";
 static constexpr const char *kGenAiRequestPresencePenalty = "gen_ai.request.presence_penalty";
 
 /**
+ * Requests with same seed value more likely to return same result.
+ */
+static constexpr const char *kGenAiRequestSeed = "gen_ai.request.seed";
+
+/**
  * List of sequences that the model will use to stop generating further tokens.
  */
 static constexpr const char *kGenAiRequestStopSequences = "gen_ai.request.stop_sequences";
@@ -143,9 +152,11 @@ static constexpr const char *kGenAiResponseModel = "gen_ai.response.model";
  * <p>
  * The @code gen_ai.system @endcode describes a family of GenAI models with specific model
  * identified by @code gen_ai.request.model @endcode and @code gen_ai.response.model @endcode
- * attributes. <p> The actual GenAI product may differ from the one identified by the client. For
- * example, when using OpenAI client libraries to communicate with Mistral, the @code gen_ai.system
- * @endcode is set to @code openai @endcode based on the instrumentation's best knowledge. <p> For
+ * attributes. <p> The actual GenAI product may differ from the one identified by the client.
+ * Multiple systems, including Azure OpenAI and Gemini, are accessible by OpenAI client
+ * libraries. In such cases, the @code gen_ai.system @endcode is set to @code openai @endcode based
+ * on the instrumentation's best knowledge, instead of the actual system. The @code server.address
+ * @endcode attribute may help identify the actual system in use for @code openai @endcode. <p> For
  * custom model, a custom friendly name SHOULD be used. If none of these options apply, the @code
  * gen_ai.system @endcode SHOULD be set to @code _OTHER @endcode.
  */
@@ -254,6 +265,11 @@ static constexpr const char *kOpenai = "openai";
 static constexpr const char *kVertexAi = "vertex_ai";
 
 /**
+ * Gemini
+ */
+static constexpr const char *kGemini = "gemini";
+
+/**
  * Anthropic
  */
 static constexpr const char *kAnthropic = "anthropic";
@@ -269,6 +285,11 @@ static constexpr const char *kCohere = "cohere";
 static constexpr const char *kAzAiInference = "az.ai.inference";
 
 /**
+ * Azure OpenAI
+ */
+static constexpr const char *kAzAiOpenai = "az.ai.openai";
+
+/**
  * IBM Watsonx AI
  */
 static constexpr const char *kIbmWatsonxAi = "ibm.watsonx.ai";
@@ -277,6 +298,31 @@ static constexpr const char *kIbmWatsonxAi = "ibm.watsonx.ai";
  * AWS Bedrock
  */
 static constexpr const char *kAwsBedrock = "aws.bedrock";
+
+/**
+ * Perplexity
+ */
+static constexpr const char *kPerplexity = "perplexity";
+
+/**
+ * xAI
+ */
+static constexpr const char *kXai = "xai";
+
+/**
+ * DeepSeek
+ */
+static constexpr const char *kDeepseek = "deepseek";
+
+/**
+ * Groq
+ */
+static constexpr const char *kGroq = "groq";
+
+/**
+ * Mistral AI
+ */
+static constexpr const char *kMistralAi = "mistral_ai";
 
 }  // namespace GenAiSystemValues
 
