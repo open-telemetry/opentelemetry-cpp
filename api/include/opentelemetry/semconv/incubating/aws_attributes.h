@@ -187,6 +187,11 @@ static constexpr const char *kAwsEcsTaskRevision = "aws.ecs.task.revision";
 static constexpr const char *kAwsEksClusterArn = "aws.eks.cluster.arn";
 
 /**
+ * The AWS extended request ID as returned in the response header @code x-amz-id-2 @endcode.
+ */
+static constexpr const char *kAwsExtendedRequestId = "aws.extended_request_id";
+
+/**
  * The full invoked ARN as provided on the @code Context @endcode passed to the function (@code
  * Lambda-Runtime-Invoked-Function-Arn @endcode header on the @code /runtime/invocation/next
  * @endcode applicable). <p> This may be different from @code cloud.resource_id @endcode if an alias
@@ -227,8 +232,8 @@ static constexpr const char *kAwsLogStreamArns = "aws.log.stream.arns";
 static constexpr const char *kAwsLogStreamNames = "aws.log.stream.names";
 
 /**
- * The AWS request ID as returned in the response headers @code x-amz-request-id @endcode or @code
- * x-amz-requestid @endcode.
+ * The AWS request ID as returned in the response headers @code x-amzn-requestid @endcode, @code
+ * x-amzn-request-id @endcode or @code x-amz-request-id @endcode.
  */
 static constexpr const char *kAwsRequestId = "aws.request_id";
 
