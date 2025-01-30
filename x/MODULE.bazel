@@ -87,4 +87,4 @@ use_repo(
 #
 bazel_dep(name = "grpc-java", version = "1.69.0")
 
-bazel_dep(name = "rules_cue", version = "0.10.0")
+bazel_dep(name = "rules_cue", version = "0.11.0")
