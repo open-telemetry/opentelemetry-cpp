@@ -16,7 +16,7 @@ single_version_override(
         "bazel/absl_win10_cache_zone.patch",
     ],
 )
-bazel_dep(name = "aspect_bazel_lib", version = "2.12.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.13.0")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "boringssl", version = "0.20250114.0")
 bazel_dep(name = "curl", version = "8.8.0.bcr.2")
