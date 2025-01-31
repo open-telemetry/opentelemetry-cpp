@@ -96,12 +96,12 @@ This property makes it possible to:
 
 ### Case study, using Factory and shared gRPC client between OTLP gRPC exporters
 
-To reduce the cost of gRPC, the SDK allow users to shared gRPC clients between
+To reduce the cost of gRPC, the SDK allow users to share gRPC clients between
 OTLP gRPC exporters when these exporters have the same settings. This can be
 used as follows from the application code:
 
 ```cpp
-// Include follows headers
+// Include following headers
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
@@ -112,12 +112,17 @@ used as follows from the application code:
 namespace otlp = opentelemetry::exporter::otlp;
 
 void SetupOtlp() {
+  otlp::OtlpGrpcClientOptions client_opts;
   otlp::OtlpGrpcExporterOptions trace_opts;
   otlp::OtlpGrpcLogRecordExporterOptions log_opts;
 
-  // Setting trace_opts and log_opts
+  // Setting client_opts, trace_opts and log_opts
+  // client_opts.endpoint = "localhost:1234";
+  // Or we can use client_opts = trace_opts; to copy options from environment of
+  // trace OTLP exporter.
+
   std::shared_ptr<otlp::OtlpGrpcClient> shared_client =
-    otlp::OtlpGrpcClientFactory::Create(trace_opts);
+    otlp::OtlpGrpcClientFactory::Create(client_opts);
 
   // Create exporters
   auto trace_exporter =
@@ -129,8 +134,8 @@ void SetupOtlp() {
 }
 ```
 
-Be careful, create OTLP exporters with a existed `OtlpGrpcClient` will ignore
-the options of gRPC when pass the `OtlpGrpcExporterOptions` or other option
+Be careful, create OTLP exporters with an existing `OtlpGrpcClient` will ignore
+the options of gRPC when passing the `OtlpGrpcExporterOptions` or other option
 object.
 
 ## SDK extension
