@@ -91,7 +91,7 @@ private:
 /**
  * No-op implementation of Tracer.
  */
-class NoopTracer final : public Tracer,
+class OPENTELEMETRY_EXPORT_TYPE NoopTracer final : public Tracer,
                                               public std::enable_shared_from_this<NoopTracer>
 {
 public:
