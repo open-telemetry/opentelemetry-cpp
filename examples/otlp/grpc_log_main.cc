@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h"
@@ -37,10 +38,10 @@ opentelemetry::exporter::otlp::OtlpGrpcLogRecordExporterOptions log_opts;
 std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> tracer_provider;
 std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> logger_provider;
 
-void InitTracer()
+void InitTracer(const std::shared_ptr<otlp::OtlpGrpcClient> &shared_client)
 {
   // Create OTLP exporter instance
-  auto exporter   = otlp::OtlpGrpcExporterFactory::Create(opts);
+  auto exporter   = otlp::OtlpGrpcExporterFactory::Create(opts, shared_client);
   auto processor  = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
   tracer_provider = trace_sdk::TracerProviderFactory::Create(std::move(processor));
 
@@ -62,10 +63,10 @@ void CleanupTracer()
   trace::Provider::SetTracerProvider(none);
 }
 
-void InitLogger()
+void InitLogger(const std::shared_ptr<otlp::OtlpGrpcClient> &shared_client)
 {
   // Create OTLP exporter instance
-  auto exporter   = otlp::OtlpGrpcLogRecordExporterFactory::Create(log_opts);
+  auto exporter   = otlp::OtlpGrpcLogRecordExporterFactory::Create(log_opts, shared_client);
   auto processor  = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
   logger_provider = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
 
@@ -102,8 +103,11 @@ int main(int argc, char *argv[])
       log_opts.ssl_credentials_cacert_path = argv[2];
     }
   }
-  InitLogger();
-  InitTracer();
+
+  std::shared_ptr<otlp::OtlpGrpcClient> shared_client = otlp::OtlpGrpcClientFactory::Create(opts);
+
+  InitLogger(shared_client);
+  InitTracer(shared_client);
   foo_library();
   CleanupTracer();
   CleanupLogger();
