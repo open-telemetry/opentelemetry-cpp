@@ -159,6 +159,21 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "tracer_config_test",
+    srcs = [
+        "tracer_config_test.cc",
+    ],
+    tags = [
+        "test",
+        "trace",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 otel_cc_benchmark(
     name = "sampler_benchmark",
     srcs = ["sampler_benchmark.cc"],

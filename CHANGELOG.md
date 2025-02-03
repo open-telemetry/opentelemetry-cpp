@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add tracer scope configurator
+  [#3137](https://github.com/open-telemetry/opentelemetry-cpp/pull/3137)
+
 * [SDK] Support OTEL_SDK_DISABLED environment variable
   [#3245](https://github.com/open-telemetry/opentelemetry-cpp/pull/3245)
 
