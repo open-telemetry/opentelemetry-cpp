@@ -93,14 +93,12 @@ opentelemetry::common::SystemTimestamp MeterContext::GetSDKStartTime() noexcept
   return sdk_start_ts_;
 }
 
-std::weak_ptr<MetricCollector> MeterContext::AddMetricReader(
-    std::shared_ptr<MetricReader> reader,
-    std::unique_ptr<MetricFilter> metric_filter) noexcept
+void MeterContext::AddMetricReader(std::shared_ptr<MetricReader> reader,
+                                   std::unique_ptr<MetricFilter> metric_filter) noexcept
 {
   auto collector = std::shared_ptr<MetricCollector>{
       new MetricCollector(this, std::move(reader), std::move(metric_filter))};
   collectors_.push_back(collector);
-  return std::weak_ptr<MetricCollector>(collector);
 }
 
 void MeterContext::AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
