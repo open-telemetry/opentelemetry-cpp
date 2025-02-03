@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 
+#include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -17,6 +18,7 @@ TEST(Provider, GetMeterProviderDefault)
   EXPECT_NE(nullptr, tf);
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
 TEST(Provider, SetMeterProvider)
 {
   auto tf = opentelemetry::nostd::shared_ptr<MeterProvider>(new NoopMeterProvider());
@@ -33,3 +35,4 @@ TEST(Provider, MultipleMeterProviders)
 
   ASSERT_NE(Provider::GetMeterProvider(), tf);
 }
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */

@@ -16,6 +16,7 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
@@ -188,7 +189,7 @@ void init(const otlp::OtlpHttpExporterOptions &opts)
   std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
       trace_sdk::TracerProviderFactory::Create(std::move(processor));
   // Set the global trace provider
-  trace::Provider::SetTracerProvider(provider);
+  trace_sdk::Provider::SetTracerProvider(provider);
 }
 
 void payload()
@@ -208,7 +209,7 @@ void payload()
 void cleanup()
 {
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
-  trace::Provider::SetTracerProvider(none);
+  trace_sdk::Provider::SetTracerProvider(none);
 }
 
 void instrumented_payload(const otlp::OtlpHttpExporterOptions &opts)

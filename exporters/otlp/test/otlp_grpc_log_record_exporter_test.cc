@@ -27,6 +27,7 @@
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
@@ -324,7 +325,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
     const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
 
     auto tracer = trace_provider->GetTracer("opentelelemtry_library", "", schema_url);
-    opentelemetry::trace::Provider::SetTracerProvider(std::move(trace_provider));
+    opentelemetry::sdk::trace::Provider::SetTracerProvider(std::move(trace_provider));
     auto trace_span = tracer->StartSpan("test_log");
     opentelemetry::trace::Scope trace_scope{trace_span};
 
@@ -350,7 +351,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
                           trace_span->GetContext(), std::chrono::system_clock::now());
   }
 
-  opentelemetry::trace::Provider::SetTracerProvider(
+  opentelemetry::sdk::trace::Provider::SetTracerProvider(
       opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
           new opentelemetry::trace::NoopTracerProvider()));
   trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::sdk::trace::TracerProvider>();
@@ -410,7 +411,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ShareClientTest)
 
     auto tracer              = trace_provider->GetTracer("opentelelemtry_library", "", schema_url);
     auto copy_trace_provider = trace_provider;
-    opentelemetry::trace::Provider::SetTracerProvider(std::move(copy_trace_provider));
+    opentelemetry::sdk::trace::Provider::SetTracerProvider(std::move(copy_trace_provider));
     auto trace_span = tracer->StartSpan("test_log");
     opentelemetry::trace::Scope trace_scope{trace_span};
 
@@ -460,7 +461,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ShareClientTest)
   trace_provider->Shutdown();
   EXPECT_TRUE(shared_client->IsShutdown());
 
-  opentelemetry::trace::Provider::SetTracerProvider(
+  opentelemetry::sdk::trace::Provider::SetTracerProvider(
       opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
           new opentelemetry::trace::NoopTracerProvider()));
   trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::sdk::trace::TracerProvider>();

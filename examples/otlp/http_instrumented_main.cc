@@ -1,8 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <chrono>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <utility>
 
@@ -16,37 +18,34 @@
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_runtime_options.h"
 #include "opentelemetry/logs/logger_provider.h"
-#include "opentelemetry/logs/provider.h"
 #include "opentelemetry/metrics/meter_provider.h"
-#include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_factory.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_runtime_options.h"
+#include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
+#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/provider.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_runtime_options.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/meter_context_factory.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/provider.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_runtime_options.h"
+#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/tracer_provider.h"
-
-#include <chrono>
-#include <mutex>
-#include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
-#include "opentelemetry/sdk/logs/batch_log_record_processor_runtime_options.h"
-#include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/sdk/logs/processor.h"
-#include "opentelemetry/sdk/metrics/meter_provider.h"
-#include "opentelemetry/sdk/trace/exporter.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/logs_foo_library/foo_library.h"
@@ -186,7 +185,7 @@ void InitTracer()
 
   // Set the global trace provider
   std::shared_ptr<opentelemetry::trace::TracerProvider> api_provider = tracer_provider;
-  opentelemetry::trace::Provider::SetTracerProvider(api_provider);
+  opentelemetry::sdk::trace::Provider::SetTracerProvider(api_provider);
 }
 
 void CleanupTracer()
@@ -200,7 +199,7 @@ void CleanupTracer()
 
   tracer_provider.reset();
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
-  opentelemetry::trace::Provider::SetTracerProvider(none);
+  opentelemetry::sdk::trace::Provider::SetTracerProvider(none);
 }
 
 void InitMetrics()
@@ -241,7 +240,7 @@ void InitMetrics()
   meter_provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create(std::move(context));
   std::shared_ptr<opentelemetry::metrics::MeterProvider> api_provider = meter_provider;
 
-  opentelemetry::metrics::Provider::SetMeterProvider(api_provider);
+  opentelemetry::sdk::metrics::Provider::SetMeterProvider(api_provider);
 }
 
 void CleanupMetrics()
@@ -255,7 +254,7 @@ void CleanupMetrics()
 
   meter_provider.reset();
   std::shared_ptr<opentelemetry::metrics::MeterProvider> none;
-  opentelemetry::metrics::Provider::SetMeterProvider(none);
+  opentelemetry::sdk::metrics::Provider::SetMeterProvider(none);
 }
 
 void InitLogger()
@@ -284,7 +283,7 @@ void InitLogger()
   logger_provider = opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(processor));
 
   std::shared_ptr<opentelemetry::logs::LoggerProvider> api_provider = logger_provider;
-  opentelemetry::logs::Provider::SetLoggerProvider(api_provider);
+  opentelemetry::sdk::logs::Provider::SetLoggerProvider(api_provider);
 }
 
 void CleanupLogger()
@@ -298,7 +297,7 @@ void CleanupLogger()
 
   logger_provider.reset();
   std::shared_ptr<opentelemetry::logs::LoggerProvider> none;
-  opentelemetry::logs::Provider::SetLoggerProvider(none);
+  opentelemetry::sdk::logs::Provider::SetLoggerProvider(none);
 }
 
 }  // namespace
