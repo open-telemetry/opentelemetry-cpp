@@ -93,6 +93,10 @@ otel_cc_binary(
         "//exporters/otlp:otlp_grpc_exporter",
         "//exporters/otlp:otlp_grpc_log_record_exporter",
         "//sdk/src/trace",
+        "@grpc//:grpc++",
+        "@opentelemetry-proto//:logs_service_grpc_cc",
+        "@opentelemetry-proto//:metrics_service_grpc_cc",
+        "@opentelemetry-proto//:trace_service_grpc_cc",
     ]),
 )
 
