@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
+#include <algorithm>
 #include <map>
 #include <memory>
 #include <string>
