@@ -29,6 +29,11 @@
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #endif
 
+namespace testing
+{
+class MetricCollectorTest;
+}
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -113,15 +118,13 @@ public:
    * @param reader The MetricReader for which a MetricCollector is to be created. This must not be a
    * nullptr.
    * @param metric_filter The optional MetricFilter used when creating the MetricCollector.
-   * @return The MetricCollector created.
    *
    * Note: This reader may not receive any in-flight meter data, but will get newly created meter
    * data.
    * Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  std::weak_ptr<MetricCollector> AddMetricReader(
-      std::shared_ptr<MetricReader> reader,
-      std::unique_ptr<MetricFilter> metric_filter = nullptr) noexcept;
+  void AddMetricReader(std::shared_ptr<MetricReader> reader,
+                       std::unique_ptr<MetricFilter> metric_filter = nullptr) noexcept;
 
   /**
    * Attaches a View to list of configured Views for this Meter context.
@@ -168,6 +171,8 @@ public:
   bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
 private:
+  friend class ::testing::MetricCollectorTest;
+
   opentelemetry::sdk::resource::Resource resource_;
   std::vector<std::shared_ptr<CollectorHandle>> collectors_;
   std::unique_ptr<ViewRegistry> views_;

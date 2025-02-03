@@ -94,15 +94,13 @@ public:
    * @param reader The MetricReader for which a MetricCollector is to be created. This must not be a
    * nullptr.
    * @param metric_filter The optional MetricFilter used when creating the MetricCollector.
-   * @return The MetricCollector created.
    *
    * Note: This reader may not receive any in-flight meter data, but will get newly created meter
    * data.
    * Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  std::weak_ptr<MetricCollector> AddMetricReader(
-      std::shared_ptr<MetricReader> reader,
-      std::unique_ptr<MetricFilter> metric_filter = nullptr) noexcept;
+  void AddMetricReader(std::shared_ptr<MetricReader> reader,
+                       std::unique_ptr<MetricFilter> metric_filter = nullptr) noexcept;
 
   /**
    * Attaches a View to list of configured Views for this Meter provider.

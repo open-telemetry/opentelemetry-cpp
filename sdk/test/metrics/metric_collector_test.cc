@@ -86,7 +86,22 @@ MetricFilter::TestAttributesFn DropAllTestAttributesFn()
 
 }  // namespace
 
-TEST(MetricCollectorTest, CollectWithMetricFilterTestMetricTest1)
+class testing::MetricCollectorTest : public Test
+{
+public:
+  std::weak_ptr<MetricCollector> AddMetricReaderToMeterContext(
+      std::shared_ptr<MeterContext> context,
+      std::shared_ptr<MetricReader> reader,
+      std::unique_ptr<MetricFilter> metric_filter = nullptr) noexcept
+  {
+    auto collector = std::shared_ptr<MetricCollector>{
+        new MetricCollector(context.get(), std::move(reader), std::move(metric_filter))};
+    context->collectors_.push_back(collector);
+    return std::weak_ptr<MetricCollector>(collector);
+  }
+};
+
+TEST_F(MetricCollectorTest, CollectWithMetricFilterTestMetricTest1)
 {
   auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
   auto scope   = InstrumentationScope::Create("CollectWithMetricFilterTestMetricTest1");
@@ -95,7 +110,7 @@ TEST(MetricCollectorTest, CollectWithMetricFilterTestMetricTest1)
 
   auto filter    = MetricFilter::Create(AcceptAllTestMetricFn(), DropAllTestAttributesFn());
   auto reader    = std::shared_ptr<MetricReader>(new MockMetricReader());
-  auto collector = context->AddMetricReader(reader, std::move(filter)).lock();
+  auto collector = AddMetricReaderToMeterContext(context, reader, std::move(filter)).lock();
 
   auto instrument_1_name = "instrument_1";
   auto instrument_1      = meter->CreateUInt64Counter(instrument_1_name);
@@ -137,7 +152,7 @@ TEST(MetricCollectorTest, CollectWithMetricFilterTestMetricTest1)
   }
 }
 
-TEST(MetricCollectorTest, CollectWithMetricFilterTestMetricTest2)
+TEST_F(MetricCollectorTest, CollectWithMetricFilterTestMetricTest2)
 {
   auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
   auto scope   = InstrumentationScope::Create("CollectWithMetricFilterTestMetricTest2");
@@ -146,7 +161,7 @@ TEST(MetricCollectorTest, CollectWithMetricFilterTestMetricTest2)
 
   auto filter    = MetricFilter::Create(DropAllTestMetricFn(), AcceptAllTestAttributesFn());
   auto reader    = std::shared_ptr<MetricReader>(new MockMetricReader());
-  auto collector = context->AddMetricReader(reader, std::move(filter)).lock();
+  auto collector = AddMetricReaderToMeterContext(context, reader, std::move(filter)).lock();
 
   auto instrument_1_name = "instrument_1";
   auto instrument_1      = meter->CreateUInt64Counter(instrument_1_name);
@@ -173,7 +188,7 @@ TEST(MetricCollectorTest, CollectWithMetricFilterTestMetricTest2)
   EXPECT_EQ(resource_metrics.scope_metric_data_.size(), 0);
 }
 
-TEST(MetricCollectorTest, CollectWithMetricFilterTestMetricTest3)
+TEST_F(MetricCollectorTest, CollectWithMetricFilterTestMetricTest3)
 {
   auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
   auto scope   = InstrumentationScope::Create("CollectWithMetricFilterTestMetricTest3");
@@ -192,7 +207,7 @@ TEST(MetricCollectorTest, CollectWithMetricFilterTestMetricTest3)
   };
   auto filter    = MetricFilter::Create(test_metric_fn, DropAllTestAttributesFn());
   auto reader    = std::shared_ptr<MetricReader>(new MockMetricReader());
-  auto collector = context->AddMetricReader(reader, std::move(filter)).lock();
+  auto collector = AddMetricReaderToMeterContext(context, reader, std::move(filter)).lock();
 
   auto instrument_1_name = "instrument_1";
   auto instrument_1      = meter->CreateUInt64Counter(instrument_1_name);
@@ -227,7 +242,7 @@ TEST(MetricCollectorTest, CollectWithMetricFilterTestMetricTest3)
   }
 }
 
-TEST(MetricCollectorTest, CollectWithMetricFilterTestAttributesTest1)
+TEST_F(MetricCollectorTest, CollectWithMetricFilterTestAttributesTest1)
 {
   auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
   auto scope   = InstrumentationScope::Create("CollectWithMetricFilterTestAttributesTest1");
@@ -246,7 +261,7 @@ TEST(MetricCollectorTest, CollectWithMetricFilterTestAttributesTest1)
   };
   auto filter    = MetricFilter::Create(AcceptPartialAllTestMetricFn(), test_attributes_fn);
   auto reader    = std::shared_ptr<MetricReader>(new MockMetricReader());
-  auto collector = context->AddMetricReader(reader, std::move(filter)).lock();
+  auto collector = AddMetricReaderToMeterContext(context, reader, std::move(filter)).lock();
 
   auto instrument_1_name = "instrument_1";
   auto instrument_1      = meter->CreateUInt64Counter(instrument_1_name);
@@ -310,7 +325,7 @@ TEST(MetricCollectorTest, CollectWithMetricFilterTestAttributesTest1)
   }
 }
 
-TEST(MetricCollectorTest, CollectWithMetricFilterTestAttributesTest2)
+TEST_F(MetricCollectorTest, CollectWithMetricFilterTestAttributesTest2)
 {
   auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
   auto scope   = InstrumentationScope::Create("CollectWithMetricFilterTestAttributesTest2");
@@ -333,7 +348,7 @@ TEST(MetricCollectorTest, CollectWithMetricFilterTestAttributesTest2)
   };
   auto filter    = MetricFilter::Create(AcceptPartialAllTestMetricFn(), test_attributes_fn);
   auto reader    = std::shared_ptr<MetricReader>(new MockMetricReader());
-  auto collector = context->AddMetricReader(reader, std::move(filter)).lock();
+  auto collector = AddMetricReaderToMeterContext(context, reader, std::move(filter)).lock();
 
   auto instrument_1_name = "instrument_1";
   auto instrument_1      = meter->CreateUInt64Counter(instrument_1_name);

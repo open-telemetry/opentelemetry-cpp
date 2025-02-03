@@ -113,11 +113,10 @@ const resource::Resource &MeterProvider::GetResource() const noexcept
   return context_->GetResource();
 }
 
-std::weak_ptr<MetricCollector> MeterProvider::AddMetricReader(
-    std::shared_ptr<MetricReader> reader,
-    std::unique_ptr<MetricFilter> metric_filter) noexcept
+void MeterProvider::AddMetricReader(std::shared_ptr<MetricReader> reader,
+                                    std::unique_ptr<MetricFilter> metric_filter) noexcept
 {
-  return context_->AddMetricReader(std::move(reader), std::move(metric_filter));
+  context_->AddMetricReader(std::move(reader), std::move(metric_filter));
 }
 
 void MeterProvider::AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
