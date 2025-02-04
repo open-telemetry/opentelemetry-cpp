@@ -218,7 +218,7 @@ void BatchLogRecordProcessor::DoBackgroundWork()
     if (synchronization_data_->is_shutdown.load() == true)
     {
       DrainQueue();
-      return;
+      break;
     }
 
     auto start = std::chrono::steady_clock::now();
