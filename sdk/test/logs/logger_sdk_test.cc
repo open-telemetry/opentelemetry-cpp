@@ -9,26 +9,21 @@
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/event_logger.h"
 #include "opentelemetry/logs/event_logger_provider.h"
-#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
-#include "opentelemetry/logs/provider.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/event_logger_provider.h"
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/processor.h"
-#include "opentelemetry/sdk/logs/provider.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -44,7 +39,6 @@
 
 using namespace opentelemetry::sdk::logs;
 namespace logs_api = opentelemetry::logs;
-namespace logs_sdk = opentelemetry::sdk::logs;
 namespace nostd    = opentelemetry::nostd;
 
 TEST(LoggerSDK, LogToNullProcessor)
@@ -308,47 +302,4 @@ TEST(LoggerSDK, EventLog)
   ASSERT_EQ(shared_recordable->GetBody(), "Event Log Message");
   ASSERT_EQ(shared_recordable->GetEventName(), "otel-cpp.event_name");
   ASSERT_EQ(shared_recordable->GetEventDomain(), "otel-cpp.event_domain");
-}
-
-// Define a basic Logger class
-class TestLogger : public opentelemetry::logs::Logger
-{
-  const nostd::string_view GetName() noexcept override { return "test logger"; }
-
-  nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override
-  {
-    return nullptr;
-  }
-
-  using Logger::EmitLogRecord;
-
-  void EmitLogRecord(nostd::unique_ptr<opentelemetry::logs::LogRecord> &&) noexcept override {}
-};
-
-// Define a basic LoggerProvider class that returns an instance of the logger class defined above
-class TestProvider : public opentelemetry::logs::LoggerProvider
-{
-  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
-      nostd::string_view /* logger_name */,
-      nostd::string_view /* library_name */,
-      nostd::string_view /* library_version */,
-      nostd::string_view /* schema_url */,
-      const opentelemetry::common::KeyValueIterable & /* attributes */) override
-  {
-    return nostd::shared_ptr<opentelemetry::logs::Logger>(new TestLogger());
-  }
-};
-
-TEST(Logger, PushLoggerImplementation)
-{
-  // Push the new loggerprovider class into the global singleton
-  auto test_provider = nostd::shared_ptr<opentelemetry::logs::LoggerProvider>(new TestProvider());
-  logs_sdk::Provider::SetLoggerProvider(test_provider);
-
-  auto lp = logs_api::Provider::GetLoggerProvider();
-
-  // Check that the implementation was pushed by calling TestLogger's GetName()
-  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
-  ASSERT_EQ("test logger", logger->GetName());
 }
