@@ -18,6 +18,9 @@ Increment the:
 * [SDK] Add tracer scope configurator
   [#3137](https://github.com/open-telemetry/opentelemetry-cpp/pull/3137)
 
+* [SDK] Implement spec: MetricFilter
+  [#3235](https://github.com/open-telemetry/opentelemetry-cpp/pull/3235)
+
 ## [1.19 2025-01-22]
 
 * [PROMETHEUS_EXPORTER] Fix default for emitting otel_scope attributes
