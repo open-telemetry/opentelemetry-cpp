@@ -42,11 +42,9 @@ TEST(Provider, GetTracerProviderDefault)
   EXPECT_NE(nullptr, tf);
 }
 
-#if OPENTELEMETRY_ABI_VERSION_NO == 1
 TEST(Provider, SetTracerProvider)
 {
   auto tf = nostd::shared_ptr<TracerProvider>(new TestProvider());
   Provider::SetTracerProvider(tf);
   ASSERT_EQ(tf, Provider::GetTracerProvider());
 }
-#endif /* OPENTELEMETRY_ABI_VERSION_NO */

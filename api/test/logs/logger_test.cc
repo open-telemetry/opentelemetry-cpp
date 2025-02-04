@@ -220,7 +220,6 @@ class TestProvider : public LoggerProvider
   }
 };
 
-#if OPENTELEMETRY_ABI_VERSION_NO == 1
 TEST(Logger, PushLoggerImplementation)
 {
   // Push the new loggerprovider class into the global singleton
@@ -234,4 +233,3 @@ TEST(Logger, PushLoggerImplementation)
   auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
   ASSERT_EQ("test logger", logger->GetName());
 }
-#endif /* OPENTELEMETRY_ABI_VERSION_NO */

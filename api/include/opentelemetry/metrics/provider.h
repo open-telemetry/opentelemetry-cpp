@@ -5,26 +5,17 @@
 
 #include <mutex>
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
-#include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
-{
 namespace metrics
 {
-// The forward declaration is sufficient,
-// we do not want a API -> SDK dependency.
-// IWYU pragma: no_include "opentelemetry/sdk/metrics/provider.h"
-class Provider;  // IWYU pragma: keep
-}  // namespace metrics
-}  // namespace sdk
 
-namespace metrics
-{
+class MeterProvider;
 
 /**
  * Stores the singleton global MeterProvider.
@@ -44,10 +35,6 @@ public:
     return nostd::shared_ptr<MeterProvider>(GetProvider());
   }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-private:
-#endif /* OPENTELEMETRY_ABI_VERSION_NO */
-
   /**
    * Changes the singleton MeterProvider.
    */
@@ -58,9 +45,6 @@ private:
   }
 
 private:
-  /* The SDK is allowed to change the singleton in the API. */
-  friend class opentelemetry::sdk::metrics::Provider;
-
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<MeterProvider> &GetProvider() noexcept
   {
     static nostd::shared_ptr<MeterProvider> provider(new NoopMeterProvider);

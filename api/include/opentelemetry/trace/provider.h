@@ -12,17 +12,6 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
-{
-namespace trace
-{
-// The forward declaration is sufficient,
-// we do not want a API -> SDK dependency.
-// IWYU pragma: no_include "opentelemetry/sdk/trace/provider.h"
-class Provider;  // IWYU pragma: keep
-}  // namespace trace
-}  // namespace sdk
-
 namespace trace
 {
 
@@ -44,10 +33,6 @@ public:
     return nostd::shared_ptr<TracerProvider>(GetProvider());
   }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-private:
-#endif /* OPENTELEMETRY_ABI_VERSION_NO */
-
   /**
    * Changes the singleton TracerProvider.
    */
@@ -58,9 +43,6 @@ private:
   }
 
 private:
-  /* The SDK is allowed to change the singleton in the API. */
-  friend class opentelemetry::sdk::trace::Provider;
-
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<TracerProvider> &GetProvider() noexcept
   {
     static nostd::shared_ptr<TracerProvider> provider(new NoopTracerProvider);

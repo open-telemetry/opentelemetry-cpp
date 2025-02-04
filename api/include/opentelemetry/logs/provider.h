@@ -12,17 +12,6 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
-{
-namespace logs
-{
-// The forward declaration is sufficient,
-// we do not want a API -> SDK dependency.
-// IWYU pragma: no_include "opentelemetry/sdk/logs/provider.h"
-class Provider;
-}  // namespace logs
-}  // namespace sdk
-
 namespace logs
 {
 
@@ -48,6 +37,15 @@ public:
   }
 
   /**
+   * Changes the singleton LoggerProvider.
+   */
+  static void SetLoggerProvider(const nostd::shared_ptr<LoggerProvider> &tp) noexcept
+  {
+    std::lock_guard<common::SpinLockMutex> guard(GetLock());
+    GetProvider() = tp;
+  }
+
+  /**
    * Returns the singleton EventLoggerProvider.
    *
    * By default, a no-op EventLoggerProvider is returned. This will never return a
@@ -68,23 +66,7 @@ public:
     GetEventProvider() = tp;
   }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 private:
-#endif /* OPENTELEMETRY_ABI_VERSION_NO */
-
-  /**
-   * Changes the singleton LoggerProvider.
-   */
-  static void SetLoggerProvider(const nostd::shared_ptr<LoggerProvider> &tp) noexcept
-  {
-    std::lock_guard<common::SpinLockMutex> guard(GetLock());
-    GetProvider() = tp;
-  }
-
-private:
-  /* The SDK is allowed to change the singleton in the API. */
-  friend class opentelemetry::sdk::logs::Provider;
-
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<LoggerProvider> &GetProvider() noexcept
   {
     static nostd::shared_ptr<LoggerProvider> provider(new NoopLoggerProvider);
