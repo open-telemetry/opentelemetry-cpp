@@ -22,6 +22,22 @@ otel_cc_test(
 )
 
 otel_cc_test(
+    name = "tracer_provider_set_test",
+    srcs = [
+        "tracer_provider_set_test.cc",
+    ],
+    tags = [
+        "test",
+        "trace",
+    ],
+    deps = dll_deps([
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "@googletest//:gtest_main",
+    ]),
+)
+
+otel_cc_test(
     name = "span_data_test",
     srcs = [
         "span_data_test.cc",

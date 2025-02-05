@@ -11,9 +11,11 @@
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
 #include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/provider.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
@@ -47,7 +49,7 @@ void InitTracer(const std::shared_ptr<otlp::OtlpGrpcClient> &shared_client)
 
   // Set the global trace provider
   std::shared_ptr<opentelemetry::trace::TracerProvider> api_provider = tracer_provider;
-  trace::Provider::SetTracerProvider(api_provider);
+  trace_sdk::Provider::SetTracerProvider(api_provider);
 }
 
 void CleanupTracer()
@@ -60,7 +62,7 @@ void CleanupTracer()
 
   tracer_provider.reset();
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
-  trace::Provider::SetTracerProvider(none);
+  trace_sdk::Provider::SetTracerProvider(none);
 }
 
 void InitLogger(const std::shared_ptr<otlp::OtlpGrpcClient> &shared_client)
@@ -72,7 +74,7 @@ void InitLogger(const std::shared_ptr<otlp::OtlpGrpcClient> &shared_client)
 
   // Set the global logger provider
   std::shared_ptr<opentelemetry::logs::LoggerProvider> api_provider = logger_provider;
-  opentelemetry::logs::Provider::SetLoggerProvider(api_provider);
+  logs_sdk::Provider::SetLoggerProvider(api_provider);
 }
 
 void CleanupLogger()
@@ -85,7 +87,7 @@ void CleanupLogger()
 
   logger_provider.reset();
   nostd::shared_ptr<logs::LoggerProvider> none;
-  opentelemetry::logs::Provider::SetLoggerProvider(none);
+  logs_sdk::Provider::SetLoggerProvider(none);
 }
 }  // namespace
 

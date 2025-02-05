@@ -10,10 +10,10 @@
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
 #include "foo_library/foo_library.h"
@@ -36,13 +36,13 @@ void InitTracer()
   std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
       trace_sdk::TracerProviderFactory::Create(std::move(processor), resource);
   // Set the global trace provider
-  trace::Provider::SetTracerProvider(provider);
+  trace_sdk::Provider::SetTracerProvider(provider);
 }
 
 void CleanupTracer()
 {
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
-  trace::Provider::SetTracerProvider(none);
+  trace_sdk::Provider::SetTracerProvider(none);
 }
 }  // namespace
 

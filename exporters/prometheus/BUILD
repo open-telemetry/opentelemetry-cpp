@@ -90,6 +90,7 @@ otel_cc_test(
     tags = [
         "prometheus",
         "test",
+        "manual", # malkia: this has recently became broken, civetweb can't allocate port on localhost:9464
     ],
     deps = dll_deps([
         ":prometheus_exporter",

@@ -4,6 +4,7 @@
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
@@ -31,7 +32,7 @@ void InitTracer()
 
   // Set the global trace provider
   std::shared_ptr<opentelemetry::trace::TracerProvider> api_provider = provider;
-  trace::Provider::SetTracerProvider(api_provider);
+  trace_sdk::Provider::SetTracerProvider(api_provider);
 }
 
 void CleanupTracer()
@@ -44,7 +45,7 @@ void CleanupTracer()
 
   provider.reset();
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
-  trace::Provider::SetTracerProvider(none);
+  trace_sdk::Provider::SetTracerProvider(none);
 }
 }  // namespace
 

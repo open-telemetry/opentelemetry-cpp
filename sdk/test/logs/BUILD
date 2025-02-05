@@ -21,6 +21,22 @@ otel_cc_test(
 )
 
 otel_cc_test(
+    name = "logger_provider_set_test",
+    srcs = [
+        "logger_provider_set_test.cc",
+    ],
+    tags = [
+        "logs",
+        "test",
+    ],
+    deps = dll_deps([
+        "//api",
+        "//sdk/src/logs",
+        "@googletest//:gtest_main",
+    ]),
+)
+
+otel_cc_test(
     name = "logger_sdk_test",
     srcs = [
         "logger_sdk_test.cc",

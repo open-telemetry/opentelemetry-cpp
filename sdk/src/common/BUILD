@@ -36,6 +36,18 @@ otel_cc_library(
 )
 
 otel_cc_library(
+    name = "disabled",
+    srcs = [
+        "disabled.cc",
+    ],
+    include_prefix = "src/common",
+    deps = [
+        "//api",
+        "//sdk:headers",
+    ],
+)
+
+otel_cc_library(
     name = "env_variables",
     srcs = [
         "env_variables.cc",

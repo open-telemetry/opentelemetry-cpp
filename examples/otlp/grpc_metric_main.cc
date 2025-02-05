@@ -10,6 +10,7 @@
 #include "opentelemetry/sdk/metrics/meter_context_factory.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
+#include "opentelemetry/sdk/metrics/provider.h"
 
 #include <memory>
 #include <thread>
@@ -47,13 +48,13 @@ void InitMetrics()
   auto u_provider = metric_sdk::MeterProviderFactory::Create(std::move(context));
   std::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
 
-  metrics_api::Provider::SetMeterProvider(provider);
+  metric_sdk::Provider::SetMeterProvider(provider);
 }
 
 void CleanupMetrics()
 {
   std::shared_ptr<metrics_api::MeterProvider> none;
-  metrics_api::Provider::SetMeterProvider(none);
+  metric_sdk::Provider::SetMeterProvider(none);
 }
 }  // namespace
 
