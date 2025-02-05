@@ -26,7 +26,7 @@ bazel_dep(name = "gazelle", version = "0.42.0")
 bazel_dep(name = "stardoc", version = "0.8.0")
 bazel_dep(name = "rules_android", version = "0.6.0")
 
-bazel_dep(name = "grpc", version = "1.69.0")
+bazel_dep(name = "grpc", version = "1.70.1")
 
 bazel_dep(name = "nlohmann_json", version = "3.11.3.bcr.1")
 bazel_dep(name = "platforms", version = "0.0.11")
