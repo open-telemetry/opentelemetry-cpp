@@ -30,7 +30,7 @@ endif()
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS ${this_target}
-    EXPORT "${PROJECT_NAME}-target"
+    EXPORT "${PROJECT_NAME}-shims_opentracing-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -40,6 +40,12 @@ if(OPENTELEMETRY_INSTALL)
     DESTINATION include/opentelemetry
     FILES_MATCHING
     PATTERN "*.h")
+
+  install(
+    EXPORT "${PROJECT_NAME}-shims_opentracing-target"
+    FILE "${PROJECT_NAME}-shims_opentracing-target.cmake"
+    NAMESPACE "${PROJECT_NAME}::"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 endif()
 
 if(BUILD_TESTING)

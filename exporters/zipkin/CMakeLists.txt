@@ -12,6 +12,9 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 
+set_target_properties(opentelemetry_exporter_zipkin_trace
+                      PROPERTIES EXPORT_NAME zipkin_trace_exporter)
+
 set_target_version(opentelemetry_exporter_zipkin_trace)
 
 target_link_libraries(
@@ -22,7 +25,7 @@ target_link_libraries(
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS opentelemetry_exporter_zipkin_trace
-    EXPORT "${PROJECT_NAME}-target"
+    EXPORT "${PROJECT_NAME}-exporters_zipkin-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -33,6 +36,13 @@ if(OPENTELEMETRY_INSTALL)
     FILES_MATCHING
     PATTERN "*.h"
     PATTERN "recordable.h" EXCLUDE)
+
+  install(
+    EXPORT "${PROJECT_NAME}-exporters_zipkin-target"
+    FILE "${PROJECT_NAME}-exporters_zipkin-target.cmake"
+    NAMESPACE "${PROJECT_NAME}::"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+
 endif()
 
 if(BUILD_TESTING)
