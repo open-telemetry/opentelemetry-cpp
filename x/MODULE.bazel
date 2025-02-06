@@ -8,7 +8,7 @@ local_path_override(
     module_name = "otel_sdk",
     path = "..",
 )
-bazel_dep(name = "abseil-cpp", version = "20240722.1")
+bazel_dep(name = "abseil-cpp", version = "20250127.0")
 single_version_override(
     module_name = "abseil-cpp",
     patch_strip = 1,
