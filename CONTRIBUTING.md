@@ -18,6 +18,18 @@ on how to become a
 and
 [**Maintainer**](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).
 
+
+## Prerequisites
+
+Before contributing, ensure you have the following tools installed:
+
+- **C++ Compiler** (GCC 5+ or Clang 3.4+)
+- **CMake** (version 3.12+)
+- **Bazel** (version 7.1.1 for building examples)
+- **clang-format** (version 10.0)
+- **Docker** (for DevContainer setup)
+
+
 ## Development
 
 OpenTelemetry C++ uses the [Google naming
