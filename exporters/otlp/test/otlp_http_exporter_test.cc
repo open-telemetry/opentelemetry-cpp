@@ -7,6 +7,7 @@
 #  include <thread>
 
 #  include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
+#  include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
@@ -18,10 +19,14 @@
 #  include "opentelemetry/ext/http/server/http_server.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor_options.h"
+#  include "opentelemetry/sdk/trace/simple_processor.h"
+#  include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
+#  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
 #  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 #  include "opentelemetry/trace/provider.h"
+#  include "opentelemetry/trace/tracer_provider.h"
 
 #  include <google/protobuf/message_lite.h>
 #  include <gtest/gtest.h>
@@ -54,23 +59,32 @@ static nostd::span<T, N> MakeSpan(T (&array)[N])
 OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_type,
                                                 bool async_mode)
 {
+  std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation> not_instrumented;
   OtlpHttpExporterOptions options;
   options.content_type  = content_type;
   options.console_debug = true;
   options.timeout       = std::chrono::system_clock::duration::zero();
   options.http_headers.insert(std::make_pair("Custom-Header-Key", "Custom-Header-Value"));
+  options.retry_policy_max_attempts       = 0U;
+  options.retry_policy_initial_backoff    = std::chrono::duration<float>::zero();
+  options.retry_policy_max_backoff        = std::chrono::duration<float>::zero();
+  options.retry_policy_backoff_multiplier = 0.0f;
   OtlpHttpClientOptions otlp_http_client_options(
-      options.url, false,                 /* ssl_insecure_skip_verify */
-      "", /* ssl_ca_cert_path */ "",      /* ssl_ca_cert_string */
-      "",                                 /* ssl_client_key_path */
-      "", /* ssl_client_key_string */ "", /* ssl_client_cert_path */
-      "",                                 /* ssl_client_cert_string */
-      "",                                 /* ssl_min_tls */
-      "",                                 /* ssl_max_tls */
-      "",                                 /* ssl_cipher */
-      "",                                 /* ssl_cipher_suite */
+      options.url, false, /* ssl_insecure_skip_verify */
+      "",                 /* ssl_ca_cert_path */
+      "",                 /* ssl_ca_cert_string */
+      "",                 /* ssl_client_key_path */
+      "",                 /* ssl_client_key_string */
+      "",                 /* ssl_client_cert_path */
+      "",                 /* ssl_client_cert_string */
+      "",                 /* ssl_min_tls */
+      "",                 /* ssl_max_tls */
+      "",                 /* ssl_cipher */
+      "",                 /* ssl_cipher_suite */
       options.content_type, options.json_bytes_mapping, options.compression, options.use_json_name,
-      options.console_debug, options.timeout, options.http_headers);
+      options.console_debug, options.timeout, options.http_headers,
+      options.retry_policy_max_attempts, options.retry_policy_initial_backoff,
+      options.retry_policy_max_backoff, options.retry_policy_backoff_multiplier, not_instrumented);
   if (!async_mode)
   {
     otlp_http_client_options.max_concurrent_requests = 0;
@@ -620,7 +634,162 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL");
 }
-#  endif
+
+TEST_F(OtlpHttpExporterTestPeer, ConfigRetryDefaultValues)
+{
+  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 5);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5.0f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 1.5f);
+}
+
+TEST_F(OtlpHttpExporterTestPeer, ConfigRetryValuesFromEnv)
+{
+  setenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_ATTEMPTS", "123", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_INITIAL_BACKOFF", "4.5", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF", "6.7", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
+
+  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 123);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 8.9f);
+
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_BACKOFF_MULTIPLIER");
+}
+
+TEST_F(OtlpHttpExporterTestPeer, ConfigRetryGenericValuesFromEnv)
+{
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS", "321", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF", "5.4", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
+
+  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 321);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 9.8f);
+
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
+}
+#  endif  // NO_GETENV
+
+#  ifdef ENABLE_OTLP_RETRY_PREVIEW
+using StatusCodeVector = std::vector<int>;
+
+class OtlpHttpExporterRetryIntegrationTests
+    : public ::testing::TestWithParam<std::tuple<bool, StatusCodeVector, std::size_t>>
+{};
+
+INSTANTIATE_TEST_SUITE_P(StatusCodes,
+                         OtlpHttpExporterRetryIntegrationTests,
+                         testing::Values(
+                             // With retry policy enabled
+                             std::make_tuple(true, StatusCodeVector{100}, 1),
+                             std::make_tuple(true, StatusCodeVector{200}, 1),
+                             std::make_tuple(true, StatusCodeVector{201}, 1),
+                             std::make_tuple(true, StatusCodeVector{202}, 1),
+                             std::make_tuple(true, StatusCodeVector{204}, 1),
+                             std::make_tuple(true, StatusCodeVector{302}, 1),
+                             std::make_tuple(true, StatusCodeVector{400}, 1),
+                             std::make_tuple(true, StatusCodeVector{401}, 1),
+                             std::make_tuple(true, StatusCodeVector{403}, 1),
+                             std::make_tuple(true, StatusCodeVector{404}, 1),
+                             std::make_tuple(true, StatusCodeVector{405}, 1),
+                             std::make_tuple(true, StatusCodeVector{429}, 5),
+                             std::make_tuple(true, StatusCodeVector{500}, 1),
+                             std::make_tuple(true, StatusCodeVector{501}, 1),
+                             std::make_tuple(true, StatusCodeVector{502}, 5),
+                             std::make_tuple(true, StatusCodeVector{503}, 5),
+                             std::make_tuple(true, StatusCodeVector{504}, 5),
+                             std::make_tuple(true, StatusCodeVector{429, 502, 503, 504}, 5),
+                             std::make_tuple(true, StatusCodeVector{503, 503, 503, 200}, 4),
+                             std::make_tuple(true, StatusCodeVector{429, 503, 504, 200}, 4),
+                             // With retry policy disabled
+                             std::make_tuple(false, StatusCodeVector{100}, 1),
+                             std::make_tuple(false, StatusCodeVector{200}, 1),
+                             std::make_tuple(false, StatusCodeVector{201}, 1),
+                             std::make_tuple(false, StatusCodeVector{202}, 1),
+                             std::make_tuple(false, StatusCodeVector{204}, 1),
+                             std::make_tuple(false, StatusCodeVector{302}, 1),
+                             std::make_tuple(false, StatusCodeVector{400}, 1),
+                             std::make_tuple(false, StatusCodeVector{401}, 1),
+                             std::make_tuple(false, StatusCodeVector{403}, 1),
+                             std::make_tuple(false, StatusCodeVector{404}, 1),
+                             std::make_tuple(false, StatusCodeVector{405}, 1),
+                             std::make_tuple(false, StatusCodeVector{429}, 1),
+                             std::make_tuple(false, StatusCodeVector{500}, 1),
+                             std::make_tuple(false, StatusCodeVector{501}, 1),
+                             std::make_tuple(false, StatusCodeVector{502}, 1),
+                             std::make_tuple(false, StatusCodeVector{503}, 1),
+                             std::make_tuple(false, StatusCodeVector{504}, 1),
+                             std::make_tuple(false, StatusCodeVector{429, 502, 503, 504}, 1),
+                             std::make_tuple(false, StatusCodeVector{503, 503, 503, 200}, 1),
+                             std::make_tuple(false, StatusCodeVector{429, 503, 504, 200}, 1)));
+
+TEST_P(OtlpHttpExporterRetryIntegrationTests, StatusCodes)
+{
+  namespace otlp      = opentelemetry::exporter::otlp;
+  namespace trace_sdk = opentelemetry::sdk::trace;
+
+  const auto is_retry_enabled  = std::get<0>(GetParam());
+  const auto status_codes      = std::get<1>(GetParam());
+  const auto expected_attempts = std::get<2>(GetParam());
+
+  size_t request_count = 0UL;
+  HTTP_SERVER_NS::HttpRequestCallback request_handler{
+      [&request_count, &status_codes](HTTP_SERVER_NS::HttpRequest const & /* request */,
+                                      HTTP_SERVER_NS::HttpResponse &response) {
+        response.body = "TEST!";
+        response.code = status_codes.at(request_count++ % status_codes.size());
+        return response.code;
+      }};
+  HTTP_SERVER_NS::HttpServer server;
+  server.setKeepalive(true);
+  server.setServerName("test_server");
+  server.addHandler("/v1/traces", request_handler);
+  ASSERT_EQ(server.addListeningPort(4318), 4318);
+  server.start();
+
+  otlp::OtlpHttpExporterOptions opts{};
+
+  if (is_retry_enabled)
+  {
+    opts.retry_policy_max_attempts       = 5;
+    opts.retry_policy_initial_backoff    = std::chrono::duration<float>{0.1f};
+    opts.retry_policy_max_backoff        = std::chrono::duration<float>{5.0f};
+    opts.retry_policy_backoff_multiplier = 1.0f;
+  }
+  else
+  {
+    opts.retry_policy_max_attempts       = 0;
+    opts.retry_policy_initial_backoff    = std::chrono::duration<float>::zero();
+    opts.retry_policy_max_backoff        = std::chrono::duration<float>::zero();
+    opts.retry_policy_backoff_multiplier = 0.0f;
+  }
+
+  auto exporter  = otlp::OtlpHttpExporterFactory::Create(opts);
+  auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
+  auto provider  = trace_sdk::TracerProviderFactory::Create(std::move(processor));
+  provider->GetTracer("Test tracer")->StartSpan("Test span")->End();
+  provider->ForceFlush();
+  server.stop();
+
+  ASSERT_EQ(expected_attempts, request_count);
+}
+#  endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 }  // namespace otlp
 }  // namespace exporter

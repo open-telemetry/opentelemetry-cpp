@@ -11,6 +11,7 @@ cc_library(
     deps = [
         "//api",
         "//sdk:headers",
+        "//sdk/src/common:disabled",
         "//sdk/src/common:global_log_handler",
         "//sdk/src/common:random",
         "//sdk/src/resource",

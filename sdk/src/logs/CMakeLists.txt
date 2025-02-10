@@ -3,6 +3,7 @@
 
 add_library(
   opentelemetry_logs
+  provider.cc
   logger_provider.cc
   logger_provider_factory.cc
   logger.cc

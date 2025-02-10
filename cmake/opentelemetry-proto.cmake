@@ -49,7 +49,7 @@ else()
          "opentelemetry-proto=[ \\t]*([A-Za-z0-9_\\.\\-]+)")
         set(opentelemetry-proto "${CMAKE_MATCH_1}")
       else()
-        set(opentelemetry-proto "v1.4.0")
+        set(opentelemetry-proto "v1.5.0")
       endif()
       unset(OTELCPP_THIRD_PARTY_RELEASE_CONTENT)
     endif()
@@ -341,6 +341,9 @@ if(WITH_OTLP_GRPC)
     ${OTELCPP_PROTO_TARGET_OPTIONS} ${TRACE_SERVICE_GRPC_PB_CPP_FILE}
     ${LOGS_SERVICE_GRPC_PB_CPP_FILE} ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
   set_target_version(opentelemetry_proto_grpc)
+
+  # Disable include-what-you-use on generated code.
+  set_target_properties(opentelemetry_proto_grpc PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "")
 
   list(APPEND OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto_grpc)
   target_link_libraries(opentelemetry_proto_grpc PUBLIC opentelemetry_proto)

@@ -99,6 +99,29 @@ if(WITH_OTLP_HTTP)
       opentelemetry_exporter_otlp_http_log)
   endif()
 
+  # ALL, instrumented
+
+  add_executable(example_otlp_instrumented_http http_instrumented_main.cc)
+
+  # Note: common_logs_foo_library provide traces and logs
+  target_link_libraries(
+    example_otlp_instrumented_http ${CMAKE_THREAD_LIBS_INIT}
+    common_metrics_foo_library common_logs_foo_library)
+
+  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+    target_link_libraries(example_otlp_instrumented_http opentelemetry_cpp
+                          opentelemetry_common)
+  else()
+    target_link_libraries(
+      example_otlp_instrumented_http
+      opentelemetry_trace
+      opentelemetry_metrics
+      opentelemetry_logs
+      opentelemetry_exporter_otlp_http
+      opentelemetry_exporter_otlp_http_metric
+      opentelemetry_exporter_otlp_http_log)
+  endif()
+
 endif()
 
 if(WITH_OTLP_FILE)

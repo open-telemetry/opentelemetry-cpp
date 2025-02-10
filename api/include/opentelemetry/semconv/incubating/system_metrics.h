@@ -63,7 +63,8 @@ CreateAsyncDoubleMetricSystemCpuFrequency(metrics::Meter *meter)
 
 /**
  * Reports the number of logical (virtual) processor cores created by the operating system to manage
- * multitasking <p> updowncounter
+ * multitasking <p> Calculated by multiplying the number of sockets by the number of cores per
+ * socket, and then by the number of threads per core <p> updowncounter
  */
 static constexpr const char *kMetricSystemCpuLogicalCount = "system.cpu.logical.count";
 static constexpr const char *descrMetricSystemCpuLogicalCount =
@@ -105,6 +106,8 @@ CreateAsyncDoubleMetricSystemCpuLogicalCount(metrics::Meter *meter)
 
 /**
  * Reports the number of actual physical processor cores on the hardware
+ * <p>
+ * Calculated by multiplying the number of sockets by the number of cores per socket
  * <p>
  * updowncounter
  */
@@ -270,6 +273,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  * href="https://learn.microsoft.com/archive/blogs/askcore/windows-performance-monitor-disk-counters-explained#windows-performance-monitor-disk-counters-explained">"Disk%
  * Idle Time"</a> performance counter: @code uptime * (100 - "Disk\% Idle Time") / 100 @endcode</li>
  * </ul>
+ * <p>
  * counter
  */
 static constexpr const char *kMetricSystemDiskIoTime     = "system.disk.io_time";
@@ -385,6 +389,7 @@ CreateAsyncDoubleMetricSystemDiskMerged(metrics::Meter *meter)
  *   <li>Windows: "Avg. Disk sec/Read" perf counter multiplied by "Disk Reads/sec" perf counter
  * (similar for Writes)</li>
  * </ul>
+ * <p>
  * counter
  */
 static constexpr const char *kMetricSystemDiskOperationTime = "system.disk.operation_time";
@@ -894,6 +899,7 @@ CreateAsyncDoubleMetricSystemNetworkConnections(metrics::Meter *meter)
  * href="https://docs.microsoft.com/windows/win32/api/netioapi/nf-netioapi-getifentry2">@code
  * GetIfEntry2 @endcode</a></li>
  * </ul>
+ * <p>
  * counter
  */
 static constexpr const char *kMetricSystemNetworkDropped = "system.network.dropped";
@@ -942,6 +948,7 @@ CreateAsyncDoubleMetricSystemNetworkDropped(metrics::Meter *meter)
  * href="https://docs.microsoft.com/windows/win32/api/netioapi/nf-netioapi-getifentry2">@code
  * GetIfEntry2 @endcode</a>.</li>
  * </ul>
+ * <p>
  * counter
  */
 static constexpr const char *kMetricSystemNetworkErrors     = "system.network.errors";

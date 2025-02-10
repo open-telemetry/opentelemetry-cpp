@@ -8,6 +8,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <deque>
 #include <list>
 #include <map>
 #include <memory>
@@ -23,6 +24,7 @@
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -104,6 +106,12 @@ public:
 
   void EnableLogging(bool is_log_enabled) noexcept override { is_log_enabled_ = is_log_enabled; }
 
+  void SetRetryPolicy(
+      const opentelemetry::ext::http::client::RetryPolicy &retry_policy) noexcept override
+  {
+    retry_policy_ = retry_policy;
+  }
+
 public:
   opentelemetry::ext::http::client::Method method_;
   opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
@@ -114,6 +122,7 @@ public:
   opentelemetry::ext::http::client::Compression compression_{
       opentelemetry::ext::http::client::Compression::kNone};
   bool is_log_enabled_{false};
+  opentelemetry::ext::http::client::RetryPolicy retry_policy_;
 };
 
 class Response : public opentelemetry::ext::http::client::Response
@@ -302,6 +311,7 @@ class HttpClient : public opentelemetry::ext::http::client::HttpClient
 public:
   // The call (curl_global_init) is not thread safe. Ensure this is called only once.
   HttpClient();
+  HttpClient(const std::shared_ptr<sdk::common::ThreadInstrumentation> &thread_instrumentation);
   ~HttpClient() override;
 
   std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
@@ -338,6 +348,7 @@ private:
   bool doAddSessions();
   bool doAbortSessions();
   bool doRemoveSessions();
+  bool doRetrySessions(bool report_all);
   void resetMultiHandle();
 
   std::mutex multi_handle_m_;
@@ -352,9 +363,11 @@ private:
   std::unordered_map<uint64_t, std::shared_ptr<Session>> pending_to_abort_sessions_;
   std::unordered_map<uint64_t, HttpCurlEasyResource> pending_to_remove_session_handles_;
   std::list<std::shared_ptr<Session>> pending_to_remove_sessions_;
+  std::deque<std::shared_ptr<Session>> pending_to_retry_sessions_;
 
   std::mutex background_thread_m_;
   std::unique_ptr<std::thread> background_thread_;
+  std::shared_ptr<sdk::common::ThreadInstrumentation> background_thread_instrumentation_;
   std::chrono::milliseconds scheduled_delay_milliseconds_;
 
   std::chrono::milliseconds background_thread_wait_for_;
