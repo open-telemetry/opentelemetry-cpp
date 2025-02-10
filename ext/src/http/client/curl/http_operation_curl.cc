@@ -464,7 +464,7 @@ std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
 {
   static std::random_device rd;
   static std::mt19937 gen(rd());
-  static std::uniform_real_distribution<float> dis(0.8, 1.2);
+  static std::uniform_real_distribution<float> dis(0.8f, 1.2f);
 
   // The initial retry attempt will occur after initialBackoff * random(0.8, 1.2)
   auto backoff = retry_policy_.initial_backoff;
@@ -1043,7 +1043,7 @@ CURLcode HttpOperation::Setup()
   // TODO: control local port to use
   // curl_easy_setopt(curl, CURLOPT_LOCALPORT, dcf_port);
 
-  rc = SetCurlLongOption(CURLOPT_TIMEOUT_MS, http_conn_timeout_.count());
+  rc = SetCurlLongOption(CURLOPT_TIMEOUT_MS, static_cast<long>(http_conn_timeout_.count()));
   if (rc != CURLE_OK)
   {
     return rc;

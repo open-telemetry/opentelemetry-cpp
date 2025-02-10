@@ -642,9 +642,9 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigRetryDefaultValues)
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 5);
-  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0);
-  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5.0);
-  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 1.5);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5.0f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 1.5f);
 }
 
 TEST_F(OtlpHttpExporterTestPeer, ConfigRetryValuesFromEnv)
@@ -657,9 +657,9 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigRetryValuesFromEnv)
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 123);
-  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5);
-  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7);
-  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 8.9);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 8.9f);
 
   unsetenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_ATTEMPTS");
   unsetenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_INITIAL_BACKOFF");
@@ -677,9 +677,9 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 321);
-  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4);
-  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6);
-  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 9.8);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 9.8f);
 
   unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS");
   unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF");
