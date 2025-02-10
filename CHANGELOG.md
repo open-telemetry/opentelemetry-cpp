@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+#### [Documentation] 
+- Improved `CONTRIBUTING.md` structure for better readability. [#3264](https://github.com/open-telemetry/opentelemetry-cpp/pull/3264)
+- Added **Prerequisites** section with required tool versions (including Bazel 7.1.1).
+
+
 * [SDK] Add tracer scope configurator
   [#3137](https://github.com/open-telemetry/opentelemetry-cpp/pull/3137)
 
