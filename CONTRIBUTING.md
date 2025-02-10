@@ -89,6 +89,25 @@ Before getting started, ensure you have the following installed:
    files provided (e.g., `.devcontainer/devcontainer.json`). This setup will install
    required dependencies, tools, and environment variables needed for the project.
 
+* **Customizing Your Dev Container**:
+
+  Customize your dev container using build arguments (for direct Docker builds) or environment variables (read in via `devcontainer.json`).
+
+  **User Settings:**
+
+  *   **Username:** `USER_NAME` / `OTEL_CPP_DEVCONTAINER_USER_NAME` (Default: `devuser`)
+  *   **User ID (UID):** `USER_UID` / `OTEL_CPP_DEVCONTAINER_USER_UID` (Default: `1000`)
+  *   **Group ID (GID):** `USER_GID` / `OTEL_CPP_DEVCONTAINER_USER_GID` (Default: `1000`)
+
+  **Install Packages:**
+
+  *   `INSTALL_PACKAGES` / `OTEL_CPP_DEVCONTAINER_INSTALL_PACKAGES` (Space-separated list of packages to install with `apt install`)
+
+  **Examples:**
+
+  *   **Docker Build:** `docker build --build-arg USER_NAME=myuser --build-arg INSTALL_PACKAGES="nano gitk"...`
+  *   **env:**  `OTEL_CPP_DEVCONTAINER_USER_NAME=myuser`, `OTEL_CPP_DEVCONTAINER_INSTALL_PACKAGES="nano gitk"`
+
 #### Available Commands
 
 Once inside the DevContainer, you can use the following commands to run tests
