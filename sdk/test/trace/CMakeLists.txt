@@ -3,6 +3,7 @@
 
 foreach(
   testname
+  tracer_provider_set_test
   tracer_provider_test
   span_data_test
   simple_processor_test

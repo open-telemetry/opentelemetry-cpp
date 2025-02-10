@@ -7,18 +7,18 @@
 #include "opentelemetry/exporters/ostream/log_record_exporter.h"
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 #include "opentelemetry/logs/logger_provider.h"
-#include "opentelemetry/logs/provider.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
 #include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/provider.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
 #ifdef BAZEL_BUILD
@@ -48,13 +48,13 @@ void InitTracer()
 
   // Set the global trace provider
   const std::shared_ptr<trace_api::TracerProvider> &api_provider = sdk_provider;
-  trace_api::Provider::SetTracerProvider(api_provider);
+  trace_sdk::Provider::SetTracerProvider(api_provider);
 }
 
 void CleanupTracer()
 {
   std::shared_ptr<trace_api::TracerProvider> noop;
-  trace_api::Provider::SetTracerProvider(noop);
+  trace_sdk::Provider::SetTracerProvider(noop);
 }
 
 void InitLogger()
@@ -69,13 +69,13 @@ void InitLogger()
 
   // Set the global logger provider
   const std::shared_ptr<logs_api::LoggerProvider> &api_provider = sdk_provider;
-  logs_api::Provider::SetLoggerProvider(api_provider);
+  logs_sdk::Provider::SetLoggerProvider(api_provider);
 }
 
 void CleanupLogger()
 {
   std::shared_ptr<logs_api::LoggerProvider> noop;
-  logs_api::Provider::SetLoggerProvider(noop);
+  logs_sdk::Provider::SetLoggerProvider(noop);
 }
 
 }  // namespace
