@@ -1,14 +1,12 @@
 # Contributing to opentelemetry-cpp
 
-The OpenTelemetry C/C++ special interest group (SIG) meets regularly. See the
-OpenTelemetry [community](https://github.com/open-telemetry/community#cc-sdk)
+The OpenTelemetry C/C++ special interest group (SIG) meets regularly. 
+See the OpenTelemetry [community](https://github.com/open-telemetry/community#cc-sdk)
 repo for information on this and other language SIGs.
 
-See the [public meeting
-notes](https://docs.google.com/document/d/1i1E4-_y4uJ083lCutKGDhkpi3n4_e774SBLi9hPLocw/edit)
+See the [public meeting notes](https://docs.google.com/document/d/1i1E4-_y4uJ083lCutKGDhkpi3n4_e774SBLi9hPLocw/edit)
 for a summary description of past meetings. To request edit access, join the
-meeting or get in touch on
-[Slack](https://cloud-native.slack.com/archives/C01N3AT62SJ).
+meeting or get in touch on [Slack](https://cloud-native.slack.com/archives/C01N3AT62SJ).
 
 See the [community membership
 document](https://github.com/open-telemetry/community/blob/main/community-membership.md)
@@ -283,8 +281,8 @@ the C++ repository.
 
 * [OpenTelemetry
   Specification](https://github.com/open-telemetry/opentelemetry-specification)
-  * The OpenTelemetry Specification describes the requirements and expectations
-    of for all OpenTelemetry implementations.
+  * The OpenTelemetry Specification describes the requirements and
+    expectations of for all OpenTelemetry implementations.
 
 * Read through the OpenTelemetry C++ documentation
   * The
