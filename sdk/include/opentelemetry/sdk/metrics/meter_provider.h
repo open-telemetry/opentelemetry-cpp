@@ -37,9 +37,11 @@ class OPENTELEMETRY_EXPORT MeterProvider final : public opentelemetry::metrics::
 {
 public:
   /**
-   * Initialize a new meter provider
+   * Initialize a new meter provider.
    * @param views The views for this meter provider
    * @param resource  The resources for this meter provider.
+   * @param meter_configurator Provides access to a function that computes the MeterConfig for
+   * Meters provided by this MeterProvider.
    */
   MeterProvider(
       std::unique_ptr<ViewRegistry> views     = std::unique_ptr<ViewRegistry>(new ViewRegistry()),

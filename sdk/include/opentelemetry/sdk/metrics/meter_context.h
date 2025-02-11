@@ -75,16 +75,20 @@ public:
    */
   ViewRegistry *GetViewRegistry() const noexcept;
 
+  /**
+   * Obtain the ScopeConfigurator with this meter context.
+   * @return The ScopeConfigurator for this meter context.
+   */
   const instrumentationscope::ScopeConfigurator<MeterConfig> &GetMeterConfigurator() const noexcept;
 
   /**
-   * NOTE - INTERNAL method, can change in future.
+   * NOTE - INTERNAL method, can change in the future.
    * Process callback for each meter in thread-safe manner
    */
   bool ForEachMeter(nostd::function_ref<bool(std::shared_ptr<Meter> &meter)> callback) noexcept;
 
   /**
-   * NOTE - INTERNAL method, can change in future.
+   * NOTE - INTERNAL method, can change in the future.
    * Get the configured meters.
    * This method is NOT thread safe, and only called through MeterProvider
    *
