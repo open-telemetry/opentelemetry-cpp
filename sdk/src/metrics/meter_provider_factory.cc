@@ -35,8 +35,20 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> MeterProviderFactory
     std::unique_ptr<ViewRegistry> views,
     const opentelemetry::sdk::resource::Resource &resource)
 {
+  auto meter_configurator = std::make_unique<instrumentationscope::ScopeConfigurator<MeterConfig>>(
+      instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(MeterConfig::Default())
+          .Build());
+  return Create(std::move(views), resource, std::move(meter_configurator));
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> MeterProviderFactory::Create(
+    std::unique_ptr<ViewRegistry> views,
+    const opentelemetry::sdk::resource::Resource &resource,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>> meter_configurator)
+{
   std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> provider(
-      new opentelemetry::sdk::metrics::MeterProvider(std::move(views), resource));
+      new opentelemetry::sdk::metrics::MeterProvider(std::move(views), resource,
+                                                     std::move(meter_configurator)));
   return provider;
 }
 

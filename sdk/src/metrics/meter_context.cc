@@ -35,8 +35,13 @@ namespace metrics
 {
 
 MeterContext::MeterContext(std::unique_ptr<ViewRegistry> views,
-                           const opentelemetry::sdk::resource::Resource &resource) noexcept
-    : resource_{resource}, views_(std::move(views)), sdk_start_ts_{std::chrono::system_clock::now()}
+                           const opentelemetry::sdk::resource::Resource &resource,
+                           std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>>
+                               meter_configurator) noexcept
+    : resource_{resource},
+      views_(std::move(views)),
+      sdk_start_ts_{std::chrono::system_clock::now()},
+      meter_configurator_(std::move(meter_configurator))
 {}
 
 const resource::Resource &MeterContext::GetResource() const noexcept
@@ -47,6 +52,12 @@ const resource::Resource &MeterContext::GetResource() const noexcept
 ViewRegistry *MeterContext::GetViewRegistry() const noexcept
 {
   return views_.get();
+}
+
+const instrumentationscope::ScopeConfigurator<MeterConfig> &MeterContext::GetMeterConfigurator()
+    const noexcept
+{
+  return *meter_configurator_;
 }
 
 bool MeterContext::ForEachMeter(

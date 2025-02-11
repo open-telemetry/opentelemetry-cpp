@@ -36,8 +36,11 @@ MeterProvider::MeterProvider(std::unique_ptr<MeterContext> context) noexcept
 {}
 
 MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
-                             const sdk::resource::Resource &resource) noexcept
-    : context_(std::make_shared<MeterContext>(std::move(views), resource))
+                             const sdk::resource::Resource &resource,
+                             std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>>
+                                 meter_configurator) noexcept
+    : context_(
+          std::make_shared<MeterContext>(std::move(views), resource, std::move(meter_configurator)))
 {
   OTEL_INTERNAL_LOG_DEBUG("[MeterProvider] MeterProvider created.");
 }

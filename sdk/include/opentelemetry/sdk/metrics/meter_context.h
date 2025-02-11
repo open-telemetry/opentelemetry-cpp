@@ -13,6 +13,8 @@
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
@@ -55,7 +57,11 @@ public:
   MeterContext(
       std::unique_ptr<ViewRegistry> views = std::unique_ptr<ViewRegistry>(new ViewRegistry()),
       const opentelemetry::sdk::resource::Resource &resource =
-          opentelemetry::sdk::resource::Resource::Create({})) noexcept;
+          opentelemetry::sdk::resource::Resource::Create({}),
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>> meter_configurator =
+          std::make_unique<instrumentationscope::ScopeConfigurator<MeterConfig>>(
+              instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(MeterConfig::Default())
+                  .Build())) noexcept;
 
   /**
    * Obtain the resource associated with this meter context.
@@ -68,6 +74,8 @@ public:
    * @return The reference to view registry
    */
   ViewRegistry *GetViewRegistry() const noexcept;
+
+  const instrumentationscope::ScopeConfigurator<MeterConfig> &GetMeterConfigurator() const noexcept;
 
   /**
    * NOTE - INTERNAL method, can change in future.
@@ -154,6 +162,7 @@ private:
   std::vector<std::shared_ptr<CollectorHandle>> collectors_;
   std::unique_ptr<ViewRegistry> views_;
   opentelemetry::common::SystemTimestamp sdk_start_ts_;
+  std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>> meter_configurator_;
   std::vector<std::shared_ptr<Meter>> meters_;
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
