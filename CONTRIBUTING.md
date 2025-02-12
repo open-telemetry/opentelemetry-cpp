@@ -95,27 +95,27 @@ Customize your dev container using build arguments (for direct Docker builds) or
 environment variables (for evaluation in `devcontainer.json`).
 
 * **Username:**
-   * Docker ARG:
+  * Docker ARG:
    `USER_NAME` (Default: `devuser`)
-   * Environment Variable:
+  * Environment Variable:
    `OTEL_CPP_DEVCONTAINER_USER_NAME` (Default: `devuser`)
 
 * **User ID (UID):**
-   * Docker ARG:
+  * Docker ARG:
    `USER_UID`  (Default: `1000`)
-   * Environment Variable:
+  * Environment Variable:
    `OTEL_CPP_DEVCONTAINER_USER_UID` (Default: `1000`)
 
 * **Group ID (GID):**
-   * Docker ARG:
+  * Docker ARG:
    `USER_GID`  (Default: `1000`)
-   * Environment Variable:
+  * Environment Variable:
    `OTEL_CPP_DEVCONTAINER_USER_GID` (Default: `1000`)
 
 * **Install Packages:**
-   * Docker ARG:
+  * Docker ARG:
    `INSTALL_PACKAGES`  (Default: ``)
-   * Environment Variable:
+  * Environment Variable:
    `OTEL_CPP_DEVCONTAINER_INSTALL_PACKAGES` (Default: ``)
 
 ##### Examples
