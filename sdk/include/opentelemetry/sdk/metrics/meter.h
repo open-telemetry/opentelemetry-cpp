@@ -136,17 +136,17 @@ private:
   // meter-context.
   std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> scope_;
   std::weak_ptr<sdk::metrics::MeterContext> meter_context_;
-  //   MeterConfig meter_config_;
   // Mapping between instrument-name and Aggregation Storage.
   std::unordered_map<std::string, std::shared_ptr<MetricStorage>> storage_registry_;
   std::shared_ptr<ObservableRegistry> observable_registry_;
+  MeterConfig meter_config_;
   std::unique_ptr<SyncWritableMetricStorage> RegisterSyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
   std::unique_ptr<AsyncWritableMetricStorage> RegisterAsyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
   opentelemetry::common::SpinLockMutex storage_lock_;
 
-  // static const opentelemetry::metrics::NoopMeter kNoopMeter;
+  static opentelemetry::metrics::NoopMeter kNoopMeter;
 
   static nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
   GetNoopObservableInsrument()
