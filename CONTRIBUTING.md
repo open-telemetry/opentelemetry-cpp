@@ -89,24 +89,40 @@ Before getting started, ensure you have the following installed:
    files provided (e.g., `.devcontainer/devcontainer.json`). This setup will install
    required dependencies, tools, and environment variables needed for the project.
 
-* **Customizing Your Dev Container**:
+#### Customizing Your Dev Container
 
-  Customize your dev container using build arguments (for direct Docker builds) or environment variables (read in via `devcontainer.json`).
+Customize your dev container using build arguments (for direct Docker builds) or
+environment variables (for evaluation in `devcontainer.json`).
 
-  **User Settings:**
+* **Username:**
+   * Docker ARG:
+   `USER_NAME` (Default: `devuser`)
+   * Environment Variable:
+   `OTEL_CPP_DEVCONTAINER_USER_NAME` (Default: `devuser`)
 
-  *   **Username:** `USER_NAME` / `OTEL_CPP_DEVCONTAINER_USER_NAME` (Default: `devuser`)
-  *   **User ID (UID):** `USER_UID` / `OTEL_CPP_DEVCONTAINER_USER_UID` (Default: `1000`)
-  *   **Group ID (GID):** `USER_GID` / `OTEL_CPP_DEVCONTAINER_USER_GID` (Default: `1000`)
+* **User ID (UID):**
+   * Docker ARG:
+   `USER_UID`  (Default: `1000`)
+   * Environment Variable:
+   `OTEL_CPP_DEVCONTAINER_USER_UID` (Default: `1000`)
 
-  **Install Packages:**
+* **Group ID (GID):**
+   * Docker ARG:
+   `USER_GID`  (Default: `1000`)
+   * Environment Variable:
+   `OTEL_CPP_DEVCONTAINER_USER_GID` (Default: `1000`)
 
-  *   `INSTALL_PACKAGES` / `OTEL_CPP_DEVCONTAINER_INSTALL_PACKAGES` (Space-separated list of packages to install with `apt install`)
+* **Install Packages:**
+   * Docker ARG:
+   `INSTALL_PACKAGES`  (Default: ``)
+   * Environment Variable:
+   `OTEL_CPP_DEVCONTAINER_INSTALL_PACKAGES` (Default: ``)
 
-  **Examples:**
+##### Examples
 
-  *   **Docker Build:** `docker build --build-arg USER_NAME=myuser --build-arg INSTALL_PACKAGES="nano gitk"...`
-  *   **env:**  `OTEL_CPP_DEVCONTAINER_USER_NAME=myuser`, `OTEL_CPP_DEVCONTAINER_INSTALL_PACKAGES="nano gitk"`
+* `docker build --build-arg USER_NAME=myuser --build-arg INSTALL_PACKAGES="nano gitk"...`
+* `export OTEL_CPP_DEVCONTAINER_USER_NAME=myuser`
+* `export OTEL_CPP_DEVCONTAINER_INSTALL_PACKAGES="nano gitk"`
 
 #### Available Commands
 
@@ -211,7 +227,13 @@ If you made changes to the Markdown documents (`*.md` files), install the latest
 [`markdownlint-cli`](https://github.com/igorshubovych/markdownlint-cli) and run:
 
 ```sh
-markdownlint .
+mdl <path to markdown file>.md
+```
+
+If you modified shell scripts (`*.sh` files), install `shellcheck` and run:
+
+```sh
+shellcheck --severity=error <path to shell script>.sh
 ```
 
 Open a pull request against the main `opentelemetry-cpp` repo.
@@ -290,11 +312,11 @@ the C++ repository.
 
 * [OpenTelemetry
   Specification](https://github.com/open-telemetry/opentelemetry-specification)
-  * The OpenTelemetry Specification describes the requirements and expectations
-    of for all OpenTelemetry implementations.
+* The OpenTelemetry Specification describes the requirements and expectations
+  of for all OpenTelemetry implementations.
 
 * Read through the OpenTelemetry C++ documentation
-  * The
+* The
     [API](https://opentelemetry-cpp.readthedocs.io/en/latest/api/api.html)
     and
     [SDK](https://opentelemetry-cpp.readthedocs.io/en/latest/sdk/sdk.html)

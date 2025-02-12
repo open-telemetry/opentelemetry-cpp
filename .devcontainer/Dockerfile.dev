@@ -20,7 +20,8 @@ COPY ci /opt/ci
 RUN apt update && apt install -y wget \
 	ninja-build \
 	libcurl4-openssl-dev \
-	markdownlint
+	markdownlint \
+	shellcheck
 
 RUN cd /opt/ci && bash setup_cmake.sh
 RUN cd /opt/ci && bash setup_ci_environment.sh
@@ -36,6 +37,7 @@ ENV INSTALL_PACKAGES=${INSTALL_PACKAGES}
 ENV USER_NAME=${USER_NAME}
 ENV USER_UID=${USER_UID}
 ENV USER_GID=${USER_GID}
+ENV IS_CONTAINER_BUILD=true
 COPY ./.devcontainer/customize_container.sh /tmp/opentelemetry_cpp/devcontainer/customize_container.sh
 RUN /tmp/opentelemetry_cpp/devcontainer/customize_container.sh
 
