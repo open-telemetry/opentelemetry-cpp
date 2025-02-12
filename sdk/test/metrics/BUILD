@@ -19,6 +19,21 @@ cc_library(
 )
 
 cc_test(
+    name = "meter_config_test",
+    srcs = [
+        "meter_config_test.cc",
+    ],
+    tags = [
+        "test",
+        "metrics",
+    ],
+    deps = [
+        "metrics_common_test_utils",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "all_tests",
     srcs = glob(["*_test.cc"]),
     tags = [
