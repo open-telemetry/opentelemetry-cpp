@@ -20,8 +20,8 @@ if(POLICY CMP0091)
 endif()
 
 if(POLICY CMP0092)
-  # https://cmake.org/cmake/help/latest/policy/CMP0092.html#policy:CMP0092
-  # Make sure the /W3 is not removed from CMAKE_CXX_FLAGS since CMake 3.15
+  # https://cmake.org/cmake/help/latest/policy/CMP0092.html#policy:CMP0092 Make
+  # sure the /W3 is not removed from CMAKE_CXX_FLAGS since CMake 3.15
   cmake_policy(SET CMP0092 OLD)
 endif()
 
