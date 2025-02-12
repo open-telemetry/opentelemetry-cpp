@@ -3,17 +3,17 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-set -eu 
+set -eu
 
-if [! -f /.dockerenv ]; then 
+if [! -f /.dockerenv ]; then
   echo "This script should only run inside a Docker container."
   exit 1
 fi
 
-if [ -n "$INSTALL_PACKAGES" ]; then  
-    packages=($INSTALL_PACKAGES) 
-    for package in "${packages[@]}"; do 
-        apt install -y "$package"; 
+if [ -n "$INSTALL_PACKAGES" ]; then
+    packages=($INSTALL_PACKAGES)
+    for package in "${packages[@]}"; do
+        apt install -y "$package";
     done
 fi
 
