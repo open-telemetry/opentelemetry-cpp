@@ -33,11 +33,11 @@ TEST(MeterConfig, CheckDefaultConfigWorksAccToSpec)
 /** Tests to verify the behavior of metrics_sdk::MeterConfig::Default */
 
 static std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> attr1 = {
-  "accept_single_attr", true};
+    "accept_single_attr", true};
 static std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> attr2 = {
-  "accept_second_attr", "some other attr"};
+    "accept_second_attr", "some other attr"};
 static std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> attr3 = {
-  "accept_third_attr", 3};
+    "accept_third_attr", 3};
 
 static instrumentation_scope::InstrumentationScope test_scope_1 =
     *instrumentation_scope::InstrumentationScope::Create("test_scope_1");
@@ -64,7 +64,7 @@ static instrumentation_scope::InstrumentationScope test_scope_5 =
 // library, see https://github.com/google/googletest/issues/3805#issuecomment-1397301790 for more
 // details. Using pointers is a workaround to prevent the Valgrind warnings.
 const std::array<instrumentation_scope::InstrumentationScope *, 5> instrumentation_scopes = {
-  &test_scope_1, &test_scope_2, &test_scope_3, &test_scope_4, &test_scope_5,
+    &test_scope_1, &test_scope_2, &test_scope_3, &test_scope_4, &test_scope_5,
 };
 
 // Test fixture for VerifyDefaultConfiguratorBehavior
