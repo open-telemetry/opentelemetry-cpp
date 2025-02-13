@@ -55,11 +55,20 @@ nostd::shared_ptr<metrics::Meter> InitMeter(MetricReader **metricReaderPtr,
   return meter;
 }
 
-void asyc_generate_measurements(opentelemetry::metrics::ObserverResult observer, void * /* state */)
+void asyc_generate_measurements_long(opentelemetry::metrics::ObserverResult observer,
+                                     void * /* state */)
 {
   auto observer_long =
       nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>>>(observer);
   observer_long->Observe(10);
+}
+
+void asyc_generate_measurements_double(opentelemetry::metrics::ObserverResult observer,
+                                       void * /* state */)
+{
+  auto observer_double =
+      nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(observer);
+  observer_double->Observe(10.2f);
 }
 
 std::shared_ptr<metrics::MeterProvider> GetMeterProviderWithScopeConfigurator(
@@ -84,7 +93,7 @@ TEST(MeterTest, BasicAsyncTests)
   MetricReader *metric_reader_ptr = nullptr;
   auto meter                      = InitMeter(&metric_reader_ptr);
   auto observable_counter         = meter->CreateInt64ObservableCounter("observable_counter");
-  observable_counter->AddCallback(asyc_generate_measurements, nullptr);
+  observable_counter->AddCallback(asyc_generate_measurements_long, nullptr);
 
   size_t count = 0;
   metric_reader_ptr->Collect([&count](ResourceMetrics &metric_data) {
@@ -100,7 +109,7 @@ TEST(MeterTest, BasicAsyncTests)
     }
     return true;
   });
-  observable_counter->RemoveCallback(asyc_generate_measurements, nullptr);
+  observable_counter->RemoveCallback(asyc_generate_measurements_long, nullptr);
 }
 
 constexpr static unsigned MAX_THREADS       = 25;
@@ -137,7 +146,7 @@ TEST(MeterTest, StressMultiThread)
             std::cout << "\n creating async thread " << std::to_string(numIterations);
             auto observable_instrument = meter->CreateInt64ObservableUpDownCounter(
                 "test_gauge_" + std::to_string(instrument_id));
-            observable_instrument->AddCallback(asyc_generate_measurements, nullptr);
+            observable_instrument->AddCallback(asyc_generate_measurements_long, nullptr);
             observable_instruments.push_back(std::move(observable_instrument));
             do_collect.store(true);
             instrument_id++;
@@ -171,26 +180,39 @@ TEST(MeterTest, MeterWithDisabledConfig)
 
   auto meter = meter_provider->GetMeter("foo", "0.1.0", "https://opentelemetry.io/schemas/1.24.0");
 
-  // Test all supported instruments from this meter
-  // Test DoubleCounter
-  auto double_counter = meter->CreateDoubleCounter("double_counter");
-  double_counter->Add(1.0f);
-  metric_reader_ptr->Collect([&](ResourceMetrics &metric_data) {
-    EXPECT_EQ(metric_data.scope_metric_data_.size(), 0);
-    return true;
-  });
-
-  // Test DoubleHistogram
-  auto double_histogram = meter->CreateDoubleHistogram("double_histogram");
-  double_histogram->Record(23.2f, {});
-  metric_reader_ptr->Collect([&](ResourceMetrics &metric_data) {
-    EXPECT_EQ(metric_data.scope_metric_data_.size(), 0);
-    return true;
-  });
-
-  // Test DoubleUpDownCounter
+  // Test all supported instruments from this meter - create instruments
+  auto double_counter         = meter->CreateDoubleCounter("double_counter");
+  auto double_histogram       = meter->CreateDoubleHistogram("double_histogram");
   auto double_up_down_counter = meter->CreateDoubleUpDownCounter("double_up_down_counter");
+  auto double_obs_counter     = meter->CreateDoubleObservableCounter("double_obs_counter");
+  auto double_obs_gauge       = meter->CreateDoubleObservableGauge("double_obs_gauge");
+  auto double_obs_up_down_counter =
+      meter->CreateDoubleObservableUpDownCounter("double_obs_up_down_counter");
+
+  auto uint64_counter        = meter->CreateUInt64Counter("uint64_counter");
+  auto uint64_histogram      = meter->CreateUInt64Histogram("uint64_histogram");
+  auto int64_up_down_counter = meter->CreateInt64UpDownCounter("int64_up_down_counter");
+  auto int64_obs_counter     = meter->CreateInt64ObservableCounter("int64_obs_counter");
+  auto int64_obs_gauge       = meter->CreateInt64ObservableGauge("int64_obs_gauge");
+  auto int64_obs_up_down_counter =
+      meter->CreateInt64ObservableUpDownCounter("int64_obs_up_down_counter");
+
+  // Invoke the created instruments
+  double_counter->Add(1.0f);
+  double_histogram->Record(23.2f, {});
   double_up_down_counter->Add(-2.4f);
+  double_obs_counter->AddCallback(asyc_generate_measurements_double, nullptr);
+  double_obs_gauge->AddCallback(asyc_generate_measurements_double, nullptr);
+  double_obs_up_down_counter->AddCallback(asyc_generate_measurements_double, nullptr);
+
+  uint64_counter->Add(1);
+  uint64_histogram->Record(23, {});
+  int64_up_down_counter->Add(-2);
+  int64_obs_counter->AddCallback(asyc_generate_measurements_long, nullptr);
+  int64_obs_gauge->AddCallback(asyc_generate_measurements_long, nullptr);
+  int64_obs_up_down_counter->AddCallback(asyc_generate_measurements_long, nullptr);
+
+  // No active instruments are expected - since all scopes are disabled.
   metric_reader_ptr->Collect([&](ResourceMetrics &metric_data) {
     EXPECT_EQ(metric_data.scope_metric_data_.size(), 0);
     return true;
@@ -199,76 +221,87 @@ TEST(MeterTest, MeterWithDisabledConfig)
 
 TEST(MeterTest, MeterWithEnabledConfig)
 {
-  ScopeConfigurator<MeterConfig> disable_all_scopes =
+  ScopeConfigurator<MeterConfig> enable_all_scopes =
       ScopeConfigurator<MeterConfig>::Builder(MeterConfig::Enabled()).Build();
   MetricReader *metric_reader_ptr = nullptr;
   std::shared_ptr<metrics::MeterProvider> meter_provider =
-      GetMeterProviderWithScopeConfigurator(disable_all_scopes, &metric_reader_ptr);
+      GetMeterProviderWithScopeConfigurator(enable_all_scopes, &metric_reader_ptr);
 
   auto meter = meter_provider->GetMeter("foo", "0.1.0", "https://opentelemetry.io/schemas/1.24.0");
 
-  // Test supported instruments from this meter
-  // Test DoubleCounter
-  auto double_counter = meter->CreateDoubleCounter("double_counter");
-  double_counter->Add(1.0f);
-  metric_reader_ptr->Collect([&](const ResourceMetrics &metric_data) {
-    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
-    EXPECT_EQ(metric_data.scope_metric_data_.at(0).scope_->GetName(), "foo");
-    bool instrument_found = false;
-    for (const MetricData &md : metric_data.scope_metric_data_.at(0).metric_data_)
-    {
-      if (md.instrument_descriptor.name_ == "double_counter")
-      {
-        instrument_found = true;
-        break;
-      }
-    }
-    EXPECT_TRUE(instrument_found);
-    return true;
-  });
-
-  // Test DoubleHistogram
-  auto double_histogram = meter->CreateDoubleHistogram("double_histogram");
-  double_histogram->Record(23.2f, {});
-  metric_reader_ptr->Collect([&](ResourceMetrics &metric_data) {
-    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
-    EXPECT_EQ(metric_data.scope_metric_data_.at(0).scope_->GetName(), "foo");
-    bool instrument_found = false;
-    for (const MetricData &md : metric_data.scope_metric_data_.at(0).metric_data_)
-    {
-      if (md.instrument_descriptor.name_ == "double_histogram")
-      {
-        instrument_found = true;
-        break;
-      }
-    }
-    EXPECT_TRUE(instrument_found);
-    return true;
-  });
-
-  // Test DoubleUpDownCounter
+  // Test all supported instruments from this meter - create instruments
+  auto double_counter         = meter->CreateDoubleCounter("double_counter");
+  auto double_histogram       = meter->CreateDoubleHistogram("double_histogram");
   auto double_up_down_counter = meter->CreateDoubleUpDownCounter("double_up_down_counter");
+  auto double_obs_counter     = meter->CreateDoubleObservableCounter("double_obs_counter");
+  auto double_obs_gauge       = meter->CreateDoubleObservableGauge("double_obs_gauge");
+  auto double_obs_up_down_counter =
+      meter->CreateDoubleObservableUpDownCounter("double_obs_up_down_counter");
+
+  auto uint64_counter        = meter->CreateUInt64Counter("uint64_counter");
+  auto uint64_histogram      = meter->CreateUInt64Histogram("uint64_histogram");
+  auto int64_up_down_counter = meter->CreateInt64UpDownCounter("int64_up_down_counter");
+  auto int64_obs_counter     = meter->CreateInt64ObservableCounter("int64_obs_counter");
+  auto int64_obs_gauge       = meter->CreateInt64ObservableGauge("int64_obs_gauge");
+  auto int64_obs_up_down_counter =
+      meter->CreateInt64ObservableUpDownCounter("int64_obs_up_down_counter");
+
+  // Invoke the created instruments
+  double_counter->Add(1.0f);
+  double_histogram->Record(23.2f, {});
   double_up_down_counter->Add(-2.4f);
-  metric_reader_ptr->Collect([&](ResourceMetrics &metric_data) {
+  double_obs_counter->AddCallback(asyc_generate_measurements_double, nullptr);
+  double_obs_gauge->AddCallback(asyc_generate_measurements_double, nullptr);
+  double_obs_up_down_counter->AddCallback(asyc_generate_measurements_double, nullptr);
+
+  uint64_counter->Add(1);
+  uint64_histogram->Record(23, {});
+  int64_up_down_counter->Add(-2);
+  int64_obs_counter->AddCallback(asyc_generate_measurements_long, nullptr);
+  int64_obs_gauge->AddCallback(asyc_generate_measurements_long, nullptr);
+  int64_obs_up_down_counter->AddCallback(asyc_generate_measurements_long, nullptr);
+
+  // Expected active instruments
+  std::vector<std::pair<std::string, std::string>> active_scope_instrument_pairs;
+  active_scope_instrument_pairs.emplace_back("foo", "double_counter");
+  active_scope_instrument_pairs.emplace_back("foo", "double_histogram");
+  active_scope_instrument_pairs.emplace_back("foo", "double_up_down_counter");
+  active_scope_instrument_pairs.emplace_back("foo", "double_obs_up_down_counter");
+  active_scope_instrument_pairs.emplace_back("foo", "double_obs_counter");
+  active_scope_instrument_pairs.emplace_back("foo", "double_obs_gauge");
+  active_scope_instrument_pairs.emplace_back("foo", "uint64_counter");
+  active_scope_instrument_pairs.emplace_back("foo", "uint64_histogram");
+  active_scope_instrument_pairs.emplace_back("foo", "int64_up_down_counter");
+  active_scope_instrument_pairs.emplace_back("foo", "int64_obs_up_down_counter");
+  active_scope_instrument_pairs.emplace_back("foo", "int64_obs_counter");
+  active_scope_instrument_pairs.emplace_back("foo", "int64_obs_gauge");
+
+  metric_reader_ptr->Collect([&](const ResourceMetrics &metric_data) {
+    bool unexpected_instrument_found = false;
+    std::string curr_scope_name      = metric_data.scope_metric_data_.at(0).scope_->GetName();
     EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
     EXPECT_EQ(metric_data.scope_metric_data_.at(0).scope_->GetName(), "foo");
-    bool instrument_found = false;
+    EXPECT_EQ(metric_data.scope_metric_data_.at(0).metric_data_.size(), 12);
     for (const MetricData &md : metric_data.scope_metric_data_.at(0).metric_data_)
     {
-      if (md.instrument_descriptor.name_ == "double_up_down_counter")
+      auto found_instrument = std::make_pair(curr_scope_name, md.instrument_descriptor.name_);
+      // confirm if the found instrument is expected
+      auto it = std::find(active_scope_instrument_pairs.begin(),
+                          active_scope_instrument_pairs.end(), found_instrument);
+      if (it == active_scope_instrument_pairs.end())
       {
-        instrument_found = true;
+        // found instrument is not expected
+        unexpected_instrument_found = true;
         break;
       }
     }
-    EXPECT_TRUE(instrument_found);
+    EXPECT_FALSE(unexpected_instrument_found);
     return true;
   });
 }
 
 TEST(MeterTest, MeterWithCustomConfig)
 {
-  // TODO: Replace with a single collect call and check for all expected and unexpected instruments
   // within the same call
   auto check_if_version_present = [](const InstrumentationScope &scope_info) {
     return !scope_info.GetVersion().empty();
@@ -285,75 +318,56 @@ TEST(MeterTest, MeterWithCustomConfig)
   std::shared_ptr<metrics::MeterProvider> meter_provider =
       GetMeterProviderWithScopeConfigurator(custom_scope_configurator, &metric_reader_ptr);
 
-  // The meter has version information and name is not "foo_library"
-  // All instruments from this meter should be active and recording metrics
+  // The meter has version information and name is not "foo_library".
+  // All instruments from this meter should be active and recording metrics.
   auto meter_enabled_expected_bar =
       meter_provider->GetMeter("bar_library", "0.1.0", "https://opentelemetry.io/schemas/1.24.0");
 
-  // Test supported instruments from this meter
-  auto double_counter_bar = meter_enabled_expected_bar->CreateDoubleCounter("double_counter");
-  double_counter_bar->Add(1.0f);
-  metric_reader_ptr->Collect([&](const ResourceMetrics &metric_data) {
-    bool instrument_found = false;
-    for (const ScopeMetrics &sm : metric_data.scope_metric_data_)
-    {
-      std::string curr_scope = sm.scope_->GetName();
-      for (const MetricData &md : sm.metric_data_)
-      {
-        if (md.instrument_descriptor.name_ == "double_counter" && curr_scope == "bar_library")
-        {
-          instrument_found = true;
-        }
-      }
-    }
-    EXPECT_TRUE(instrument_found);
-    return true;
-  });
-
-  // The meter has version information and name is "foo_library"
-  // All instruments from this meter should be noop
+  // The meter has version information and name is "foo_library".
+  // All instruments from this meter should be noop.
   auto meter_disabled_expected_foo =
       meter_provider->GetMeter("foo_library", "0.1.0", "https://opentelemetry.io/schemas/1.24.0");
 
-  // Test supported instruments from this meter
-  auto double_counter_foo = meter_disabled_expected_foo->CreateDoubleCounter("double_counter");
-  double_counter_foo->Add(1.0f);
-  metric_reader_ptr->Collect([&](const ResourceMetrics &metric_data) {
-    bool unexpected_instrument_found = false;
-    for (const ScopeMetrics &sm : metric_data.scope_metric_data_)
-    {
-      std::string curr_scope = sm.scope_->GetName();
-      for (const MetricData &md : sm.metric_data_)
-      {
-        if (md.instrument_descriptor.name_ == "double_counter" && curr_scope == "foo_library")
-        {
-          unexpected_instrument_found = true;
-        }
-      }
-    }
-    EXPECT_FALSE(unexpected_instrument_found);
-    return true;
-  });
-
+  // This meter has no version information.
+  // All instruments from this meter should be noop.
   auto meter_disabled_expected_baz =
       meter_provider->GetMeter("baz_library", "", "https://opentelemetry.io/schemas/1.24.0");
 
-  // Test supported instruments from this meter
+  // Create instruments from all meters
+  auto double_counter_bar = meter_enabled_expected_bar->CreateDoubleCounter("double_counter");
+  auto double_counter_foo = meter_disabled_expected_foo->CreateDoubleCounter("double_counter");
   auto double_counter_baz = meter_disabled_expected_baz->CreateDoubleCounter("double_counter");
+
+  // Invoke created instruments at least once
+  double_counter_bar->Add(1.0f);
+  double_counter_foo->Add(1.0f);
   double_counter_baz->Add(1.0f);
+
+  std::vector<std::pair<std::string, std::string>> active_scope_instrument_pairs;
+  active_scope_instrument_pairs.emplace_back("bar_library", "double_counter");
+
   metric_reader_ptr->Collect([&](const ResourceMetrics &metric_data) {
+    int found_instruments            = 0;
     bool unexpected_instrument_found = false;
     for (const ScopeMetrics &sm : metric_data.scope_metric_data_)
     {
       std::string curr_scope = sm.scope_->GetName();
       for (const MetricData &md : sm.metric_data_)
       {
-        if (md.instrument_descriptor.name_ == "double_counter" && curr_scope == "baz_library")
+        found_instruments++;
+        auto found_instrument = std::make_pair(curr_scope, md.instrument_descriptor.name_);
+        // confirm if the found instrument is expected
+        auto it = std::find(active_scope_instrument_pairs.begin(),
+                            active_scope_instrument_pairs.end(), found_instrument);
+        if (it == active_scope_instrument_pairs.end())
         {
+          // found instrument is not expected
           unexpected_instrument_found = true;
+          break;
         }
       }
     }
+    EXPECT_EQ(found_instruments, active_scope_instrument_pairs.size());
     EXPECT_FALSE(unexpected_instrument_found);
     return true;
   });
