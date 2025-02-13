@@ -50,7 +50,6 @@ class MeterContext : public std::enable_shared_from_this<MeterContext>
 public:
   /**
    * Initialize a new meter provider
-   * @param readers The readers to be configured with meter context.
    * @param views The views to be configured with meter context.
    * @param resource  The resource for this meter context.
    */
