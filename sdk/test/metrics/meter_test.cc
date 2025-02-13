@@ -13,10 +13,17 @@
 #include <vector>
 #include "common.h"
 
+#include <functional>
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/metrics/async_instruments.h"
 #include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_config.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
+#include "opentelemetry/sdk/resource/resource.h"
 
-#include <opentelemetry/sdk/metrics/meter_provider_factory.h>
 #include <opentelemetry/sdk/metrics/view/view_registry_factory.h>
 
 #include "opentelemetry/metrics/meter_provider.h"
@@ -261,6 +268,8 @@ TEST(MeterTest, MeterWithEnabledConfig)
 
 TEST(MeterTest, MeterWithCustomConfig)
 {
+  // TODO: Replace with a single collect call and check for all expected and unexpected instruments
+  // within the same call
   auto check_if_version_present = [](const InstrumentationScope &scope_info) {
     return !scope_info.GetVersion().empty();
   };

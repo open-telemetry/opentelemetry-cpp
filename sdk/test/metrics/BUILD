@@ -24,8 +24,8 @@ cc_test(
         "meter_config_test.cc",
     ],
     tags = [
-        "test",
         "metrics",
+        "test",
     ],
     deps = [
         "metrics_common_test_utils",
