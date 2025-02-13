@@ -227,7 +227,7 @@ If you made changes to the Markdown documents (`*.md` files), install the latest
 [`markdownlint-cli`](https://github.com/igorshubovych/markdownlint-cli) and run:
 
 ```sh
-mdl <path to markdown file>.md
+markdownlint .
 ```
 
 If you modified shell scripts (`*.sh` files), install `shellcheck` and run:
