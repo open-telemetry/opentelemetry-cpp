@@ -30,6 +30,8 @@
 #include "opentelemetry/sdk/logs/log_record_data.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/provider.h"
+#include "opentelemetry/sdk/logs/read_write_log_record.h"
 #include "opentelemetry/sdk/logs/readable_log_record.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor.h"
@@ -396,7 +398,7 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
       new sdklogs::SimpleLogRecordProcessor(std::move(exporter))));
   auto apiProvider = nostd::shared_ptr<logs_api::LoggerProvider>(sdkProvider);
   auto provider    = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
-  logs_api::Provider::SetLoggerProvider(provider);
+  sdklogs::Provider::SetLoggerProvider(provider);
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = logs_api::Provider::GetLoggerProvider()->GetLogger(
       "Logger", "opentelelemtry_library", OPENTELEMETRY_SDK_VERSION, schema_url,
@@ -467,7 +469,7 @@ TEST(OStreamLogRecordExporter, IntegrationTestWithEventId)
       new sdklogs::SimpleLogRecordProcessor(std::move(exporter))));
   auto apiProvider = nostd::shared_ptr<logs_api::LoggerProvider>(sdkProvider);
   auto provider    = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
-  logs_api::Provider::SetLoggerProvider(provider);
+  sdklogs::Provider::SetLoggerProvider(provider);
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = logs_api::Provider::GetLoggerProvider()->GetLogger(
       "Logger", "opentelelemtry_library", OPENTELEMETRY_SDK_VERSION, schema_url,
