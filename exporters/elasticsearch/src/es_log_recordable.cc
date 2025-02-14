@@ -23,12 +23,25 @@
 
 namespace nlohmann
 {
+template <class T>
+struct json_assign_visitor
+{
+  T *j_;
+  json_assign_visitor(T &j) : j_(&j) {}
+
+  template <class U>
+  void operator()(const U &u)
+  {
+    *j_ = u;
+  }
+};
+
 template <>
 struct adl_serializer<opentelemetry::sdk::common::OwnedAttributeValue>
 {
   static void to_json(json &j, const opentelemetry::sdk::common::OwnedAttributeValue &v)
   {
-    opentelemetry::nostd::visit([&j](const auto &value) { j = value; }, v);
+    opentelemetry::nostd::visit(json_assign_visitor<json>(j), v);
   }
 };
 
@@ -37,7 +50,7 @@ struct adl_serializer<opentelemetry::common::AttributeValue>
 {
   static void to_json(json &j, const opentelemetry::common::AttributeValue &v)
   {
-    opentelemetry::nostd::visit([&j](const auto &value) { j = value; }, v);
+    opentelemetry::nostd::visit(json_assign_visitor<json>(j), v);
   }
 };
 }  // namespace nlohmann
