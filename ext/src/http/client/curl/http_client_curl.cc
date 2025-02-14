@@ -15,7 +15,6 @@
 #include <mutex>
 #include <string>
 #include <thread>
-#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -27,6 +26,7 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
@@ -116,7 +116,7 @@ int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *m
   // now empty input buffer (this will only occur for long incompressible streams, more than ~20 MB
   // for the default deflate memLevel of 8, or when *max_len is too small and less than the length
   // of the header plus one byte)
-  auto hold = static_cast<std::remove_const_t<decltype(z_stream::next_in)>>(
+  auto hold = static_cast<nostd::remove_const_t<decltype(z_stream::next_in)>>(
       strm->zalloc(strm->opaque, strm->avail_in, 1));  // allocated buffer to hold input data
   if (hold == Z_NULL)
   {

@@ -12,3 +12,4 @@ common:xcode  --run_under='/usr/bin/xcdebug'
 #common:slrun --run_under='sudo -E --inline q:/superluminal/SuperluminalCmd.exe run windows --symbol-location q:/symbols --resolve --symbol-cache-dir q:/symcache '
 #common:test1 --run_under='"c:/windows/system32/cmd.exe" /k set 1>d:\\1.txt 2>d:\\2.txt && echo a '
 
+common --incompatible_disable_target_provider_fields=false
