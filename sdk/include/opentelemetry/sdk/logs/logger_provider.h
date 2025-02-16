@@ -39,11 +39,15 @@ public:
    */
   explicit LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
                           const opentelemetry::sdk::resource::Resource &resource =
-                              opentelemetry::sdk::resource::Resource::Create({})) noexcept;
+                              opentelemetry::sdk::resource::Resource::Create({}),
+                          std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator =
+                              std::make_unique<instrumentationscope::ScopeConfigurator<LoggerConfig>>(instrumentationscope::ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Default()).Build())) noexcept;
 
   explicit LoggerProvider(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
                           const opentelemetry::sdk::resource::Resource &resource =
-                              opentelemetry::sdk::resource::Resource::Create({})) noexcept;
+                              opentelemetry::sdk::resource::Resource::Create({}),
+                          std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator =
+                              std::make_unique<instrumentationscope::ScopeConfigurator<LoggerConfig>>(instrumentationscope::ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Default()).Build())) noexcept;
 
   /**
    * Initialize a new logger provider. A processor must later be assigned

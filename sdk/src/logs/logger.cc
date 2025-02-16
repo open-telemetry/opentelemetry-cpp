@@ -31,13 +31,18 @@ namespace logs
 namespace trace_api = opentelemetry::trace;
 namespace common    = opentelemetry::common;
 
+const opentelemetry::logs::NoopLogger Logger::kNoopLogger = opentelemetry::logs::NoopLogger();
+
+// TODO: Implement configurator logic
+
 Logger::Logger(
     opentelemetry::nostd::string_view name,
     std::shared_ptr<LoggerContext> context,
     std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
     : logger_name_(std::string(name)),
       instrumentation_scope_(std::move(instrumentation_scope)),
-      context_(std::move(context))
+      context_(std::move(context)),
+      logger_config_(context_->GetLoggerConfigurator().ComputeConfig(*instrumentation_scope_))
 {}
 
 const opentelemetry::nostd::string_view Logger::GetName() noexcept

@@ -35,6 +35,14 @@ public:
   static std::unique_ptr<LoggerContext> Create(
       std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
       const opentelemetry::sdk::resource::Resource &resource);
+
+  /**
+   * Create a LoggerContext.
+   */
+  static std::unique_ptr<LoggerContext> Create(
+      std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
+      const opentelemetry::sdk::resource::Resource &resource,
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator);
 };
 
 }  // namespace logs
