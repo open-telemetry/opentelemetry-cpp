@@ -197,6 +197,11 @@ void OtlpLogRecordable::SetBody(const opentelemetry::common::AttributeValue &mes
   OtlpPopulateAttributeUtils::PopulateAnyValue(proto_record_.mutable_body(), message);
 }
 
+void OtlpLogRecordable::SetEventId(int64_t /* id */, nostd::string_view event_name) noexcept
+{
+  proto_record_.set_event_name(event_name.data(), event_name.size());
+}
+
 void OtlpLogRecordable::SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept
 {
   if (trace_id.IsValid())
