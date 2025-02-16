@@ -19,10 +19,12 @@ namespace logs
 {
 
 LoggerContext::LoggerContext(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
-                             const opentelemetry::sdk::resource::Resource &resource) noexcept
+                             const opentelemetry::sdk::resource::Resource &resource,
+                             std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator) noexcept
     : resource_(resource),
       processor_(
-          std::unique_ptr<LogRecordProcessor>(new MultiLogRecordProcessor(std::move(processors))))
+          std::unique_ptr<LogRecordProcessor>(new MultiLogRecordProcessor(std::move(processors)))),
+      logger_configurator_(std::move(logger_configurator))
 {}
 
 void LoggerContext::AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept
@@ -39,6 +41,12 @@ LogRecordProcessor &LoggerContext::GetProcessor() const noexcept
 const opentelemetry::sdk::resource::Resource &LoggerContext::GetResource() const noexcept
 {
   return resource_;
+}
+
+const instrumentationscope::ScopeConfigurator<LoggerConfig> &LoggerContext::GetLoggerConfigurator()
+    const noexcept
+{
+  return *logger_configurator_;
 }
 
 bool LoggerContext::ForceFlush(std::chrono::microseconds timeout) noexcept
