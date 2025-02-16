@@ -174,6 +174,16 @@ TEST(OtlpLogRecordable, SetInstrumentationScope)
   EXPECT_EQ(&rec.GetInstrumentationScope(), inst_lib.get());
 }
 
+TEST(OtlpLogRecordable, SetEventName)
+{
+  OtlpLogRecordable rec;
+
+  nostd::string_view event_name = "Test Event";
+  rec.SetEventId(0, event_name);
+
+  EXPECT_EQ(rec.log_record().event_name(), event_name);
+}
+
 /**
  * AttributeValue can contain different int types, such as int, int64_t,
  * unsigned int, and uint64_t. To avoid writing test cases for each, we can
