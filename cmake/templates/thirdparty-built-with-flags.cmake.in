@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 #-------------------------------------------------------------------------
 # CMAKE flags to capture the build configuration for the insalled package
 #    BUILT_WITH_<dependency> is set to true if the installed package requires that dependency

@@ -241,6 +241,7 @@ elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
   make -j $(nproc)
   make test
   make install
+  export LD_LIBRARY_PATH="${OTEL_CPP_TEST_INSTALL_DIR}/lib:$LD_LIBRARY_PATH"
   cmake -S "${SRC_DIR}/cmake/install/test" \
         -B "${BUILD_DIR}/install_test" \
         "-DCMAKE_PREFIX_PATH=${OTEL_CPP_TEST_INSTALL_DIR}" \
@@ -441,6 +442,7 @@ elif [[ "$1" == "cmake.install.test" ]]; then
         "${SRC_DIR}"
   make -j $(nproc)
   make install
+  export LD_LIBRARY_PATH="${OTEL_CPP_TEST_INSTALL_DIR}/lib:$LD_LIBRARY_PATH"
   cmake -S "${SRC_DIR}/cmake/install/test" \
         -B "${BUILD_DIR}/install_test" \
          "-DCMAKE_PREFIX_PATH=${OTEL_CPP_TEST_INSTALL_DIR}" \

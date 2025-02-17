@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 cmake_minimum_required(VERSION 3.10)
 
 project(opentelemetry-cpp-full-package-install-test LANGUAGES CXX)
@@ -11,14 +14,7 @@ endif()
 
 find_package(opentelemetry-cpp CONFIG REQUIRED)
 
-# Test that the following variables are set: OPENTELEMETRY_CPP_INCLUDE_DIRS  -
-# Include directories of opentelemetry-cpp. OPENTELEMETRY_CPP_LIBRARY_DIRS  -
-# Link directories of opentelemetry-cpp. OPENTELEMETRY_CPP_LIBRARIES     - List
-# of libraries when using opentelemetry-cpp. OPENTELEMETRY_CPP_FOUND         -
-# True if opentelemetry-cpp found. OPENTELEMETRY_ABI_VERSION_NO    - ABI version
-# of opentelemetry-cpp. OPENTELEMETRY_VERSION           - Version of
-# opentelemetry-cpp. OPENTELEMETRY_CPP_COMPONENTS_INSTALLED - List of components
-# installed.
+# Test that the required OPENTELEMETRY_CPP_* variables are set
 
 if(NOT OPENTELEMETRY_CPP_INCLUDE_DIRS)
   message(FATAL_ERROR "OPENTELEMETRY_CPP_INCLUDE_DIRS is empty")

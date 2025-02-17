@@ -1,6 +1,9 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 cmake_minimum_required(VERSION 3.10)
 project(opentelemetry-cpp-exporters-zipkin-install-test LANGUAGES CXX)
-message(STATUS "Testing the exporters_zipkin_test component install")
+
 find_package(opentelemetry-cpp REQUIRED COMPONENTS exporters_zipkin)
 
 find_package(GTest REQUIRED)

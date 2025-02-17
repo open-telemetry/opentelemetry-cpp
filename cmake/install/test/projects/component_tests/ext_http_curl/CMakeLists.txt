@@ -1,6 +1,9 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 cmake_minimum_required(VERSION 3.10)
 project(opentelemetry-cpp-ext_http_curl-install-test LANGUAGES CXX)
-message(STATUS "Testing the ext_http_curl component install")
+
 find_package(opentelemetry-cpp REQUIRED COMPONENTS ext_http_curl)
 
 if(NOT TARGET CURL::libcurl)

@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 cmake_minimum_required(VERSION 3.10)
 project(opentelemetry-cpp-component-install-tests LANGUAGES CXX)
 
@@ -12,6 +15,7 @@ endif()
 
 include(${CMAKE_SOURCE_DIR}/../../install/component-definitions.cmake)
 
+# If COMPONENTS_TO_TEST is not set, then test all components
 if(NOT COMPONENTS_TO_TEST)
   set(COMPONENTS_TO_TEST ${opentelemetry-cpp_COMPONENTS})
 else()
@@ -41,6 +45,8 @@ message(STATUS "Testing cmake usage for find_package(opentelemetry ...)")
 # 2. Test find_package with components specified but not sorted in dependency
 #    order
 # 3. Test find_package with components specified but missing dependent components
+# 4. Test find_package with components specified but including
+#    unsupported/unknown components
 
 add_test(
   NAME cmake-usage-no-components-test
@@ -76,9 +82,7 @@ add_test(
 
 # -----------------------------------------------------------
 # Test the full package install using legacy cmake build instructions
-# find_package(opentelemetry-cpp CONFIG REQUIRED) target_include_directories(foo
-# PRIVATE ${OPENTELEMETRY_CPP_INCLUDE_DIRS}) target_link_libraries(foo PRIVATE
-# ${OPENTELEMETRY_CPP_LIBRARIES})
+# find_package(opentelemetry-cpp CONFIG REQUIRED)
 message(STATUS "Testing the full package install")
 # Test cmake configuration
 add_test(

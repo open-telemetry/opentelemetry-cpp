@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 #-----------------------------------------------------------------------
 # Third party dependencies supported by opentelemetry-cpp
 #    Dependencies will be found in this order when find_package(opentelemetry-cpp ...)  is called.

@@ -1,6 +1,9 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 cmake_minimum_required(VERSION 3.10)
 project(opentelemetry-cpp-shims_opentracing-install-test LANGUAGES CXX)
-message(STATUS "Testing the shims_opentracing component install")
+
 find_package(opentelemetry-cpp REQUIRED COMPONENTS shims_opentracing)
 
 if(NOT TARGET OpenTracing::opentracing)

@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 include("${CMAKE_CURRENT_LIST_DIR}/component-definitions.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/thirdparty-dependency-definitions.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/thirdparty-built-with-flags.cmake")

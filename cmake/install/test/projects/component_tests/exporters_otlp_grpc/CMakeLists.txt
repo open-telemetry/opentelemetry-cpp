@@ -1,6 +1,9 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 cmake_minimum_required(VERSION 3.10)
 project(opentelemetry-cpp-exporters-otlp-grpc-install-test LANGUAGES CXX)
-message(STATUS "Testing the exporters_otlp_grpc_test component install")
+
 find_package(opentelemetry-cpp REQUIRED COMPONENTS exporters_otlp_grpc)
 
 if(NOT TARGET protobuf::libprotobuf)
