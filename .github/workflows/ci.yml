@@ -554,14 +554,12 @@ jobs:
         sudo ./ci/install_protobuf.sh
         sudo ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf
     - name: build and run tests
-      env:
-        OTEL_CPP_TEST_INSTALL_DIR: "${{ env.HOME }}/test-install"
       run: |
+        export OTEL_CPP_TEST_INSTALL_DIR=$HOME/test-install
         ./ci/do_ci.sh cmake.install.test
     - name: verify packages
-      env:
-        PKG_CONFIG_PATH: "${{ env.HOME }}/test-install/lib/pkgconfig:${{ env.PKG_CONFIG_PATH }}"
       run: |
+        export PKG_CONFIG_PATH=$HOME/test-install/lib/pkgconfig:$PKG_CONFIG_PATH
         ./ci/verify_packages.sh
 
   plugin_test:
