@@ -34,6 +34,7 @@ DLL_DEPS = {
   Label("@otel_sdk//ext/src/http/client/curl:http_client_curl"): None,
   Label("@otel_sdk//sdk:headers"): None,
   Label("@otel_sdk//sdk/src/common:base64"): None,
+  Label("@otel_sdk//sdk/src/common:disabled"): None,
   Label("@otel_sdk//sdk/src/common:env_variables"): None,
   Label("@otel_sdk//sdk/src/common:global_log_handler"): None,
   Label("@otel_sdk//sdk/src/logs:logs"): None,

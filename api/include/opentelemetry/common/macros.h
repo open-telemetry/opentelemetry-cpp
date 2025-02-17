@@ -524,6 +524,50 @@ point.
 #  define OPENTELEMETRY_SANITIZER_NO_ADDRESS
 #endif
 
+// what foloows are overrides specific to github.com/malkia/opentelemetry-cpp's fork
+// where we force certain flags to be set, such that users of the library do not have to set them (through -Dxxx=yyy, etc.)
+// It assumes more strict target requirements: C++2017, exceptions/rtti ON, otel abi version 2, etc.
+
+// Stick to C++2017 for now
+#ifdef OPENTELEMETRY_STL_VERSION
+#undef OPENTELEMETRY_STL_VERSION
+#endif
+#define OPENTELEMETRY_STL_VERSION 2017
+
+#ifdef OPENTELEMETRY_RTTI_ENABLED
+#undef OPENTELEMETRY_RTTI_ENABLED
+#endif
+#define OPENTELEMETRY_RTTI_ENABLED 1
+
+#ifdef OPENTELEMETRY_OPTION_USE_STD_SPAN
+#undef OPENTELEMETRY_OPTION_USE_STD_SPAN
+#endif
+#define OPENTELEMETRY_OPTION_USE_STD_SPAN 0 // Use the nostd version, std::span is in C++2020
+
+#ifdef OPENTELEMETRY_TRIVIALITY_TYPE_TRAITS
+#undef OPENTELEMETRY_TRIVIALITY_TYPE_TRAITS
+#endif
+#define OPENTELEMETRY_TRIVIALITY_TYPE_TRAITS 1
+
+#ifdef OPENTELEMETRY_HAVE_EXCEPTIONS
+#undef OPENTELEMETRY_HAVE_EXCEPTIONS
+#endif
+#define OPENTELEMETRY_HAVE_EXCEPTIONS 1
+
+#ifdef OPENTELEMETRY_ABI_VERSION_NO
+#undef OPENTELEMETRY_ABI_VERSION_NO
+#endif
+#define OPENTELEMETRY_ABI_VERSION_NO 2 // Use the new api
+
+// Enable specific library features
+#define ENABLE_METRICS_EXEMPLAR_PREVIEW 1
+#define ENABLE_ASYNC_EXPORT 1
+#define ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW 1
+#define ENABLE_OTLP_COMPRESSION_PREVIEW 1
+#define ENABLE_OTLP_RETRY_PREVIEW 1
+#define ENABLE_THREAD_INSTRUMENTATION_PREVIEW 1
+#define ENABLE_CURL_LOGGING 1
+
 // What follows is specific to the https://github.com/malkia/opentelemetry-cpp windows-dll branch.
 // Users should not predefine OPENTELEMETRY_DLL, and it would get set to 1 ("dllimport").
 // When building, using bazel --//:with_dll=true, OPENTELEMETRY_DLL is set to -1, except for tests.
@@ -550,25 +594,6 @@ point.
 #   if !defined(OPENTELEMETRY_RTTI_ENABLED)
 #      error OPENTELEMETRY_DLL: RTTI must be enabled.
 #   endif
-//  Build settings for otel_sdk are hard-coded in this file, so users don't have to define them.
-#   define OPENTELEMETRY_STL_VERSION 2017
-#   define OPENTELEMETRY_OPTION_USE_STD_SPAN 0 // Use the nostd version, std::span is in C++2020
-#   ifdef OPENTELEMETRY_ABI_VERSION_NO
-#   undef OPENTELEMETRY_ABI_VERSION_NO
-#   endif
-#   define OPENTELEMETRY_ABI_VERSION_NO 2 // Use the new api
-#   define ENABLE_METRICS_EXEMPLAR_PREVIEW 1
-#   define ENABLE_ASYNC_EXPORT 1
-#   define ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW 1
-#   define ENABLE_OTLP_COMPRESSION_PREVIEW 1
-#   define ENABLE_OTLP_RETRY_PREVIEW 1
-#   define ENABLE_THREAD_INSTRUMENTATION_PREVIEW 1
-#   define ENABLE_CURL_LOGGING 1
-//  We ensure that this is defined to a value of, as its gets encoded down in the detect_mismatch
-#   undef OPENTELEMETRY_RTTI_ENABLED
-#   define OPENTELEMETRY_RTTI_ENABLED 1
-#   undef OPENTELEMETRY_HAVE_EXCEPTIONS
-#   define OPENTELEMETRY_HAVE_EXCEPTIONS 1
 #   undef OPENTELEMETRY_EXPORT
 #   undef OPENTELEMETRY_EXPORT_TYPE
 #   undef OPENTELEMETRY_API_SINGLETON
@@ -597,27 +622,28 @@ point.
 // The rule is that if there is struct/class with one or more OPENTELEMETRY_API_SINGLETON function members,
 // then itself can't be defined OPENTELEMETRY_EXPORT 
 #  define OPENTELEMETRY_API_SINGLETON OPENTELEMETRY_EXPORT
-//
-#  if defined(_MSC_VER)
-#  define OPENTELEMETRY_DLL_STRX(x) #x
-#  define OPENTELEMETRY_DLL_STR(x) OPENTELEMETRY_DLL_STRX(x)
-// TODO: Revisit what's broken here
-#     pragma detect_mismatch("otel_sdk_detect_mismatch", \
-        "+dll:" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_DLL) \
-        "+stl:" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_STL_VERSION) \
-        "+rtti:" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_RTTI_ENABLED) \
-        "+std_span:" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_OPTION_USE_STD_SPAN) \
-        "+abi:" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_ABI_VERSION_NO) \
-        "+exemplar:" OPENTELEMETRY_DLL_STR(ENABLE_METRICS_EXEMPLAR_PREVIEW) \
-        "+async:" OPENTELEMETRY_DLL_STR(ENABLE_ASYNC_EXPORT) \
-        "+mtls:" OPENTELEMETRY_DLL_STR(ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW) \
-        "+otlp_compr:" OPENTELEMETRY_DLL_STR(ENABLE_OTLP_COMPRESSION_PREVIEW) \
-        "+otlp_retry:" OPENTELEMETRY_DLL_STR(ENABLE_OTLP_RETRY_PREVIEW) \
-        "+thrd_instr:" OPENTELEMETRY_DLL_STR(ENABLE_THREAD_INSTRUMENTATION_PREVIEW) \
-        "+curl_log:"  OPENTELEMETRY_DLL_STR(ENABLE_CURL_LOGGING) \
-      )
-#  undef OPENTELEMETRY_DLL_STRX
-#  undef OPENTELEMETRY_DLL_STR
-
-#  endif
 #endif // if OPENTELEMETRY_DLL != 0
+
+// this check only works for static library build
+#if defined(_MSC_VER)
+#define OPENTELEMETRY_STRX(x) #x
+#define OPENTELEMETRY_STR(x) OPENTELEMETRY_STRX(x)
+#pragma detect_mismatch("otel_sdk_detect_mismatch", \
+  "+dll:" OPENTELEMETRY_STR(OPENTELEMETRY_DLL) \
+  "+stl:" OPENTELEMETRY_STR(OPENTELEMETRY_STL_VERSION) \
+  "+rtti:" OPENTELEMETRY_STR(OPENTELEMETRY_RTTI_ENABLED) \
+  "+std_span:" OPENTELEMETRY_STR(OPENTELEMETRY_OPTION_USE_STD_SPAN) \
+  "+type_traits:" OPENTELEMETRY_STR(OPENTELEMETRY_TRIVIALITY_TYPE_TRAITS) \
+  "+have_excpts:" OPENTELEMETRY_STR(OPENTELEMETRY_HAVE_EXCEPTIONS) \
+  "+abi:" OPENTELEMETRY_STR(OPENTELEMETRY_ABI_VERSION_NO) \
+  "+exemplar:" OPENTELEMETRY_STR(ENABLE_METRICS_EXEMPLAR_PREVIEW) \
+  "+async:" OPENTELEMETRY_STR(ENABLE_ASYNC_EXPORT) \
+  "+mtls:" OPENTELEMETRY_STR(ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW) \
+  "+otlp_compr:" OPENTELEMETRY_STR(ENABLE_OTLP_COMPRESSION_PREVIEW) \
+  "+otlp_retry:" OPENTELEMETRY_STR(ENABLE_OTLP_RETRY_PREVIEW) \
+  "+thrd_instr:" OPENTELEMETRY_STR(ENABLE_THREAD_INSTRUMENTATION_PREVIEW) \
+  "+curl_log:"  OPENTELEMETRY_STR(ENABLE_CURL_LOGGING) \
+)
+#undef OPENTELEMETRY_DLL_STRX
+#undef OPENTELEMETRY_DLL_STR
+#endif
