@@ -119,9 +119,15 @@ add_custom_command(
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS opentelemetry_cpp
-    EXPORT "${PROJECT_NAME}-ext-target"
+    EXPORT "${PROJECT_NAME}-ext_dll-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ext_dll)
 
+  install(
+    EXPORT "${PROJECT_NAME}-ext_dll-target"
+    FILE "${PROJECT_NAME}-ext_dll-target.cmake"
+    NAMESPACE "${PROJECT_NAME}::"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    COMPONENT ext_dll)
 endif()

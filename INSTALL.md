@@ -184,9 +184,9 @@ build configuration.
 |                            | opentelemetry-cpp::trace                                                                         |
 |                            | opentelemetry-cpp::metrics                                                                       |
 |                            | opentelemetry-cpp::logs                                                                          |
-| **ext**                    | opentelemetry-cpp::ext                                                                           |
-|                            | opentelemetry-cpp::http_client_curl                                                              |
-|                            | opentelemetry-cpp::opentelemetry_cpp                                                             |
+| **ext_common**             | opentelemetry-cpp::ext                                                                           |
+| **ext_http_curl**          | opentelemetry-cpp::http_client_curl                                                              |
+| **ext_dll**                | opentelemetry-cpp::opentelemetry_cpp                                                             |
 | **exporters_in_memory**    | opentelemetry-cpp::in_memory_span_exporter                                                       |
 |                            | opentelemetry-cpp::in_memory_metric_exporter                                                    |
 | **exporters_ostream**      | opentelemetry-cpp::ostream_log_record_exporter                                                   |

@@ -1,0 +1,72 @@
+#-------------------------------------------------------------------------
+# CMAKE flags to capture the build configuration for the insalled package
+#    BUILT_WITH_<dependency> is set to true if the installed package requires that dependency
+# See the thirdparty-dependency-deinfitions.cmake for the supported dependency list and
+# mapping to opentelemetry-cpp components that may require them.
+#-------------------------------------------------------------------------
+
+# Initialize dependency expected flags
+set(BUILT_WITH_Threads TRUE)
+set(BUILT_WITH_absl FALSE)
+set(BUILT_WITH_CURL FALSE)
+set(BUILT_WITH_ZLIB FALSE)
+set(BUILT_WITH_nlohmann_json FALSE)
+set(BUILT_WITH_Protobuf FALSE)
+set(BUILT_WITH_gRPC FALSE)
+set(BUILT_WITH_prometheus-cpp FALSE)
+set(BUILT_WITH_OpenTracing FALSE)
+
+# absl:
+# Expected TRUE if either:
+#   - WITH_ABSEIL is enabled, OR
+#   - WITH_OTLP_GRPC is enabled, OR
+#   - WITH_OTLP_HTTP or WITH_OTLP_FILE is enabled and Protobuf version is at least 3.22.0.
+if(@WITH_ABSEIL@)
+  set(BUILT_WITH_absl TRUE)
+elseif(@WITH_OTLP_HTTP@ OR @WITH_OTLP_FILE@ OR @WITH_OTLP_GRPC@)
+  if( @WITH_OTLP_GRPC@ )
+    set(BUILT_WITH_absl TRUE)
+  elseif("@Protobuf_VERSION@" VERSION_GREATER_EQUAL "3.22.0")
+    set(BUILT_WITH_absl TRUE)
+  endif()
+endif()
+
+# CURL and ZLIB:
+# Expected TRUE if WITH_HTTP_CLIENT_CURL is enabled and we're building static libraries.
+if(@WITH_HTTP_CLIENT_CURL@ AND NOT "@BUILD_SHARED_LIBS@")
+  if("@CURL_FOUND@")
+    set(BUILT_WITH_CURL TRUE)
+  endif()
+  if("@ZLIB_FOUND@")
+    set(BUILT_WITH_ZLIB TRUE)
+  endif()
+endif()
+
+# nlohmann_json:
+# Expected TRUE if both USE_NLOHMANN_JSON is true and the package was found during build.
+if("@USE_NLOHMANN_JSON@" AND "@nlohmann_json_FOUND@")
+  set(BUILT_WITH_nlohmann_json TRUE)
+endif()
+
+# Protobuf:
+# Expected TRUE if protobuf was found during the build
+if("@Protobuf_FOUND@" OR "@PROTOBUF_FOUND@")
+  set(BUILT_WITH_Protobuf TRUE)
+endif()
+
+# gRPC:
+if(@WITH_OTLP_GRPC@)
+  set(BUILT_WITH_gRPC TRUE)
+endif()
+
+# prometheus-cpp:
+if(@WITH_PROMETHEUS@)
+  set(BUILT_WITH_prometheus-cpp TRUE)
+endif()
+
+# OpenTracing:
+if(@WITH_OPENTRACING@)
+  set(BUILT_WITH_OpenTracing TRUE)
+endif()
+
+

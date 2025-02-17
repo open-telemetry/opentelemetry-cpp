@@ -535,19 +535,28 @@ jobs:
         ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
 
   cmake_install_test:
-    name: CMake install test (with abseil)
+    name: CMake install test
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     - name: setup
+      env:
+        CXX_STANDARD: '14'
+        PROTOBUF_VERSION: '21.3'
+        GRPC_VERSION: 'v1.49.2'
+        OTEL_CPP_TEST_INSTALL_DIR: "$HOME/test-install"
+        PKG_CONFIG_PATH: "${OTEL_CPP_TEST_INSTALL_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
       run: |
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
-    - name: run cmake install (with abseil)
+    - name: run cmake install
       run: |
-        sudo ./ci/install_abseil.sh
+        sudo ./ci/install_protobuf.sh
+        sudo ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf
+    - name: build and run tests
+      run: |
         ./ci/do_ci.sh cmake.install.test
     - name: verify packages
       run: |

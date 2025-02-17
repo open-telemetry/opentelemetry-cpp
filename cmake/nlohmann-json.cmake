@@ -85,9 +85,10 @@ else()
   if(OPENTELEMETRY_INSTALL)
     install(
       TARGETS nlohmann_json_
-      EXPORT "${PROJECT_NAME}-target"
+      EXPORT "${PROJECT_NAME}-third_party_nlohmann_json_target"
       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      COMPONENT third_party_nlohmann_json)
   endif()
 endif()

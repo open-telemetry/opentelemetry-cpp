@@ -43,11 +43,12 @@ if(OPENTELEMETRY_INSTALL)
     EXPORT "${PROJECT_NAME}-exporters_prometheus-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT exporters_prometheus)
 
   install(
     DIRECTORY include/opentelemetry/exporters/prometheus
     DESTINATION include/opentelemetry/exporters/
+    COMPONENT exporters_prometheus
     FILES_MATCHING
     PATTERN "*.h")
 
@@ -55,7 +56,8 @@ if(OPENTELEMETRY_INSTALL)
     EXPORT "${PROJECT_NAME}-exporters_prometheus-target"
     FILE "${PROJECT_NAME}-exporters_prometheus-target.cmake"
     NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    COMPONENT exporters_prometheus)
 endif()
 
 if(BUILD_TESTING)

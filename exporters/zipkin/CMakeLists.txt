@@ -28,11 +28,12 @@ if(OPENTELEMETRY_INSTALL)
     EXPORT "${PROJECT_NAME}-exporters_zipkin-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT exporters_zipkin)
 
   install(
     DIRECTORY include/opentelemetry/exporters/zipkin
     DESTINATION include/opentelemetry/exporters
+    COMPONENT exporters_zipkin
     FILES_MATCHING
     PATTERN "*.h"
     PATTERN "recordable.h" EXCLUDE)
@@ -41,7 +42,8 @@ if(OPENTELEMETRY_INSTALL)
     EXPORT "${PROJECT_NAME}-exporters_zipkin-target"
     FILE "${PROJECT_NAME}-exporters_zipkin-target.cmake"
     NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    COMPONENT exporters_zipkin)
 
 endif()
 

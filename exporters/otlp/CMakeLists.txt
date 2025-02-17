@@ -278,11 +278,12 @@ if(OPENTELEMETRY_INSTALL)
     EXPORT "${PROJECT_NAME}-exporters_otlp_common-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT exporters_otlp_common)
 
   install(
     DIRECTORY include/opentelemetry/exporters/otlp
     DESTINATION include/opentelemetry/exporters
+    COMPONENT exporters_otlp_common
     FILES_MATCHING
     PATTERN "*.h")
 
@@ -290,7 +291,8 @@ if(OPENTELEMETRY_INSTALL)
     EXPORT "${PROJECT_NAME}-exporters_otlp_common-target"
     FILE "${PROJECT_NAME}-exporters_otlp_common-target.cmake"
     NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    COMPONENT exporters_otlp_common)
 
   if(WITH_OTLP_GRPC)
     install(
@@ -298,13 +300,14 @@ if(OPENTELEMETRY_INSTALL)
       EXPORT "${PROJECT_NAME}-exporters_otlp_grpc-target"
       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT exporters_otlp_grpc)
 
     install(
       EXPORT "${PROJECT_NAME}-exporters_otlp_grpc-target"
       FILE "${PROJECT_NAME}-exporters_otlp_grpc-target.cmake"
       NAMESPACE "${PROJECT_NAME}::"
-      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+      COMPONENT exporters_otlp_grpc)
   endif()
 
   if(WITH_OTLP_FILE)
@@ -313,13 +316,14 @@ if(OPENTELEMETRY_INSTALL)
       EXPORT "${PROJECT_NAME}-exporters_otlp_file-target"
       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT exporters_otlp_file)
 
     install(
       EXPORT "${PROJECT_NAME}-exporters_otlp_file-target"
       FILE "${PROJECT_NAME}-exporters_otlp_file-target.cmake"
       NAMESPACE "${PROJECT_NAME}::"
-      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+      COMPONENT exporters_otlp_file)
   endif()
 
   if(WITH_OTLP_HTTP)
@@ -328,13 +332,14 @@ if(OPENTELEMETRY_INSTALL)
       EXPORT "${PROJECT_NAME}-exporters_otlp_http-target"
       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT exporters_otlp_http)
 
     install(
       EXPORT "${PROJECT_NAME}-exporters_otlp_http-target"
       FILE "${PROJECT_NAME}-exporters_otlp_http-target.cmake"
       NAMESPACE "${PROJECT_NAME}::"
-      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+      COMPONENT exporters_otlp_http)
   endif()
 endif()
 

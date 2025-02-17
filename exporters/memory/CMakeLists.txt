@@ -39,11 +39,12 @@ if(OPENTELEMETRY_INSTALL)
     EXPORT "${PROJECT_NAME}-exporters_in_memory-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT exporters_in_memory)
 
   install(
     DIRECTORY include/opentelemetry/exporters/memory
     DESTINATION include/opentelemetry/exporters
+    COMPONENT exporters_in_memory
     FILES_MATCHING
     PATTERN "*.h")
 
@@ -51,7 +52,8 @@ if(OPENTELEMETRY_INSTALL)
     EXPORT "${PROJECT_NAME}-exporters_in_memory-target"
     FILE "${PROJECT_NAME}-exporters_in_memory-target.cmake"
     NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    COMPONENT exporters_in_memory)
 
 endif()
 

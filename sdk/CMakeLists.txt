@@ -15,17 +15,19 @@ if(OPENTELEMETRY_INSTALL)
     EXPORT "${PROJECT_NAME}-sdk-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk)
 
   install(
     DIRECTORY include/opentelemetry/
     DESTINATION include/opentelemetry
+    COMPONENT sdk
     FILES_MATCHING
     PATTERN "*config.h")
 
   install(
     DIRECTORY include/opentelemetry/sdk
     DESTINATION include/opentelemetry
+    COMPONENT sdk
     FILES_MATCHING
     PATTERN "*.h")
 
@@ -33,7 +35,8 @@ if(OPENTELEMETRY_INSTALL)
     EXPORT "${PROJECT_NAME}-sdk-target"
     FILE "${PROJECT_NAME}-sdk-target.cmake"
     NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    COMPONENT sdk)
 
 endif()
 

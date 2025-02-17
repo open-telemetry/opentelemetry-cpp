@@ -772,12 +772,11 @@ if(OPENTELEMETRY_INSTALL)
   # Write config file for find_packages(opentelemetry-cpp CONFIG)
   set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
   configure_package_config_file(
-    "${CMAKE_CURRENT_LIST_DIR}/cmake/opentelemetry-cpp-config.cmake.in"
+    "${CMAKE_CURRENT_LIST_DIR}/cmake/templates/opentelemetry-cpp-config.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config.cmake"
     INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     PATH_VARS OPENTELEMETRY_ABI_VERSION_NO OPENTELEMETRY_VERSION PROJECT_NAME
-              INCLUDE_INSTALL_DIR CMAKE_INSTALL_LIBDIR
-    NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+              INCLUDE_INSTALL_DIR CMAKE_INSTALL_LIBDIR)
 
   # Write version file for find_packages(opentelemetry-cpp CONFIG)
   write_basic_package_version_file(
@@ -785,11 +784,23 @@ if(OPENTELEMETRY_INSTALL)
     VERSION ${OPENTELEMETRY_VERSION}
     COMPATIBILITY ExactVersion)
 
+  # Write the "BUILT_WITH_<dependency" flags for use in the
+  # opentelemetry-cpp-config.cmake
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/thirdparty-built-with-flags.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/thirdparty-built-with-flags.cmake"
+    @ONLY)
+
   install(
     FILES
       "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config.cmake"
       "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config-version.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+      "${CMAKE_CURRENT_BINARY_DIR}/thirdparty-built-with-flags.cmake"
+      "${CMAKE_CURRENT_LIST_DIR}/cmake/install/component-definitions.cmake"
+      "${CMAKE_CURRENT_LIST_DIR}/cmake/install/thirdparty-dependency-definitions.cmake"
+      "${CMAKE_CURRENT_LIST_DIR}/cmake/install/find-package-support-functions.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    COMPONENT cmake-config)
 
   if(BUILD_PACKAGE)
     include(cmake/package.cmake)

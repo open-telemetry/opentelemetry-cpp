@@ -1,0 +1,19 @@
+cmake_minimum_required(VERSION 3.10)
+project(opentelemetry-cpp-exporters-prometheus-install-test LANGUAGES CXX)
+message(STATUS "Testing the exporters_prometheus_test component install")
+find_package(opentelemetry-cpp REQUIRED COMPONENTS exporters_prometheus)
+
+if(NOT TARGET prometheus-cpp::core)
+  message(FATAL_ERROR "prometheus-cpp::core target not found")
+endif()
+
+find_package(GTest REQUIRED)
+include(GoogleTest)
+
+add_executable(exporters_prometheus_test
+               ${INSTALL_TEST_SRC_DIR}/test_exporters_prometheus.cc)
+target_link_libraries(
+  exporters_prometheus_test PRIVATE opentelemetry-cpp::prometheus_exporter
+                                    GTest::GTest GTest::Main)
+
+gtest_discover_tests(exporters_prometheus_test)

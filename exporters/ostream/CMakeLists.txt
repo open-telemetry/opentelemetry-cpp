@@ -72,17 +72,19 @@ if(OPENTELEMETRY_INSTALL)
     EXPORT "${PROJECT_NAME}-exporters_ostream-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT exporters_ostream)
   install(
     DIRECTORY include/opentelemetry/exporters/ostream
     DESTINATION include/opentelemetry/exporters
+    COMPONENT exporters_ostream
     PATTERN "*.h")
 
   install(
     EXPORT "${PROJECT_NAME}-exporters_ostream-target"
     FILE "${PROJECT_NAME}-exporters_ostream-target.cmake"
     NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    COMPONENT exporters_ostream)
 endif()
 
 if(BUILD_TESTING)
