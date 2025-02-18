@@ -8,19 +8,27 @@
 		"context": "..",
 		"dockerfile": "Dockerfile.dev",
 		"args": {
-			"GRPC_VERSION": "v1.55.0",
-			"PROTOBUF_VERSION": "23.4",
-			"ABSEIL_CPP_VERSION":"20240116.1"
+			"USER_UID": "${localEnv:OTEL_CPP_DEVCONTAINER_USER_UID:1000}",
+			"USER_GID": "${localEnv:OTEL_CPP_DEVCONTAINER_USER_GID:1000}",
+			"INSTALL_PACKAGES": "${localEnv:OTEL_CPP_DEVCONTAINER_INSTALL_PACKAGES:}",
+			"CXX_STANDARD": "${localEnv:OTEL_CPP_DEVCONTAINER_CXX_STANDARD:17}",
+			"GRPC_VERSION": "${localEnv:OTEL_CPP_DEVCONTAINER_GRPC_VERSION:v1.55.0}",
+			"PROTOBUF_VERSION": "${localEnv:OTEL_CPP_DEVCONTAINER_PROTOBUF_VERSION:23.3}",
+			"ABSEIL_CPP_VERSION":"${localEnv:OTEL_CPP_DEVCONTAINER_ABSEIL_CPP_VERSION:20230125.3}"
 		}
 	},
-	"settings": {
-		"terminal.integrated.shell.linux": "/bin/sh"
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-vscode.cpptools",
+				"ms-azuretools.vscode-docker",
+				"ms-vscode.cpptools-extension-pack"
+			],
+			"settings": {
+				"terminal.integrated.shell.linux": "/bin/bash",
+			}
+		}
 	},
-	"extensions": [
-		"ms-vscode.cpptools",
-		"ms-azuretools.vscode-docker",
-		"ms-vscode.cpptools-extension-pack"
-	],
 
-	"remoteUser": "root"
+	"remoteUser": "devuser"
 }

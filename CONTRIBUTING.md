@@ -89,6 +89,9 @@ Before getting started, ensure you have the following installed:
    files provided (e.g., `.devcontainer/devcontainer.json`). This setup will install
    required dependencies, tools, and environment variables needed for the project.
 
+* **Container Customization**:
+   See `.devcontainer/README.md` for devcontainer configuration options.
+
 #### Available Commands
 
 Once inside the DevContainer, you can use the following commands to run tests
@@ -145,6 +148,33 @@ If you encounter issues:
 * **Bazelisk Documentation**: [https://github.com/bazelbuild/bazelisk](https://github.com/bazelbuild/bazelisk)
 * **VSCode DevContainer Documentation**: [https://code.visualstudio.com/docs/remote/containers](https://code.visualstudio.com/docs/remote/containers)
 
+### Docker Development Image
+
+The `.devcontainer/Dockerfile.dev`
+dockerfile can be built directly with the following command.
+
+```sh
+ docker build -t opentelemetry-cpp-dev -f ./.devcontainer/Dockerfile.dev .
+```
+
+You can customize the image using build arguments
+ to match permissions with the host user.
+
+```sh
+ docker build -t opentelemetry-cpp-dev \
+  --build-arg USER_UID="$(id -u)" \
+  --build-arg USER_GID="$(id -g)" \
+  -f ./.devcontainer/Dockerfile.dev .
+
+```
+
+Run an interactive bash session binding your host
+ opentelemetry-cpp directory to the container's workspace:
+
+```sh
+docker run -it -v "$PWD:/workspaces/opentelemetry-cpp" opentelemetry-cpp-dev bash
+```
+
 ## Pull Requests
 
 ### How to Send Pull Requests
@@ -193,6 +223,12 @@ If you made changes to the Markdown documents (`*.md` files), install the latest
 
 ```sh
 markdownlint .
+```
+
+If you modified shell scripts (`*.sh` files), install `shellcheck` and run:
+
+```sh
+shellcheck --severity=error <path to shell script>.sh
 ```
 
 Open a pull request against the main `opentelemetry-cpp` repo.
@@ -271,11 +307,11 @@ the C++ repository.
 
 * [OpenTelemetry
   Specification](https://github.com/open-telemetry/opentelemetry-specification)
-  * The OpenTelemetry Specification describes the requirements and expectations
-    of for all OpenTelemetry implementations.
+* The OpenTelemetry Specification describes the requirements and expectations
+  of for all OpenTelemetry implementations.
 
 * Read through the OpenTelemetry C++ documentation
-  * The
+* The
     [API](https://opentelemetry-cpp.readthedocs.io/en/latest/api/api.html)
     and
     [SDK](https://opentelemetry-cpp.readthedocs.io/en/latest/sdk/sdk.html)
