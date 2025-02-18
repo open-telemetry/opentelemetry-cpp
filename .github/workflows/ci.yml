@@ -554,9 +554,9 @@ jobs:
         PROTOBUF_VERSION: '23.3'
         GRPC_VERSION: 'v1.55.0'
       run: |
-        sudo ./ci/install_abseil.sh
-        sudo ./ci/install_protobuf.sh
-        sudo ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil
+        sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/install_protobuf.sh
+        sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil
     - name: build and test
       run: |
         ./ci/do_ci.sh cmake.install.test
