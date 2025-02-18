@@ -13,11 +13,11 @@ else()
     STATUS "CMAKE_CXX_STANDARD is set to default of ${CMAKE_CXX_STANDARD}")
 endif()
 
-include(${CMAKE_SOURCE_DIR}/../../install/component-definitions.cmake)
+include(${CMAKE_SOURCE_DIR}/../../../cmake/component-definitions.cmake)
 
-# If COMPONENTS_TO_TEST is not set, then test all components
+# Check that COMPONENTS_TO_TEST is set and contains valid components
 if(NOT COMPONENTS_TO_TEST)
-  set(COMPONENTS_TO_TEST ${opentelemetry-cpp_COMPONENTS})
+  message(FATAL_ERROR "COMPONENTS_TO_TEST is not set")
 else()
   set(COMPONENTS_ARE_VALID TRUE)
   foreach(component ${COMPONENTS_TO_TEST})
@@ -33,11 +33,10 @@ else()
   endif()
 endif()
 
-set(INSTALL_TEST_SRC_DIR "${CMAKE_SOURCE_DIR}/src")
+set(INSTALL_TEST_SRC_DIR "${CMAKE_SOURCE_DIR}/../src")
 
 enable_testing()
 
-message(STATUS "Testing cmake usage for find_package(opentelemetry ...)")
 # -----------------------------------------------------------
 # CMake Usage tests for find_package(opentelemetry-cpp ...)
 #
@@ -52,7 +51,7 @@ add_test(
   NAME cmake-usage-no-components-test
   COMMAND
     ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/projects/cmake_usage_tests/no_components -B
+    ${CMAKE_SOURCE_DIR}/usage_tests/no_components -B
     build-cmake-usage-no-components-test
     -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
 
@@ -60,7 +59,7 @@ add_test(
   NAME cmake-usage-unsorted-components-test
   COMMAND
     ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/projects/cmake_usage_tests/unsorted_components -B
+    ${CMAKE_SOURCE_DIR}/usage_tests/unsorted_components -B
     build-cmake-usage-unsorted-components-test
     -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
 
@@ -68,7 +67,7 @@ add_test(
   NAME cmake-usage-missing-components-test
   COMMAND
     ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/projects/cmake_usage_tests/missing_components -B
+    ${CMAKE_SOURCE_DIR}/usage_tests/missing_components -B
     build-cmake-usage-missing-components-test
     -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
 
@@ -76,21 +75,20 @@ add_test(
   NAME cmake-usage-unsupported-components-test
   COMMAND
     ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/projects/cmake_usage_tests/unsupported_components -B
+    ${CMAKE_SOURCE_DIR}/usage_tests/unsupported_components -B
     build-cmake-usage-unsupported-components-test
     -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
 
 # -----------------------------------------------------------
 # Test the full package install using legacy cmake build instructions
 # find_package(opentelemetry-cpp CONFIG REQUIRED)
-message(STATUS "Testing the full package install")
+
 # Test cmake configuration
 add_test(
   NAME full-package-cmake-config-test
   COMMAND
-    ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/projects/package_test -B build-full-package-test
-    -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+    ${CMAKE_COMMAND} --log-level=DEBUG -S ${CMAKE_SOURCE_DIR}/package_test -B
+    build-full-package-test -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
     -DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR})
 
 # Build the full package test executable
@@ -106,13 +104,12 @@ add_test(NAME full-package-run-test
 # -----------------------------------------------------------
 # Loop over all the components to test
 foreach(component ${COMPONENTS_TO_TEST})
-  message(STATUS "Testing the ${component} component install")
   # Test cmake configuration
   add_test(
     NAME component-${component}-cmake-config-test
     COMMAND
       ${CMAKE_COMMAND} --log-level=DEBUG -S
-      ${CMAKE_SOURCE_DIR}/projects/component_tests/${component} -B
+      ${CMAKE_SOURCE_DIR}/component_tests/${component} -B
       build-${component}-test -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
       -DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR})
 

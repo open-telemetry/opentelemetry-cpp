@@ -68,6 +68,7 @@ public:
 class NoopLogRecordExporter : public logs_sdk::LogRecordExporter
 {
 public:
+  ~NoopLogRecordExporter() override = default;
   std::unique_ptr<logs_sdk::Recordable> MakeRecordable() noexcept override
   {
     return std::move(std::unique_ptr<logs_sdk::Recordable>{new NoopLogRecordable()});
@@ -120,6 +121,7 @@ public:
 class NoopSpanExporter : public trace_sdk::SpanExporter
 {
 public:
+  ~NoopSpanExporter() override = default;
   std::unique_ptr<trace_sdk::Recordable> MakeRecordable() noexcept override
   {
     return std::move(std::unique_ptr<trace_sdk::Recordable>{new NoopSpanRecordable()});
@@ -144,6 +146,7 @@ public:
 class NoopPushMetricExporter : public metrics_sdk::PushMetricExporter
 {
 public:
+  ~NoopPushMetricExporter() override = default;
   common_sdk::ExportResult Export(
       const metrics_sdk::ResourceMetrics &resource_metrics) noexcept override
   {
@@ -189,52 +192,71 @@ TEST(SdkInstallTest, ResourceDetectorCheck)
 
 TEST(SdkInstallTest, LoggerProviderCheck)
 {
-  auto exporter     = nostd::unique_ptr<logs_sdk::LogRecordExporter>(new NoopLogRecordExporter());
-  auto processor    = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
-  auto sdk_provider = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
-  nostd::shared_ptr<opentelemetry::logs::LoggerProvider> new_provider{sdk_provider.release()};
-  logs_sdk::Provider::SetLoggerProvider(new_provider);
+  {
+    auto exporter     = nostd::unique_ptr<logs_sdk::LogRecordExporter>(new NoopLogRecordExporter());
+    auto processor    = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
+    auto sdk_provider = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
+    nostd::shared_ptr<opentelemetry::logs::LoggerProvider> new_provider{sdk_provider.release()};
+    logs::Provider::SetLoggerProvider(new_provider);
+  }
+
   auto provider = opentelemetry::logs::Provider::GetLoggerProvider();
   ASSERT_TRUE(provider != nullptr);
-  auto logger = provider->GetLogger("test-logger");
-  ASSERT_TRUE(logger != nullptr);
-  logger->Info("test-message");
-  static_cast<logs_sdk::LoggerProvider *>(provider.get())->ForceFlush();
+  {
+    auto logger = provider->GetLogger("test-logger");
+    ASSERT_TRUE(logger != nullptr);
+    logger->Info("test-message");
+  }
+  auto sdk_provider = static_cast<logs_sdk::LoggerProvider *>(provider.get());
+  sdk_provider->ForceFlush();
 }
 
 TEST(SdkInstallTest, TracerProviderCheck)
 {
-  auto exporter     = nostd::unique_ptr<trace_sdk::SpanExporter>(new NoopSpanExporter());
-  auto processor    = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
-  auto sdk_provider = trace_sdk::TracerProviderFactory::Create(std::move(processor));
-  nostd::shared_ptr<trace::TracerProvider> new_provider{sdk_provider.release()};
-  trace::Provider::SetTracerProvider(new_provider);
+  {
+    auto exporter     = nostd::unique_ptr<trace_sdk::SpanExporter>(new NoopSpanExporter());
+    auto processor    = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
+    auto sdk_provider = trace_sdk::TracerProviderFactory::Create(std::move(processor));
+    nostd::shared_ptr<trace::TracerProvider> new_provider{sdk_provider.release()};
+    trace::Provider::SetTracerProvider(new_provider);
+  }
+
   auto provider = trace::Provider::GetTracerProvider();
   ASSERT_TRUE(provider != nullptr);
-  auto tracer = provider->GetTracer("test-tracer");
-  ASSERT_TRUE(tracer != nullptr);
-  auto span = tracer->StartSpan("test-span");
-  ASSERT_TRUE(span != nullptr);
-  span->End();
-  static_cast<trace_sdk::TracerProvider *>(provider.get())->ForceFlush();
+  {
+    auto tracer = provider->GetTracer("test-tracer");
+    ASSERT_TRUE(tracer != nullptr);
+    auto span = tracer->StartSpan("test-span");
+    ASSERT_TRUE(span != nullptr);
+    span->End();
+  }
+  auto sdk_provider = static_cast<trace_sdk::TracerProvider *>(provider.get());
+  sdk_provider->ForceFlush();
 }
 
 TEST(SdkInstallTest, MeterProviderCheck)
 {
-  auto exporter = nostd::unique_ptr<metrics_sdk::PushMetricExporter>(new NoopPushMetricExporter());
-  auto reader   = metrics_sdk::PeriodicExportingMetricReaderFactory::Create(
-      std::move(exporter), metrics_sdk::PeriodicExportingMetricReaderOptions{});
-  auto context      = metrics_sdk::MeterContextFactory::Create();
-  auto sdk_provider = metrics_sdk::MeterProviderFactory::Create(std::move(context));
-  sdk_provider->AddMetricReader(std::move(reader));
-  nostd::shared_ptr<metrics::MeterProvider> new_provider{sdk_provider.release()};
-  metrics::Provider::SetMeterProvider(new_provider);
+  {
+    auto exporter =
+        nostd::unique_ptr<metrics_sdk::PushMetricExporter>(new NoopPushMetricExporter());
+    auto reader = metrics_sdk::PeriodicExportingMetricReaderFactory::Create(
+        std::move(exporter), metrics_sdk::PeriodicExportingMetricReaderOptions{});
+    auto context      = metrics_sdk::MeterContextFactory::Create();
+    auto sdk_provider = metrics_sdk::MeterProviderFactory::Create(std::move(context));
+    sdk_provider->AddMetricReader(std::move(reader));
+    nostd::shared_ptr<metrics::MeterProvider> new_provider{sdk_provider.release()};
+    metrics::Provider::SetMeterProvider(new_provider);
+  }
+
   auto provider = metrics::Provider::GetMeterProvider();
   ASSERT_TRUE(provider != nullptr);
-  auto meter = provider->GetMeter("test-meter");
-  ASSERT_TRUE(meter != nullptr);
-  auto counter = meter->CreateUInt64Counter("test-counter");
-  ASSERT_TRUE(counter != nullptr);
-  counter->Add(1);
-  static_cast<metrics_sdk::MeterProvider *>(provider.get())->ForceFlush();
+  {
+    auto meter = provider->GetMeter("test-meter");
+    ASSERT_TRUE(meter != nullptr);
+    auto counter = meter->CreateUInt64Counter("test-counter");
+    ASSERT_TRUE(counter != nullptr);
+    counter->Add(1);
+  }
+  auto sdk_provider = static_cast<metrics_sdk::MeterProvider *>(provider.get());
+  sdk_provider->ForceFlush();
 }

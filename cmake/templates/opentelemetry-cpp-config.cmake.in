@@ -7,10 +7,10 @@
 # Finding opentelemetry-cpp in CMake projects
 # ========================================
 #
-#  - find_package(opentelemetry-cpp CONFIG) to import all installed targets and dependencies
+#  - find_package(opentelemetry-cpp CONFIG REQUIRED) to import all installed targets and dependencies
 #  - find_package(opentelemetry-cpp CONFIG COMPONENTS ...) to import specific components' targets and dependencies
 #
-# Supported use cases
+# Example usage
 # -------------------
 #
 # 1. **No Components Specified**
@@ -22,28 +22,18 @@
 #       find_package(opentelemetry-cpp CONFIG REQUIRED)
 #
 #
-# 2. **Subset of Required Components Specified**
+# 2. **Components Specified**
 #
-#    If you request only a subset (e.g. one component), the package will import the
-#    requested component and resolve additional dependencies as needed.
+#    When a component is specified, its third-party dependencies are found;
+#    then, targets from that component, along with the components on which it depends, are imported.
 #
 #    .. code-block:: cmake
 #
 #       find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS exporters_otlp_grpc)
 #
-# 3. **Components Specified Out-of-Order**
-#
-#    The package automatically sorts components based on their inter-dependencies.
-#    For instance, even if the components are listed out-of-order:
-#
-#    .. code-block:: cmake
-#
-#       find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS exporters_ostream sdk api)
-#
-#    the correct dependency order is applied internally.
 #
 #.. note::
-#   To troubleshoot issues with ``find_package(opentelemetry-cpp)``, run CMake with debug logging enabled:
+#   To troubleshoot issues with ``find_package(opentelemetry-cpp CONFIG REQUIRED)``, run CMake with debug logging enabled:
 #
 #   .. code-block:: bash
 #
@@ -74,7 +64,10 @@
 #   opentelemetry-cpp_<component>_FOUND - True if the requested component is found.
 # ::
 #
-# This module includes the following components for use with `find_package(opentelemetry-cpp COMPONENTS ...)`
+#
+# CMake Components and Targets Supported
+# --------------------
+# opentelemetry-cpp supports the following components and targets. This install may include a subset.
 #
 # COMPONENTS
 #   api
@@ -158,8 +151,7 @@
 #
 # - **component-definitions.cmake**
 #   This file defines the available opentelemetry-cpp components, the targets associated with each
-#   component, and the inter-component dependency relationships. It ensures that, regardless of the
-#   order in which components are specified, all necessary dependencies and targets are imported correctly.
+#   component, and the inter-component dependencies.
 #
 
 
@@ -205,7 +197,7 @@ set(_OPENTELEMETRY_CPP_TARGETS "")
 get_targets(_REQUESTED_COMPONENTS _OPENTELEMETRY_CPP_TARGETS)
 check_targets_imported(_OPENTELEMETRY_CPP_TARGETS)
 
-# Set OPENTELEMETRY_CPP_* variables to preserve legacy CMake style
+# Set OPENTELEMETRY_CPP_* variables
 set(OPENTELEMETRY_CPP_LIBRARIES)
 
 foreach(_TARGET IN LISTS _OPENTELEMETRY_CPP_TARGETS)

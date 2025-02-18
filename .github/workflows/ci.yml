@@ -537,6 +537,9 @@ jobs:
   cmake_install_test:
     name: CMake install test
     runs-on: ubuntu-24.04
+    env:
+      INSTALL_TEST_DIR: '/home/runner/install_test'
+      CXX_STANDARD: '17'
     steps:
     - uses: actions/checkout@v4
       with:
@@ -545,21 +548,21 @@ jobs:
       run: |
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
-    - name: run cmake install
+    - name: install dependencies
       env:
-        CXX_STANDARD: '14'
-        PROTOBUF_VERSION: '21.3'
-        GRPC_VERSION: 'v1.49.2'
+        ABSEIL_CPP_VERSION: '20230125.3'
+        PROTOBUF_VERSION: '23.3'
+        GRPC_VERSION: 'v1.55.0'
       run: |
+        sudo ./ci/install_abseil.sh
         sudo ./ci/install_protobuf.sh
-        sudo ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf
-    - name: build and run tests
+        sudo ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil
+    - name: build and test
       run: |
-        export OTEL_CPP_TEST_INSTALL_DIR=$HOME/test-install
         ./ci/do_ci.sh cmake.install.test
     - name: verify packages
       run: |
-        export PKG_CONFIG_PATH=$HOME/test-install/lib/pkgconfig:$PKG_CONFIG_PATH
+        export PKG_CONFIG_PATH=$INSTALL_TEST_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
         ./ci/verify_packages.sh
 
   plugin_test:

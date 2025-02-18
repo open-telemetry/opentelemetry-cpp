@@ -18,7 +18,7 @@ set(THIRD_PARTY_DEPENDENCIES_SUPPORTED
 )
 
 #-----------------------------------------------------------------------
-# Flags to determine if find_dependency(dep) or find_dependency(dep CONFIG) should be used
+# Flags to determine if CONFIG search mode should be used in find_dependency(...)
 #-----------------------------------------------------------------------
 
 # absl

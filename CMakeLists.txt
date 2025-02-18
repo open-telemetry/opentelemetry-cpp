@@ -394,6 +394,8 @@ if(WITH_PROMETHEUS)
   endif()
 endif()
 
+message(STATUS "Building WITH_ABSEIL=${WITH_ABSEIL}")
+
 if(WITH_ABSEIL)
   if(NOT TARGET absl::strings)
     find_package(absl CONFIG REQUIRED)
@@ -796,9 +798,9 @@ if(OPENTELEMETRY_INSTALL)
       "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config.cmake"
       "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config-version.cmake"
       "${CMAKE_CURRENT_BINARY_DIR}/thirdparty-built-with-flags.cmake"
-      "${CMAKE_CURRENT_LIST_DIR}/cmake/install/component-definitions.cmake"
-      "${CMAKE_CURRENT_LIST_DIR}/cmake/install/thirdparty-dependency-definitions.cmake"
-      "${CMAKE_CURRENT_LIST_DIR}/cmake/install/find-package-support-functions.cmake"
+      "${CMAKE_CURRENT_LIST_DIR}/cmake/component-definitions.cmake"
+      "${CMAKE_CURRENT_LIST_DIR}/cmake/thirdparty-dependency-definitions.cmake"
+      "${CMAKE_CURRENT_LIST_DIR}/cmake/find-package-support-functions.cmake"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     COMPONENT cmake-config)
 
