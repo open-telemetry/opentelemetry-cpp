@@ -150,15 +150,17 @@ If you encounter issues:
 
 ### Docker Development Image
 
-To build a development docker image you can use `.devcontainer/Dockerfile.dev` dockerfile with the following command.
+The `.devcontainer/Dockerfile.dev`
+dockerfile can be built directly with the following command.
 
-```
+```sh
  docker build -t opentelemetry-cpp-dev -f ./.devcontainer/Dockerfile.dev .
 ```
 
-You can customize the image using build arguments. Commonly you should set your user id and group id.
+You can customize the image using build arguments
+ to match permissions with the host user.
 
-```
+```sh
  docker build -t opentelemetry-cpp-dev \
   --build-arg USER_UID="$(id -u)" \
   --build-arg USER_GID="$(id -g)" \
@@ -166,9 +168,10 @@ You can customize the image using build arguments. Commonly you should set your 
 
 ```
 
-Run an interactive bash session binding your host opentelemetry-cpp directory to the container:
+Run an interactive bash session binding your host
+ opentelemetry-cpp directory to the container's workspace:
 
-```
+```sh
 docker run -it -v "$PWD:/workspaces/opentelemetry-cpp" opentelemetry-cpp-dev bash
 ```
 
