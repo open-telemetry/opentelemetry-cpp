@@ -89,40 +89,8 @@ Before getting started, ensure you have the following installed:
    files provided (e.g., `.devcontainer/devcontainer.json`). This setup will install
    required dependencies, tools, and environment variables needed for the project.
 
-#### Customizing Your Dev Container
-
-Customize your dev container using build arguments (for direct Docker builds) or
-environment variables (for evaluation in `devcontainer.json`).
-
-* **Username:**
-  * Docker ARG:
-   `USER_NAME` (Default: `devuser`)
-  * Environment Variable:
-   `OTEL_CPP_DEVCONTAINER_USER_NAME` (Default: `devuser`)
-
-* **User ID (UID):**
-  * Docker ARG:
-   `USER_UID`  (Default: `1000`)
-  * Environment Variable:
-   `OTEL_CPP_DEVCONTAINER_USER_UID` (Default: `1000`)
-
-* **Group ID (GID):**
-  * Docker ARG:
-   `USER_GID`  (Default: `1000`)
-  * Environment Variable:
-   `OTEL_CPP_DEVCONTAINER_USER_GID` (Default: `1000`)
-
-* **Install Packages:**
-  * Docker ARG:
-   `INSTALL_PACKAGES`  (Default: ``)
-  * Environment Variable:
-   `OTEL_CPP_DEVCONTAINER_INSTALL_PACKAGES` (Default: ``)
-
-##### Examples
-
-* `docker build --build-arg USER_NAME=myuser --build-arg INSTALL_PACKAGES="nano gitk"...`
-* `export OTEL_CPP_DEVCONTAINER_USER_NAME=myuser`
-* `export OTEL_CPP_DEVCONTAINER_INSTALL_PACKAGES="nano gitk"`
+* **Container Customization**:
+   See `.devcontainer/README.md` for devcontainer configuration options.
 
 #### Available Commands
 
@@ -179,6 +147,30 @@ If you encounter issues:
 
 * **Bazelisk Documentation**: [https://github.com/bazelbuild/bazelisk](https://github.com/bazelbuild/bazelisk)
 * **VSCode DevContainer Documentation**: [https://code.visualstudio.com/docs/remote/containers](https://code.visualstudio.com/docs/remote/containers)
+
+### Docker Development Image
+
+To build a development docker image you can use `.devcontainer/Dockerfile.dev` dockerfile with the following command.
+
+```
+ docker build -t opentelemetry-cpp-dev -f ./.devcontainer/Dockerfile.dev .
+```
+
+You can customize the image using build arguments. Commonly you should set your user id and group id.
+
+```
+ docker build -t opentelemetry-cpp-dev \
+  --build-arg USER_UID="$(id -u)" \
+  --build-arg USER_GID="$(id -g)" \
+  -f ./.devcontainer/Dockerfile.dev .
+
+```
+
+Run an interactive bash session binding your host opentelemetry-cpp directory to the container:
+
+```
+docker run -it -v "$PWD:/workspaces/opentelemetry-cpp" opentelemetry-cpp-dev bash
+```
 
 ## Pull Requests
 
