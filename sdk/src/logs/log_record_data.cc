@@ -6,14 +6,15 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/logs/log_record_data.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
@@ -26,76 +27,76 @@ namespace sdk
 namespace logs
 {
 
-ReadWriteLogRecord::ReadWriteLogRecord()
+LogRecordData::LogRecordData()
     : severity_(opentelemetry::logs::Severity::kInvalid),
       resource_(nullptr),
       instrumentation_scope_(nullptr),
-      body_(nostd::string_view()),
       observed_timestamp_(std::chrono::system_clock::now()),
       event_id_(0),
       event_name_("")
-{}
+{
+  body_.SetAttribute("", nostd::string_view());
+}
 
-ReadWriteLogRecord::~ReadWriteLogRecord() {}
+LogRecordData::~LogRecordData() {}
 
-void ReadWriteLogRecord::SetTimestamp(opentelemetry::common::SystemTimestamp timestamp) noexcept
+void LogRecordData::SetTimestamp(opentelemetry::common::SystemTimestamp timestamp) noexcept
 {
   timestamp_ = timestamp;
 }
 
-opentelemetry::common::SystemTimestamp ReadWriteLogRecord::GetTimestamp() const noexcept
+opentelemetry::common::SystemTimestamp LogRecordData::GetTimestamp() const noexcept
 {
   return timestamp_;
 }
 
-void ReadWriteLogRecord::SetObservedTimestamp(
-    opentelemetry::common::SystemTimestamp timestamp) noexcept
+void LogRecordData::SetObservedTimestamp(opentelemetry::common::SystemTimestamp timestamp) noexcept
 {
   observed_timestamp_ = timestamp;
 }
 
-opentelemetry::common::SystemTimestamp ReadWriteLogRecord::GetObservedTimestamp() const noexcept
+opentelemetry::common::SystemTimestamp LogRecordData::GetObservedTimestamp() const noexcept
 {
   return observed_timestamp_;
 }
 
-void ReadWriteLogRecord::SetSeverity(opentelemetry::logs::Severity severity) noexcept
+void LogRecordData::SetSeverity(opentelemetry::logs::Severity severity) noexcept
 {
   severity_ = severity;
 }
 
-opentelemetry::logs::Severity ReadWriteLogRecord::GetSeverity() const noexcept
+opentelemetry::logs::Severity LogRecordData::GetSeverity() const noexcept
 {
   return severity_;
 }
 
-void ReadWriteLogRecord::SetBody(const opentelemetry::common::AttributeValue &message) noexcept
+void LogRecordData::SetBody(const opentelemetry::common::AttributeValue &message) noexcept
 {
-  body_ = message;
+  body_.SetAttribute("", message);
 }
 
-const opentelemetry::common::AttributeValue &ReadWriteLogRecord::GetBody() const noexcept
+const opentelemetry::common::AttributeValue &LogRecordData::GetBody() const noexcept
 {
-  return body_;
+  return body_.GetAttributes().begin()->second;
 }
 
-void ReadWriteLogRecord::SetEventId(int64_t id, nostd::string_view name) noexcept
+void LogRecordData::SetEventId(int64_t id, nostd::string_view name) noexcept
 {
   event_id_   = id;
   event_name_ = std::string{name};
 }
 
-int64_t ReadWriteLogRecord::GetEventId() const noexcept
+int64_t LogRecordData::GetEventId() const noexcept
 {
   return event_id_;
 }
 
-nostd::string_view ReadWriteLogRecord::GetEventName() const noexcept
+nostd::string_view LogRecordData::GetEventName() const noexcept
 {
   return nostd::string_view{event_name_};
 }
 
-void ReadWriteLogRecord::SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept
+void LogRecordData::SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept
 {
   if (!trace_state_)
   {
@@ -105,7 +106,7 @@ void ReadWriteLogRecord::SetTraceId(const opentelemetry::trace::TraceId &trace_i
   trace_state_->trace_id = trace_id;
 }
 
-const opentelemetry::trace::TraceId &ReadWriteLogRecord::GetTraceId() const noexcept
+const opentelemetry::trace::TraceId &LogRecordData::GetTraceId() const noexcept
 {
   if (trace_state_)
   {
@@ -116,7 +117,7 @@ const opentelemetry::trace::TraceId &ReadWriteLogRecord::GetTraceId() const noex
   return empty;
 }
 
-void ReadWriteLogRecord::SetSpanId(const opentelemetry::trace::SpanId &span_id) noexcept
+void LogRecordData::SetSpanId(const opentelemetry::trace::SpanId &span_id) noexcept
 {
   if (!trace_state_)
   {
@@ -126,7 +127,7 @@ void ReadWriteLogRecord::SetSpanId(const opentelemetry::trace::SpanId &span_id) 
   trace_state_->span_id = span_id;
 }
 
-const opentelemetry::trace::SpanId &ReadWriteLogRecord::GetSpanId() const noexcept
+const opentelemetry::trace::SpanId &LogRecordData::GetSpanId() const noexcept
 {
   if (trace_state_)
   {
@@ -137,7 +138,7 @@ const opentelemetry::trace::SpanId &ReadWriteLogRecord::GetSpanId() const noexce
   return empty;
 }
 
-void ReadWriteLogRecord::SetTraceFlags(const opentelemetry::trace::TraceFlags &trace_flags) noexcept
+void LogRecordData::SetTraceFlags(const opentelemetry::trace::TraceFlags &trace_flags) noexcept
 {
   if (!trace_state_)
   {
@@ -147,7 +148,7 @@ void ReadWriteLogRecord::SetTraceFlags(const opentelemetry::trace::TraceFlags &t
   trace_state_->trace_flags = trace_flags;
 }
 
-const opentelemetry::trace::TraceFlags &ReadWriteLogRecord::GetTraceFlags() const noexcept
+const opentelemetry::trace::TraceFlags &LogRecordData::GetTraceFlags() const noexcept
 {
   if (trace_state_)
   {
@@ -158,19 +159,19 @@ const opentelemetry::trace::TraceFlags &ReadWriteLogRecord::GetTraceFlags() cons
   return empty;
 }
 
-void ReadWriteLogRecord::SetAttribute(nostd::string_view key,
-                                      const opentelemetry::common::AttributeValue &value) noexcept
+void LogRecordData::SetAttribute(nostd::string_view key,
+                                 const opentelemetry::common::AttributeValue &value) noexcept
 {
-  attributes_map_[std::string(key)] = value;
+  attributes_map_.SetAttribute(key, value);
 }
 
 const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &
-ReadWriteLogRecord::GetAttributes() const noexcept
+LogRecordData::GetAttributes() const noexcept
 {
-  return attributes_map_;
+  return attributes_map_.GetAttributes();
 }
 
-const opentelemetry::sdk::resource::Resource &ReadWriteLogRecord::GetResource() const noexcept
+const opentelemetry::sdk::resource::Resource &LogRecordData::GetResource() const noexcept
 {
   if OPENTELEMETRY_LIKELY_CONDITION (nullptr != resource_)
   {
@@ -180,14 +181,13 @@ const opentelemetry::sdk::resource::Resource &ReadWriteLogRecord::GetResource() 
   return GetDefaultResource();
 }
 
-void ReadWriteLogRecord::SetResource(
-    const opentelemetry::sdk::resource::Resource &resource) noexcept
+void LogRecordData::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
   resource_ = &resource;
 }
 
 const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
-ReadWriteLogRecord::GetInstrumentationScope() const noexcept
+LogRecordData::GetInstrumentationScope() const noexcept
 {
   if OPENTELEMETRY_LIKELY_CONDITION (nullptr != instrumentation_scope_)
   {
@@ -197,7 +197,7 @@ ReadWriteLogRecord::GetInstrumentationScope() const noexcept
   return GetDefaultInstrumentationScope();
 }
 
-void ReadWriteLogRecord::SetInstrumentationScope(
+void LogRecordData::SetInstrumentationScope(
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope
         &instrumentation_scope) noexcept
 {
