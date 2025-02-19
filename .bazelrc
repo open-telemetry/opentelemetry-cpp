@@ -115,10 +115,6 @@ common --incompatible_modify_execution_info_additive
 common --modify_execution_info=CppCompile=+supports-path-mapping
 common --skip_incompatible_explicit_targets
 
-build --@curl//:use_mbedtls=true 
-# build --@curl//:http_only=true
-
-
 # build --experimental_save_feature_state
 # saves .s and .ii files but tends to be super slow
 # build --save_temps
