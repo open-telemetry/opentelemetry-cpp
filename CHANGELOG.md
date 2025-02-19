@@ -21,6 +21,9 @@ Increment the:
 * [SDK] Support OTEL_SDK_DISABLED environment variable
   [#3245](https://github.com/open-telemetry/opentelemetry-cpp/pull/3245)
 
+* [SDK] Add meter scope configurator
+  [#3268](https://github.com/open-telemetry/opentelemetry-cpp/pull/3268)
+
 Important changes:
 
 * [SDK] Support OTEL_SDK_DISABLED environment variable
