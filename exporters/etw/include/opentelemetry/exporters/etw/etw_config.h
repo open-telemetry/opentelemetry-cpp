@@ -4,6 +4,10 @@
 #pragma once
 #include <map>
 
+#if defined(OPENTELEMETRY_ATTRIBUTE_TIMESTAMP_PREVIEW)
+#include <set>
+#endif  // defined(OPENTELEMETRY_ATTRIBUTE_TIMESTAMP_PREVIEW)
+
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
@@ -23,9 +27,18 @@ namespace etw
 /**
  * @brief TelemetryProvider Options passed via SDK API.
  */
+
+#if defined(OPENTELEMETRY_ATTRIBUTE_TIMESTAMP_PREVIEW)
+using TelemetryProviderOptions = std::map<
+    std::string,
+    nostd::variant<std::string, uint64_t, float, bool, std::map<std::string, std::string>, std::set<std::string>>>;
+
+#else
 using TelemetryProviderOptions = std::map<
     std::string,
     nostd::variant<std::string, uint64_t, float, bool, std::map<std::string, std::string>>>;
+
+#endif  // defined(OPENTELEMETRY_ATTRIBUTE_TIMESTAMP_PREVIEW)
 
 /**
  * @brief TelemetryProvider runtime configuration class. Internal representation
@@ -45,6 +58,13 @@ typedef struct
   bool enableTableNameMappings;  // Map instrumentation scope name to table name with
                                  // `tableNameMappings`
   std::map<std::string, std::string> tableNameMappings;
+
+#if defined(OPENTELEMETRY_ATTRIBUTE_TIMESTAMP_PREVIEW)
+
+  std::set<std::string> timestampAttributes;  // Attributes to use as timestamp
+
+#endif  // defined(OPENTELEMETRY_ATTRIBUTE_TIMESTAMP_PREVIEW)
+
 } TelemetryProviderConfiguration;
 
 /**
