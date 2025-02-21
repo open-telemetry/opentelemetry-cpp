@@ -20,6 +20,9 @@
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
 
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/meter.h"
+
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #endif
@@ -34,13 +37,19 @@ class OPENTELEMETRY_EXPORT_TYPE MeterProvider final : public opentelemetry::metr
 {
 public:
   /**
-   * Initialize a new meter provider
+   * Initialize a new meter provider.
    * @param views The views for this meter provider
    * @param resource  The resources for this meter provider.
+   * @param meter_configurator Provides access to a function that computes the MeterConfig for
+   * Meters provided by this MeterProvider.
    */
   MeterProvider(
       std::unique_ptr<ViewRegistry> views     = std::unique_ptr<ViewRegistry>(new ViewRegistry()),
-      const sdk::resource::Resource &resource = sdk::resource::Resource::Create({})) noexcept;
+      const sdk::resource::Resource &resource = sdk::resource::Resource::Create({}),
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>> meter_configurator =
+          std::make_unique<instrumentationscope::ScopeConfigurator<MeterConfig>>(
+              instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(MeterConfig::Default())
+                  .Build())) noexcept;
 
   /**
    * Initialize a new meter provider with a specified context

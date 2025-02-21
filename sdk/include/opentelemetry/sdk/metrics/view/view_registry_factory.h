@@ -13,7 +13,7 @@ namespace sdk
 {
 namespace metrics
 {
-class ViewRegistryFactory
+class OPENTELEMETRY_EXPORT_TYPE ViewRegistryFactory
 {
 public:
   static std::unique_ptr<ViewRegistry> Create();

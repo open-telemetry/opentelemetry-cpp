@@ -14,6 +14,8 @@
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
@@ -48,14 +50,17 @@ class OPENTELEMETRY_EXPORT_TYPE MeterContext : public std::enable_shared_from_th
 public:
   /**
    * Initialize a new meter provider
-   * @param readers The readers to be configured with meter context.
    * @param views The views to be configured with meter context.
    * @param resource  The resource for this meter context.
    */
   MeterContext(
       std::unique_ptr<ViewRegistry> views = std::unique_ptr<ViewRegistry>(new ViewRegistry()),
       const opentelemetry::sdk::resource::Resource &resource =
-          opentelemetry::sdk::resource::Resource::Create({})) noexcept;
+          opentelemetry::sdk::resource::Resource::Create({}),
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>> meter_configurator =
+          std::make_unique<instrumentationscope::ScopeConfigurator<MeterConfig>>(
+              instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(MeterConfig::Default())
+                  .Build())) noexcept;
 
   /**
    * Obtain the resource associated with this meter context.
@@ -70,13 +75,19 @@ public:
   ViewRegistry *GetViewRegistry() const noexcept;
 
   /**
-   * NOTE - INTERNAL method, can change in future.
+   * Obtain the ScopeConfigurator with this meter context.
+   * @return The ScopeConfigurator for this meter context.
+   */
+  const instrumentationscope::ScopeConfigurator<MeterConfig> &GetMeterConfigurator() const noexcept;
+
+  /**
+   * NOTE - INTERNAL method, can change in the future.
    * Process callback for each meter in thread-safe manner
    */
   bool ForEachMeter(nostd::function_ref<bool(std::shared_ptr<Meter> &meter)> callback) noexcept;
 
   /**
-   * NOTE - INTERNAL method, can change in future.
+   * NOTE - INTERNAL method, can change in the future.
    * Get the configured meters.
    * This method is NOT thread safe, and only called through MeterProvider
    *
@@ -154,6 +165,7 @@ private:
   std::vector<std::shared_ptr<CollectorHandle>> collectors_;
   std::unique_ptr<ViewRegistry> views_;
   opentelemetry::common::SystemTimestamp sdk_start_ts_;
+  std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>> meter_configurator_;
   std::vector<std::shared_ptr<Meter>> meters_;
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
