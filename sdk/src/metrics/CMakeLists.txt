@@ -8,6 +8,7 @@ add_library(
   meter_provider.cc
   meter_provider_factory.cc
   meter.cc
+  meter_config.cc
   meter_context.cc
   meter_context_factory.cc
   metric_reader.cc
