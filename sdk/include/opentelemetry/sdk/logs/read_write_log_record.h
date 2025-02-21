@@ -82,7 +82,12 @@ public:
    * Get body field of this log.
    * @return the body field for this log.
    */
-  const opentelemetry::common::AttributeValue &GetBody() const noexcept override;
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  const common::OwnedAttributeValue &
+#else
+  const opentelemetry::common::AttributeValue &
+#endif
+  GetBody() const noexcept override;
 
   /**
    * Set the Event Id object
@@ -151,8 +156,12 @@ public:
    * Get attributes of this log.
    * @return the body field of this log
    */
-  const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &GetAttributes()
-      const noexcept override;
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  const std::unordered_map<std::string, common::OwnedAttributeValue> &
+#else
+  const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &
+#endif
+  GetAttributes() const noexcept override;
 
   /**
    * Get resource of this log
@@ -187,9 +196,16 @@ private:
   const opentelemetry::sdk::resource::Resource *resource_;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_;
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  common::AttributeMap attributes_map_;
+  // We resue the same utility functions of MixedAttributeMap with key="" for the body field
+  common::OwnedAttributeValue body_;
+  common::AttributeConverter attribute_converter_;
+#else
   std::unordered_map<std::string, opentelemetry::common::AttributeValue> attributes_map_;
   // We resue the same utility functions of MixedAttributeMap with key="" for the body field
   opentelemetry::common::AttributeValue body_;
+#endif
   opentelemetry::common::SystemTimestamp timestamp_;
   opentelemetry::common::SystemTimestamp observed_timestamp_;
 

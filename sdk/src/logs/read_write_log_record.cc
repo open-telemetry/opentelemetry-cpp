@@ -30,11 +30,16 @@ ReadWriteLogRecord::ReadWriteLogRecord()
     : severity_(opentelemetry::logs::Severity::kInvalid),
       resource_(nullptr),
       instrumentation_scope_(nullptr),
-      body_(nostd::string_view()),
       observed_timestamp_(std::chrono::system_clock::now()),
       event_id_(0),
       event_name_("")
-{}
+{
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  body_ = std::string();
+#else
+  body_ = nostd::string_view();
+#endif
+}
 
 ReadWriteLogRecord::~ReadWriteLogRecord() {}
 
@@ -71,10 +76,19 @@ opentelemetry::logs::Severity ReadWriteLogRecord::GetSeverity() const noexcept
 
 void ReadWriteLogRecord::SetBody(const opentelemetry::common::AttributeValue &message) noexcept
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  body_ = nostd::visit(attribute_converter_, message);
+#else
   body_ = message;
+#endif
 }
 
-const opentelemetry::common::AttributeValue &ReadWriteLogRecord::GetBody() const noexcept
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+const common::OwnedAttributeValue &
+#else
+const opentelemetry::common::AttributeValue &
+#endif
+ReadWriteLogRecord::GetBody() const noexcept
 {
   return body_;
 }
@@ -161,13 +175,25 @@ const opentelemetry::trace::TraceFlags &ReadWriteLogRecord::GetTraceFlags() cons
 void ReadWriteLogRecord::SetAttribute(nostd::string_view key,
                                       const opentelemetry::common::AttributeValue &value) noexcept
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  attributes_map_.SetAttribute(key, value);
+#else
   attributes_map_[std::string(key)] = value;
+#endif
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
+#else
 const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &
+#endif
 ReadWriteLogRecord::GetAttributes() const noexcept
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  return attributes_map_.GetAttributes();
+#else
   return attributes_map_;
+#endif
 }
 
 const opentelemetry::sdk::resource::Resource &ReadWriteLogRecord::GetResource() const noexcept
