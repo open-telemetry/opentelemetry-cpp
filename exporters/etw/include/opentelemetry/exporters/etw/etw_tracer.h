@@ -590,6 +590,7 @@ public:
     return result;
   }
 
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
   /**
    * @brief Force flush data to Tracer, spending up to given amount of microseconds to flush.
    * NOTE: this method has no effect for the realtime streaming Tracer.
@@ -615,6 +616,7 @@ public:
       etwProvider().close(provHandle);
     }
   }
+#endif
 
   /**
    * @brief Add event data to span associated with tracer.
@@ -736,7 +738,18 @@ public:
   /**
    * @brief Tracer destructor.
    */
-  virtual ~Tracer() { CloseWithMicroseconds(0); }
+  virtual ~Tracer()
+  {
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
+    CloseWithMicroseconds(0);
+#else
+    // Close once only
+    if (!isClosed_.exchange(true))
+    {
+      etwProvider().close(provHandle);
+    }
+#endif
+  }
 };
 
 /**
@@ -892,6 +905,34 @@ public:
   {
     owner_.AddEvent(*this, name, timestamp, attributes);
   }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+  /**
+   * Add link (ABI).
+   *
+   * See comments about sampling in @ref opentelemetry::trace::Span
+   *
+   * @since ABI_VERSION 2
+   */
+  void AddLink(const trace::SpanContext & /*target*/,
+               const common::KeyValueIterable & /*attrs*/) noexcept override
+  {
+    // FIXME: What to do with links?
+  }
+
+  /**
+   * Add links (ABI).
+   *
+   * See comments about sampling in @ref opentelemetry::trace::Span
+   *
+   * @since ABI_VERSION 2
+   */
+  void AddLinks(const trace::SpanContextKeyValueIterable & /*links*/) noexcept override
+  {
+    // FIXME: What to do with links?
+  }
+#endif
 
   /**
    * @brief Set Span status
@@ -1116,7 +1157,13 @@ public:
   nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view name,
       nostd::string_view args       = "",
-      nostd::string_view schema_url = "") noexcept override
+      nostd::string_view schema_url = ""
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+      ,
+      // FIXME: This is a temporary workaround to avoid breaking compiling.
+      const common::KeyValueIterable * /*attributes*/ = nullptr
+#endif
+      ) noexcept override
   {
     UNREFERENCED_PARAMETER(args);
     UNREFERENCED_PARAMETER(schema_url);

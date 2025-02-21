@@ -116,7 +116,9 @@ public:
   void Teardown()
   {
     span_->End();
+#  if OPENTELEMETRY_ABI_VERSION_NO == 1
     tracer_->CloseWithMicroseconds(0);
+#  endif
   }
 };
 

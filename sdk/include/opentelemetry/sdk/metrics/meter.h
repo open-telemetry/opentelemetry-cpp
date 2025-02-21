@@ -19,6 +19,7 @@
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -138,11 +139,14 @@ private:
   // Mapping between instrument-name and Aggregation Storage.
   std::unordered_map<std::string, std::shared_ptr<MetricStorage>> storage_registry_;
   std::shared_ptr<ObservableRegistry> observable_registry_;
+  MeterConfig meter_config_;
   std::unique_ptr<SyncWritableMetricStorage> RegisterSyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
   std::unique_ptr<AsyncWritableMetricStorage> RegisterAsyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
   opentelemetry::common::SpinLockMutex storage_lock_;
+
+  static opentelemetry::metrics::NoopMeter kNoopMeter;
 
   static nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
   GetNoopObservableInsrument()
