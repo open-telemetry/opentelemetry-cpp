@@ -25,8 +25,8 @@ namespace message
  * @deprecated
  * Replaced by @code rpc.message.compressed_size @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessageCompressedSize = "message.compressed_size";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessageCompressedSize =
+    "message.compressed_size";
 
 /**
  * Deprecated, use @code rpc.message.id @endcode instead.
@@ -34,8 +34,7 @@ static constexpr const char *kMessageCompressedSize = "message.compressed_size";
  * @deprecated
  * Replaced by @code rpc.message.id @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessageId = "message.id";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessageId = "message.id";
 
 /**
  * Deprecated, use @code rpc.message.type @endcode instead.
@@ -43,8 +42,7 @@ static constexpr const char *kMessageId = "message.id";
  * @deprecated
  * Replaced by @code rpc.message.type @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessageType = "message.type";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessageType = "message.type";
 
 /**
  * Deprecated, use @code rpc.message.uncompressed_size @endcode instead.
@@ -52,8 +50,8 @@ static constexpr const char *kMessageType = "message.type";
  * @deprecated
  * Replaced by @code rpc.message.uncompressed_size @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessageUncompressedSize = "message.uncompressed_size";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessageUncompressedSize =
+    "message.uncompressed_size";
 
 namespace MessageTypeValues
 {

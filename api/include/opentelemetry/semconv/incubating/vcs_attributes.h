@@ -124,8 +124,8 @@ static constexpr const char *kVcsRefType = "vcs.ref.type";
  * @deprecated
  * Deprecated, use @code vcs.change.id @endcode instead.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kVcsRepositoryChangeId = "vcs.repository.change.id";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryChangeId =
+    "vcs.repository.change.id";
 
 /**
  * Deprecated, use @code vcs.change.title @endcode instead.
@@ -133,8 +133,8 @@ static constexpr const char *kVcsRepositoryChangeId = "vcs.repository.change.id"
  * @deprecated
  * Deprecated, use @code vcs.change.title @endcode instead.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kVcsRepositoryChangeTitle = "vcs.repository.change.title";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryChangeTitle =
+    "vcs.repository.change.title";
 
 /**
  * The human readable name of the repository. It SHOULD NOT include any additional identifier like
@@ -150,8 +150,8 @@ static constexpr const char *kVcsRepositoryName = "vcs.repository.name";
  * @deprecated
  * Deprecated, use @code vcs.ref.head.name @endcode instead.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kVcsRepositoryRefName = "vcs.repository.ref.name";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryRefName =
+    "vcs.repository.ref.name";
 
 /**
  * Deprecated, use @code vcs.ref.head.revision @endcode instead.
@@ -159,8 +159,8 @@ static constexpr const char *kVcsRepositoryRefName = "vcs.repository.ref.name";
  * @deprecated
  * Deprecated, use @code vcs.ref.head.revision @endcode instead.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kVcsRepositoryRefRevision = "vcs.repository.ref.revision";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryRefRevision =
+    "vcs.repository.ref.revision";
 
 /**
  * Deprecated, use @code vcs.ref.head.type @endcode instead.
@@ -168,8 +168,8 @@ static constexpr const char *kVcsRepositoryRefRevision = "vcs.repository.ref.rev
  * @deprecated
  * Deprecated, use @code vcs.ref.head.type @endcode instead.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kVcsRepositoryRefType = "vcs.repository.ref.type";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryRefType =
+    "vcs.repository.ref.type";
 
 /**
  * The <a
