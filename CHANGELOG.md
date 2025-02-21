@@ -24,6 +24,9 @@ Increment the:
 * [SDK] Add meter scope configurator
   [#3268](https://github.com/open-telemetry/opentelemetry-cpp/pull/3268)
 
+* [DEVCONTAINER] Support customization and run as non-root user
+  [#3270](https://github.com/open-telemetry/opentelemetry-cpp/pull/3270)
+
 Important changes:
 
 * [SDK] Support OTEL_SDK_DISABLED environment variable
