@@ -169,7 +169,7 @@ TEST(ETWLogger, LoggerCheckWithTableNameMappings)
  *   "Timestamp": "2021-09-30T22:04:15.066411500Z",
  *   "TraceId": "00000000000000000000000000000000",
  *   "_name": "table1",
- *   "attrib1": 1,
+ *   "tiemstamp1": "2025-02-20T19:18:11.048166700Z",
  *   "attrib2": "value2",
  *   "body": "This is a debug log body",
  *   "severityNumber": 5,
@@ -182,14 +182,14 @@ TEST(ETWLogger, LoggerCheckWithTableNameMappings)
 TEST(ETWLogger, LoggerCheckWithTimestampAttributes)
 {
   std::string providerName = kGlobalProviderName;  // supply unique instrumentation name here
-  std::set<std::string> timestampAttributes = {{"attrib1"}};
+  std::set<std::string> timestampAttributes = {{"timestamp1"}};
   exporter::etw::TelemetryProviderOptions options = {{"timestampAttributes", timestampAttributes}};
   exporter::etw::LoggerProvider lp{options};
 
   auto logger = lp.GetLogger(providerName, "name1");
 
   // Log attributes
-  Properties attribs = {{"attrib1", 133845526910481667ULL}, {"attrib2", "value2"}};
+  Properties attribs = {{"timestamp1", 133845526910481667ULL}, {"attrib2", "value2"}};
 
   EXPECT_NO_THROW(
       logger->Debug("This is a debug log body", opentelemetry::common::MakeAttributes(attribs)));
