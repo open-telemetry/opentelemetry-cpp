@@ -338,12 +338,14 @@ public:
           continue;
         }
         int64_t filetime = value_index == exporter_etw::PropertyType::kTypeUInt64
-                        ? nostd::get<uint64_t>(it->second)
-                        : nostd::get<int64_t>(it->second);
-        constexpr int64_t FILETIME_EPOCH_DIFF = 11644473600LL; // Seconds from 1601 to 1970
+                               ? nostd::get<uint64_t>(it->second)
+                               : nostd::get<int64_t>(it->second);
+        constexpr int64_t FILETIME_EPOCH_DIFF = 11644473600LL;  // Seconds from 1601 to 1970
         constexpr int64_t HUNDRED_NANOSECONDS_PER_SECOND = 10000000LL;
-        int64_t unix_time_seconds = (filetime / HUNDRED_NANOSECONDS_PER_SECOND) - FILETIME_EPOCH_DIFF;
-        int64_t unix_time_nanos = unix_time_seconds * 1'000'000'000 + (filetime % HUNDRED_NANOSECONDS_PER_SECOND) * 100;
+        int64_t unix_time_seconds =
+            (filetime / HUNDRED_NANOSECONDS_PER_SECOND) - FILETIME_EPOCH_DIFF;
+        int64_t unix_time_nanos =
+            unix_time_seconds * 1'000'000'000 + (filetime % HUNDRED_NANOSECONDS_PER_SECOND) * 100;
         it->second = utils::formatUtcTimestampNsAsISO8601(unix_time_nanos);
       }
     }

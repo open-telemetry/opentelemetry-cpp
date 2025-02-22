@@ -182,7 +182,7 @@ TEST(ETWLogger, LoggerCheckWithTableNameMappings)
 TEST(ETWLogger, LoggerCheckWithTimestampAttributes)
 {
   std::string providerName = kGlobalProviderName;  // supply unique instrumentation name here
-  std::set<std::string> timestampAttributes = {{"timestamp1"}};
+  std::set<std::string> timestampAttributes       = {{"timestamp1"}};
   exporter::etw::TelemetryProviderOptions options = {{"timestampAttributes", timestampAttributes}};
   exporter::etw::LoggerProvider lp{options};
 

@@ -5,7 +5,7 @@
 #include <map>
 
 #if defined(OPENTELEMETRY_ATTRIBUTE_TIMESTAMP_PREVIEW)
-#include <set>
+#  include <set>
 #endif  // defined(OPENTELEMETRY_ATTRIBUTE_TIMESTAMP_PREVIEW)
 
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -29,9 +29,13 @@ namespace etw
  */
 
 #if defined(OPENTELEMETRY_ATTRIBUTE_TIMESTAMP_PREVIEW)
-using TelemetryProviderOptions = std::map<
-    std::string,
-    nostd::variant<std::string, uint64_t, float, bool, std::map<std::string, std::string>, std::set<std::string>>>;
+using TelemetryProviderOptions = std::map<std::string,
+                                          nostd::variant<std::string,
+                                                         uint64_t,
+                                                         float,
+                                                         bool,
+                                                         std::map<std::string, std::string>,
+                                                         std::set<std::string>>>;
 
 #else
 using TelemetryProviderOptions = std::map<
