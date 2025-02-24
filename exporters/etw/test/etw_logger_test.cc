@@ -5,7 +5,10 @@
 
 #  include <gtest/gtest.h>
 #  include <map>
+#  include <set>
 #  include <string>
+
+#  define OPENTELEMETRY_ATTRIBUTE_TIMESTAMP_PREVIEW
 
 #  include "opentelemetry/exporters/etw/etw_logger_exporter.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
@@ -141,6 +144,52 @@ TEST(ETWLogger, LoggerCheckWithTableNameMappings)
 
   // Log attributes
   Properties attribs = {{"attrib1", 1}, {"attrib2", "value2"}};
+
+  EXPECT_NO_THROW(
+      logger->Debug("This is a debug log body", opentelemetry::common::MakeAttributes(attribs)));
+}
+
+/**
+ * @brief Logger Test with structured attributes
+ *
+ * Example Event for below test:
+ * {
+ *  "Timestamp": "2024-06-02T15:04:15.4227815-07:00",
+ *  "ProviderName": "OpenTelemetry-ETW-TLD",
+ *  "Id": 1,
+ *  "Message": null,
+ *  "ProcessId": 37696,
+ *  "Level": "Always",
+ *  "Keywords": "0x0000000000000000",
+ *  "EventName": "table1",
+ *  "ActivityID": null,
+ *  "RelatedActivityID": null,
+ *  "Payload": {
+ *   "SpanId": "0000000000000000",
+ *   "Timestamp": "2021-09-30T22:04:15.066411500Z",
+ *   "TraceId": "00000000000000000000000000000000",
+ *   "_name": "table1",
+ *   "tiemstamp1": "2025-02-20T19:18:11.048166700Z",
+ *   "attrib2": "value2",
+ *   "body": "This is a debug log body",
+ *   "severityNumber": 5,
+ *   "severityText": "DEBUG"
+ *  }
+ * }
+ *
+ */
+
+TEST(ETWLogger, LoggerCheckWithTimestampAttributes)
+{
+  std::string providerName = kGlobalProviderName;  // supply unique instrumentation name here
+  std::set<std::string> timestampAttributes       = {{"timestamp1"}};
+  exporter::etw::TelemetryProviderOptions options = {{"timestampAttributes", timestampAttributes}};
+  exporter::etw::LoggerProvider lp{options};
+
+  auto logger = lp.GetLogger(providerName, "name1");
+
+  // Log attributes
+  Properties attribs = {{"timestamp1", 133845526910481667ULL}, {"attrib2", "value2"}};
 
   EXPECT_NO_THROW(
       logger->Debug("This is a debug log body", opentelemetry::common::MakeAttributes(attribs)));
