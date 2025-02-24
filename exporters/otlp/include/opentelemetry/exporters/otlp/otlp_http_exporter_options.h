@@ -28,7 +28,10 @@ namespace otlp
  */
 struct OPENTELEMETRY_EXPORT OtlpHttpExporterOptions
 {
+  /** Lookup environment variables. */
   OtlpHttpExporterOptions();
+  /** No defaults. */
+  OtlpHttpExporterOptions(void * /* raw */);
   ~OtlpHttpExporterOptions();
 
   /** The endpoint to export to. */
