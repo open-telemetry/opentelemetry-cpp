@@ -30,8 +30,7 @@ static constexpr const char *kSystemCpuLogicalNumber = "system.cpu.logical_numbe
  * @deprecated
  * Replaced by @code cpu.mode @endcode
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kSystemCpuState = "system.cpu.state";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemCpuState = "system.cpu.state";
 
 /**
  * The device identifier
@@ -69,8 +68,7 @@ static constexpr const char *kSystemMemoryState = "system.memory.state";
  * @deprecated
  * Removed, report network connection state with @code network.connection.state @endcode attribute
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kSystemNetworkState = "system.network.state";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemNetworkState = "system.network.state";
 
 /**
  * The paging access direction
@@ -100,8 +98,8 @@ static constexpr const char *kSystemProcessStatus = "system.process.status";
  * @deprecated
  * Replaced by @code system.process.status @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kSystemProcessesStatus = "system.processes.status";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemProcessesStatus =
+    "system.processes.status";
 
 namespace SystemCpuStateValues
 {
@@ -213,8 +211,7 @@ static constexpr const char *kFree = "free";
  * @deprecated
  * Removed, report shared memory usage with @code metric.system.memory.shared @endcode metric
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kShared = "shared";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kShared = "shared";
 
 /**
  * none

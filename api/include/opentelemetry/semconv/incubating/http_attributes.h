@@ -25,8 +25,7 @@ namespace http
  * @deprecated
  * Replaced by @code client.address @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kHttpClientIp = "http.client_ip";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpClientIp = "http.client_ip";
 
 /**
  * State of the HTTP connection in the HTTP connection pool.
@@ -39,8 +38,7 @@ static constexpr const char *kHttpConnectionState = "http.connection.state";
  * @deprecated
  * Replaced by @code network.protocol.name @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kHttpFlavor = "http.flavor";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpFlavor = "http.flavor";
 
 /**
  * Deprecated, use one of @code server.address @endcode, @code client.address @endcode or @code
@@ -49,8 +47,7 @@ static constexpr const char *kHttpFlavor = "http.flavor";
  * Replaced by one of @code server.address @endcode, @code client.address @endcode or @code
  * http.request.header.host @endcode, depending on the usage.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kHttpHost = "http.host";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpHost = "http.host";
 
 /**
  * Deprecated, use @code http.request.method @endcode instead.
@@ -58,8 +55,7 @@ static constexpr const char *kHttpHost = "http.host";
  * @deprecated
  * Replaced by @code http.request.method @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kHttpMethod = "http.method";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpMethod = "http.method";
 
 /**
  * The size of the request payload body in bytes. This is the number of bytes transferred excluding
@@ -131,8 +127,8 @@ static constexpr const char *kHttpRequestSize = "http.request.size";
  * @deprecated
  * Replaced by @code http.request.header.<key> @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kHttpRequestContentLength = "http.request_content_length";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpRequestContentLength =
+    "http.request_content_length";
 
 /**
  * Deprecated, use @code http.request.body.size @endcode instead.
@@ -140,8 +136,7 @@ static constexpr const char *kHttpRequestContentLength = "http.request_content_l
  * @deprecated
  * Replaced by @code http.request.body.size @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kHttpRequestContentLengthUncompressed =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpRequestContentLengthUncompressed =
     "http.request_content_length_uncompressed";
 
 /**
@@ -182,8 +177,8 @@ static constexpr const char *kHttpResponseStatusCode = "http.response.status_cod
  * @deprecated
  * Replaced by @code http.response.header.<key> @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kHttpResponseContentLength = "http.response_content_length";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpResponseContentLength =
+    "http.response_content_length";
 
 /**
  * Deprecated, use @code http.response.body.size @endcode instead.
@@ -191,8 +186,7 @@ static constexpr const char *kHttpResponseContentLength = "http.response_content
  * @deprecated
  * Replace by @code http.response.body.size @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kHttpResponseContentLengthUncompressed =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpResponseContentLengthUncompressed =
     "http.response_content_length_uncompressed";
 
 /**
@@ -210,8 +204,7 @@ static constexpr const char *kHttpRoute = "http.route";
  * @deprecated
  * Replaced by @code url.scheme @endcode instead.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kHttpScheme = "http.scheme";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpScheme = "http.scheme";
 
 /**
  * Deprecated, use @code server.address @endcode instead.
@@ -219,8 +212,7 @@ static constexpr const char *kHttpScheme = "http.scheme";
  * @deprecated
  * Replaced by @code server.address @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kHttpServerName = "http.server_name";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpServerName = "http.server_name";
 
 /**
  * Deprecated, use @code http.response.status_code @endcode instead.
@@ -228,8 +220,7 @@ static constexpr const char *kHttpServerName = "http.server_name";
  * @deprecated
  * Replaced by @code http.response.status_code @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kHttpStatusCode = "http.status_code";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpStatusCode = "http.status_code";
 
 /**
  * Deprecated, use @code url.path @endcode and @code url.query @endcode instead.
@@ -237,8 +228,7 @@ static constexpr const char *kHttpStatusCode = "http.status_code";
  * @deprecated
  * Split to @code url.path @endcode and `url.query.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kHttpTarget = "http.target";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpTarget = "http.target";
 
 /**
  * Deprecated, use @code url.full @endcode instead.
@@ -246,8 +236,7 @@ static constexpr const char *kHttpTarget = "http.target";
  * @deprecated
  * Replaced by @code url.full @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kHttpUrl = "http.url";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpUrl = "http.url";
 
 /**
  * Deprecated, use @code user_agent.original @endcode instead.
@@ -255,8 +244,7 @@ static constexpr const char *kHttpUrl = "http.url";
  * @deprecated
  * Replaced by @code user_agent.original @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kHttpUserAgent = "http.user_agent";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpUserAgent = "http.user_agent";
 
 namespace HttpConnectionStateValues
 {

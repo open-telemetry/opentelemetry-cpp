@@ -60,8 +60,7 @@ static constexpr const char *kProcessContextSwitchType = "process.context_switch
  * @deprecated
  * Replaced by @code cpu.mode @endcode
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kProcessCpuState = "process.cpu.state";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kProcessCpuState = "process.cpu.state";
 
 /**
  * The date and time the process was created, in ISO 8601 format.
@@ -91,8 +90,7 @@ static constexpr const char *kProcessExecutableBuildIdHtlhash =
  * @deprecated
  * Replaced by @code process.executable.build_id.htlhash @endcode
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kProcessExecutableBuildIdProfiling =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kProcessExecutableBuildIdProfiling =
     "process.executable.build_id.profiling";
 
 /**
