@@ -9,8 +9,21 @@ cc_test(
     srcs = ["x.cpp"],
     deps = ["@otel_sdk//:dll"],
     local = True,
-    tags = ["manual", "external"],
+    tags = ["manual", "external", "no-cache"],
 
+    # Minimal set of env vars for Visual Studio
+    env_inherit = [ 
+        "windir", # Mandatory
+        #"USERPROFILE", # In order to avoid creating %USERPROFILE%
+    ],
+)
+
+cc_test(
+    name = "t",
+    srcs = ["t.cpp"],
+    deps = ["@otel_sdk//:dll"],
+    local = True,
+    tags = ["manual", "external", "no-cache"],
     # Minimal set of env vars for Visual Studio
     env_inherit = [ 
         "windir", # Mandatory
@@ -23,7 +36,7 @@ cc_test(
     srcs = ["m.cpp"],
     deps = ["@otel_sdk//:dll"],
     local = True,
-    tags = ["manual", "external"],
+    tags = ["manual", "external", "no-cache"],
 
     # Minimal set of env vars for Visual Studio
     env_inherit = [ 
