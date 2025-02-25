@@ -26,8 +26,7 @@ namespace exception
  * It's no longer recommended to record exceptions that are handled and do not escape the scope of a
  * span.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kExceptionEscaped = "exception.escaped";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kExceptionEscaped = "exception.escaped";
 
 /**
  * The exception message.

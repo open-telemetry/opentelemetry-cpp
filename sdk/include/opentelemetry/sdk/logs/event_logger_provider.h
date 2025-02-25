@@ -19,7 +19,8 @@ namespace sdk
 {
 namespace logs
 {
-class OPENTELEMETRY_EXPORT EventLoggerProvider final
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+class OPENTELEMETRY_EXPORT OPENTELEMETRY_DEPRECATED EventLoggerProvider final
     : public opentelemetry::logs::EventLoggerProvider
 {
 public:
@@ -31,6 +32,7 @@ public:
       nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
       nostd::string_view event_domain) noexcept override;
 };
+#endif
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

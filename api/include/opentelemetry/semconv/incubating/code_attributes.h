@@ -25,8 +25,7 @@ namespace code
  * @deprecated
  * Replaced by @code code.column.number @endcode
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kCodeColumn = "code.column";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeColumn = "code.column";
 
 /**
  * The column number in @code code.file.path @endcode best representing the operation. It SHOULD
@@ -51,8 +50,7 @@ static constexpr const char *kCodeFilepath = "code.filepath";
  * @deprecated
  * Replaced by @code code.function.name @endcode
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kCodeFunction = "code.function";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeFunction = "code.function";
 
 /**
  * The method or function name, or equivalent (usually rightmost part of the code unit's name).
@@ -71,8 +69,7 @@ static constexpr const char *kCodeLineNumber = "code.line.number";
  * @deprecated
  * Replaced by @code code.line.number @endcode
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kCodeLineno = "code.lineno";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeLineno = "code.lineno";
 
 /**
  * The "namespace" within which @code code.function.name @endcode is defined. Usually the qualified
