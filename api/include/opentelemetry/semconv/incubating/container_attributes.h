@@ -43,8 +43,7 @@ static constexpr const char *kContainerCommandLine = "container.command_line";
  * @deprecated
  * Replaced by @code cpu.mode @endcode
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kContainerCpuState = "container.cpu.state";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kContainerCpuState = "container.cpu.state";
 
 /**
  * The name of the CSI (<a href="https://github.com/container-storage-interface/spec">Container
@@ -118,8 +117,7 @@ static constexpr const char *kContainerLabel = "container.label";
  * @deprecated
  * Replaced by @code container.label @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kContainerLabels = "container.labels";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kContainerLabels = "container.labels";
 
 /**
  * Container name used by container runtime.
