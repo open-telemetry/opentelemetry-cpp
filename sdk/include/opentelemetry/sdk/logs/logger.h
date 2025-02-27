@@ -68,7 +68,7 @@ private:
   std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope_;
   std::shared_ptr<LoggerContext> context_;
   LoggerConfig logger_config_;
-  static const opentelemetry::logs::NoopLogger kNoopLogger;
+  static opentelemetry::logs::NoopLogger kNoopLogger;
 };
 
 }  // namespace logs

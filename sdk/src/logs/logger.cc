@@ -31,9 +31,7 @@ namespace logs
 namespace trace_api = opentelemetry::trace;
 namespace common    = opentelemetry::common;
 
-const opentelemetry::logs::NoopLogger Logger::kNoopLogger = opentelemetry::logs::NoopLogger();
-
-// TODO: Implement configurator logic
+opentelemetry::logs::NoopLogger Logger::kNoopLogger = opentelemetry::logs::NoopLogger();
 
 Logger::Logger(
     opentelemetry::nostd::string_view name,
@@ -47,11 +45,18 @@ Logger::Logger(
 
 const opentelemetry::nostd::string_view Logger::GetName() noexcept
 {
+  if (!logger_config_.IsEnabled()) {
+    return kNoopLogger.GetName();
+  }
   return logger_name_;
 }
 
 opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noexcept
 {
+  if (!logger_config_.IsEnabled()) {
+    return kNoopLogger.CreateLogRecord();
+  }
+
   auto recordable = context_->GetProcessor().MakeRecordable();
 
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());
@@ -95,6 +100,10 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
 void Logger::EmitLogRecord(
     opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
 {
+  if (!logger_config_.IsEnabled()) {
+    return kNoopLogger.EmitLogRecord(std::move(log_record));
+  }
+
   if (!log_record)
   {
     return;
