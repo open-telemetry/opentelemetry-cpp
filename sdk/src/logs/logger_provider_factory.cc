@@ -29,8 +29,17 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> LoggerProviderFactory:
     std::unique_ptr<LogRecordProcessor> &&processor,
     const opentelemetry::sdk::resource::Resource &resource)
 {
+  auto logger_configurator = std::make_unique<instrumentationscope::ScopeConfigurator<LoggerConfig>>(instrumentationscope::ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Default()).Build());
+  return Create(std::move(processor), resource, std::move(logger_configurator));
+}
+
+std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> LoggerProviderFactory::Create(
+    std::unique_ptr<LogRecordProcessor> &&processor,
+    const resource::Resource &resource,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator)
+{
   std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> provider(
-      new LoggerProvider(std::move(processor), resource));
+      new LoggerProvider(std::move(processor), resource, std::move(logger_configurator)));
   return provider;
 }
 
@@ -45,8 +54,17 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> LoggerProviderFactory:
     std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
     const opentelemetry::sdk::resource::Resource &resource)
 {
+  auto logger_configurator = std::make_unique<instrumentationscope::ScopeConfigurator<LoggerConfig>>(instrumentationscope::ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Default()).Build());
+  return Create(std::move(processors), resource, std::move(logger_configurator));
+}
+
+std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> LoggerProviderFactory::Create(
+    std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
+    const resource::Resource &resource,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator)
+{
   std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> provider(
-      new LoggerProvider(std::move(processors), resource));
+      new LoggerProvider(std::move(processors), resource, std::move(logger_configurator)));
   return provider;
 }
 
