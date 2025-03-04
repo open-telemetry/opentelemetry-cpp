@@ -2141,7 +2141,7 @@ namespace tld
 
         void AddFieldInfo(UINT8 arity, Type type, UINT32 tags)
         {
-            _tld_ASSERT((type & InTypeMask) == (type & 0xff), "InType out of range");
+            _tld_ASSERT((type & (Type)InTypeMask) == (type & 0xff), "InType out of range");
             _tld_ASSERT((type & _tld_MAKE_TYPE(0, OutTypeMask)) == (Type)(type & 0xffffff00), "OutType out of range");
 
             UINT8 inMeta = arity | static_cast<UINT8>(type);

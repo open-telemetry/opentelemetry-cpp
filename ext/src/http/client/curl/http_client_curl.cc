@@ -15,7 +15,6 @@
 #include <mutex>
 #include <string>
 #include <thread>
-#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -26,6 +25,7 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
@@ -116,7 +116,7 @@ int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *m
   // now empty input buffer (this will only occur for long incompressible streams, more than ~20 MB
   // for the default deflate memLevel of 8, or when *max_len is too small and less than the length
   // of the header plus one byte)
-  auto hold = static_cast<std::remove_const_t<decltype(z_stream::next_in)>>(
+  auto hold = static_cast<nostd::remove_const_t<decltype(z_stream::next_in)>>(
       strm->zalloc(strm->opaque, strm->avail_in, 1));  // allocated buffer to hold input data
   if (hold == Z_NULL)
   {
@@ -475,7 +475,7 @@ bool HttpClient::MaybeSpawnBackgroundThread()
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
         // curl_multi_poll is added from libcurl 7.66.0, before 7.68.0, we can only wait until
-        // timeout to do the rest jobs
+        // timeout to do the remaining jobs
 #if LIBCURL_VERSION_NUM >= 0x074200
             /* wait for activity, timeout or "nothing" */
             mc = curl_multi_poll(self->multi_handle_, nullptr, 0,
@@ -646,16 +646,16 @@ void HttpClient::ScheduleAddSession(uint64_t session_id)
 void HttpClient::ScheduleAbortSession(uint64_t session_id)
 {
   {
-    std::lock_guard<std::mutex> lock_guard{sessions_m_};
+    std::lock_guard<std::mutex> sessions_lock{sessions_m_};
     auto session = sessions_.find(session_id);
     if (session == sessions_.end())
     {
-      std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};
+      std::lock_guard<std::recursive_mutex> session_ids_lock{session_ids_m_};
       pending_to_add_session_ids_.erase(session_id);
     }
     else
     {
-      std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};
+      std::lock_guard<std::recursive_mutex> session_ids_lock{session_ids_m_};
       pending_to_abort_sessions_[session_id] = std::move(session->second);
       pending_to_add_session_ids_.erase(session_id);
 

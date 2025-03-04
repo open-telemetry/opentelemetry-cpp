@@ -91,8 +91,8 @@ static constexpr const char *kTlsClientNotBefore = "tls.client.not_before";
  * @deprecated
  * Replaced by @code server.address @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kTlsClientServerName = "tls.client.server_name";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kTlsClientServerName =
+    "tls.client.server_name";
 
 /**
  * Distinguished name of subject of the x.509 certificate presented by the client.
