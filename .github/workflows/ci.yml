@@ -27,7 +27,7 @@ jobs:
 #        sudo -E ./ci/setup_gcc10.sh
 #        sudo -E ./ci/setup_cmake.sh
 #        sudo -E ./ci/setup_ci_environment.sh
-#        sudo -E ./ci/setup_googletest.sh
+#        git submodule update --init third_party/googletest
 #        sudo -E ./ci/install_abseil.sh
 #        sudo -E ./ci/install_protobuf.sh
 #    - name: run otlp exporter tests
@@ -52,8 +52,8 @@ jobs:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
     - name: run cmake tests (without otlp-exporter)
       env:
         CC: /usr/bin/gcc-12
@@ -75,8 +75,8 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -111,8 +111,8 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -147,8 +147,8 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -183,8 +183,8 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -219,8 +219,8 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -296,8 +296,8 @@ jobs:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
     - name: run cmake tests (without otlp-exporter)
       env:
         CC: /usr/bin/gcc-12
@@ -314,8 +314,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
     - name: run cmake tests (enable abseil-cpp)
       run: |
         sudo ./ci/install_abseil.sh
@@ -330,8 +330,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
     - name: run cmake tests (enable opentracing-shim)
       run: ./ci/do_ci.sh cmake.opentracing_shim.test
 
@@ -345,7 +345,7 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
+        git submodule update --init third_party/googletest
     - name: run tests (enable stl)
       env:
         CXX_STANDARD: '14'
@@ -361,7 +361,7 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
+        git submodule update --init third_party/googletest
     - name: run tests (enable stl)
       env:
         CXX_STANDARD: '17'
@@ -377,7 +377,7 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
+        git submodule update --init third_party/googletest
     - name: run tests
       env:
         CXX_STANDARD: '20'
@@ -401,7 +401,7 @@ jobs:
         CXXFLAGS: "-stdlib=libc++"
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
+        git submodule update --init third_party/googletest
     - name: run tests
       env:
         CC: /usr/bin/clang
@@ -427,7 +427,7 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
+        git submodule update --init third_party/googletest
     - name: run tests
       env:
         CXX_STANDARD: '23'
@@ -451,7 +451,7 @@ jobs:
         CXXFLAGS: "-stdlib=libc++"
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
+        git submodule update --init third_party/googletest
     - name: run tests
       env:
         CC: /usr/bin/clang
@@ -476,8 +476,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh
@@ -505,8 +505,8 @@ jobs:
         ABSEIL_CPP_VERSION: '20230125.3'
         CXX_STANDARD: '14'
       run: |
-        sudo ./ci/setup_googletest.sh
         sudo ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
         sudo -E ./ci/install_abseil.sh
         sudo -E ./ci/install_protobuf.sh
     - name: run otlp exporter tests
@@ -526,8 +526,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh
@@ -542,8 +542,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh -T
@@ -558,8 +558,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
     - name: run cmake install (with abseil)
       run: |
         sudo ./ci/install_abseil.sh
@@ -580,8 +580,8 @@ jobs:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
     - name: run tests
       env:
         CC: /usr/bin/gcc-12
@@ -907,8 +907,8 @@ jobs:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        git submodule update --init third_party/googletest
     - name: run tests and generate report
       env:
         CC: /usr/bin/gcc-10
@@ -978,8 +978,8 @@ jobs:
           CC: /usr/bin/gcc-12
           CXX: /usr/bin/g++-12
         run: |
-          sudo -E ./ci/setup_googletest.sh
           sudo -E ./ci/setup_ci_environment.sh
+          git submodule update --init third_party/googletest
       - name: run w3c trace-context test server (background)
         env:
           CXX_STANDARD: '14'
