@@ -620,19 +620,8 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
 include(CTest)
 if(BUILD_TESTING)
-  if(EXISTS ${CMAKE_BINARY_DIR}/lib/libgtest.a)
-    # Prefer GTest from build tree. GTest is not always working with
-    # CMAKE_PREFIX_PATH
-    set(GTEST_INCLUDE_DIRS
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googlemock/include)
-    if(TARGET gtest)
-      set(GTEST_BOTH_LIBRARIES gtest gtest_main)
-    else()
-      set(GTEST_BOTH_LIBRARIES ${CMAKE_BINARY_DIR}/lib/libgtest.a
-                               ${CMAKE_BINARY_DIR}/lib/libgtest_main.a)
-    endif()
-  elseif(WIN32)
+
+  if(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
     find_package(GTest)
     if(NOT (GTEST_FOUND OR GTest_FOUND))
@@ -648,9 +637,81 @@ if(BUILD_TESTING)
       endif()
     endif()
   else()
-    # Prefer GTest installed by OS distro, brew or vcpkg package manager
-    find_package(GTest REQUIRED)
+    # Build googletest from sources. This is the preferred way.
+    set(GTEST_SRC_DIR_DEFAULT ${CMAKE_SOURCE_DIR}/third_party/googletest)
+    set(GTEST_SRC_DIR ${GTEST_SRC_DIR_DEFAULT} CACHE STRING "Location of gtest sources")
+    if(EXISTS ${GTEST_SRC_DIR}/googletest/src/gtest-all.cc)
+
+      include(ExternalProject)
+
+      # Build googletest/googletest from sources available as third party
+      ExternalProject_Add(
+        googletest
+        DOWNLOAD_COMMAND ""
+        SOURCE_DIR ${GTEST_SRC_DIR}/googletest
+        INSTALL_COMMAND ""
+        LOG_CONFIGURE ON
+        LOG_BUILD ON
+        CMAKE_ARGS  -DBUILD_SHARED_LIBS=ON
+                    -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+                    #BUILD_BYPRODUCTS
+                    #${CMAKE_BINARY_DIR}/googletest-prefix/src/googletest-build/lib/libgtest.so
+                    #${CMAKE_BINARY_DIR}/googletest-prefix/src/googletest-build/lib/libgtest_main.so
+      )
+      message(STATUS "Building googletest from sources in ${GTEST_SRC_DIR}")
+
+      set(GTEST_LIBRARY_PATH ${CMAKE_BINARY_DIR}/googletest-prefix/src/googletest-build/lib/libgtest.so)
+      add_library(GTest::gtest SHARED IMPORTED)
+      set_target_properties(GTest::gtest PROPERTIES IMPORTED_LOCATION
+        ${GTEST_LIBRARY_PATH})
+      add_dependencies(GTest::gtest googletest)
+
+      set(GTEST_MAIN_LIBRARY_PATH  ${CMAKE_BINARY_DIR}/googletest-prefix/src/googletest-build/lib/libgtest_main.so)
+      add_library(GTest::gtest_main SHARED IMPORTED)
+      set_target_properties(GTest::gtest_main PROPERTIES IMPORTED_LOCATION
+        ${GTEST_MAIN_LIBRARY_PATH})
+      add_dependencies(GTest::gtest_main googletest)
+
+      ExternalProject_Get_Property(googletest source_dir)
+      set(GTEST_INCLUDE_DIR ${source_dir}/include)
+
+      # Build googletest/googlemock from sources available as third party
+      ExternalProject_Add(
+          googlemock
+          DOWNLOAD_COMMAND ""
+          SOURCE_DIR ${GTEST_SRC_DIR}/googlemock
+          INSTALL_COMMAND ""
+          LOG_CONFIGURE ON
+          LOG_BUILD ON
+          CMAKE_ARGS -DBUILD_SHARED_LIBS=ON
+                     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+      )
+      message(STATUS "Building googlemock from sources in ${GTEST_SRC_DIR}")
+
+      set(GMOCK_LIBRARY_PATH ${CMAKE_BINARY_DIR}/googlemock-prefix/src/googlemock-build/lib/libgmock.so)
+      add_library(GTest::gmock SHARED IMPORTED)
+      set_target_properties(GTest::gmock PROPERTIES IMPORTED_LOCATION
+        ${GMOCK_LIBRARY_PATH})
+      add_dependencies(GTest::gmock googlemock)
+
+      set(GMOCK_MAIN_LIBRARY_PATH  ${CMAKE_BINARY_DIR}/googlemock-prefix/src/googlemock-build/lib/libgmock_main.so)
+      add_library(GTest::gmock_main SHARED IMPORTED)
+      set_target_properties(GTest::gmock_main PROPERTIES IMPORTED_LOCATION
+        ${GMOCK_MAIN_LIBRARY_PATH})
+      add_dependencies(GTest::gtest_main googlemock)
+
+      set(GTEST_INCLUDE_DIRS
+          ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include
+          ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googlemock/include)
+
+      set(GTEST_BOTH_LIBRARIES GTest::gtest_main GTest::gtest)
+      set(GMOCK_LIB GTest::gmock)
+
+    else()
+      message(FATAL_ERROR "UNIT_TEST is set but unable to find gtest library source code")
+    endif()
   endif()
+
   if(NOT GTEST_BOTH_LIBRARIES)
     # New GTest package names
     if(TARGET GTest::gtest)
@@ -664,6 +725,11 @@ if(BUILD_TESTING)
   endif()
   message(STATUS "GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
   message(STATUS "GTEST_BOTH_LIBRARIES = ${GTEST_BOTH_LIBRARIES}")
+  message(STATUS "gtest library path ${GTEST_LIBRARY_PATH}")
+  message(STATUS "gtest main library path ${GTEST_MAIN_LIBRARY_PATH}")
+  message(STATUS "GMOCK_LIB = ${GMOCK_LIB}")
+  message(STATUS "gmock library path ${GMOCK_LIBRARY_PATH}")
+  message(STATUS "gmock main library path ${GMOCK_MAIN_LIBRARY_PATH}")
 
   # Try to find gmock
   if(NOT GMOCK_LIB AND TARGET GTest::gmock)
