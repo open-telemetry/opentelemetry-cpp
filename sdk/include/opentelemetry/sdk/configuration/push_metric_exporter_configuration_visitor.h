@@ -11,7 +11,8 @@ namespace sdk
 namespace configuration
 {
 
-class OtlpPushMetricExporterConfiguration;
+class OtlpHttpPushMetricExporterConfiguration;
+class OtlpGrpcPushMetricExporterConfiguration;
 class ConsolePushMetricExporterConfiguration;
 class ExtensionPushMetricExporterConfiguration;
 
@@ -21,7 +22,8 @@ public:
   PushMetricExporterConfigurationVisitor()          = default;
   virtual ~PushMetricExporterConfigurationVisitor() = default;
 
-  virtual void VisitOtlp(const OtlpPushMetricExporterConfiguration *model)           = 0;
+  virtual void VisitOtlpHttp(const OtlpHttpPushMetricExporterConfiguration *model)   = 0;
+  virtual void VisitOtlpGrpc(const OtlpGrpcPushMetricExporterConfiguration *model)   = 0;
   virtual void VisitConsole(const ConsolePushMetricExporterConfiguration *model)     = 0;
   virtual void VisitExtension(const ExtensionPushMetricExporterConfiguration *model) = 0;
 };

@@ -15,16 +15,16 @@ namespace configuration
 {
 
 // YAML-SCHEMA: schema/common.json
-// YAML-NODE: Otlp
-class OtlpSpanExporterConfiguration : public SpanExporterConfiguration
+// YAML-NODE: OtlpHttpExporter
+class OtlpHttpSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:
-  OtlpSpanExporterConfiguration()           = default;
-  ~OtlpSpanExporterConfiguration() override = default;
+  OtlpHttpSpanExporterConfiguration()           = default;
+  ~OtlpHttpSpanExporterConfiguration() override = default;
 
   void Accept(SpanExporterConfigurationVisitor *visitor) const override
   {
-    visitor->VisitOtlp(this);
+    visitor->VisitOtlpHttp(this);
   }
 
   std::string protocol;

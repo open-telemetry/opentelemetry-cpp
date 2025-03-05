@@ -13,14 +13,14 @@ namespace sdk
 namespace init
 {
 
-class OtlpPushMetricExporterBuilder
+class OtlpGrpcPushMetricExporterBuilder
 {
 public:
-  OtlpPushMetricExporterBuilder()          = default;
-  virtual ~OtlpPushMetricExporterBuilder() = default;
+  OtlpGrpcPushMetricExporterBuilder()          = default;
+  virtual ~OtlpGrpcPushMetricExporterBuilder() = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Build(
-      const opentelemetry::sdk::configuration::OtlpPushMetricExporterConfiguration *model)
+      const opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *model)
       const = 0;
 };
 

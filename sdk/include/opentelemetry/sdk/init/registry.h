@@ -13,7 +13,8 @@ namespace sdk
 {
 namespace init
 {
-class OtlpSpanExporterBuilder;
+class OtlpHttpSpanExporterBuilder;
+class OtlpGrpcSpanExporterBuilder;
 class ConsoleSpanExporterBuilder;
 class ZipkinSpanExporterBuilder;
 class TextMapPropagatorBuilder;
@@ -21,13 +22,15 @@ class ExtensionSamplerBuilder;
 class ExtensionSpanExporterBuilder;
 class ExtensionSpanProcessorBuilder;
 
-class OtlpPushMetricExporterBuilder;
+class OtlpHttpPushMetricExporterBuilder;
+class OtlpGrpcPushMetricExporterBuilder;
 class ConsolePushMetricExporterBuilder;
 class ExtensionPushMetricExporterBuilder;
 class PrometheusPullMetricExporterBuilder;
 class ExtensionPullMetricExporterBuilder;
 
-class OtlpLogRecordExporterBuilder;
+class OtlpHttpLogRecordExporterBuilder;
+class OtlpGrpcLogRecordExporterBuilder;
 class ConsoleLogRecordExporterBuilder;
 class ExtensionLogRecordExporterBuilder;
 class ExtensionLogRecordProcessorBuilder;
@@ -40,14 +43,14 @@ public:
 
   /* Core optional components. */
 
-  const OtlpSpanExporterBuilder *GetOtlpHttpSpanBuilder() { return m_otlp_http_span_builder; }
-  void SetOtlpHttpSpanBuilder(const OtlpSpanExporterBuilder *builder)
+  const OtlpHttpSpanExporterBuilder *GetOtlpHttpSpanBuilder() { return m_otlp_http_span_builder; }
+  void SetOtlpHttpSpanBuilder(const OtlpHttpSpanExporterBuilder *builder)
   {
     m_otlp_http_span_builder = builder;
   }
 
-  const OtlpSpanExporterBuilder *GetOtlpGrpcSpanBuilder() { return m_otlp_grpc_span_builder; }
-  void SetOtlpGrpcSpanBuilder(const OtlpSpanExporterBuilder *builder)
+  const OtlpGrpcSpanExporterBuilder *GetOtlpGrpcSpanBuilder() { return m_otlp_grpc_span_builder; }
+  void SetOtlpGrpcSpanBuilder(const OtlpGrpcSpanExporterBuilder *builder)
   {
     m_otlp_grpc_span_builder = builder;
   }
@@ -64,20 +67,20 @@ public:
     m_zipkin_span_builder = builder;
   }
 
-  const OtlpPushMetricExporterBuilder *GetOtlpHttpPushMetricExporterBuilder()
+  const OtlpHttpPushMetricExporterBuilder *GetOtlpHttpPushMetricExporterBuilder()
   {
     return m_otlp_http_push_metric_builder;
   }
-  void SetOtlpHttpPushMetricExporterBuilder(const OtlpPushMetricExporterBuilder *builder)
+  void SetOtlpHttpPushMetricExporterBuilder(const OtlpHttpPushMetricExporterBuilder *builder)
   {
     m_otlp_http_push_metric_builder = builder;
   }
 
-  const OtlpPushMetricExporterBuilder *GetOtlpGrpcPushMetricExporterBuilder()
+  const OtlpGrpcPushMetricExporterBuilder *GetOtlpGrpcPushMetricExporterBuilder()
   {
     return m_otlp_grpc_push_metric_builder;
   }
-  void SetOtlpGrpcPushMetricExporterBuilder(const OtlpPushMetricExporterBuilder *builder)
+  void SetOtlpGrpcPushMetricExporterBuilder(const OtlpGrpcPushMetricExporterBuilder *builder)
   {
     m_otlp_grpc_push_metric_builder = builder;
   }
@@ -100,20 +103,20 @@ public:
     m_prometheus_metric_builder = builder;
   }
 
-  const OtlpLogRecordExporterBuilder *GetOtlpHttpLogRecordBuilder()
+  const OtlpHttpLogRecordExporterBuilder *GetOtlpHttpLogRecordBuilder()
   {
     return m_otlp_http_log_record_builder;
   }
-  void SetOtlpHttpLogRecordBuilder(const OtlpLogRecordExporterBuilder *builder)
+  void SetOtlpHttpLogRecordBuilder(const OtlpHttpLogRecordExporterBuilder *builder)
   {
     m_otlp_http_log_record_builder = builder;
   }
 
-  const OtlpLogRecordExporterBuilder *GetOtlpGrpcLogRecordBuilder()
+  const OtlpGrpcLogRecordExporterBuilder *GetOtlpGrpcLogRecordBuilder()
   {
     return m_otlp_grpc_log_record_builder;
   }
-  void SetOtlpGrpcLogRecordBuilder(const OtlpLogRecordExporterBuilder *builder)
+  void SetOtlpGrpcLogRecordBuilder(const OtlpGrpcLogRecordExporterBuilder *builder)
   {
     m_otlp_grpc_log_record_builder = builder;
   }
@@ -164,18 +167,18 @@ public:
                                              ExtensionLogRecordProcessorBuilder *builder);
 
 private:
-  const OtlpSpanExporterBuilder *m_otlp_http_span_builder{nullptr};
-  const OtlpSpanExporterBuilder *m_otlp_grpc_span_builder{nullptr};
+  const OtlpHttpSpanExporterBuilder *m_otlp_http_span_builder{nullptr};
+  const OtlpGrpcSpanExporterBuilder *m_otlp_grpc_span_builder{nullptr};
   const ConsoleSpanExporterBuilder *m_console_span_builder{nullptr};
   const ZipkinSpanExporterBuilder *m_zipkin_span_builder{nullptr};
 
-  const OtlpPushMetricExporterBuilder *m_otlp_http_push_metric_builder{nullptr};
-  const OtlpPushMetricExporterBuilder *m_otlp_grpc_push_metric_builder{nullptr};
+  const OtlpHttpPushMetricExporterBuilder *m_otlp_http_push_metric_builder{nullptr};
+  const OtlpGrpcPushMetricExporterBuilder *m_otlp_grpc_push_metric_builder{nullptr};
   const ConsolePushMetricExporterBuilder *m_console_metric_builder{nullptr};
   const PrometheusPullMetricExporterBuilder *m_prometheus_metric_builder{nullptr};
 
-  const OtlpLogRecordExporterBuilder *m_otlp_http_log_record_builder{nullptr};
-  const OtlpLogRecordExporterBuilder *m_otlp_grpc_log_record_builder{nullptr};
+  const OtlpHttpLogRecordExporterBuilder *m_otlp_http_log_record_builder{nullptr};
+  const OtlpGrpcLogRecordExporterBuilder *m_otlp_grpc_log_record_builder{nullptr};
   const ConsoleLogRecordExporterBuilder *m_console_log_record_builder{nullptr};
 
   std::map<std::string, TextMapPropagatorBuilder *> m_propagator_builders;

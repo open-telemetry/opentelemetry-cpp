@@ -46,9 +46,12 @@
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_push_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
@@ -113,10 +116,38 @@ static std::unique_ptr<AttributeLimitsConfiguration> ParseAttributeLimitsConfigu
   return model;
 }
 
-static std::unique_ptr<OtlpLogRecordExporterConfiguration> ParseOtlpLogRecordExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+static std::unique_ptr<OtlpHttpLogRecordExporterConfiguration>
+ParseOtlpHttpLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<OtlpLogRecordExporterConfiguration> model(new OtlpLogRecordExporterConfiguration);
+  std::unique_ptr<OtlpHttpLogRecordExporterConfiguration> model(
+      new OtlpHttpLogRecordExporterConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  model->protocol           = node->GetRequiredString("protocol");
+  model->endpoint           = node->GetRequiredString("endpoint");
+  model->certificate        = node->GetString("certificate", "");
+  model->client_key         = node->GetString("client_key", "");
+  model->client_certificate = node->GetString("client_certificate", "");
+
+  child = node->GetChildNode("headers");
+  if (child)
+  {
+    model->headers = ParseHeadersConfiguration(child);
+  }
+
+  model->headers_list = node->GetString("headers_list", "");
+  model->compression  = node->GetString("compression", "");
+  model->timeout      = node->GetInteger("timeout", 10000);
+  model->insecure     = node->GetBoolean("insecure", false);
+
+  return model;
+}
+
+static std::unique_ptr<OtlpGrpcLogRecordExporterConfiguration>
+ParseOtlpGrpcLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<OtlpGrpcLogRecordExporterConfiguration> model(
+      new OtlpGrpcLogRecordExporterConfiguration);
   std::unique_ptr<DocumentNode> child;
 
   model->protocol           = node->GetRequiredString("protocol");
@@ -181,9 +212,13 @@ static std::unique_ptr<LogRecordExporterConfiguration> ParseLogRecordExporterCon
     throw InvalidSchemaException("Illegal span exporter");
   }
 
-  if (name == "otlp")
+  if (name == "otlp_http")
   {
-    model = ParseOtlpLogRecordExporterConfiguration(child);
+    model = ParseOtlpHttpLogRecordExporterConfiguration(child);
+  }
+  else if (name == "otlp_grpc")
+  {
+    model = ParseOtlpGrpcLogRecordExporterConfiguration(child);
   }
   else if (name == "console")
   {
@@ -333,11 +368,44 @@ static enum_default_histogram_aggregation ParseDefaultHistogramAggregation(const
   throw InvalidSchemaException("Illegal default_histogram_aggregation");
 }
 
-static std::unique_ptr<OtlpPushMetricExporterConfiguration>
-ParseOtlpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
+static std::unique_ptr<OtlpHttpPushMetricExporterConfiguration>
+ParseOtlpHttpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<OtlpPushMetricExporterConfiguration> model(
-      new OtlpPushMetricExporterConfiguration);
+  std::unique_ptr<OtlpHttpPushMetricExporterConfiguration> model(
+      new OtlpHttpPushMetricExporterConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  model->protocol           = node->GetRequiredString("protocol");
+  model->endpoint           = node->GetRequiredString("endpoint");
+  model->certificate        = node->GetString("certificate", "");
+  model->client_key         = node->GetString("client_key", "");
+  model->client_certificate = node->GetString("client_certificate", "");
+
+  child = node->GetChildNode("headers");
+  if (child)
+  {
+    model->headers = ParseHeadersConfiguration(child);
+  }
+
+  model->headers_list           = node->GetString("headers_list", "");
+  model->compression            = node->GetString("compression", "");
+  model->timeout                = node->GetInteger("timeout", 10000);
+  model->temporality_preference = node->GetString("temporality_preference", "");
+
+  std::string default_histogram_aggregation = node->GetString("default_histogram_aggregation", "");
+  model->default_histogram_aggregation =
+      ParseDefaultHistogramAggregation(default_histogram_aggregation);
+
+  model->insecure = node->GetBoolean("insecure", false);
+
+  return model;
+}
+
+static std::unique_ptr<OtlpGrpcPushMetricExporterConfiguration>
+ParseOtlpGrpcPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<OtlpGrpcPushMetricExporterConfiguration> model(
+      new OtlpGrpcPushMetricExporterConfiguration);
   std::unique_ptr<DocumentNode> child;
 
   model->protocol           = node->GetRequiredString("protocol");
@@ -434,9 +502,13 @@ static std::unique_ptr<PushMetricExporterConfiguration> ParsePushMetricExporterC
     throw InvalidSchemaException("Illegal metric exporter");
   }
 
-  if (name == "otlp")
+  if (name == "otlp_http")
   {
-    model = ParseOtlpPushMetricExporterConfiguration(child);
+    model = ParseOtlpHttpPushMetricExporterConfiguration(child);
+  }
+  else if (name == "otlp_grpc")
+  {
+    model = ParseOtlpGrpcPushMetricExporterConfiguration(child);
   }
   else if (name == "console")
   {
@@ -1001,10 +1073,36 @@ static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
   return model;
 }
 
-static std::unique_ptr<OtlpSpanExporterConfiguration> ParseOtlpSpanExporterConfiguration(
+static std::unique_ptr<OtlpHttpSpanExporterConfiguration> ParseOtlpHttpSpanExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<OtlpSpanExporterConfiguration> model(new OtlpSpanExporterConfiguration);
+  std::unique_ptr<OtlpHttpSpanExporterConfiguration> model(new OtlpHttpSpanExporterConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  model->protocol           = node->GetRequiredString("protocol");
+  model->endpoint           = node->GetRequiredString("endpoint");
+  model->certificate        = node->GetString("certificate", "");
+  model->client_key         = node->GetString("client_key", "");
+  model->client_certificate = node->GetString("client_certificate", "");
+
+  child = node->GetChildNode("headers");
+  if (child)
+  {
+    model->headers = ParseHeadersConfiguration(child);
+  }
+
+  model->headers_list = node->GetString("headers_list", "");
+  model->compression  = node->GetString("compression", "");
+  model->timeout      = node->GetInteger("timeout", 10000);
+  model->insecure     = node->GetBoolean("insecure", false);
+
+  return model;
+}
+
+static std::unique_ptr<OtlpGrpcSpanExporterConfiguration> ParseOtlpGrpcSpanExporterConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<OtlpGrpcSpanExporterConfiguration> model(new OtlpGrpcSpanExporterConfiguration);
   std::unique_ptr<DocumentNode> child;
 
   model->protocol           = node->GetRequiredString("protocol");
@@ -1078,9 +1176,13 @@ static std::unique_ptr<SpanExporterConfiguration> ParseSpanExporterConfiguration
     throw InvalidSchemaException("Illegal span exporter");
   }
 
-  if (name == "otlp")
+  if (name == "otlp_http")
   {
-    model = ParseOtlpSpanExporterConfiguration(child);
+    model = ParseOtlpHttpSpanExporterConfiguration(child);
+  }
+  else if (name == "otlp_grpc")
+  {
+    model = ParseOtlpGrpcSpanExporterConfiguration(child);
   }
   else if (name == "console")
   {

@@ -51,6 +51,7 @@ public:
 
   std::string file_format;
   bool disabled{false};
+  std::string log_level;
 
   std::unique_ptr<AttributeLimitsConfiguration> attribute_limits;
   std::unique_ptr<LoggerProviderConfiguration> logger_provider;

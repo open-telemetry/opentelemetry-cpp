@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include "opentelemetry/sdk/configuration/otlp_push_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/init/otlp_push_metric_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/init/otlp_http_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/version.h"
@@ -18,7 +18,7 @@ namespace otlp
 {
 
 class OPENTELEMETRY_EXPORT OtlpHttpPushMetricBuilder
-    : public opentelemetry::sdk::init::OtlpPushMetricExporterBuilder
+    : public opentelemetry::sdk::init::OtlpHttpPushMetricExporterBuilder
 {
 public:
   static void Register(opentelemetry::sdk::init::Registry *registry);
@@ -27,7 +27,7 @@ public:
   ~OtlpHttpPushMetricBuilder() override = default;
 
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Build(
-      const opentelemetry::sdk::configuration::OtlpPushMetricExporterConfiguration *model)
+      const opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *model)
       const override;
 };
 

@@ -20,7 +20,7 @@ void OtlpGrpcPushMetricBuilder::Register(opentelemetry::sdk::init::Registry *reg
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpGrpcPushMetricBuilder::Build(
-    const opentelemetry::sdk::configuration::OtlpPushMetricExporterConfiguration * /* model */)
+    const opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration * /* model */)
     const
 {
   // FIXME, use model

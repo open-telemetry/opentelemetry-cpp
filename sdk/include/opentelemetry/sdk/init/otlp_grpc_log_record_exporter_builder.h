@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/configuration/otlp_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/version.h"
 
@@ -13,14 +13,15 @@ namespace sdk
 namespace init
 {
 
-class OtlpLogRecordExporterBuilder
+class OtlpGrpcLogRecordExporterBuilder
 {
 public:
-  OtlpLogRecordExporterBuilder()          = default;
-  virtual ~OtlpLogRecordExporterBuilder() = default;
+  OtlpGrpcLogRecordExporterBuilder()          = default;
+  virtual ~OtlpGrpcLogRecordExporterBuilder() = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Build(
-      const opentelemetry::sdk::configuration::OtlpLogRecordExporterConfiguration *model) const = 0;
+      const opentelemetry::sdk::configuration::OtlpGrpcLogRecordExporterConfiguration *model)
+      const = 0;
 };
 
 }  // namespace init

@@ -11,7 +11,8 @@ namespace sdk
 namespace configuration
 {
 
-class OtlpSpanExporterConfiguration;
+class OtlpHttpSpanExporterConfiguration;
+class OtlpGrpcSpanExporterConfiguration;
 class ConsoleSpanExporterConfiguration;
 class ZipkinSpanExporterConfiguration;
 class ExtensionSpanExporterConfiguration;
@@ -22,7 +23,8 @@ public:
   SpanExporterConfigurationVisitor()          = default;
   virtual ~SpanExporterConfigurationVisitor() = default;
 
-  virtual void VisitOtlp(const OtlpSpanExporterConfiguration *model)           = 0;
+  virtual void VisitOtlpHttp(const OtlpHttpSpanExporterConfiguration *model)   = 0;
+  virtual void VisitOtlpGrpc(const OtlpGrpcSpanExporterConfiguration *model)   = 0;
   virtual void VisitConsole(const ConsoleSpanExporterConfiguration *model)     = 0;
   virtual void VisitZipkin(const ZipkinSpanExporterConfiguration *model)       = 0;
   virtual void VisitExtension(const ExtensionSpanExporterConfiguration *model) = 0;

@@ -11,7 +11,8 @@ namespace sdk
 namespace configuration
 {
 
-class OtlpLogRecordExporterConfiguration;
+class OtlpHttpLogRecordExporterConfiguration;
+class OtlpGrpcLogRecordExporterConfiguration;
 class ConsoleLogRecordExporterConfiguration;
 class ExtensionLogRecordExporterConfiguration;
 
@@ -21,7 +22,8 @@ public:
   LogRecordExporterConfigurationVisitor()          = default;
   virtual ~LogRecordExporterConfigurationVisitor() = default;
 
-  virtual void VisitOtlp(const OtlpLogRecordExporterConfiguration *model)           = 0;
+  virtual void VisitOtlpHttp(const OtlpHttpLogRecordExporterConfiguration *model)   = 0;
+  virtual void VisitOtlpGrpc(const OtlpGrpcLogRecordExporterConfiguration *model)   = 0;
   virtual void VisitConsole(const ConsoleLogRecordExporterConfiguration *model)     = 0;
   virtual void VisitExtension(const ExtensionLogRecordExporterConfiguration *model) = 0;
 };

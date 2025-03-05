@@ -4,8 +4,8 @@
 #pragma once
 
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
-#include "opentelemetry/sdk/configuration/log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/log_record_exporter_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/span_exporter_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -15,16 +15,16 @@ namespace configuration
 {
 
 // YAML-SCHEMA: schema/common.json
-// YAML-NODE: Otlp
-class OtlpLogRecordExporterConfiguration : public LogRecordExporterConfiguration
+// YAML-NODE: OtlpGrpcExporter
+class OtlpGrpcSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:
-  OtlpLogRecordExporterConfiguration()           = default;
-  ~OtlpLogRecordExporterConfiguration() override = default;
+  OtlpGrpcSpanExporterConfiguration()           = default;
+  ~OtlpGrpcSpanExporterConfiguration() override = default;
 
-  void Accept(LogRecordExporterConfigurationVisitor *visitor) const override
+  void Accept(SpanExporterConfigurationVisitor *visitor) const override
   {
-    visitor->VisitOtlp(this);
+    visitor->VisitOtlpGrpc(this);
   }
 
   std::string protocol;

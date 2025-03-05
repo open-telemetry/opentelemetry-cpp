@@ -20,7 +20,8 @@ void OtlpHttpLogRecordBuilder::Register(opentelemetry::sdk::init::Registry *regi
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> OtlpHttpLogRecordBuilder::Build(
-    const opentelemetry::sdk::configuration::OtlpLogRecordExporterConfiguration * /* model */) const
+    const opentelemetry::sdk::configuration::OtlpHttpLogRecordExporterConfiguration * /* model */)
+    const
 {
   // FIXME, use model
   OtlpHttpLogRecordExporterOptions options;

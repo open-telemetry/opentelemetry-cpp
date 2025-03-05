@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/version.h"
 
@@ -13,14 +13,14 @@ namespace sdk
 namespace init
 {
 
-class OtlpSpanExporterBuilder
+class OtlpHttpSpanExporterBuilder
 {
 public:
-  OtlpSpanExporterBuilder()          = default;
-  virtual ~OtlpSpanExporterBuilder() = default;
+  OtlpHttpSpanExporterBuilder()          = default;
+  virtual ~OtlpHttpSpanExporterBuilder() = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
-      const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model) const = 0;
+      const opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *model) const = 0;
 };
 
 }  // namespace init

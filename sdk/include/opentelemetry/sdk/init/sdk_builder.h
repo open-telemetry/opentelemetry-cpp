@@ -14,9 +14,12 @@
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_push_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
@@ -71,8 +74,11 @@ public:
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateSampler(
       const std::unique_ptr<opentelemetry::sdk::configuration::SamplerConfiguration> &model) const;
 
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpSpanExporter(
-      const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model) const;
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpHttpSpanExporter(
+      const opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpGrpcSpanExporter(
+      const opentelemetry::sdk::configuration::OtlpGrpcSpanExporterConfiguration *model) const;
 
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateConsoleSpanExporter(
       const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) const;
@@ -111,8 +117,13 @@ public:
       const std::unique_ptr<opentelemetry::sdk::configuration::PropagatorConfiguration> &model)
       const;
 
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> CreateOtlpPushMetricExporter(
-      const opentelemetry::sdk::configuration::OtlpPushMetricExporterConfiguration *model) const;
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> CreateOtlpHttpPushMetricExporter(
+      const opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *model)
+      const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> CreateOtlpGrpcPushMetricExporter(
+      const opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *model)
+      const;
 
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> CreateConsolePushMetricExporter(
       const opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration *model) const;
@@ -156,8 +167,11 @@ public:
       const std::unique_ptr<opentelemetry::sdk::configuration::MeterProviderConfiguration> &model,
       const opentelemetry::sdk::resource::Resource &resource) const;
 
-  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CreateOtlpLogRecordExporter(
-      const opentelemetry::sdk::configuration::OtlpLogRecordExporterConfiguration *model) const;
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CreateOtlpHttpLogRecordExporter(
+      const opentelemetry::sdk::configuration::OtlpHttpLogRecordExporterConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CreateOtlpGrpcLogRecordExporter(
+      const opentelemetry::sdk::configuration::OtlpGrpcLogRecordExporterConfiguration *model) const;
 
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CreateConsoleLogRecordExporter(
       const opentelemetry::sdk::configuration::ConsoleLogRecordExporterConfiguration *model) const;

@@ -20,7 +20,7 @@ void OtlpGrpcSpanBuilder::Register(opentelemetry::sdk::init::Registry *registry)
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcSpanBuilder::Build(
-    const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration * /* model */) const
+    const opentelemetry::sdk::configuration::OtlpGrpcSpanExporterConfiguration * /* model */) const
 {
   // FIXME, use model
   OtlpGrpcExporterOptions options;

@@ -38,9 +38,12 @@
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration_visitor.h"
-#include "opentelemetry/sdk/configuration/otlp_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_push_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
@@ -76,9 +79,12 @@
 #include "opentelemetry/sdk/init/extension_sampler_builder.h"
 #include "opentelemetry/sdk/init/extension_span_exporter_builder.h"
 #include "opentelemetry/sdk/init/extension_span_processor_builder.h"
-#include "opentelemetry/sdk/init/otlp_log_record_exporter_builder.h"
-#include "opentelemetry/sdk/init/otlp_push_metric_exporter_builder.h"
-#include "opentelemetry/sdk/init/otlp_span_exporter_builder.h"
+#include "opentelemetry/sdk/init/otlp_grpc_log_record_exporter_builder.h"
+#include "opentelemetry/sdk/init/otlp_grpc_push_metric_exporter_builder.h"
+#include "opentelemetry/sdk/init/otlp_grpc_span_exporter_builder.h"
+#include "opentelemetry/sdk/init/otlp_http_log_record_exporter_builder.h"
+#include "opentelemetry/sdk/init/otlp_http_push_metric_exporter_builder.h"
+#include "opentelemetry/sdk/init/otlp_http_span_exporter_builder.h"
 #include "opentelemetry/sdk/init/prometheus_pull_metric_exporter_builder.h"
 #include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/init/sdk_builder.h"
@@ -216,10 +222,16 @@ public:
   SpanExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
   ~SpanExporterBuilder() override = default;
 
-  void VisitOtlp(
-      const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model) override
+  void VisitOtlpHttp(
+      const opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *model) override
   {
-    exporter = m_sdk_builder->CreateOtlpSpanExporter(model);
+    exporter = m_sdk_builder->CreateOtlpHttpSpanExporter(model);
+  }
+
+  void VisitOtlpGrpc(
+      const opentelemetry::sdk::configuration::OtlpGrpcSpanExporterConfiguration *model) override
+  {
+    exporter = m_sdk_builder->CreateOtlpGrpcSpanExporter(model);
   }
 
   void VisitConsole(
@@ -278,10 +290,18 @@ public:
   PushMetricExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
   ~PushMetricExporterBuilder() override = default;
 
-  void VisitOtlp(
-      const opentelemetry::sdk::configuration::OtlpPushMetricExporterConfiguration *model) override
+  void VisitOtlpHttp(
+      const opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *model)
+      override
   {
-    exporter = m_sdk_builder->CreateOtlpPushMetricExporter(model);
+    exporter = m_sdk_builder->CreateOtlpHttpPushMetricExporter(model);
+  }
+
+  void VisitOtlpGrpc(
+      const opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *model)
+      override
+  {
+    exporter = m_sdk_builder->CreateOtlpGrpcPushMetricExporter(model);
   }
 
   void VisitConsole(const opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration
@@ -369,10 +389,16 @@ public:
   LogRecordExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
   ~LogRecordExporterBuilder() override = default;
 
-  void VisitOtlp(
-      const opentelemetry::sdk::configuration::OtlpLogRecordExporterConfiguration *model) override
+  void VisitOtlpHttp(const opentelemetry::sdk::configuration::OtlpHttpLogRecordExporterConfiguration
+                         *model) override
   {
-    exporter = m_sdk_builder->CreateOtlpLogRecordExporter(model);
+    exporter = m_sdk_builder->CreateOtlpHttpLogRecordExporter(model);
+  }
+
+  void VisitOtlpGrpc(const opentelemetry::sdk::configuration::OtlpGrpcLogRecordExporterConfiguration
+                         *model) override
+  {
+    exporter = m_sdk_builder->CreateOtlpGrpcLogRecordExporter(model);
   }
 
   void VisitConsole(const opentelemetry::sdk::configuration::ConsoleLogRecordExporterConfiguration
@@ -489,48 +515,42 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateSampler(
   return sdk;
 }
 
-std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpSpanExporter(
-    const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model) const
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpHttpSpanExporter(
+    const opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
-  const OtlpSpanExporterBuilder *builder;
+  const OtlpHttpSpanExporterBuilder *builder;
 
-  if (model->protocol.find("http/") == 0)
+  builder = m_registry->GetOtlpHttpSpanBuilder();
+  if (builder != nullptr)
   {
-    builder = m_registry->GetOtlpHttpSpanBuilder();
-    if (builder != nullptr)
-    {
-      OTEL_INTERNAL_LOG_DEBUG("CreateOtlpSpanExporter() using registered http builder");
-      sdk = builder->Build(model);
-      return sdk;
-    }
-
-    std::string die("No http builder for OtlpSpanExporter");
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpSpanExporter() using registered http builder");
+    sdk = builder->Build(model);
+    return sdk;
   }
 
-  if (model->protocol.find("grpc/") == 0)
-  {
-    builder = m_registry->GetOtlpGrpcSpanBuilder();
-    if (builder != nullptr)
-    {
-      OTEL_INTERNAL_LOG_DEBUG("CreateOtlpSpanExporter() using registered grpc builder");
-      sdk = builder->Build(model);
-      return sdk;
-    }
-
-    std::string die("No builder for OtlpSpanExporter");
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
-  }
-
-  std::string die("OtlpSpanExporter: illegal protocol: ");
-  die.append(model->protocol);
+  std::string die("No http builder for OtlpHttpSpanExporter");
   OTEL_INTERNAL_LOG_ERROR(die);
   throw UnsupportedException(die);
+}
 
-  return sdk;
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpGrpcSpanExporter(
+    const opentelemetry::sdk::configuration::OtlpGrpcSpanExporterConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
+  const OtlpGrpcSpanExporterBuilder *builder;
+
+  builder = m_registry->GetOtlpGrpcSpanBuilder();
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpSpanExporter() using registered grpc builder");
+    sdk = builder->Build(model);
+    return sdk;
+  }
+
+  std::string die("No builder for OtlpGrpcSpanExporter");
+  OTEL_INTERNAL_LOG_ERROR(die);
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateConsoleSpanExporter(
@@ -783,48 +803,43 @@ static opentelemetry::sdk::metrics::InstrumentType ConvertInstrumentType(
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
-SdkBuilder::CreateOtlpPushMetricExporter(
-    const opentelemetry::sdk::configuration::OtlpPushMetricExporterConfiguration *model) const
+SdkBuilder::CreateOtlpHttpPushMetricExporter(
+    const opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
-  const OtlpPushMetricExporterBuilder *builder;
+  const OtlpHttpPushMetricExporterBuilder *builder;
 
-  if (model->protocol.find("http/") == 0)
+  builder = m_registry->GetOtlpHttpPushMetricExporterBuilder();
+  if (builder != nullptr)
   {
-    builder = m_registry->GetOtlpHttpPushMetricExporterBuilder();
-    if (builder != nullptr)
-    {
-      OTEL_INTERNAL_LOG_DEBUG("CreateOtlpPushMetricExporter() using registered http builder");
-      sdk = builder->Build(model);
-      return sdk;
-    }
-
-    std::string die("No http builder for OtlpPushMetricExporter");
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpPushMetricExporter() using registered http builder");
+    sdk = builder->Build(model);
+    return sdk;
   }
 
-  if (model->protocol.find("grpc/") == 0)
-  {
-    builder = m_registry->GetOtlpGrpcPushMetricExporterBuilder();
-    if (builder != nullptr)
-    {
-      OTEL_INTERNAL_LOG_DEBUG("CreateOtlpPushMetricExporter() using registered grpc builder");
-      sdk = builder->Build(model);
-      return sdk;
-    }
-
-    std::string die("No grpc builder for OtlpPushMetricExporter");
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
-  }
-
-  std::string die("OtlpPushMetricExporter: illegal protocol: ");
-  die.append(model->protocol);
+  std::string die("No http builder for OtlpPushMetricExporter");
   OTEL_INTERNAL_LOG_ERROR(die);
   throw UnsupportedException(die);
+}
 
-  return sdk;
+std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
+SdkBuilder::CreateOtlpGrpcPushMetricExporter(
+    const opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
+  const OtlpGrpcPushMetricExporterBuilder *builder;
+
+  builder = m_registry->GetOtlpGrpcPushMetricExporterBuilder();
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpPushMetricExporter() using registered grpc builder");
+    sdk = builder->Build(model);
+    return sdk;
+  }
+
+  std::string die("No grpc builder for OtlpPushMetricExporter");
+  OTEL_INTERNAL_LOG_ERROR(die);
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
@@ -1070,49 +1085,44 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMe
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
-SdkBuilder::CreateOtlpLogRecordExporter(
-    const opentelemetry::sdk::configuration::OtlpLogRecordExporterConfiguration *model) const
+SdkBuilder::CreateOtlpHttpLogRecordExporter(
+    const opentelemetry::sdk::configuration::OtlpHttpLogRecordExporterConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> sdk;
-  const OtlpLogRecordExporterBuilder *builder;
+  const OtlpHttpLogRecordExporterBuilder *builder;
 
-  if (model->protocol.find("http/") == 0)
+  builder = m_registry->GetOtlpHttpLogRecordBuilder();
+  if (builder != nullptr)
   {
-    builder = m_registry->GetOtlpHttpLogRecordBuilder();
-    if (builder != nullptr)
-    {
-      OTEL_INTERNAL_LOG_DEBUG("CreateOtlpLogRecordExporter() using registered http builder");
-      sdk = builder->Build(model);
-      return sdk;
-    }
-
-    std::string die("No http builder for OtlpLogRecordExporter");
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpLogRecordExporter() using registered http builder");
+    sdk = builder->Build(model);
+    return sdk;
   }
 
-  if (model->protocol.find("grpc/") == 0)
-  {
-    builder = m_registry->GetOtlpGrpcLogRecordBuilder();
-    if (builder != nullptr)
-    {
-      builder = m_registry->GetOtlpGrpcLogRecordBuilder();
-      OTEL_INTERNAL_LOG_DEBUG("CreateOtlpLogRecordExporter() using registered grpc builder");
-      sdk = builder->Build(model);
-      return sdk;
-    }
-
-    std::string die("No grpc builder for OtlpLogRecordExporter");
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
-  }
-
-  std::string die("OtlpLogRecordExporter: illegal protocol: ");
-  die.append(model->protocol);
+  std::string die("No http builder for OtlpLogRecordExporter");
   OTEL_INTERNAL_LOG_ERROR(die);
   throw UnsupportedException(die);
+}
 
-  return sdk;
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
+SdkBuilder::CreateOtlpGrpcLogRecordExporter(
+    const opentelemetry::sdk::configuration::OtlpGrpcLogRecordExporterConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> sdk;
+  const OtlpGrpcLogRecordExporterBuilder *builder;
+
+  builder = m_registry->GetOtlpGrpcLogRecordBuilder();
+  if (builder != nullptr)
+  {
+    builder = m_registry->GetOtlpGrpcLogRecordBuilder();
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpLogRecordExporter() using registered grpc builder");
+    sdk = builder->Build(model);
+    return sdk;
+  }
+
+  std::string die("No grpc builder for OtlpLogRecordExporter");
+  OTEL_INTERNAL_LOG_ERROR(die);
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
