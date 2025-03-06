@@ -25,8 +25,7 @@ namespace gen_ai
  * @deprecated
  * Removed, no replacement at this time.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kGenAiCompletion = "gen_ai.completion";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiCompletion = "gen_ai.completion";
 
 /**
  * The response format that is requested.
@@ -40,8 +39,8 @@ static constexpr const char *kGenAiOpenaiRequestResponseFormat =
  * @deprecated
  * Replaced by @code gen_ai.request.seed @endcode attribute.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kGenAiOpenaiRequestSeed = "gen_ai.openai.request.seed";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiOpenaiRequestSeed =
+    "gen_ai.openai.request.seed";
 
 /**
  * The service tier requested. May be a specific tier, default, or auto.
@@ -76,8 +75,7 @@ static constexpr const char *kGenAiOperationName = "gen_ai.operation.name";
  * @deprecated
  * Removed, no replacement at this time.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kGenAiPrompt = "gen_ai.prompt";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiPrompt = "gen_ai.prompt";
 
 /**
  * The encoding formats requested in an embeddings operation, if specified.
@@ -173,8 +171,8 @@ static constexpr const char *kGenAiTokenType = "gen_ai.token.type";
  * @deprecated
  * Replaced by @code gen_ai.usage.output_tokens @endcode attribute.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kGenAiUsageCompletionTokens = "gen_ai.usage.completion_tokens";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiUsageCompletionTokens =
+    "gen_ai.usage.completion_tokens";
 
 /**
  * The number of tokens used in the GenAI input (prompt).
@@ -192,8 +190,8 @@ static constexpr const char *kGenAiUsageOutputTokens = "gen_ai.usage.output_toke
  * @deprecated
  * Replaced by @code gen_ai.usage.input_tokens @endcode attribute.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kGenAiUsagePromptTokens = "gen_ai.usage.prompt_tokens";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiUsagePromptTokens =
+    "gen_ai.usage.prompt_tokens";
 
 namespace GenAiOpenaiRequestResponseFormatValues
 {

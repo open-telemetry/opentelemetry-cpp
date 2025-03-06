@@ -90,6 +90,7 @@ private:
   nostd::shared_ptr<Logger> logger_;
 };
 
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
 class NoopEventLogger final : public EventLogger
 {
 public:
@@ -124,6 +125,7 @@ public:
 private:
   nostd::shared_ptr<EventLogger> event_logger_;
 };
+#endif
 
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE

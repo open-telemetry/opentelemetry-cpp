@@ -25,8 +25,7 @@ namespace event
  * @deprecated
  * Replaced by EventName top-level field on the LogRecord
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kEventName = "event.name";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kEventName = "event.name";
 
 }  // namespace event
 }  // namespace semconv

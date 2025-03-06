@@ -25,8 +25,8 @@ namespace deployment
  * @deprecated
  * Deprecated, use @code deployment.environment.name @endcode instead.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kDeploymentEnvironment = "deployment.environment";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kDeploymentEnvironment =
+    "deployment.environment";
 
 /**
  * Name of the <a href="https://wikipedia.org/wiki/Deployment_environment">deployment
