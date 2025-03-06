@@ -29,6 +29,7 @@
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/drop_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/exporter_default_histogram_aggregation.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
@@ -89,16 +90,24 @@ static std::unique_ptr<HeadersConfiguration> ParseHeadersConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
   std::unique_ptr<HeadersConfiguration> model(new HeadersConfiguration);
+  std::unique_ptr<DocumentNode> kv_pair;
+  std::unique_ptr<DocumentNode> name_child;
+  std::unique_ptr<DocumentNode> value_child;
+  std::string name;
+  std::string value;
 
-  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  for (auto it = node->begin(); it != node->end(); ++it)
   {
-    std::string name                    = it.Name();
-    std::unique_ptr<DocumentNode> child = it.Value();
-    std::string string_value            = child->AsString();
+    kv_pair = *it;
 
-    OTEL_INTERNAL_LOG_DEBUG("ParseHeadersConfiguration() name = " << name
-                                                                  << ", value = " << string_value);
-    std::pair<std::string, std::string> entry(name, string_value);
+    name_child  = kv_pair->GetRequiredChildNode("name");
+    value_child = kv_pair->GetRequiredChildNode("value");
+
+    name  = name_child->AsString();
+    value = value_child->AsString();
+
+    OTEL_INTERNAL_LOG_DEBUG("ParseHeadersConfiguration() name = " << name << ", value = " << value);
+    std::pair<std::string, std::string> entry(name, value);
     model->kv_map.insert(entry);
   }
 
@@ -123,11 +132,10 @@ ParseOtlpHttpLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> 
       new OtlpHttpLogRecordExporterConfiguration);
   std::unique_ptr<DocumentNode> child;
 
-  model->protocol           = node->GetRequiredString("protocol");
-  model->endpoint           = node->GetRequiredString("endpoint");
-  model->certificate        = node->GetString("certificate", "");
-  model->client_key         = node->GetString("client_key", "");
-  model->client_certificate = node->GetString("client_certificate", "");
+  model->endpoint                = node->GetRequiredString("endpoint");
+  model->certificate_file        = node->GetString("certificate_file", "");
+  model->client_key_file         = node->GetString("client_key_file", "");
+  model->client_certificate_file = node->GetString("client_certificate_file", "");
 
   child = node->GetChildNode("headers");
   if (child)
@@ -138,7 +146,7 @@ ParseOtlpHttpLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
-  model->insecure     = node->GetBoolean("insecure", false);
+  // FIXME: encoding
 
   return model;
 }
@@ -150,11 +158,10 @@ ParseOtlpGrpcLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> 
       new OtlpGrpcLogRecordExporterConfiguration);
   std::unique_ptr<DocumentNode> child;
 
-  model->protocol           = node->GetRequiredString("protocol");
-  model->endpoint           = node->GetRequiredString("endpoint");
-  model->certificate        = node->GetString("certificate", "");
-  model->client_key         = node->GetString("client_key", "");
-  model->client_certificate = node->GetString("client_certificate", "");
+  model->endpoint                = node->GetRequiredString("endpoint");
+  model->certificate_file        = node->GetString("certificate_file", "");
+  model->client_key_file         = node->GetString("client_key_file", "");
+  model->client_certificate_file = node->GetString("client_certificate_file", "");
 
   child = node->GetChildNode("headers");
   if (child)
@@ -375,11 +382,10 @@ ParseOtlpHttpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
       new OtlpHttpPushMetricExporterConfiguration);
   std::unique_ptr<DocumentNode> child;
 
-  model->protocol           = node->GetRequiredString("protocol");
-  model->endpoint           = node->GetRequiredString("endpoint");
-  model->certificate        = node->GetString("certificate", "");
-  model->client_key         = node->GetString("client_key", "");
-  model->client_certificate = node->GetString("client_certificate", "");
+  model->endpoint                = node->GetRequiredString("endpoint");
+  model->certificate_file        = node->GetString("certificate_file", "");
+  model->client_key_file         = node->GetString("client_key_file", "");
+  model->client_certificate_file = node->GetString("client_certificate_file", "");
 
   child = node->GetChildNode("headers");
   if (child)
@@ -396,8 +402,6 @@ ParseOtlpHttpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(default_histogram_aggregation);
 
-  model->insecure = node->GetBoolean("insecure", false);
-
   return model;
 }
 
@@ -408,11 +412,10 @@ ParseOtlpGrpcPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
       new OtlpGrpcPushMetricExporterConfiguration);
   std::unique_ptr<DocumentNode> child;
 
-  model->protocol           = node->GetRequiredString("protocol");
-  model->endpoint           = node->GetRequiredString("endpoint");
-  model->certificate        = node->GetString("certificate", "");
-  model->client_key         = node->GetString("client_key", "");
-  model->client_certificate = node->GetString("client_certificate", "");
+  model->endpoint                = node->GetRequiredString("endpoint");
+  model->certificate_file        = node->GetString("certificate_file", "");
+  model->client_key_file         = node->GetString("client_key_file", "");
+  model->client_certificate_file = node->GetString("client_certificate_file", "");
 
   child = node->GetChildNode("headers");
   if (child)
@@ -817,6 +820,10 @@ static std::unique_ptr<StreamConfiguration> ParseStreamConfiguration(
 
   if (child)
   {
+    OTEL_INTERNAL_LOG_ERROR("ParseStreamConfiguration: FIXME");
+
+    // Schema has changed
+#ifdef NEVER
     for (auto it = child->begin(); it != child->end(); ++it)
     {
       std::unique_ptr<DocumentNode> attribute_key(*it);
@@ -825,6 +832,7 @@ static std::unique_ptr<StreamConfiguration> ParseStreamConfiguration(
 
       model->attribute_keys.push_back(name);
     }
+#endif
   }
 
   return model;
@@ -1079,11 +1087,10 @@ static std::unique_ptr<OtlpHttpSpanExporterConfiguration> ParseOtlpHttpSpanExpor
   std::unique_ptr<OtlpHttpSpanExporterConfiguration> model(new OtlpHttpSpanExporterConfiguration);
   std::unique_ptr<DocumentNode> child;
 
-  model->protocol           = node->GetRequiredString("protocol");
-  model->endpoint           = node->GetRequiredString("endpoint");
-  model->certificate        = node->GetString("certificate", "");
-  model->client_key         = node->GetString("client_key", "");
-  model->client_certificate = node->GetString("client_certificate", "");
+  model->endpoint                = node->GetRequiredString("endpoint");
+  model->certificate_file        = node->GetString("certificate_file", "");
+  model->client_key_file         = node->GetString("client_key_file", "");
+  model->client_certificate_file = node->GetString("client_certificate_file", "");
 
   child = node->GetChildNode("headers");
   if (child)
@@ -1094,7 +1101,6 @@ static std::unique_ptr<OtlpHttpSpanExporterConfiguration> ParseOtlpHttpSpanExpor
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
-  model->insecure     = node->GetBoolean("insecure", false);
 
   return model;
 }
@@ -1105,11 +1111,10 @@ static std::unique_ptr<OtlpGrpcSpanExporterConfiguration> ParseOtlpGrpcSpanExpor
   std::unique_ptr<OtlpGrpcSpanExporterConfiguration> model(new OtlpGrpcSpanExporterConfiguration);
   std::unique_ptr<DocumentNode> child;
 
-  model->protocol           = node->GetRequiredString("protocol");
-  model->endpoint           = node->GetRequiredString("endpoint");
-  model->certificate        = node->GetString("certificate", "");
-  model->client_key         = node->GetString("client_key", "");
-  model->client_certificate = node->GetString("client_certificate", "");
+  model->endpoint                = node->GetRequiredString("endpoint");
+  model->certificate_file        = node->GetString("certificate_file", "");
+  model->client_key_file         = node->GetString("client_key_file", "");
+  model->client_certificate_file = node->GetString("client_certificate_file", "");
 
   child = node->GetChildNode("headers");
   if (child)
@@ -1319,6 +1324,10 @@ static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
   std::unique_ptr<AttributesConfiguration> model(new AttributesConfiguration);
   std::unique_ptr<DocumentNode> child;
 
+  OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME");
+
+  // Schema has changed
+#ifdef NEVER
   for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
   {
     std::string name                    = it.Name();
@@ -1331,6 +1340,7 @@ static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
     std::pair<std::string, std::string> entry(name, string_value);
     model->kv_map.insert(entry);
   }
+#endif
 
   return model;
 }

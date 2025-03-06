@@ -13,13 +13,16 @@
 #include "opentelemetry/sdk/configuration/ryml_document_node.h"
 #include "opentelemetry/version.h"
 
+// Local debug, do not use in production
+// #define WITH_DEBUG_NODE
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace configuration
 {
 
-#if 0
+#ifdef WITH_DEBUG_NODE
 static void DebugNode(opentelemetry::nostd::string_view name, ryml::ConstNodeRef node)
 {
   OTEL_INTERNAL_LOG_DEBUG("Processing: " << name);
@@ -42,7 +45,7 @@ static void DebugNode(opentelemetry::nostd::string_view name, ryml::ConstNodeRef
     OTEL_INTERNAL_LOG_DEBUG(" - val() : " << node.val());
   }
 }
-#endif
+#endif  // WITH_DEBUG_NODE
 
 std::string RymlDocumentNode::Key() const
 {
@@ -351,14 +354,14 @@ DocumentNodeConstIterator RymlDocumentNode::begin() const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::begin()");
 
-#if 0
+#ifdef WITH_DEBUG_NODE
   DebugNode("::begin()", m_node);
 
   for (int index = 0; index < m_node.num_children(); index++)
   {
     DebugNode("(child)", m_node[index]);
   }
-#endif
+#endif  // WITH_DEBUG_NODE
 
   return DocumentNodeConstIterator(new RymlDocumentNodeConstIteratorImpl(m_node, 0, m_depth));
 }
@@ -388,14 +391,14 @@ PropertiesNodeConstIterator RymlDocumentNode::begin_properties() const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::begin_properties()");
 
-#if 0
+#ifdef WITH_DEBUG_NODE
   DebugNode("::begin_properties()", m_node);
 
   for (int index = 0; index < m_node.num_children(); index++)
   {
     DebugNode("(child)", m_node[index]);
   }
-#endif
+#endif  // WITH_DEBUG_NODE
 
   return PropertiesNodeConstIterator(new RymlPropertiesNodeConstIteratorImpl(m_node, 0, m_depth));
 }
@@ -463,7 +466,8 @@ void RymlPropertiesNodeConstIteratorImpl::Next()
 std::string RymlPropertiesNodeConstIteratorImpl::Name() const
 {
   ryml::ConstNodeRef ryml_item = m_parent[m_index];
-  ryml::csubstr k              = ryml_item.key();
+  // FIXME: check there is a key()
+  ryml::csubstr k = ryml_item.key();
   std::string name(k.str, k.len);
 
   OTEL_INTERNAL_LOG_DEBUG("RymlPropertiesNodeConstIteratorImpl::Name() = " << name);

@@ -31,14 +31,14 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpSpanBuilder::Bu
     const opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *model) const
 {
   OtlpHttpExporterOptions options(nullptr);
-  options.url          = model->endpoint;
-  options.content_type = GetOtlpHttpProtocolFromString(model->protocol);
-  options.timeout      = std::chrono::duration_cast<std::chrono::system_clock::duration>(
+  options.url = model->endpoint;
+  // options.content_type = xxx;
+  options.timeout = std::chrono::duration_cast<std::chrono::system_clock::duration>(
       std::chrono::seconds{model->timeout});
   // options.http_headers = model->xxx;
-  options.ssl_ca_cert_path     = model->certificate;
-  options.ssl_client_key_path  = model->client_key;
-  options.ssl_client_cert_path = model->client_certificate;
+  options.ssl_ca_cert_path     = model->certificate_file;
+  options.ssl_client_key_path  = model->client_key_file;
+  options.ssl_client_cert_path = model->client_certificate_file;
   return OtlpHttpExporterFactory::Create(options);
 }
 

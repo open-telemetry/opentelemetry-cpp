@@ -28,11 +28,10 @@ public:
     visitor->VisitOtlpGrpc(this);
   }
 
-  std::string protocol;
   std::string endpoint;
-  std::string certificate;
-  std::string client_key;
-  std::string client_certificate;
+  std::string certificate_file;
+  std::string client_key_file;
+  std::string client_certificate_file;
   std::unique_ptr<HeadersConfiguration> headers;
   std::string headers_list;
   std::string compression;
