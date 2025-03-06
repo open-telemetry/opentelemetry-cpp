@@ -70,10 +70,9 @@ set(THIRD_PARTY_CURL_DEPENDENT_COMPONENTS
 
 # Components that require nlohmann_json
 set(THIRD_PARTY_nlohmann_json_DEPENDENT_COMPONENTS
-    exporters_otlp_file
-    exporters_otlp_http
     exporters_zipkin
     exporters_elasticsearch
+    exporters_etw
 )
 
 # Components that require Protobuf

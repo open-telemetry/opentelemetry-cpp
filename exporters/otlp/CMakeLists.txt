@@ -120,8 +120,11 @@ if(WITH_OTLP_HTTP)
   target_link_libraries(
     opentelemetry_exporter_otlp_http_client
     PUBLIC opentelemetry_sdk opentelemetry_ext
-    PRIVATE opentelemetry_proto opentelemetry_http_client_curl
-            nlohmann_json::nlohmann_json)
+    PRIVATE opentelemetry_proto opentelemetry_http_client_curl)
+
+  target_link_libraries(opentelemetry_exporter_otlp_http_client
+                        PRIVATE $<BUILD_INTERFACE:nlohmann_json::nlohmann_json>)
+
   if(TARGET absl::strings)
     target_link_libraries(opentelemetry_exporter_otlp_http_client
                           PUBLIC absl::strings)
@@ -199,7 +202,11 @@ if(WITH_OTLP_FILE)
   target_link_libraries(
     opentelemetry_exporter_otlp_file_client
     PUBLIC opentelemetry_sdk opentelemetry_common
-    PRIVATE opentelemetry_proto nlohmann_json::nlohmann_json)
+    PRIVATE opentelemetry_proto)
+
+  target_link_libraries(opentelemetry_exporter_otlp_file_client
+                        PRIVATE $<BUILD_INTERFACE:nlohmann_json::nlohmann_json>)
+
   if(TARGET absl::strings)
     target_link_libraries(opentelemetry_exporter_otlp_file_client
                           PUBLIC absl::strings)

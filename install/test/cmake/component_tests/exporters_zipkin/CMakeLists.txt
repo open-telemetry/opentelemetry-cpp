@@ -6,6 +6,10 @@ project(opentelemetry-cpp-exporters-zipkin-install-test LANGUAGES CXX)
 
 find_package(opentelemetry-cpp REQUIRED COMPONENTS exporters_zipkin)
 
+if(NOT TARGET nlohmann_json::nlohmann_json)
+  message(FATAL_ERROR "nlohmann_json::nlohmann_json target not found")
+endif()
+
 find_package(GTest REQUIRED)
 include(GoogleTest)
 

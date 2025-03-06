@@ -6,6 +6,10 @@ project(opentelemetry-cpp-sdk-install-test LANGUAGES CXX)
 
 find_package(opentelemetry-cpp REQUIRED COMPONENTS sdk)
 
+if(NOT TARGET Threads::Threads)
+  message(FATAL_ERROR "Threads::Threads target not found")
+endif()
+
 find_package(GTest REQUIRED)
 include(GoogleTest)
 
