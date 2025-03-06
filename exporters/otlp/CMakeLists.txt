@@ -204,8 +204,7 @@ if(WITH_OTLP_FILE)
   target_link_libraries(
     opentelemetry_exporter_otlp_file_client
     PUBLIC opentelemetry_sdk opentelemetry_common
-    PRIVATE opentelemetry_proto
-    $<BUILD_INTERFACE:nlohmann_json::nlohmann_json>)
+    PRIVATE opentelemetry_proto $<BUILD_INTERFACE:nlohmann_json::nlohmann_json>)
 
   if(TARGET absl::strings)
     target_link_libraries(opentelemetry_exporter_otlp_file_client
