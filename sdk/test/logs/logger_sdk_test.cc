@@ -275,6 +275,7 @@ TEST(LoggerSDK, LogToAProcessor)
       now);
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
 TEST(LoggerSDK, EventLog)
 {
   // Create an API LoggerProvider and logger
@@ -303,3 +304,4 @@ TEST(LoggerSDK, EventLog)
   ASSERT_EQ(shared_recordable->GetEventName(), "otel-cpp.event_name");
   ASSERT_EQ(shared_recordable->GetEventDomain(), "otel-cpp.event_domain");
 }
+#endif

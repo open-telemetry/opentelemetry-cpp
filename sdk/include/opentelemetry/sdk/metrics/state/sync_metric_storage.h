@@ -83,7 +83,7 @@ public:
 
   void RecordLong(int64_t value,
                   const opentelemetry::context::Context &context
-                      OPENTELEMETRY_MAYBE_UNUSED) noexcept override
+                  OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
@@ -103,7 +103,7 @@ public:
   void RecordLong(int64_t value,
                   const opentelemetry::common::KeyValueIterable &attributes,
                   const opentelemetry::context::Context &context
-                      OPENTELEMETRY_MAYBE_UNUSED) noexcept override
+                  OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
@@ -136,7 +136,7 @@ public:
 
   void RecordDouble(double value,
                     const opentelemetry::context::Context &context
-                        OPENTELEMETRY_MAYBE_UNUSED) noexcept override
+                    OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
@@ -156,7 +156,7 @@ public:
   void RecordDouble(double value,
                     const opentelemetry::common::KeyValueIterable &attributes,
                     const opentelemetry::context::Context &context
-                        OPENTELEMETRY_MAYBE_UNUSED) noexcept override
+                    OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {

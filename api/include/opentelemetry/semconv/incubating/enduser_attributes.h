@@ -25,8 +25,7 @@ namespace enduser
  * @deprecated
  * Replaced by @code user.id @endcode attribute.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kEnduserId = "enduser.id";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kEnduserId = "enduser.id";
 
 /**
  * Deprecated, use @code user.roles @endcode instead.
@@ -34,8 +33,7 @@ static constexpr const char *kEnduserId = "enduser.id";
  * @deprecated
  * Replaced by @code user.roles @endcode attribute.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kEnduserRole = "enduser.role";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kEnduserRole = "enduser.role";
 
 /**
  * Deprecated, no replacement at this time.
@@ -43,8 +41,7 @@ static constexpr const char *kEnduserRole = "enduser.role";
  * @deprecated
  * Removed.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kEnduserScope = "enduser.scope";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kEnduserScope = "enduser.scope";
 
 }  // namespace enduser
 }  // namespace semconv

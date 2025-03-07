@@ -20,8 +20,10 @@ using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
 #endif
 
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
 using opentelemetry::logs::EventLogger;
 using opentelemetry::logs::EventLoggerProvider;
+#endif
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
 using opentelemetry::logs::Provider;

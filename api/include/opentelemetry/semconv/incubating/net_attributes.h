@@ -25,8 +25,7 @@ namespace net
  * @deprecated
  * Replaced by @code network.local.address @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetHostIp = "net.host.ip";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetHostIp = "net.host.ip";
 
 /**
  * Deprecated, use @code server.address @endcode.
@@ -34,8 +33,7 @@ static constexpr const char *kNetHostIp = "net.host.ip";
  * @deprecated
  * Replaced by @code server.address @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetHostName = "net.host.name";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetHostName = "net.host.name";
 
 /**
  * Deprecated, use @code server.port @endcode.
@@ -43,8 +41,7 @@ static constexpr const char *kNetHostName = "net.host.name";
  * @deprecated
  * Replaced by @code server.port @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetHostPort = "net.host.port";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetHostPort = "net.host.port";
 
 /**
  * Deprecated, use @code network.peer.address @endcode.
@@ -52,8 +49,7 @@ static constexpr const char *kNetHostPort = "net.host.port";
  * @deprecated
  * Replaced by @code network.peer.address @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetPeerIp = "net.peer.ip";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetPeerIp = "net.peer.ip";
 
 /**
  * Deprecated, use @code server.address @endcode on client spans and @code client.address @endcode
@@ -62,8 +58,7 @@ static constexpr const char *kNetPeerIp = "net.peer.ip";
  * Replaced by @code server.address @endcode on client spans and @code client.address @endcode on
  * server spans.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetPeerName = "net.peer.name";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetPeerName = "net.peer.name";
 
 /**
  * Deprecated, use @code server.port @endcode on client spans and @code client.port @endcode on
@@ -72,8 +67,7 @@ static constexpr const char *kNetPeerName = "net.peer.name";
  * Replaced by @code server.port @endcode on client spans and @code client.port @endcode on server
  * spans.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetPeerPort = "net.peer.port";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetPeerPort = "net.peer.port";
 
 /**
  * Deprecated, use @code network.protocol.name @endcode.
@@ -81,8 +75,7 @@ static constexpr const char *kNetPeerPort = "net.peer.port";
  * @deprecated
  * Replaced by @code network.protocol.name @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetProtocolName = "net.protocol.name";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetProtocolName = "net.protocol.name";
 
 /**
  * Deprecated, use @code network.protocol.version @endcode.
@@ -90,8 +83,7 @@ static constexpr const char *kNetProtocolName = "net.protocol.name";
  * @deprecated
  * Replaced by @code network.protocol.version @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetProtocolVersion = "net.protocol.version";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetProtocolVersion = "net.protocol.version";
 
 /**
  * Deprecated, use @code network.transport @endcode and @code network.type @endcode.
@@ -99,8 +91,7 @@ static constexpr const char *kNetProtocolVersion = "net.protocol.version";
  * @deprecated
  * Split to @code network.transport @endcode and @code network.type @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetSockFamily = "net.sock.family";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetSockFamily = "net.sock.family";
 
 /**
  * Deprecated, use @code network.local.address @endcode.
@@ -108,8 +99,7 @@ static constexpr const char *kNetSockFamily = "net.sock.family";
  * @deprecated
  * Replaced by @code network.local.address @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetSockHostAddr = "net.sock.host.addr";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetSockHostAddr = "net.sock.host.addr";
 
 /**
  * Deprecated, use @code network.local.port @endcode.
@@ -117,8 +107,7 @@ static constexpr const char *kNetSockHostAddr = "net.sock.host.addr";
  * @deprecated
  * Replaced by @code network.local.port @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetSockHostPort = "net.sock.host.port";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetSockHostPort = "net.sock.host.port";
 
 /**
  * Deprecated, use @code network.peer.address @endcode.
@@ -126,8 +115,7 @@ static constexpr const char *kNetSockHostPort = "net.sock.host.port";
  * @deprecated
  * Replaced by @code network.peer.address @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetSockPeerAddr = "net.sock.peer.addr";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetSockPeerAddr = "net.sock.peer.addr";
 
 /**
  * Deprecated, no replacement at this time.
@@ -135,8 +123,7 @@ static constexpr const char *kNetSockPeerAddr = "net.sock.peer.addr";
  * @deprecated
  * Removed.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetSockPeerName = "net.sock.peer.name";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetSockPeerName = "net.sock.peer.name";
 
 /**
  * Deprecated, use @code network.peer.port @endcode.
@@ -144,8 +131,7 @@ static constexpr const char *kNetSockPeerName = "net.sock.peer.name";
  * @deprecated
  * Replaced by @code network.peer.port @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetSockPeerPort = "net.sock.peer.port";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetSockPeerPort = "net.sock.peer.port";
 
 /**
  * Deprecated, use @code network.transport @endcode.
@@ -153,8 +139,7 @@ static constexpr const char *kNetSockPeerPort = "net.sock.peer.port";
  * @deprecated
  * Replaced by @code network.transport @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kNetTransport = "net.transport";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kNetTransport = "net.transport";
 
 namespace NetSockFamilyValues
 {

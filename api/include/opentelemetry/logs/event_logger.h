@@ -14,10 +14,11 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs
 {
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
 /**
  * Handles event log record creation.
  **/
-class EventLogger
+class OPENTELEMETRY_DEPRECATED EventLogger
 {
 public:
   virtual ~EventLogger() = default;
@@ -76,5 +77,6 @@ private:
   void IgnoreTraitResult(ValueType &&...)
   {}
 };
+#endif
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE

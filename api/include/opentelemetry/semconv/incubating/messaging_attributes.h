@@ -111,8 +111,7 @@ static constexpr const char *kMessagingDestinationTemporary = "messaging.destina
  * @deprecated
  * No replacement at this time.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessagingDestinationPublishAnonymous =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingDestinationPublishAnonymous =
     "messaging.destination_publish.anonymous";
 
 /**
@@ -121,8 +120,7 @@ static constexpr const char *kMessagingDestinationPublishAnonymous =
  * @deprecated
  * No replacement at this time.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessagingDestinationPublishName =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingDestinationPublishName =
     "messaging.destination_publish.name";
 
 /**
@@ -131,8 +129,7 @@ static constexpr const char *kMessagingDestinationPublishName =
  * @deprecated
  * Replaced by @code messaging.consumer.group.name @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessagingEventhubsConsumerGroup =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingEventhubsConsumerGroup =
     "messaging.eventhubs.consumer.group";
 
 /**
@@ -172,8 +169,8 @@ static constexpr const char *kMessagingGcpPubsubMessageOrderingKey =
  * @deprecated
  * Replaced by @code messaging.consumer.group.name @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessagingKafkaConsumerGroup = "messaging.kafka.consumer.group";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingKafkaConsumerGroup =
+    "messaging.kafka.consumer.group";
 
 /**
  * Deprecated, use @code messaging.destination.partition.id @endcode instead.
@@ -181,8 +178,7 @@ static constexpr const char *kMessagingKafkaConsumerGroup = "messaging.kafka.con
  * @deprecated
  * Replaced by @code messaging.destination.partition.id @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessagingKafkaDestinationPartition =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingKafkaDestinationPartition =
     "messaging.kafka.destination.partition";
 
 /**
@@ -200,8 +196,8 @@ static constexpr const char *kMessagingKafkaMessageKey = "messaging.kafka.messag
  * @deprecated
  * Replaced by @code messaging.kafka.offset @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessagingKafkaMessageOffset = "messaging.kafka.message.offset";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingKafkaMessageOffset =
+    "messaging.kafka.message.offset";
 
 /**
  * A boolean that is true if the message is a tombstone.
@@ -246,8 +242,7 @@ static constexpr const char *kMessagingMessageId = "messaging.message.id";
  * @deprecated
  * Replaced by @code messaging.operation.type @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessagingOperation = "messaging.operation";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingOperation = "messaging.operation";
 
 /**
  * The system-specific name of the messaging operation.
@@ -280,8 +275,8 @@ static constexpr const char *kMessagingRabbitmqMessageDeliveryTag =
  * Replaced by @code messaging.consumer.group.name @endcode on the consumer spans. No replacement
  * for producer spans.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessagingRocketmqClientGroup = "messaging.rocketmq.client_group";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingRocketmqClientGroup =
+    "messaging.rocketmq.client_group";
 
 /**
  * Model of message consumption. This only applies to consumer spans.
@@ -333,9 +328,9 @@ static constexpr const char *kMessagingRocketmqNamespace = "messaging.rocketmq.n
  * @deprecated
  * Replaced by @code messaging.destination.subscription.name @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessagingServicebusDestinationSubscriptionName =
-    "messaging.servicebus.destination.subscription_name";
+OPENTELEMETRY_DEPRECATED static constexpr const char
+    *kMessagingServicebusDestinationSubscriptionName =
+        "messaging.servicebus.destination.subscription_name";
 
 /**
  * Describes the <a
@@ -403,8 +398,7 @@ static constexpr const char *kSettle = "settle";
  * @deprecated
  * Replaced by @code process @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kDeliver = "deliver";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kDeliver = "deliver";
 
 /**
  * Deprecated. Use @code send @endcode instead.
@@ -412,8 +406,7 @@ static constexpr const char *kDeliver = "deliver";
  * @deprecated
  * Replaced by @code send @endcode.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kPublish = "publish";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kPublish = "publish";
 
 }  // namespace MessagingOperationTypeValues
 

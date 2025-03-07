@@ -17,7 +17,7 @@ namespace sdk
 {
 namespace logs
 {
-
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
 EventLogger::EventLogger(
     opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
     opentelemetry::nostd::string_view event_domain) noexcept
@@ -57,7 +57,7 @@ void EventLogger::EmitEvent(
 
   delegate_logger_->EmitLogRecord(std::move(log_record));
 }
-
+#endif
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

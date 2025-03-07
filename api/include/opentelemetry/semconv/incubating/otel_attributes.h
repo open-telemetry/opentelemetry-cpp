@@ -25,8 +25,7 @@ namespace otel
  * @deprecated
  * Use the @code otel.scope.name @endcode attribute.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kOtelLibraryName = "otel.library.name";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kOtelLibraryName = "otel.library.name";
 
 /**
  * Deprecated. Use the @code otel.scope.version @endcode attribute.
@@ -34,8 +33,7 @@ static constexpr const char *kOtelLibraryName = "otel.library.name";
  * @deprecated
  * Use the @code otel.scope.version @endcode attribute.
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kOtelLibraryVersion = "otel.library.version";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kOtelLibraryVersion = "otel.library.version";
 
 /**
  * The name of the instrumentation scope - (@code InstrumentationScope.Name @endcode in OTLP).

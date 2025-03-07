@@ -14,18 +14,21 @@ namespace sdk
 namespace logs
 {
 
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
 /**
  * Factory class for EventLoggerProvider.
  */
-class EventLoggerProviderFactory
+class OPENTELEMETRY_DEPRECATED EventLoggerProviderFactory
 {
 public:
   /**
    * Create a EventLoggerProvider.
    */
 
-  static std::unique_ptr<opentelemetry::sdk::logs::EventLoggerProvider> Create();
+  OPENTELEMETRY_DEPRECATED static std::unique_ptr<opentelemetry::sdk::logs::EventLoggerProvider>
+  Create();
 };
+#endif
 
 }  // namespace logs
 }  // namespace sdk

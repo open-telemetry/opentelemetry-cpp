@@ -118,6 +118,7 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
   }
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
 TEST(LoggerProviderSDK, EventLoggerProviderFactory)
 {
   auto elp = opentelemetry::sdk::logs::EventLoggerProviderFactory::Create();
@@ -128,6 +129,7 @@ TEST(LoggerProviderSDK, EventLoggerProviderFactory)
 
   auto event_logger = elp->CreateEventLogger(logger1, "otel-cpp.test");
 }
+#endif
 
 TEST(LoggerProviderSDK, LoggerEqualityCheck)
 {

@@ -12,7 +12,7 @@ namespace sdk
 {
 namespace logs
 {
-
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
 EventLoggerProvider::EventLoggerProvider() noexcept
 {
   OTEL_INTERNAL_LOG_DEBUG("[EventLoggerProvider] EventLoggerProvider created.");
@@ -28,7 +28,7 @@ EventLoggerProvider::CreateEventLogger(
   return opentelemetry::nostd::shared_ptr<opentelemetry::logs::EventLogger>{
       new EventLogger(delegate_logger, event_domain)};
 }
-
+#endif
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
