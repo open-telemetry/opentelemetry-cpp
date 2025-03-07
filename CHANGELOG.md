@@ -21,6 +21,9 @@ Increment the:
 * [SDK] Support OTEL_SDK_DISABLED environment variable
   [#3245](https://github.com/open-telemetry/opentelemetry-cpp/pull/3245)
 
+* [SDK] Fix lifetime for sdk::ReadWriteLogRecord
+  [#3147](https://github.com/open-telemetry/opentelemetry-cpp/pull/3245)
+
 * [SDK] Add meter scope configurator
   [#3268](https://github.com/open-telemetry/opentelemetry-cpp/pull/3268)
 
@@ -45,6 +48,14 @@ Important changes:
     `Provider` classes, to benefit from this feature.
 
   * All the example code has been updated to reflect the new usage.
+
+  * With ABI version 2, `opentelemetry::sdk::logs::ReadableLogRecord::GetAttributes()`
+    will returns a `std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>`
+    instead of a `std::unordered_map<std::string, opentelemetry::common::AttributeValue>`
+    to keep the same type as the `opentelemetry::sdk::trace::SpanData`. And
+    `opentelemetry::sdk::logs::ReadableLogRecord::GetBody()` will returns a
+    `const opentelemetry::sdk::common::OwnedAttributeValue &` instead of a
+    `const opentelemetry::common::AttributeValue &`.
 
 ## [1.19 2025-01-22]
 
