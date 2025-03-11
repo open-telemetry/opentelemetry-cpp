@@ -78,10 +78,17 @@ public:
     // attributes. The left to right unpack order could pass the more important
     // data to processors to avoid caching and memory allocating.
     //
-    IgnoreTraitResult(
-      (detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
-        log_record.get(),
-        std::forward<ArgumentType>(args)),...));
+#if __cplusplus <= 201402L
+    // C++14 does not support fold expressions for parameter pack expansion.
+    int dummy[] = {(detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
+                        log_record.get(), std::forward<ArgumentType>(args)),
+                    0)...};
+    IgnoreTraitResult(dummy);
+#else
+    IgnoreTraitResult((detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
+                           log_record.get(), std::forward<ArgumentType>(args)),
+                       ...));
+#endif
 
     EmitLogRecord(std::move(log_record));
   }
