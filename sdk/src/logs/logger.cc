@@ -15,6 +15,9 @@
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/logger.h"
+
+#include <iostream>
+
 #include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
@@ -45,7 +48,8 @@ Logger::Logger(
 
 const opentelemetry::nostd::string_view Logger::GetName() noexcept
 {
-  if (!logger_config_.IsEnabled()) {
+  if (!logger_config_.IsEnabled())
+  {
     return kNoopLogger.GetName();
   }
   return logger_name_;
@@ -53,7 +57,8 @@ const opentelemetry::nostd::string_view Logger::GetName() noexcept
 
 opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noexcept
 {
-  if (!logger_config_.IsEnabled()) {
+  if (!logger_config_.IsEnabled())
+  {
     return kNoopLogger.CreateLogRecord();
   }
 
@@ -100,7 +105,8 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
 void Logger::EmitLogRecord(
     opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
 {
-  if (!logger_config_.IsEnabled()) {
+  if (!logger_config_.IsEnabled())
+  {
     return kNoopLogger.EmitLogRecord(std::move(log_record));
   }
 
