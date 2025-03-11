@@ -20,7 +20,7 @@ namespace rpc
 {
 
 /**
- * The <a href="https://connect.build/docs/protocol/#error-codes">error codes</a> of the Connect
+ * The <a href="https://connectrpc.com//docs/protocol/#error-codes">error codes</a> of the Connect
  * request. Error codes are always string values.
  */
 static constexpr const char *kRpcConnectRpcErrorCode = "rpc.connect_rpc.error_code";
