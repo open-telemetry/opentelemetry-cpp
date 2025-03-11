@@ -1326,21 +1326,74 @@ static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
 
   OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME");
 
-  // Schema has changed
-#ifdef NEVER
-  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  std::unique_ptr<DocumentNode> attribute_name_value;
+  std::unique_ptr<DocumentNode> name_child;
+  std::unique_ptr<DocumentNode> value_child;
+  std::unique_ptr<DocumentNode> type_child;
+  std::string name;
+  std::string value;
+  std::string type;
+
+  for (auto it = node->begin(); it != node->end(); ++it)
   {
-    std::string name                    = it.Name();
-    std::unique_ptr<DocumentNode> child = it.Value();
-    std::string string_value            = child->AsString();
+    attribute_name_value = *it;
 
-    OTEL_INTERNAL_LOG_DEBUG(
-        "ParseAttributesConfiguration() name = " << name << ", value = " << string_value);
+    name_child  = attribute_name_value->GetRequiredChildNode("name");
+    value_child = attribute_name_value->GetRequiredChildNode("value");
+    type_child  = attribute_name_value->GetChildNode("type");
 
-    std::pair<std::string, std::string> entry(name, string_value);
-    model->kv_map.insert(entry);
+    name  = name_child->AsString();
+    value = value_child->AsString();
+    if (type_child)
+    {
+      type = type_child->AsString();
+    }
+    else
+    {
+      type = "string";
+    }
+
+    if (type == "string")
+    {
+      OTEL_INTERNAL_LOG_DEBUG("ParseAttributesConfiguration() name = " << name
+                                                                       << ", value = " << value);
+      std::pair<std::string, std::string> entry(name, value);
+      model->kv_map.insert(entry);
+    }
+    else if (type == "bool")
+    {
+      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME: bool");
+    }
+    else if (type == "int")
+    {
+      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME: int");
+    }
+    else if (type == "double")
+    {
+      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME: double");
+    }
+    else if (type == "string_array")
+    {
+      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME: string_array");
+    }
+    else if (type == "bool_array")
+    {
+      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME: bool_array");
+    }
+    else if (type == "int_array")
+    {
+      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME: int_array");
+    }
+    else if (type == "double_array")
+    {
+      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME: double_array");
+    }
+    else
+    {
+      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: unknown type " << type);
+      throw InvalidSchemaException("Illegal attribute type");
+    }
   }
-#endif
 
   return model;
 }

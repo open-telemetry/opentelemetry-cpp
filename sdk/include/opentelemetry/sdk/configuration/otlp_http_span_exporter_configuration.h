@@ -36,7 +36,7 @@ public:
   std::string headers_list;
   std::string compression;
   size_t timeout{0};
-  enum_otlp_http_encoding encoding;
+  enum_otlp_http_encoding encoding{protobuf};
 };
 
 }  // namespace configuration

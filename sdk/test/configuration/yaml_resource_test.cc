@@ -50,14 +50,32 @@ resource:
   ASSERT_EQ(config->resource->attributes->kv_map.size(), 0);
 }
 
-TEST(YamlResource, some_attributes)
+TEST(YamlResource, some_attributes_0_10)
 {
+  // This is the old 0.10 format, must fail
   std::string yaml = R"(
 file_format: xx.yy
 resource:
   attributes:
     foo: "1234"
     bar: "5678"
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(YamlResource, some_attributes_0_30)
+{
+  // This is the new 0.30 format, must pass
+  std::string yaml = R"(
+file_format: xx.yy
+resource:
+  attributes:
+   - name: foo
+     value: "1234"
+   - name: bar
+     value: "5678"
 )";
 
   auto config = DoParse(yaml);
@@ -97,14 +115,33 @@ resource:
   ASSERT_EQ(config->resource->attributes_list, "foo=1234,bar=5678");
 }
 
-TEST(YamlResource, both)
+TEST(YamlResource, both_0_10)
 {
+  // This is the old 0.10 format, must fail
   std::string yaml = R"(
 file_format: xx.yy
 resource:
   attributes:
     foo: "1234"
     bar: "5678"
+  attributes_list: "foo=aaaa,bar=bbbb"
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(YamlResource, both_0_30)
+{
+  // This is the new 0.30 format, must pass
+  std::string yaml = R"(
+file_format: xx.yy
+resource:
+  attributes:
+   - name: foo
+     value: "1234"
+   - name: bar
+     value: "5678"
   attributes_list: "foo=aaaa,bar=bbbb"
 )";
 
