@@ -21,7 +21,7 @@ jobs:
       - uses: Cyberboss/install-winget@1c6f189175e9f015bf1aa113cd1cc6c73efb9d47
       - run: winget list --accept-source-agreements --disable-interactivity
       - run: winget install bazelisk -r bazel --accept-package-agreements --disable-interactivity --silent
-      - run: winget install -e LLVM.LLVM -v 19.1.7 --accept-package-agreements --disable-interactivity --silent || echo swalloing errors
+      - run: winget install -e LLVM.LLVM -v 20.1.0 --accept-package-agreements --disable-interactivity --silent || echo swalloing errors
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
         with:
