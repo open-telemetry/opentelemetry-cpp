@@ -121,6 +121,8 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
   const size_t attributes_limit   = 10;
   InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kCounter,
                                      InstrumentValueType::kLong};
+
+  AggregationConfig aggConfig(attributes_limit);
   std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   SyncMetricStorage storage(instr_desc, AggregationType::kSum, default_attributes_processor.get(),
@@ -128,7 +130,7 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
                             ExemplarFilterType::kAlwaysOff,
                             ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
-                            nullptr, attributes_limit);
+                            &aggConfig);
 
   int64_t record_value = 100;
   // add 9 unique metric points, and 6 more above limit.

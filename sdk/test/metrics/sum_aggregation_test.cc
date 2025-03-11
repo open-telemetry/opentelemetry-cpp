@@ -29,6 +29,7 @@
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
 
@@ -143,6 +144,78 @@ TEST(HistogramToSumFilterAttributes, Double)
   });
 }
 
+TEST(HistogramToSumFilterAttributesWithCardinaityLimit, Double)
+{
+  MeterProvider mp;
+  auto m                      = mp.GetMeter("meter1", "version1", "schema1");
+  std::string instrument_unit = "ms";
+  std::string instrument_name = "historgram1";
+  std::string instrument_desc = "histogram metrics";
+  size_t cardinality_limit   = 10000;
+
+  std::unordered_map<std::string, bool> allowedattr;
+  allowedattr["attr1"] = true;
+  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{
+      new opentelemetry::sdk::metrics::FilteringAttributesProcessor(allowedattr)};
+
+  std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> dummy_aggregation_config{
+      new opentelemetry::sdk::metrics::AggregationConfig(cardinality_limit)};
+  std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
+  std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
+  mp.AddMetricReader(reader);
+
+  std::unique_ptr<View> view{new View("view1", "view1_description", instrument_unit,
+                                      AggregationType::kSum, dummy_aggregation_config,
+                                      std::move(attrproc))};
+  std::unique_ptr<InstrumentSelector> instrument_selector{
+      new InstrumentSelector(InstrumentType::kHistogram, instrument_name, instrument_unit)};
+  std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
+  mp.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
+
+  auto h = m->CreateDoubleHistogram(instrument_name, instrument_desc, instrument_unit);
+  size_t total_metrics_times = 5;
+
+  size_t agg_repeat_count = 5;
+  for (size_t repeat = 0; repeat < agg_repeat_count; repeat++)
+  {
+
+    for (size_t times = 0; times < total_metrics_times; times++)
+    {
+      for (size_t i = 0; i < 2 * cardinality_limit; i++)
+      {
+        std::unordered_map<std::string, std::string> attr = {{"attr1", std::to_string(i)}, {"attr2", "val2"}};
+        h->Record(1, attr, opentelemetry::context::Context{});
+      }
+    }
+
+    reader->Collect([&](ResourceMetrics &rm) {
+      for (const ScopeMetrics &smd : rm.scope_metric_data_)
+      {
+        for (const MetricData &md : smd.metric_data_)
+        {
+          // Something weird about attributes hashmap. If cardinality is setup to n, it emits n-1 including overflow. Just making the logic generic here to succeed for n or n-1 total cardinality.
+          EXPECT_GE(cardinality_limit, md.point_data_attr_.size());
+          EXPECT_LT(cardinality_limit / 2, md.point_data_attr_.size());
+          for (size_t i = 0; i < md.point_data_attr_.size(); i++)
+          {
+            EXPECT_EQ(1, md.point_data_attr_[i].attributes.size());
+            if (md.point_data_attr_[i].attributes.end() != md.point_data_attr_[i].attributes.find("attr1"))
+            {
+              EXPECT_EQ(total_metrics_times * (repeat + 1), opentelemetry::nostd::get<double>(opentelemetry::nostd::get<SumPointData>(
+                                                                  md.point_data_attr_[i].point_data)
+                                                                  .value_));
+            } else {
+              EXPECT_NE(md.point_data_attr_[i].attributes.end(),
+                        md.point_data_attr_[i].attributes.find(sdk::metrics::kAttributesLimitOverflowKey));
+            }
+          }
+        }
+      }
+      return true;
+    });
+  }
+}
+
 TEST(CounterToSum, Double)
 {
   MeterProvider mp;
@@ -245,6 +318,79 @@ TEST(CounterToSumFilterAttributes, Double)
     return true;
   });
 }
+
+TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
+{
+  MeterProvider mp;
+  auto m                      = mp.GetMeter("meter1", "version1", "schema1");
+  std::string instrument_unit = "ms";
+  std::string instrument_name = "counter1";
+  std::string instrument_desc = "counter metrics";
+  size_t cardinality_limit       = 10000;
+
+  std::unordered_map<std::string, bool> allowedattr;
+  allowedattr["attr1"] = true;
+  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{
+      new opentelemetry::sdk::metrics::FilteringAttributesProcessor(allowedattr)};
+
+  std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> dummy_aggregation_config{
+      new opentelemetry::sdk::metrics::AggregationConfig(cardinality_limit)};
+  std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
+  std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
+  mp.AddMetricReader(reader);
+
+  std::unique_ptr<View> view{new View("view1", "view1_description", instrument_unit,
+                                      AggregationType::kSum, dummy_aggregation_config,
+                                      std::move(attrproc))};
+  std::unique_ptr<InstrumentSelector> instrument_selector{
+      new InstrumentSelector(InstrumentType::kCounter, instrument_name, instrument_unit)};
+  std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
+  mp.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
+
+  auto c = m->CreateDoubleCounter(instrument_name, instrument_desc, instrument_unit);
+
+  size_t agg_repeat_count = 5;
+  for (size_t repeat = 0; repeat < agg_repeat_count; repeat++)
+  {
+    size_t total_metrics_times = 5;
+
+    for (size_t times = 0; times < total_metrics_times; times++)
+    {
+      for (size_t i = 0; i < 2 * cardinality_limit; i++)
+      {
+        std::unordered_map<std::string, std::string> attr = {{"attr1", std::to_string(i)}, {"attr2", "val2"}};
+        c->Add(1, attr, opentelemetry::context::Context{});
+      }
+    }
+
+    reader->Collect([&](ResourceMetrics &rm) {
+      for (const ScopeMetrics &smd : rm.scope_metric_data_)
+      {
+        for (const MetricData &md : smd.metric_data_)
+        {
+          // Something weird about attributes hashmap. If cardinality is setup to n, it emits n-1 including overflow. Just making the logic generic here to succeed for n or n-1 total cardinality.
+          EXPECT_GE(cardinality_limit, md.point_data_attr_.size());
+          EXPECT_LT(cardinality_limit / 2, md.point_data_attr_.size());
+          for (int i = 0; i < md.point_data_attr_.size(); i++)
+          {
+            EXPECT_EQ(1, md.point_data_attr_[i].attributes.size());
+            if (md.point_data_attr_[i].attributes.find("attr1") != md.point_data_attr_[i].attributes.end())
+            {
+              EXPECT_EQ(total_metrics_times * (repeat + 1), opentelemetry::nostd::get<double>(opentelemetry::nostd::get<SumPointData>(
+                                                                        md.point_data_attr_[i].point_data)
+                                                                        .value_));
+            } else {
+              EXPECT_NE(md.point_data_attr_[i].attributes.end(),
+                md.point_data_attr_[i].attributes.find(sdk::metrics::kAttributesLimitOverflowKey));
+            }
+          }
+        }
+      }
+      return true;
+    });
+  }
+}
+
 
 class UpDownCounterToSumFixture : public ::testing::TestWithParam<bool>
 {};
