@@ -72,8 +72,16 @@ public:
       return;
     }
 
-    IgnoreTraitResult(detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
-        log_record.get(), std::forward<ArgumentType>(args))...);
+    //
+    // Keep the parameter pack unpacking order from left to right because left
+    // ones are usually more important like severity and event_id than the
+    // attributes. The left to right unpack order could pass the more important
+    // data to processors to avoid caching and memory allocating.
+    //
+    IgnoreTraitResult(
+      (detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
+        log_record.get(),
+        std::forward<ArgumentType>(args)),...));
 
     EmitLogRecord(std::move(log_record));
   }
