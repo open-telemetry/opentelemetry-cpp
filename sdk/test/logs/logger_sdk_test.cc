@@ -351,13 +351,14 @@ TEST(LoggerSDK, LoggerWithEnabledConfig)
             reference_ts.count());
 }
 
-static MockLogRecordable &create_mock_log_recordable(const std::string &body,
-                                                     opentelemetry::logs::Severity severity)
+static std::unique_ptr<MockLogRecordable> create_mock_log_recordable(
+    const std::string &body,
+    opentelemetry::logs::Severity severity)
 {
-  auto mock_log_recordable = new MockLogRecordable();
+  auto mock_log_recordable = std::make_unique<MockLogRecordable>();
   mock_log_recordable->SetBody(body);
   mock_log_recordable->SetSeverity(severity);
-  return *mock_log_recordable;
+  return mock_log_recordable;
 }
 
 class CustomLogConfiguratorTestData
@@ -393,8 +394,8 @@ static auto expected_log_recordable_1 =
     create_mock_log_recordable("Log Message", opentelemetry::logs::Severity::kWarn);
 static auto custom_log_configurator_test_data_1 =
     CustomLogConfiguratorTestData(instrumentation_scope_1,
-                                  test_log_recordable_1,
-                                  expected_log_recordable_1,
+                                  *test_log_recordable_1,
+                                  *expected_log_recordable_1,
                                   false);
 // Test Case 2
 static auto instrumentation_scope_2 =
@@ -405,8 +406,8 @@ static auto expected_log_recordable_2 =
     create_mock_log_recordable("", opentelemetry::logs::Severity::kDebug);
 static auto custom_log_configurator_test_data_2 =
     CustomLogConfiguratorTestData(instrumentation_scope_2,
-                                  test_log_recordable_2,
-                                  expected_log_recordable_2,
+                                  *test_log_recordable_2,
+                                  *expected_log_recordable_2,
                                   false);
 // Test Case 3
 static auto instrumentation_scope_3 = *InstrumentationScope::Create("foo_library", "", schema_url);
@@ -416,8 +417,8 @@ static auto expected_log_recordable_3 =
     create_mock_log_recordable("", opentelemetry::logs::Severity::kInvalid);
 static auto custom_log_configurator_test_data_3 =
     CustomLogConfiguratorTestData(instrumentation_scope_3,
-                                  test_log_recordable_3,
-                                  expected_log_recordable_3,
+                                  *test_log_recordable_3,
+                                  *expected_log_recordable_3,
                                   true);
 // Test Case 4
 static auto instrumentation_scope_4 =
@@ -428,8 +429,8 @@ static auto expected_log_recordable_4 =
     create_mock_log_recordable("", opentelemetry::logs::Severity::kInvalid);
 static auto custom_log_configurator_test_data_4 =
     CustomLogConfiguratorTestData(instrumentation_scope_4,
-                                  test_log_recordable_4,
-                                  expected_log_recordable_4,
+                                  *test_log_recordable_4,
+                                  *expected_log_recordable_4,
                                   true);
 
 // This array could also directly contain the reference types, but that  leads to 'uninitialized
