@@ -389,12 +389,12 @@ public:
 
 // constants used in VerifyCustomConfiguratorBehavior test
 static auto noop_logger = logs_api::NoopLogger();
-const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+const std::string schema{"https://opentelemetry.io/schemas/1.11.0"};
 
 // Generate test case data
 // Test Case 1
 static auto instrumentation_scope_1 =
-    *InstrumentationScope::Create("opentelemetry_library", "1.0.0", schema_url);
+    *InstrumentationScope::Create("opentelemetry_library", "1.0.0", schema);
 static auto test_log_recordable_1 =
     create_mock_log_recordable("Log Message", opentelemetry::logs::Severity::kWarn);
 static auto expected_log_recordable_1 =
@@ -405,8 +405,7 @@ static auto custom_log_configurator_test_data_1 =
                                   *expected_log_recordable_1,
                                   false);
 // Test Case 2
-static auto instrumentation_scope_2 =
-    *InstrumentationScope::Create("bar_library", "1.0.0", schema_url);
+static auto instrumentation_scope_2 = *InstrumentationScope::Create("bar_library", "1.0.0", schema);
 static auto test_log_recordable_2 =
     create_mock_log_recordable("", opentelemetry::logs::Severity::kDebug);
 static auto expected_log_recordable_2 =
@@ -417,7 +416,7 @@ static auto custom_log_configurator_test_data_2 =
                                   *expected_log_recordable_2,
                                   false);
 // Test Case 3
-static auto instrumentation_scope_3 = *InstrumentationScope::Create("foo_library", "", schema_url);
+static auto instrumentation_scope_3 = *InstrumentationScope::Create("foo_library", "", schema);
 static auto test_log_recordable_3 =
     create_mock_log_recordable("Info message", opentelemetry::logs::Severity::kInfo);
 static auto expected_log_recordable_3 =
@@ -428,8 +427,7 @@ static auto custom_log_configurator_test_data_3 =
                                   *expected_log_recordable_3,
                                   true);
 // Test Case 4
-static auto instrumentation_scope_4 =
-    *InstrumentationScope::Create("allowed_library", "", schema_url);
+static auto instrumentation_scope_4 = *InstrumentationScope::Create("allowed_library", "", schema);
 static auto test_log_recordable_4 =
     create_mock_log_recordable("Scope version missing", opentelemetry::logs::Severity::kInfo);
 static auto expected_log_recordable_4 =
