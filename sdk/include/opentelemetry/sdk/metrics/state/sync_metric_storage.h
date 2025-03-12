@@ -196,6 +196,7 @@ public:
 private:
   InstrumentDescriptor instrument_descriptor_;
   // hashmap to maintain the metrics for delta collection (i.e, collection since last Collect call)
+  const AggregationConfig *aggregation_config_;
   std::unique_ptr<AttributesHashMap> attributes_hashmap_;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
   const AttributesProcessor *attributes_processor_;
@@ -203,7 +204,6 @@ private:
   ExemplarFilterType exemplar_filter_type_;
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
 #endif
-  const AggregationConfig *aggregation_config_;
   TemporalMetricStorage temporal_metric_storage_;
   opentelemetry::common::SpinLockMutex attribute_hashmap_lock_;
 };
