@@ -47,7 +47,13 @@ class AttributesHashMap
 public:
   AttributesHashMap(size_t attributes_limit = kAggregationCardinalityLimit)
       : attributes_limit_(attributes_limit)
-  {}
+  {
+    if (attributes_limit_ > kAggregationCardinalityLimit)
+    {
+      hash_map_.reserve(attributes_limit_);
+    }
+  }
+
   Aggregation *Get(size_t hash) const
   {
     auto it = hash_map_.find(hash);

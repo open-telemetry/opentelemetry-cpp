@@ -63,10 +63,11 @@ public:
                     ExemplarFilterType exempler_filter_type,
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
-                    const AggregationConfig *aggregation_config,
-                    size_t attributes_limit = kAggregationCardinalityLimit)
+                    const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
-        attributes_hashmap_(new AttributesHashMap(attributes_limit)),
+        aggregation_config_(aggregation_config),
+        attributes_hashmap_(new AttributesHashMap(
+            aggregation_config ? aggregation_config->cardinality_limit_ : kAggregationCardinalityLimit)),
         attributes_processor_(attributes_processor),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_filter_type_(exempler_filter_type),
@@ -202,6 +203,7 @@ private:
   ExemplarFilterType exemplar_filter_type_;
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
 #endif
+  const AggregationConfig *aggregation_config_;
   TemporalMetricStorage temporal_metric_storage_;
   opentelemetry::common::SpinLockMutex attribute_hashmap_lock_;
 };
