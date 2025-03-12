@@ -46,7 +46,8 @@ REM singleton_test does not work when linked as static under Windows
 goto:eof
 
 :minimal
-"%__BAZEL__%" run --profile=5.pkgk.tracing.json -k --//:with_dll=true otel_sdk_files
+"%__BAZEL__%" build --profile=min.nodll.tracing.json --//:with_dll=false api_sdk_includes || goto:error
+"%__BAZEL__%" build --profile=min.dll.tracing.json --//:with_dll=true otel_sdk_files || goto:error
 goto:eof
 
 :zip

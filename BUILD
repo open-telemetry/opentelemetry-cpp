@@ -58,11 +58,6 @@ config_setting(
 # Which is then used to exclude (through dll_deps([])) the libs already linked in here.
 otel_cc_library(
     name = "otel_sdk_deps",
-    target_compatible_with = select({
-        # To compile you need `--//:with_dll=true` on the command line
-        "with_dll_enabled": None,
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
     visibility = ["//visibility:private"],
     deps = [
         "@otel_sdk//exporters/elasticsearch:es_log_record_exporter",
@@ -125,11 +120,6 @@ otel_cc_library(
         "all_api_includes.cc",
         "all_sdk_includes.cc",
     ],
-    target_compatible_with = select({
-        # To compile you need `--//:with_dll=true` on the command line
-        "with_dll_enabled": None,
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
     # Almost all headers are included here, such that the compiler can notice the __declspec(dllexport) members.
     visibility = ["//visibility:private"],
     deps = ["otel_sdk_deps"],
