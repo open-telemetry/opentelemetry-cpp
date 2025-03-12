@@ -45,7 +45,6 @@ archive_override(
     strip_prefix="c-ares-0b0d375f08edfc73d2f37090e9325c5bd600c043"
 )
 bazel_dep(name = "protobuf", version = "30.0")
-single_version_override(module_name = "protobuf", version = "29.3")
 bazel_dep(name = "opentelemetry-proto", version = "1.5.0")
 archive_override(
     module_name = "opentelemetry-proto",
