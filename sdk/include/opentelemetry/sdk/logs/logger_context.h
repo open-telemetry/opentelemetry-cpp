@@ -69,6 +69,10 @@ public:
    */
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
 
+  /**
+   * Obtain the ScopeConfigurator with this logger context.
+   * @return The ScopeConfigurator for this logger context.
+   */
   const instrumentationscope::ScopeConfigurator<LoggerConfig> &GetLoggerConfigurator()
       const noexcept;
 

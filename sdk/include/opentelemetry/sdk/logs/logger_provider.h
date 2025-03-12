@@ -32,8 +32,8 @@ class OPENTELEMETRY_EXPORT LoggerProvider final : public opentelemetry::logs::Lo
 {
 public:
   /**
-   * Initialize a new logger provider
-   * @param processor The span processor for this logger provider. This must
+   * Initialize a new logger provider.
+   * @param processor The log record processor for this logger provider. This must
    * not be a nullptr.
    * @param resource  The resources for this logger provider.
    */
@@ -47,6 +47,13 @@ public:
                   LoggerConfig::Default())
                   .Build())) noexcept;
 
+  /**
+   * Initialize a new logger provider.
+   * @param processors A list of log record processors for this logger provider.
+   * @param resource  The resources for this logger provider.
+   * @param logger_configurator The scope configurator used to determine the configs for loggers
+   * created using this logger provider.
+   */
   explicit LoggerProvider(
       std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
       const opentelemetry::sdk::resource::Resource &resource =
