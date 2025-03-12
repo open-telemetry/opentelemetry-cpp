@@ -136,21 +136,33 @@ int main(int argc, const char* argv[])
   counter = meter->CreateDoubleCounter("malkia_test_counter");
 
   srand(index);
+  //std::this_thread::sleep_for(std::chrono::milliseconds(rand()%5000));
   bool flip{ false };
   int period{ 0 };
-  for(size_t i=0; i<200; i++) 
+  for(size_t i=0; i<2000; i++) 
   {
     flip = !flip;
     if( flip )
     {
-      period = rand()%1000;
+      period = rand()%100;
     }
-    counter->Add(1);
+    flip = true;
+    period = 16*6;
+    counter->Add(1,{{"test", "one"}});
     using namespace std::chrono_literals;
-    std::this_thread::sleep_for(std::chrono::milliseconds(flip ? period : 1000 - period));
+    std::this_thread::sleep_for(std::chrono::milliseconds(flip ? period : 100 - period));
   }
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+  if( const auto sp{ 
+      std::dynamic_pointer_cast<opentelemetry::sdk::metrics::MeterProvider>( 
+        opentelemetry::metrics::Provider::GetMeterProvider() ) }; sp )
+  {
+    if( const auto p{ sp.get() }; p )
+    {
+      p->ForceFlush();
+      p->Shutdown();
+    }
+  }
   opentelemetry::metrics::Provider::SetMeterProvider({});
  
   return 0;

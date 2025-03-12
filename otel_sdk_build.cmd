@@ -16,6 +16,7 @@ echo BAZEL="%__BAZEL__%"
 if "%1"=="" goto:all
 if "%1"=="test" goto:test
 if "%1"=="zip" goto:zip
+if "%1"=="minimal" goto:minimal
 if "%1"=="shutdown" goto:shutdown
 
 popd
@@ -42,6 +43,10 @@ REM singleton_test does not work when linked as static under Windows
 "%__BAZEL__%" test  --profile=2.dbg.tracing.json --//:with_dll=true -c dbg -- ... -otel_sdk_zip || goto:error
 "%__BAZEL__%" test  --profile=3.fastbuild.tracing.json --//:with_dll=true -c fastbuild -- ... -otel_sdk_zip || goto:error
 "%__BAZEL__%" test  --profile=4.opt.tracing.json --//:with_dll=true -c opt -- ... -otel_sdk_zip || goto:error
+goto:eof
+
+:minimal
+"%__BAZEL__%" run --profile=5.pkgk.tracing.json -k --//:with_dll=true otel_sdk_files
 goto:eof
 
 :zip

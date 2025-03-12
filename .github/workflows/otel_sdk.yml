@@ -53,12 +53,12 @@ jobs:
           echo empty > d:\d\empty.txt
           cmd /c dir d:\d || echo "swallowing errors"
           refsutil dedup d:\d /s
-      - name: test otel_sdk
+      - name: build minimal otel_sdk
         run: |
           echo "build --disk_cache=d:/d" >> ../top.bazelrc
           echo "common --repository_cache=d:/r" >> ../top.bazelrc
           echo "startup --output_user_root=d:/b" >> ../top.bazelrc
-          ./otel_sdk_build.cmd test
+          ./otel_sdk_build.cmd minimal
           ./otel_sdk_build.cmd shutdown
       - run: |
           cmd /c dir d:\d || echo "swallowing errors"
@@ -81,8 +81,9 @@ jobs:
           name: tracing-profiles
           path: ./*.tracing.json
           if-no-files-found: warn
-      - name: build otel_sdk.zip
+      - name: test and build otel_sdk.zip
         run: |
+          ./otel_sdk_build.cmd test
           ./otel_sdk_build.cmd zip
           ./otel_sdk_build.cmd shutdown
           ls d:/d.vhdx
