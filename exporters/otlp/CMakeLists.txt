@@ -273,6 +273,58 @@ target_link_libraries(
   opentelemetry_otlp_recordable
   PUBLIC opentelemetry_trace opentelemetry_resources opentelemetry_proto)
 
+if(WITH_OTLP_HTTP)
+  add_library(
+    opentelemetry_otlp_http_builder
+    src/otlp_http_span_builder.cc src/otlp_http_push_metric_builder.cc
+    src/otlp_http_log_record_builder.cc)
+  set_target_properties(opentelemetry_otlp_http_builder
+                        PROPERTIES EXPORT_NAME otlp_http_builder)
+  set_target_version(opentelemetry_otlp_http_builder)
+
+  target_include_directories(
+    opentelemetry_otlp_http_builder
+    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+           "$<INSTALL_INTERFACE:include>")
+
+  # Make sure to build with the proper ABI
+  target_link_libraries(opentelemetry_otlp_http_builder
+                        PUBLIC opentelemetry_api)
+
+  target_link_libraries(opentelemetry_otlp_http_builder
+                        PUBLIC opentelemetry_exporter_otlp_http)
+  target_link_libraries(opentelemetry_otlp_http_builder
+                        PUBLIC opentelemetry_exporter_otlp_http_metric)
+  target_link_libraries(opentelemetry_otlp_http_builder
+                        PUBLIC opentelemetry_exporter_otlp_http_log)
+endif()
+
+if(WITH_OTLP_GRPC)
+  add_library(
+    opentelemetry_otlp_grpc_builder
+    src/otlp_grpc_span_builder.cc src/otlp_grpc_push_metric_builder.cc
+    src/otlp_grpc_log_record_builder.cc)
+  set_target_properties(opentelemetry_otlp_grpc_builder
+                        PROPERTIES EXPORT_NAME otlp_grpc_builder)
+  set_target_version(opentelemetry_otlp_grpc_builder)
+
+  target_include_directories(
+    opentelemetry_otlp_grpc_builder
+    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+           "$<INSTALL_INTERFACE:include>")
+
+  # Make sure to build with the proper ABI
+  target_link_libraries(opentelemetry_otlp_grpc_builder
+                        PUBLIC opentelemetry_api)
+
+  target_link_libraries(opentelemetry_otlp_grpc_builder
+                        PUBLIC opentelemetry_exporter_otlp_grpc)
+  target_link_libraries(opentelemetry_otlp_grpc_builder
+                        PUBLIC opentelemetry_exporter_otlp_grpc_metrics)
+  target_link_libraries(opentelemetry_otlp_grpc_builder
+                        PUBLIC opentelemetry_exporter_otlp_grpc_log)
+endif()
+
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS ${OPENTELEMETRY_OTLP_TARGETS}
