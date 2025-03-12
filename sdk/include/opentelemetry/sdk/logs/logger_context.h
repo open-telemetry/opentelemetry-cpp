@@ -35,14 +35,15 @@ namespace logs
 class LoggerContext
 {
 public:
-  explicit LoggerContext(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
-                         const opentelemetry::sdk::resource::Resource &resource =
-                             opentelemetry::sdk::resource::Resource::Create({}),
-                         std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator =
-                             std::make_unique<instrumentationscope::ScopeConfigurator<LoggerConfig>>(
-                                 instrumentationscope::ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Default())
-                                     .Build()
-                                 )) noexcept;
+  explicit LoggerContext(
+      std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
+      const opentelemetry::sdk::resource::Resource &resource =
+          opentelemetry::sdk::resource::Resource::Create({}),
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator =
+          std::make_unique<instrumentationscope::ScopeConfigurator<LoggerConfig>>(
+              instrumentationscope::ScopeConfigurator<LoggerConfig>::Builder(
+                  LoggerConfig::Default())
+                  .Build())) noexcept;
 
   /**
    * Attaches a log processor to list of configured processors to this logger context.
@@ -68,7 +69,8 @@ public:
    */
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
 
-  const instrumentationscope::ScopeConfigurator<LoggerConfig> &GetLoggerConfigurator() const noexcept;
+  const instrumentationscope::ScopeConfigurator<LoggerConfig> &GetLoggerConfigurator()
+      const noexcept;
 
   /**
    * Force all active LogProcessors to flush any buffered logs

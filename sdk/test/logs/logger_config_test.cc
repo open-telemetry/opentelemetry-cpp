@@ -13,7 +13,7 @@
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 
-namespace logs_sdk           = opentelemetry::sdk::logs;
+namespace logs_sdk              = opentelemetry::sdk::logs;
 namespace instrumentation_scope = opentelemetry::sdk::instrumentationscope;
 
 /** Test to verify the basic behavior of logs_sdk::LoggerConfig */

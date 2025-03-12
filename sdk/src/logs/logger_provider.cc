@@ -26,20 +26,27 @@ namespace sdk
 namespace logs
 {
 
-LoggerProvider::LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
-                               const opentelemetry::sdk::resource::Resource &resource,
-                               std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator) noexcept
+LoggerProvider::LoggerProvider(
+    std::unique_ptr<LogRecordProcessor> &&processor,
+    const opentelemetry::sdk::resource::Resource &resource,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>>
+        logger_configurator) noexcept
 {
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.emplace_back(std::move(processor));
-  context_ = std::make_shared<LoggerContext>(std::move(processors), resource, std::move(logger_configurator));
+  context_ = std::make_shared<LoggerContext>(std::move(processors), resource,
+                                             std::move(logger_configurator));
   OTEL_INTERNAL_LOG_DEBUG("[LoggerProvider] LoggerProvider created.");
 }
 
-LoggerProvider::LoggerProvider(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
-                               const opentelemetry::sdk::resource::Resource &resource,
-                               std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator) noexcept
-    : context_{std::make_shared<LoggerContext>(std::move(processors), resource, std::move(logger_configurator))}
+LoggerProvider::LoggerProvider(
+    std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
+    const opentelemetry::sdk::resource::Resource &resource,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>>
+        logger_configurator) noexcept
+    : context_{std::make_shared<LoggerContext>(std::move(processors),
+                                               resource,
+                                               std::move(logger_configurator))}
 {}
 
 LoggerProvider::LoggerProvider() noexcept

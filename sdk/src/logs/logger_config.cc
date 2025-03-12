@@ -9,7 +9,7 @@ namespace sdk
 namespace logs
 {
 
-const LoggerConfig LoggerConfig::kDefaultConfig = LoggerConfig();
+const LoggerConfig LoggerConfig::kDefaultConfig  = LoggerConfig();
 const LoggerConfig LoggerConfig::kDisabledConfig = LoggerConfig(true);
 
 bool LoggerConfig::operator==(const LoggerConfig &other) const noexcept
@@ -37,6 +37,6 @@ LoggerConfig LoggerConfig::Default()
   return kDefaultConfig;
 }
 
-} // namespace logs
-} // namespace sdk
+}  // namespace logs
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

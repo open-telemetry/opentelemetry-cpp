@@ -29,8 +29,7 @@ private:
   bool disabled_;
   static const LoggerConfig kDisabledConfig;
   static const LoggerConfig kDefaultConfig;
-
 };
-} // namespace logs
-} // namespace sdk
+}  // namespace logs
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

@@ -409,8 +409,7 @@ static auto custom_log_configurator_test_data_2 =
                                   expected_log_recordable_2,
                                   false);
 // Test Case 3
-static auto instrumentation_scope_3 =
-    *InstrumentationScope::Create("foo_library", "", schema_url);
+static auto instrumentation_scope_3 = *InstrumentationScope::Create("foo_library", "", schema_url);
 static auto test_log_recordable_3 =
     create_mock_log_recordable("Info message", opentelemetry::logs::Severity::kInfo);
 static auto expected_log_recordable_3 =
@@ -438,11 +437,8 @@ static auto custom_log_configurator_test_data_4 =
 // library, see https://github.com/google/googletest/issues/3805#issuecomment-1397301790 for more
 // details. Using pointers is a workaround to prevent the Valgrind warnings.
 constexpr std::array<CustomLogConfiguratorTestData *, 4> log_configurator_test_cases = {
-    &custom_log_configurator_test_data_1,
-    &custom_log_configurator_test_data_2,
-    &custom_log_configurator_test_data_3,
-    &custom_log_configurator_test_data_4
-};
+    &custom_log_configurator_test_data_1, &custom_log_configurator_test_data_2,
+    &custom_log_configurator_test_data_3, &custom_log_configurator_test_data_4};
 
 // Test fixture for VerifyCustomConfiguratorBehavior
 class CustomLoggerConfiguratorTestFixture
@@ -457,11 +453,11 @@ TEST_P(CustomLoggerConfiguratorTestFixture, VerifyCustomConfiguratorBehavior)
   };
   // custom scope configurator that only disables loggers for library name "foo_library" or do not
   // have version information
-  auto test_scope_configurator              = ScopeConfigurator<LoggerConfig>(
-        ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Disabled())
-            .AddConditionNameEquals("foo_library", LoggerConfig::Disabled())
-            .AddCondition(check_if_version_present, LoggerConfig::Enabled())
-            .Build());
+  auto test_scope_configurator = ScopeConfigurator<LoggerConfig>(
+      ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Disabled())
+          .AddConditionNameEquals("foo_library", LoggerConfig::Disabled())
+          .AddCondition(check_if_version_present, LoggerConfig::Enabled())
+          .Build());
 
   // Get the test case data from fixture
   CustomLogConfiguratorTestData *test_case = GetParam();
