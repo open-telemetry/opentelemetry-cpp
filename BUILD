@@ -524,16 +524,16 @@ native_binary(
 #     srcs = ["multitool.lock.json"],
 # )
 
-run_binary(
-    name = "multitool-update",
-    outs = ["multitool.lock.json"],
-    args = [
-        # "--lockfile",
-        # "$(execpath multitool.lock.json)",
-        "update",
-    ],
-    tool = "@multitool//tools/multitool",
-)
+# run_binary(
+#     name = "multitool-update",
+#     outs = ["multitool.lock.json"],
+#     args = [
+#         # "--lockfile",
+#         # "$(execpath multitool.lock.json)",
+#         "update",
+#     ],
+#     tool = "@multitool//tools/multitool",
+# )
 
 platform(
     name = "x64_windows-clang-cl",
