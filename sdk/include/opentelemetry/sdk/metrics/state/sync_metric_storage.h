@@ -8,7 +8,6 @@
 #include <functional>
 #include <memory>
 #include <mutex>
-#include <optional>
 
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
