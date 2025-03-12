@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -10,6 +11,7 @@
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_filter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -80,7 +82,9 @@ struct ResourceMetrics
 class MetricProducer
 {
 public:
-  MetricProducer()          = default;
+  MetricProducer(std::unique_ptr<MetricFilter> metric_filter = nullptr)
+      : metric_filter_(std::move(metric_filter))
+  {}
   virtual ~MetricProducer() = default;
 
   MetricProducer(const MetricProducer &)  = delete;
@@ -107,6 +111,8 @@ public:
    * partial failure.
    */
   virtual Result Produce() noexcept = 0;
+
+  std::unique_ptr<MetricFilter> metric_filter_;
 };
 
 }  // namespace metrics
