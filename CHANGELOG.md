@@ -27,6 +27,9 @@ Increment the:
 * [DEVCONTAINER] Support customization and run as non-root user
   [#3270](https://github.com/open-telemetry/opentelemetry-cpp/pull/3270)
 
+* [SDK] Add logger scope configurator
+  [#3282](https://github.com/open-telemetry/opentelemetry-cpp/pull/3282)
+
 Important changes:
 
 * [SDK] Support OTEL_SDK_DISABLED environment variable

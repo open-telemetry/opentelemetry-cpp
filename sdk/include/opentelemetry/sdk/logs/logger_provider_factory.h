@@ -41,6 +41,14 @@ public:
    * Create a LoggerProvider.
    */
   static std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> Create(
+      std::unique_ptr<LogRecordProcessor> &&processor,
+      const opentelemetry::sdk::resource::Resource &resource,
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator);
+
+  /**
+   * Create a LoggerProvider.
+   */
+  static std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> Create(
       std::vector<std::unique_ptr<LogRecordProcessor>> &&processors);
 
   /**
@@ -49,6 +57,14 @@ public:
   static std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> Create(
       std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
       const opentelemetry::sdk::resource::Resource &resource);
+
+  /**
+   * Create a LoggerProvider.
+   */
+  static std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> Create(
+      std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
+      const opentelemetry::sdk::resource::Resource &resource,
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator);
 
   /**
    * Create a LoggerProvider.
