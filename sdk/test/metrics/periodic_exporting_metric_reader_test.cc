@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
