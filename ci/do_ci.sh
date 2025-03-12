@@ -62,6 +62,8 @@ function run_benchmarks
 mkdir -p "${BUILD_DIR}"
 [ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
 mkdir -p "${PLUGIN_DIR}"
+[ -z "${INSTALL_TEST_DIR}" ] && export INSTALL_TEST_DIR=$HOME/install_test
+mkdir -p "${INSTALL_TEST_DIR}"
 
 MAKE_COMMAND="make -k -j \$(nproc)"
 
@@ -230,12 +232,21 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
 elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
+  rm -rf ${INSTALL_TEST_DIR}/*
   cmake "${CMAKE_OPTIONS[@]}" \
         -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
         -DWITH_OPENTRACING=ON \
+        -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
         "${SRC_DIR}"
   make -j $(nproc)
   make test
+  make install
+  export LD_LIBRARY_PATH="${INSTALL_TEST_DIR}/lib:$LD_LIBRARY_PATH"
+  cmake -S "${SRC_DIR}/install/test/cmake" \
+        -B "${BUILD_DIR}/install_test" \
+        "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
+        "-DCOMPONENTS_TO_TEST=shims_opentracing"
+  ctest --test-dir "${BUILD_DIR}/install_test" --output-on-failure
   exit 0
 elif [[ "$1" == "cmake.c++20.test" ]]; then
   cd "${BUILD_DIR}"
@@ -414,14 +425,30 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
 elif [[ "$1" == "cmake.install.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
+  rm -rf ${INSTALL_TEST_DIR}/*
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
         -DWITH_ABSEIL=ON \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_OTLP_GRPC=ON \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
+        -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_HTTP_CLIENT_CURL=ON \
+        -DWITH_PROMETHEUS=ON \
+        -DWITH_ZIPKIN=ON \
+        -DWITH_ELASTICSEARCH=ON \
+        -DOPENTELEMETRY_INSTALL=ON \
         "${SRC_DIR}"
   make -j $(nproc)
-  sudo make install
+  make install
+  export LD_LIBRARY_PATH="${INSTALL_TEST_DIR}/lib:$LD_LIBRARY_PATH"
+  cmake -S "${SRC_DIR}/install/test/cmake" \
+        -B "${BUILD_DIR}/install_test" \
+         "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
+         "-DCOMPONENTS_TO_TEST=api;sdk;ext_common;ext_http_curl;exporters_in_memory;exporters_ostream;exporters_otlp_common;exporters_otlp_file;exporters_otlp_grpc;exporters_otlp_http;exporters_prometheus;exporters_elasticsearch;exporters_zipkin"
+  ctest --test-dir "${BUILD_DIR}/install_test" --output-on-failure
   exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin

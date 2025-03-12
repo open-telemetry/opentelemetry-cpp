@@ -27,6 +27,9 @@ Increment the:
 * [DEVCONTAINER] Support customization and run as non-root user
   [#3270](https://github.com/open-telemetry/opentelemetry-cpp/pull/3270)
 
+* [INSTALL] Add support for cmake components to the package
+  [#3270](https://github.com/open-telemetry/opentelemetry-cpp/pull/3220)
+
 Important changes:
 
 * [SDK] Support OTEL_SDK_DISABLED environment variable

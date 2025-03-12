@@ -550,8 +550,11 @@ jobs:
         ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
 
   cmake_install_test:
-    name: CMake install test (with abseil)
-    runs-on: ubuntu-20.04
+    name: CMake install test
+    runs-on: ubuntu-24.04
+    env:
+      INSTALL_TEST_DIR: '/home/runner/install_test'
+      CXX_STANDARD: '17'
     steps:
     - uses: actions/checkout@v4
       with:
@@ -560,12 +563,21 @@ jobs:
       run: |
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
-    - name: run cmake install (with abseil)
+    - name: install dependencies
+      env:
+        ABSEIL_CPP_VERSION: '20230125.3'
+        PROTOBUF_VERSION: '23.3'
+        GRPC_VERSION: 'v1.55.0'
       run: |
-        sudo ./ci/install_abseil.sh
+        sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/install_protobuf.sh
+        sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil
+    - name: build and test
+      run: |
         ./ci/do_ci.sh cmake.install.test
     - name: verify packages
       run: |
+        export PKG_CONFIG_PATH=$INSTALL_TEST_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
         ./ci/verify_packages.sh
 
   plugin_test:
