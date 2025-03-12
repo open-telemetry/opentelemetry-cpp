@@ -193,4 +193,8 @@ otel_cc_test(
         "@googletest//:gtest_main",
         "//:windows_only",
     ]),
+    target_compatible_with = select({
+        "//:with_dll_enabled": None,
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )
