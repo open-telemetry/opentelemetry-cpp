@@ -36,6 +36,22 @@ static constexpr const char *kUserAgentName = "user_agent.name";
 static constexpr const char *kUserAgentOriginal = "user_agent.original";
 
 /**
+ * Human readable operating system name.
+ * <p>
+ * For mapping user agent strings to OS names, libraries such as <a
+ * href="https://github.com/ua-parser">ua-parser</a> can be utilized.
+ */
+static constexpr const char *kUserAgentOsName = "user_agent.os.name";
+
+/**
+ * The version string of the operating system as defined in <a
+ * href="/docs/resource/README.md#version-attributes">Version Attributes</a>. <p> For mapping user
+ * agent strings to OS versions, libraries such as <a
+ * href="https://github.com/ua-parser">ua-parser</a> can be utilized.
+ */
+static constexpr const char *kUserAgentOsVersion = "user_agent.os.version";
+
+/**
  * Specifies the category of synthetic traffic, such as tests or bots.
  * <p>
  * This attribute MAY be derived from the contents of the @code user_agent.original @endcode
