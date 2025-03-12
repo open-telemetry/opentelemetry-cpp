@@ -5,6 +5,8 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/sdk/logs/logger_context_factory.h"
 #include "opentelemetry/sdk/logs/processor.h"

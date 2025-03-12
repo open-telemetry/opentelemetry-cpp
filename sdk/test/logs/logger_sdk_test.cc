@@ -3,7 +3,10 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
+#include <algorithm>
+#include <array>
 #include <chrono>
+#include <functional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -12,16 +15,20 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/event_logger.h"
 #include "opentelemetry/logs/event_logger_provider.h"
+#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/logs/noop.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/event_logger_provider.h"
 #include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
