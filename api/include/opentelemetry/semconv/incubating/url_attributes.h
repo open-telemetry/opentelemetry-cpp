@@ -131,7 +131,7 @@ static constexpr const char *kUrlQuery = "url.query";
 /**
  * The highest registered url domain, stripped of the subdomain.
  * <p>
- * This value can be determined precisely with the <a href="http://publicsuffix.org">public suffix
+ * This value can be determined precisely with the <a href="https://publicsuffix.org/">public suffix
  * list</a>. For example, the registered domain for @code foo.example.com @endcode is @code
  * example.com @endcode. Trying to approximate this by simply taking the last two labels will not
  * work well for TLDs such as @code co.uk @endcode.
@@ -163,7 +163,7 @@ static constexpr const char *kUrlTemplate = "url.template";
 /**
  * The effective top level domain (eTLD), also known as the domain suffix, is the last part of the
  * domain name. For example, the top level domain for example.com is @code com @endcode. <p> This
- * value can be determined precisely with the <a href="http://publicsuffix.org">public suffix
+ * value can be determined precisely with the <a href="https://publicsuffix.org/">public suffix
  * list</a>.
  */
 static constexpr const char *kUrlTopLevelDomain = "url.top_level_domain";
