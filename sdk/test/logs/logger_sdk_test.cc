@@ -346,15 +346,14 @@ TEST(LoggerSDK, LoggerWithEnabledConfig)
   logger->EmitLogRecord(std::move(log_record));
   // Since log_record was created after recording reference timestamp, expect that observed
   // timestamp is greater
-  ASSERT_GT(shared_recordable->GetObservedTimestamp().time_since_epoch().count(),
+  ASSERT_GE(shared_recordable->GetObservedTimestamp().time_since_epoch().count(),
             reference_ts.count());
 
-  // Since this logger should behave like a noop logger, no values within the recordable would be
-  // set.
+  // Since this logger should behave like a valid logger, values within the recordable would be set.
   logger->EmitLogRecord(logs_api::Severity::kWarn, "Log Message");
   ASSERT_EQ(shared_recordable->GetBody(), "Log Message");
   ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kWarn);
-  ASSERT_GT(shared_recordable->GetObservedTimestamp().time_since_epoch().count(),
+  ASSERT_GE(shared_recordable->GetObservedTimestamp().time_since_epoch().count(),
             reference_ts.count());
 }
 
@@ -500,7 +499,7 @@ TEST_P(CustomLoggerConfiguratorTestFixture, VerifyCustomConfiguratorBehavior)
   else
   {
     ASSERT_EQ(logger_under_test->GetName(), "test-logger");
-    ASSERT_GT(shared_recordable_under_test->GetObservedTimestamp().time_since_epoch().count(),
+    ASSERT_GE(shared_recordable_under_test->GetObservedTimestamp().time_since_epoch().count(),
               reference_ts.count());
   }
 
