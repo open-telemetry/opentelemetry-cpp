@@ -41,9 +41,10 @@ public:
     void RegisterMetricExporter( );
     void RegisterLogRecordExporter( );
 
-    void Start();
-    void Wait();
-    void Shutdown();
+    void Start(); // deprecated
+    bool Start2(); // returns whether the server was successfully created
+    void Wait(); // don't call if Start2() returned false
+    void Shutdown(); // ditto
 
     // These are global gRPC changes.
     static void EnableDefaultHealthCheckService(bool enable);
