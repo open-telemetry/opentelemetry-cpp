@@ -372,7 +372,7 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
           // Something weird about attributes hashmap. If cardinality is setup to n, it emits n-1 including overflow. Just making the logic generic here to succeed for n or n-1 total cardinality.
           EXPECT_GE(cardinality_limit, md.point_data_attr_.size());
           EXPECT_LT(cardinality_limit / 2, md.point_data_attr_.size());
-          for (int i = 0; i < md.point_data_attr_.size(); i++)
+          for (size_t i = 0; i < md.point_data_attr_.size(); i++)
           {
             EXPECT_EQ(1, md.point_data_attr_[i].attributes.size());
             if (md.point_data_attr_[i].attributes.find("attr1") != md.point_data_attr_[i].attributes.end())
