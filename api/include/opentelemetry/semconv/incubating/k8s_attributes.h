@@ -97,6 +97,16 @@ static constexpr const char *kK8sDeploymentName = "k8s.deployment.name";
 static constexpr const char *kK8sDeploymentUid = "k8s.deployment.uid";
 
 /**
+ * The name of the horizontal pod autoscaler.
+ */
+static constexpr const char *kK8sHpaName = "k8s.hpa.name";
+
+/**
+ * The UID of the horizontal pod autoscaler.
+ */
+static constexpr const char *kK8sHpaUid = "k8s.hpa.uid";
+
+/**
  * The name of the Job.
  */
 static constexpr const char *kK8sJobName = "k8s.job.name";
@@ -145,9 +155,9 @@ static constexpr const char *kK8sPodLabel = "k8s.pod.label";
 
 /**
  * Deprecated, use @code k8s.pod.label @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code k8s.pod.label @endcode.
+ * {"note": "Replaced by @code k8s.pod.label @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kK8sPodLabels = "k8s.pod.labels";
 
@@ -170,6 +180,26 @@ static constexpr const char *kK8sReplicasetName = "k8s.replicaset.name";
  * The UID of the ReplicaSet.
  */
 static constexpr const char *kK8sReplicasetUid = "k8s.replicaset.uid";
+
+/**
+ * The name of the replication controller.
+ */
+static constexpr const char *kK8sReplicationcontrollerName = "k8s.replicationcontroller.name";
+
+/**
+ * The UID of the replication controller.
+ */
+static constexpr const char *kK8sReplicationcontrollerUid = "k8s.replicationcontroller.uid";
+
+/**
+ * The name of the resource quota.
+ */
+static constexpr const char *kK8sResourcequotaName = "k8s.resourcequota.name";
+
+/**
+ * The UID of the resource quota.
+ */
+static constexpr const char *kK8sResourcequotaUid = "k8s.resourcequota.uid";
 
 /**
  * The name of the StatefulSet.

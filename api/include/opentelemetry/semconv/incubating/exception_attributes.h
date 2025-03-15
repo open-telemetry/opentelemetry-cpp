@@ -21,10 +21,10 @@ namespace exception
 
 /**
  * Indicates that the exception is escaping the scope of the span.
- * <p>
+ *
  * @deprecated
- * It's no longer recommended to record exceptions that are handled and do not escape the scope of a
- * span.
+ * {"note": "It's no longer recommended to record exceptions that are handled and do not escape the
+ * scope of a span.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kExceptionEscaped = "exception.escaped";
 

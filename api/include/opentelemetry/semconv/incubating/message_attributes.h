@@ -21,34 +21,34 @@ namespace message
 
 /**
  * Deprecated, use @code rpc.message.compressed_size @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code rpc.message.compressed_size @endcode.
+ * {"note": "Replaced by @code rpc.message.compressed_size @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessageCompressedSize =
     "message.compressed_size";
 
 /**
  * Deprecated, use @code rpc.message.id @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code rpc.message.id @endcode.
+ * {"note": "Replaced by @code rpc.message.id @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessageId = "message.id";
 
 /**
  * Deprecated, use @code rpc.message.type @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code rpc.message.type @endcode.
+ * {"note": "Replaced by @code rpc.message.type @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessageType = "message.type";
 
 /**
  * Deprecated, use @code rpc.message.uncompressed_size @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code rpc.message.uncompressed_size @endcode.
+ * {"note": "Replaced by @code rpc.message.uncompressed_size @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessageUncompressedSize =
     "message.uncompressed_size";
