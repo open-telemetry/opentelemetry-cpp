@@ -30,16 +30,15 @@ ReadWriteLogRecord::ReadWriteLogRecord()
     : severity_(opentelemetry::logs::Severity::kInvalid),
       resource_(nullptr),
       instrumentation_scope_(nullptr),
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+      body_(std::string()),
+#else
+      body_(nostd::string_view()),
+#endif
       observed_timestamp_(std::chrono::system_clock::now()),
       event_id_(0),
       event_name_("")
-{
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  body_ = std::string();
-#else
-  body_ = nostd::string_view();
-#endif
-}
+{}
 
 ReadWriteLogRecord::~ReadWriteLogRecord() {}
 
