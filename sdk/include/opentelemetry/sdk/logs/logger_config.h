@@ -52,8 +52,6 @@ private:
   explicit LoggerConfig(const bool disabled = false) : disabled_(disabled) {}
 
   bool disabled_;
-  static const LoggerConfig kDisabledConfig;
-  static const LoggerConfig kDefaultConfig;
 };
 }  // namespace logs
 }  // namespace sdk

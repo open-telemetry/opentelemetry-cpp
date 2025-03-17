@@ -9,9 +9,6 @@ namespace sdk
 namespace logs
 {
 
-const LoggerConfig LoggerConfig::kDefaultConfig  = LoggerConfig();
-const LoggerConfig LoggerConfig::kDisabledConfig = LoggerConfig(true);
-
 bool LoggerConfig::operator==(const LoggerConfig &other) const noexcept
 {
   return disabled_ == other.disabled_;
@@ -24,16 +21,18 @@ bool LoggerConfig::IsEnabled() const noexcept
 
 LoggerConfig LoggerConfig::Enabled()
 {
-  return kDefaultConfig;
+  return Default();
 }
 
 LoggerConfig LoggerConfig::Disabled()
 {
+  static const auto kDisabledConfig = LoggerConfig(true);
   return kDisabledConfig;
 }
 
 LoggerConfig LoggerConfig::Default()
 {
+  static const auto kDefaultConfig = LoggerConfig();
   return kDefaultConfig;
 }
 
