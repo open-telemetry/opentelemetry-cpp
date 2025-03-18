@@ -9,28 +9,28 @@ namespace sdk
 namespace logs
 {
 
-bool LoggerConfig::operator==(const LoggerConfig &other) const noexcept
+OPENTELEMETRY_EXPORT bool LoggerConfig::operator==(const LoggerConfig &other) const noexcept
 {
   return disabled_ == other.disabled_;
 }
 
-bool LoggerConfig::IsEnabled() const noexcept
+OPENTELEMETRY_EXPORT bool LoggerConfig::IsEnabled() const noexcept
 {
   return !disabled_;
 }
 
-LoggerConfig LoggerConfig::Enabled()
+OPENTELEMETRY_EXPORT LoggerConfig LoggerConfig::Enabled()
 {
   return Default();
 }
 
-LoggerConfig LoggerConfig::Disabled()
+OPENTELEMETRY_EXPORT LoggerConfig LoggerConfig::Disabled()
 {
   static const auto kDisabledConfig = LoggerConfig(true);
   return kDisabledConfig;
 }
 
-LoggerConfig LoggerConfig::Default()
+OPENTELEMETRY_EXPORT LoggerConfig LoggerConfig::Default()
 {
   static const auto kDefaultConfig = LoggerConfig();
   return kDefaultConfig;

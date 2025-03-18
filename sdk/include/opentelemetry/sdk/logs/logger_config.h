@@ -16,7 +16,7 @@ namespace logs
  * ScopeConfigurator should be used to compute the desired LoggerConfig which can then be used to
  * configure a Logger.
  */
-class LoggerConfig
+class OPENTELEMETRY_EXPORT LoggerConfig
 {
 public:
   bool operator==(const LoggerConfig &other) const noexcept;
