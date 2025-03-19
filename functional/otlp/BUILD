@@ -20,3 +20,17 @@ otel_cc_binary(
         "//exporters/otlp:otlp_http_exporter",
     ]),
 )
+
+otel_cc_binary(
+    name = "func_otlp_grpc",
+    srcs = [
+        "func_grpc_main.cc",
+    ],
+    args = [
+        "--list",
+    ],
+    tags = ["otlp"],
+    deps = dll_deps([
+        "//exporters/otlp:otlp_grpc_exporter",
+    ]),
+)
