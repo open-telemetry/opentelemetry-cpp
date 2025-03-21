@@ -8,6 +8,8 @@
 #include <vector>
 
 #include "opentelemetry/version.h"
+#include "logger_config.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/resource/resource.h"
 
@@ -33,9 +35,15 @@ namespace logs
 class OPENTELEMETRY_EXPORT_TYPE LoggerContext
 {
 public:
-  explicit LoggerContext(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
-                         const opentelemetry::sdk::resource::Resource &resource =
-                             opentelemetry::sdk::resource::Resource::Create({})) noexcept;
+  explicit LoggerContext(
+      std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
+      const opentelemetry::sdk::resource::Resource &resource =
+          opentelemetry::sdk::resource::Resource::Create({}),
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator =
+          std::make_unique<instrumentationscope::ScopeConfigurator<LoggerConfig>>(
+              instrumentationscope::ScopeConfigurator<LoggerConfig>::Builder(
+                  LoggerConfig::Default())
+                  .Build())) noexcept;
 
   /**
    * Attaches a log processor to list of configured processors to this logger context.
@@ -62,6 +70,13 @@ public:
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
 
   /**
+   * Obtain the ScopeConfigurator with this logger context.
+   * @return The ScopeConfigurator for this logger context.
+   */
+  const instrumentationscope::ScopeConfigurator<LoggerConfig> &GetLoggerConfigurator()
+      const noexcept;
+
+  /**
    * Force all active LogProcessors to flush any buffered logs
    * within the given timeout.
    */
@@ -76,6 +91,8 @@ private:
   //  order of declaration is important here - resource object should be destroyed after processor.
   opentelemetry::sdk::resource::Resource resource_;
   std::unique_ptr<LogRecordProcessor> processor_;
+
+  std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator_;
 };
 }  // namespace logs
 }  // namespace sdk
