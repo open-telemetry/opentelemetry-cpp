@@ -30,11 +30,11 @@ namespace logs
  *
  * This class is thread-compatible.
  */
-class ReadWriteLogRecord final : public ReadableLogRecord
+class LogRecordData final : public ReadableLogRecord
 {
 public:
-  ReadWriteLogRecord();
-  ~ReadWriteLogRecord() override;
+  LogRecordData();
+  ~LogRecordData() override;
 
   /**
    * Set the timestamp for this log.
@@ -78,9 +78,9 @@ public:
    */
   void SetBody(const opentelemetry::common::AttributeValue &message) noexcept override;
 
-  /**
-   * Get body field of this log.
-   * @return the body field for this log.
+  /**                                     \
+   * Get body field of this log.          \
+   * @return the body field for this log. \
    */
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   const common::OwnedAttributeValue &
@@ -202,9 +202,9 @@ private:
   common::OwnedAttributeValue body_;
   common::AttributeConverter attribute_converter_;
 #else
-  std::unordered_map<std::string, opentelemetry::common::AttributeValue> attributes_map_;
+  common::MixedAttributeMap attributes_map_;
   // We resue the same utility functions of MixedAttributeMap with key="" for the body field
-  opentelemetry::common::AttributeValue body_;
+  common::MixedAttributeMap body_;
 #endif
   opentelemetry::common::SystemTimestamp timestamp_;
   opentelemetry::common::SystemTimestamp observed_timestamp_;
