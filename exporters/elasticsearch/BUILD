@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//:dll_deps.bzl", "dll_deps")
-load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -16,14 +16,6 @@ otel_cc_library(
         "include/opentelemetry/exporters/elasticsearch/es_log_record_exporter.h",
         "include/opentelemetry/exporters/elasticsearch/es_log_recordable.h",
     ],
-    linkopts = select({
-        "//bazel:windows": [
-            "-DEFAULTLIB:advapi32.lib",
-            "-DEFAULTLIB:crypt32.lib",
-            "-DEFAULTLIB:Normaliz.lib",
-        ],
-        "//conditions:default": [],
-    }),
     strip_include_prefix = "include",
     tags = ["es"],
     deps = [

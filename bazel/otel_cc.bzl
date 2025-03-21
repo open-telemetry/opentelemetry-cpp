@@ -43,6 +43,10 @@ def otel_cc_library(**kwargs):
 
     rules_cc_library(**kwargs)
 
+def otel_cc_test_library(**kwargs):
+    kwargs["testonly"] = kwargs.get("testonly", True)
+    otel_cc_library(**kwargs)
+
 def otel_cc_binary(**kwargs):
     rules_cc_binary(**kwargs)
 
