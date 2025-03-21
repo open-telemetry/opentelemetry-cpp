@@ -496,7 +496,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
                                  instrument_descriptor),
 #endif
             view.GetAggregationConfig()));
-        storage_registry_[instrument_descriptor.name_] = storage;
+        storage_registry_[view_instr_desc.name_] = storage;
         multi_storage->AddStorage(storage);
         return true;
       });
@@ -554,7 +554,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
                                  instrument_descriptor),
 #endif
             view.GetAggregationConfig()));
-        storage_registry_[instrument_descriptor.name_] = storage;
+        storage_registry_[view_instr_desc.name_] = storage;
         static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
         return true;
       });
