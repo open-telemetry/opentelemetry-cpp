@@ -9,29 +9,29 @@ namespace sdk
 namespace trace
 {
 
-TracerConfig TracerConfig::Disabled()
+OPENTELEMETRY_EXPORT TracerConfig TracerConfig::Disabled()
 {
   static const auto kDisabledConfig = TracerConfig(true);
   return kDisabledConfig;
 }
 
-TracerConfig TracerConfig::Enabled()
+OPENTELEMETRY_EXPORT TracerConfig TracerConfig::Enabled()
 {
   return Default();
 }
 
-TracerConfig TracerConfig::Default()
+OPENTELEMETRY_EXPORT TracerConfig TracerConfig::Default()
 {
   static const auto kDefaultConfig = TracerConfig();
   return kDefaultConfig;
 }
 
-bool TracerConfig::IsEnabled() const noexcept
+OPENTELEMETRY_EXPORT bool TracerConfig::IsEnabled() const noexcept
 {
   return !disabled_;
 }
 
-bool TracerConfig::operator==(const TracerConfig &other) const noexcept
+OPENTELEMETRY_EXPORT bool TracerConfig::operator==(const TracerConfig &other) const noexcept
 {
   return disabled_ == other.disabled_;
 }

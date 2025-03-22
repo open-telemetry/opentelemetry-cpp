@@ -16,7 +16,7 @@ namespace trace
  * ScopeConfigurator should be used to compute the desired TracerConfig which can then be used to
  * configure a Tracer.
  */
-class TracerConfig
+class OPENTELEMETRY_EXPORT TracerConfig
 {
 public:
   bool operator==(const TracerConfig &other) const noexcept;
