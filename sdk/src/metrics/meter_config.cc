@@ -8,9 +8,6 @@ namespace sdk
 namespace metrics
 {
 
-const MeterConfig MeterConfig::kDefaultConfig  = MeterConfig();
-const MeterConfig MeterConfig::kDisabledConfig = MeterConfig(true);
-
 bool MeterConfig::operator==(const MeterConfig &other) const noexcept
 {
   return disabled_ == other.disabled_;
@@ -23,16 +20,18 @@ bool MeterConfig::IsEnabled() const noexcept
 
 MeterConfig MeterConfig::Disabled()
 {
+  static const auto kDisabledConfig = MeterConfig(true);
   return kDisabledConfig;
 }
 
 MeterConfig MeterConfig::Enabled()
 {
-  return kDefaultConfig;
+  return Default();
 }
 
 MeterConfig MeterConfig::Default()
 {
+  static const auto kDefaultConfig = MeterConfig();
   return kDefaultConfig;
 }
 
