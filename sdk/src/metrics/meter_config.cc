@@ -8,28 +8,28 @@ namespace sdk
 namespace metrics
 {
 
-bool MeterConfig::operator==(const MeterConfig &other) const noexcept
+OPENTELEMETRY_EXPORT bool MeterConfig::operator==(const MeterConfig &other) const noexcept
 {
   return disabled_ == other.disabled_;
 }
 
-bool MeterConfig::IsEnabled() const noexcept
+OPENTELEMETRY_EXPORT bool MeterConfig::IsEnabled() const noexcept
 {
   return !disabled_;
 }
 
-MeterConfig MeterConfig::Disabled()
+OPENTELEMETRY_EXPORT MeterConfig MeterConfig::Disabled()
 {
   static const auto kDisabledConfig = MeterConfig(true);
   return kDisabledConfig;
 }
 
-MeterConfig MeterConfig::Enabled()
+OPENTELEMETRY_EXPORT MeterConfig MeterConfig::Enabled()
 {
   return Default();
 }
 
-MeterConfig MeterConfig::Default()
+OPENTELEMETRY_EXPORT MeterConfig MeterConfig::Default()
 {
   static const auto kDefaultConfig = MeterConfig();
   return kDefaultConfig;
