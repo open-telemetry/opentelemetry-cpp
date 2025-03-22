@@ -51,8 +51,6 @@ public:
 private:
   explicit TracerConfig(const bool disabled = false) : disabled_(disabled) {}
   bool disabled_;
-  static const TracerConfig kDefaultConfig;
-  static const TracerConfig kDisabledConfig;
 };
 }  // namespace trace
 }  // namespace sdk

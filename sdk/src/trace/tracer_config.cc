@@ -9,21 +9,20 @@ namespace sdk
 namespace trace
 {
 
-const TracerConfig TracerConfig::kDefaultConfig  = TracerConfig();
-const TracerConfig TracerConfig::kDisabledConfig = TracerConfig(true);
-
 TracerConfig TracerConfig::Disabled()
 {
+  static const auto kDisabledConfig = TracerConfig(true);
   return kDisabledConfig;
 }
 
 TracerConfig TracerConfig::Enabled()
 {
-  return kDefaultConfig;
+  return Default();
 }
 
 TracerConfig TracerConfig::Default()
 {
+  static const auto kDefaultConfig = TracerConfig();
   return kDefaultConfig;
 }
 

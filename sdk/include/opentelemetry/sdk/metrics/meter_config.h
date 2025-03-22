@@ -16,7 +16,7 @@ namespace metrics
  * ScopeConfigurator should be used to compute the desired MeterConfig which can then be used to
  * configure a Meter.
  */
-class MeterConfig
+class OPENTELEMETRY_EXPORT MeterConfig
 {
 public:
   bool operator==(const MeterConfig &other) const noexcept;
@@ -51,8 +51,6 @@ public:
 private:
   explicit MeterConfig(const bool disabled = false) : disabled_(disabled) {}
   bool disabled_;
-  static const MeterConfig kDefaultConfig;
-  static const MeterConfig kDisabledConfig;
 };
 }  // namespace metrics
 }  // namespace sdk
