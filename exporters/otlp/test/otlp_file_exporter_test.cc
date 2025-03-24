@@ -108,8 +108,9 @@ public:
     std::string report_trace_id;
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-    auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url",
-                                      {{"scope_key", "scope_value"}});
+    std::unordered_map<std::string, common::AttributeValue> scope_attributes;
+    scope_attributes["scope_key"] = common::AttributeValue("scope_value");
+    auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url", scope_attributes);
 #else
     auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url");
 #endif
