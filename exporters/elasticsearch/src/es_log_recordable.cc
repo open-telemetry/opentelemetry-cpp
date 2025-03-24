@@ -23,19 +23,19 @@
 
 namespace nlohmann
 {
-template <typename T>
+template <class T>
 struct json_assign_visitor
 {
   T *j_;
   json_assign_visitor(T &j) : j_(&j) {}
 
-  template <typename U>
+  template <class U>
   void operator()(const U &u)
   {
     *j_ = u;
   }
 
-  template <typename U>
+  template <class U>
   void operator()(const opentelemetry::nostd::span<U> &span)
   {
     *j_ = nlohmann::json::array();
