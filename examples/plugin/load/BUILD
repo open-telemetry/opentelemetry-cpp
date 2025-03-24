@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//:dll_deps.bzl", "dll_deps")
-load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
+load("//bazel:otel_cc.bzl", "otel_cc_binary")
 
 otel_cc_binary(
     name = "load_plugin",
@@ -14,9 +14,10 @@ otel_cc_binary(
         # This argument here is a dummy config file, that's been read and ignored
         "$(rootpath //examples/plugin/plugin:example_plugin.so)",
     ],
-    linkopts = [
-        "-ldl",
-    ],
+    linkopts = select({
+        "//bazel:windows": [],
+        "//conditions:default": ["-ldl"],
+    }),
     deps = dll_deps([
         "//api",
         "//examples/plugin/plugin:example_plugin.so",

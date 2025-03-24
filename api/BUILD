@@ -1,8 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "int_flag", "string_flag")
-load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
+load("@bazel_skylib//rules:common_settings.bzl", "int_flag", "string_flag")
+load("//bazel:otel_cc.bzl", "otel_cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -23,7 +23,6 @@ string_flag(
 
 otel_cc_library(
     name = "api",
-    hdrs = glob(["include/**/*.h"]),
     defines = ["HAVE_ABSEIL"] + select({
         ":set_cxx_stdlib_none": [],
         ### automatic selection
@@ -43,9 +42,9 @@ otel_cc_library(
         ":abi_version_no_1": ["OPENTELEMETRY_ABI_VERSION_NO=1"],
         ":abi_version_no_2": ["OPENTELEMETRY_ABI_VERSION_NO=2"],
     }),
-    strip_include_prefix = "include",
     tags = ["api"],
     deps = [
+        "headers",
         "@abseil-cpp//absl/base",
         "@abseil-cpp//absl/strings",
         "@abseil-cpp//absl/types:variant",

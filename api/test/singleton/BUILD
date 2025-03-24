@@ -174,9 +174,10 @@ otel_cc_test(
         "component_g",
         "component_h",
     ],
-    linkopts = [
-        "-ldl",
-    ],
+    linkopts = select({
+        "//bazel:windows": [],
+        "//conditions:default": ["-ldl"],
+    }),
     linkstatic = False,
     tags = [
         "api",

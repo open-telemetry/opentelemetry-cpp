@@ -9,7 +9,10 @@ otel_cc_binary(
     srcs = [
         "metrics_ostream.cc",
     ],
-    linkopts = ["-pthread"],
+    linkopts = select({
+        "//bazel:windows": [],
+        "//conditions:default": ["-pthread"],
+    }),
     tags = ["ostream"],
     deps = dll_deps([
         "//api",

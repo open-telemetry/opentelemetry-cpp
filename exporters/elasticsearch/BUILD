@@ -12,17 +12,12 @@ otel_cc_library(
         "src/es_log_record_exporter.cc",
         "src/es_log_recordable.cc",
     ],
-    hdrs = [
-        "include/opentelemetry/exporters/elasticsearch/es_log_record_exporter.h",
-        "include/opentelemetry/exporters/elasticsearch/es_log_recordable.h",
-    ],
-    strip_include_prefix = "include",
     tags = ["es"],
     deps = [
+        "headers",
         "//ext:headers",
         "//ext/src/http/client/curl:http_client_curl",
         "//sdk/src/logs",
-        "@curl",
         "@nlohmann_json//:json",
     ],
 )
@@ -37,7 +32,6 @@ otel_cc_test(
     deps = dll_deps([
         ":es_log_record_exporter",
         "@googletest//:gtest_main",
-        "@curl",
         # This was not exported in the "dll" version, hence it needs to be linked in statically
         # In the non-dll version, it'll be just a duplicate dependency, and would be ignored
         "@nlohmann_json//:json",

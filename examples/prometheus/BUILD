@@ -9,7 +9,10 @@ otel_cc_binary(
     srcs = [
         "main.cc",
     ],
-    linkopts = ["-pthread"],
+    linkopts = select({
+        "//bazel:windows": [],
+        "//conditions:default": ["-pthread"],
+    }),
     tags = ["prometheus"],
     deps = dll_deps([
         "//api",
