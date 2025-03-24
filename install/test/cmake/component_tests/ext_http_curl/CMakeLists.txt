@@ -15,7 +15,7 @@ include(GoogleTest)
 
 add_executable(ext_http_curl_test ${INSTALL_TEST_SRC_DIR}/test_ext_http_curl.cc)
 target_link_libraries(
-  ext_http_curl_test PRIVATE opentelemetry-cpp::http_client_curl GTest::GTest
-                             GTest::Main)
+  ext_http_curl_test PRIVATE opentelemetry-cpp::http_client_curl GTest::gtest
+                             GTest::gtest_main)
 
 gtest_discover_tests(ext_http_curl_test)

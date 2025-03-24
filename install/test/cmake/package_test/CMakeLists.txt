@@ -51,25 +51,21 @@ if(NOT OPENTELEMETRY_CPP_COMPONENTS_INSTALLED)
   message(FATAL_ERROR "OPENTELEMETRY_CPP_COMPONENTS_INSTALLED is empty")
 endif()
 
-# Set the components to test. If not set, use all installed components.
-if(NOT COMPONENTS_TO_TEST)
-  message(
-    STATUS
-      "COMPONENTS_TO_TEST is empty. Setting to OPENTELEMETRY_CPP_COMPONENTS_INSTALLED"
-  )
-  set(COMPONENTS_TO_TEST ${OPENTELEMETRY_CPP_COMPONENTS_INSTALLED})
+if(NOT INSTALL_TEST_COMPONENTS)
+  message(FATAL_ERROR "INSTALL_TEST_COMPONENTS is empty")
 endif()
 
 message(
   STATUS
-    "Testing the full package install on components = ${COMPONENTS_TO_TEST}")
+    "Testing the full package install on components = ${INSTALL_TEST_COMPONENTS}"
+)
 
 find_package(GTest REQUIRED)
 include(GoogleTest)
 
 add_executable(full_test)
 
-foreach(component IN LISTS COMPONENTS_TO_TEST)
+foreach(component IN LISTS INSTALL_TEST_COMPONENTS)
   message(STATUS "Adding test source for component ${component}")
   target_sources(full_test
                  PRIVATE "${INSTALL_TEST_SRC_DIR}/test_${component}.cc")
@@ -77,6 +73,6 @@ endforeach()
 
 target_include_directories(full_test PRIVATE ${OPENTELEMETRY_CPP_INCLUDE_DIRS})
 target_link_libraries(full_test PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES}
-                                        GTest::GTest GTest::Main)
+                                        GTest::gtest GTest::gtest_main)
 
 gtest_discover_tests(full_test)

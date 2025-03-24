@@ -23,6 +23,8 @@ TEST(ExportersEtwInstall, LoggerProvider)
 
   const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
   auto logger = lp.GetLogger(providerName, schema_url);
+  ASSERT_TRUE(logger != nullptr);
+
   // Log attributes
   Properties attribs = {{"attrib1", 1}, {"attrib2", 2}};
   EXPECT_NO_THROW(logger->EmitLogRecord(opentelemetry::logs::Severity::kDebug,
@@ -39,6 +41,7 @@ TEST(ExportersEtwInstall, TracerProvider)
                                     {"enableRelatedActivityId", false},
                                     {"enableAutoParent", false}});
   auto tracer = tp.GetTracer(providerName);
+  ASSERT_TRUE(tracer != nullptr);
   {
     auto aSpan  = tracer->StartSpan("A.min");
     auto aScope = tracer->WithActiveSpan(aSpan);
@@ -54,7 +57,9 @@ TEST(ExportersEtwInstall, TracerProvider)
     }
     EXPECT_NO_THROW(aSpan->End());
   }
-  tracer->CloseWithMicroseconds(0);
+#  if OPENTELEMETRY_ABI_VERSION_NO == 1
+  EXPECT_NO_THROW(tracer->CloseWithMicroseconds(0));
+#  endif
 }
 
 #endif  // _WIN32

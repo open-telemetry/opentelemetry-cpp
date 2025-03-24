@@ -152,18 +152,8 @@ set(COMPONENT_ext_dll_COMPONENT_DEPENDS
     api
     sdk
     ext_common
-    ext_http_curl
     exporters_in_memory
     exporters_ostream
-    exporters_otlp_common
-    exporters_otlp_file
-    exporters_otlp_grpc
-    exporters_otlp_http
-    exporters_prometheus
-    exporters_elasticsearch
-    exporters_etw
-    exporters_zipkin
-    shims_opentracing
 )
 
 set(COMPONENT_exporters_in_memory_COMPONENT_DEPENDS

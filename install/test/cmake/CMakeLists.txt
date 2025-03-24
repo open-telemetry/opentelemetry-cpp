@@ -4,34 +4,47 @@
 cmake_minimum_required(VERSION 3.10)
 project(opentelemetry-cpp-component-install-tests LANGUAGES CXX)
 
-if(CXX_STANDARD)
-  message(STATUS "CMAKE_CXX_STANDARD is set from CXX_STANDARD=${CXX_STANDARD}")
-  set(CMAKE_CXX_STANDARD $CXX_STANDARD)
-else()
-  set(CMAKE_CXX_STANDARD 14)
-  message(
-    STATUS "CMAKE_CXX_STANDARD is set to default of ${CMAKE_CXX_STANDARD}")
+if(NOT INSTALL_TEST_CMAKE_OPTIONS)
+  set(INSTALL_TEST_CMAKE_OPTIONS
+      "-DCMAKE_CXX_STANDARD=14 -DCMAKE_BUILD_TYPE=Debug")
 endif()
 
-include(${CMAKE_SOURCE_DIR}/../../../cmake/component-definitions.cmake)
+separate_arguments(INSTALL_TEST_CMAKE_OPTIONS)
 
-# Check that COMPONENTS_TO_TEST is set and contains valid components
-if(NOT COMPONENTS_TO_TEST)
-  message(FATAL_ERROR "COMPONENTS_TO_TEST is not set")
+message(
+  STATUS "INSTALL_TEST_CMAKE_OPTIONS is set to ${INSTALL_TEST_CMAKE_OPTIONS}")
+
+find_package(opentelemetry-cpp CONFIG REQUIRED)
+
+message(
+  STATUS
+    "OPENTELEMETRY_CPP_COMPONENTS_INSTALLED = ${OPENTELEMETRY_CPP_COMPONENTS_INSTALLED}"
+)
+
+# Check that INSTALL_TEST_COMPONENTS is set and contains installed components
+if(NOT INSTALL_TEST_COMPONENTS)
+  message(
+    STATUS
+      "INSTALL_TEST_COMPONENTS is not set. Setting to OPENTELEMETRY_CPP_COMPONENTS_INSTALLED"
+  )
+  set(INSTALL_TEST_COMPONENTS ${OPENTELEMETRY_CPP_COMPONENTS_INSTALLED})
 else()
   set(COMPONENTS_ARE_VALID TRUE)
-  foreach(component ${COMPONENTS_TO_TEST})
-    if(NOT component IN_LIST opentelemetry-cpp_COMPONENTS)
+  foreach(component ${INSTALL_TEST_COMPONENTS})
+    if(NOT component IN_LIST OPENTELEMETRY_CPP_COMPONENTS_INSTALLED)
       message(
         ERROR
-        " Component ${component} is not a valid opentelemetry-cpp component")
+        " Component ${component} is not an installed opentelemetry-cpp component"
+      )
       set(COMPONENTS_ARE_VALID FALSE)
     endif()
   endforeach()
   if(NOT COMPONENTS_ARE_VALID)
-    message(FATAL_ERROR "COMPONENTS_TO_TEST contains invalid components")
+    message(FATAL_ERROR "INSTALL_TEST_COMPONENTS contains invalid components")
   endif()
 endif()
+
+message(STATUS "INSTALL_TEST_COMPONENTS = ${INSTALL_TEST_COMPONENTS}")
 
 set(INSTALL_TEST_SRC_DIR "${CMAKE_SOURCE_DIR}/../src")
 
@@ -53,7 +66,7 @@ add_test(
     ${CMAKE_COMMAND} --log-level=DEBUG -S
     ${CMAKE_SOURCE_DIR}/usage_tests/no_components -B
     build-cmake-usage-no-components-test
-    -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
+    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
 
 add_test(
   NAME cmake-usage-unsorted-components-test
@@ -61,7 +74,7 @@ add_test(
     ${CMAKE_COMMAND} --log-level=DEBUG -S
     ${CMAKE_SOURCE_DIR}/usage_tests/unsorted_components -B
     build-cmake-usage-unsorted-components-test
-    -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
+    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
 
 add_test(
   NAME cmake-usage-missing-components-test
@@ -69,7 +82,7 @@ add_test(
     ${CMAKE_COMMAND} --log-level=DEBUG -S
     ${CMAKE_SOURCE_DIR}/usage_tests/missing_components -B
     build-cmake-usage-missing-components-test
-    -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
+    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
 
 add_test(
   NAME cmake-usage-unsupported-components-test
@@ -77,7 +90,7 @@ add_test(
     ${CMAKE_COMMAND} --log-level=DEBUG -S
     ${CMAKE_SOURCE_DIR}/usage_tests/unsupported_components -B
     build-cmake-usage-unsupported-components-test
-    -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH})
+    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
 
 # -----------------------------------------------------------
 # Test the full package install using legacy cmake build instructions
@@ -88,8 +101,10 @@ add_test(
   NAME full-package-cmake-config-test
   COMMAND
     ${CMAKE_COMMAND} --log-level=DEBUG -S ${CMAKE_SOURCE_DIR}/package_test -B
-    build-full-package-test -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-    -DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR})
+    build-full-package-test "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+    ${INSTALL_TEST_CMAKE_OPTIONS}
+    "-DINSTALL_TEST_COMPONENTS=${INSTALL_TEST_COMPONENTS}"
+    "-DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR}")
 
 # Build the full package test executable
 add_test(NAME full-package-build-test
@@ -103,15 +118,16 @@ add_test(NAME full-package-run-test
 
 # -----------------------------------------------------------
 # Loop over all the components to test
-foreach(component ${COMPONENTS_TO_TEST})
+foreach(component ${INSTALL_TEST_COMPONENTS})
   # Test cmake configuration
   add_test(
     NAME component-${component}-cmake-config-test
     COMMAND
       ${CMAKE_COMMAND} --log-level=DEBUG -S
       ${CMAKE_SOURCE_DIR}/component_tests/${component} -B
-      build-${component}-test -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-      -DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR})
+      build-${component}-test "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+      ${INSTALL_TEST_CMAKE_OPTIONS}
+      "-DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR}")
 
   # Build the component test executable
   add_test(NAME component-${component}-build-test

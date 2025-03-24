@@ -17,6 +17,6 @@ add_executable(exporters_zipkin_test
                ${INSTALL_TEST_SRC_DIR}/test_exporters_zipkin.cc)
 target_link_libraries(
   exporters_zipkin_test PRIVATE opentelemetry-cpp::zipkin_trace_exporter
-                                GTest::GTest GTest::Main)
+                                GTest::gtest GTest::gtest_main)
 
 gtest_discover_tests(exporters_zipkin_test)

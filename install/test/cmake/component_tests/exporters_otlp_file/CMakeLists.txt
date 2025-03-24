@@ -21,7 +21,7 @@ target_link_libraries(
           opentelemetry-cpp::otlp_file_exporter
           opentelemetry-cpp::otlp_file_log_record_exporter
           opentelemetry-cpp::otlp_file_metric_exporter
-          GTest::GTest
-          GTest::Main)
+          GTest::gtest
+          GTest::gtest_main)
 
 gtest_discover_tests(exporters_otlp_file_test)

@@ -200,9 +200,11 @@ check_targets_imported(_OPENTELEMETRY_CPP_TARGETS)
 # Set OPENTELEMETRY_CPP_* variables
 set(OPENTELEMETRY_CPP_LIBRARIES)
 
+set(DLL_TARGET "opentelemetry-cpp::opentelemetry_cpp")
+
 foreach(_TARGET IN LISTS _OPENTELEMETRY_CPP_TARGETS)
-  if(TARGET ${_TARGET})
-    list(APPEND OPENTELEMETRY_CPP_LIBRARIES ${_TARGET})
+  if(TARGET "${_TARGET}" AND NOT "${_TARGET}" STREQUAL "${DLL_TARGET}")
+    list(APPEND OPENTELEMETRY_CPP_LIBRARIES "${_TARGET}")
   endif()
 endforeach()
 

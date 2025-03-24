@@ -24,7 +24,7 @@ target_link_libraries(
           opentelemetry-cpp::trace
           opentelemetry-cpp::metrics
           opentelemetry-cpp::logs
-          GTest::GTest
-          GTest::Main)
+          GTest::gtest
+          GTest::gtest_main)
 
 gtest_discover_tests(sdk_test)

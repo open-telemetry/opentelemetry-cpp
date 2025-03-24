@@ -567,7 +567,7 @@ jobs:
       run: |
         sudo -E ./ci/install_abseil.sh
         sudo -E ./ci/install_protobuf.sh
-        sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil
+        sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
     - name: build and test
       run: |
         ./ci/do_ci.sh cmake.install.test
@@ -860,6 +860,8 @@ jobs:
       run: ./ci/do_ci.ps1 cmake.dll.cxx20.test
     - name: run otprotocol test (DLL build)
       run: ./ci/do_ci.ps1 cmake.exporter.otprotocol.dll.test
+    - name: run cmake install test
+      run: ./ci/do_ci.ps1 cmake.dll.install.test
 
   windows_with_async_export:
     name: CMake (With async export) -> exporter proto
@@ -902,6 +904,18 @@ jobs:
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.test_example_plugin
+
+  windows_cmake_install_test:
+    name: Windows CMake install test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+      - name: Setup Windows CI Environment
+        run: ./ci/setup_windows_ci_environment.ps1
+      - name: Run Tests
+        run: ./ci/do_ci.ps1 cmake.install.test
 
   code_coverage:
     name: Code coverage

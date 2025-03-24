@@ -21,12 +21,10 @@ add_executable(exporters_otlp_grpc_test
                ${INSTALL_TEST_SRC_DIR}/test_exporters_otlp_grpc.cc)
 target_link_libraries(
   exporters_otlp_grpc_test
-  PRIVATE opentelemetry-cpp::proto_grpc
-          opentelemetry-cpp::otlp_grpc_client
-          opentelemetry-cpp::otlp_grpc_exporter
+  PRIVATE opentelemetry-cpp::otlp_grpc_exporter
           opentelemetry-cpp::otlp_grpc_log_record_exporter
           opentelemetry-cpp::otlp_grpc_metrics_exporter
-          GTest::GTest
-          GTest::Main)
+          GTest::gtest
+          GTest::gtest_main)
 
 gtest_discover_tests(exporters_otlp_grpc_test)
