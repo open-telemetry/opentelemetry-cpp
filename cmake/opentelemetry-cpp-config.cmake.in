@@ -1,8 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-#.rst:
-# opentelemetry-cpp-config.cmake
+# .rst: opentelemetry-cpp-config.cmake
 # --------
 #
 # Find the native opentelemetry-cpp includes and library.
@@ -14,48 +13,63 @@
 #
 # ::
 #
-#   OPENTELEMETRY_CPP_INCLUDE_DIRS  - Include directories of opentelemetry-cpp.
-#   OPENTELEMETRY_CPP_LIBRARY_DIRS  - Link directories of opentelemetry-cpp.
-#   OPENTELEMETRY_CPP_LIBRARIES     - List of libraries when using opentelemetry-cpp.
-#   OPENTELEMETRY_CPP_FOUND         - True if opentelemetry-cpp found.
-#   OPENTELEMETRY_ABI_VERSION_NO    - ABI version of opentelemetry-cpp.
-#   OPENTELEMETRY_VERSION           - Version of opentelemetry-cpp.
+# OPENTELEMETRY_CPP_INCLUDE_DIRS  - Include directories of opentelemetry-cpp.
+# OPENTELEMETRY_CPP_LIBRARY_DIRS  - Link directories of opentelemetry-cpp.
+# OPENTELEMETRY_CPP_LIBRARIES     - List of libraries when using
+# opentelemetry-cpp. OPENTELEMETRY_CPP_FOUND         - True if opentelemetry-cpp
+# found. OPENTELEMETRY_ABI_VERSION_NO    - ABI version of opentelemetry-cpp.
+# OPENTELEMETRY_VERSION           - Version of opentelemetry-cpp.
 #
-# ::
-#   opentelemetry-cpp::api                               - Imported target of opentelemetry-cpp::api
-#   opentelemetry-cpp::sdk                               - Imported target of opentelemetry-cpp::sdk
-#   opentelemetry-cpp::ext                               - Imported target of opentelemetry-cpp::ext
-#   opentelemetry-cpp::version                           - Imported target of opentelemetry-cpp::version
-#   opentelemetry-cpp::common                            - Imported target of opentelemetry-cpp::common
-#   opentelemetry-cpp::trace                             - Imported target of opentelemetry-cpp::trace
-#   opentelemetry-cpp::metrics                           - Imported target of opentelemetry-cpp::metrics
-#   opentelemetry-cpp::logs                              - Imported target of opentelemetry-cpp::logs
-#   opentelemetry-cpp::in_memory_span_exporter           - Imported target of opentelemetry-cpp::in_memory_span_exporter
-#   opentelemetry-cpp::otlp_grpc_client                  - Imported target of opentelemetry-cpp::otlp_grpc_client
-#   opentelemetry-cpp::otlp_recordable                   - Imported target of opentelemetry-cpp::otlp_recordable
-#   opentelemetry-cpp::otlp_grpc_exporter                - Imported target of opentelemetry-cpp::otlp_grpc_exporter
-#   opentelemetry-cpp::otlp_grpc_log_record_exporter     - Imported target of opentelemetry-cpp::otlp_grpc_log_record_exporter
-#   opentelemetry-cpp::otlp_grpc_metrics_exporter        - Imported target of opentelemetry-cpp::otlp_grpc_metrics_exporter
-#   opentelemetry-cpp::otlp_http_client                  - Imported target of opentelemetry-cpp::otlp_http_client
-#   opentelemetry-cpp::otlp_http_exporter                - Imported target of opentelemetry-cpp::otlp_http_exporter
-#   opentelemetry-cpp::otlp_http_log_record_exporter     - Imported target of opentelemetry-cpp::otlp_http_log_record_exporter
-#   opentelemetry-cpp::otlp_http_metric_exporter         - Imported target of opentelemetry-cpp::otlp_http_metric_exporter
-#   opentelemetry-cpp::otlp_file_client                  - Imported target of opentelemetry-cpp::otlp_file_client
-#   opentelemetry-cpp::otlp_file_exporter                - Imported target of opentelemetry-cpp::otlp_file_exporter
-#   opentelemetry-cpp::otlp_file_log_record_exporter     - Imported target of opentelemetry-cpp::otlp_file_log_record_exporter
-#   opentelemetry-cpp::otlp_file_metric_exporter         - Imported target of opentelemetry-cpp::otlp_file_metric_exporter
-#   opentelemetry-cpp::ostream_log_record_exporter       - Imported target of opentelemetry-cpp::ostream_log_record_exporter
-#   opentelemetry-cpp::ostream_metrics_exporter          - Imported target of opentelemetry-cpp::ostream_metrics_exporter
-#   opentelemetry-cpp::ostream_span_exporter             - Imported target of opentelemetry-cpp::ostream_span_exporter
-#   opentelemetry-cpp::elasticsearch_log_record_exporter - Imported target of opentelemetry-cpp::elasticsearch_log_record_exporter
-#   opentelemetry-cpp::etw_exporter                      - Imported target of opentelemetry-cpp::etw_exporter
-#   opentelemetry-cpp::http_client_curl                  - Imported target of opentelemetry-cpp::http_client_curl
-#   opentelemetry-cpp::opentracing_shim                  - Imported target of opentelemetry-cpp::opentracing_shim
+# :: opentelemetry-cpp::api                               - Imported target of
+# opentelemetry-cpp::api opentelemetry-cpp::sdk                               -
+# Imported target of opentelemetry-cpp::sdk opentelemetry-cpp::ext - Imported
+# target of opentelemetry-cpp::ext opentelemetry-cpp::version - Imported target
+# of opentelemetry-cpp::version opentelemetry-cpp::common - Imported target of
+# opentelemetry-cpp::common opentelemetry-cpp::trace - Imported target of
+# opentelemetry-cpp::trace opentelemetry-cpp::metrics - Imported target of
+# opentelemetry-cpp::metrics opentelemetry-cpp::logs - Imported target of
+# opentelemetry-cpp::logs opentelemetry-cpp::in_memory_span_exporter           -
+# Imported target of opentelemetry-cpp::in_memory_span_exporter
+# opentelemetry-cpp::otlp_grpc_client - Imported target of
+# opentelemetry-cpp::otlp_grpc_client opentelemetry-cpp::otlp_recordable -
+# Imported target of opentelemetry-cpp::otlp_recordable
+# opentelemetry-cpp::otlp_grpc_exporter - Imported target of
+# opentelemetry-cpp::otlp_grpc_exporter
+# opentelemetry-cpp::otlp_grpc_log_record_exporter     - Imported target of
+# opentelemetry-cpp::otlp_grpc_log_record_exporter
+# opentelemetry-cpp::otlp_grpc_metrics_exporter        - Imported target of
+# opentelemetry-cpp::otlp_grpc_metrics_exporter
+# opentelemetry-cpp::otlp_http_client                  - Imported target of
+# opentelemetry-cpp::otlp_http_client opentelemetry-cpp::otlp_http_exporter -
+# Imported target of opentelemetry-cpp::otlp_http_exporter
+# opentelemetry-cpp::otlp_http_log_record_exporter     - Imported target of
+# opentelemetry-cpp::otlp_http_log_record_exporter
+# opentelemetry-cpp::otlp_http_metric_exporter         - Imported target of
+# opentelemetry-cpp::otlp_http_metric_exporter
+# opentelemetry-cpp::otlp_file_client                  - Imported target of
+# opentelemetry-cpp::otlp_file_client opentelemetry-cpp::otlp_file_exporter -
+# Imported target of opentelemetry-cpp::otlp_file_exporter
+# opentelemetry-cpp::otlp_file_log_record_exporter     - Imported target of
+# opentelemetry-cpp::otlp_file_log_record_exporter
+# opentelemetry-cpp::otlp_file_metric_exporter         - Imported target of
+# opentelemetry-cpp::otlp_file_metric_exporter
+# opentelemetry-cpp::ostream_log_record_exporter       - Imported target of
+# opentelemetry-cpp::ostream_log_record_exporter
+# opentelemetry-cpp::ostream_metrics_exporter          - Imported target of
+# opentelemetry-cpp::ostream_metrics_exporter
+# opentelemetry-cpp::ostream_span_exporter             - Imported target of
+# opentelemetry-cpp::ostream_span_exporter
+# opentelemetry-cpp::elasticsearch_log_record_exporter - Imported target of
+# opentelemetry-cpp::elasticsearch_log_record_exporter
+# opentelemetry-cpp::etw_exporter                      - Imported target of
+# opentelemetry-cpp::etw_exporter opentelemetry-cpp::http_client_curl - Imported
+# target of opentelemetry-cpp::http_client_curl
+# opentelemetry-cpp::opentracing_shim                  - Imported target of
+# opentelemetry-cpp::opentracing_shim
 #
 
 # =============================================================================
-# Copyright The OpenTelemetry Authors
-# SPDX-License-Identifier: Apache-2.0
+# Copyright The OpenTelemetry Authors SPDX-License-Identifier: Apache-2.0
 # =============================================================================
 
 set(OPENTELEMETRY_ABI_VERSION_NO
@@ -73,10 +87,6 @@ include(CMakeFindDependencyMacro)
 
 find_dependency(Threads)
 
-if(@WITH_ABSEIL@)
-  find_dependency(absl)
-endif()
-
 if(@WITH_OTLP_GRPC@)
   find_dependency(gRPC)
 endif()
@@ -93,7 +103,7 @@ if("@Protobuf_FOUND@" OR "@PROTOBUF_FOUND@")
   find_dependency(Protobuf)
 endif()
 
-if (@WITH_HTTP_CLIENT_CURL@ AND NOT @BUILD_SHARED_LIBS@)
+if(@WITH_HTTP_CLIENT_CURL@ AND NOT @BUILD_SHARED_LIBS@)
   if("@CURL_FOUND@")
     find_dependency(CURL)
   endif()
@@ -103,7 +113,7 @@ if (@WITH_HTTP_CLIENT_CURL@ AND NOT @BUILD_SHARED_LIBS@)
   endif()
 endif()
 
-if(@WITH_ABSEIL@ OR @WITH_OTLP_GRPC@)
+if(@WITH_OTLP_GRPC@)
   find_package(absl CONFIG)
 elseif(@WITH_OTLP_HTTP@ OR @WITH_OTLP_FILE@)
   if("@Protobuf_VERSION@" VERSION_GREATER_EQUAL "3.22.0")
