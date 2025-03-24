@@ -388,6 +388,23 @@ if(WITH_PROMETHEUS)
       set(CMAKE_CXX_CLANG_TIDY ${SAVED_CMAKE_CXX_CLANG_TIDY})
       set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE
           ${SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
+
+      # Get the version of the prometheus-cpp submodule
+      find_package(Git QUIET)
+      if(Git_FOUND)
+        execute_process(
+          COMMAND ${GIT_EXECUTABLE} describe --tags --always
+          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/third_party/prometheus-cpp
+          OUTPUT_VARIABLE prometheus-cpp_VERSION
+          OUTPUT_STRIP_TRAILING_WHITESPACE)
+        string(REGEX REPLACE "^v" "" prometheus-cpp_VERSION
+                             "${prometheus-cpp_VERSION}")
+      endif()
+
+      message(
+        STATUS
+          "Using local prometheus-cpp from submodule. Version = ${prometheus-cpp_VERSION}"
+      )
     else()
       message(
         FATAL_ERROR

@@ -18,29 +18,6 @@ set(THIRD_PARTY_DEPENDENCIES_SUPPORTED
 )
 
 #-----------------------------------------------------------------------
-# Flags to determine if CONFIG search mode should be used in find_dependency(...)
-#-----------------------------------------------------------------------
-
-# absl
-set(FIND_DEPENDENCY_absl_USE_CONFIG TRUE)
-# Threads
-set(FIND_DEPENDENCY_Threads_USE_CONFIG FALSE)
-# ZLIB
-set(FIND_DEPENDENCY_ZLIB_USE_CONFIG FALSE)
-# CURL
-set(FIND_DEPENDENCY_CURL_USE_CONFIG FALSE)
-# nlohmann_json
-set(FIND_DEPENDENCY_nlohmann_json_USE_CONFIG TRUE)
-# Protobuf
-set(FIND_DEPENDENCY_Protobuf_USE_CONFIG TRUE)
-# gRPC
-set(FIND_DEPENDENCY_gRPC_USE_CONFIG TRUE)
-# prometheus-cpp
-set(FIND_DEPENDENCY_prometheus-cpp_USE_CONFIG TRUE)
-# OpenTracing
-set(FIND_DEPENDENCY_OpenTracing_USE_CONFIG TRUE)
-
-#-----------------------------------------------------------------------
 # THIRD_PARTY to COMPONENT dependencies
 #   These are the components that may require the third party dependency
 #-----------------------------------------------------------------------
