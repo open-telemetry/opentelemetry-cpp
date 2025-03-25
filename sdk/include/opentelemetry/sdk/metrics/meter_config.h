@@ -51,8 +51,6 @@ public:
 private:
   explicit MeterConfig(const bool disabled = false) : disabled_(disabled) {}
   bool disabled_;
-  static const MeterConfig kDefaultConfig;
-  static const MeterConfig kDisabledConfig;
 };
 }  // namespace metrics
 }  // namespace sdk
