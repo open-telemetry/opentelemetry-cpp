@@ -77,17 +77,16 @@ public:
         auto delta = prev->Diff(*aggr);
         // store received value in cumulative map, and the diff in delta map (to pass it to temporal
         // storage)
-        cumulative_hash_map_->Set(measurement.first, std::move(aggr), 0);
-        delta_hash_map_->Set(measurement.first, std::move(delta), 0);
+        cumulative_hash_map_->Set(measurement.first, std::move(aggr));
+        delta_hash_map_->Set(measurement.first, std::move(delta));
       }
       else
       {
         // store received value in cumulative and delta map.
         cumulative_hash_map_->Set(
             measurement.first,
-            DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_, *aggr),
-            0);
-        delta_hash_map_->Set(measurement.first, std::move(aggr), 0);
+            DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_, *aggr));
+        delta_hash_map_->Set(measurement.first, std::move(aggr));
       }
     }
   }

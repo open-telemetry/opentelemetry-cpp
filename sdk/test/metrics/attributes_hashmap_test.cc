@@ -35,14 +35,14 @@ TEST(AttributesHashMap, BasicTests)
   // Set
   std::unique_ptr<Aggregation> aggregation1(
       new DropAggregation());  //  = std::unique_ptr<Aggregation>(new DropAggregation);
-  hash_map.Set(m1, std::move(aggregation1), 0);
+  hash_map.Set(m1, std::move(aggregation1));
   hash_map.Get(m1)->Aggregate(static_cast<int64_t>(1));
   EXPECT_EQ(hash_map.Size(), 1);
   EXPECT_EQ(hash_map.Has(m1), true);
 
   // Set same key again
   auto aggregation2 = std::unique_ptr<Aggregation>(new DropAggregation());
-  hash_map.Set(m1, std::move(aggregation2), 0);
+  hash_map.Set(m1, std::move(aggregation2));
   hash_map.Get(m1)->Aggregate(static_cast<int64_t>(1));
   EXPECT_EQ(hash_map.Size(), 1);
   EXPECT_EQ(hash_map.Has(m1), true);
@@ -50,7 +50,7 @@ TEST(AttributesHashMap, BasicTests)
   // Set more enteria
   auto aggregation3   = std::unique_ptr<Aggregation>(new DropAggregation());
   MetricAttributes m3 = {{"k1", "v1"}, {"k2", "v2"}};
-  hash_map.Set(m3, std::move(aggregation3), 0);
+  hash_map.Set(m3, std::move(aggregation3));
   EXPECT_EQ(hash_map.Has(m1), true);
   EXPECT_EQ(hash_map.Has(m3), true);
   hash_map.Get(m3)->Aggregate(static_cast<int64_t>(1));
@@ -62,7 +62,7 @@ TEST(AttributesHashMap, BasicTests)
     return std::unique_ptr<Aggregation>(new DropAggregation);
   };
   MetricAttributes m4 = {{"k1", "v1"}, {"k2", "v2"}, {"k3", "v3"}};
-  hash_map.GetOrSetDefault(m4, create_default_aggregation, 0)
+  hash_map.GetOrSetDefault(m4, create_default_aggregation)
       ->Aggregate(static_cast<int64_t>(1));
   EXPECT_EQ(hash_map.Size(), 3);
 

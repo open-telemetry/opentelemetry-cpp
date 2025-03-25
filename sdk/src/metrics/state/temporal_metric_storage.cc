@@ -107,15 +107,14 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
           auto agg  = merged_metrics->Get(attributes);
           if (agg)
           {
-            merged_metrics->Set(attributes, agg->Merge(aggregation), 0);
+            merged_metrics->Set(attributes, agg->Merge(aggregation));
           }
           else
           {
             merged_metrics->Set(attributes,
                                 DefaultAggregation::CreateAggregation(
                                     aggregation_type_, instrument_descriptor_, aggregation_config_)
-                                    ->Merge(aggregation),
-                                0);
+                                    ->Merge(aggregation));
           }
           return true;
         });
@@ -141,13 +140,13 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
             auto agg  = merged_metrics->Get(attributes);
             if (agg)
             {
-              merged_metrics->Set(attributes, agg->Merge(aggregation), 0);
+              merged_metrics->Set(attributes, agg->Merge(aggregation));
             }
             else
             {
               auto def_agg = DefaultAggregation::CreateAggregation(
                   aggregation_type_, instrument_descriptor_, aggregation_config_);
-              merged_metrics->Set(attributes, def_agg->Merge(aggregation), 0);
+              merged_metrics->Set(attributes, def_agg->Merge(aggregation));
             }
             return true;
           });

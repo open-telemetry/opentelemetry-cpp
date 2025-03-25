@@ -71,9 +71,7 @@ public:
    */
   Aggregation *GetOrSetDefault(const opentelemetry::common::KeyValueIterable &attributes,
                                const AttributesProcessor *attributes_processor,
-                               std::function<std::unique_ptr<Aggregation>()> aggregation_callback,
-                               // TODO: remove this, this is not correct!
-                               size_t hash)
+                               std::function<std::unique_ptr<Aggregation>()> aggregation_callback)
   {
     MetricAttributes attr{attributes, attributes_processor};
 
@@ -92,28 +90,8 @@ public:
     return hash_map_[attr].get();
   }
 
-//   Aggregation *GetOrSetDefault(std::function<std::unique_ptr<Aggregation>()> aggregation_callback,
-//                                size_t hash)
-//   {
-//     auto it = hash_map_.find(hash);
-//     if (it != hash_map_.end())
-//     {
-//       return it->second.second.get();
-//     }
-// 
-//     if (IsOverflowAttributes())
-//     {
-//       return GetOrSetOveflowAttributes(aggregation_callback);
-//     }
-// 
-//     MetricAttributes attr{};
-//     hash_map_[hash] = {attr, aggregation_callback()};
-//     return hash_map_[hash].second.get();
-//   }
-
   Aggregation *GetOrSetDefault(const MetricAttributes &attributes,
-                               std::function<std::unique_ptr<Aggregation>()> aggregation_callback,
-                               size_t hash)
+                               std::function<std::unique_ptr<Aggregation>()> aggregation_callback)
   {
     auto it = hash_map_.find(attributes);
     if (it != hash_map_.end())
@@ -135,8 +113,7 @@ public:
    */
   void Set(const opentelemetry::common::KeyValueIterable &attributes,
            const AttributesProcessor *attributes_processor,
-           std::unique_ptr<Aggregation> aggr,
-           size_t hash)
+           std::unique_ptr<Aggregation> aggr)
   {
     MetricAttributes attr{attributes, attributes_processor};
 
@@ -156,7 +133,7 @@ public:
     }
   }
 
-  void Set(const MetricAttributes &attributes, std::unique_ptr<Aggregation> aggr, size_t hash)
+  void Set(const MetricAttributes &attributes, std::unique_ptr<Aggregation> aggr)
   {
     auto it = hash_map_.find(attributes);
     if (it != hash_map_.end())

@@ -97,7 +97,7 @@ public:
 #endif
     static MetricAttributes attr = MetricAttributes{};
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
-    attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_, 0)->Aggregate(value);
+    attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
   void RecordLong(int64_t value,
@@ -119,7 +119,7 @@ public:
 
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     attributes_hashmap_
-        ->GetOrSetDefault(attributes, attributes_processor_, create_default_aggregation_, 0)
+        ->GetOrSetDefault(attributes, attributes_processor_, create_default_aggregation_)
         ->Aggregate(value);
   }
 
@@ -139,7 +139,7 @@ public:
 #endif
     static MetricAttributes attr = MetricAttributes{};
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
-    attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_, 0)->Aggregate(value);
+    attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
   void RecordDouble(double value,
@@ -160,7 +160,7 @@ public:
 #endif
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     attributes_hashmap_
-        ->GetOrSetDefault(attributes, attributes_processor_, create_default_aggregation_, 0)
+        ->GetOrSetDefault(attributes, attributes_processor_, create_default_aggregation_)
         ->Aggregate(value);
   }
 
