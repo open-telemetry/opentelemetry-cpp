@@ -39,7 +39,6 @@ void BM_AttributseHashMap(benchmark::State &state)
       return std::unique_ptr<Aggregation>(new DropAggregation);
     };
     m.lock();
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes[i % 2]);
     hash_map.GetOrSetDefault(attributes[i % 2], create_default_aggregation)
         ->Aggregate(static_cast<int64_t>(1));
     benchmark::DoNotOptimize(hash_map.Has(attributes[i % 2]));
