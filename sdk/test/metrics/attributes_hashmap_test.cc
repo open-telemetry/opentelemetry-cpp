@@ -70,6 +70,10 @@ TEST(AttributesHashMap, BasicTests)
   MetricAttributes m5 = {{"k2", "v2"}, {"k1", "v1"}};
   EXPECT_EQ(hash_map.Has(m5), true);
 
+  // Set attributes with different order - shouldn't create a new entry.
+  MetricAttributes m6 = {{"k1", "v2"}, {"k2", "v1"}};
+  EXPECT_EQ(hash_map.Has(m6), false);
+
   // GetAllEnteries
   size_t count = 0;
   hash_map.GetAllEnteries(
@@ -78,6 +82,57 @@ TEST(AttributesHashMap, BasicTests)
         return true;
       });
   EXPECT_EQ(count, hash_map.Size());
+}
+
+class MetricAttributeMapHashForCollision
+{
+public:
+  size_t operator()(const MetricAttributes &attributes) const
+  {
+    return 42;
+  }
+};
+
+TEST(AttributesHashMap, CollisionTest)
+{
+  // The hash on MetricsAttributes will be ignored by MetricAttributeMapHashForCollision
+  MetricAttributes m1 = {{"k1", "v1"}};
+  MetricAttributes m2 = {{"k2", "v2"}};
+  MetricAttributes m3 = {{"k1", "v1"}, {"k2", "v2"}};
+  MetricAttributes m4 = {};
+
+  AttributesHashMapWithCustomHash<MetricAttributeMapHashForCollision> hash_map;
+
+  hash_map.Set(m1, std::unique_ptr<Aggregation>(new DropAggregation()));
+  hash_map.Set(m2, std::unique_ptr<Aggregation>(new DropAggregation()));
+  hash_map.Set(m3, std::unique_ptr<Aggregation>(new DropAggregation()));
+  hash_map.Set(m4, std::unique_ptr<Aggregation>(new DropAggregation()));
+
+  EXPECT_EQ(hash_map.Size(), 4);
+  EXPECT_EQ(hash_map.Has(m1), true);
+  EXPECT_EQ(hash_map.Has(m2), true);
+  EXPECT_EQ(hash_map.Has(m3), true);
+  EXPECT_EQ(hash_map.Has(m4), true);
+
+  MetricAttributes m5 = {{"k2", "v1"}};
+  EXPECT_EQ(hash_map.Has(m5), false);
+
+  //
+  // Verify only one bucket used based on the custom hash
+  //
+  size_t total_active_buckets = 0;
+  size_t total_elements = 0;
+  for (size_t i = 0; i < hash_map.BucketCount(); i++)
+  {
+    size_t bucket_size = hash_map.BucketSize(i);
+    if (bucket_size > 0)
+    {
+      total_active_buckets++;
+      total_elements += bucket_size;
+    }
+  }
+  EXPECT_EQ(total_active_buckets, 1);
+  EXPECT_EQ(total_elements, 4);
 }
 
 std::string make_unique_string(const char *str)

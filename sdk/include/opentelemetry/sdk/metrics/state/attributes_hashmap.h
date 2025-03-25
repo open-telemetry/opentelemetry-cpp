@@ -42,10 +42,11 @@ public:
   }
 };
 
-class AttributesHashMap
+template <typename CustomHash=MetricAttributesHash>
+class AttributesHashMapWithCustomHash
 {
 public:
-  AttributesHashMap(size_t attributes_limit = kAggregationCardinalityLimit)
+  AttributesHashMapWithCustomHash(size_t attributes_limit = kAggregationCardinalityLimit)
       : attributes_limit_(attributes_limit)
   {}
   Aggregation *Get(const MetricAttributes &attributes) const
@@ -204,8 +205,13 @@ public:
    */
   size_t Size() { return hash_map_.size(); }
 
+#ifdef UNIT_TESTING
+  size_t BucketCount() { return hash_map_.bucket_count(); }
+  size_t BucketSize(size_t n) { return hash_map_.bucket_size(n); }
+#endif
+
 private:
-  std::unordered_map<MetricAttributes, std::unique_ptr<Aggregation>, FilteredOrderedAttributeMapHash> hash_map_;
+  std::unordered_map<MetricAttributes, std::unique_ptr<Aggregation>, CustomHash> hash_map_;
   size_t attributes_limit_;
 
   Aggregation *GetOrSetOveflowAttributes(
@@ -230,6 +236,9 @@ private:
 
   bool IsOverflowAttributes() const { return (hash_map_.size() + 1 >= attributes_limit_); }
 };
+
+using AttributesHashMap = AttributesHashMapWithCustomHash<>;
+
 }  // namespace metrics
 
 }  // namespace sdk
