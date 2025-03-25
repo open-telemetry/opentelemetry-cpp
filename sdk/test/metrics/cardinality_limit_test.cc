@@ -51,9 +51,8 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 0; i < 10; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
     static_cast<LongSumAggregation *>(
-        hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
+        hash_map.GetOrSetDefault(attributes, aggregation_callback, 0))
         ->Aggregate(record_value);
   }
   EXPECT_EQ(hash_map.Size(), 10);
@@ -62,9 +61,8 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 10; i < 15; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
     static_cast<LongSumAggregation *>(
-        hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
+        hash_map.GetOrSetDefault(attributes, aggregation_callback, 0))
         ->Aggregate(record_value);
   }
   EXPECT_EQ(hash_map.Size(), 10);  // only one more metric point should be added as overflow.
@@ -73,16 +71,15 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 0; i < 5; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
     static_cast<LongSumAggregation *>(
-        hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
+        hash_map.GetOrSetDefault(attributes, aggregation_callback, 0))
         ->Aggregate(record_value);
   }
   EXPECT_EQ(hash_map.Size(), 10);  // no new metric point added
 
   // get the overflow metric point
   auto agg1 = hash_map.GetOrSetDefault(
-      FilteredOrderedAttributeMap({{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}}),
+      kOverflowAttributes,
       aggregation_callback, 0);
   EXPECT_NE(agg1, nullptr);
   auto sum_agg1 = static_cast<LongSumAggregation *>(agg1);
@@ -92,10 +89,9 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 0; i < 9; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
     auto agg2 = hash_map.GetOrSetDefault(
-        FilteredOrderedAttributeMap({{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}}),
-        aggregation_callback, hash);
+        attributes,
+        aggregation_callback, 0);
     EXPECT_NE(agg2, nullptr);
     auto sum_agg2 = static_cast<LongSumAggregation *>(agg2);
     if (i < 5)
