@@ -120,18 +120,18 @@ static constexpr const char *kVcsRefType = "vcs.ref.type";
 
 /**
  * Deprecated, use @code vcs.change.id @endcode instead.
- * <p>
+ *
  * @deprecated
- * Deprecated, use @code vcs.change.id @endcode instead.
+ * {"note": "Deprecated, use @code vcs.change.id @endcode instead.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryChangeId =
     "vcs.repository.change.id";
 
 /**
  * Deprecated, use @code vcs.change.title @endcode instead.
- * <p>
+ *
  * @deprecated
- * Deprecated, use @code vcs.change.title @endcode instead.
+ * {"note": "Deprecated, use @code vcs.change.title @endcode instead.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryChangeTitle =
     "vcs.repository.change.title";
@@ -146,27 +146,28 @@ static constexpr const char *kVcsRepositoryName = "vcs.repository.name";
 
 /**
  * Deprecated, use @code vcs.ref.head.name @endcode instead.
- * <p>
+ *
  * @deprecated
- * Deprecated, use @code vcs.ref.head.name @endcode instead.
+ * {"note": "Deprecated, use @code vcs.ref.head.name @endcode instead.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryRefName =
     "vcs.repository.ref.name";
 
 /**
  * Deprecated, use @code vcs.ref.head.revision @endcode instead.
- * <p>
+ *
  * @deprecated
- * Deprecated, use @code vcs.ref.head.revision @endcode instead.
+ * {"note": "Deprecated, use @code vcs.ref.head.revision @endcode instead.", "reason":
+ * "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryRefRevision =
     "vcs.repository.ref.revision";
 
 /**
  * Deprecated, use @code vcs.ref.head.type @endcode instead.
- * <p>
+ *
  * @deprecated
- * Deprecated, use @code vcs.ref.head.type @endcode instead.
+ * {"note": "Deprecated, use @code vcs.ref.head.type @endcode instead.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryRefType =
     "vcs.repository.ref.type";

@@ -20,15 +20,15 @@ namespace system
 {
 
 /**
- * The logical CPU number [0..n-1]
+ * Deprecated, use @code cpu.logical_number @endcode instead.
  */
 static constexpr const char *kSystemCpuLogicalNumber = "system.cpu.logical_number";
 
 /**
  * Deprecated, use @code cpu.mode @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code cpu.mode @endcode
+ * {"note": "Replaced by @code cpu.mode @endcode", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemCpuState = "system.cpu.state";
 
@@ -64,9 +64,10 @@ static constexpr const char *kSystemMemoryState = "system.memory.state";
 
 /**
  * Deprecated, use @code network.connection.state @endcode instead.
- * <p>
+ *
  * @deprecated
- * Removed, report network connection state with @code network.connection.state @endcode attribute
+ * {"note": "Removed, report network connection state with @code network.connection.state @endcode
+ * attribute", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemNetworkState = "system.network.state";
 
@@ -94,9 +95,9 @@ static constexpr const char *kSystemProcessStatus = "system.process.status";
 
 /**
  * Deprecated, use @code system.process.status @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code system.process.status @endcode.
+ * {"note": "Replaced by @code system.process.status @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemProcessesStatus =
     "system.processes.status";
@@ -207,11 +208,8 @@ static constexpr const char *kFree = "free";
 
 /**
  * none
- * <p>
- * @deprecated
- * Removed, report shared memory usage with @code metric.system.memory.shared @endcode metric
  */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kShared = "shared";
+static constexpr const char *kShared = "shared";
 
 /**
  * none

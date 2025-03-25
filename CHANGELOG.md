@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Fix misssing exported definition for OTLP file exporter and forceflush
+  [#3319](https://github.com/open-telemetry/opentelemetry-cpp/pull/3319)
+
 * [SDK] Add tracer scope configurator
   [#3137](https://github.com/open-telemetry/opentelemetry-cpp/pull/3137)
 
@@ -27,8 +30,8 @@ Increment the:
 * [DEVCONTAINER] Support customization and run as non-root user
   [#3270](https://github.com/open-telemetry/opentelemetry-cpp/pull/3270)
 
-* [INSTALL] Add support for cmake components to the package
-  [#3270](https://github.com/open-telemetry/opentelemetry-cpp/pull/3220)
+* [SDK] Add logger scope configurator
+  [#3282](https://github.com/open-telemetry/opentelemetry-cpp/pull/3282)
 
 Important changes:
 
@@ -48,6 +51,9 @@ Important changes:
     `Provider` classes, to benefit from this feature.
 
   * All the example code has been updated to reflect the new usage.
+
+* [SDK] Implement spec: MetricFilter
+  [#3235](https://github.com/open-telemetry/opentelemetry-cpp/pull/3235)
 
 ## [1.19 2025-01-22]
 

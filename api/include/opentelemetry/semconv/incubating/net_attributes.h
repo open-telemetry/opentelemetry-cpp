@@ -21,123 +21,126 @@ namespace net
 
 /**
  * Deprecated, use @code network.local.address @endcode.
- * <p>
+ *
  * @deprecated
- * Replaced by @code network.local.address @endcode.
+ * {"note": "Replaced by @code network.local.address @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetHostIp = "net.host.ip";
 
 /**
  * Deprecated, use @code server.address @endcode.
- * <p>
+ *
  * @deprecated
- * Replaced by @code server.address @endcode.
+ * {"note": "Replaced by @code server.address @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetHostName = "net.host.name";
 
 /**
  * Deprecated, use @code server.port @endcode.
- * <p>
+ *
  * @deprecated
- * Replaced by @code server.port @endcode.
+ * {"note": "Replaced by @code server.port @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetHostPort = "net.host.port";
 
 /**
  * Deprecated, use @code network.peer.address @endcode.
- * <p>
+ *
  * @deprecated
- * Replaced by @code network.peer.address @endcode.
+ * {"note": "Replaced by @code network.peer.address @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetPeerIp = "net.peer.ip";
 
 /**
  * Deprecated, use @code server.address @endcode on client spans and @code client.address @endcode
- * on server spans. <p>
+ * on server spans.
+ *
  * @deprecated
- * Replaced by @code server.address @endcode on client spans and @code client.address @endcode on
- * server spans.
+ * {"note": "Replaced by @code server.address @endcode on client spans and @code client.address
+ * @endcode on server spans.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetPeerName = "net.peer.name";
 
 /**
  * Deprecated, use @code server.port @endcode on client spans and @code client.port @endcode on
- * server spans. <p>
+ * server spans.
+ *
  * @deprecated
- * Replaced by @code server.port @endcode on client spans and @code client.port @endcode on server
- * spans.
+ * {"note": "Replaced by @code server.port @endcode on client spans and @code client.port @endcode
+ * on server spans.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetPeerPort = "net.peer.port";
 
 /**
  * Deprecated, use @code network.protocol.name @endcode.
- * <p>
+ *
  * @deprecated
- * Replaced by @code network.protocol.name @endcode.
+ * {"note": "Replaced by @code network.protocol.name @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetProtocolName = "net.protocol.name";
 
 /**
  * Deprecated, use @code network.protocol.version @endcode.
- * <p>
+ *
  * @deprecated
- * Replaced by @code network.protocol.version @endcode.
+ * {"note": "Replaced by @code network.protocol.version @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetProtocolVersion = "net.protocol.version";
 
 /**
  * Deprecated, use @code network.transport @endcode and @code network.type @endcode.
- * <p>
+ *
  * @deprecated
- * Split to @code network.transport @endcode and @code network.type @endcode.
+ * {"note": "Split to @code network.transport @endcode and @code network.type @endcode.", "reason":
+ * "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetSockFamily = "net.sock.family";
 
 /**
  * Deprecated, use @code network.local.address @endcode.
- * <p>
+ *
  * @deprecated
- * Replaced by @code network.local.address @endcode.
+ * {"note": "Replaced by @code network.local.address @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetSockHostAddr = "net.sock.host.addr";
 
 /**
  * Deprecated, use @code network.local.port @endcode.
- * <p>
+ *
  * @deprecated
- * Replaced by @code network.local.port @endcode.
+ * {"note": "Replaced by @code network.local.port @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetSockHostPort = "net.sock.host.port";
 
 /**
  * Deprecated, use @code network.peer.address @endcode.
- * <p>
+ *
  * @deprecated
- * Replaced by @code network.peer.address @endcode.
+ * {"note": "Replaced by @code network.peer.address @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetSockPeerAddr = "net.sock.peer.addr";
 
 /**
  * Deprecated, no replacement at this time.
- * <p>
+ *
  * @deprecated
- * Removed.
+ * {"note": "Removed.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetSockPeerName = "net.sock.peer.name";
 
 /**
  * Deprecated, use @code network.peer.port @endcode.
- * <p>
+ *
  * @deprecated
- * Replaced by @code network.peer.port @endcode.
+ * {"note": "Replaced by @code network.peer.port @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetSockPeerPort = "net.sock.peer.port";
 
 /**
  * Deprecated, use @code network.transport @endcode.
- * <p>
+ *
  * @deprecated
- * Replaced by @code network.transport @endcode.
+ * {"note": "Replaced by @code network.transport @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kNetTransport = "net.transport";
 

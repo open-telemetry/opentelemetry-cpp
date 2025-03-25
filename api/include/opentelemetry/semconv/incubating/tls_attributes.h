@@ -87,9 +87,9 @@ static constexpr const char *kTlsClientNotBefore = "tls.client.not_before";
 
 /**
  * Deprecated, use @code server.address @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code server.address @endcode.
+ * {"note": "Replaced by @code server.address @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kTlsClientServerName =
     "tls.client.server_name";
@@ -124,15 +124,15 @@ static constexpr const char *kTlsNextProtocol = "tls.next_protocol";
 
 /**
  * Normalized lowercase protocol name parsed from original string of the negotiated <a
- * href="https://www.openssl.org/docs/man1.1.1/man3/SSL_get_version.html#RETURN-VALUES">SSL/TLS
- * protocol version</a>
+ * href="https://docs.openssl.org/1.1.1/man3/SSL_get_version/#return-values">SSL/TLS protocol
+ * version</a>
  */
 static constexpr const char *kTlsProtocolName = "tls.protocol.name";
 
 /**
  * Numeric part of the version parsed from the original string of the negotiated <a
- * href="https://www.openssl.org/docs/man1.1.1/man3/SSL_get_version.html#RETURN-VALUES">SSL/TLS
- * protocol version</a>
+ * href="https://docs.openssl.org/1.1.1/man3/SSL_get_version/#return-values">SSL/TLS protocol
+ * version</a>
  */
 static constexpr const char *kTlsProtocolVersion = "tls.protocol.version";
 

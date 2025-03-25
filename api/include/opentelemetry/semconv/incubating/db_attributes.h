@@ -21,63 +21,64 @@ namespace db
 
 /**
  * Deprecated, use @code cassandra.consistency.level @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code cassandra.consistency.level @endcode.
+ * {"note": "Replaced by @code cassandra.consistency.level @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCassandraConsistencyLevel =
     "db.cassandra.consistency_level";
 
 /**
  * Deprecated, use @code cassandra.coordinator.dc @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code cassandra.coordinator.dc @endcode.
+ * {"note": "Replaced by @code cassandra.coordinator.dc @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCassandraCoordinatorDc =
     "db.cassandra.coordinator.dc";
 
 /**
  * Deprecated, use @code cassandra.coordinator.id @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code cassandra.coordinator.id @endcode.
+ * {"note": "Replaced by @code cassandra.coordinator.id @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCassandraCoordinatorId =
     "db.cassandra.coordinator.id";
 
 /**
  * Deprecated, use @code cassandra.query.idempotent @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code cassandra.query.idempotent @endcode.
+ * {"note": "Replaced by @code cassandra.query.idempotent @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCassandraIdempotence =
     "db.cassandra.idempotence";
 
 /**
  * Deprecated, use @code cassandra.page.size @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code cassandra.page.size @endcode.
+ * {"note": "Replaced by @code cassandra.page.size @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCassandraPageSize =
     "db.cassandra.page_size";
 
 /**
  * Deprecated, use @code cassandra.speculative_execution.count @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code cassandra.speculative_execution.count @endcode.
+ * {"note": "Replaced by @code cassandra.speculative_execution.count @endcode.", "reason":
+ * "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCassandraSpeculativeExecutionCount =
     "db.cassandra.speculative_execution_count";
 
 /**
  * Deprecated, use @code db.collection.name @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.collection.name @endcode.
+ * {"note": "Replaced by @code db.collection.name @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCassandraTable = "db.cassandra.table";
 
@@ -98,18 +99,18 @@ static constexpr const char *kDbClientConnectionState = "db.client.connection.st
 
 /**
  * Deprecated, use @code db.client.connection.pool.name @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.client.connection.pool.name @endcode.
+ * {"note": "Replaced by @code db.client.connection.pool.name @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbClientConnectionsPoolName =
     "db.client.connections.pool.name";
 
 /**
  * Deprecated, use @code db.client.connection.state @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.client.connection.state @endcode.
+ * {"note": "Replaced by @code db.client.connection.state @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbClientConnectionsState =
     "db.client.connections.state";
@@ -117,180 +118,190 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kDbClientConnectionsState 
 /**
  * The name of a collection (table, container) within the database.
  * <p>
- * It is RECOMMENDED to capture the value as provided by the application without attempting to do
- * any case normalization. <p> The collection name SHOULD NOT be extracted from @code db.query.text
- * @endcode, unless the query format is known to only ever have a single collection name present.
+ * It is RECOMMENDED to capture the value as provided by the application
+ * without attempting to do any case normalization.
  * <p>
- * For batch operations, if the individual operations are known to have the same collection name
- * then that collection name SHOULD be used.
+ * The collection name SHOULD NOT be extracted from @code db.query.text @endcode,
+ * when the database system supports cross-table queries in non-batch operations.
+ * <p>
+ * For batch operations, if the individual operations are known to have the same
+ * collection name then that collection name SHOULD be used.
  */
 static constexpr const char *kDbCollectionName = "db.collection.name";
 
 /**
  * Deprecated, use @code server.address @endcode, @code server.port @endcode attributes instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code server.address @endcode and @code server.port @endcode.
+ * {"note": "Replaced by @code server.address @endcode and @code server.port @endcode.", "reason":
+ * "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbConnectionString = "db.connection_string";
 
 /**
  * Deprecated, use @code azure.client.id @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code azure.client.id @endcode.
+ * {"note": "Replaced by @code azure.client.id @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCosmosdbClientId = "db.cosmosdb.client_id";
 
 /**
  * Deprecated, use @code azure.cosmosdb.connection.mode @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code azure.cosmosdb.connection.mode @endcode.
+ * {"note": "Replaced by @code azure.cosmosdb.connection.mode @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCosmosdbConnectionMode =
     "db.cosmosdb.connection_mode";
 
 /**
  * Deprecated, use @code cosmosdb.consistency.level @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code azure.cosmosdb.consistency.level @endcode.
+ * {"note": "Replaced by @code azure.cosmosdb.consistency.level @endcode.", "reason":
+ * "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCosmosdbConsistencyLevel =
     "db.cosmosdb.consistency_level";
 
 /**
  * Deprecated, use @code db.collection.name @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.collection.name @endcode.
+ * {"note": "Replaced by @code db.collection.name @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCosmosdbContainer =
     "db.cosmosdb.container";
 
 /**
  * Deprecated, no replacement at this time.
- * <p>
+ *
  * @deprecated
- * No replacement at this time.
+ * {"note": "No replacement at this time.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCosmosdbOperationType =
     "db.cosmosdb.operation_type";
 
 /**
  * Deprecated, use @code azure.cosmosdb.operation.contacted_regions @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code azure.cosmosdb.operation.contacted_regions @endcode.
+ * {"note": "Replaced by @code azure.cosmosdb.operation.contacted_regions @endcode.", "reason":
+ * "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCosmosdbRegionsContacted =
     "db.cosmosdb.regions_contacted";
 
 /**
  * Deprecated, use @code azure.cosmosdb.operation.request_charge @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code azure.cosmosdb.operation.request_charge @endcode.
+ * {"note": "Replaced by @code azure.cosmosdb.operation.request_charge @endcode.", "reason":
+ * "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCosmosdbRequestCharge =
     "db.cosmosdb.request_charge";
 
 /**
  * Deprecated, use @code azure.cosmosdb.request.body.size @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code azure.cosmosdb.request.body.size @endcode.
+ * {"note": "Replaced by @code azure.cosmosdb.request.body.size @endcode.", "reason":
+ * "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCosmosdbRequestContentLength =
     "db.cosmosdb.request_content_length";
 
 /**
  * Deprecated, use @code db.response.status_code @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.response.status_code @endcode.
+ * {"note": "Replaced by @code db.response.status_code @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCosmosdbStatusCode =
     "db.cosmosdb.status_code";
 
 /**
  * Deprecated, use @code azure.cosmosdb.response.sub_status_code @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code azure.cosmosdb.response.sub_status_code @endcode.
+ * {"note": "Replaced by @code azure.cosmosdb.response.sub_status_code @endcode.", "reason":
+ * "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCosmosdbSubStatusCode =
     "db.cosmosdb.sub_status_code";
 
 /**
  * Deprecated, use @code db.namespace @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.namespace @endcode.
+ * {"note": "Replaced by @code db.namespace @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbElasticsearchClusterName =
     "db.elasticsearch.cluster.name";
 
 /**
  * Deprecated, use @code elasticsearch.node.name @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code elasticsearch.node.name @endcode.
+ * {"note": "Replaced by @code elasticsearch.node.name @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbElasticsearchNodeName =
     "db.elasticsearch.node.name";
 
 /**
  * Deprecated, use @code db.operation.parameter @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.operation.parameter @endcode.
+ * {"note": "Replaced by @code db.operation.parameter @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbElasticsearchPathParts =
     "db.elasticsearch.path_parts";
 
 /**
  * Deprecated, no general replacement at this time. For Elasticsearch, use @code
- * db.elasticsearch.node.name @endcode instead. <p>
- * @deprecated
- * Deprecated, no general replacement at this time. For Elasticsearch, use @code
  * db.elasticsearch.node.name @endcode instead.
+ *
+ * @deprecated
+ * {"note": "Deprecated, no general replacement at this time. For Elasticsearch, use @code
+ * db.elasticsearch.node.name @endcode instead.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbInstanceId = "db.instance.id";
 
 /**
  * Removed, no replacement at this time.
- * <p>
+ *
  * @deprecated
- * Removed as not used.
+ * {"note": "Removed as not used.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbJdbcDriverClassname =
     "db.jdbc.driver_classname";
 
 /**
  * Deprecated, use @code db.collection.name @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.collection.name @endcode.
+ * {"note": "Replaced by @code db.collection.name @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbMongodbCollection =
     "db.mongodb.collection";
 
 /**
  * Deprecated, SQL Server instance is now populated as a part of @code db.namespace @endcode
- * attribute. <p>
+ * attribute.
+ *
  * @deprecated
- * Deprecated, no replacement at this time.
+ * {"note": "Deprecated, no replacement at this time.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbMssqlInstanceName =
     "db.mssql.instance_name";
 
 /**
  * Deprecated, use @code db.namespace @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.namespace @endcode.
+ * {"note": "Replaced by @code db.namespace @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbName = "db.name";
 
@@ -309,9 +320,9 @@ static constexpr const char *kDbNamespace = "db.namespace";
 
 /**
  * Deprecated, use @code db.operation.name @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.operation.name @endcode.
+ * {"note": "Replaced by @code db.operation.name @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbOperation = "db.operation";
 
@@ -330,7 +341,7 @@ static constexpr const char *kDbOperationBatchSize = "db.operation.batch.size";
  * without attempting to do any case normalization.
  * <p>
  * The operation name SHOULD NOT be extracted from @code db.query.text @endcode,
- * unless the query format is known to only ever have a single operation name present.
+ * when the database system supports cross-table queries in non-batch operations.
  * <p>
  * For batch operations, if the individual operations are known to have the same operation name
  * then that operation name SHOULD be used prepended by @code BATCH  @endcode,
@@ -351,9 +362,10 @@ static constexpr const char *kDbOperationParameter = "db.operation.parameter";
 
 /**
  * A query parameter used in @code db.query.text @endcode, with @code <key> @endcode being the
- * parameter name, and the attribute value being a string representation of the parameter value. <p>
+ * parameter name, and the attribute value being a string representation of the parameter value.
+ *
  * @deprecated
- * Replaced by @code db.operation.parameter @endcode.
+ * {"note": "Replaced by @code db.operation.parameter @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbQueryParameter = "db.query.parameter";
 
@@ -365,8 +377,8 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kDbQueryParameter = "db.qu
  * database calls involving complex queries. Summary may be available to the instrumentation through
  * instrumentation hooks or other means. If it is not available, instrumentations that support query
  * parsing SHOULD generate a summary following <a
- * href="../../docs/database/database-spans.md#generating-a-summary-of-the-query-text">Generating
- * query summary</a> section.
+ * href="../database/database-spans.md#generating-a-summary-of-the-query-text">Generating query
+ * summary</a> section.
  */
 static constexpr const char *kDbQuerySummary = "db.query.summary";
 
@@ -374,7 +386,7 @@ static constexpr const char *kDbQuerySummary = "db.query.summary";
  * The database query being executed.
  * <p>
  * For sanitization see <a
- * href="../../docs/database/database-spans.md#sanitization-of-dbquerytext">Sanitization of @code
+ * href="../database/database-spans.md#sanitization-of-dbquerytext">Sanitization of @code
  * db.query.text @endcode</a>. For batch operations, if the individual operations are known to have
  * the same query text then that query text SHOULD be used, otherwise all of the individual query
  * texts SHOULD be concatenated with separator @code ;  @endcode or some other database system
@@ -387,9 +399,9 @@ static constexpr const char *kDbQueryText = "db.query.text";
 
 /**
  * Deprecated, use @code db.namespace @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.namespace @endcode.
+ * {"note": "Replaced by @code db.namespace @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbRedisDatabaseIndex =
     "db.redis.database_index";
@@ -411,25 +423,25 @@ static constexpr const char *kDbResponseStatusCode = "db.response.status_code";
 
 /**
  * Deprecated, use @code db.collection.name @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.collection.name @endcode.
+ * {"note": "Replaced by @code db.collection.name @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbSqlTable = "db.sql.table";
 
 /**
  * The database statement being executed.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.query.text @endcode.
+ * {"note": "Replaced by @code db.query.text @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbStatement = "db.statement";
 
 /**
  * Deprecated, use @code db.system.name @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.system.name @endcode.
+ * {"note": "Replaced by @code db.system.name @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbSystem = "db.system";
 
@@ -444,9 +456,9 @@ static constexpr const char *kDbSystemName = "db.system.name";
 
 /**
  * Deprecated, no replacement at this time.
- * <p>
+ *
  * @deprecated
- * No replacement at this time.
+ * {"note": "No replacement at this time.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbUser = "db.user";
 
@@ -673,11 +685,8 @@ static constexpr const char *kAdabas = "adabas";
 
 /**
  * Deprecated, use @code intersystems_cache @endcode instead.
- * <p>
- * @deprecated
- * Replaced by @code intersystems_cache @endcode.
  */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kCache = "cache";
+static constexpr const char *kCache = "cache";
 
 /**
  * InterSystems Caché
@@ -696,11 +705,8 @@ static constexpr const char *kClickhouse = "clickhouse";
 
 /**
  * Deprecated, use @code other_sql @endcode instead.
- * <p>
- * @deprecated
- * Replaced by @code other_sql @endcode.
  */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kCloudscape = "cloudscape";
+static constexpr const char *kCloudscape = "cloudscape";
 
 /**
  * CockroachDB
@@ -709,11 +715,8 @@ static constexpr const char *kCockroachdb = "cockroachdb";
 
 /**
  * Deprecated, no replacement at this time.
- * <p>
- * @deprecated
- * Removed.
  */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kColdfusion = "coldfusion";
+static constexpr const char *kColdfusion = "coldfusion";
 
 /**
  * Microsoft Azure Cosmos DB
@@ -767,11 +770,8 @@ static constexpr const char *kFirebird = "firebird";
 
 /**
  * Deprecated, use @code other_sql @endcode instead.
- * <p>
- * @deprecated
- * Replaced by @code other_sql @endcode.
  */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kFirstsql = "firstsql";
+static constexpr const char *kFirstsql = "firstsql";
 
 /**
  * Apache Geode
@@ -855,11 +855,8 @@ static constexpr const char *kMssql = "mssql";
 
 /**
  * Deprecated, Microsoft SQL Server Compact is discontinued.
- * <p>
- * @deprecated
- * Removed, use @code other_sql @endcode instead.
  */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kMssqlcompact = "mssqlcompact";
+static constexpr const char *kMssqlcompact = "mssqlcompact";
 
 /**
  * MySQL (This value has stability level RELEASE CANDIDATE)
