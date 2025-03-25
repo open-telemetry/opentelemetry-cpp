@@ -147,11 +147,9 @@ target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
 
 #### Using opentelemetry-cpp package components
 
-> **Note:** `opentelemetry-cpp` CMake package components were introduced in `v.TODO`.
-> **Status:** [`Development`](https://opentelemetry.io/docs/specs/otel/document-status/)
+> **Note:** `opentelemetry-cpp` CMake package components were introduced in `v1.21.0`
 
-The `opentelemetry-cpp` package includes components to enable selective inclusion
-of its CMake targets and their dependencies using the `COMPONENTS` argument to
+The `opentelemetry-cpp` package supports using the `COMPONENTS` argument to
 `find_package`. The following example illustrates using this feature to include
 and link the `api` header only target to an instrumented `foo_lib` while only including
 and linking the `sdk` and `otlp_grpc_exporter` targets to the `foo_app`.
