@@ -44,6 +44,9 @@ cc_test(
         "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
     ],
+    copts = [
+        "-DUNIT_TESTING",
+    ],
 )
 
 otel_cc_benchmark(
