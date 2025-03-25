@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Fix misssing exported definition for OTLP file exporter and forceflush
+  [#3319](https://github.com/open-telemetry/opentelemetry-cpp/pull/3319)
+
 * [SDK] Add tracer scope configurator
   [#3137](https://github.com/open-telemetry/opentelemetry-cpp/pull/3137)
 
