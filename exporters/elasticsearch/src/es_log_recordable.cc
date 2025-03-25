@@ -34,6 +34,16 @@ struct json_assign_visitor
   {
     *j_ = u;
   }
+
+  template <class U>
+  void operator()(const opentelemetry::nostd::span<U> &span)
+  {
+    *j_ = nlohmann::json::array();
+    for (const auto &elem : span)
+    {
+      j_->push_back(elem);
+    }
+  }
 };
 
 template <>
