@@ -48,7 +48,7 @@ public:
   AttributesHashMap(size_t attributes_limit = kAggregationCardinalityLimit)
       : attributes_limit_(attributes_limit)
   {}
-  Aggregation *Get(MetricAttributes attributes) const
+  Aggregation *Get(const MetricAttributes &attributes) const
   {
     auto it = hash_map_.find(attributes);
     if (it != hash_map_.end())
