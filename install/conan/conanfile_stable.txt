@@ -1,11 +1,15 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 [requires]
 zlib/1.2.13
 libcurl/8.5.0
 abseil/20230125.3
 protobuf/3.21.12
 grpc/1.54.3
-nlohmann_json/3.11.3
+nlohmann_json/3.10.5
 prometheus-cpp/1.3.0
+opentracing-cpp/1.6.0
 
 [options]
 grpc/*:fPIC=True
@@ -20,6 +24,8 @@ protobuf/*:fPIC=True
 protobuf/*:shared=False
 abseil/*:fPIC=True
 abseil/*:shared=False
+opentracing-cpp/*:fPIC=True
+opentracing-cpp/*:shared=True
 
 [test_requires]
 gtest/1.14.0

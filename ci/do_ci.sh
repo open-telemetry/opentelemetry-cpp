@@ -247,6 +247,16 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
 elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}" \
+        -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
+        -DWITH_OPENTRACING=ON \
+        "${SRC_DIR}"
+  make -j $(nproc)
+  make test
+  exit 0
+elif [[ "$1" == "cmake.opentracing_shim.install.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
   rm -rf ${INSTALL_TEST_DIR}/*
   cmake "${CMAKE_OPTIONS[@]}" \
         -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
@@ -262,7 +272,6 @@ elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
     "api"
     "sdk"
     "ext_common"
-    "ext_http_curl"
     "exporters_in_memory"
     "exporters_ostream"
     "shims_opentracing"
@@ -273,7 +282,7 @@ elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
         "${CMAKE_OPTIONS[@]}" \
         "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
         "-DINSTALL_TEST_CMAKE_OPTIONS=${CMAKE_OPTIONS_STRING}" \
-        "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS}"
+        "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}"
   ctest --test-dir "${BUILD_DIR}/install_test" --output-on-failure
   exit 0
 elif [[ "$1" == "cmake.c++20.test" ]]; then

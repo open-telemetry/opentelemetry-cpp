@@ -458,7 +458,8 @@ switch ($action) {
   }
   "cmake.dll.install.test" {
     cd "$BUILD_DIR"
-    rm -Recurse -Force "$INSTALL_TEST_DIR\*"
+    Remove-Item -Recurse -Force "$BUILD_DIR\*"
+    Remove-Item -Recurse -Force "$INSTALL_TEST_DIR\*"
 
     $CMAKE_OPTIONS = @(
     "-DCMAKE_CXX_STANDARD=17",
@@ -475,8 +476,20 @@ switch ($action) {
       -DWITH_ABSEIL=OFF `
       -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON `
       -DWITH_METRICS_EXEMPLAR_PREVIEW=ON `
+      -DWITH_ASYNC_EXPORT_PREVIEW=ON `
       -DWITH_ETW=ON `
-      -DOPENTELEMETRY_INSTALL=ON
+      -DOPENTELEMETRY_INSTALL=ON `
+      -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=OFF `
+      -DWITH_OTLP_RETRY_PREVIEW=OFF `
+      -DWITH_OTLP_GRPC=OFF `
+      -DWITH_OTLP_HTTP=OFF `
+      -DWITH_OTLP_FILE=OFF `
+      -DWITH_OTLP_HTTP_COMPRESSION=OFF `
+      -DWITH_HTTP_CLIENT_CURL=OFF `
+      -DWITH_PROMETHEUS=OFF `
+      -DWITH_ZIPKIN=OFF `
+      -DWITH_ELASTICSEARCH=OFF `
+      -DWITH_EXAMPLES=OFF `
 
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
