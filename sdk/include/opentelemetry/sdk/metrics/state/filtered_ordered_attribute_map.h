@@ -29,11 +29,15 @@ public:
       std::initializer_list<std::pair<nostd::string_view, opentelemetry::common::AttributeValue>>
           attributes)
       : OrderedAttributeMap(attributes)
-  {}
+  {
+    UpdateHash();
+  }
 
   FilteredOrderedAttributeMap(const opentelemetry::common::KeyValueIterable &attributes)
       : FilteredOrderedAttributeMap(attributes, nullptr)
-  {}
+  {
+    // No need to update hash here as it is already updated in the constructor above
+  }
 
   FilteredOrderedAttributeMap(const opentelemetry::common::KeyValueIterable &attributes,
                               const opentelemetry::sdk::metrics::AttributesProcessor *processor);

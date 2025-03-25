@@ -12,7 +12,6 @@ namespace sdk
 {
 namespace metrics
 {
-
 FilteredOrderedAttributeMap::FilteredOrderedAttributeMap(
     const opentelemetry::common::KeyValueIterable &attributes,
     const AttributesProcessor *processor)

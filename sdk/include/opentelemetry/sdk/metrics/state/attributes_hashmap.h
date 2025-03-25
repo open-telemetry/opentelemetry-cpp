@@ -108,6 +108,23 @@ public:
     return hash_map_[attributes].get();
   }
 
+  Aggregation *GetOrSetDefault(MetricAttributes &&attributes,
+                               std::function<std::unique_ptr<Aggregation>()> aggregation_callback)
+  {
+    auto it = hash_map_.find(attributes);
+    if (it != hash_map_.end())
+    {
+      return it->second.get();
+    }
+
+    if (IsOverflowAttributes())
+    {
+      return GetOrSetOveflowAttributes(aggregation_callback);
+    }
+
+    auto [iter, inserted] = hash_map_.emplace(std::move(attributes), aggregation_callback());
+    return iter->second.get();
+  }
   /**
    * Set the value for given key, overwriting the value if already present
    */
@@ -128,8 +145,7 @@ public:
     }
     else
     {
-      MetricAttributes attr{attributes, attributes_processor};
-      hash_map_[attr] = std::move(aggr);
+      hash_map_[std::move(attr)] = std::move(aggr);
     }
   }
 
@@ -147,6 +163,23 @@ public:
     else
     {
       hash_map_[attributes] = std::move(aggr);
+    }
+  }
+
+  void Set(MetricAttributes &&attributes, std::unique_ptr<Aggregation> aggr)
+  {
+    auto it = hash_map_.find(attributes);
+    if (it != hash_map_.end())
+    {
+      it->second = std::move(aggr);
+    }
+    else if (IsOverflowAttributes())
+    {
+      hash_map_[kOverflowAttributes] = std::move(aggr);
+    }
+    else
+    {
+      hash_map_[std::move(attributes)] = std::move(aggr);
     }
   }
 
