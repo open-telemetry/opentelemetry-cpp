@@ -86,7 +86,11 @@ TEST(AttributesHashMap, BasicTests)
 class MetricAttributeMapHashForCollision
 {
 public:
-  size_t operator()(const MetricAttributes &attributes) const { return 42; }
+  size_t operator()(const MetricAttributes &attributes) const
+  {
+    (void)attributes;
+    return 42;
+  }
 };
 
 TEST(AttributesHashMap, CollisionTest)
