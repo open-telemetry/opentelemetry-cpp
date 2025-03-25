@@ -116,21 +116,10 @@ public:
                                             std::chrono::system_clock::now());
     }
 #endif
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
-        attributes, [this](nostd::string_view key) {
-          if (attributes_processor_)
-          {
-            return attributes_processor_->isPresent(key);
-          }
-          else
-          {
-            return true;
-          }
-        });
 
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     attributes_hashmap_
-        ->GetOrSetDefault(attributes, attributes_processor_, create_default_aggregation_, hash)
+        ->GetOrSetDefault(attributes, attributes_processor_, create_default_aggregation_, 0)
         ->Aggregate(value);
   }
 
@@ -169,20 +158,9 @@ public:
                                             std::chrono::system_clock::now());
     }
 #endif
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
-        attributes, [this](nostd::string_view key) {
-          if (attributes_processor_)
-          {
-            return attributes_processor_->isPresent(key);
-          }
-          else
-          {
-            return true;
-          }
-        });
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     attributes_hashmap_
-        ->GetOrSetDefault(attributes, attributes_processor_, create_default_aggregation_, hash)
+        ->GetOrSetDefault(attributes, attributes_processor_, create_default_aggregation_, 0)
         ->Aggregate(value);
   }
 

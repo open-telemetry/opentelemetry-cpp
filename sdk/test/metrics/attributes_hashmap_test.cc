@@ -28,7 +28,6 @@ TEST(AttributesHashMap, BasicTests)
   AttributesHashMap hash_map;
   EXPECT_EQ(hash_map.Size(), 0);
   MetricAttributes m1 = {{"k1", "v1"}};
-  auto hash           = opentelemetry::sdk::common::GetHashForAttributeMap(m1);
 
   EXPECT_EQ(hash_map.Get(m1), nullptr);
   EXPECT_EQ(hash_map.Has(m1), false);
@@ -36,14 +35,14 @@ TEST(AttributesHashMap, BasicTests)
   // Set
   std::unique_ptr<Aggregation> aggregation1(
       new DropAggregation());  //  = std::unique_ptr<Aggregation>(new DropAggregation);
-  hash_map.Set(m1, std::move(aggregation1), hash);
+  hash_map.Set(m1, std::move(aggregation1), 0);
   hash_map.Get(m1)->Aggregate(static_cast<int64_t>(1));
   EXPECT_EQ(hash_map.Size(), 1);
   EXPECT_EQ(hash_map.Has(m1), true);
 
   // Set same key again
   auto aggregation2 = std::unique_ptr<Aggregation>(new DropAggregation());
-  hash_map.Set(m1, std::move(aggregation2), hash);
+  hash_map.Set(m1, std::move(aggregation2), 0);
   hash_map.Get(m1)->Aggregate(static_cast<int64_t>(1));
   EXPECT_EQ(hash_map.Size(), 1);
   EXPECT_EQ(hash_map.Has(m1), true);
@@ -51,8 +50,7 @@ TEST(AttributesHashMap, BasicTests)
   // Set more enteria
   auto aggregation3   = std::unique_ptr<Aggregation>(new DropAggregation());
   MetricAttributes m3 = {{"k1", "v1"}, {"k2", "v2"}};
-  auto hash3          = opentelemetry::sdk::common::GetHashForAttributeMap(m3);
-  hash_map.Set(m3, std::move(aggregation3), hash3);
+  hash_map.Set(m3, std::move(aggregation3), 0);
   EXPECT_EQ(hash_map.Has(m1), true);
   EXPECT_EQ(hash_map.Has(m3), true);
   hash_map.Get(m3)->Aggregate(static_cast<int64_t>(1));
@@ -64,14 +62,12 @@ TEST(AttributesHashMap, BasicTests)
     return std::unique_ptr<Aggregation>(new DropAggregation);
   };
   MetricAttributes m4 = {{"k1", "v1"}, {"k2", "v2"}, {"k3", "v3"}};
-  auto hash4          = opentelemetry::sdk::common::GetHashForAttributeMap(m4);
-  hash_map.GetOrSetDefault(m4, create_default_aggregation, hash4)
+  hash_map.GetOrSetDefault(m4, create_default_aggregation, 0)
       ->Aggregate(static_cast<int64_t>(1));
   EXPECT_EQ(hash_map.Size(), 3);
 
   // Set attributes with different order - shouldn't create a new entry.
   MetricAttributes m5 = {{"k2", "v2"}, {"k1", "v1"}};
-  auto hash5          = opentelemetry::sdk::common::GetHashForAttributeMap(m5);
   EXPECT_EQ(hash_map.Has(m5), true);
 
   // GetAllEnteries
@@ -87,46 +83,6 @@ TEST(AttributesHashMap, BasicTests)
 std::string make_unique_string(const char *str)
 {
   return std::string(str);
-}
-
-TEST(AttributesHashMap, HashWithKeyValueIterable)
-{
-  std::string key1   = make_unique_string("k1");
-  std::string value1 = make_unique_string("v1");
-  std::string key2   = make_unique_string("k2");
-  std::string value2 = make_unique_string("v2");
-  std::string key3   = make_unique_string("k3");
-  std::string value3 = make_unique_string("v3");
-
-  // Create mock KeyValueIterable instances with the same content but different variables
-  std::map<std::string, std::string> attributes1({{key1, value1}, {key2, value2}});
-  std::map<std::string, std::string> attributes2({{key1, value1}, {key2, value2}});
-  std::map<std::string, std::string> attributes3({{key1, value1}, {key2, value2}, {key3, value3}});
-
-  // Create a callback that filters "k3" key
-  auto is_key_filter_k3_callback = [](nostd::string_view key) {
-    if (key == "k3")
-    {
-      return false;
-    }
-    return true;
-  };
-  // Calculate hash
-  size_t hash1 = opentelemetry::sdk::common::GetHashForAttributeMap(
-      opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attributes1),
-      is_key_filter_k3_callback);
-  size_t hash2 = opentelemetry::sdk::common::GetHashForAttributeMap(
-      opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attributes2),
-      is_key_filter_k3_callback);
-
-  size_t hash3 = opentelemetry::sdk::common::GetHashForAttributeMap(
-      opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attributes3),
-      is_key_filter_k3_callback);
-
-  // Expect the hashes to be the same because the content is the same
-  EXPECT_EQ(hash1, hash2);
-  // Expect the hashes to be the same because the content is the same
-  EXPECT_EQ(hash1, hash3);
 }
 
 TEST(AttributesHashMap, HashConsistencyAcrossStringTypes)
