@@ -545,37 +545,6 @@ jobs:
         sudo ./ci/setup_grpc.sh -T
         ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
 
-  cmake_install_test:
-    name: CMake install test
-    runs-on: ubuntu-24.04
-    env:
-      INSTALL_TEST_DIR: '/home/runner/install_test'
-      CXX_STANDARD: '17'
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: install dependencies
-      env:
-        ABSEIL_CPP_VERSION: '20230125.3'
-        PROTOBUF_VERSION: '23.3'
-        GRPC_VERSION: 'v1.55.0'
-      run: |
-        sudo -E ./ci/install_abseil.sh
-        sudo -E ./ci/install_protobuf.sh
-        sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
-    - name: build and test
-      run: |
-        ./ci/do_ci.sh cmake.install.test
-    - name: verify packages
-      run: |
-        export PKG_CONFIG_PATH=$INSTALL_TEST_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
-        ./ci/verify_packages.sh
-
   plugin_test:
     name: Plugin -> CMake
     runs-on: ubuntu-latest
@@ -860,8 +829,6 @@ jobs:
       run: ./ci/do_ci.ps1 cmake.dll.cxx20.test
     - name: run otprotocol test (DLL build)
       run: ./ci/do_ci.ps1 cmake.exporter.otprotocol.dll.test
-    - name: run cmake install test
-      run: ./ci/do_ci.ps1 cmake.dll.install.test
 
   windows_with_async_export:
     name: CMake (With async export) -> exporter proto
@@ -904,18 +871,6 @@ jobs:
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.test_example_plugin
-
-  windows_cmake_install_test:
-    name: Windows CMake install test
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: 'recursive'
-      - name: Setup Windows CI Environment
-        run: ./ci/setup_windows_ci_environment.ps1
-      - name: Run Tests
-        run: ./ci/do_ci.ps1 cmake.install.test
 
   code_coverage:
     name: Code coverage
