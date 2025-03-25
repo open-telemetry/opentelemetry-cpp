@@ -64,8 +64,13 @@ if(BUILD_TESTING)
   add_executable(zipkin_exporter_test test/zipkin_exporter_test.cc)
 
   target_link_libraries(
-    zipkin_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    ${GMOCK_LIB} opentelemetry_exporter_zipkin_trace opentelemetry_resources)
+    zipkin_exporter_test
+    ${GTEST_BOTH_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${GMOCK_LIB}
+    opentelemetry_exporter_zipkin_trace
+    opentelemetry_resources
+    ${CURL_LIBRARIES})
 
   gtest_add_tests(
     TARGET zipkin_exporter_test
