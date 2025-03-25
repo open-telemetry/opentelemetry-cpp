@@ -104,11 +104,10 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   {
     agg_hashmap->GetAllEnteries(
         [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
-          auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-          auto agg  = merged_metrics->Get(hash);
+          auto agg  = merged_metrics->Get(attributes);
           if (agg)
           {
-            merged_metrics->Set(attributes, agg->Merge(aggregation), hash);
+            merged_metrics->Set(attributes, agg->Merge(aggregation), 0);
           }
           else
           {
@@ -116,7 +115,7 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
                                 DefaultAggregation::CreateAggregation(
                                     aggregation_type_, instrument_descriptor_, aggregation_config_)
                                     ->Merge(aggregation),
-                                hash);
+                                0);
           }
           return true;
         });
@@ -139,17 +138,16 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
       // merge current delta to previous cumulative
       last_aggr_hashmap->GetAllEnteries(
           [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
-            auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-            auto agg  = merged_metrics->Get(hash);
+            auto agg  = merged_metrics->Get(attributes);
             if (agg)
             {
-              merged_metrics->Set(attributes, agg->Merge(aggregation), hash);
+              merged_metrics->Set(attributes, agg->Merge(aggregation), 0);
             }
             else
             {
               auto def_agg = DefaultAggregation::CreateAggregation(
                   aggregation_type_, instrument_descriptor_, aggregation_config_);
-              merged_metrics->Set(attributes, def_agg->Merge(aggregation), hash);
+              merged_metrics->Set(attributes, def_agg->Merge(aggregation), 0);
             }
             return true;
           });

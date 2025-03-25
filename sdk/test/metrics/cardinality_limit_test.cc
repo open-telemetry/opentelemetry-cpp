@@ -83,7 +83,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   // get the overflow metric point
   auto agg1 = hash_map.GetOrSetDefault(
       FilteredOrderedAttributeMap({{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}}),
-      aggregation_callback, kOverflowAttributesHash);
+      aggregation_callback, 0);
   EXPECT_NE(agg1, nullptr);
   auto sum_agg1 = static_cast<LongSumAggregation *>(agg1);
   EXPECT_EQ(nostd::get<int64_t>(nostd::get<SumPointData>(sum_agg1->ToPoint()).value_),

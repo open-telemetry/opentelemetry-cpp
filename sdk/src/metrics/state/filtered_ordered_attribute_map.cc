@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/sdk/common/attributemap_hash.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
@@ -10,6 +12,9 @@ namespace sdk
 {
 namespace metrics
 {
+
+using namespace opentelemetry::sdk::common;
+
 FilteredOrderedAttributeMap::FilteredOrderedAttributeMap(
     const opentelemetry::common::KeyValueIterable &attributes,
     const AttributesProcessor *processor)
@@ -23,6 +28,8 @@ FilteredOrderedAttributeMap::FilteredOrderedAttributeMap(
         }
         return true;
       });
+
+  UpdateHash();
 }
 
 FilteredOrderedAttributeMap::FilteredOrderedAttributeMap(
@@ -38,6 +45,8 @@ FilteredOrderedAttributeMap::FilteredOrderedAttributeMap(
       SetAttribute(kv.first, kv.second);
     }
   }
+
+  UpdateHash();
 }
 }  // namespace metrics
 }  // namespace sdk

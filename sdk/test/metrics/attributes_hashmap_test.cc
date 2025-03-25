@@ -30,32 +30,32 @@ TEST(AttributesHashMap, BasicTests)
   MetricAttributes m1 = {{"k1", "v1"}};
   auto hash           = opentelemetry::sdk::common::GetHashForAttributeMap(m1);
 
-  EXPECT_EQ(hash_map.Get(hash), nullptr);
-  EXPECT_EQ(hash_map.Has(hash), false);
+  EXPECT_EQ(hash_map.Get(m1), nullptr);
+  EXPECT_EQ(hash_map.Has(m1), false);
 
   // Set
   std::unique_ptr<Aggregation> aggregation1(
       new DropAggregation());  //  = std::unique_ptr<Aggregation>(new DropAggregation);
   hash_map.Set(m1, std::move(aggregation1), hash);
-  hash_map.Get(hash)->Aggregate(static_cast<int64_t>(1));
+  hash_map.Get(m1)->Aggregate(static_cast<int64_t>(1));
   EXPECT_EQ(hash_map.Size(), 1);
-  EXPECT_EQ(hash_map.Has(hash), true);
+  EXPECT_EQ(hash_map.Has(m1), true);
 
   // Set same key again
   auto aggregation2 = std::unique_ptr<Aggregation>(new DropAggregation());
   hash_map.Set(m1, std::move(aggregation2), hash);
-  hash_map.Get(hash)->Aggregate(static_cast<int64_t>(1));
+  hash_map.Get(m1)->Aggregate(static_cast<int64_t>(1));
   EXPECT_EQ(hash_map.Size(), 1);
-  EXPECT_EQ(hash_map.Has(hash), true);
+  EXPECT_EQ(hash_map.Has(m1), true);
 
   // Set more enteria
   auto aggregation3   = std::unique_ptr<Aggregation>(new DropAggregation());
   MetricAttributes m3 = {{"k1", "v1"}, {"k2", "v2"}};
   auto hash3          = opentelemetry::sdk::common::GetHashForAttributeMap(m3);
   hash_map.Set(m3, std::move(aggregation3), hash3);
-  EXPECT_EQ(hash_map.Has(hash), true);
-  EXPECT_EQ(hash_map.Has(hash3), true);
-  hash_map.Get(hash3)->Aggregate(static_cast<int64_t>(1));
+  EXPECT_EQ(hash_map.Has(m1), true);
+  EXPECT_EQ(hash_map.Has(m3), true);
+  hash_map.Get(m3)->Aggregate(static_cast<int64_t>(1));
   EXPECT_EQ(hash_map.Size(), 2);
 
   // GetOrSetDefault
@@ -72,7 +72,7 @@ TEST(AttributesHashMap, BasicTests)
   // Set attributes with different order - shouldn't create a new entry.
   MetricAttributes m5 = {{"k2", "v2"}, {"k1", "v1"}};
   auto hash5          = opentelemetry::sdk::common::GetHashForAttributeMap(m5);
-  EXPECT_EQ(hash_map.Has(hash5), true);
+  EXPECT_EQ(hash_map.Has(m5), true);
 
   // GetAllEnteries
   size_t count = 0;
