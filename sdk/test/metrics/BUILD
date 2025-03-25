@@ -36,6 +36,9 @@ cc_test(
 cc_test(
     name = "all_tests",
     srcs = glob(["*_test.cc"]),
+    copts = [
+        "-DUNIT_TESTING",
+    ],
     tags = [
         "metrics",
         "test",
@@ -43,9 +46,6 @@ cc_test(
     deps = [
         "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
-    ],
-    copts = [
-        "-DUNIT_TESTING",
     ],
 )
 
