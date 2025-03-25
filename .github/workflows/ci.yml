@@ -42,7 +42,7 @@ jobs:
 
   cmake_test:
     name: CMake test (prometheus, elasticsearch, zipkin)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       CXX_STANDARD: '17'
     steps:
