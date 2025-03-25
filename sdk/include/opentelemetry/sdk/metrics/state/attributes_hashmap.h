@@ -122,8 +122,8 @@ public:
       return GetOrSetOveflowAttributes(aggregation_callback);
     }
 
-    auto [iter, inserted] = hash_map_.emplace(std::move(attributes), aggregation_callback());
-    return iter->second.get();
+    auto result = hash_map_.emplace(std::move(attributes), aggregation_callback());
+    return result.first->second.get();
   }
   /**
    * Set the value for given key, overwriting the value if already present

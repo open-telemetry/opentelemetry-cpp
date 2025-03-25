@@ -4,6 +4,7 @@
 #pragma once
 
 #include <initializer_list>
+#include <limits>
 #include <utility>
 
 #include "opentelemetry/common/attribute_value.h"
@@ -47,16 +48,24 @@ public:
           attributes,
       const opentelemetry::sdk::metrics::AttributesProcessor *processor);
 
-  size_t GetHash() const { return _hash; }
+  //
+  // Copy and move constructors, assignment operators
+  //
+  FilteredOrderedAttributeMap(const FilteredOrderedAttributeMap &other) = default;
+  FilteredOrderedAttributeMap(FilteredOrderedAttributeMap &&other)      = default;
+  FilteredOrderedAttributeMap &operator=(const FilteredOrderedAttributeMap &other) = default;
+  FilteredOrderedAttributeMap &operator=(FilteredOrderedAttributeMap &&other) = default;
 
-private:
+  size_t GetHash() const { return _hash; }
 
   void UpdateHash()
   {
     _hash = GetHashForAttributeMap(*this);
   }
 
-  size_t _hash = 0UL;
+private:
+
+  size_t _hash = (std::numeric_limits<size_t>::max)();
 };
 
 class FilteredOrderedAttributeMapHash
