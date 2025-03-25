@@ -51,27 +51,24 @@ public:
   //
   // Copy and move constructors, assignment operators
   //
-  FilteredOrderedAttributeMap(const FilteredOrderedAttributeMap &other) = default;
-  FilteredOrderedAttributeMap(FilteredOrderedAttributeMap &&other)      = default;
+  FilteredOrderedAttributeMap(const FilteredOrderedAttributeMap &other)            = default;
+  FilteredOrderedAttributeMap(FilteredOrderedAttributeMap &&other)                 = default;
   FilteredOrderedAttributeMap &operator=(const FilteredOrderedAttributeMap &other) = default;
-  FilteredOrderedAttributeMap &operator=(FilteredOrderedAttributeMap &&other) = default;
+  FilteredOrderedAttributeMap &operator=(FilteredOrderedAttributeMap &&other)      = default;
 
   size_t GetHash() const { return _hash; }
 
-  void UpdateHash()
-  {
-    _hash = GetHashForAttributeMap(*this);
-  }
+  void UpdateHash() { _hash = GetHashForAttributeMap(*this); }
 
 private:
-
   size_t _hash = (std::numeric_limits<size_t>::max)();
 };
 
 class FilteredOrderedAttributeMapHash
 {
 public:
-  size_t operator()(const opentelemetry::sdk::metrics::FilteredOrderedAttributeMap &attributes) const
+  size_t operator()(
+      const opentelemetry::sdk::metrics::FilteredOrderedAttributeMap &attributes) const
   {
     return attributes.GetHash();
   }

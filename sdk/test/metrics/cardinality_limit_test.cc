@@ -51,8 +51,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 0; i < 10; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    static_cast<LongSumAggregation *>(
-        hash_map.GetOrSetDefault(attributes, aggregation_callback))
+    static_cast<LongSumAggregation *>(hash_map.GetOrSetDefault(attributes, aggregation_callback))
         ->Aggregate(record_value);
   }
   EXPECT_EQ(hash_map.Size(), 10);
@@ -61,8 +60,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 10; i < 15; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    static_cast<LongSumAggregation *>(
-        hash_map.GetOrSetDefault(attributes, aggregation_callback))
+    static_cast<LongSumAggregation *>(hash_map.GetOrSetDefault(attributes, aggregation_callback))
         ->Aggregate(record_value);
   }
   EXPECT_EQ(hash_map.Size(), 10);  // only one more metric point should be added as overflow.
@@ -71,14 +69,13 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 0; i < 5; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    static_cast<LongSumAggregation *>(
-        hash_map.GetOrSetDefault(attributes, aggregation_callback))
+    static_cast<LongSumAggregation *>(hash_map.GetOrSetDefault(attributes, aggregation_callback))
         ->Aggregate(record_value);
   }
   EXPECT_EQ(hash_map.Size(), 10);  // no new metric point added
 
   // get the overflow metric point
-  auto agg1 = hash_map.GetOrSetDefault( kOverflowAttributes, aggregation_callback);
+  auto agg1 = hash_map.GetOrSetDefault(kOverflowAttributes, aggregation_callback);
   EXPECT_NE(agg1, nullptr);
   auto sum_agg1 = static_cast<LongSumAggregation *>(agg1);
   EXPECT_EQ(nostd::get<int64_t>(nostd::get<SumPointData>(sum_agg1->ToPoint()).value_),

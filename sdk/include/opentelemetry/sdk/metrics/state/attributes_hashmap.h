@@ -30,8 +30,9 @@ using opentelemetry::sdk::common::OrderedAttributeMap;
 constexpr size_t kAggregationCardinalityLimit = 2000;
 const std::string kAttributesLimitOverflowKey = "otel.metrics.overflow";
 const bool kAttributesLimitOverflowValue      = true;
-const MetricAttributes kOverflowAttributes = {
-    {kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}};  // precalculated for optimization
+const MetricAttributes kOverflowAttributes    = {
+    {kAttributesLimitOverflowKey,
+        kAttributesLimitOverflowValue}};  // precalculated for optimization
 
 class AttributeHashGenerator
 {
@@ -42,7 +43,7 @@ public:
   }
 };
 
-template <typename CustomHash=MetricAttributesHash>
+template <typename CustomHash = MetricAttributesHash>
 class AttributesHashMapWithCustomHash
 {
 public:
@@ -63,7 +64,10 @@ public:
    * @return check if key is present in hash
    *
    */
-  bool Has(const MetricAttributes& attributes) const { return hash_map_.find(attributes) != hash_map_.end(); }
+  bool Has(const MetricAttributes &attributes) const
+  {
+    return hash_map_.find(attributes) != hash_map_.end();
+  }
 
   /**
    * @return the pointer to value for given key if present.

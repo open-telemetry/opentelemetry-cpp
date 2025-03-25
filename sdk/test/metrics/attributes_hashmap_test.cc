@@ -62,8 +62,7 @@ TEST(AttributesHashMap, BasicTests)
     return std::unique_ptr<Aggregation>(new DropAggregation);
   };
   MetricAttributes m4 = {{"k1", "v1"}, {"k2", "v2"}, {"k3", "v3"}};
-  hash_map.GetOrSetDefault(m4, create_default_aggregation)
-      ->Aggregate(static_cast<int64_t>(1));
+  hash_map.GetOrSetDefault(m4, create_default_aggregation)->Aggregate(static_cast<int64_t>(1));
   EXPECT_EQ(hash_map.Size(), 3);
 
   // Set attributes with different order - shouldn't create a new entry.
@@ -87,10 +86,7 @@ TEST(AttributesHashMap, BasicTests)
 class MetricAttributeMapHashForCollision
 {
 public:
-  size_t operator()(const MetricAttributes &attributes) const
-  {
-    return 42;
-  }
+  size_t operator()(const MetricAttributes &attributes) const { return 42; }
 };
 
 TEST(AttributesHashMap, CollisionTest)
@@ -121,7 +117,7 @@ TEST(AttributesHashMap, CollisionTest)
   // Verify only one bucket used based on the custom hash
   //
   size_t total_active_buckets = 0;
-  size_t total_elements = 0;
+  size_t total_elements       = 0;
   for (size_t i = 0; i < hash_map.BucketCount(); i++)
   {
     size_t bucket_size = hash_map.BucketSize(i);

@@ -104,7 +104,7 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   {
     agg_hashmap->GetAllEnteries(
         [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
-          auto agg  = merged_metrics->Get(attributes);
+          auto agg = merged_metrics->Get(attributes);
           if (agg)
           {
             merged_metrics->Set(attributes, agg->Merge(aggregation));
@@ -137,7 +137,7 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
       // merge current delta to previous cumulative
       last_aggr_hashmap->GetAllEnteries(
           [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
-            auto agg  = merged_metrics->Get(attributes);
+            auto agg = merged_metrics->Get(attributes);
             if (agg)
             {
               merged_metrics->Set(attributes, agg->Merge(aggregation));
