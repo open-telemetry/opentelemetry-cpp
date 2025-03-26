@@ -3,13 +3,19 @@
 
 #pragma once
 
+#include <stddef.h>
+#include <algorithm>
+#include <functional>
 #include <initializer_list>
 #include <limits>
+#include <map>
+#include <string>
 #include <utility>
-
+#include <vector>
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/version.h"

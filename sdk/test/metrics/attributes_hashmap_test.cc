@@ -10,7 +10,6 @@
 #include <string>
 #include <utility>
 
-#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"

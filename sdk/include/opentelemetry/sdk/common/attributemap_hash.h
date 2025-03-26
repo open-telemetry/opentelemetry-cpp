@@ -10,10 +10,6 @@
 #include <utility>
 #include <vector>
 
-#include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/version.h"
