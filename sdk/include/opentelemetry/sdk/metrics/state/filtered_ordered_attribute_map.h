@@ -24,7 +24,7 @@ class AttributesProcessor;  // IWYU pragma: keep
 class FilteredOrderedAttributeMap : public opentelemetry::sdk::common::OrderedAttributeMap
 {
 public:
-  FilteredOrderedAttributeMap() = default;
+  FilteredOrderedAttributeMap() : OrderedAttributeMap() { UpdateHash(); }
 
   FilteredOrderedAttributeMap(
       std::initializer_list<std::pair<nostd::string_view, opentelemetry::common::AttributeValue>>
