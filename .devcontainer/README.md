@@ -10,6 +10,14 @@ environment variables (for evaluation in `devcontainer.json`).
   * Host Environment Variable:
    `OTEL_CPP_DEVCONTAINER_CXX_STANDARD`
 
+* **abseil-cpp version:**
+  This is the version of abseil-cpp that will be used to build protobuf, gRPC,
+  and opentelemetry-cpp.
+  * Docker ARG:
+   `ABSEIL_CPP_VERSION`
+  * Host Environment Variable:
+   `OTEL_CPP_DEVCONTAINER_ABSEIL_CPP_VERSION`
+
 * **Protobuf version:**
   * Docker ARG:
    `PROTOBUF_VERSION`
