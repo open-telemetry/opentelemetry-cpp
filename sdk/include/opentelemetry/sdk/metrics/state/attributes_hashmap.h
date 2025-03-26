@@ -91,8 +91,8 @@ public:
       return GetOrSetOveflowAttributes(aggregation_callback);
     }
 
-    hash_map_[attr] = aggregation_callback();
-    return hash_map_[attr].get();
+    auto result = hash_map_.emplace(std::move(attr), aggregation_callback());
+    return result.first->second.get();
   }
 
   Aggregation *GetOrSetDefault(const MetricAttributes &attributes,
@@ -233,9 +233,9 @@ private:
       return it->second.get();
     }
 
-    MetricAttributes attr{{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}};
     hash_map_[kOverflowAttributes] = std::move(agg);
-    return hash_map_[kOverflowAttributes].get();
+    auto result                    = hash_map_.emplace(kOverflowAttributes, std::move(agg));
+    return result.first->second.get();
   }
 
   bool IsOverflowAttributes() const { return (hash_map_.size() + 1 >= attributes_limit_); }

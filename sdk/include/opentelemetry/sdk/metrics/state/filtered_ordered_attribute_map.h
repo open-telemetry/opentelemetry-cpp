@@ -56,6 +56,15 @@ public:
   FilteredOrderedAttributeMap &operator=(const FilteredOrderedAttributeMap &other) = default;
   FilteredOrderedAttributeMap &operator=(FilteredOrderedAttributeMap &&other)      = default;
 
+  //
+  // equality operator
+  //
+  bool operator==(const FilteredOrderedAttributeMap &other) const
+  {
+    return _hash == other._hash && static_cast<const OrderedAttributeMap &>(*this) ==
+                                       static_cast<const OrderedAttributeMap &>(other);
+  }
+
   size_t GetHash() const { return _hash; }
 
   void UpdateHash() { _hash = GetHashForAttributeMap(*this); }
