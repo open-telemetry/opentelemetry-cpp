@@ -233,8 +233,7 @@ private:
       return it->second.get();
     }
 
-    hash_map_[kOverflowAttributes] = std::move(agg);
-    auto result                    = hash_map_.emplace(kOverflowAttributes, std::move(agg));
+    auto result = hash_map_.emplace(kOverflowAttributes, std::move(agg));
     return result.first->second.get();
   }
 
