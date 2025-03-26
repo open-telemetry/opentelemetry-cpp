@@ -96,6 +96,7 @@ For edit access, get in touch on
 ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
 * [Josh Suereth](https://github.com/jsuereth), Google
+* [Pranav Sharma](https://github.com/psx95), Google
 * [WenTao Ou](https://github.com/owent), Tencent
 
 [Emeritus
