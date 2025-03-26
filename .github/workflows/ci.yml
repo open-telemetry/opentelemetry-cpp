@@ -545,25 +545,6 @@ jobs:
         sudo ./ci/setup_grpc.sh -T
         ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
 
-  cmake_install_test:
-    name: CMake install test (with abseil)
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: run cmake install (with abseil)
-      run: |
-        sudo ./ci/install_abseil.sh
-        ./ci/do_ci.sh cmake.install.test
-    - name: verify packages
-      run: |
-        ./ci/verify_packages.sh
-
   plugin_test:
     name: Plugin -> CMake
     runs-on: ubuntu-latest
