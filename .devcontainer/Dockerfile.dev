@@ -30,7 +30,7 @@ RUN cd /opt/ci && bash setup_ci_environment.sh
 RUN cd /opt && bash ci/setup_googletest.sh \
     && bash ci/install_abseil.sh \
     && bash ci/install_protobuf.sh \
-    && bash ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil
+    && bash ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
 
 ADD https://github.com/bazelbuild/bazelisk/releases/download/v1.22.1/bazelisk-linux-amd64 /usr/local/bin
 	

@@ -38,7 +38,9 @@ CPP_PROTOBUF_BUILD_OPTIONS=(
 )
 
 if [ ! -z "${CXX_STANDARD}" ]; then
-    CPP_PROTOBUF_BUILD_OPTIONS=(${CPP_PROTOBUF_BUILD_OPTIONS[@]} "-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
+    CPP_PROTOBUF_BUILD_OPTIONS+=("-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
+    CPP_PROTOBUF_BUILD_OPTIONS+=("-DCMAKE_CXX_STANDARD_REQUIRED=ON")
+    CPP_PROTOBUF_BUILD_OPTIONS+=("-DCMAKE_CXX_EXTENSIONS=OFF")
 fi
 
 # After protobuf 22/4.22, protobuf depends on absl and we can use
@@ -58,6 +60,9 @@ fi
 cd /tmp
 wget https://github.com/google/protobuf/releases/download/v${PROTOBUF_VERSION}/${CPP_PROTOBUF_PACKAGE_NAME}.tar.gz
 tar zxf ${CPP_PROTOBUF_PACKAGE_NAME}.tar.gz --no-same-owner
+
+echo "Building protobuf ${CPP_PROTOBUF_VERSION}"
+echo "CMake build options:" "${CPP_PROTOBUF_BUILD_OPTIONS[@]}"
 
 mkdir protobuf-${CPP_PROTOBUF_VERSION}/build && pushd protobuf-${CPP_PROTOBUF_VERSION}/build
 if [ -e "../CMakeLists.txt" ]; then
