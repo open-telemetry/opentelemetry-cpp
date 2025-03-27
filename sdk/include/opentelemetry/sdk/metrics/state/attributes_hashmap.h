@@ -78,6 +78,8 @@ public:
                                const AttributesProcessor *attributes_processor,
                                std::function<std::unique_ptr<Aggregation>()> aggregation_callback)
   {
+    // TODO: avoid constructing MetricAttributes from KeyValueIterable for
+    // hash_map_.find which is a heavy operation
     MetricAttributes attr{attributes, attributes_processor};
 
     auto it = hash_map_.find(attr);

@@ -67,16 +67,16 @@ public:
   //
   bool operator==(const FilteredOrderedAttributeMap &other) const
   {
-    return _hash == other._hash && static_cast<const OrderedAttributeMap &>(*this) ==
+    return hash_ == other.hash_ && static_cast<const OrderedAttributeMap &>(*this) ==
                                        static_cast<const OrderedAttributeMap &>(other);
   }
 
-  size_t GetHash() const { return _hash; }
+  size_t GetHash() const { return hash_; }
 
-  void UpdateHash() { _hash = GetHashForAttributeMap(*this); }
+  void UpdateHash() { hash_ = GetHashForAttributeMap(*this); }
 
 private:
-  size_t _hash = (std::numeric_limits<size_t>::max)();
+  size_t hash_ = (std::numeric_limits<size_t>::max)();
 };
 
 class FilteredOrderedAttributeMapHash
