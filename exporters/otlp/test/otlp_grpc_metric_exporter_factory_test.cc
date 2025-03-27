@@ -18,6 +18,15 @@
   Implementation, this requires protobuf.
 */
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
+
+/*
+  Make sure OtlpGrpcClientFactory does not require,
+  even indirectly, gRPC headers.
+*/
+#if defined(GRPC_CPP_VERSION_MAJOR) || defined(GRPC_CPP_VERSION_STRING)
+#  error "gRPC should not be included"
+#endif
+
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

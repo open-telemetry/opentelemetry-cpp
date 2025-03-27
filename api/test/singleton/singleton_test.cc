@@ -56,6 +56,8 @@ void do_something()
 
 #  ifdef _WIN32
   HMODULE component_g = LoadLibraryA("component_g.dll");
+#  elif defined(__APPLE__)
+  void *component_g = dlopen("libcomponent_g.dylib", RTLD_NOW);
 #  else
   void *component_g = dlopen("libcomponent_g.so", RTLD_NOW);
 #  endif
@@ -82,6 +84,8 @@ void do_something()
 
 #  ifdef _WIN32
   HMODULE component_h = LoadLibraryA("component_h.dll");
+#  elif defined(__APPLE__)
+  void *component_h = dlopen("libcomponent_h.dylib", RTLD_NOW);
 #  else
   void *component_h = dlopen("libcomponent_h.so", RTLD_NOW);
 #  endif
