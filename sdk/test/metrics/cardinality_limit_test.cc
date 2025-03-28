@@ -19,7 +19,6 @@
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
@@ -51,9 +50,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 0; i < 10; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-    static_cast<LongSumAggregation *>(
-        hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
+    static_cast<LongSumAggregation *>(hash_map.GetOrSetDefault(attributes, aggregation_callback))
         ->Aggregate(record_value);
   }
   EXPECT_EQ(hash_map.Size(), 10);
@@ -62,9 +59,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 10; i < 15; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-    static_cast<LongSumAggregation *>(
-        hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
+    static_cast<LongSumAggregation *>(hash_map.GetOrSetDefault(attributes, aggregation_callback))
         ->Aggregate(record_value);
   }
   EXPECT_EQ(hash_map.Size(), 10);  // only one more metric point should be added as overflow.
@@ -73,17 +68,13 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 0; i < 5; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-    static_cast<LongSumAggregation *>(
-        hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
+    static_cast<LongSumAggregation *>(hash_map.GetOrSetDefault(attributes, aggregation_callback))
         ->Aggregate(record_value);
   }
   EXPECT_EQ(hash_map.Size(), 10);  // no new metric point added
 
   // get the overflow metric point
-  auto agg1 = hash_map.GetOrSetDefault(
-      FilteredOrderedAttributeMap({{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}}),
-      aggregation_callback, kOverflowAttributesHash);
+  auto agg1 = hash_map.GetOrSetDefault(kOverflowAttributes, aggregation_callback);
   EXPECT_NE(agg1, nullptr);
   auto sum_agg1 = static_cast<LongSumAggregation *>(agg1);
   EXPECT_EQ(nostd::get<int64_t>(nostd::get<SumPointData>(sum_agg1->ToPoint()).value_),
@@ -92,10 +83,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 0; i < 9; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-    auto agg2 = hash_map.GetOrSetDefault(
-        FilteredOrderedAttributeMap({{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}}),
-        aggregation_callback, hash);
+    auto agg2 = hash_map.GetOrSetDefault(attributes, aggregation_callback);
     EXPECT_NE(agg2, nullptr);
     auto sum_agg2 = static_cast<LongSumAggregation *>(agg2);
     if (i < 5)

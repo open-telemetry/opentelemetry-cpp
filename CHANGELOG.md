@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Fix hash collision in MetricAttributes
+  [#3322](https://github.com/open-telemetry/opentelemetry-cpp/pull/3322)
+
 * [BUILD] Fix misssing exported definition for OTLP file exporter and forceflush
   [#3319](https://github.com/open-telemetry/opentelemetry-cpp/pull/3319)
 
