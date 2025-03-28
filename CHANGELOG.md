@@ -125,6 +125,9 @@ Increment the:
 * [DEVCONTAINER] fix grpc install
   [#3325](https://github.com/open-telemetry/opentelemetry-cpp/pull/3325)
 
+* [ADMIN] Add dbarker to approvers
+  [#3331](https://github.com/open-telemetry/opentelemetry-cpp/pull/3331)
+
 Important changes:
 
 * [SDK] Support OTEL_SDK_DISABLED environment variable
