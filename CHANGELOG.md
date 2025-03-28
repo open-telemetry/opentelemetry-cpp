@@ -55,6 +55,9 @@ Important changes:
 * [SDK] Implement spec: MetricFilter
   [#3235](https://github.com/open-telemetry/opentelemetry-cpp/pull/3235)
 
+* [API] Remove `WITH_ABSEIL` and `HAVE_ABSEIL`
+  [#3318](https://github.com/open-telemetry/opentelemetry-cpp/pull/3318)
+
 ## [1.19 2025-01-22]
 
 * [PROMETHEUS_EXPORTER] Fix default for emitting otel_scope attributes

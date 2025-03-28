@@ -12,7 +12,7 @@ environment variables (for evaluation in `devcontainer.json`).
 
 * **abseil-cpp version:**
   This is the version of abseil-cpp that will be used to build protobuf, gRPC,
-  and opentelemetry-cpp (when WITH_ABSEIL is set).
+  and opentelemetry-cpp.
   * Docker ARG:
    `ABSEIL_CPP_VERSION`
   * Host Environment Variable:

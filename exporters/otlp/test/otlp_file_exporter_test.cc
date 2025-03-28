@@ -108,9 +108,9 @@ public:
     std::string report_trace_id;
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-    auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url",
-                                      {{ "scope_key",
-                                         "scope_value" }});
+    std::unordered_map<std::string, common::AttributeValue> scope_attributes;
+    scope_attributes["scope_key"] = common::AttributeValue("scope_value");
+    auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url", scope_attributes);
 #else
     auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url");
 #endif
@@ -139,6 +139,12 @@ public:
     auto check_json_text = output.str();
     if (!check_json_text.empty())
     {
+      // If the exporting is splited to two standalone resource_span, just checking the first one.
+      std::string::size_type eol = check_json_text.find('\n');
+      if (eol != std::string::npos)
+      {
+        check_json_text = check_json_text.substr(0, eol);
+      }
       auto check_json = nlohmann::json::parse(check_json_text, nullptr, false);
       if (!check_json.is_discarded())
       {

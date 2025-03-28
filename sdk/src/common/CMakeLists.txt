@@ -18,7 +18,7 @@ target_link_libraries(
   opentelemetry_common PUBLIC opentelemetry_api opentelemetry_sdk
                               Threads::Threads)
 
-if(WITH_ABSEIL OR WITH_OTLP_GRPC)
+if(WITH_OTLP_GRPC)
   target_link_libraries(opentelemetry_common PUBLIC absl::strings)
 endif()
 
