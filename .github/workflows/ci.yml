@@ -304,6 +304,8 @@ jobs:
   cmake_abseil_stl_test:
     name: CMake test (with abseil)
     runs-on: ubuntu-22.04
+    env:
+      CXX_STANDARD: '14'
     steps:
     - uses: actions/checkout@v4
       with:
@@ -548,6 +550,8 @@ jobs:
   cmake_install_test:
     name: CMake install test (with abseil)
     runs-on: ubuntu-22.04
+    env:
+      CXX_STANDARD: '14'
     steps:
     - uses: actions/checkout@v4
       with:
