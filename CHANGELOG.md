@@ -128,6 +128,9 @@ Increment the:
 * [ADMIN] Add dbarker to approvers
   [#3331](https://github.com/open-telemetry/opentelemetry-cpp/pull/3331)
 
+* [CI] Upgrade CI to ubuntu 22.04
+  [#3330](https://github.com/open-telemetry/opentelemetry-cpp/pull/3330)
+
 Important changes:
 
 * [SDK] Support OTEL_SDK_DISABLED environment variable
