@@ -25,11 +25,11 @@ cc_import(
     shared_library = ":lib_dll_or_so",
 )
 
-#cc_test(
-#    name = "try",
-#    srcs = ["try.cc"],
-#    deps = [
-#        "@otel_sdk//:dll", 
-#        ":lib",
-#    ],
-#)
+cc_test(
+   name = "try",
+   srcs = ["try.cc"],
+   deps = [
+       "@otel_sdk//:dll", 
+       ":lib",
+   ],
+)
