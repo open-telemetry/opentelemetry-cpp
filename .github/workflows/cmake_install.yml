@@ -128,9 +128,9 @@ jobs:
         BUILD_SHARED_LIBS: 'ON'
       run: ./ci/do_ci.sh cmake.install.test
 
-  ubuntu_2004_script_build_grpc_1_49_2:
-    name: Ubuntu 20.04 script grpc 1.49.2 cxx14 (static libs - shared libs)
-    runs-on: ubuntu-20.04
+  ubuntu_2204_script_build_grpc_1_49_2:
+    name: Ubuntu 22.04 script grpc 1.49.2 cxx14 (static libs - shared libs)
+    runs-on: ubuntu-22.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
       CXX_STANDARD: '14'
