@@ -414,7 +414,7 @@ if(WITH_OTLP_GRPC
   # opentelemetry-cpp-config.cmake
 
   if(WITH_OTLP_GRPC)
-    find_package(gRPC)
+    find_package(gRPC CONFIG)
   endif()
   if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (WITH_OTLP_GRPC
                                                      AND NOT gRPC_FOUND))
@@ -433,7 +433,7 @@ if(WITH_OTLP_GRPC
       find_package(Protobuf REQUIRED)
     endif()
     if(NOT gRPC_FOUND AND WITH_OTLP_GRPC)
-      find_package(gRPC)
+      find_package(gRPC CONFIG)
     endif()
     if(WIN32)
       # Always use x64 protoc.exe
