@@ -137,6 +137,9 @@ Increment the:
 * [CI] pin cmake in ci and devcontainer
   [#3336](https://github.com/open-telemetry/opentelemetry-cpp/pull/3336)
 
+* [METRICS SDK] Fix hash collision in MetricAttributes
+  [#3322](https://github.com/open-telemetry/opentelemetry-cpp/pull/3322)
+
 Important changes:
 
 * [SDK] Support OTEL_SDK_DISABLED environment variable
