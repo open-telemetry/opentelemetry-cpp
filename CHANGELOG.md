@@ -15,17 +15,55 @@ Increment the:
 
 ## [Unreleased]
 
-* [METRICS SDK] Fix hash collision in MetricAttributes
-  [#3322](https://github.com/open-telemetry/opentelemetry-cpp/pull/3322)
+## [1.20 2025-04-01]
 
-* [BUILD] Fix misssing exported definition for OTLP file exporter and forceflush
-  [#3319](https://github.com/open-telemetry/opentelemetry-cpp/pull/3319)
+* [BUILD] Update opentelemetry-proto version
+  [#3254](https://github.com/open-telemetry/opentelemetry-cpp/pull/3254)
+
+* [BUILD] Build break with CURL 7.29.0
+  [#3255](https://github.com/open-telemetry/opentelemetry-cpp/pull/3255)
+
+* [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.30.0
+  [#3258](https://github.com/open-telemetry/opentelemetry-cpp/pull/3258)
 
 * [SDK] Add tracer scope configurator
   [#3137](https://github.com/open-telemetry/opentelemetry-cpp/pull/3137)
 
+* [DOC] Add document and example for sharing gRPC Client
+  [#3260](https://github.com/open-telemetry/opentelemetry-cpp/pull/3260)
+
+* [SDK] Fix BatchLogRecordProcessor to instrument shutdown
+  [#3262](https://github.com/open-telemetry/opentelemetry-cpp/pull/3262)
+
 * [SDK] Support OTEL_SDK_DISABLED environment variable
   [#3245](https://github.com/open-telemetry/opentelemetry-cpp/pull/3245)
+
+* [CI] OTLP in Windows builds
+  [#3263](https://github.com/open-telemetry/opentelemetry-cpp/pull/3263)
+
+* [BUILD] Fixes compatibility of type_traits
+  [#3274](https://github.com/open-telemetry/opentelemetry-cpp/pull/3274)
+
+* [BUILD] Fix compilation with Regex being disabled
+  [#3276](https://github.com/open-telemetry/opentelemetry-cpp/pull/3276)
+
+* [EXPORTER] Support exporting event_name using OTLP Exporter
+  [#3277](https://github.com/open-telemetry/opentelemetry-cpp/pull/3277)
+
+* [CI] Add FOSSA scanning workflow
+  [#3279](https://github.com/open-telemetry/opentelemetry-cpp/pull/3279)
+
+* [BUILD] Adding typecast without whom c++latest build fails
+  [#3281](https://github.com/open-telemetry/opentelemetry-cpp/pull/3281)
+
+* [ADMIN] Add FOSSA badges
+  [#3280](https://github.com/open-telemetry/opentelemetry-cpp/pull/3280)
+
+* [BUILD] Fix compiling problems with abiv2 and MSVC
+  [#3284](https://github.com/open-telemetry/opentelemetry-cpp/pull/3284)
+
+* [BUILD] Enable old behavior of CMP0092
+  [#3269](https://github.com/open-telemetry/opentelemetry-cpp/pull/3269)
 
 * [SDK] Add meter scope configurator
   [#3268](https://github.com/open-telemetry/opentelemetry-cpp/pull/3268)
@@ -33,8 +71,74 @@ Increment the:
 * [DEVCONTAINER] Support customization and run as non-root user
   [#3270](https://github.com/open-telemetry/opentelemetry-cpp/pull/3270)
 
+* [ETW] Add configuration to export 64-bit integer as timestamp
+  [#3286](https://github.com/open-telemetry/opentelemetry-cpp/pull/3286)
+
+* [API] Deprecate event logger
+  [#3285](https://github.com/open-telemetry/opentelemetry-cpp/pull/3285)
+
+* [BUILD] Add link directory to support curl 8.12
+  [#3272](https://github.com/open-telemetry/opentelemetry-cpp/pull/3272)
+
+* [API] Change the param-pack unpacking order to start from left to right
+  [#3296](https://github.com/open-telemetry/opentelemetry-cpp/pull/3296)
+
+* [SDK] Implement spec: MetricFilter
+  [#3235](https://github.com/open-telemetry/opentelemetry-cpp/pull/3235)
+
+* [SEMANTIC CONVENTIONS] Upgrade semantic conventions to 1.31.0
+  [#3297](https://github.com/open-telemetry/opentelemetry-cpp/pull/3297)
+
 * [SDK] Add logger scope configurator
   [#3282](https://github.com/open-telemetry/opentelemetry-cpp/pull/3282)
+
+* [EXAMPLE] fix buffer overrun in the gRPC sample project
+  [#3304](https://github.com/open-telemetry/opentelemetry-cpp/pull/3304)
+
+* [CI] Bump fossas/fossa-action from 1.5.0 to 1.6.0
+  [#3305](https://github.com/open-telemetry/opentelemetry-cpp/pull/3305)
+
+* [TEST] fix segfault in singleton test with cmake on macos-latest
+  [#3316](https://github.com/open-telemetry/opentelemetry-cpp/pull/3316)
+
+* [TEST] fix test failure with elasticsearch exporter on cxx20
+  [#3308](https://github.com/open-telemetry/opentelemetry-cpp/pull/3308)
+
+* [TEST] otlp grpc exporter retry test fix
+  [#3311](https://github.com/open-telemetry/opentelemetry-cpp/pull/3311)
+
+* [SDK] Use OPENTELEMETRY_EXPORT and static local variables
+  [#3314](https://github.com/open-telemetry/opentelemetry-cpp/pull/3314)
+
+* [BUILD] Fix elasticsearch exporter json compatibility
+  [#3313](https://github.com/open-telemetry/opentelemetry-cpp/pull/3313)
+
+* [BUILD] Fix missing exported definition for OTLP file exporter and forceflush
+  [#3319](https://github.com/open-telemetry/opentelemetry-cpp/pull/3319)
+
+* [BUILD] Remove gRPC header including in OtlpGrpcClientFactory
+  [#3321](https://github.com/open-telemetry/opentelemetry-cpp/pull/3321)
+
+* [ADMIN] Add Pranav Sharma in cpp-approvers
+  [#3323](https://github.com/open-telemetry/opentelemetry-cpp/pull/3323)
+
+* [DEVCONTAINER] fix grpc install
+  [#3325](https://github.com/open-telemetry/opentelemetry-cpp/pull/3325)
+
+* [ADMIN] Add dbarker to approvers
+  [#3331](https://github.com/open-telemetry/opentelemetry-cpp/pull/3331)
+
+* [CI] Upgrade CI to ubuntu 22.04
+  [#3330](https://github.com/open-telemetry/opentelemetry-cpp/pull/3330)
+
+* [CI] Add ossf-scorecard scanning workflow
+  [#3332](https://github.com/open-telemetry/opentelemetry-cpp/pull/3332)
+
+* [CI] pin cmake in ci and devcontainer
+  [#3336](https://github.com/open-telemetry/opentelemetry-cpp/pull/3336)
+
+* [METRICS SDK] Fix hash collision in MetricAttributes
+  [#3322](https://github.com/open-telemetry/opentelemetry-cpp/pull/3322)
 
 Important changes:
 
@@ -54,9 +158,6 @@ Important changes:
     `Provider` classes, to benefit from this feature.
 
   * All the example code has been updated to reflect the new usage.
-
-* [SDK] Implement spec: MetricFilter
-  [#3235](https://github.com/open-telemetry/opentelemetry-cpp/pull/3235)
 
 ## [1.19 2025-01-22]
 
