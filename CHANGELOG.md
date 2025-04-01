@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.20 2025-03-27]
+## [1.20 2025-04-01]
 
 * [BUILD] Update opentelemetry-proto version
   [#3254](https://github.com/open-telemetry/opentelemetry-cpp/pull/3254)
@@ -133,6 +133,9 @@ Increment the:
 
 * [CI] Add ossf-scorecard scanning workflow
   [#3332](https://github.com/open-telemetry/opentelemetry-cpp/pull/3332)
+
+* [CI] pin cmake in ci and devcontainer
+  [#3336](https://github.com/open-telemetry/opentelemetry-cpp/pull/3336)
 
 Important changes:
 
