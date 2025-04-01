@@ -129,11 +129,6 @@ TEST(AttributesHashMap, CollisionTest)
   EXPECT_EQ(total_elements, 4);
 }
 
-std::string make_unique_string(const char *str)
-{
-  return std::string(str);
-}
-
 TEST(AttributesHashMap, HashConsistencyAcrossStringTypes)
 {
   const char *c_str                 = "teststring";

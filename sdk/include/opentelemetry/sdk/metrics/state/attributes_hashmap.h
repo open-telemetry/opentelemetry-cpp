@@ -139,21 +139,7 @@ public:
            const AttributesProcessor *attributes_processor,
            std::unique_ptr<Aggregation> aggr)
   {
-    MetricAttributes attr{attributes, attributes_processor};
-
-    auto it = hash_map_.find(attr);
-    if (it != hash_map_.end())
-    {
-      it->second = std::move(aggr);
-    }
-    else if (IsOverflowAttributes())
-    {
-      hash_map_[kOverflowAttributes] = std::move(aggr);
-    }
-    else
-    {
-      hash_map_[std::move(attr)] = std::move(aggr);
-    }
+    Set(MetricAttributes{attributes, attributes_processor}, std::move(aggr));
   }
 
   void Set(const MetricAttributes &attributes, std::unique_ptr<Aggregation> aggr)
