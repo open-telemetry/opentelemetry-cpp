@@ -131,6 +131,9 @@ Increment the:
 * [CI] Upgrade CI to ubuntu 22.04
   [#3330](https://github.com/open-telemetry/opentelemetry-cpp/pull/3330)
 
+* [CI] Add ossf-scorecard scanning workflow
+  [#3332](https://github.com/open-telemetry/opentelemetry-cpp/pull/3332)
+
 Important changes:
 
 * [SDK] Support OTEL_SDK_DISABLED environment variable
