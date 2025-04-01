@@ -30,15 +30,6 @@ jobs:
 #        sudo -E ./ci/setup_googletest.sh
 #        sudo -E ./ci/install_abseil.sh
 #        sudo -E ./ci/install_protobuf.sh
-#    - name: run otlp exporter tests
-#      env:
-#        CC: /usr/bin/gcc-10
-#        CXX: /usr/bin/g++-10
-#        WITH_ABSEIL: 'ON'
-#        CXX_STANDARD: '14'
-#      run: |
-#        sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
-#        ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   cmake_test:
     name: CMake test (prometheus, elasticsearch, zipkin)
@@ -528,7 +519,6 @@ jobs:
         sudo -E ./ci/install_protobuf.sh
     - name: run otlp exporter tests
       env:
-        WITH_ABSEIL: 'ON'
         CXX_STANDARD: '14'
       run: |
         sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp

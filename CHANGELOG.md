@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] Remove `WITH_ABSEIL` and `HAVE_ABSEIL`
+  [#3318](https://github.com/open-telemetry/opentelemetry-cpp/pull/3318)
+
 ## [1.20 2025-04-01]
 
 * [BUILD] Update opentelemetry-proto version

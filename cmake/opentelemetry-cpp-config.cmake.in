@@ -1,16 +1,12 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+#[[
 #.rst:
 # opentelemetry-cpp-config.cmake
 # --------
 #
 # Find the native opentelemetry-cpp includes and library.
-#
-# Result Variables
-# ^^^^^^^^^^^^^^^^
-#
-# This module defines the following variables:
 #
 # ::
 #
@@ -52,10 +48,9 @@
 #   opentelemetry-cpp::http_client_curl                  - Imported target of opentelemetry-cpp::http_client_curl
 #   opentelemetry-cpp::opentracing_shim                  - Imported target of opentelemetry-cpp::opentracing_shim
 #
-
+]]
 # =============================================================================
-# Copyright The OpenTelemetry Authors
-# SPDX-License-Identifier: Apache-2.0
+# Copyright The OpenTelemetry Authors SPDX-License-Identifier: Apache-2.0
 # =============================================================================
 
 set(OPENTELEMETRY_ABI_VERSION_NO
@@ -73,10 +68,6 @@ include(CMakeFindDependencyMacro)
 
 find_dependency(Threads)
 
-if(@WITH_ABSEIL@)
-  find_dependency(absl)
-endif()
-
 if(@WITH_OTLP_GRPC@)
   find_dependency(gRPC)
 endif()
@@ -93,7 +84,7 @@ if("@Protobuf_FOUND@" OR "@PROTOBUF_FOUND@")
   find_dependency(Protobuf)
 endif()
 
-if (@WITH_HTTP_CLIENT_CURL@ AND NOT @BUILD_SHARED_LIBS@)
+if(@WITH_HTTP_CLIENT_CURL@ AND NOT @BUILD_SHARED_LIBS@)
   if("@CURL_FOUND@")
     find_dependency(CURL)
   endif()
@@ -103,7 +94,7 @@ if (@WITH_HTTP_CLIENT_CURL@ AND NOT @BUILD_SHARED_LIBS@)
   endif()
 endif()
 
-if(@WITH_ABSEIL@ OR @WITH_OTLP_GRPC@)
+if(@WITH_OTLP_GRPC@)
   find_package(absl CONFIG)
 elseif(@WITH_OTLP_HTTP@ OR @WITH_OTLP_FILE@)
   if("@Protobuf_VERSION@" VERSION_GREATER_EQUAL "3.22.0")
