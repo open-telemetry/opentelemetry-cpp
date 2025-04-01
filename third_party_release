@@ -14,7 +14,7 @@
 #
 
 gRPC=v1.69.0
-abseil=20250127.1
+abseil=20240722.0
 benchmark=v1.8.3
 googletest=1.16.0
 ms-gsl=v3.1.0-67-g6f45293
