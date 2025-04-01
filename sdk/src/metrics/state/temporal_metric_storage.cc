@@ -13,7 +13,6 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
@@ -104,19 +103,17 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   {
     agg_hashmap->GetAllEnteries(
         [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
-          auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-          auto agg  = merged_metrics->Get(hash);
+          auto agg = merged_metrics->Get(attributes);
           if (agg)
           {
-            merged_metrics->Set(attributes, agg->Merge(aggregation), hash);
+            merged_metrics->Set(attributes, agg->Merge(aggregation));
           }
           else
           {
             merged_metrics->Set(attributes,
                                 DefaultAggregation::CreateAggregation(
                                     aggregation_type_, instrument_descriptor_, aggregation_config_)
-                                    ->Merge(aggregation),
-                                hash);
+                                    ->Merge(aggregation));
           }
           return true;
         });
@@ -139,17 +136,16 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
       // merge current delta to previous cumulative
       last_aggr_hashmap->GetAllEnteries(
           [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
-            auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-            auto agg  = merged_metrics->Get(hash);
+            auto agg = merged_metrics->Get(attributes);
             if (agg)
             {
-              merged_metrics->Set(attributes, agg->Merge(aggregation), hash);
+              merged_metrics->Set(attributes, agg->Merge(aggregation));
             }
             else
             {
               auto def_agg = DefaultAggregation::CreateAggregation(
                   aggregation_type_, instrument_descriptor_, aggregation_config_);
-              merged_metrics->Set(attributes, def_agg->Merge(aggregation), hash);
+              merged_metrics->Set(attributes, def_agg->Merge(aggregation));
             }
             return true;
           });

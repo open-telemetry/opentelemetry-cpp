@@ -71,24 +71,22 @@ public:
 
       auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
       aggr->Aggregate(measurement.second);
-      auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(measurement.first);
-      auto prev = cumulative_hash_map_->Get(hash);
+      auto prev = cumulative_hash_map_->Get(measurement.first);
       if (prev)
       {
         auto delta = prev->Diff(*aggr);
         // store received value in cumulative map, and the diff in delta map (to pass it to temporal
         // storage)
-        cumulative_hash_map_->Set(measurement.first, std::move(aggr), hash);
-        delta_hash_map_->Set(measurement.first, std::move(delta), hash);
+        cumulative_hash_map_->Set(measurement.first, std::move(aggr));
+        delta_hash_map_->Set(measurement.first, std::move(delta));
       }
       else
       {
         // store received value in cumulative and delta map.
         cumulative_hash_map_->Set(
             measurement.first,
-            DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_, *aggr),
-            hash);
-        delta_hash_map_->Set(measurement.first, std::move(aggr), hash);
+            DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_, *aggr));
+        delta_hash_map_->Set(measurement.first, std::move(aggr));
       }
     }
   }
