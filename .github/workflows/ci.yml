@@ -183,9 +183,9 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -252,6 +252,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.maintainer.test
@@ -265,6 +266,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       env:
@@ -280,6 +282,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       env:
@@ -623,6 +626,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
@@ -846,6 +850,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test
@@ -862,6 +867,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test (DLL build)
@@ -880,6 +886,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test
@@ -909,6 +916,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.test_example_plugin
