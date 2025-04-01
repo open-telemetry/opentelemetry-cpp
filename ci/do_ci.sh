@@ -233,6 +233,7 @@ elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}" \
         -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
         -DWITH_OPENTRACING=ON \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
         "${SRC_DIR}"
   make -j $(nproc)
   make test

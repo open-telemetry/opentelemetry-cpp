@@ -49,6 +49,7 @@ jobs:
             -DWITH_OTLP_HTTP=ON \
             -DWITH_OTLP_FILE=ON \
             -DWITH_OPENTRACING=ON \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
             -DWITH_OTLP_HTTP_COMPRESSION=ON \
             -DWITH_THREAD_INSTRUMENTATION=ON \
             -DWITH_ZIPKIN=ON \
