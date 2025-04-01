@@ -317,19 +317,25 @@ jobs:
 #        sudo ./ci/install_abseil.sh
 #        ./ci/do_ci.sh cmake.abseil.test
 
-  cmake_opentracing_shim_test:
-    name: CMake test (with opentracing-shim)
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: run cmake tests (enable opentracing-shim)
-      run: ./ci/do_ci.sh cmake.opentracing_shim.test
+# As of 2025-04-01 (!), github workers use CMake 4.0.0
+# CMake 4.0.0 no longer supports cmake_minimum_required
+# for CMake < 3.5
+# The opentracing-cpp library requires CMake 3.1,
+# which fails to build in CI for Ubuntu 22 and 24.
+#
+#  cmake_opentracing_shim_test:
+#    name: CMake test (with opentracing-shim)
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v4
+#      with:
+#        submodules: 'recursive'
+#    - name: setup
+#      run: |
+#        sudo -E ./ci/setup_googletest.sh
+#        sudo -E ./ci/setup_ci_environment.sh
+#    - name: run cmake tests (enable opentracing-shim)
+#      run: ./ci/do_ci.sh cmake.opentracing_shim.test
 
   cmake_test_cxx14_gcc:
     name: CMake C++14 test(GCC)
