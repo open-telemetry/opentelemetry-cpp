@@ -48,10 +48,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_google_absl",
-        sha256 = "f50e5ac311a81382da7fa75b97310e4b9006474f9560ac46f54a9967f07d4ae3",
-        strip_prefix = "abseil-cpp-20240722.0",
+        sha256 = "733726b8c3a6d39a4120d7e45ea8b41a434cdacde401cba500f14236c49b39dc",
+        strip_prefix = "abseil-cpp-20240116.2",
         urls = [
-            "https://github.com/abseil/abseil-cpp/archive/refs/tags/20240722.0.tar.gz",
+            "https://github.com/abseil/abseil-cpp/archive/refs/tags/20240116.2.tar.gz",
         ],
     )
 
@@ -76,10 +76,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_grpc_grpc",
-        sha256 = "cd256d91781911d46a57506978b3979bfee45d5086a1b6668a3ae19c5e77f8dc",
-        strip_prefix = "grpc-1.69.0",
+        sha256 = "f40bde4ce2f31760f65dc49a2f50876f59077026494e67dccf23992548b1b04f",
+        strip_prefix = "grpc-1.62.0",
         urls = [
-            "https://github.com/grpc/grpc/archive/refs/tags/v1.69.0.tar.gz",
+            "https://github.com/grpc/grpc/archive/refs/tags/v1.62.0.tar.gz",
         ],
     )
 

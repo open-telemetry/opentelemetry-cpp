@@ -13,10 +13,10 @@
 #   git submodule status
 #
 
-gRPC=v1.69.0
-abseil=20240722.0
+gRPC=v1.49.2
+abseil=20240116.1
 benchmark=v1.8.3
-googletest=1.16.0
+googletest=1.14.0
 ms-gsl=v3.1.0-67-g6f45293
 nlohmann-json=v3.11.3
 opentelemetry-proto=v1.5.0

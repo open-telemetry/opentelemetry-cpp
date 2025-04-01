@@ -6,8 +6,8 @@
 set -e
 export DEBIAN_FRONTEND=noninteractive
 old_grpc_version='v1.33.2'
-new_grpc_version='v1.69.0'
-modern_grpc_version='v1.69.0'
+new_grpc_version='v1.49.2'
+modern_grpc_version='v1.55.0'
 gcc_version_for_new_grpc='5.1'
 std_version='14'
 if [ ! -z "${CXX_STANDARD}" ]; then
@@ -107,6 +107,7 @@ if [[ $build_internal_abseil_cpp -ne 0 ]]; then
         -DCMAKE_CXX_STANDARD=${std_version}
         -DCMAKE_CXX_STANDARD_REQUIRED=ON
         -DCMAKE_CXX_EXTENSIONS=OFF
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
         -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE
         -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
     )

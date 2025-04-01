@@ -5,7 +5,7 @@
 
 set -ex
 export DEBIAN_FRONTEND=noninteractive
-[ -z "${ABSEIL_CPP_VERSION}" ] && export ABSEIL_CPP_VERSION="20240722.0"
+[ -z "${ABSEIL_CPP_VERSION}" ] && export ABSEIL_CPP_VERSION="20240116.1"
 
 TOPDIR=`pwd`
 
@@ -16,6 +16,7 @@ git clone --depth=1 -b ${ABSEIL_CPP_VERSION} https://github.com/abseil/abseil-cp
 cd abseil-cpp
 ABSEIL_CPP_BUILD_OPTIONS=(
     "-DBUILD_TESTING=OFF"
+    "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
     "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
     "-DCMAKE_INSTALL_PREFIX=$INSTALL_DIR"
 )
