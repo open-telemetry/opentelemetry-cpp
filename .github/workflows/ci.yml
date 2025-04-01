@@ -648,6 +648,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.no_bzlmod.test
@@ -669,6 +670,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.with_async_export.test
@@ -690,6 +692,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.valgrind
@@ -711,6 +714,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.noexcept
@@ -732,6 +736,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.nortti
@@ -753,6 +758,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.asan
@@ -774,6 +780,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.tsan
