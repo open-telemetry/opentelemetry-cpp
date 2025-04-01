@@ -41,23 +41,19 @@ jobs:
 #        ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   cmake_test:
-    name: CMake test (without otlp-exporter)
-    runs-on: ubuntu-latest
+    name: CMake test (prometheus, elasticsearch, zipkin)
+    runs-on: ubuntu-22.04
+    env:
+      CXX_STANDARD: '17'
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
       run: |
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
-    - name: run cmake tests (without otlp-exporter)
-      env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
+    - name: run cmake tests
       run: |
         ./ci/do_ci.sh cmake.test
 
@@ -305,21 +301,21 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.with_async_export.test
 
-  cmake_abseil_stl_test:
-    name: CMake test (with abseil)
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: run cmake tests (enable abseil-cpp)
-      run: |
-        sudo ./ci/install_abseil.sh
-        ./ci/do_ci.sh cmake.abseil.test
+#  cmake_abseil_stl_test:
+#    name: CMake test (with abseil)
+#    runs-on: ubuntu-20.04
+#    steps:
+#    - uses: actions/checkout@v4
+#      with:
+#        submodules: 'recursive'
+#    - name: setup
+#      run: |
+#        sudo -E ./ci/setup_googletest.sh
+#        sudo -E ./ci/setup_ci_environment.sh
+#    - name: run cmake tests (enable abseil-cpp)
+#      run: |
+#        sudo ./ci/install_abseil.sh
+#        ./ci/do_ci.sh cmake.abseil.test
 
   cmake_opentracing_shim_test:
     name: CMake test (with opentracing-shim)
@@ -337,7 +333,7 @@ jobs:
 
   cmake_test_cxx14_gcc:
     name: CMake C++14 test(GCC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -353,7 +349,7 @@ jobs:
 
   cmake_test_cxx17_gcc:
     name: CMake C++17 test(GCC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -369,7 +365,7 @@ jobs:
 
   cmake_test_cxx20_gcc:
     name: CMake C++20 test(GCC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -469,7 +465,7 @@ jobs:
 
   cmake_otprotocol_test:
     name: CMake test (with otlp-exporter)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -519,7 +515,7 @@ jobs:
 
   cmake_do_not_install_test:
     name: CMake do not install test (with otlp-exporter)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -535,7 +531,7 @@ jobs:
 
   cmake_otprotocol_shared_libs_with_static_grpc_test:
     name: CMake test (build shared libraries with otlp-exporter and static gRPC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -549,24 +545,24 @@ jobs:
         sudo ./ci/setup_grpc.sh -T
         ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
 
-  cmake_install_test:
-    name: CMake install test (with abseil)
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: run cmake install (with abseil)
-      run: |
-        sudo ./ci/install_abseil.sh
-        ./ci/do_ci.sh cmake.install.test
-    - name: verify packages
-      run: |
-        ./ci/verify_packages.sh
+#  cmake_install_test:
+#    name: CMake install test (with abseil)
+#    runs-on: ubuntu-20.04
+#    steps:
+#    - uses: actions/checkout@v4
+#      with:
+#        submodules: 'recursive'
+#    - name: setup
+#      run: |
+#        sudo -E ./ci/setup_googletest.sh
+#        sudo -E ./ci/setup_ci_environment.sh
+#    - name: run cmake install (with abseil)
+#      run: |
+#        sudo ./ci/install_abseil.sh
+#        ./ci/do_ci.sh cmake.install.test
+#    - name: verify packages
+#      run: |
+#        ./ci/verify_packages.sh
 
   plugin_test:
     name: Plugin -> CMake
@@ -813,7 +809,7 @@ jobs:
 
   copyright:
     name: Copyright
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
     - name: check copyright

@@ -95,7 +95,9 @@ For edit access, get in touch on
 [Approvers](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver)
 ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
+* [Doug Barker](https://github.com/dbarker)
 * [Josh Suereth](https://github.com/jsuereth), Google
+* [Pranav Sharma](https://github.com/psx95), Google
 * [WenTao Ou](https://github.com/owent), Tencent
 
 [Emeritus
