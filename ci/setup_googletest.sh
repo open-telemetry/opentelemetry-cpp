@@ -10,7 +10,7 @@ apt-get update
 
 if [ -z "${GOOGLETEST_VERSION}" ]; then
   # Version by default. Requires C++14.
-  export GOOGLETEST_VERSION=1.14.0
+  export GOOGLETEST_VERSION=1.16.0
 fi
 
 OLD_GOOGLETEST_VERSION_REGEXP="^1\.([0-9]|10|11|12)(\..*)?$"

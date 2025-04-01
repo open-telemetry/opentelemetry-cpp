@@ -6,8 +6,8 @@
 set -e
 export DEBIAN_FRONTEND=noninteractive
 old_grpc_version='v1.33.2'
-new_grpc_version='v1.49.2'
-modern_grpc_version='v1.55.0'
+new_grpc_version='v1.69.0'
+modern_grpc_version='v1.69.0'
 gcc_version_for_new_grpc='5.1'
 std_version='14'
 if [ ! -z "${CXX_STANDARD}" ]; then

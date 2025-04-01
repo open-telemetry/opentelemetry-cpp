@@ -5,7 +5,7 @@
 
 set -ex
 export DEBIAN_FRONTEND=noninteractive
-[ -z "${ABSEIL_CPP_VERSION}" ] && export ABSEIL_CPP_VERSION="20240116.1"
+[ -z "${ABSEIL_CPP_VERSION}" ] && export ABSEIL_CPP_VERSION="20250127.1"
 
 TOPDIR=`pwd`
 
