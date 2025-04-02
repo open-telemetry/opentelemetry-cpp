@@ -70,7 +70,7 @@ void DownscaleBuckets(AdaptingCircularBufferCounter *buckets, uint32_t by) noexc
     const uint64_t count = buckets->Get(i);
     if (count > 0)
     {
-      buckets->Increment(i >> by, count);
+      new_buckets.Increment(i >> by, count);
     }
   }
   *buckets = std::move(new_buckets);
@@ -83,7 +83,7 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
 {
   const Base2ExponentialHistogramAggregationConfig default_config;
   auto ac = static_cast<const Base2ExponentialHistogramAggregationConfig *>(aggregation_config);
-  if (!ac)
+  if (!ac) 
   {
     ac = &default_config;
   }

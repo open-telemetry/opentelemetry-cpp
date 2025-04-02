@@ -11,6 +11,7 @@
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
@@ -222,4 +223,46 @@ TEST(Aggregation, DoubleHistogramAggregation)
   EXPECT_EQ(histogram_data.counts_[3], 0);  // aggr2(13.0) - aggr1(11.0)
   EXPECT_EQ(histogram_data.counts_[4], 0);  // aggr2(28.1) - aggr1(25.1)
   EXPECT_EQ(histogram_data.counts_[7], 1);  // aggr2(105.0) - aggr1(0)
+}
+
+TEST(aggregation, Base2ExponentialHistogramAggregation)
+{
+  auto MAX_SCALE = 20;
+  auto MAX_BUCKETS = 100;
+  Base2ExponentialHistogramAggregationConfig config;
+  config.max_scale_ = MAX_SCALE;
+  config.max_buckets_ = MAX_BUCKETS;
+  config.record_min_max_ = true;
+  Base2ExponentialHistogramAggregation aggr = Base2ExponentialHistogramAggregation(&config);
+  auto point = aggr.ToPoint();
+  ASSERT_TRUE(nostd::holds_alternative<Base2ExponentialHistogramPointData>(point));
+  auto histo_point = nostd::get<Base2ExponentialHistogramPointData>(point);
+  EXPECT_EQ(histo_point.count_, 0);
+  EXPECT_EQ(histo_point.sum_, 0.0);
+  EXPECT_EQ(histo_point.zero_count_, 0);
+  EXPECT_EQ(histo_point.min_, std::numeric_limits<double>::max());
+  EXPECT_EQ(histo_point.max_, std::numeric_limits<double>::min());
+  EXPECT_EQ(histo_point.scale_, MAX_SCALE);
+  EXPECT_EQ(histo_point.max_buckets_, MAX_BUCKETS);
+  ASSERT_TRUE(histo_point.positive_buckets_.Empty());
+
+  aggr.Aggregate(0.0, {});
+  histo_point = nostd::get<Base2ExponentialHistogramPointData>(aggr.ToPoint());
+  EXPECT_EQ(histo_point.count_, 1);
+  EXPECT_EQ(histo_point.zero_count_, 1);
+
+  aggr.Aggregate(3.0, {});
+  aggr.Aggregate(4.5, {});
+  histo_point = nostd::get<Base2ExponentialHistogramPointData>(aggr.ToPoint());
+  EXPECT_EQ(histo_point.count_, 3);
+  EXPECT_EQ(histo_point.sum_, 7.5);
+  EXPECT_EQ(histo_point.min_, 0.0);
+  EXPECT_EQ(histo_point.max_, 4.5);
+  ASSERT_FALSE(histo_point.positive_buckets_.Empty());
+  auto start_index = histo_point.positive_buckets_.StartIndex();
+  auto end_index   = histo_point.positive_buckets_.EndIndex();
+  EXPECT_EQ(start_index, 202);
+  EXPECT_EQ(end_index, 277);
+  EXPECT_EQ(histo_point.positive_buckets_.Get(start_index), 1);
+  EXPECT_EQ(histo_point.positive_buckets_.Get(end_index), 1);
 }
