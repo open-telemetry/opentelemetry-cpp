@@ -28,7 +28,7 @@ jobs:
 
   windows_2019_vcpkg:
     name: Windows 2019 vcpkg cxx14 (static libs)
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       CXX_STANDARD: '14'
     steps:
