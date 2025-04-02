@@ -188,8 +188,6 @@ set(WITH_STL
 option(WITH_GSL
        "Whether to use Guidelines Support Library for C++ latest features" OFF)
 
-option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
-
 set(OPENTELEMETRY_INSTALL_default ON)
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   set(OPENTELEMETRY_INSTALL_default OFF)
@@ -417,10 +415,8 @@ if(WITH_PROMETHEUS)
   endif()
 endif()
 
-if(WITH_ABSEIL)
-  if(NOT TARGET absl::strings)
-    find_package(absl CONFIG REQUIRED)
-  endif()
+if(WITH_OTLP_GRPC)
+  find_package(absl CONFIG REQUIRED)
 endif()
 
 if(WITH_OTLP_GRPC
