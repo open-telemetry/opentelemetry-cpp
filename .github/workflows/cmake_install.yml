@@ -18,7 +18,9 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Build dependencies with vcpkg submodule
-        run: ./ci/setup_windows_ci_environment.ps1
+        run: |
+          ./ci/setup_cmake.ps1
+          ./ci/setup_windows_ci_environment.ps1
       - name: Run Tests
         run: ./ci/do_ci.ps1 cmake.install.test
       - name: Run DLL Tests
@@ -34,7 +36,9 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Build dependencies with vcpkg submodule
-        run: ./ci/setup_windows_ci_environment.ps1
+        run: |
+          ./ci/setup_cmake.ps1
+          ./ci/setup_windows_ci_environment.ps1
       - name: Run Tests
         run: ./ci/do_ci.ps1 cmake.install.test
 
@@ -51,8 +55,9 @@ jobs:
         submodules: 'recursive'
     - name: Install libcurl, zlib, nlohmann-json with apt
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: Install abseil, protobuf, and grpc with apt
       run: |
         sudo -E apt-get update
@@ -79,8 +84,9 @@ jobs:
         submodules: 'recursive'
     - name: Install gtest, libcurl, zlib, nlohmann-json with apt
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: Build abseil, protobuf, and grpc with ci scripts
       env:
         ABSEIL_CPP_VERSION: '20240722.1'
@@ -108,8 +114,9 @@ jobs:
         submodules: 'recursive'
     - name: Install gtest, libcurl, zlib, nlohmann-json with apt
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: Build abseil, protobuf, and grpc with ci scripts
       env:
         ABSEIL_CPP_VERSION: '20230125.3'
@@ -141,8 +148,9 @@ jobs:
         submodules: 'recursive'
     - name: Install gtest, libcurl, zlib, nlohmann-json with apt
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: Build abseil, protobuf, and grpc with ci scripts
       env:
         ABSEIL_CPP_VERSION: '20220623.2'
@@ -179,7 +187,9 @@ jobs:
           pip install "conan>=2.0,<3"
           conan profile detect --force
       - name: Install or build all dependencies with Conan
-        run: conan install install/conan/conanfile_stable.txt --build=missing -of /home/runner/conan -s build_type=Debug
+        run: |
+          sudo -E ./ci/setup_cmake.sh
+          conan install install/conan/conanfile_stable.txt --build=missing -of /home/runner/conan -s build_type=Debug
       - name: Run Tests (static libs)
         env:
           BUILD_SHARED_LIBS: 'OFF'
@@ -213,7 +223,9 @@ jobs:
           pip install "conan>=2.0,<3"
           conan profile detect --force
       - name: Install or build all dependencies with Conan
-        run: conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=Debug
+        run: |
+          sudo -E ./ci/setup_cmake.sh
+          conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=Debug
       - name: Run Tests (static libs)
         env:
           BUILD_SHARED_LIBS: 'OFF'
@@ -238,6 +250,7 @@ jobs:
     - name: Install Conan and tools
       run: |
         brew install conan autoconf automake libtool coreutils
+        sudo -E ./ci/setup_cmake_macos.sh
         conan profile detect --force
     - name: Install or build all dependencies with Conan
       run: conan install install/conan/conanfile_stable.txt --build=missing -of /Users/runner/conan -s build_type=Debug
@@ -258,6 +271,7 @@ jobs:
         submodules: 'recursive'
     - name: Install Dependencies with Homebrew
       run: |
+        sudo -E ./ci/setup_cmake_macos.sh
         brew install coreutils
         brew install googletest
         brew install google-benchmark
