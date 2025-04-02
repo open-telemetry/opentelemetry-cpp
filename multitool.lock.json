@@ -60,33 +60,33 @@
     "binaries": [
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.50.2/perses_0.50.2_linux_amd64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.50.3/perses_0.50.3_linux_amd64.tar.gz",
         "file": "percli",
-        "sha256": "0fd3568381e98e07f1c947d9874d5722ea8713b695a1439a25ff6bb43e497c5e",
+        "sha256": "c018b2e1381ced3a30faaea01bcc2dbefa4172cc872828f792fdde6dd48dddd0",
         "os": "linux",
         "cpu": "x86_64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.50.2/perses_0.50.2_darwin_arm64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.50.3/perses_0.50.3_darwin_arm64.tar.gz",
         "file": "percli",
-        "sha256": "a2397fa3007af7521c528cc2751c00e00aa5b62abbf8c99873957808f210e02b",
+        "sha256": "55b83e96d90793264935de7f65f0018fc6128afa0bb91cc015da2192bddb6ea6",
         "os": "macos",
         "cpu": "arm64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.50.2/perses_0.50.2_darwin_amd64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.50.3/perses_0.50.3_darwin_amd64.tar.gz",
         "file": "percli",
-        "sha256": "e7f0ac3291bb6b2cdebefd6f42c641f49a07b84f4f455d09ac0905c172278388",
+        "sha256": "cc6fa2c48c60e8d680fa65284e565b8aac5e2ecc4dcc6797b8dead758ca0b38d",
         "os": "macos",
         "cpu": "x86_64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.50.2/perses_0.50.2_windows_amd64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.50.3/perses_0.50.3_windows_amd64.tar.gz",
         "file": "percli.exe",
-        "sha256": "a5d78a4ffc4723462371725e56135a3b8daacda0c86eb38bc6338e14b8a0a77b",
+        "sha256": "39addb4f76aa2402e5566e643751d851e78283bdd7ab8c73db97f897081b4458",
         "os": "windows",
         "cpu": "x86_64"
       }
@@ -96,33 +96,33 @@
     "binaries": [
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.50.2/perses_0.50.2_linux_amd64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.50.3/perses_0.50.3_linux_amd64.tar.gz",
         "file": "perses",
-        "sha256": "0fd3568381e98e07f1c947d9874d5722ea8713b695a1439a25ff6bb43e497c5e",
+        "sha256": "c018b2e1381ced3a30faaea01bcc2dbefa4172cc872828f792fdde6dd48dddd0",
         "os": "linux",
         "cpu": "x86_64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.50.2/perses_0.50.2_darwin_arm64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.50.3/perses_0.50.3_darwin_arm64.tar.gz",
         "file": "perses",
-        "sha256": "a2397fa3007af7521c528cc2751c00e00aa5b62abbf8c99873957808f210e02b",
+        "sha256": "55b83e96d90793264935de7f65f0018fc6128afa0bb91cc015da2192bddb6ea6",
         "os": "macos",
         "cpu": "arm64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.50.2/perses_0.50.2_darwin_amd64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.50.3/perses_0.50.3_darwin_amd64.tar.gz",
         "file": "perses",
-        "sha256": "e7f0ac3291bb6b2cdebefd6f42c641f49a07b84f4f455d09ac0905c172278388",
+        "sha256": "cc6fa2c48c60e8d680fa65284e565b8aac5e2ecc4dcc6797b8dead758ca0b38d",
         "os": "macos",
         "cpu": "x86_64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.50.2/perses_0.50.2_windows_amd64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.50.3/perses_0.50.3_windows_amd64.tar.gz",
         "file": "perses.exe",
-        "sha256": "a5d78a4ffc4723462371725e56135a3b8daacda0c86eb38bc6338e14b8a0a77b",
+        "sha256": "39addb4f76aa2402e5566e643751d851e78283bdd7ab8c73db97f897081b4458",
         "os": "windows",
         "cpu": "x86_64"
       }
@@ -132,36 +132,36 @@
     "binaries": [
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.42.4/sentry-cli-Linux-aarch64",
-        "sha256": "134c9e2b21d341a19710c90eaadb6dc817230f13edbb11a3ec9e41f04d118066",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.42.5/sentry-cli-Linux-aarch64",
+        "sha256": "2d4f9df6e567ffaf90aab1a6dd892b1ba9fd580edd8b9ffe7d8484e5530263eb",
         "os": "linux",
         "cpu": "arm64"
       },
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.42.4/sentry-cli-Linux-x86_64",
-        "sha256": "6d61432bc47f78fcfeb615302a58796e5d135f1471d5b9bc7dde576b1ac956b6",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.42.5/sentry-cli-Linux-x86_64",
+        "sha256": "ece674996d051b3d236bb3b3e2ae4c315d0aa55373fa3bcde2d6d474b7c6ba96",
         "os": "linux",
         "cpu": "x86_64"
       },
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.42.4/sentry-cli-Darwin-arm64",
-        "sha256": "9dc0dbcce902f615a5d5b859ac8ebfcf580eb34eadf9fe0dd31048534bf05216",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.42.5/sentry-cli-Darwin-arm64",
+        "sha256": "833a7a87be13f4b28f52928b3890b1112684a8b3d148a3c0cdc0d1e3b65e80f7",
         "os": "macos",
         "cpu": "arm64"
       },
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.42.4/sentry-cli-Darwin-x86_64",
-        "sha256": "f63f0539ebb6dbc8b410393813536893104cd74c66c50e192da51fde24d55674",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.42.5/sentry-cli-Darwin-x86_64",
+        "sha256": "5110eb2e6568d836901c3f8f0c02cc596fa36663fab37e2d5f995207e878f8aa",
         "os": "macos",
         "cpu": "x86_64"
       },
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.42.4/sentry-cli-Windows-x86_64.exe",
-        "sha256": "051aa138fa192b3cbe7ddeb3d682c3acab54fc0bfa21a27fed7ebef8b646cf05",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.42.5/sentry-cli-Windows-x86_64.exe",
+        "sha256": "ea1f5a9ad24ed1ac43c238166857490772fb823d868997e874517648cace13d7",
         "os": "windows",
         "cpu": "x86_64"
       }
