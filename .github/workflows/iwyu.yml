@@ -21,7 +21,6 @@ jobs:
           sudo apt install -y --no-install-recommends --no-install-suggests \
             build-essential \
             iwyu \
-            cmake \
             ninja-build \
             libssl-dev \
             libcurl4-openssl-dev \
@@ -30,6 +29,7 @@ jobs:
             libgmock-dev \
             libgtest-dev \
             libbenchmark-dev
+          sudo ./ci/setup_cmake.sh
           sudo ./ci/install_ryml.sh
 
       - name: setup grpc

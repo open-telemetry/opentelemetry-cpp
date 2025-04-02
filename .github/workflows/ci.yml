@@ -25,20 +25,11 @@ jobs:
 #        CXX: /usr/bin/g++-10
 #      run: |
 #        sudo -E ./ci/setup_gcc10.sh
-#        sudo -E ./ci/setup_cmake.sh
 #        sudo -E ./ci/setup_ci_environment.sh
+#        sudo -E ./ci/setup_cmake.sh
 #        sudo -E ./ci/setup_googletest.sh
 #        sudo -E ./ci/install_abseil.sh
 #        sudo -E ./ci/install_protobuf.sh
-#    - name: run otlp exporter tests
-#      env:
-#        CC: /usr/bin/gcc-10
-#        CXX: /usr/bin/g++-10
-#        WITH_ABSEIL: 'ON'
-#        CXX_STANDARD: '14'
-#      run: |
-#        sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
-#        ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   cmake_test:
     name: CMake test (prometheus, elasticsearch, zipkin)
@@ -51,8 +42,9 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run cmake tests
       run: |
         ./ci/do_ci.sh cmake.test
@@ -71,8 +63,9 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -107,8 +100,9 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -143,8 +137,9 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -213,8 +208,9 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -249,8 +245,9 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -280,6 +277,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.maintainer.test
@@ -293,6 +291,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       env:
@@ -308,6 +307,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       env:
@@ -326,30 +326,15 @@ jobs:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run cmake tests (without otlp-exporter)
       env:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
       run: |
         ./ci/do_ci.sh cmake.with_async_export.test
-
-  cmake_abseil_stl_test:
-    name: CMake test (with abseil)
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: run cmake tests (enable abseil-cpp)
-      run: |
-        sudo ./ci/install_abseil.sh
-        ./ci/do_ci.sh cmake.abseil.test
 
   cmake_opentracing_shim_test:
     name: CMake test (with opentracing-shim)
@@ -360,14 +345,15 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run cmake tests (enable opentracing-shim)
       run: ./ci/do_ci.sh cmake.opentracing_shim.test
 
   cmake_test_cxx14_gcc:
     name: CMake C++14 test(GCC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -375,6 +361,7 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: run tests (enable stl)
       env:
@@ -383,7 +370,7 @@ jobs:
 
   cmake_test_cxx17_gcc:
     name: CMake C++17 test(GCC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -391,6 +378,7 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: run tests (enable stl)
       env:
@@ -399,7 +387,7 @@ jobs:
 
   cmake_test_cxx20_gcc:
     name: CMake C++20 test(GCC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -407,6 +395,7 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
@@ -431,6 +420,7 @@ jobs:
         CXXFLAGS: "-stdlib=libc++"
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
@@ -457,6 +447,7 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
@@ -481,6 +472,7 @@ jobs:
         CXXFLAGS: "-stdlib=libc++"
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
@@ -499,15 +491,16 @@ jobs:
 
   cmake_otprotocol_test:
     name: CMake test (with otlp-exporter)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh
@@ -535,13 +528,13 @@ jobs:
         ABSEIL_CPP_VERSION: '20230125.3'
         CXX_STANDARD: '14'
       run: |
-        sudo ./ci/setup_googletest.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_abseil.sh
         sudo -E ./ci/install_protobuf.sh
     - name: run otlp exporter tests
       env:
-        WITH_ABSEIL: 'ON'
         CXX_STANDARD: '14'
       run: |
         sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
@@ -549,15 +542,16 @@ jobs:
 
   cmake_do_not_install_test:
     name: CMake do not install test (with otlp-exporter)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh
@@ -565,38 +559,20 @@ jobs:
 
   cmake_otprotocol_shared_libs_with_static_grpc_test:
     name: CMake test (build shared libraries with otlp-exporter and static gRPC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh -T
         ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
-
-  cmake_install_test:
-    name: CMake install test (with abseil)
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: run cmake install (with abseil)
-      run: |
-        sudo ./ci/install_abseil.sh
-        ./ci/do_ci.sh cmake.install.test
-    - name: verify packages
-      run: |
-        ./ci/verify_packages.sh
 
   plugin_test:
     name: Plugin -> CMake
@@ -610,8 +586,9 @@ jobs:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
         CC: /usr/bin/gcc-12
@@ -635,6 +612,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
@@ -656,6 +634,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.no_bzlmod.test
@@ -677,6 +656,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.with_async_export.test
@@ -698,6 +678,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.valgrind
@@ -719,6 +700,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.noexcept
@@ -740,6 +722,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.nortti
@@ -761,6 +744,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.asan
@@ -782,6 +766,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.tsan
@@ -843,7 +828,7 @@ jobs:
 
   copyright:
     name: Copyright
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
     - name: check copyright
@@ -858,6 +843,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test
@@ -874,6 +860,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test (DLL build)
@@ -892,6 +879,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test
@@ -921,6 +909,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.test_example_plugin
@@ -937,8 +926,9 @@ jobs:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run tests and generate report
       env:
         CC: /usr/bin/gcc-10
@@ -1008,8 +998,9 @@ jobs:
           CC: /usr/bin/gcc-12
           CXX: /usr/bin/g++-12
         run: |
-          sudo -E ./ci/setup_googletest.sh
           sudo -E ./ci/setup_ci_environment.sh
+          sudo -E ./ci/setup_cmake.sh
+          sudo -E ./ci/setup_googletest.sh
       - name: run w3c trace-context test server (background)
         env:
           CXX_STANDARD: '14'

@@ -80,4 +80,4 @@ jobs:
           COUNT=$(grep -c "warning:" clang-tidy.log)
           echo "clang-tidy reported ${COUNT} warning(s)"
 
-# TODO: include WITH_OTLP_GRPC and WITH_ABSEIL flags.
+# TODO: include WITH_OTLP_GRPC flags.

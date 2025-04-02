@@ -13,6 +13,9 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 
+set_target_properties(opentelemetry_exporter_zipkin_trace
+                      PROPERTIES EXPORT_NAME zipkin_trace_exporter)
+
 set_target_version(opentelemetry_exporter_zipkin_trace)
 
 target_link_libraries(
@@ -23,17 +26,26 @@ target_link_libraries(
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS opentelemetry_exporter_zipkin_trace
-    EXPORT "${PROJECT_NAME}-target"
+    EXPORT "${PROJECT_NAME}-exporters_zipkin-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT exporters_zipkin)
 
   install(
     DIRECTORY include/opentelemetry/exporters/zipkin
     DESTINATION include/opentelemetry/exporters
+    COMPONENT exporters_zipkin
     FILES_MATCHING
     PATTERN "*.h"
     PATTERN "recordable.h" EXCLUDE)
+
+  install(
+    EXPORT "${PROJECT_NAME}-exporters_zipkin-target"
+    FILE "${PROJECT_NAME}-exporters_zipkin-target.cmake"
+    NAMESPACE "${PROJECT_NAME}::"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    COMPONENT exporters_zipkin)
+
 endif()
 
 if(BUILD_TESTING)
@@ -53,8 +65,13 @@ if(BUILD_TESTING)
   add_executable(zipkin_exporter_test test/zipkin_exporter_test.cc)
 
   target_link_libraries(
-    zipkin_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    ${GMOCK_LIB} opentelemetry_exporter_zipkin_trace opentelemetry_resources)
+    zipkin_exporter_test
+    ${GTEST_BOTH_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${GMOCK_LIB}
+    opentelemetry_exporter_zipkin_trace
+    opentelemetry_resources
+    ${CURL_LIBRARIES})
 
   gtest_add_tests(
     TARGET zipkin_exporter_test
