@@ -18,10 +18,6 @@ target_link_libraries(
   opentelemetry_common PUBLIC opentelemetry_api opentelemetry_sdk
                               Threads::Threads)
 
-if(WITH_OTLP_GRPC)
-  target_link_libraries(opentelemetry_common PUBLIC absl::strings)
-endif()
-
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS opentelemetry_common

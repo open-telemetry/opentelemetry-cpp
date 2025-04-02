@@ -37,6 +37,7 @@ project(opentelemetry-cpp)
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
 # Prefer cmake CONFIG to auto resolve dependencies.
+# This is important to properly find protobuf versions 3.22.0 and above
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 # Don't use customized cmake modules if vcpkg is used to resolve dependence.
@@ -415,19 +416,16 @@ if(WITH_PROMETHEUS)
   endif()
 endif()
 
-if(WITH_OTLP_GRPC)
-  find_package(absl CONFIG REQUIRED)
-endif()
-
 if(WITH_OTLP_GRPC
    OR WITH_OTLP_HTTP
    OR WITH_OTLP_FILE)
+   
   find_package(Protobuf)
   # Protobuf 3.22 or upper require abseil-cpp, we can find it in
   # opentelemetry-cpp-config.cmake
 
   if(WITH_OTLP_GRPC)
-    find_package(gRPC)
+    find_package(gRPC CONFIG)
   endif()
   if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (WITH_OTLP_GRPC
                                                      AND NOT gRPC_FOUND))
@@ -446,7 +444,7 @@ if(WITH_OTLP_GRPC
       find_package(Protobuf REQUIRED)
     endif()
     if(NOT gRPC_FOUND AND WITH_OTLP_GRPC)
-      find_package(gRPC)
+      find_package(gRPC CONFIG)
     endif()
     if(WIN32)
       # Always use x64 protoc.exe
@@ -738,7 +736,6 @@ message(STATUS "OTELCPP_VERSIONED_LIBS: ${OTELCPP_VERSIONED_LIBS}")
 message(STATUS "OTELCPP_MAINTAINER_MODE: ${OTELCPP_MAINTAINER_MODE}")
 message(STATUS "WITH_STL: ${WITH_STL}")
 message(STATUS "WITH_GSL: ${WITH_GSL}")
-message(STATUS "WITH_ABSEIL: ${WITH_ABSEIL}")
 message(STATUS "WITH_NO_GETENV: ${WITH_NO_GETENV}")
 
 message(STATUS "---------------------------------------------")

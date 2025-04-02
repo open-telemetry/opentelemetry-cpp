@@ -127,10 +127,6 @@ if(WITH_OTLP_HTTP)
             "$<BUILD_INTERFACE:nlohmann_json::nlohmann_json>"
             "$<INSTALL_INTERFACE:opentelemetry_http_client_curl>")
 
-  if(TARGET absl::strings)
-    target_link_libraries(opentelemetry_exporter_otlp_http_client
-                          PUBLIC absl::strings)
-  endif()
   if(nlohmann_json_clone)
     add_dependencies(opentelemetry_exporter_otlp_http_client
                      nlohmann_json::nlohmann_json)
@@ -206,10 +202,6 @@ if(WITH_OTLP_FILE)
     PUBLIC opentelemetry_sdk opentelemetry_common
     PRIVATE opentelemetry_proto $<BUILD_INTERFACE:nlohmann_json::nlohmann_json>)
 
-  if(TARGET absl::strings)
-    target_link_libraries(opentelemetry_exporter_otlp_file_client
-                          PUBLIC absl::strings)
-  endif()
   if(nlohmann_json_clone)
     add_dependencies(opentelemetry_exporter_otlp_file_client
                      nlohmann_json::nlohmann_json)

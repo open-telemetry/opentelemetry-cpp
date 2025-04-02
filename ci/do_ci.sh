@@ -232,18 +232,6 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
   make -j $(nproc)
   make test
   exit 0
-elif [[ "$1" == "cmake.abseil.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_ABSEIL=ON \
-        "${SRC_DIR}"
-  make -j $(nproc)
-  make test
-  exit 0
 elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
@@ -387,9 +375,6 @@ elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
 elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  if [[ ! -z "${WITH_ABSEIL}" ]]; then
-    CMAKE_OPTIONS=(${CMAKE_OPTIONS[@]} "-DWITH_ABSEIL=${WITH_ABSEIL}")
-  fi
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
@@ -477,7 +462,6 @@ elif [[ "$1" == "cmake.install.test" ]]; then
         -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
         -DWITH_ABI_VERSION_1=OFF \
         -DWITH_ABI_VERSION_2=ON \
-        -DWITH_ABSEIL=OFF \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
