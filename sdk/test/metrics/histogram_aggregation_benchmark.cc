@@ -99,7 +99,7 @@ BENCHMARK(BM_HistogramAggregation);
 
 void BM_Base2ExponentialHistogramAggregation(benchmark::State &state)
 {
-  std::string instrument_unit = "ms";
+  std::string instrument_unit = "histogram1_unit";
   std::unique_ptr<InstrumentSelector> histogram_instrument_selector{
       new InstrumentSelector(InstrumentType::kHistogram, ".*", instrument_unit)};
   std::unique_ptr<MeterSelector> histogram_meter_selector{
@@ -117,7 +117,7 @@ BENCHMARK(BM_Base2ExponentialHistogramAggregation);
 
 void BM_Base2ExponentialHistogramAggregationZeroScale(benchmark::State &state)
 {
-  std::string instrument_unit = "ms";
+  std::string instrument_unit = "histogram1_unit";
   std::unique_ptr<InstrumentSelector> histogram_instrument_selector{
       new InstrumentSelector(InstrumentType::kHistogram, ".*", instrument_unit)};
   std::unique_ptr<MeterSelector> histogram_meter_selector{
