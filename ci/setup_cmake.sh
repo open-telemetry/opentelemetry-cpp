@@ -5,7 +5,6 @@
 
 set -e
 
-# Use CMAKE_VERSION env var if set, else default to 3.31.6
 CMAKE_VERSION=${CMAKE_VERSION:-3.31.6}
 CMAKE_DIR="cmake-$CMAKE_VERSION-linux-x86_64"
 CMAKE_TAR="$CMAKE_DIR.tar.gz"
@@ -25,7 +24,7 @@ mkdir -p /opt/cmake
 mv "$CMAKE_DIR" /opt/cmake/cmake
 
 for file in /opt/cmake/cmake/bin/*; do
-    ln -sf "$file" /usr/local/bin/$(basename "$file")
+    ln -sf "$file" "/usr/local/bin/$(basename "$file")"
 done
 
 rm -f "$CMAKE_TAR"
