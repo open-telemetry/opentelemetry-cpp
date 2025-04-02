@@ -13,7 +13,6 @@ message("VCPKG_LIBRARY_LINKAGE    = ${VCPKG_LIBRARY_LINKAGE}")
 vcpkg_check_features(
     OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     stdlib WITH_STDLIB
-    abseil WITH_ABSEIL
 )
 
 # TODO: if building dynamic, use portable ABI. if building static, use STDLIB

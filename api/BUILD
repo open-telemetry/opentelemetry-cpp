@@ -23,7 +23,7 @@ string_flag(
 
 otel_cc_library(
     name = "api",
-    defines = ["HAVE_ABSEIL"] + select({
+    defines = select({
         ":set_cxx_stdlib_none": [],
         ### automatic selection
         ":set_cxx_stdlib_best": ["OPENTELEMETRY_STL_VERSION=(__cplusplus/100)"],

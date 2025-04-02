@@ -139,6 +139,7 @@ int main(int argc, const char* argv[])
   //std::this_thread::sleep_for(std::chrono::milliseconds(rand()%5000));
   bool flip{ false };
   int period{ 0 };
+  std::this_thread::sleep_for(std::chrono::seconds(rand()%60));
   for(size_t i=0; i<2000; i++) 
   {
     flip = !flip;
