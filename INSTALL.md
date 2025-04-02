@@ -40,18 +40,28 @@ You can link OpenTelemetry C++ SDK with libraries provided in
 - Apart from above core requirements, the Exporters and Propagators have their
   build dependencies.
 
-### Building dependencies for the OTLP exporters 
+### Building dependencies for the OTLP exporters
 
-The opentelemetry-cpp OTLP exporters depend on Protobuf and gRPC (in the case of the otlp grpc exporters). Protobuf (since version 3.22.0) and gRPC depend on Abseil.  
-For cmake builds, it is best practice to build and install Abseil, Protobuf, and gPRC as independent packages - configuring cmake for Protobuf and gRPC to build against the installed packages instead of using their submodule option. 
+The opentelemetry-cpp OTLP exporters depend on Protobuf and gRPC
+ (in the case of the otlp grpc exporters).
+Protobuf (since version 3.22.0) and gRPC depend on Abseil.
+For cmake builds, it is best practice to build and install Abseil
+, Protobuf, and gPRC as independent packages -
+configuring cmake for Protobuf and gRPC to build against
+ the installed packages instead of using their submodule option.
 
-If building and installing Protobuf and gRPC manually with cmake the recommended approach is: 
-1. Choose the desired tag version of grpc. Find the compatible versions of abseil and protobuf by inspecting the submodules of grpc at that tag. 
-2. Build and install the required version of abseil 
-3. Build and install the required version of protobuf 
-    - Set the cmake option of Protobuf to build against the installed package of Abseil (`protobuf_ABSL_PROVIDER=package`)
-4. Build and install the required version of grpc 
-    - Set the cmake option of grpc to build against the installed packages of Abseil and Protobuf (cmake options - `gRPC_ABSL_PROVIDER=package` and `gRPC_PROTOBUF_PROVIDER=package`)
+If building and installing Protobuf and gRPC manually with cmake the
+ recommended approach is:
+
+1. Choose the desired tag version of grpc. Find the compatible versions of abseil
+ and protobuf by inspecting the submodules of grpc at that tag.
+2. Build and install the required version of abseil
+3. Build and install the required version of protobuf
+    - Set the cmake option of Protobuf to build against the installed
+     package of Abseil (`protobuf_ABSL_PROVIDER=package`)
+4. Build and install the required version of grpc
+    - Set the cmake option of grpc to build against the installed packages
+     of Abseil and Protobuf (cmake options - `gRPC_ABSL_PROVIDER=package` and `gRPC_PROTOBUF_PROVIDER=package`)
 
 ### Building as standalone CMake Project
 

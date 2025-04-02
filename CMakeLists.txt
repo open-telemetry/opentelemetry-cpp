@@ -36,8 +36,8 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
-# Prefer cmake CONFIG to auto resolve dependencies.
-# This is important to properly find protobuf versions 3.22.0 and above
+# Prefer cmake CONFIG to auto resolve dependencies. This is important to
+# properly find protobuf versions 3.22.0 and above
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 # Don't use customized cmake modules if vcpkg is used to resolve dependence.
@@ -419,7 +419,7 @@ endif()
 if(WITH_OTLP_GRPC
    OR WITH_OTLP_HTTP
    OR WITH_OTLP_FILE)
-   
+
   find_package(Protobuf)
   # Protobuf 3.22 or upper require abseil-cpp, we can find it in
   # opentelemetry-cpp-config.cmake
