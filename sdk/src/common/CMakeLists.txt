@@ -18,17 +18,13 @@ target_link_libraries(
   opentelemetry_common PUBLIC opentelemetry_api opentelemetry_sdk
                               Threads::Threads)
 
-if(WITH_OTLP_GRPC)
-  target_link_libraries(opentelemetry_common PUBLIC absl::strings)
-endif()
-
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS opentelemetry_common
-    EXPORT "${PROJECT_NAME}-target"
+    EXPORT "${PROJECT_NAME}-sdk-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk)
 
   opentelemetry_add_pkgconfig(
     common
