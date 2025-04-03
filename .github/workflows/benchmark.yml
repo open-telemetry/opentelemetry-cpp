@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: actions/download-artifact@2a5974104b6d5dbdb2f9468a3e54da3bdd241578 # master
+      - uses: actions/download-artifact@2a5974104b6d5dbdb2f9468a3e54da3bdd241578 # v4.2.1
         with:
           name: benchmark_results
           path: benchmarks
