@@ -306,4 +306,14 @@ TEST(aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(merged_point.positive_buckets_.Get(1), 4);
   EXPECT_EQ(merged_point.negative_buckets_.Get(-2), 1);
   EXPECT_EQ(merged_point.positive_buckets_.Get(2), 0);
+
+  auto diffd = merged->Diff(scale1_aggr);
+  auto diffd_point = nostd::get<Base2ExponentialHistogramPointData>(diffd->ToPoint());
+  EXPECT_EQ(diffd_point.count_, 4);
+  EXPECT_EQ(diffd_point.sum_, 6.2);
+  EXPECT_EQ(diffd_point.zero_count_, 1);
+  EXPECT_EQ(diffd_point.scale_, 0);
+  EXPECT_EQ(diffd_point.positive_buckets_.Get(1), 2);
+  EXPECT_EQ(diffd_point.negative_buckets_.Get(-2), 1);
+  EXPECT_EQ(diffd_point.positive_buckets_.Get(2), 0);
 }
