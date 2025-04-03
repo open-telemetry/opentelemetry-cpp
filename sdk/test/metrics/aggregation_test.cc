@@ -227,14 +227,15 @@ TEST(Aggregation, DoubleHistogramAggregation)
 
 TEST(aggregation, Base2ExponentialHistogramAggregation)
 {
-  auto MAX_SCALE = 20;
-  auto MAX_BUCKETS = 100;
-  Base2ExponentialHistogramAggregationConfig config;
-  config.max_scale_ = MAX_SCALE;
-  config.max_buckets_ = MAX_BUCKETS;
-  config.record_min_max_ = true;
-  Base2ExponentialHistogramAggregation aggr = Base2ExponentialHistogramAggregation(&config);
-  auto point = aggr.ToPoint();
+  // Low res histo
+  auto SCALE0 = 0;
+  auto MAX_BUCKETS0 = 7;
+  Base2ExponentialHistogramAggregationConfig scale0_config;
+  scale0_config.max_scale_ = SCALE0;
+  scale0_config.max_buckets_ = MAX_BUCKETS0;
+  scale0_config.record_min_max_ = true;
+  Base2ExponentialHistogramAggregation scale0_aggr = Base2ExponentialHistogramAggregation(&scale0_config);
+  auto point = scale0_aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<Base2ExponentialHistogramPointData>(point));
   auto histo_point = nostd::get<Base2ExponentialHistogramPointData>(point);
   EXPECT_EQ(histo_point.count_, 0);
@@ -242,27 +243,65 @@ TEST(aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(histo_point.zero_count_, 0);
   EXPECT_EQ(histo_point.min_, std::numeric_limits<double>::max());
   EXPECT_EQ(histo_point.max_, std::numeric_limits<double>::min());
-  EXPECT_EQ(histo_point.scale_, MAX_SCALE);
-  EXPECT_EQ(histo_point.max_buckets_, MAX_BUCKETS);
+  EXPECT_EQ(histo_point.scale_, SCALE0);
+  EXPECT_EQ(histo_point.max_buckets_, MAX_BUCKETS0);
   ASSERT_TRUE(histo_point.positive_buckets_.Empty());
 
-  aggr.Aggregate(0.0, {});
-  histo_point = nostd::get<Base2ExponentialHistogramPointData>(aggr.ToPoint());
+  // zero point
+  scale0_aggr.Aggregate(0.0, {});
+  histo_point = nostd::get<Base2ExponentialHistogramPointData>(scale0_aggr.ToPoint());
   EXPECT_EQ(histo_point.count_, 1);
   EXPECT_EQ(histo_point.zero_count_, 1);
 
-  aggr.Aggregate(3.0, {});
-  aggr.Aggregate(4.5, {});
-  histo_point = nostd::get<Base2ExponentialHistogramPointData>(aggr.ToPoint());
+  // Two recordings in the same bucket (bucket 1 at scale 0)
+  scale0_aggr.Aggregate(3.0, {});
+  scale0_aggr.Aggregate(3.5, {});
+  histo_point = nostd::get<Base2ExponentialHistogramPointData>(scale0_aggr.ToPoint());
   EXPECT_EQ(histo_point.count_, 3);
-  EXPECT_EQ(histo_point.sum_, 7.5);
+  EXPECT_EQ(histo_point.sum_, 6.5);
   EXPECT_EQ(histo_point.min_, 0.0);
-  EXPECT_EQ(histo_point.max_, 4.5);
+  EXPECT_EQ(histo_point.max_, 3.5);
   ASSERT_FALSE(histo_point.positive_buckets_.Empty());
   auto start_index = histo_point.positive_buckets_.StartIndex();
   auto end_index   = histo_point.positive_buckets_.EndIndex();
-  EXPECT_EQ(start_index, 202);
-  EXPECT_EQ(end_index, 277);
-  EXPECT_EQ(histo_point.positive_buckets_.Get(start_index), 1);
-  EXPECT_EQ(histo_point.positive_buckets_.Get(end_index), 1);
+  EXPECT_EQ(start_index, 1);
+  EXPECT_EQ(end_index, 1);
+  EXPECT_EQ(histo_point.positive_buckets_.Get(start_index), 2);
+
+  // Recording in a different bucket (bucket -2 at scale 0)
+  scale0_aggr.Aggregate(-0.3, {});
+  histo_point = nostd::get<Base2ExponentialHistogramPointData>(scale0_aggr.ToPoint());
+  EXPECT_EQ(histo_point.count_, 4);
+  EXPECT_EQ(histo_point.sum_, 6.2);
+  EXPECT_EQ(histo_point.min_, -0.3);
+  EXPECT_EQ(histo_point.max_, 3.5);
+  EXPECT_EQ(histo_point.negative_buckets_.Get(-2), 1);
+  EXPECT_EQ(histo_point.positive_buckets_.Get(1), 2);
+  
+  Base2ExponentialHistogramAggregationConfig scale1_config;
+  scale1_config.max_scale_ = 1;
+  scale1_config.max_buckets_ = 14;
+  scale1_config.record_min_max_ = true;
+  Base2ExponentialHistogramAggregation scale1_aggr;
+
+  scale1_aggr.Aggregate(0.0, {});
+  scale1_aggr.Aggregate(3.0, {});
+  scale1_aggr.Aggregate(3.5, {});
+  scale1_aggr.Aggregate(0.3, {});
+  auto scale1_point = nostd::get<Base2ExponentialHistogramPointData>(scale1_aggr.ToPoint());
+  EXPECT_EQ(scale1_point.count_, 4);
+  EXPECT_EQ(scale1_point.sum_, 6.8);
+  EXPECT_EQ(scale1_point.zero_count_, 1);
+  EXPECT_EQ(scale1_point.min_, 0.0);
+  EXPECT_EQ(scale1_point.max_, 3.5);
+
+  auto merged = scale0_aggr.Merge(scale1_aggr);
+  auto merged_point = nostd::get<Base2ExponentialHistogramPointData>(merged->ToPoint());
+  EXPECT_EQ(merged_point.count_, 8);
+  EXPECT_EQ(merged_point.sum_, 13.0);
+  EXPECT_EQ(merged_point.zero_count_, 2);
+  EXPECT_EQ(merged_point.min_, -0.3);
+  EXPECT_EQ(merged_point.max_, 3.5);
+  EXPECT_EQ(merged_point.scale_, 0);
+  EXPECT_EQ(merged_point.positive_buckets_.Get(1), 4); 
 }
