@@ -210,6 +210,7 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
     if(!histogram_data.negative_buckets_.Empty())
     {
       auto negative_buckets = proto_histogram_point_data->mutable_negative();
+      negative_buckets->set_offset(histogram_data.negative_buckets_.StartIndex());
 
       for( auto index = histogram_data.negative_buckets_.StartIndex();
           index <= histogram_data.negative_buckets_.EndIndex(); ++index)
@@ -221,6 +222,7 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
     if(!histogram_data.positive_buckets_.Empty())
     {
       auto positive_buckets = proto_histogram_point_data->mutable_positive();
+      positive_buckets->set_offset(histogram_data.positive_buckets_.StartIndex());
 
       for( auto index = histogram_data.positive_buckets_.StartIndex();
           index <= histogram_data.positive_buckets_.EndIndex(); ++index)
@@ -228,6 +230,11 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
         positive_buckets->add_bucket_counts(histogram_data.positive_buckets_.Get(index));
       }
     }
+    proto_histogram_point_data->set_scale(histogram_data.scale_);
+    proto_histogram_point_data->set_zero_count(histogram_data.zero_count_);
+
+
+
     // attributes
     for (auto &kv_attr : point_data_with_attributes.attributes)
     {
