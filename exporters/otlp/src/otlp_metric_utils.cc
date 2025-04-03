@@ -63,6 +63,11 @@ metric_sdk::AggregationType OtlpMetricUtils::GetAggregationType(
   {
     return metric_sdk::AggregationType::kHistogram;
   }
+  else if (nostd::holds_alternative<sdk::metrics::Base2ExponentialHistogramPointData>(
+    point_data_with_attributes.point_data))
+  {
+    return metric_sdk::AggregationType::kBase2ExponentialHistogram;
+  }
   else if (nostd::holds_alternative<sdk::metrics::LastValuePointData>(
                point_data_with_attributes.point_data))
   {
