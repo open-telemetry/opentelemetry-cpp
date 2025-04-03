@@ -83,7 +83,7 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
 {
   const Base2ExponentialHistogramAggregationConfig default_config;
   auto ac = static_cast<const Base2ExponentialHistogramAggregationConfig *>(aggregation_config);
-  if (!ac) 
+  if (!ac)
   {
     ac = &default_config;
   }
@@ -99,7 +99,7 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
 
 Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
     Base2ExponentialHistogramPointData point_data)
-    : point_data_{std::move(point_data)}, indexer_(point_data.scale_)
+    : point_data_{std::move(point_data)}, indexer_(point_data.scale_)\
 {}
 
 void Base2ExponentialHistogramAggregation::Aggregate(
@@ -176,7 +176,7 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
   auto left = nostd::get<Base2ExponentialHistogramPointData>(ToPoint());
   auto right = nostd::get<Base2ExponentialHistogramPointData>(
       (static_cast<const Base2ExponentialHistogramAggregation &>(delta).ToPoint()));
-  
+
   auto low_res = left.scale_ < right.scale_ ? left : right;
   auto high_res = left.scale_ < right.scale_ ? right : left;
   auto scale_reduction = high_res.scale_ - low_res.scale_;
