@@ -282,7 +282,7 @@ TEST(aggregation, Base2ExponentialHistogramAggregation)
   scale1_config.max_scale_ = 1;
   scale1_config.max_buckets_ = 14;
   scale1_config.record_min_max_ = true;
-  Base2ExponentialHistogramAggregation scale1_aggr;
+  Base2ExponentialHistogramAggregation scale1_aggr = Base2ExponentialHistogramAggregation(&scale1_config);
 
   scale1_aggr.Aggregate(0.0, {});
   scale1_aggr.Aggregate(3.0, {});
@@ -303,5 +303,7 @@ TEST(aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(merged_point.min_, -0.3);
   EXPECT_EQ(merged_point.max_, 3.5);
   EXPECT_EQ(merged_point.scale_, 0);
-  EXPECT_EQ(merged_point.positive_buckets_.Get(1), 4); 
+  EXPECT_EQ(merged_point.positive_buckets_.Get(1), 4);
+  EXPECT_EQ(merged_point.negative_buckets_.Get(-2), 1);
+  EXPECT_EQ(merged_point.positive_buckets_.Get(2), 0);
 }
