@@ -179,8 +179,7 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
   
   auto low_res = left.scale_ < right.scale_ ? left : right;
   auto high_res = left.scale_ < right.scale_ ? right : left;
-  auto scale_reduction = GetScaleReduction(low_res.positive_buckets_, high_res.positive_buckets_,
-                                           low_res.max_buckets_);
+  auto scale_reduction = high_res.scale_ - low_res.scale_;
 
   if (scale_reduction > 0)
   {
