@@ -139,6 +139,11 @@ int main(int argc, char *argv[])
       }
     }
   }
+  std::cout << "Using endpoint: " << exporter_options.endpoint << std::endl;
+  std::cout << "Using example type: " << example_type << std::endl;
+  std::cout << "Using cacert path: " << exporter_options.ssl_credentials_cacert_path << std::endl;
+  std::cout << "Using ssl credentials: " << exporter_options.use_ssl_credentials << std::endl;
+
   // Removing this line will leave the default noop MetricProvider in place.
 
   std::string name{"otlp_grpc_metric_example"};
@@ -146,8 +151,6 @@ int main(int argc, char *argv[])
   InitMetrics(name);
 
   //InitMetrics();
-
-  foo_library::histogram_exp_example(name);
 
   if (example_type == "counter")
   {
@@ -160,6 +163,8 @@ int main(int argc, char *argv[])
   else if (example_type == "histogram")
   {
     foo_library::histogram_example(name);
+  } else if (example_type == "exponential_histogram") {
+    foo_library::histogram_exp_example(name);
   }
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   else if (example_type == "gauge")
