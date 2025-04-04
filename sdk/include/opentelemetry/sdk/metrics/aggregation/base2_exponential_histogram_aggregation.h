@@ -24,7 +24,6 @@ public:
   Base2ExponentialHistogramAggregation(const Base2ExponentialHistogramPointData &point_data);
   Base2ExponentialHistogramAggregation(Base2ExponentialHistogramPointData &&point_data);
 
-
   void Aggregate(int64_t value, const PointAttributes &attributes = {}) noexcept override;
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
 

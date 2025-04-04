@@ -99,53 +99,61 @@ BENCHMARK(BM_HistogramAggregation);
 
 // Add this helper function before your benchmark functions
 
-void RunBase2ExponentialHistogramAggregation(benchmark::State &state, int scale) {
+void RunBase2ExponentialHistogramAggregation(benchmark::State &state, int scale)
+{
   std::string instrument_unit = "histogram1_unit";
   std::unique_ptr<InstrumentSelector> histogram_instrument_selector{
       new InstrumentSelector(InstrumentType::kHistogram, ".*", instrument_unit)};
   std::unique_ptr<MeterSelector> histogram_meter_selector{
       new MeterSelector("meter1", "version1", "schema1")};
-  
+
   Base2ExponentialHistogramAggregationConfig config;
   config.max_scale_ = scale;
-  
+
   std::unique_ptr<View> histogram_view{
-      new View("base2_expohisto", "description", instrument_unit, AggregationType::kBase2ExponentialHistogram,
+      new View("base2_expohisto", "description", instrument_unit,
+               AggregationType::kBase2ExponentialHistogram,
                std::make_shared<Base2ExponentialHistogramAggregationConfig>(config))};
 
   std::unique_ptr<ViewRegistry> views{new ViewRegistry()};
   views->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
                  std::move(histogram_view));
-  
+
   HistogramAggregation<Base2ExponentialHistogramPointData>(state, std::move(views));
 }
 
-void BM_Base2ExponentialHistogramAggregationZeroScale(benchmark::State &state) {
+void BM_Base2ExponentialHistogramAggregationZeroScale(benchmark::State &state)
+{
   RunBase2ExponentialHistogramAggregation(state, 0);
 }
 BENCHMARK(BM_Base2ExponentialHistogramAggregationZeroScale);
 
-void BM_Base2ExponentialHistogramAggregationOneScale(benchmark::State &state) {
+void BM_Base2ExponentialHistogramAggregationOneScale(benchmark::State &state)
+{
   RunBase2ExponentialHistogramAggregation(state, 1);
 }
 BENCHMARK(BM_Base2ExponentialHistogramAggregationOneScale);
 
-void BM_Base2ExponentialHistogramAggregationTwoScale(benchmark::State &state) {
+void BM_Base2ExponentialHistogramAggregationTwoScale(benchmark::State &state)
+{
   RunBase2ExponentialHistogramAggregation(state, 2);
 }
 BENCHMARK(BM_Base2ExponentialHistogramAggregationTwoScale);
 
-void BM_Base2ExponentialHistogramAggregationFourScale(benchmark::State &state) {
+void BM_Base2ExponentialHistogramAggregationFourScale(benchmark::State &state)
+{
   RunBase2ExponentialHistogramAggregation(state, 4);
 }
 BENCHMARK(BM_Base2ExponentialHistogramAggregationFourScale);
 
-void BM_Base2ExponentialHistogramAggregationEightScale(benchmark::State &state) {
+void BM_Base2ExponentialHistogramAggregationEightScale(benchmark::State &state)
+{
   RunBase2ExponentialHistogramAggregation(state, 8);
 }
 BENCHMARK(BM_Base2ExponentialHistogramAggregationEightScale);
 
-void BM_Base2ExponentialHistogramAggregationSixteenScale(benchmark::State &state) {
+void BM_Base2ExponentialHistogramAggregationSixteenScale(benchmark::State &state)
+{
   RunBase2ExponentialHistogramAggregation(state, 16);
 }
 BENCHMARK(BM_Base2ExponentialHistogramAggregationSixteenScale);

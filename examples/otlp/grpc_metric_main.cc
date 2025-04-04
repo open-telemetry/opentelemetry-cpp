@@ -15,8 +15,8 @@
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/provider.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector_factory.h"
-#include "opentelemetry/sdk/metrics/view/view_factory.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector_factory.h"
+#include "opentelemetry/sdk/metrics/view/view_factory.h"
 
 #include <memory>
 #include <thread>
@@ -87,15 +87,16 @@ void InitMetrics(std::string &name)
 
   // histogram view
   std::string histogram_name = name + "_histogram";
-  std::string unit = "unit";
+  std::string unit           = "unit";
 
   auto histogram_instrument_selector = metric_sdk::InstrumentSelectorFactory::Create(
-    metric_sdk::InstrumentType::kHistogram, histogram_name, unit);
+      metric_sdk::InstrumentType::kHistogram, histogram_name, unit);
 
   auto histogram_meter_selector = metric_sdk::MeterSelectorFactory::Create(name, version, schema);
 
-  auto histogram_aggregation_config = std::unique_ptr<metric_sdk::Base2ExponentialHistogramAggregationConfig>(
-      new metric_sdk::Base2ExponentialHistogramAggregationConfig);
+  auto histogram_aggregation_config =
+      std::unique_ptr<metric_sdk::Base2ExponentialHistogramAggregationConfig>(
+          new metric_sdk::Base2ExponentialHistogramAggregationConfig);
 
   histogram_aggregation_config->max_scale_ = 3;
 
@@ -106,7 +107,8 @@ void InitMetrics(std::string &name)
       std::move(histogram_aggregation_config));
 
   auto histogram_view = metric_sdk::ViewFactory::Create(
-      name, "description", unit, metric_sdk::AggregationType::kBase2ExponentialHistogram, aggregation_config);
+      name, "description", unit, metric_sdk::AggregationType::kBase2ExponentialHistogram,
+      aggregation_config);
 
   provider->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
                     std::move(histogram_view));
@@ -150,7 +152,7 @@ int main(int argc, char *argv[])
 
   InitMetrics(name);
 
-  //InitMetrics();
+  // InitMetrics();
 
   if (example_type == "counter")
   {
@@ -163,7 +165,9 @@ int main(int argc, char *argv[])
   else if (example_type == "histogram")
   {
     foo_library::histogram_example(name);
-  } else if (example_type == "exponential_histogram") {
+  }
+  else if (example_type == "exponential_histogram")
+  {
     foo_library::histogram_exp_example(name);
   }
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -174,8 +178,8 @@ int main(int argc, char *argv[])
 #endif
   else
   {
-    //std::thread counter_example{&foo_library::counter_example, name};
-    // std::thread observable_counter_example{&foo_library::observable_counter_example, name};
+    // std::thread counter_example{&foo_library::counter_example, name};
+    //  std::thread observable_counter_example{&foo_library::observable_counter_example, name};
     std::thread histogram_example{&foo_library::histogram_example, name};
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
     std::thread gauge_example{&foo_library::gauge_example, name};

@@ -19,10 +19,10 @@ namespace metrics
 
 using PointAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
 using PointType       = opentelemetry::nostd::variant<SumPointData,
-                                                HistogramPointData,
-                                                Base2ExponentialHistogramPointData,
-                                                LastValuePointData,
-                                                DropPointData>;
+                                                      HistogramPointData,
+                                                      Base2ExponentialHistogramPointData,
+                                                      LastValuePointData,
+                                                      DropPointData>;
 
 struct PointDataAttributes
 {

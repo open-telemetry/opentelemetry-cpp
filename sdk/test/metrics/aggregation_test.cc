@@ -10,8 +10,8 @@
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
-#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
@@ -228,11 +228,11 @@ TEST(Aggregation, DoubleHistogramAggregation)
 TEST(aggregation, Base2ExponentialHistogramAggregation)
 {
   // Low res histo
-  auto SCALE0 = 0;
+  auto SCALE0       = 0;
   auto MAX_BUCKETS0 = 7;
   Base2ExponentialHistogramAggregationConfig scale0_config;
-  scale0_config.max_scale_ = SCALE0;
-  scale0_config.max_buckets_ = MAX_BUCKETS0;
+  scale0_config.max_scale_      = SCALE0;
+  scale0_config.max_buckets_    = MAX_BUCKETS0;
   scale0_config.record_min_max_ = true;
   Base2ExponentialHistogramAggregation scale0_aggr(&scale0_config);
   auto point = scale0_aggr.ToPoint();
@@ -279,8 +279,8 @@ TEST(aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(histo_point.positive_buckets_.Get(1), 2);
 
   Base2ExponentialHistogramAggregationConfig scale1_config;
-  scale1_config.max_scale_ = 1;
-  scale1_config.max_buckets_ = 14;
+  scale1_config.max_scale_      = 1;
+  scale1_config.max_buckets_    = 14;
   scale1_config.record_min_max_ = true;
   Base2ExponentialHistogramAggregation scale1_aggr(&scale1_config);
 
@@ -295,7 +295,7 @@ TEST(aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(scale1_point.min_, 0.0);
   EXPECT_EQ(scale1_point.max_, 3.5);
 
-  auto merged = scale0_aggr.Merge(scale1_aggr);
+  auto merged       = scale0_aggr.Merge(scale1_aggr);
   auto merged_point = nostd::get<Base2ExponentialHistogramPointData>(merged->ToPoint());
   EXPECT_EQ(merged_point.count_, 8);
   EXPECT_EQ(merged_point.sum_, 13.0);
@@ -307,7 +307,7 @@ TEST(aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(merged_point.negative_buckets_.Get(-2), 1);
   EXPECT_EQ(merged_point.positive_buckets_.Get(2), 0);
 
-  auto diffd = merged->Diff(scale1_aggr);
+  auto diffd       = merged->Diff(scale1_aggr);
   auto diffd_point = nostd::get<Base2ExponentialHistogramPointData>(diffd->ToPoint());
   EXPECT_EQ(diffd_point.count_, 4);
   EXPECT_EQ(diffd_point.sum_, 6.2);

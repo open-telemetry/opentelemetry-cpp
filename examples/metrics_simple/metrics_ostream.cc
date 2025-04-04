@@ -15,9 +15,9 @@
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_context_factory.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
-#include "opentelemetry/sdk/metrics/meter_context_factory.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/provider.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
@@ -114,17 +114,18 @@ void InitMetrics(const std::string &name)
                     std::move(histogram_view));
 
   // hisogram view with base2 exponential aggregation
-  std::string histogram_base2_name = name + "_exponential_histogram";
-  unit                            = "histogram-unit";
+  std::string histogram_base2_name         = name + "_exponential_histogram";
+  unit                                     = "histogram-unit";
   auto histogram_base2_instrument_selector = metrics_sdk::InstrumentSelectorFactory::Create(
       metrics_sdk::InstrumentType::kHistogram, histogram_base2_name, unit);
-  auto histogram_base2_meter_selector = metrics_sdk::MeterSelectorFactory::Create(name, version,
-                                                                                   schema);
-  auto histogram_base2_aggregation_config = std::unique_ptr<metrics_sdk::Base2ExponentialHistogramAggregationConfig>(
-      new metrics_sdk::Base2ExponentialHistogramAggregationConfig);
-  histogram_base2_aggregation_config->max_scale_ = 3;
+  auto histogram_base2_meter_selector =
+      metrics_sdk::MeterSelectorFactory::Create(name, version, schema);
+  auto histogram_base2_aggregation_config =
+      std::unique_ptr<metrics_sdk::Base2ExponentialHistogramAggregationConfig>(
+          new metrics_sdk::Base2ExponentialHistogramAggregationConfig);
+  histogram_base2_aggregation_config->max_scale_      = 3;
   histogram_base2_aggregation_config->record_min_max_ = true;
-  histogram_base2_aggregation_config->max_buckets_ = 100;
+  histogram_base2_aggregation_config->max_buckets_    = 100;
 
   std::shared_ptr<metrics_sdk::AggregationConfig> base2_aggregation_config(
       std::move(histogram_base2_aggregation_config));
@@ -133,7 +134,8 @@ void InitMetrics(const std::string &name)
       name, "description", unit, metrics_sdk::AggregationType::kBase2ExponentialHistogram,
       base2_aggregation_config);
 
-  provider->AddView(std::move(histogram_base2_instrument_selector), std::move(histogram_base2_meter_selector), std::move(histogram_base2_view));
+  provider->AddView(std::move(histogram_base2_instrument_selector),
+                    std::move(histogram_base2_meter_selector), std::move(histogram_base2_view));
 
   std::shared_ptr<opentelemetry::metrics::MeterProvider> api_provider(std::move(provider));
 

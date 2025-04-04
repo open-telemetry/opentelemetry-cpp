@@ -257,14 +257,15 @@ void OStreamMetricExporter::printPointData(const opentelemetry::sdk::metrics::Po
     sout_ << "\n  zero_count: " << histogram_point_data.zero_count_;
     if (histogram_point_data.record_min_max_)
     {
-        sout_ << "\n  min: " << histogram_point_data.min_;
-        sout_ << "\n  max: " << histogram_point_data.max_;
+      sout_ << "\n  min: " << histogram_point_data.min_;
+      sout_ << "\n  max: " << histogram_point_data.max_;
     }
     sout_ << "\n  scale: " << histogram_point_data.scale_;
     sout_ << "\n  positive buckets: ";
     if (!histogram_point_data.positive_buckets_.Empty())
     {
-      for (auto i = histogram_point_data.positive_buckets_.StartIndex(); i <= histogram_point_data.positive_buckets_.EndIndex(); ++i)
+      for (auto i = histogram_point_data.positive_buckets_.StartIndex();
+           i <= histogram_point_data.positive_buckets_.EndIndex(); ++i)
       {
         sout_ << "\n\t" << i << ": " << histogram_point_data.positive_buckets_.Get(i);
       }
@@ -272,7 +273,8 @@ void OStreamMetricExporter::printPointData(const opentelemetry::sdk::metrics::Po
     sout_ << "\n  negative buckets: ";
     if (!histogram_point_data.negative_buckets_.Empty())
     {
-      for (auto i = histogram_point_data.negative_buckets_.StartIndex(); i <= histogram_point_data.negative_buckets_.EndIndex(); ++i)
+      for (auto i = histogram_point_data.negative_buckets_.StartIndex();
+           i <= histogram_point_data.negative_buckets_.EndIndex(); ++i)
       {
         sout_ << "\n\t" << i << ": " << histogram_point_data.negative_buckets_.Get(i);
       }

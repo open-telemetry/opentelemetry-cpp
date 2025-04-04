@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <chrono>
 #include <cmath>
+#include <iostream>
 #include <map>
 #include <thread>
-#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -22,10 +22,10 @@
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/metrics/view/view_factory.h"
 #include "opentelemetry/semconv/http_metrics.h"
 #include "opentelemetry/semconv/incubating/container_metrics.h"
 #include "opentelemetry/semconv/incubating/system_metrics.h"
-#include "opentelemetry/sdk/metrics/view/view_factory.h"
 
 namespace metrics_api = opentelemetry::metrics;
 

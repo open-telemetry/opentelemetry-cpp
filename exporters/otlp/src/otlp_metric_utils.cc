@@ -64,7 +64,7 @@ metric_sdk::AggregationType OtlpMetricUtils::GetAggregationType(
     return metric_sdk::AggregationType::kHistogram;
   }
   else if (nostd::holds_alternative<sdk::metrics::Base2ExponentialHistogramPointData>(
-    point_data_with_attributes.point_data))
+               point_data_with_attributes.point_data))
   {
     return metric_sdk::AggregationType::kBase2ExponentialHistogram;
   }
@@ -183,8 +183,8 @@ void OtlpMetricUtils::ConvertHistogramMetric(
 }
 
 void OtlpMetricUtils::ConvertExponentialHistogramMetric(
-  const metric_sdk::MetricData &metric_data,
-  proto::metrics::v1::ExponentialHistogram *const histogram) noexcept
+    const metric_sdk::MetricData &metric_data,
+    proto::metrics::v1::ExponentialHistogram *const histogram) noexcept
 {
   histogram->set_aggregation_temporality(
       GetProtoAggregationTemporality(metric_data.aggregation_temporality));
@@ -196,44 +196,42 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
         histogram->add_data_points();
     proto_histogram_point_data->set_start_time_unix_nano(start_ts);
     proto_histogram_point_data->set_time_unix_nano(ts);
-    auto histogram_data =
-        nostd::get<sdk::metrics::Base2ExponentialHistogramPointData>(point_data_with_attributes.point_data);
+    auto histogram_data = nostd::get<sdk::metrics::Base2ExponentialHistogramPointData>(
+        point_data_with_attributes.point_data);
     // sum
     proto_histogram_point_data->set_sum(histogram_data.sum_);
     proto_histogram_point_data->set_count(histogram_data.count_);
     if (histogram_data.record_min_max_)
     {
-        proto_histogram_point_data->set_min(histogram_data.min_);
-        proto_histogram_point_data->set_max(histogram_data.max_);
+      proto_histogram_point_data->set_min(histogram_data.min_);
+      proto_histogram_point_data->set_max(histogram_data.max_);
     }
     // negative buckets
-    if(!histogram_data.negative_buckets_.Empty())
+    if (!histogram_data.negative_buckets_.Empty())
     {
       auto negative_buckets = proto_histogram_point_data->mutable_negative();
       negative_buckets->set_offset(histogram_data.negative_buckets_.StartIndex());
 
-      for( auto index = histogram_data.negative_buckets_.StartIndex();
-          index <= histogram_data.negative_buckets_.EndIndex(); ++index)
+      for (auto index = histogram_data.negative_buckets_.StartIndex();
+           index <= histogram_data.negative_buckets_.EndIndex(); ++index)
       {
-          negative_buckets->add_bucket_counts(histogram_data.negative_buckets_.Get(index));
+        negative_buckets->add_bucket_counts(histogram_data.negative_buckets_.Get(index));
       }
     }
     // positive buckets
-    if(!histogram_data.positive_buckets_.Empty())
+    if (!histogram_data.positive_buckets_.Empty())
     {
       auto positive_buckets = proto_histogram_point_data->mutable_positive();
       positive_buckets->set_offset(histogram_data.positive_buckets_.StartIndex());
 
-      for( auto index = histogram_data.positive_buckets_.StartIndex();
-          index <= histogram_data.positive_buckets_.EndIndex(); ++index)
+      for (auto index = histogram_data.positive_buckets_.StartIndex();
+           index <= histogram_data.positive_buckets_.EndIndex(); ++index)
       {
         positive_buckets->add_bucket_counts(histogram_data.positive_buckets_.Get(index));
       }
     }
     proto_histogram_point_data->set_scale(histogram_data.scale_);
     proto_histogram_point_data->set_zero_count(histogram_data.zero_count_);
-
-
 
     // attributes
     for (auto &kv_attr : point_data_with_attributes.attributes)
@@ -243,7 +241,6 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
     }
   }
 }
-
 
 void OtlpMetricUtils::ConvertGaugeMetric(const opentelemetry::sdk::metrics::MetricData &metric_data,
                                          proto::metrics::v1::Gauge *const gauge) noexcept
