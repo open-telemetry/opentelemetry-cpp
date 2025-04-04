@@ -1,6 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "grpcpp/grpcpp.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h"
 #include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
@@ -11,6 +14,9 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/provider.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector_factory.h"
+#include "opentelemetry/sdk/metrics/view/view_factory.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector_factory.h"
 
 #include <memory>
 #include <thread>
@@ -55,6 +61,61 @@ void InitMetrics()
   metric_sdk::Provider::SetMeterProvider(provider);
 }
 
+void InitMetrics(std::string &name)
+{
+  auto exporter = otlp_exporter::OtlpGrpcMetricExporterFactory::Create(exporter_options);
+
+  std::string version{"1.2.0"};
+  std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
+
+  // Initialize and set the global MeterProvider
+  metric_sdk::PeriodicExportingMetricReaderOptions reader_options;
+  reader_options.export_interval_millis = std::chrono::milliseconds(1000);
+  reader_options.export_timeout_millis  = std::chrono::milliseconds(500);
+
+  auto reader =
+      metric_sdk::PeriodicExportingMetricReaderFactory::Create(std::move(exporter), reader_options);
+
+  auto context = metric_sdk::MeterContextFactory::Create();
+  context->AddMetricReader(std::move(reader));
+
+  auto provider = metric_sdk::MeterProviderFactory::Create(std::move(context));
+
+  // auto provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
+
+  // std::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
+
+  // histogram view
+  std::string histogram_name = name + "_histogram";
+  std::string unit = "unit";
+
+  auto histogram_instrument_selector = metric_sdk::InstrumentSelectorFactory::Create(
+    metric_sdk::InstrumentType::kHistogram, histogram_name, unit);
+
+  auto histogram_meter_selector = metric_sdk::MeterSelectorFactory::Create(name, version, schema);
+
+  auto histogram_aggregation_config = std::unique_ptr<metric_sdk::Base2ExponentialHistogramAggregationConfig>(
+      new metric_sdk::Base2ExponentialHistogramAggregationConfig);
+
+  histogram_aggregation_config->max_scale_ = 3;
+
+  // histogram_aggregation_config->boundaries_ = std::vector<double>{
+  //     0.0, 50.0, 100.0, 250.0, 500.0, 750.0, 1000.0, 2500.0, 5000.0, 10000.0, 20000.0};
+
+  std::shared_ptr<metric_sdk::AggregationConfig> aggregation_config(
+      std::move(histogram_aggregation_config));
+
+  auto histogram_view = metric_sdk::ViewFactory::Create(
+      name, "description", unit, metric_sdk::AggregationType::kBase2ExponentialHistogram, aggregation_config);
+
+  provider->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
+                    std::move(histogram_view));
+
+  std::shared_ptr<opentelemetry::metrics::MeterProvider> api_provider(std::move(provider));
+
+  metric_sdk::Provider::SetMeterProvider(api_provider);
+}
+
 void CleanupMetrics()
 {
   std::shared_ptr<metrics_api::MeterProvider> none;
@@ -78,9 +139,18 @@ int main(int argc, char *argv[])
       }
     }
   }
+  std::cout << "Using endpoint: " << exporter_options.endpoint << std::endl;
+  std::cout << "Using example type: " << example_type << std::endl;
+  std::cout << "Using cacert path: " << exporter_options.ssl_credentials_cacert_path << std::endl;
+  std::cout << "Using ssl credentials: " << exporter_options.use_ssl_credentials << std::endl;
+
   // Removing this line will leave the default noop MetricProvider in place.
-  InitMetrics();
+
   std::string name{"otlp_grpc_metric_example"};
+
+  InitMetrics(name);
+
+  //InitMetrics();
 
   if (example_type == "counter")
   {
@@ -93,6 +163,8 @@ int main(int argc, char *argv[])
   else if (example_type == "histogram")
   {
     foo_library::histogram_example(name);
+  } else if (example_type == "exponential_histogram") {
+    foo_library::histogram_exp_example(name);
   }
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   else if (example_type == "gauge")
@@ -102,15 +174,15 @@ int main(int argc, char *argv[])
 #endif
   else
   {
-    std::thread counter_example{&foo_library::counter_example, name};
-    std::thread observable_counter_example{&foo_library::observable_counter_example, name};
+    //std::thread counter_example{&foo_library::counter_example, name};
+    // std::thread observable_counter_example{&foo_library::observable_counter_example, name};
     std::thread histogram_example{&foo_library::histogram_example, name};
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
     std::thread gauge_example{&foo_library::gauge_example, name};
 #endif
 
-    counter_example.join();
-    observable_counter_example.join();
+    // counter_example.join();
+    // observable_counter_example.join();
     histogram_example.join();
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
     gauge_example.join();
