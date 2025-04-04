@@ -70,7 +70,7 @@ void DownscaleBuckets(AdaptingCircularBufferCounter *buckets, uint32_t by) noexc
     const uint64_t count = buckets->Get(i);
     if (count > 0)
     {
-      buckets->Increment(i >> by, count);
+      new_buckets.Increment(i >> by, count);
     }
   }
   *buckets = std::move(new_buckets);
@@ -98,8 +98,12 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
 }
 
 Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
-    Base2ExponentialHistogramPointData point_data)
-    : point_data_{std::move(point_data)}, indexer_(point_data.scale_)
+    const Base2ExponentialHistogramPointData &point_data)
+    : point_data_{point_data},  indexer_(point_data.scale_), record_min_max_{point_data.record_min_max_}
+{}
+
+Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(Base2ExponentialHistogramPointData &&point_data)
+    : point_data_{std::move(point_data)}, indexer_(point_data_.scale_), record_min_max_{point_data_.record_min_max_}
 {}
 
 void Base2ExponentialHistogramAggregation::Aggregate(
@@ -115,9 +119,13 @@ void Base2ExponentialHistogramAggregation::Aggregate(
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.sum_ += value;
-  point_data_.min_ = std::min(point_data_.min_, value);
-  point_data_.max_ = std::max(point_data_.max_, value);
   point_data_.count_++;
+
+  if (record_min_max_)
+  {
+    point_data_.min_ = std::min(point_data_.min_, value);
+    point_data_.max_ = std::max(point_data_.max_, value);
+  }
 
   if (value == 0)
   {
@@ -173,57 +181,125 @@ void Base2ExponentialHistogramAggregation::Downscale(uint32_t by) noexcept
 std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
     const Aggregation &delta) const noexcept
 {
-  auto curr_value  = nostd::get<Base2ExponentialHistogramPointData>(ToPoint());
-  auto delta_value = nostd::get<Base2ExponentialHistogramPointData>(
+  auto left = nostd::get<Base2ExponentialHistogramPointData>(ToPoint());
+  auto right = nostd::get<Base2ExponentialHistogramPointData>(
       (static_cast<const Base2ExponentialHistogramAggregation &>(delta).ToPoint()));
-  Base2ExponentialHistogramAggregationConfig agg_config;
-  agg_config.max_scale_      = std::min(curr_value.scale_, delta_value.scale_);
-  agg_config.max_buckets_    = curr_value.max_buckets_;
-  agg_config.record_min_max_ = curr_value.record_min_max_ && delta_value.record_min_max_;
+
+  auto low_res = left.scale_ < right.scale_ ? left : right;
+  auto high_res = left.scale_ < right.scale_ ? right : left;
+  auto scale_reduction = high_res.scale_ - low_res.scale_;
+
+  if (scale_reduction > 0)
+  {
+    DownscaleBuckets(&high_res.positive_buckets_, scale_reduction);
+    DownscaleBuckets(&high_res.negative_buckets_, scale_reduction);
+    high_res.scale_ -= scale_reduction;
+  }
 
   Base2ExponentialHistogramPointData result_value;
-  result_value.count_            = curr_value.count_ + delta_value.count_;
-  result_value.sum_              = curr_value.sum_ + delta_value.sum_;
-  result_value.zero_count_       = curr_value.zero_count_ + delta_value.zero_count_;
-  result_value.min_              = std::min(curr_value.min_, delta_value.min_);
-  result_value.max_              = std::max(curr_value.max_, delta_value.max_);
-  result_value.positive_buckets_ = std::move(curr_value.positive_buckets_);
-  result_value.record_min_max_   = curr_value.record_min_max_ && delta_value.record_min_max_;
-  // if (!delta_value.positive_buckets_.Empty())
-  // {
-  // }
-  result_value.negative_buckets_ = std::move(curr_value.negative_buckets_);
-  // if (!delta_value.negative_buckets_.Empty())
-  // {
-  //   for (int i = delta_value.negative_buckets_.StartIndex();
-  //        i <= delta_value.negative_buckets_.EndIndex(); i++)
-  //   {
-  //     result.negative_buckets_.Increment(i, delta);
-  //   }
-  // }
+  result_value.count_            = low_res.count_ + high_res.count_;
+  result_value.sum_              = low_res.sum_ + high_res.sum_;
+  result_value.zero_count_       = low_res.zero_count_ + high_res.zero_count_;
+  result_value.scale_            = std::min(low_res.scale_, high_res.scale_);
+  result_value.max_buckets_      = low_res.max_buckets_;
+  result_value.record_min_max_   = low_res.record_min_max_ && high_res.record_min_max_;
+  if (result_value.record_min_max_)
+  {
+    result_value.min_ = std::min(low_res.min_, high_res.min_);
+    result_value.max_ = std::max(low_res.max_, high_res.max_);
+  }
+  if (!high_res.positive_buckets_.Empty())
+  {
+    for (int i = high_res.positive_buckets_.StartIndex();
+         i <= high_res.positive_buckets_.EndIndex(); i++)
+    {
+      low_res.positive_buckets_.Increment(i, high_res.positive_buckets_.Get(i));
+    }
+  }
+  result_value.positive_buckets_ = std::move(low_res.positive_buckets_);
+
+  if (!high_res.negative_buckets_.Empty())
+  {
+    for (int i = high_res.negative_buckets_.StartIndex();
+         i <= high_res.negative_buckets_.EndIndex(); i++)
+    {
+      low_res.negative_buckets_.Increment(i, high_res.negative_buckets_.Get(i));
+    }
+  }
+  result_value.negative_buckets_ = std::move(low_res.negative_buckets_);
 
   return std::unique_ptr<Base2ExponentialHistogramAggregation>{
       new Base2ExponentialHistogramAggregation(std::move(result_value))};
 }
 
 std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
-    const Aggregation &next) const noexcept
+      const Aggregation &next) const noexcept
 {
-  auto curr_value = nostd::get<Base2ExponentialHistogramPointData>(ToPoint());
-  auto next_value = nostd::get<Base2ExponentialHistogramPointData>(
+  auto left = nostd::get<Base2ExponentialHistogramPointData>(ToPoint());
+  auto right = nostd::get<Base2ExponentialHistogramPointData>(
       (static_cast<const Base2ExponentialHistogramAggregation &>(next).ToPoint()));
 
+  auto low_res = left.scale_ < right.scale_ ? left : right;
+  auto high_res = left.scale_ < right.scale_ ? right : left;
+  auto scale_reduction = high_res.scale_ - low_res.scale_;
+
+  if (scale_reduction > 0)
+  {
+    DownscaleBuckets(&high_res.positive_buckets_, scale_reduction);
+    DownscaleBuckets(&high_res.negative_buckets_, scale_reduction);
+    high_res.scale_ -= scale_reduction;
+  }
+
   Base2ExponentialHistogramPointData result_value;
-  result_value.scale_          = curr_value.scale_;
-  result_value.max_buckets_    = curr_value.max_buckets_;
+  result_value.scale_          = low_res.scale_;
+  result_value.max_buckets_    = low_res.max_buckets_;
   result_value.record_min_max_ = false;
-  result_value.count_          = next_value.count_ - curr_value.count_;
-  result_value.sum_            = next_value.sum_ - curr_value.sum_;
-  result_value.zero_count_     = next_value.zero_count_ - curr_value.zero_count_;
+  // caution for underflow
+  result_value.count_      = (left.count_ >= right.count_) ? (left.count_ - right.count_) : 0;
+  result_value.sum_        = (left.sum_   >= right.sum_) ? (left.sum_   - right.sum_) : 0.0;
+  result_value.zero_count_ = (left.zero_count_ >= right.zero_count_) ? (left.zero_count_ - right.zero_count_) : 0;
+  if (!high_res.positive_buckets_.Empty())
+  {
+    for (int i = high_res.positive_buckets_.StartIndex();
+         i <= high_res.positive_buckets_.EndIndex(); i++)
+    {
+      low_res.positive_buckets_.Increment(i, 0-high_res.positive_buckets_.Get(i));
+    }
+  }
+  result_value.positive_buckets_ = std::move(low_res.positive_buckets_);
+
+  if (!high_res.negative_buckets_.Empty())
+  {
+    for (int i = high_res.negative_buckets_.StartIndex();
+         i <= high_res.negative_buckets_.EndIndex(); i++)
+    {
+      low_res.negative_buckets_.Increment(i, 0-high_res.negative_buckets_.Get(i));
+    }
+  }
+  result_value.negative_buckets_ = std::move(low_res.negative_buckets_);
 
   return std::unique_ptr<Base2ExponentialHistogramAggregation>{
       new Base2ExponentialHistogramAggregation(std::move(result_value))};
 }
+
+// std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
+//     const Aggregation &next) const noexcept
+// {
+//   auto curr_value = nostd::get<Base2ExponentialHistogramPointData>(ToPoint());
+//   auto next_value = nostd::get<Base2ExponentialHistogramPointData>(
+//       (static_cast<const Base2ExponentialHistogramAggregation &>(next).ToPoint()));
+
+//   Base2ExponentialHistogramPointData result_value;
+//   result_value.scale_          = curr_value.scale_;
+//   result_value.max_buckets_    = curr_value.max_buckets_;
+//   result_value.record_min_max_ = false;
+//   result_value.count_          = next_value.count_ - curr_value.count_;
+//   result_value.sum_            = next_value.sum_ - curr_value.sum_;
+//   result_value.zero_count_     = next_value.zero_count_ - curr_value.zero_count_;
+
+//   return std::unique_ptr<Base2ExponentialHistogramAggregation>{
+//       new Base2ExponentialHistogramAggregation(std::move(result_value))};
+// }
 
 PointType Base2ExponentialHistogramAggregation::ToPoint() const noexcept
 {
