@@ -200,11 +200,14 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
   result_value.count_            = low_res.count_ + high_res.count_;
   result_value.sum_              = low_res.sum_ + high_res.sum_;
   result_value.zero_count_       = low_res.zero_count_ + high_res.zero_count_;
-  result_value.min_              = std::min(low_res.min_, high_res.min_);
-  result_value.max_              = std::max(low_res.max_, high_res.max_);
   result_value.scale_            = std::min(low_res.scale_, high_res.scale_);
   result_value.max_buckets_      = low_res.max_buckets_;
   result_value.record_min_max_   = low_res.record_min_max_ && high_res.record_min_max_;
+  if (result_value.record_min_max_)
+  {
+    result_value.min_ = std::min(low_res.min_, high_res.min_);
+    result_value.max_ = std::max(low_res.max_, high_res.max_);
+  }
   if (!high_res.positive_buckets_.Empty())
   {
     for (int i = high_res.positive_buckets_.StartIndex();
