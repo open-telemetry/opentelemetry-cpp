@@ -141,7 +141,7 @@ static metrics_sdk::MetricData CreateExponentialHistogramAggregationData(
   s_data_1.min_              = 0.0;
   s_data_1.max_              = 3.5;
   s_data_1.scale_            = 3;
-  s_data_2.record_min_max_   = true;
+  s_data_1.record_min_max_   = true;
   s_data_1.zero_count_       = 1;
   s_data_1.positive_buckets_ = opentelemetry::sdk::metrics::AdaptingCircularBufferCounter(10);
   s_data_1.negative_buckets_ = opentelemetry::sdk::metrics::AdaptingCircularBufferCounter(10);

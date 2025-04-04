@@ -261,7 +261,7 @@ void OStreamMetricExporter::printPointData(const opentelemetry::sdk::metrics::Po
       sout_ << "\n  max: " << histogram_point_data.max_;
     }
     sout_ << "\n  scale: " << histogram_point_data.scale_;
-    sout_ << "\n  positive buckets: ";
+    sout_ << "\n  positive buckets:";
     if (!histogram_point_data.positive_buckets_.Empty())
     {
       for (auto i = histogram_point_data.positive_buckets_.StartIndex();
@@ -270,7 +270,7 @@ void OStreamMetricExporter::printPointData(const opentelemetry::sdk::metrics::Po
         sout_ << "\n\t" << i << ": " << histogram_point_data.positive_buckets_.Get(i);
       }
     }
-    sout_ << "\n  negative buckets: ";
+    sout_ << "\n  negative buckets:";
     if (!histogram_point_data.negative_buckets_.Empty())
     {
       for (auto i = histogram_point_data.negative_buckets_.StartIndex();
