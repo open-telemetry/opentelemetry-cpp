@@ -286,11 +286,9 @@ add_custom_command(
     ${PROTOBUF_PROTOC_EXECUTABLE} ${PROTOBUF_COMMON_FLAGS}
     ${PROTOBUF_INCLUDE_FLAGS} ${COMMON_PROTO} ${RESOURCE_PROTO} ${TRACE_PROTO}
     ${LOGS_PROTO} ${METRICS_PROTO} ${TRACE_SERVICE_PROTO} ${LOGS_SERVICE_PROTO}
-    ${METRICS_SERVICE_PROTO} ${PROFILES_PROTO}
-    ${PROFILES_SERVICE_PROTO}
+    ${METRICS_SERVICE_PROTO} ${PROFILES_PROTO} ${PROFILES_SERVICE_PROTO}
   COMMENT "[Run]: ${PROTOBUF_RUN_PROTOC_COMMAND}"
-  DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE}
-  )
+  DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE})
 
 include_directories("${GENERATED_PROTOBUF_PATH}")
 
@@ -320,11 +318,6 @@ set_target_version(opentelemetry_proto)
 # Disable include-what-you-use on generated code.
 set_target_properties(opentelemetry_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE
                                                      "")
-
-if(TARGET absl::bad_variant_access)
-  target_link_libraries(opentelemetry_proto PUBLIC absl::bad_variant_access)
-endif()
-
 if(NOT Protobuf_INCLUDE_DIRS AND TARGET protobuf::libprotobuf)
   get_target_property(Protobuf_INCLUDE_DIRS protobuf::libprotobuf
                       INTERFACE_INCLUDE_DIRECTORIES)
@@ -343,7 +336,8 @@ if(WITH_OTLP_GRPC)
   set_target_version(opentelemetry_proto_grpc)
 
   # Disable include-what-you-use on generated code.
-  set_target_properties(opentelemetry_proto_grpc PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "")
+  set_target_properties(opentelemetry_proto_grpc
+                        PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "")
 
   list(APPEND OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto_grpc)
   target_link_libraries(opentelemetry_proto_grpc PUBLIC opentelemetry_proto)
@@ -372,15 +366,27 @@ patch_protobuf_targets(opentelemetry_proto)
 
 if(OPENTELEMETRY_INSTALL)
   install(
-    TARGETS ${OPENTELEMETRY_PROTO_TARGETS}
-    EXPORT "${PROJECT_NAME}-target"
+    TARGETS opentelemetry_proto
+    EXPORT "${PROJECT_NAME}-exporters_otlp_common-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    COMPONENT exporters_otlp_common)
+
+  if(WITH_OTLP_GRPC)
+    install(
+      TARGETS opentelemetry_proto_grpc
+      EXPORT "${PROJECT_NAME}-exporters_otlp_grpc-target"
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      COMPONENT exporters_otlp_grpc)
+  endif()
 
   install(
     DIRECTORY ${GENERATED_PROTOBUF_PATH}/opentelemetry
     DESTINATION include
+    COMPONENT exporters_otlp_common
     FILES_MATCHING
     PATTERN "*.h")
 endif()
@@ -391,11 +397,11 @@ else() # cmake 3.8 or lower
   target_link_libraries(opentelemetry_proto PUBLIC ${Protobuf_LIBRARIES})
 endif()
 
+# this is needed on some older grcp versions specifically conan recipe for grpc/1.54.3
 if(WITH_OTLP_GRPC)
-  find_package(absl CONFIG)
   if(TARGET absl::synchronization)
     target_link_libraries(opentelemetry_proto_grpc
-                          PRIVATE absl::synchronization)
+                          PUBLIC "$<BUILD_INTERFACE:absl::synchronization>")
   endif()
 endif()
 
