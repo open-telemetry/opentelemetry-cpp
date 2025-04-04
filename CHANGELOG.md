@@ -13,6 +13,16 @@ Increment the:
 * MINOR version when you add functionality in a backwards compatible manner, and
 * PATCH version when you make backwards compatible bug fixes.
 
+## [1.21 2025-04-04]
+* [SDK] Base2 exponential histogram aggregation
+  [#3175](https://github.com/open-telemetry/opentelemetry-cpp/pull/3346)
+
+  New Features:
+
+  Add base2 exponential histogram aggregation. Includes a new aggregation type,
+  ostream exporter, and otlp/grpc exporter. Updated histogram aggregation and
+  benchmark tests. 
+
 ## [Unreleased]
 
 * [API] Remove `WITH_ABSEIL` and `HAVE_ABSEIL`
