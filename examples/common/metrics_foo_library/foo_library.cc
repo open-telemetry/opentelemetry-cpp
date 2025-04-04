@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <chrono>
 #include <cmath>
+#include <iostream>
 #include <map>
 #include <thread>
 #include <utility>
@@ -21,6 +22,7 @@
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/metrics/view/view_factory.h"
 #include "opentelemetry/semconv/http_metrics.h"
 #include "opentelemetry/semconv/incubating/container_metrics.h"
 #include "opentelemetry/semconv/incubating/system_metrics.h"
@@ -100,7 +102,24 @@ void foo_library::histogram_example(const std::string &name)
   std::string histogram_name = name + "_histogram";
   auto provider              = metrics_api::Provider::GetMeterProvider();
   opentelemetry::nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
-  auto histogram_counter = meter->CreateDoubleHistogram(histogram_name, "des", "unit");
+  auto histogram_counter = meter->CreateDoubleHistogram(histogram_name, "des", "histogram-unit");
+  auto context           = opentelemetry::context::Context{};
+  for (uint32_t i = 0; i < 20; ++i)
+  {
+    double val                                = (rand() % 700) + 1.1;
+    std::map<std::string, std::string> labels = get_random_attr();
+    auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
+    histogram_counter->Record(val, labelkv, context);
+    std::this_thread::sleep_for(std::chrono::milliseconds(250));
+  }
+}
+
+void foo_library::histogram_exp_example(const std::string &name)
+{
+  std::string histogram_name = name + "_exponential_histogram";
+  auto provider              = metrics_api::Provider::GetMeterProvider();
+  opentelemetry::nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
+  auto histogram_counter = meter->CreateDoubleHistogram(histogram_name, "des", "histogram-unit");
   auto context           = opentelemetry::context::Context{};
   for (uint32_t i = 0; i < 20; ++i)
   {
