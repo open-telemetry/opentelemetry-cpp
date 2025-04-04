@@ -142,6 +142,9 @@ startup --client_debug
 
 common --flag_alias=dll=@otel_sdk//:with_dll
 
+# disable GRPC experiments
+build --define=grpc_experiments_are_final=true
+
 ## This is what my ../top.bazelrc contains (not in the repo as local to my machine)
 # build --disk_cache=f:/b/d
 # common --repository_cache=f:/b/r
