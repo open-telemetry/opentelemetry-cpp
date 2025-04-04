@@ -234,7 +234,7 @@ TEST(aggregation, Base2ExponentialHistogramAggregation)
   scale0_config.max_scale_ = SCALE0;
   scale0_config.max_buckets_ = MAX_BUCKETS0;
   scale0_config.record_min_max_ = true;
-  Base2ExponentialHistogramAggregation scale0_aggr = Base2ExponentialHistogramAggregation(&scale0_config);
+  Base2ExponentialHistogramAggregation scale0_aggr(&scale0_config);
   auto point = scale0_aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<Base2ExponentialHistogramPointData>(point));
   auto histo_point = nostd::get<Base2ExponentialHistogramPointData>(point);
@@ -277,12 +277,12 @@ TEST(aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(histo_point.max_, 3.5);
   EXPECT_EQ(histo_point.negative_buckets_.Get(-2), 1);
   EXPECT_EQ(histo_point.positive_buckets_.Get(1), 2);
-  
+
   Base2ExponentialHistogramAggregationConfig scale1_config;
   scale1_config.max_scale_ = 1;
   scale1_config.max_buckets_ = 14;
   scale1_config.record_min_max_ = true;
-  Base2ExponentialHistogramAggregation scale1_aggr = Base2ExponentialHistogramAggregation(&scale1_config);
+  Base2ExponentialHistogramAggregation scale1_aggr(&scale1_config);
 
   scale1_aggr.Aggregate(0.0, {});
   scale1_aggr.Aggregate(3.0, {});

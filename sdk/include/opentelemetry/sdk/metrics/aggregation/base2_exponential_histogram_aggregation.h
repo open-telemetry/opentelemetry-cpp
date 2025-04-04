@@ -21,7 +21,9 @@ class Base2ExponentialHistogramAggregation : public Aggregation
 {
 public:
   Base2ExponentialHistogramAggregation(const AggregationConfig *aggregation_config = nullptr);
-  Base2ExponentialHistogramAggregation(Base2ExponentialHistogramPointData point_data);
+  Base2ExponentialHistogramAggregation(const Base2ExponentialHistogramPointData &point_data);
+  Base2ExponentialHistogramAggregation(Base2ExponentialHistogramPointData &&point_data);
+
 
   void Aggregate(int64_t value, const PointAttributes &attributes = {}) noexcept override;
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
@@ -46,6 +48,7 @@ private:
   mutable opentelemetry::common::SpinLockMutex lock_;
   Base2ExponentialHistogramPointData point_data_;
   Base2ExponentialHistogramIndexer indexer_;
+  bool record_min_max_ = true;
 };
 
 }  // namespace metrics

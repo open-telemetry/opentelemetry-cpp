@@ -98,8 +98,12 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
 }
 
 Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
-    Base2ExponentialHistogramPointData point_data)
-    : point_data_{std::move(point_data)}, indexer_(point_data.scale_)\
+    const Base2ExponentialHistogramPointData &point_data)
+    : point_data_{point_data},  indexer_(point_data.scale_), record_min_max_{point_data.record_min_max_}
+{}
+
+Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(Base2ExponentialHistogramPointData &&point_data)
+    : point_data_{std::move(point_data)}, indexer_(point_data_.scale_), record_min_max_{point_data_.record_min_max_}
 {}
 
 void Base2ExponentialHistogramAggregation::Aggregate(
@@ -115,9 +119,13 @@ void Base2ExponentialHistogramAggregation::Aggregate(
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.sum_ += value;
-  point_data_.min_ = std::min(point_data_.min_, value);
-  point_data_.max_ = std::max(point_data_.max_, value);
   point_data_.count_++;
+
+  if (record_min_max_)
+  {
+    point_data_.min_ = std::min(point_data_.min_, value);
+    point_data_.max_ = std::max(point_data_.max_, value);
+  }
 
   if (value == 0)
   {
@@ -227,7 +235,7 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
   auto left = nostd::get<Base2ExponentialHistogramPointData>(ToPoint());
   auto right = nostd::get<Base2ExponentialHistogramPointData>(
       (static_cast<const Base2ExponentialHistogramAggregation &>(next).ToPoint()));
-  
+
   auto low_res = left.scale_ < right.scale_ ? left : right;
   auto high_res = left.scale_ < right.scale_ ? right : left;
   auto scale_reduction = high_res.scale_ - low_res.scale_;
