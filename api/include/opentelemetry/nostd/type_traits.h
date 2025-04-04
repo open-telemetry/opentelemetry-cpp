@@ -133,7 +133,7 @@ using is_nothrow_swappable = detail::swappable::is_nothrow_swappable<is_swappabl
  *  std::is_trivialy_copy_assignable
  *  std::is_trivialy_move_assignable
  */
-#ifdef OPENTELEMETRY_TRIVIALITY_TYPE_TRAITS
+#if defined(OPENTELEMETRY_STL_VERSION) && OPENTELEMETRY_STL_VERSION >= 2011
 using std::is_trivially_copy_assignable;
 using std::is_trivially_copy_constructible;
 using std::is_trivially_move_assignable;
