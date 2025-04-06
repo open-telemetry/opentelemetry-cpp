@@ -20,10 +20,9 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
-# Note: CMAKE_FIND_PACKAGE_PREFER_CONFIG requires cmake 3.15 
-#   Prefer cmake CONFIG to auto resolve dependencies. 
-#   This is important to properly find protobuf versions
-#   3.22.0 and above due to the abseil-cpp dependency.
+# Note: CMAKE_FIND_PACKAGE_PREFER_CONFIG requires cmake 3.15 Prefer cmake CONFIG
+# to auto resolve dependencies. This is important to properly find protobuf
+# versions 3.22.0 and above due to the abseil-cpp dependency.
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 # Don't use customized cmake modules if vcpkg is used to resolve dependence.
@@ -406,18 +405,18 @@ if(WITH_OTLP_GRPC
    OR WITH_OTLP_HTTP
    OR WITH_OTLP_FILE)
 
-  # Note: remove once cmake 3.14 is no longer supported
-  #  including the CMakeFindDependencyMacro is required with cmake 3.14 
-  #  due to an issue with the gRPCConfig.cmake file. 
+  # Note: remove once cmake 3.14 is no longer supported including the
+  # CMakeFindDependencyMacro is required with cmake 3.14 due to an issue with
+  # the gRPCConfig.cmake file.
   include(CMakeFindDependencyMacro)
 
-  # Protobuf 3.22 and up requires abseil-cpp. This is found using the 
-  #   CONFIG search mode. In cmake 3.14 we must manually 
-  #   try config mode first then fall back to MODULE mode
+  # Protobuf 3.22 and up requires abseil-cpp. This is found using the CONFIG
+  # search mode. In cmake 3.14 we must manually try config mode first then fall
+  # back to MODULE mode
   find_package(Protobuf CONFIG)
   if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
     find_package(Protobuf MODULE)
-  endif() 
+  endif()
 
   if(WITH_OTLP_GRPC)
     find_package(gRPC CONFIG)
