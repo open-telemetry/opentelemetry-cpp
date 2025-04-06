@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 project(opentelemetry-cpp-exporters-otlp-grpc-install-test LANGUAGES CXX)
 
 find_package(opentelemetry-cpp REQUIRED COMPONENTS exporters_otlp_grpc)
@@ -24,7 +24,7 @@ target_link_libraries(
   PRIVATE opentelemetry-cpp::otlp_grpc_exporter
           opentelemetry-cpp::otlp_grpc_log_record_exporter
           opentelemetry-cpp::otlp_grpc_metrics_exporter
-          GTest::gtest
-          GTest::gtest_main)
+          GTest::GTest
+          GTest::Main)
 
 gtest_discover_tests(exporters_otlp_grpc_test)

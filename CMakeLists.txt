@@ -1,23 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.10)
-
-# See https://cmake.org/cmake/help/latest/policy/CMP0074.html required by
-# certain version of zlib which CURL depends on.
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
-  cmake_policy(SET CMP0074 NEW)
-endif()
-
-# Allow to use normal variable for option()
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13")
-  cmake_policy(SET CMP0077 NEW)
-endif()
-
-# Prefer CMAKE_MSVC_RUNTIME_LIBRARY if possible
-if(POLICY CMP0091)
-  cmake_policy(SET CMP0091 NEW)
-endif()
+cmake_minimum_required(VERSION 3.14)
 
 if(POLICY CMP0092)
   # https://cmake.org/cmake/help/latest/policy/CMP0092.html#policy:CMP0092 Make
@@ -36,8 +20,10 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
-# Prefer cmake CONFIG to auto resolve dependencies. This is important to
-# properly find protobuf versions 3.22.0 and above
+# Note: CMAKE_FIND_PACKAGE_PREFER_CONFIG requires cmake 3.15 
+#   Prefer cmake CONFIG to auto resolve dependencies. 
+#   This is important to properly find protobuf versions
+#   3.22.0 and above due to the abseil-cpp dependency.
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 # Don't use customized cmake modules if vcpkg is used to resolve dependence.
@@ -420,9 +406,18 @@ if(WITH_OTLP_GRPC
    OR WITH_OTLP_HTTP
    OR WITH_OTLP_FILE)
 
-  find_package(Protobuf)
-  # Protobuf 3.22 or upper require abseil-cpp, we can find it in
-  # opentelemetry-cpp-config.cmake
+  # Note: remove once cmake 3.14 is no longer supported
+  #  including the CMakeFindDependencyMacro is required with cmake 3.14 
+  #  due to an issue with the gRPCConfig.cmake file. 
+  include(CMakeFindDependencyMacro)
+
+  # Protobuf 3.22 and up requires abseil-cpp. This is found using the 
+  #   CONFIG search mode. In cmake 3.14 we must manually 
+  #   try config mode first then fall back to MODULE mode
+  find_package(Protobuf CONFIG)
+  if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
+    find_package(Protobuf MODULE)
+  endif() 
 
   if(WITH_OTLP_GRPC)
     find_package(gRPC CONFIG)
@@ -441,7 +436,7 @@ if(WITH_OTLP_GRPC
     endif()
 
     if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
-      find_package(Protobuf REQUIRED)
+      find_package(Protobuf CONFIG REQUIRED)
     endif()
     if(NOT gRPC_FOUND AND WITH_OTLP_GRPC)
       find_package(gRPC CONFIG)
@@ -800,10 +795,10 @@ if(gRPC_FOUND)
   message(STATUS "gRPC: ${gRPC_VERSION}")
 endif()
 if(CURL_FOUND)
-  message(STATUS "CURL: ${CURL_VERSION}")
+  message(STATUS "CURL: ${CURL_VERSION_STRING}")
 endif()
 if(ZLIB_FOUND)
-  message(STATUS "ZLIB: ${ZLIB_VERSION}")
+  message(STATUS "ZLIB: ${ZLIB_VERSION_STRING}")
 endif()
 if(USE_NLOHMANN_JSON)
   message(STATUS "nlohmann-json: ${nlohmann_json_VERSION}")

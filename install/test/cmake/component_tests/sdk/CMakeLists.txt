@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 project(opentelemetry-cpp-sdk-install-test LANGUAGES CXX)
 
 find_package(opentelemetry-cpp REQUIRED COMPONENTS sdk)
@@ -24,7 +24,7 @@ target_link_libraries(
           opentelemetry-cpp::trace
           opentelemetry-cpp::metrics
           opentelemetry-cpp::logs
-          GTest::gtest
-          GTest::gtest_main)
+          GTest::GTest
+          GTest::Main)
 
 gtest_discover_tests(sdk_test)

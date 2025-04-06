@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 project(opentelemetry-cpp-exporters-otlp-common-install-test LANGUAGES CXX)
 
 find_package(opentelemetry-cpp REQUIRED COMPONENTS exporters_otlp_common)
@@ -18,6 +18,6 @@ add_executable(exporters_otlp_common_test
 target_link_libraries(
   exporters_otlp_common_test
   PRIVATE opentelemetry-cpp::proto opentelemetry-cpp::otlp_recordable
-          GTest::gtest GTest::gtest_main)
+          GTest::GTest GTest::Main)
 
 gtest_discover_tests(exporters_otlp_common_test)
