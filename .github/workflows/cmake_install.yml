@@ -30,7 +30,7 @@ jobs:
     name: Windows 2019 vcpkg submodule versions minimum cmake cxx14 (static libs)
     runs-on: windows-2019
     env:
-      CMAKE_VERSION: '3.16.0'
+      CMAKE_VERSION: '3.15.0'
       CXX_STANDARD: '14'
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2

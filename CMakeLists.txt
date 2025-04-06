@@ -3,6 +3,22 @@
 
 cmake_minimum_required(VERSION 3.14)
 
+# See https://cmake.org/cmake/help/latest/policy/CMP0074.html required by
+# certain version of zlib which CURL depends on.
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
+  cmake_policy(SET CMP0074 NEW)
+endif()
+
+# Allow to use normal variable for option()
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13")
+  cmake_policy(SET CMP0077 NEW)
+endif()
+
+# Prefer CMAKE_MSVC_RUNTIME_LIBRARY if possible
+if(POLICY CMP0091)
+  cmake_policy(SET CMP0091 NEW)
+endif()
+
 if(POLICY CMP0092)
   # https://cmake.org/cmake/help/latest/policy/CMP0092.html#policy:CMP0092 Make
   # sure the /W3 is not removed from CMAKE_CXX_FLAGS since CMake 3.15
