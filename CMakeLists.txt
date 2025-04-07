@@ -433,7 +433,7 @@ if(WITH_OTLP_GRPC
   find_package(Protobuf CONFIG)
   if(NOT Protobuf_FOUND)
     find_package(Protobuf MODULE)
-    if(Protobuf_FOUND AND Protobuf_VERSION VERSION_GE "3.22.0")
+    if(Protobuf_FOUND AND Protobuf_VERSION VERSION_GREATER_EQUAL "3.22.0")
       message(
         WARNING
           "Found Protobuf version ${Protobuf_VERSION} using MODULE mode. "

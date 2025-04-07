@@ -30,6 +30,7 @@ jobs:
     name: Windows 2019 vcpkg submodule versions minimum cmake cxx14 (static libs)
     runs-on: windows-2019
     env:
+      # cmake 3.15 is the minimum for windows builds (See https://github.com/open-telemetry/opentelemetry-cpp/pull/3349#discussion_r2030319430)
       CMAKE_VERSION: '3.15.0'
       CXX_STANDARD: '14'
     steps:
