@@ -36,9 +36,9 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
-# Note: CMAKE_FIND_PACKAGE_PREFER_CONFIG requires cmake 3.15 Prefer cmake CONFIG
-# to auto resolve dependencies. This is important to properly find protobuf
-# versions 3.22.0 and above due to the abseil-cpp dependency.
+# Note: CMAKE_FIND_PACKAGE_PREFER_CONFIG requires cmake 3.15. Prefer cmake
+# CONFIG search mode to find dependencies. This is important to properly find
+# protobuf versions 3.22.0 and above due to the abseil-cpp dependency.
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 # Don't use customized cmake modules if vcpkg is used to resolve dependence.
@@ -421,24 +421,31 @@ if(WITH_OTLP_GRPC
    OR WITH_OTLP_HTTP
    OR WITH_OTLP_FILE)
 
-  # Note: remove once cmake 3.14 is no longer supported including the
-  # CMakeFindDependencyMacro is required with cmake 3.14 due to an issue with
-  # the gRPCConfig.cmake file.
+  # Including the CMakeFindDependencyMacro resolves an error from
+  # gRPCConfig.cmake on some grpc versions. See
+  # https://github.com/grpc/grpc/pull/33361 for more details.
   include(CMakeFindDependencyMacro)
 
-  # Protobuf 3.22 and up requires abseil-cpp. This is found using the CONFIG
-  # search mode. In cmake 3.14 we must manually try config mode first then fall
-  # back to MODULE mode
+  # Protobuf 3.22+ and depends on abseil-cpp and must be found using the CONFIG
+  # search mode. The following attempts to find Protobuf using the CONFIG mode
+  # first, and if not found, falls back to the MODULE mode. See
+  # https://gitlab.kitware.com/cmake/cmake/-/issues/24321 for more details.
   find_package(Protobuf CONFIG)
-  if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
+  if(NOT Protobuf_FOUND)
     find_package(Protobuf MODULE)
+    if(Protobuf_FOUND AND Protobuf_VERSION VERSION_GE "3.22.0")
+      message(
+        WARNING
+          "Found Protobuf version ${Protobuf_VERSION} using MODULE mode. "
+          "Linking errors may occur. Protobuf 3.22+ depends on abseil-cpp "
+          "and should be found using the CONFIG mode.")
+    endif()
   endif()
 
   if(WITH_OTLP_GRPC)
     find_package(gRPC CONFIG)
   endif()
-  if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (WITH_OTLP_GRPC
-                                                     AND NOT gRPC_FOUND))
+  if((NOT Protobuf_FOUND) OR (WITH_OTLP_GRPC AND NOT gRPC_FOUND))
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
       install_windows_deps()
     endif()
@@ -450,7 +457,7 @@ if(WITH_OTLP_GRPC
       include(${CMAKE_TOOLCHAIN_FILE})
     endif()
 
-    if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
+    if(NOT Protobuf_FOUND)
       find_package(Protobuf CONFIG REQUIRED)
     endif()
     if(NOT gRPC_FOUND AND WITH_OTLP_GRPC)
@@ -512,6 +519,11 @@ endif()
 if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
   # No specific version required.
   find_package(CURL REQUIRED)
+  # Set the CURL_VERSION from the legacy CURL_VERSION_STRING Required for CMake
+  # versions below 4.0
+  if(NOT DEFINED CURL_VERSION AND DEFINED CURL_VERSION_STRING)
+    set(CURL_VERSION ${CURL_VERSION_STRING})
+  endif()
 endif()
 
 #
@@ -523,6 +535,11 @@ if((NOT WITH_API_ONLY)
    AND WITH_OTLP_HTTP_COMPRESSION)
   # No specific version required.
   find_package(ZLIB REQUIRED)
+  # Set the ZLIB_VERSION from the legacy ZLIB_VERSION_STRING Required for CMake
+  # versions below 3.26
+  if(NOT DEFINED ZLIB_VERSION AND DEFINED ZLIB_VERSION_STRING)
+    set(ZLIB_VERSION ${ZLIB_VERSION_STRING})
+  endif()
 endif()
 
 #
@@ -810,10 +827,10 @@ if(gRPC_FOUND)
   message(STATUS "gRPC: ${gRPC_VERSION}")
 endif()
 if(CURL_FOUND)
-  message(STATUS "CURL: ${CURL_VERSION_STRING}")
+  message(STATUS "CURL: ${CURL_VERSION}")
 endif()
 if(ZLIB_FOUND)
-  message(STATUS "ZLIB: ${ZLIB_VERSION_STRING}")
+  message(STATUS "ZLIB: ${ZLIB_VERSION}")
 endif()
 if(USE_NLOHMANN_JSON)
   message(STATUS "nlohmann-json: ${nlohmann_json_VERSION}")
