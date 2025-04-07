@@ -13,7 +13,7 @@ jobs:
 #    name: CMake test arm64 (with modern protobuf,grpc and abseil)
 #    runs-on: actuated-arm64-4cpu-16gb
 #    steps:
-#    - uses: actions/checkout@v4
+#    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 #      with:
 #        submodules: 'recursive'
 #    - name: setup
@@ -37,7 +37,7 @@ jobs:
     env:
       CXX_STANDARD: '17'
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -53,7 +53,7 @@ jobs:
     name: CMake gcc 14 (maintainer mode, sync)
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -90,7 +90,7 @@ jobs:
     name: CMake gcc 14 (maintainer mode, async)
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -127,7 +127,7 @@ jobs:
     name: CMake clang 18 (maintainer mode, sync)
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -164,7 +164,7 @@ jobs:
     name: CMake clang 18 (maintainer mode, async)
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -201,7 +201,7 @@ jobs:
     name: CMake clang 18 (maintainer mode, abiv2)
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -238,7 +238,7 @@ jobs:
     name: CMake msvc (maintainer mode)
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -252,7 +252,7 @@ jobs:
     name: CMake msvc (maintainer mode) with C++20
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -268,7 +268,7 @@ jobs:
     name: CMake msvc (maintainer mode, abiv2)
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -284,7 +284,7 @@ jobs:
     name: CMake test (without otlp-exporter and with async export)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -306,7 +306,7 @@ jobs:
     name: CMake test (with opentracing-shim)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -321,7 +321,7 @@ jobs:
     name: CMake C++14 test(GCC)
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -338,7 +338,7 @@ jobs:
     name: CMake C++17 test(GCC)
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -355,7 +355,7 @@ jobs:
     name: CMake C++20 test(GCC)
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -376,7 +376,7 @@ jobs:
     name: CMake C++20 test(Clang with libc++)
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -407,7 +407,7 @@ jobs:
     name: CMake C++23 test(GCC)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -428,7 +428,7 @@ jobs:
     name: CMake C++23 test(Clang with libc++)
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -459,7 +459,7 @@ jobs:
     name: CMake test (with otlp-exporter)
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -485,7 +485,7 @@ jobs:
     name: CMake test (with modern protobuf,grpc and abseil)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -510,7 +510,7 @@ jobs:
     name: CMake do not install test (with otlp-exporter)
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -527,7 +527,7 @@ jobs:
     name: CMake test (build shared libraries with otlp-exporter and static gRPC)
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -544,7 +544,7 @@ jobs:
     name: Plugin -> CMake
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -565,11 +565,11 @@ jobs:
     name: Bazel
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -587,11 +587,11 @@ jobs:
     name: Bazel without bzlmod
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -609,11 +609,11 @@ jobs:
     name: Bazel with async export
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -631,11 +631,11 @@ jobs:
     name: Bazel valgrind
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -653,11 +653,11 @@ jobs:
     name: Bazel noexcept
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -675,11 +675,11 @@ jobs:
     name: Bazel nortti
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -697,11 +697,11 @@ jobs:
     name: Bazel asan config
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -719,11 +719,11 @@ jobs:
     name: Bazel tsan config
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -741,11 +741,11 @@ jobs:
     name: Bazel on MacOS
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -758,11 +758,11 @@ jobs:
     name: Benchmark
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -777,7 +777,7 @@ jobs:
         env BENCHMARK_DIR=/benchmark
         ./ci/do_ci.sh benchmark
     - name: Upload benchmark results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: benchmark_reports
         path: /home/runner/benchmark
@@ -786,7 +786,7 @@ jobs:
     name: Format
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: setup
       run: sudo apt remove needrestart && sudo ./ci/install_format_tools.sh #refer: https://github.com/actions/runner-images/issues/9937
     - name: run tests
@@ -796,7 +796,7 @@ jobs:
     name: Copyright
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: check copyright
       run: ./tools/check_copyright.sh
 
@@ -804,7 +804,7 @@ jobs:
     name: CMake -> exporter proto
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -821,7 +821,7 @@ jobs:
     name: CMake -> exporter proto (Build as DLL)
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -840,7 +840,7 @@ jobs:
     name: CMake (With async export) -> exporter proto
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -857,7 +857,7 @@ jobs:
     name: Bazel Windows
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -870,7 +870,7 @@ jobs:
     name: Plugin -> CMake Windows
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -884,7 +884,7 @@ jobs:
     name: Code coverage
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -901,7 +901,7 @@ jobs:
         CXX: /usr/bin/g++-10
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
       with:
         files: /home/runner/build/coverage.info
 
@@ -910,7 +910,7 @@ jobs:
 
     steps:
     - name: check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - name: install markdownlint-cli
       run: sudo npm install -g markdownlint-cli
@@ -922,7 +922,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: install shellcheck
       run: sudo apt install --assume-yes shellcheck
     - name: run shellcheck
@@ -932,7 +932,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: install misspell
       run: |
         curl -L -o ./install-misspell.sh https://git.io/misspell
@@ -944,7 +944,7 @@ jobs:
     name: DocFX check
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: install docfx
       run: choco install docfx -y --version=2.58.5
     - name: run ./ci/docfx.cmd
@@ -956,7 +956,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout open-telemetry/opentelemetry-cpp
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           submodules: 'recursive'
       - name: setup
@@ -975,7 +975,7 @@ jobs:
           cd $HOME/build/ext/test/w3c_tracecontext_http_test_server
           ./w3c_tracecontext_http_test_server &
       - name: Checkout w3c/trace-context repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: w3c/trace-context
           path: trace-context
