@@ -26,6 +26,7 @@ abseil/*:fPIC=True
 abseil/*:shared=False
 opentracing-cpp/*:fPIC=True
 opentracing-cpp/*:shared=True
+pcre2/*:with_bzip2=False
 
 [test_requires]
 gtest/1.16.0
