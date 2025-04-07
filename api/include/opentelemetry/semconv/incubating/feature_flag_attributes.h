@@ -31,9 +31,13 @@ static constexpr const char *kFeatureFlagEvaluationErrorMessage =
     "feature_flag.evaluation.error.message";
 
 /**
- * The reason code which shows how a feature flag value was determined.
+ * Deprecated, use @code feature_flag.result.reason @endcode instead.
+ *
+ * @deprecated
+ * {"note": "Replaced by @code feature_flag.result.reason @endcode.", "reason": "uncategorized"}
  */
-static constexpr const char *kFeatureFlagEvaluationReason = "feature_flag.evaluation.reason";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kFeatureFlagEvaluationReason =
+    "feature_flag.evaluation.reason";
 
 /**
  * The lookup key of the feature flag.
@@ -46,10 +50,9 @@ static constexpr const char *kFeatureFlagKey = "feature_flag.key";
 static constexpr const char *kFeatureFlagProviderName = "feature_flag.provider_name";
 
 /**
- * The identifier of the <a href="https://openfeature.dev/specification/glossary/#flag-set">flag
- * set</a> to which the feature flag belongs.
+ * The reason code which shows how a feature flag value was determined.
  */
-static constexpr const char *kFeatureFlagSetId = "feature_flag.set.id";
+static constexpr const char *kFeatureFlagResultReason = "feature_flag.result.reason";
 
 /**
  * A semantic identifier for an evaluated flag value.
@@ -59,7 +62,21 @@ static constexpr const char *kFeatureFlagSetId = "feature_flag.set.id";
  * provide additional context for understanding the meaning behind a value.
  * For example, the variant @code red @endcode maybe be used for the value @code #c05543 @endcode.
  */
-static constexpr const char *kFeatureFlagVariant = "feature_flag.variant";
+static constexpr const char *kFeatureFlagResultVariant = "feature_flag.result.variant";
+
+/**
+ * The identifier of the <a href="https://openfeature.dev/specification/glossary/#flag-set">flag
+ * set</a> to which the feature flag belongs.
+ */
+static constexpr const char *kFeatureFlagSetId = "feature_flag.set.id";
+
+/**
+ * Deprecated, use @code feature_flag.result.variant @endcode instead.
+ *
+ * @deprecated
+ * {"note": "Replaced by @code feature_flag.result.variant @endcode.", "reason": "uncategorized"}
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kFeatureFlagVariant = "feature_flag.variant";
 
 /**
  * The version of the ruleset used during the evaluation. This may be any stable value which
@@ -117,6 +134,57 @@ static constexpr const char *kStale = "stale";
 static constexpr const char *kError = "error";
 
 }  // namespace FeatureFlagEvaluationReasonValues
+
+namespace FeatureFlagResultReasonValues
+{
+/**
+ * The resolved value is static (no dynamic evaluation).
+ */
+static constexpr const char *kStatic = "static";
+
+/**
+ * The resolved value fell back to a pre-configured value (no dynamic evaluation occurred or dynamic
+ * evaluation yielded no result).
+ */
+static constexpr const char *kDefault = "default";
+
+/**
+ * The resolved value was the result of a dynamic evaluation, such as a rule or specific
+ * user-targeting.
+ */
+static constexpr const char *kTargetingMatch = "targeting_match";
+
+/**
+ * The resolved value was the result of pseudorandom assignment.
+ */
+static constexpr const char *kSplit = "split";
+
+/**
+ * The resolved value was retrieved from cache.
+ */
+static constexpr const char *kCached = "cached";
+
+/**
+ * The resolved value was the result of the flag being disabled in the management system.
+ */
+static constexpr const char *kDisabled = "disabled";
+
+/**
+ * The reason for the resolved value could not be determined.
+ */
+static constexpr const char *kUnknown = "unknown";
+
+/**
+ * The resolved value is non-authoritative or possibly out of date
+ */
+static constexpr const char *kStale = "stale";
+
+/**
+ * The resolved value was the result of an error.
+ */
+static constexpr const char *kError = "error";
+
+}  // namespace FeatureFlagResultReasonValues
 
 }  // namespace feature_flag
 }  // namespace semconv

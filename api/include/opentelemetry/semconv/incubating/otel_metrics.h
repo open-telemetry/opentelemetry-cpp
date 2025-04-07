@@ -21,6 +21,96 @@ namespace otel
 {
 
 /**
+ * The number of log records for which the export has finished, either successful or failed
+ * <p>
+ * For successful exports, @code error.type @endcode MUST NOT be set. For failed exports, @code
+ * error.type @endcode must contain the failure cause. For exporters with partial success semantics
+ * (e.g. OTLP with @code rejected_log_records @endcode), rejected log records must count as failed
+ * and only non-rejected log records count as success. If no rejection reason is available, @code
+ * rejected @endcode SHOULD be used as value for @code error.type @endcode. <p> counter
+ */
+static constexpr const char *kMetricOtelSdkExporterLogExported = "otel.sdk.exporter.log.exported";
+static constexpr const char *descrMetricOtelSdkExporterLogExported =
+    "The number of log records for which the export has finished, either successful or failed";
+static constexpr const char *unitMetricOtelSdkExporterLogExported = "{log_record}";
+
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricOtelSdkExporterLogExported(metrics::Meter *meter)
+{
+  return meter->CreateUInt64Counter(kMetricOtelSdkExporterLogExported,
+                                    descrMetricOtelSdkExporterLogExported,
+                                    unitMetricOtelSdkExporterLogExported);
+}
+
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricOtelSdkExporterLogExported(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricOtelSdkExporterLogExported,
+                                    descrMetricOtelSdkExporterLogExported,
+                                    unitMetricOtelSdkExporterLogExported);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricOtelSdkExporterLogExported(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableCounter(kMetricOtelSdkExporterLogExported,
+                                             descrMetricOtelSdkExporterLogExported,
+                                             unitMetricOtelSdkExporterLogExported);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricOtelSdkExporterLogExported(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricOtelSdkExporterLogExported,
+                                              descrMetricOtelSdkExporterLogExported,
+                                              unitMetricOtelSdkExporterLogExported);
+}
+
+/**
+ * The number of log records which were passed to the exporter, but that have not been exported yet
+ * (neither successful, nor failed) <p> For successful exports, @code error.type @endcode MUST NOT
+ * be set. For failed exports, @code error.type @endcode must contain the failure cause. <p>
+ * updowncounter
+ */
+static constexpr const char *kMetricOtelSdkExporterLogInflight = "otel.sdk.exporter.log.inflight";
+static constexpr const char *descrMetricOtelSdkExporterLogInflight =
+    "The number of log records which were passed to the exporter, but that have not been exported "
+    "yet (neither successful, nor failed)";
+static constexpr const char *unitMetricOtelSdkExporterLogInflight = "{log_record}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricOtelSdkExporterLogInflight(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricOtelSdkExporterLogInflight,
+                                         descrMetricOtelSdkExporterLogInflight,
+                                         unitMetricOtelSdkExporterLogInflight);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricOtelSdkExporterLogInflight(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricOtelSdkExporterLogInflight,
+                                          descrMetricOtelSdkExporterLogInflight,
+                                          unitMetricOtelSdkExporterLogInflight);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricOtelSdkExporterLogInflight(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricOtelSdkExporterLogInflight,
+                                                   descrMetricOtelSdkExporterLogInflight,
+                                                   unitMetricOtelSdkExporterLogInflight);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricOtelSdkExporterLogInflight(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricOtelSdkExporterLogInflight,
+                                                    descrMetricOtelSdkExporterLogInflight,
+                                                    unitMetricOtelSdkExporterLogInflight);
+}
+
+/**
  * The number of spans for which the export has finished, either successful or failed
  * <p>
  * For successful exports, @code error.type @endcode MUST NOT be set. For failed exports, @code
@@ -110,6 +200,178 @@ CreateAsyncDoubleMetricOtelSdkExporterSpanInflightCount(metrics::Meter *meter)
   return meter->CreateDoubleObservableUpDownCounter(kMetricOtelSdkExporterSpanInflightCount,
                                                     descrMetricOtelSdkExporterSpanInflightCount,
                                                     unitMetricOtelSdkExporterSpanInflightCount);
+}
+
+/**
+ * The number of logs submitted to enabled SDK Loggers
+ * <p>
+ * counter
+ */
+static constexpr const char *kMetricOtelSdkLogCreated = "otel.sdk.log.created";
+static constexpr const char *descrMetricOtelSdkLogCreated =
+    "The number of logs submitted to enabled SDK Loggers";
+static constexpr const char *unitMetricOtelSdkLogCreated = "{log_record}";
+
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricOtelSdkLogCreated(
+    metrics::Meter *meter)
+{
+  return meter->CreateUInt64Counter(kMetricOtelSdkLogCreated, descrMetricOtelSdkLogCreated,
+                                    unitMetricOtelSdkLogCreated);
+}
+
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricOtelSdkLogCreated(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricOtelSdkLogCreated, descrMetricOtelSdkLogCreated,
+                                    unitMetricOtelSdkLogCreated);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricOtelSdkLogCreated(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableCounter(kMetricOtelSdkLogCreated, descrMetricOtelSdkLogCreated,
+                                             unitMetricOtelSdkLogCreated);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricOtelSdkLogCreated(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(
+      kMetricOtelSdkLogCreated, descrMetricOtelSdkLogCreated, unitMetricOtelSdkLogCreated);
+}
+
+/**
+ * The number of log records for which the processing has finished, either successful or failed
+ * <p>
+ * For successful processing, @code error.type @endcode MUST NOT be set. For failed processing,
+ * @code error.type @endcode must contain the failure cause. For the SDK Simple and Batching Log
+ * Record Processor a log record is considered to be processed already when it has been submitted to
+ * the exporter, not when the corresponding export call has finished. <p> counter
+ */
+static constexpr const char *kMetricOtelSdkProcessorLogProcessed =
+    "otel.sdk.processor.log.processed";
+static constexpr const char *descrMetricOtelSdkProcessorLogProcessed =
+    "The number of log records for which the processing has finished, either successful or failed";
+static constexpr const char *unitMetricOtelSdkProcessorLogProcessed = "{log_record}";
+
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricOtelSdkProcessorLogProcessed(metrics::Meter *meter)
+{
+  return meter->CreateUInt64Counter(kMetricOtelSdkProcessorLogProcessed,
+                                    descrMetricOtelSdkProcessorLogProcessed,
+                                    unitMetricOtelSdkProcessorLogProcessed);
+}
+
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricOtelSdkProcessorLogProcessed(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricOtelSdkProcessorLogProcessed,
+                                    descrMetricOtelSdkProcessorLogProcessed,
+                                    unitMetricOtelSdkProcessorLogProcessed);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricOtelSdkProcessorLogProcessed(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableCounter(kMetricOtelSdkProcessorLogProcessed,
+                                             descrMetricOtelSdkProcessorLogProcessed,
+                                             unitMetricOtelSdkProcessorLogProcessed);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricOtelSdkProcessorLogProcessed(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricOtelSdkProcessorLogProcessed,
+                                              descrMetricOtelSdkProcessorLogProcessed,
+                                              unitMetricOtelSdkProcessorLogProcessed);
+}
+
+/**
+ * The maximum number of log records the queue of a given instance of an SDK Log Record processor
+ * can hold <p> Only applies to Log Record processors which use a queue, e.g. the SDK Batching Log
+ * Record Processor. <p> updowncounter
+ */
+static constexpr const char *kMetricOtelSdkProcessorLogQueueCapacity =
+    "otel.sdk.processor.log.queue.capacity";
+static constexpr const char *descrMetricOtelSdkProcessorLogQueueCapacity =
+    "The maximum number of log records the queue of a given instance of an SDK Log Record "
+    "processor can hold";
+static constexpr const char *unitMetricOtelSdkProcessorLogQueueCapacity = "{log_record}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricOtelSdkProcessorLogQueueCapacity(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricOtelSdkProcessorLogQueueCapacity,
+                                         descrMetricOtelSdkProcessorLogQueueCapacity,
+                                         unitMetricOtelSdkProcessorLogQueueCapacity);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricOtelSdkProcessorLogQueueCapacity(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricOtelSdkProcessorLogQueueCapacity,
+                                          descrMetricOtelSdkProcessorLogQueueCapacity,
+                                          unitMetricOtelSdkProcessorLogQueueCapacity);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricOtelSdkProcessorLogQueueCapacity(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricOtelSdkProcessorLogQueueCapacity,
+                                                   descrMetricOtelSdkProcessorLogQueueCapacity,
+                                                   unitMetricOtelSdkProcessorLogQueueCapacity);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricOtelSdkProcessorLogQueueCapacity(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricOtelSdkProcessorLogQueueCapacity,
+                                                    descrMetricOtelSdkProcessorLogQueueCapacity,
+                                                    unitMetricOtelSdkProcessorLogQueueCapacity);
+}
+
+/**
+ * The number of log records in the queue of a given instance of an SDK log processor
+ * <p>
+ * Only applies to log record processors which use a queue, e.g. the SDK Batching Log Record
+ * Processor. <p> updowncounter
+ */
+static constexpr const char *kMetricOtelSdkProcessorLogQueueSize =
+    "otel.sdk.processor.log.queue.size";
+static constexpr const char *descrMetricOtelSdkProcessorLogQueueSize =
+    "The number of log records in the queue of a given instance of an SDK log processor";
+static constexpr const char *unitMetricOtelSdkProcessorLogQueueSize = "{log_record}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricOtelSdkProcessorLogQueueSize(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricOtelSdkProcessorLogQueueSize,
+                                         descrMetricOtelSdkProcessorLogQueueSize,
+                                         unitMetricOtelSdkProcessorLogQueueSize);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricOtelSdkProcessorLogQueueSize(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricOtelSdkProcessorLogQueueSize,
+                                          descrMetricOtelSdkProcessorLogQueueSize,
+                                          unitMetricOtelSdkProcessorLogQueueSize);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricOtelSdkProcessorLogQueueSize(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricOtelSdkProcessorLogQueueSize,
+                                                   descrMetricOtelSdkProcessorLogQueueSize,
+                                                   unitMetricOtelSdkProcessorLogQueueSize);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricOtelSdkProcessorLogQueueSize(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricOtelSdkProcessorLogQueueSize,
+                                                    descrMetricOtelSdkProcessorLogQueueSize,
+                                                    unitMetricOtelSdkProcessorLogQueueSize);
 }
 
 /**
