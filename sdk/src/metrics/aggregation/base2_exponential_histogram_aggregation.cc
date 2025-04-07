@@ -37,19 +37,19 @@ uint32_t GetScaleReduction(int32_t start_index, int32_t end_index, size_t max_bu
   return scale_reduction;
 }
 
-uint32_t GetScaleReduction(const AdaptingCircularBufferCounter &first,
-                           const AdaptingCircularBufferCounter &second,
-                           size_t max_buckets)
-{
-  if (first.Empty() || second.Empty())
-  {
-    return 0;
-  }
-
-  const int32_t start_index = std::min(first.StartIndex(), second.StartIndex());
-  const int32_t end_index   = std::max(first.EndIndex(), second.EndIndex());
-  return GetScaleReduction(start_index, end_index, max_buckets);
-}
+// Commented out as it is not used
+// uint32_t GetScaleReduction(const AdaptingCircularBufferCounter &first,
+//                            const AdaptingCircularBufferCounter &second,
+//                            size_t max_buckets)
+// {
+//   if (first.Empty() || second.Empty())
+//   {
+//     return 0;
+//   }
+//   const int32_t start_index = std::min(first.StartIndex(), second.StartIndex());
+//   const int32_t end_index   = std::max(first.EndIndex(), second.EndIndex());
+//   return GetScaleReduction(start_index, end_index, max_buckets);
+// }
 
 void DownscaleBuckets(AdaptingCircularBufferCounter *buckets, uint32_t by) noexcept
 {
