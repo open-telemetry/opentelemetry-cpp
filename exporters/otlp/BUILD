@@ -418,6 +418,7 @@ cc_test(
     deps = [
         ":otlp_recordable",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -435,6 +436,7 @@ cc_test(
         ":otlp_recordable",
         "@com_github_opentelemetry_proto//:logs_service_proto_cc",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -452,6 +454,7 @@ cc_test(
         ":otlp_recordable",
         "//api",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -467,6 +470,7 @@ cc_test(
         ":otlp_grpc_exporter",
         "//api",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -482,6 +486,7 @@ cc_test(
         ":otlp_grpc_exporter",
         "//api",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -498,6 +503,7 @@ cc_test(
         "//api",
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -514,6 +520,7 @@ cc_test(
         "//api",
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -529,6 +536,7 @@ cc_test(
         ":otlp_file_exporter",
         "//api",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -544,6 +552,7 @@ cc_test(
         ":otlp_file_exporter",
         "//api",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -560,6 +569,7 @@ cc_test(
         "//api",
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -576,6 +586,7 @@ cc_test(
         "//api",
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -591,6 +602,7 @@ cc_test(
         ":otlp_file_log_record_exporter",
         "//api",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -606,6 +618,7 @@ cc_test(
         ":otlp_file_log_record_exporter",
         "//api",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -623,6 +636,7 @@ cc_test(
         "//api",
         "//sdk/src/logs",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -639,6 +653,7 @@ cc_test(
         "//api",
         "//sdk/src/logs",
         "@com_google_googletest//:gtest_main",
+        "//sdk/src/metrics"
     ],
 )
 
@@ -747,5 +762,6 @@ otel_cc_benchmark(
     deps = [
         ":otlp_grpc_exporter",
         "//examples/common/foo_library:common_foo_library",
+        "//sdk/src/metrics"
     ],
 )
