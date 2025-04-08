@@ -57,10 +57,6 @@ void InitMetrics(std::string &name)
 
   auto provider = metric_sdk::MeterProviderFactory::Create(std::move(context));
 
-  // auto provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
-
-  // std::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
-
   // histogram view
   std::string histogram_name = name + "_histogram";
   std::string unit           = "unit";
