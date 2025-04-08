@@ -37,30 +37,6 @@ namespace
 
 otlp_exporter::OtlpGrpcMetricExporterOptions exporter_options;
 
-void InitMetrics()
-{
-  auto exporter = otlp_exporter::OtlpGrpcMetricExporterFactory::Create(exporter_options);
-
-  std::string version{"1.2.0"};
-  std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
-
-  // Initialize and set the global MeterProvider
-  metric_sdk::PeriodicExportingMetricReaderOptions reader_options;
-  reader_options.export_interval_millis = std::chrono::milliseconds(1000);
-  reader_options.export_timeout_millis  = std::chrono::milliseconds(500);
-
-  auto reader =
-      metric_sdk::PeriodicExportingMetricReaderFactory::Create(std::move(exporter), reader_options);
-
-  auto context = metric_sdk::MeterContextFactory::Create();
-  context->AddMetricReader(std::move(reader));
-
-  auto u_provider = metric_sdk::MeterProviderFactory::Create(std::move(context));
-  std::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
-
-  metric_sdk::Provider::SetMeterProvider(provider);
-}
-
 void InitMetrics(std::string &name)
 {
   auto exporter = otlp_exporter::OtlpGrpcMetricExporterFactory::Create(exporter_options);
@@ -151,8 +127,6 @@ int main(int argc, char *argv[])
   std::string name{"otlp_grpc_metric_example"};
 
   InitMetrics(name);
-
-  // InitMetrics();
 
   if (example_type == "counter")
   {
