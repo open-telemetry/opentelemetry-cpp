@@ -99,6 +99,16 @@ static constexpr const char *kBatchingSpanProcessor = "batching_span_processor";
 static constexpr const char *kSimpleSpanProcessor = "simple_span_processor";
 
 /**
+ * The builtin SDK Batching LogRecord Processor
+ */
+static constexpr const char *kBatchingLogProcessor = "batching_log_processor";
+
+/**
+ * The builtin SDK Simple LogRecord Processor
+ */
+static constexpr const char *kSimpleLogProcessor = "simple_log_processor";
+
+/**
  * OTLP span exporter over gRPC with protobuf serialization
  */
 static constexpr const char *kOtlpGrpcSpanExporter = "otlp_grpc_span_exporter";
@@ -112,6 +122,21 @@ static constexpr const char *kOtlpHttpSpanExporter = "otlp_http_span_exporter";
  * OTLP span exporter over HTTP with JSON serialization
  */
 static constexpr const char *kOtlpHttpJsonSpanExporter = "otlp_http_json_span_exporter";
+
+/**
+ * OTLP LogRecord exporter over gRPC with protobuf serialization
+ */
+static constexpr const char *kOtlpGrpcLogExporter = "otlp_grpc_log_exporter";
+
+/**
+ * OTLP LogRecord exporter over HTTP with protobuf serialization
+ */
+static constexpr const char *kOtlpHttpLogExporter = "otlp_http_log_exporter";
+
+/**
+ * OTLP LogRecord exporter over HTTP with JSON serialization
+ */
+static constexpr const char *kOtlpHttpJsonLogExporter = "otlp_http_json_log_exporter";
 
 }  // namespace OtelComponentTypeValues
 

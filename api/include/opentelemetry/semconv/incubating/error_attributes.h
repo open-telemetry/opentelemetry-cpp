@@ -20,6 +20,18 @@ namespace error
 {
 
 /**
+ * A message providing more detail about an error in human-readable form.
+ * <p>
+ * @code error.message @endcode should provide additional context and detail about an error.
+ * It is NOT RECOMMENDED to duplicate the value of @code error.type @endcode in @code error.message
+ * @endcode. It is also NOT RECOMMENDED to duplicate the value of @code exception.message @endcode
+ * in @code error.message @endcode. <p>
+ * @code error.message @endcode is NOT RECOMMENDED for metrics or spans due to its unbounded
+ * cardinality and overlap with span status.
+ */
+static constexpr const char *kErrorMessage = "error.message";
+
+/**
  * Describes a class of error the operation ended with.
  * <p>
  * The @code error.type @endcode SHOULD be predictable, and SHOULD have low cardinality.
