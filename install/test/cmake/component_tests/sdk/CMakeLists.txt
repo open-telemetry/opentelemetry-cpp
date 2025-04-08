@@ -10,7 +10,7 @@ if(NOT TARGET Threads::Threads)
   message(FATAL_ERROR "Threads::Threads target not found")
 endif()
 
-find_package(GTest REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 include(GoogleTest)
 
 add_executable(sdk_test ${INSTALL_TEST_SRC_DIR}/test_sdk.cc)
@@ -24,7 +24,7 @@ target_link_libraries(
           opentelemetry-cpp::trace
           opentelemetry-cpp::metrics
           opentelemetry-cpp::logs
-          GTest::GTest
-          GTest::Main)
+          GTest::gtest
+          GTest::gtest_main)
 
 gtest_discover_tests(sdk_test)

@@ -10,11 +10,11 @@ if(NOT TARGET nlohmann_json::nlohmann_json)
   message(FATAL_ERROR "nlohmann_json::nlohmann_json target not found")
 endif()
 
-find_package(GTest REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 include(GoogleTest)
 
 add_executable(exporters_etw_test ${INSTALL_TEST_SRC_DIR}/test_exporters_etw.cc)
 target_link_libraries(exporters_etw_test PRIVATE opentelemetry-cpp::etw_exporter
-                                                 GTest::GTest GTest::Main)
+                                                 GTest::gtest GTest::gtest_main)
 
 gtest_discover_tests(exporters_etw_test)

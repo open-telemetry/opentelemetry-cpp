@@ -10,7 +10,7 @@ if(NOT TARGET protobuf::libprotobuf)
   message(FATAL_ERROR "protobuf::libprotobuf target not found")
 endif()
 
-find_package(GTest REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 include(GoogleTest)
 
 add_executable(exporters_otlp_http_test
@@ -21,7 +21,7 @@ target_link_libraries(
           opentelemetry-cpp::otlp_http_exporter
           opentelemetry-cpp::otlp_http_log_record_exporter
           opentelemetry-cpp::otlp_http_metric_exporter
-          GTest::GTest
-          GTest::Main)
+          GTest::gtest
+          GTest::gtest_main)
 
 gtest_discover_tests(exporters_otlp_http_test)

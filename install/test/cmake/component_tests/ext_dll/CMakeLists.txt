@@ -8,7 +8,7 @@ find_package(opentelemetry-cpp REQUIRED COMPONENTS ext_dll)
 
 add_definitions(-DOPENTELEMETRY_BUILD_IMPORT_DLL)
 
-find_package(GTest REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 include(GoogleTest)
 
 add_executable(ext_dll_test ${INSTALL_TEST_SRC_DIR}/test_ext_dll.cc)
@@ -17,6 +17,6 @@ target_include_directories(ext_dll_test
                            PRIVATE ${OPENTELEMETRY_CPP_INCLUDE_DIRS})
 
 target_link_libraries(ext_dll_test PRIVATE opentelemetry-cpp::opentelemetry_cpp
-                                           GTest::GTest GTest::Main)
+                                           GTest::gtest GTest::gtest_main)
 
 gtest_discover_tests(ext_dll_test)

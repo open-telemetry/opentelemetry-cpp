@@ -14,7 +14,7 @@ if(NOT TARGET gRPC::grpc++)
   message(FATAL_ERROR "gRPC::grpc++ target not found")
 endif()
 
-find_package(GTest REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 include(GoogleTest)
 
 add_executable(exporters_otlp_grpc_test
@@ -24,7 +24,7 @@ target_link_libraries(
   PRIVATE opentelemetry-cpp::otlp_grpc_exporter
           opentelemetry-cpp::otlp_grpc_log_record_exporter
           opentelemetry-cpp::otlp_grpc_metrics_exporter
-          GTest::GTest
-          GTest::Main)
+          GTest::gtest
+          GTest::gtest_main)
 
 gtest_discover_tests(exporters_otlp_grpc_test)

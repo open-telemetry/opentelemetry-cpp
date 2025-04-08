@@ -60,7 +60,7 @@ message(
     "Testing the full package install on components = ${INSTALL_TEST_COMPONENTS}"
 )
 
-find_package(GTest REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 include(GoogleTest)
 
 add_executable(full_test)
@@ -73,6 +73,6 @@ endforeach()
 
 target_include_directories(full_test PRIVATE ${OPENTELEMETRY_CPP_INCLUDE_DIRS})
 target_link_libraries(full_test PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES}
-                                        GTest::GTest GTest::Main)
+                                        GTest::gtest GTest::gtest_main)
 
 gtest_discover_tests(full_test)

@@ -10,13 +10,13 @@ if(NOT TARGET OpenTracing::opentracing)
   message(FATAL_ERROR "OpenTracing::opentracing target not found")
 endif()
 
-find_package(GTest REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 include(GoogleTest)
 
 add_executable(shims_opentracing_test
                ${INSTALL_TEST_SRC_DIR}/test_shims_opentracing.cc)
 target_link_libraries(
   shims_opentracing_test PRIVATE opentelemetry-cpp::opentracing_shim
-                                 GTest::GTest GTest::Main)
+                                 GTest::gtest GTest::gtest_main)
 
 gtest_discover_tests(shims_opentracing_test)
