@@ -20,6 +20,67 @@ namespace gcp
 {
 
 /**
+ * The container within GCP where the AppHub application is defined.
+ */
+static constexpr const char *kGcpApphubApplicationContainer = "gcp.apphub.application.container";
+
+/**
+ * The name of the application as configured in AppHub.
+ */
+static constexpr const char *kGcpApphubApplicationId = "gcp.apphub.application.id";
+
+/**
+ * The GCP zone or region where the application is defined.
+ */
+static constexpr const char *kGcpApphubApplicationLocation = "gcp.apphub.application.location";
+
+/**
+ * Criticality of a service indicates its importance to the business.
+ * <p>
+ * <a href="https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type">See AppHub type
+ * enum</a>
+ */
+static constexpr const char *kGcpApphubServiceCriticalityType =
+    "gcp.apphub.service.criticality_type";
+
+/**
+ * Environment of a service is the stage of a software lifecycle.
+ * <p>
+ * <a href="https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type_1">See AppHub
+ * environment type</a>
+ */
+static constexpr const char *kGcpApphubServiceEnvironmentType =
+    "gcp.apphub.service.environment_type";
+
+/**
+ * The name of the service as configured in AppHub.
+ */
+static constexpr const char *kGcpApphubServiceId = "gcp.apphub.service.id";
+
+/**
+ * Criticality of a workload indicates its importance to the business.
+ * <p>
+ * <a href="https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type">See AppHub type
+ * enum</a>
+ */
+static constexpr const char *kGcpApphubWorkloadCriticalityType =
+    "gcp.apphub.workload.criticality_type";
+
+/**
+ * Environment of a workload is the stage of a software lifecycle.
+ * <p>
+ * <a href="https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type_1">See AppHub
+ * environment type</a>
+ */
+static constexpr const char *kGcpApphubWorkloadEnvironmentType =
+    "gcp.apphub.workload.environment_type";
+
+/**
+ * The name of the workload as configured in AppHub.
+ */
+static constexpr const char *kGcpApphubWorkloadId = "gcp.apphub.workload.id";
+
+/**
  * Identifies the Google Cloud service for which the official client library is intended.
  * <p>
  * Intended to be a stable identifier for Google Cloud client libraries that is uniform across
@@ -58,6 +119,102 @@ static constexpr const char *kGcpGceInstanceHostname = "gcp.gce.instance.hostnam
  * internal DNS name</a>.
  */
 static constexpr const char *kGcpGceInstanceName = "gcp.gce.instance.name";
+
+namespace GcpApphubServiceCriticalityTypeValues
+{
+/**
+ * Mission critical service.
+ */
+static constexpr const char *kMissionCritical = "MISSION_CRITICAL";
+
+/**
+ * High impact.
+ */
+static constexpr const char *kHigh = "HIGH";
+
+/**
+ * Medium impact.
+ */
+static constexpr const char *kMedium = "MEDIUM";
+
+/**
+ * Low impact.
+ */
+static constexpr const char *kLow = "LOW";
+
+}  // namespace GcpApphubServiceCriticalityTypeValues
+
+namespace GcpApphubServiceEnvironmentTypeValues
+{
+/**
+ * Production environment.
+ */
+static constexpr const char *kProduction = "PRODUCTION";
+
+/**
+ * Staging environment.
+ */
+static constexpr const char *kStaging = "STAGING";
+
+/**
+ * Test environment.
+ */
+static constexpr const char *kTest = "TEST";
+
+/**
+ * Development environment.
+ */
+static constexpr const char *kDevelopment = "DEVELOPMENT";
+
+}  // namespace GcpApphubServiceEnvironmentTypeValues
+
+namespace GcpApphubWorkloadCriticalityTypeValues
+{
+/**
+ * Mission critical service.
+ */
+static constexpr const char *kMissionCritical = "MISSION_CRITICAL";
+
+/**
+ * High impact.
+ */
+static constexpr const char *kHigh = "HIGH";
+
+/**
+ * Medium impact.
+ */
+static constexpr const char *kMedium = "MEDIUM";
+
+/**
+ * Low impact.
+ */
+static constexpr const char *kLow = "LOW";
+
+}  // namespace GcpApphubWorkloadCriticalityTypeValues
+
+namespace GcpApphubWorkloadEnvironmentTypeValues
+{
+/**
+ * Production environment.
+ */
+static constexpr const char *kProduction = "PRODUCTION";
+
+/**
+ * Staging environment.
+ */
+static constexpr const char *kStaging = "STAGING";
+
+/**
+ * Test environment.
+ */
+static constexpr const char *kTest = "TEST";
+
+/**
+ * Development environment.
+ */
+static constexpr const char *kDevelopment = "DEVELOPMENT";
+
+}  // namespace GcpApphubWorkloadEnvironmentTypeValues
 
 }  // namespace gcp
 }  // namespace semconv
