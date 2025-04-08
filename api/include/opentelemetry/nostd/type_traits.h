@@ -6,17 +6,7 @@
 #if defined(OPENTELEMETRY_STL_VERSION)
 #  if OPENTELEMETRY_STL_VERSION >= 2011
 #    include "opentelemetry/std/type_traits.h"
-#    define OPENTELEMETRY_HAVE_STD_TYPE_TRAITS
 #  endif
-#endif
-
-#if !defined(OPENTELEMETRY_HAVE_STD_TYPE_TRAITS)
-#  include <array>
-#  include <type_traits>
-
-#  include "opentelemetry/config.h"
-#  include "opentelemetry/nostd/detail/void.h"  // IWYU pragma: export
-#  include "opentelemetry/version.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
