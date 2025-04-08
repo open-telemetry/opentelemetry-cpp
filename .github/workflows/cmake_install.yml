@@ -12,6 +12,7 @@ jobs:
     name: Windows 2022 vcpkg submodule versions cxx17 (static libs - dll)
     runs-on: windows-2022
     env:
+      CMAKE_VERSION: '3.31.6'
       CXX_STANDARD: '17'
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -79,6 +80,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
+      CMAKE_VERSION: '3.31.6'
       CXX_STANDARD: '20'
       GOOGLETEST_VERSION: '1.16.0'
       ABSEIL_CPP_VERSION: '20240722.1'
@@ -145,8 +147,8 @@ jobs:
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
       CMAKE_VERSION: '3.14.0'
-      GOOGLETEST_VERSION: '1.11.0'
       CXX_STANDARD: '14'
+      GOOGLETEST_VERSION: '1.11.0'
       ABSEIL_CPP_VERSION: '20220623.2'
       PROTOBUF_VERSION: '21.12'
       GRPC_VERSION: 'v1.49.2'
@@ -216,6 +218,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
+      CMAKE_VERSION: '3.31.6'
       CXX_STANDARD: '17'
       CMAKE_TOOLCHAIN_FILE: /home/runner/conan/build/Debug/generators/conan_toolchain.cmake
       BUILD_TYPE: 'Debug'
@@ -246,8 +249,8 @@ jobs:
     runs-on: macos-14
     env:
       INSTALL_TEST_DIR: '/Users/runner/install_test'
-      CXX_STANDARD: '17'
       CMAKE_VERSION: '3.28.3'
+      CXX_STANDARD: '17'
       CMAKE_TOOLCHAIN_FILE: '/Users/runner/conan/build/Debug/generators/conan_toolchain.cmake'
       BUILD_TYPE: 'Debug'
     steps:
@@ -270,6 +273,8 @@ jobs:
     name: macOS 14 brew latest versions cxx17 (static libs)
     runs-on: macos-14
     env:
+      INSTALL_TEST_DIR: '/Users/runner/install_test'
+      CMAKE_VERSION: '3.31.6'
       CXX_STANDARD: '17'
       BUILD_TYPE: 'Debug'
     steps:
