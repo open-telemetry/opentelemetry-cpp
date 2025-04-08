@@ -42,6 +42,16 @@ static constexpr const char *kVcsChangeTitle = "vcs.change.title";
 static constexpr const char *kVcsLineChangeType = "vcs.line_change.type";
 
 /**
+ * The group owner within the version control system.
+ */
+static constexpr const char *kVcsOwnerName = "vcs.owner.name";
+
+/**
+ * The name of the version control system provider.
+ */
+static constexpr const char *kVcsProviderName = "vcs.provider.name";
+
+/**
  * The name of the <a href="https://git-scm.com/docs/gitglossary#def_ref">reference</a> such as
  * <strong>branch</strong> or <strong>tag</strong> in the repository. <p>
  * @code base @endcode refers to the starting point of a change. For example, @code main @endcode
@@ -227,6 +237,30 @@ static constexpr const char *kAdded = "added";
 static constexpr const char *kRemoved = "removed";
 
 }  // namespace VcsLineChangeTypeValues
+
+namespace VcsProviderNameValues
+{
+/**
+ * <a href="https://github.com">GitHub</a>
+ */
+static constexpr const char *kGithub = "github";
+
+/**
+ * <a href="https://gitlab.com">GitLab</a>
+ */
+static constexpr const char *kGitlab = "gitlab";
+
+/**
+ * <a href="https://gitea.io">Gitea</a>
+ */
+static constexpr const char *kGittea = "gittea";
+
+/**
+ * <a href="https://bitbucket.org">Bitbucket</a>
+ */
+static constexpr const char *kBitbucket = "bitbucket";
+
+}  // namespace VcsProviderNameValues
 
 namespace VcsRefBaseTypeValues
 {
