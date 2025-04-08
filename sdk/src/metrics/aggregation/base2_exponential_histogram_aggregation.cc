@@ -1,20 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <cmath>
+#include <iostream>
+#include <limits>
+
 #include "opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h"
-#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/data/circular_buffer.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/version.h"
-
-#include <cmath>
-#include <cstddef>
-#include <exception>
-#include <limits>
-#include <memory>
-#include <mutex>
-
-#include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -46,8 +40,8 @@ uint32_t GetScaleReduction(int32_t start_index, int32_t end_index, size_t max_bu
 //   {
 //     return 0;
 //   }
-//   const int32_t start_index = std::min(first.StartIndex(), second.StartIndex());
-//   const int32_t end_index   = std::max(first.EndIndex(), second.EndIndex());
+//   const int32_t start_index = (std::min)(first.StartIndex(), second.StartIndex());
+//   const int32_t end_index   = (std::max)(first.EndIndex(), second.EndIndex());
 //   return GetScaleReduction(start_index, end_index, max_buckets);
 // }
 
@@ -91,8 +85,8 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
   point_data_.max_buckets_    = ac->max_buckets_;
   point_data_.scale_          = ac->max_scale_;
   point_data_.record_min_max_ = ac->record_min_max_;
-  point_data_.min_            = std::numeric_limits<double>::max();
-  point_data_.max_            = std::numeric_limits<double>::min();
+  point_data_.min_            = (std::numeric_limits<double>::max)();
+  point_data_.max_            = (std::numeric_limits<double>::min)();
 
   indexer_ = Base2ExponentialHistogramIndexer(point_data_.scale_);
 }
@@ -128,8 +122,8 @@ void Base2ExponentialHistogramAggregation::Aggregate(
 
   if (record_min_max_)
   {
-    point_data_.min_ = std::min(point_data_.min_, value);
-    point_data_.max_ = std::max(point_data_.max_, value);
+    point_data_.min_ = (std::min)(point_data_.min_, value);
+    point_data_.max_ = (std::max)(point_data_.max_, value);
   }
 
   if (value == 0)
@@ -159,8 +153,8 @@ void Base2ExponentialHistogramAggregation::AggregateIntoBuckets(
   const int32_t index = indexer_.ComputeIndex(value);
   if (!buckets->Increment(index, 1))
   {
-    const int32_t start_index = std::min(buckets->StartIndex(), index);
-    const int32_t end_index   = std::max(buckets->EndIndex(), index);
+    const int32_t start_index = (std::min)(buckets->StartIndex(), index);
+    const int32_t end_index   = (std::max)(buckets->EndIndex(), index);
     const uint32_t scale_reduction =
         GetScaleReduction(start_index, end_index, point_data_.max_buckets_);
     Downscale(scale_reduction);
@@ -205,13 +199,13 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
   result_value.count_          = low_res.count_ + high_res.count_;
   result_value.sum_            = low_res.sum_ + high_res.sum_;
   result_value.zero_count_     = low_res.zero_count_ + high_res.zero_count_;
-  result_value.scale_          = std::min(low_res.scale_, high_res.scale_);
+  result_value.scale_          = (std::min)(low_res.scale_, high_res.scale_);
   result_value.max_buckets_    = low_res.max_buckets_;
   result_value.record_min_max_ = low_res.record_min_max_ && high_res.record_min_max_;
   if (result_value.record_min_max_)
   {
-    result_value.min_ = std::min(low_res.min_, high_res.min_);
-    result_value.max_ = std::max(low_res.max_, high_res.max_);
+    result_value.min_ = (std::min)(low_res.min_, high_res.min_);
+    result_value.max_ = (std::max)(low_res.max_, high_res.max_);
   }
   if (!high_res.positive_buckets_.Empty())
   {

@@ -241,8 +241,8 @@ TEST(aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(histo_point.count_, 0);
   EXPECT_EQ(histo_point.sum_, 0.0);
   EXPECT_EQ(histo_point.zero_count_, 0);
-  EXPECT_EQ(histo_point.min_, std::numeric_limits<double>::max());
-  EXPECT_EQ(histo_point.max_, std::numeric_limits<double>::min());
+  EXPECT_EQ(histo_point.min_, (std::numeric_limits<double>::max)());
+  EXPECT_EQ(histo_point.max_, (std::numeric_limits<double>::min)());
   EXPECT_EQ(histo_point.scale_, SCALE0);
   EXPECT_EQ(histo_point.max_buckets_, MAX_BUCKETS0);
   ASSERT_TRUE(histo_point.positive_buckets_.Empty());

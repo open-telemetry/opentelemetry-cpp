@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <stddef.h>
-#include <cstdint>
 #include <limits>
 #include <vector>
 
@@ -144,7 +142,7 @@ public:
 private:
   size_t ToBufferIndex(int32_t index) const;
 
-  static constexpr int32_t kNullIndex = std::numeric_limits<int32_t>::min();
+  static constexpr int32_t kNullIndex = (std::numeric_limits<int32_t>::min)();
 
   // Index of the first populated element, may be kNullIndex if container is empty.
   int32_t start_index_ = kNullIndex;
