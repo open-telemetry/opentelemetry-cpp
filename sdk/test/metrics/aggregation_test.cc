@@ -296,6 +296,7 @@ TEST(aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(scale1_point.min_, 0.0);
   EXPECT_EQ(scale1_point.max_, 3.5);
 
+  // Merge test
   auto merged       = scale0_aggr.Merge(scale1_aggr);
   auto merged_point = nostd::get<Base2ExponentialHistogramPointData>(merged->ToPoint());
   EXPECT_EQ(merged_point.count_, 8);
