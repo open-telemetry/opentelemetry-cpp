@@ -105,10 +105,7 @@ public:
   }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  bool Enabled() noexcept override
-  {
-    return true;
-  }
+  bool Enabled() noexcept override { return true; }
 #endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO == 1
