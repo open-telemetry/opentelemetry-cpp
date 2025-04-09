@@ -508,6 +508,12 @@ TEST(Tracer, StartSpanWithDisabledConfig)
       std::make_shared<opentelemetry::trace::NoopTracer>();
   auto noop_span = noop_tracer->StartSpan("noop");
   EXPECT_TRUE(span.get() == noop_span.get());
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  std::cout << "Running tests for APPI v2 \n";
+  EXPECT_FALSE(noop_tracer->Enabled());
+  EXPECT_FALSE(tracer->Enabled());
+#endif
 }
 
 TEST(Tracer, StartSpanWithEnabledConfig)
@@ -524,6 +530,11 @@ TEST(Tracer, StartSpanWithEnabledConfig)
       std::make_shared<opentelemetry::trace::NoopTracer>();
   auto noop_span = noop_tracer->StartSpan("noop");
   EXPECT_FALSE(span.get() == noop_span.get());
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  EXPECT_FALSE(noop_tracer->Enabled());
+  EXPECT_TRUE(tracer->Enabled());
+#endif
 }
 
 TEST(Tracer, StartSpanWithCustomConfig)
@@ -567,6 +578,14 @@ TEST(Tracer, StartSpanWithCustomConfig)
                  new RandomIdGenerator(), custom_configurator, std::move(bar_scope));
   auto span_bar_scope = tracer_bar_scope->StartSpan("span 1");
   EXPECT_FALSE(span_bar_scope == noop_span);
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  EXPECT_FALSE(noop_tracer->Enabled());
+  EXPECT_FALSE(tracer_default_scope->Enabled());
+  EXPECT_FALSE(tracer_foo_scope->Enabled());
+  EXPECT_TRUE(tracer_foo_scope_with_version->Enabled());
+  EXPECT_TRUE(tracer_bar_scope->Enabled());
+#endif
 }
 
 TEST(Tracer, StartSpanWithCustomConfigDifferingConditionOrder)
@@ -608,6 +627,11 @@ TEST(Tracer, StartSpanWithCustomConfigDifferingConditionOrder)
   // evaluating other condition
   const auto span_foo_scope_with_version_2 = tracer_foo_scope_with_version_2->StartSpan("span 1");
   EXPECT_TRUE(span_foo_scope_with_version_2 == noop_span);
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  EXPECT_TRUE(tracer_foo_scope_with_version_1->Enabled());
+  EXPECT_FALSE(tracer_foo_scope_with_version_2->Enabled());
+#endif
 }
 
 TEST(Tracer, SpanSetLinks)
