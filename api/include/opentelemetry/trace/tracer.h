@@ -163,6 +163,19 @@ public:
     }
   }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  /**
+   * Reports if the tracer is enabled or not. A disabled tracer will not create spans.
+   *
+   * The returned value can change over time so the instrumentation authors must call this method
+   * every time before creating a span to potentially avoid performing computationally expensive
+   * operations.
+   *
+   * @since ABI_VERSION 2
+   */
+  virtual bool Enabled() noexcept = 0;
+#endif
+
 #if OPENTELEMETRY_ABI_VERSION_NO == 1
 
   /*

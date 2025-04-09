@@ -71,6 +71,8 @@ public:
   }
 
   void CloseWithMicroseconds(uint64_t timeout) noexcept;
+
+  bool Enabled() noexcept override;
 #else
   /* Exposed in the API in ABI version 1, but does not belong to the API */
   void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override;

@@ -108,6 +108,13 @@ public:
     return noop_span;
   }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  bool Enabled() noexcept override
+  {
+    return false;
+  }
+#endif
+
 #if OPENTELEMETRY_ABI_VERSION_NO == 1
 
   void ForceFlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}

@@ -163,6 +163,13 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
   }
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+bool Tracer::Enabled() noexcept
+{
+  return tracer_config_.IsEnabled();
+}
+#endif
+
 void Tracer::ForceFlushWithMicroseconds(uint64_t timeout) noexcept
 {
   if (context_)

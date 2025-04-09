@@ -91,3 +91,10 @@ nostd::shared_ptr<trace::Span> Tracer::StartSpan(nostd::string_view name,
   return nostd::shared_ptr<trace::Span>{
       new (std::nothrow) Span{this->shared_from_this(), name, attributes, links, options}};
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+bool Tracer::Enabled() noexcept
+{
+  return true;
+}
+#endif
