@@ -488,16 +488,32 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
         }
         auto multi_storage = static_cast<SyncMultiMetricStorage *>(storages.get());
 
-        auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
-            view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
+        if (auto storage_iter = storage_registry_.find(view_instr_desc.name_);
+            storage_iter != storage_registry_.end())
+        {
+          auto storage = std::dynamic_pointer_cast<SyncMetricStorage>(storage_iter->second);
+          if (!storage)
+          {
+            OTEL_INTERNAL_LOG_ERROR(
+                "[Meter::RegisterSyncMetricStorage] - Error during finding matching views."
+                << "The storage is not of type SyncMetricStorage");
+            return false;
+          }
+          multi_storage->AddStorage(storage);
+        }
+        else
+        {
+          auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
+              view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-            exemplar_filter_type,
-            GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
-                                 instrument_descriptor),
+              exemplar_filter_type,
+              GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
+                                   instrument_descriptor),
 #endif
-            view.GetAggregationConfig()));
-        storage_registry_[instrument_descriptor.name_] = storage;
-        multi_storage->AddStorage(storage);
+              view.GetAggregationConfig()));
+          storage_registry_.insert({instrument_descriptor.name_, storage});
+          multi_storage->AddStorage(storage);
+        }
         return true;
       });
 
@@ -546,16 +562,33 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         {
           view_instr_desc.description_ = view.GetDescription();
         }
-        auto storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
-            view_instr_desc, view.GetAggregationType(),
+        if (auto storage_iter = storage_registry_.find(view_instr_desc.name_);
+            storage_iter != storage_registry_.end())
+        {
+          auto storage = std::dynamic_pointer_cast<AsyncMetricStorage>(storage_iter->second);
+          if (!storage)
+          {
+            OTEL_INTERNAL_LOG_ERROR(
+                "[Meter::RegisterAsyncMetricStorage] - Error during finding matching views."
+                << "The storage is not of type AsyncMetricStorage");
+            return false;
+          }
+          static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
+          return true;
+        }
+        else
+        {
+          auto storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
+              view_instr_desc, view.GetAggregationType(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-            exemplar_filter_type,
-            GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
-                                 instrument_descriptor),
+              exemplar_filter_type,
+              GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
+                                   instrument_descriptor),
 #endif
-            view.GetAggregationConfig()));
-        storage_registry_[instrument_descriptor.name_] = storage;
-        static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
+              view.GetAggregationConfig()));
+          storage_registry_[instrument_descriptor.name_] = storage;
+          static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
+        }
         return true;
       });
   if (!success)

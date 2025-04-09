@@ -372,3 +372,57 @@ TEST(MeterTest, MeterWithCustomConfig)
     return true;
   });
 }
+
+TEST(MeterTest, IdenticalSyncInstrumentTests)
+{
+  MetricReader *metric_reader_ptr = nullptr;
+  auto meter                      = InitMeter(&metric_reader_ptr);
+  auto counter1                   = meter->CreateUInt64Counter("my_counter");
+  auto counter2                   = meter->CreateUInt64Counter("my_counter");
+
+  counter1->Add(1, {{"key", "value1"}});
+  counter2->Add(1, {{"key", "value2"}});
+
+  size_t count = 0;
+  metric_reader_ptr->Collect([&count](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_.size(), 2);
+    return true;
+  });
+}
+
+
+TEST(MeterTest, IdenticalAsyncInstrumentTests)
+{
+  MetricReader *metric_reader_ptr = nullptr;
+  auto meter                      = InitMeter(&metric_reader_ptr);
+  auto observable_counter1         = meter->CreateInt64ObservableCounter("observable_counter");
+  auto callback1 = [](opentelemetry::metrics::ObserverResult observer,
+    void * /* state */) 
+    {
+      auto observer_long =
+      nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>>>(observer);
+      observer_long->Observe(10, {{"key1", "value1"}});
+    };
+
+  observable_counter1->AddCallback(callback1, nullptr);
+
+  auto observable_counter2         = meter->CreateInt64ObservableCounter("observable_counter");
+  auto callback2 = [](opentelemetry::metrics::ObserverResult observer,
+    void * /* state */) 
+    {
+      auto observer_long =
+      nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>>>(observer);
+      observer_long->Observe(10, {{"key1", "value2"}});
+    };
+  observable_counter2->AddCallback(callback2, nullptr);
+
+  size_t count = 0;
+  metric_reader_ptr->Collect([&count](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_.size(), 2);
+    return true;
+  });
+}
