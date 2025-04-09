@@ -104,6 +104,13 @@ public:
     return nostd::shared_ptr<trace::Span>{new (std::nothrow) Span{this->shared_from_this(), span}};
   }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  bool Enabled() noexcept override
+  {
+    return true;
+  }
+#endif
+
 #if OPENTELEMETRY_ABI_VERSION_NO == 1
 
   void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override

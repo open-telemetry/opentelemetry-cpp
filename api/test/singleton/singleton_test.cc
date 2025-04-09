@@ -285,6 +285,15 @@ public:
     return result;
   }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+  bool Enabled() noexcept override
+  {
+    return true;
+  }
+
+#endif
+
 #if OPENTELEMETRY_ABI_VERSION_NO == 1
 
   void ForceFlushWithMicroseconds(uint64_t /* timeout */) noexcept override {}
