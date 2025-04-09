@@ -66,7 +66,7 @@ public:
   template <class T,
             class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr,
-            nostd::enable_if_t<detail::is_span_context_kv_iterable<U>::value> *   = nullptr>
+            nostd::enable_if_t<detail::is_span_context_kv_iterable<U>::value>   * = nullptr>
   nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
                                     const T &attributes,
                                     const U &links,
@@ -167,9 +167,8 @@ public:
   /**
    * Reports if the tracer is enabled or not. A disabled tracer will not create spans.
    *
-   * The returned value can change over time so the instrumentation authors must call this method
-   * every time before creating a span to potentially avoid performing computationally expensive
-   * operations.
+   * The instrumentation authors must call this method very time before creating a span to
+   * potentially avoid performing computationally expensive operations for disabled tracers.
    *
    * @since ABI_VERSION 2
    */
