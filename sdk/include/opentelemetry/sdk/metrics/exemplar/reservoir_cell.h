@@ -125,6 +125,7 @@ private:
         res.erase(it);
       }
     }
+    res.UpdateHash();
     return res;
   }
 

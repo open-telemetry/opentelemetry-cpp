@@ -38,6 +38,7 @@ foreach(
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     metrics_common_test_utils opentelemetry_resources)
+  target_compile_definitions(${testname} PRIVATE UNIT_TESTING)
   gtest_add_tests(
     TARGET ${testname}
     TEST_PREFIX metrics.

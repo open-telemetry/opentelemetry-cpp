@@ -65,6 +65,7 @@ struct InstrumentDescriptor
 };
 
 using MetricAttributes               = opentelemetry::sdk::metrics::FilteredOrderedAttributeMap;
+using MetricAttributesHash           = opentelemetry::sdk::metrics::FilteredOrderedAttributeMapHash;
 using AggregationTemporalitySelector = std::function<AggregationTemporality(InstrumentType)>;
 
 /*class InstrumentSelector {

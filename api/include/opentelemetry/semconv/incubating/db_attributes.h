@@ -343,6 +343,9 @@ static constexpr const char *kDbOperationBatchSize = "db.operation.batch.size";
  * The operation name SHOULD NOT be extracted from @code db.query.text @endcode,
  * when the database system supports cross-table queries in non-batch operations.
  * <p>
+ * If spaces can occur in the operation name, multiple consecutive spaces
+ * SHOULD be normalized to a single space.
+ * <p>
  * For batch operations, if the individual operations are known to have the same operation name
  * then that operation name SHOULD be used prepended by @code BATCH  @endcode,
  * otherwise @code db.operation.name @endcode SHOULD be @code BATCH @endcode or some other database
@@ -357,6 +360,7 @@ static constexpr const char *kDbOperationName = "db.operation.name";
  * index. If @code db.query.text @endcode is also captured, then @code db.operation.parameter.<key>
  * @endcode SHOULD match up with the parameterized placeholders present in @code db.query.text
  * @endcode.
+ * @code db.operation.parameter.<key> @endcode SHOULD NOT be captured on batch operations.
  */
 static constexpr const char *kDbOperationParameter = "db.operation.parameter";
 
@@ -422,10 +426,12 @@ static constexpr const char *kDbResponseReturnedRows = "db.response.returned_row
 static constexpr const char *kDbResponseStatusCode = "db.response.status_code";
 
 /**
- * Deprecated, use @code db.collection.name @endcode instead.
+ * Deprecated, use @code db.collection.name @endcode instead, but only if not extracting the value
+ * from @code db.query.text @endcode.
  *
  * @deprecated
- * {"note": "Replaced by @code db.collection.name @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code db.collection.name @endcode, but only if not extracting the value
+ * from @code db.query.text @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbSqlTable = "db.sql.table";
 
@@ -436,6 +442,17 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kDbSqlTable = "db.sql.tabl
  * {"note": "Replaced by @code db.query.text @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbStatement = "db.statement";
+
+/**
+ * The name of a stored procedure within the database.
+ * <p>
+ * It is RECOMMENDED to capture the value as provided by the application
+ * without attempting to do any case normalization.
+ * <p>
+ * For batch operations, if the individual operations are known to have the same
+ * stored procedure name then that stored procedure name SHOULD be used.
+ */
+static constexpr const char *kDbStoredProcedureName = "db.stored_procedure.name";
 
 /**
  * Deprecated, use @code db.system.name @endcode instead.

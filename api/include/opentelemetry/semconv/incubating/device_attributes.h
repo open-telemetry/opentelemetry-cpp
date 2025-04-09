@@ -22,17 +22,24 @@ namespace device
 /**
  * A unique identifier representing the device
  * <p>
- * The device identifier MUST only be defined using the values outlined below. This value is not an
- * advertising identifier and MUST NOT be used as such. On iOS (Swift or Objective-C), this value
- * MUST be equal to the <a
- * href="https://developer.apple.com/documentation/uikit/uidevice/1620059-identifierforvendor">vendor
- * identifier</a>. On Android (Java or Kotlin), this value MUST be equal to the Firebase
- * Installation ID or a globally unique UUID which is persisted across sessions in your application.
- * More information can be found <a
- * href="https://developer.android.com/training/articles/user-data-ids">here</a> on best practices
- * and exact implementation details. Caution should be taken when storing personal data or anything
- * which can identify a user. GDPR and data protection laws may apply, ensure you do your own due
- * diligence.
+ * Its value SHOULD be identical for all apps on a device and it SHOULD NOT change if an app is
+ * uninstalled and re-installed. However, it might be resettable by the user for all apps on a
+ * device. Hardware IDs (e.g. vendor-specific serial number, IMEI or MAC address) MAY be used as
+ * values. <p> More information about Android identifier best practices can be found <a
+ * href="https://developer.android.com/training/articles/user-data-ids">here</a>. <blockquote>
+ * [!WARNING]
+ * <p>
+ * This attribute may contain sensitive (PII) information. Caution should be taken when storing
+ * personal data or anything which can identify a user. GDPR and data protection laws may apply,
+ * ensure you do your own due diligence.
+ * <p>
+ * Due to these reasons, this identifier is not recommended for consumer applications and will
+ * likely result in rejection from both Google Play and App Store. However, it may be appropriate
+ * for specific enterprise scenarios, such as kiosk devices or enterprise-managed devices, with
+ * appropriate compliance clearance. Any instrumentation providing this identifier MUST implement it
+ * as an opt-in feature. <p> See <a
+ * href="/docs/attributes-registry/app.md#app-installation-id">@code app.installation.id
+ * @endcode</a> for a more privacy-preserving alternative.</blockquote>
  */
 static constexpr const char *kDeviceId = "device.id";
 

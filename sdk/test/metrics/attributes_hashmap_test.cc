@@ -5,12 +5,10 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <functional>
-#include <map>
 #include <memory>
 #include <string>
 #include <utility>
 
-#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
@@ -28,34 +26,32 @@ TEST(AttributesHashMap, BasicTests)
   AttributesHashMap hash_map;
   EXPECT_EQ(hash_map.Size(), 0);
   MetricAttributes m1 = {{"k1", "v1"}};
-  auto hash           = opentelemetry::sdk::common::GetHashForAttributeMap(m1);
 
-  EXPECT_EQ(hash_map.Get(hash), nullptr);
-  EXPECT_EQ(hash_map.Has(hash), false);
+  EXPECT_EQ(hash_map.Get(m1), nullptr);
+  EXPECT_EQ(hash_map.Has(m1), false);
 
   // Set
   std::unique_ptr<Aggregation> aggregation1(
       new DropAggregation());  //  = std::unique_ptr<Aggregation>(new DropAggregation);
-  hash_map.Set(m1, std::move(aggregation1), hash);
-  hash_map.Get(hash)->Aggregate(static_cast<int64_t>(1));
+  hash_map.Set(m1, std::move(aggregation1));
+  hash_map.Get(m1)->Aggregate(static_cast<int64_t>(1));
   EXPECT_EQ(hash_map.Size(), 1);
-  EXPECT_EQ(hash_map.Has(hash), true);
+  EXPECT_EQ(hash_map.Has(m1), true);
 
   // Set same key again
   auto aggregation2 = std::unique_ptr<Aggregation>(new DropAggregation());
-  hash_map.Set(m1, std::move(aggregation2), hash);
-  hash_map.Get(hash)->Aggregate(static_cast<int64_t>(1));
+  hash_map.Set(m1, std::move(aggregation2));
+  hash_map.Get(m1)->Aggregate(static_cast<int64_t>(1));
   EXPECT_EQ(hash_map.Size(), 1);
-  EXPECT_EQ(hash_map.Has(hash), true);
+  EXPECT_EQ(hash_map.Has(m1), true);
 
   // Set more enteria
   auto aggregation3   = std::unique_ptr<Aggregation>(new DropAggregation());
   MetricAttributes m3 = {{"k1", "v1"}, {"k2", "v2"}};
-  auto hash3          = opentelemetry::sdk::common::GetHashForAttributeMap(m3);
-  hash_map.Set(m3, std::move(aggregation3), hash3);
-  EXPECT_EQ(hash_map.Has(hash), true);
-  EXPECT_EQ(hash_map.Has(hash3), true);
-  hash_map.Get(hash3)->Aggregate(static_cast<int64_t>(1));
+  hash_map.Set(m3, std::move(aggregation3));
+  EXPECT_EQ(hash_map.Has(m1), true);
+  EXPECT_EQ(hash_map.Has(m3), true);
+  hash_map.Get(m3)->Aggregate(static_cast<int64_t>(1));
   EXPECT_EQ(hash_map.Size(), 2);
 
   // GetOrSetDefault
@@ -64,15 +60,16 @@ TEST(AttributesHashMap, BasicTests)
     return std::unique_ptr<Aggregation>(new DropAggregation);
   };
   MetricAttributes m4 = {{"k1", "v1"}, {"k2", "v2"}, {"k3", "v3"}};
-  auto hash4          = opentelemetry::sdk::common::GetHashForAttributeMap(m4);
-  hash_map.GetOrSetDefault(m4, create_default_aggregation, hash4)
-      ->Aggregate(static_cast<int64_t>(1));
+  hash_map.GetOrSetDefault(m4, create_default_aggregation)->Aggregate(static_cast<int64_t>(1));
   EXPECT_EQ(hash_map.Size(), 3);
 
   // Set attributes with different order - shouldn't create a new entry.
   MetricAttributes m5 = {{"k2", "v2"}, {"k1", "v1"}};
-  auto hash5          = opentelemetry::sdk::common::GetHashForAttributeMap(m5);
-  EXPECT_EQ(hash_map.Has(hash5), true);
+  EXPECT_EQ(hash_map.Has(m5), true);
+
+  // Set attributes with different order - shouldn't create a new entry.
+  MetricAttributes m6 = {{"k1", "v2"}, {"k2", "v1"}};
+  EXPECT_EQ(hash_map.Has(m6), false);
 
   // GetAllEnteries
   size_t count = 0;
@@ -84,49 +81,52 @@ TEST(AttributesHashMap, BasicTests)
   EXPECT_EQ(count, hash_map.Size());
 }
 
-std::string make_unique_string(const char *str)
+class MetricAttributeMapHashForCollision
 {
-  return std::string(str);
-}
+public:
+  size_t operator()(const MetricAttributes & /*attributes*/) const { return 42; }
+};
 
-TEST(AttributesHashMap, HashWithKeyValueIterable)
+TEST(AttributesHashMap, CollisionTest)
 {
-  std::string key1   = make_unique_string("k1");
-  std::string value1 = make_unique_string("v1");
-  std::string key2   = make_unique_string("k2");
-  std::string value2 = make_unique_string("v2");
-  std::string key3   = make_unique_string("k3");
-  std::string value3 = make_unique_string("v3");
+  // The hash on MetricsAttributes will be ignored by MetricAttributeMapHashForCollision
+  MetricAttributes m1 = {{"k1", "v1"}};
+  MetricAttributes m2 = {{"k2", "v2"}};
+  MetricAttributes m3 = {{"k1", "v1"}, {"k2", "v2"}};
+  MetricAttributes m4 = {};
 
-  // Create mock KeyValueIterable instances with the same content but different variables
-  std::map<std::string, std::string> attributes1({{key1, value1}, {key2, value2}});
-  std::map<std::string, std::string> attributes2({{key1, value1}, {key2, value2}});
-  std::map<std::string, std::string> attributes3({{key1, value1}, {key2, value2}, {key3, value3}});
+  AttributesHashMapWithCustomHash<MetricAttributeMapHashForCollision> hash_map;
 
-  // Create a callback that filters "k3" key
-  auto is_key_filter_k3_callback = [](nostd::string_view key) {
-    if (key == "k3")
+  hash_map.Set(m1, std::unique_ptr<Aggregation>(new DropAggregation()));
+  hash_map.Set(m2, std::unique_ptr<Aggregation>(new DropAggregation()));
+  hash_map.Set(m3, std::unique_ptr<Aggregation>(new DropAggregation()));
+  hash_map.Set(m4, std::unique_ptr<Aggregation>(new DropAggregation()));
+
+  EXPECT_EQ(hash_map.Size(), 4);
+  EXPECT_EQ(hash_map.Has(m1), true);
+  EXPECT_EQ(hash_map.Has(m2), true);
+  EXPECT_EQ(hash_map.Has(m3), true);
+  EXPECT_EQ(hash_map.Has(m4), true);
+
+  MetricAttributes m5 = {{"k2", "v1"}};
+  EXPECT_EQ(hash_map.Has(m5), false);
+
+  //
+  // Verify only one bucket used based on the custom hash
+  //
+  size_t total_active_buckets = 0;
+  size_t total_elements       = 0;
+  for (size_t i = 0; i < hash_map.BucketCount(); i++)
+  {
+    size_t bucket_size = hash_map.BucketSize(i);
+    if (bucket_size > 0)
     {
-      return false;
+      total_active_buckets++;
+      total_elements += bucket_size;
     }
-    return true;
-  };
-  // Calculate hash
-  size_t hash1 = opentelemetry::sdk::common::GetHashForAttributeMap(
-      opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attributes1),
-      is_key_filter_k3_callback);
-  size_t hash2 = opentelemetry::sdk::common::GetHashForAttributeMap(
-      opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attributes2),
-      is_key_filter_k3_callback);
-
-  size_t hash3 = opentelemetry::sdk::common::GetHashForAttributeMap(
-      opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attributes3),
-      is_key_filter_k3_callback);
-
-  // Expect the hashes to be the same because the content is the same
-  EXPECT_EQ(hash1, hash2);
-  // Expect the hashes to be the same because the content is the same
-  EXPECT_EQ(hash1, hash3);
+  }
+  EXPECT_EQ(total_active_buckets, 1);
+  EXPECT_EQ(total_elements, 4);
 }
 
 TEST(AttributesHashMap, HashConsistencyAcrossStringTypes)

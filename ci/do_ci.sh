@@ -62,6 +62,8 @@ function run_benchmarks
 mkdir -p "${BUILD_DIR}"
 [ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
 mkdir -p "${PLUGIN_DIR}"
+[ -z "${INSTALL_TEST_DIR}" ] && export INSTALL_TEST_DIR=$HOME/install_test
+mkdir -p "${INSTALL_TEST_DIR}"
 
 MAKE_COMMAND="make -k -j \$(nproc)"
 
@@ -81,12 +83,27 @@ BAZEL_MACOS_TEST_OPTIONS="$BAZEL_MACOS_OPTIONS --test_output=errors"
 
 BAZEL_STARTUP_OPTIONS="--output_user_root=$HOME/.cache/bazel"
 
-CMAKE_OPTIONS=(-DCMAKE_BUILD_TYPE=Debug)
-if [ ! -z "${CXX_STANDARD}" ]; then
-  CMAKE_OPTIONS=(${CMAKE_OPTIONS[@]} "-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
+if [[ "${BUILD_TYPE}" =~ ^(Debug|Release|RelWithDebInfo|MinSizeRel)$ ]]; then
+  CMAKE_OPTIONS=(-DCMAKE_BUILD_TYPE=${BUILD_TYPE})
 else
-  CMAKE_OPTIONS=(${CMAKE_OPTIONS[@]} "-DCMAKE_CXX_STANDARD=14")
+  CMAKE_OPTIONS=(-DCMAKE_BUILD_TYPE=Debug)
 fi
+
+if [ -n "${CXX_STANDARD}" ]; then
+  CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
+else
+  CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD=14")
+fi
+
+CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD_REQUIRED=ON")
+CMAKE_OPTIONS+=("-DCMAKE_CXX_EXTENSIONS=OFF")
+
+if [ -n "$CMAKE_TOOLCHAIN_FILE" ]; then
+  echo "CMAKE_TOOLCHAIN_FILE is set to: $CMAKE_TOOLCHAIN_FILE"
+  CMAKE_OPTIONS+=("-DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE")
+fi
+
+echo "CMAKE_OPTIONS:" "${CMAKE_OPTIONS[@]}"
 
 export CTEST_OUTPUT_ON_FAILURE=1
 
@@ -215,18 +232,6 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
   make -j $(nproc)
   make test
   exit 0
-elif [[ "$1" == "cmake.abseil.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_ABSEIL=ON \
-        "${SRC_DIR}"
-  make -j $(nproc)
-  make test
-  exit 0
 elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
@@ -236,6 +241,37 @@ elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
         "${SRC_DIR}"
   make -j $(nproc)
   make test
+  exit 0
+elif [[ "$1" == "cmake.opentracing_shim.install.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  rm -rf ${INSTALL_TEST_DIR}/*
+  cmake "${CMAKE_OPTIONS[@]}" \
+        -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
+        -DWITH_OPENTRACING=ON \
+        -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
+        "${SRC_DIR}"
+  make -j $(nproc)
+  make test
+  make install
+  export LD_LIBRARY_PATH="${INSTALL_TEST_DIR}/lib:$LD_LIBRARY_PATH"
+  CMAKE_OPTIONS_STRING=$(IFS=" "; echo "${CMAKE_OPTIONS[*]}")
+  EXPECTED_COMPONENTS=(
+    "api"
+    "sdk"
+    "ext_common"
+    "exporters_in_memory"
+    "exporters_ostream"
+    "shims_opentracing"
+  )
+  EXPECTED_COMPONENTS_STRING=$(IFS=\;; echo "${EXPECTED_COMPONENTS[*]}")
+  cmake -S "${SRC_DIR}/install/test/cmake" \
+        -B "${BUILD_DIR}/install_test" \
+        "${CMAKE_OPTIONS[@]}" \
+        "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
+        "-DINSTALL_TEST_CMAKE_OPTIONS=${CMAKE_OPTIONS_STRING}" \
+        "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}"
+  ctest --test-dir "${BUILD_DIR}/install_test" --output-on-failure
   exit 0
 elif [[ "$1" == "cmake.c++20.test" ]]; then
   cd "${BUILD_DIR}"
@@ -339,9 +375,6 @@ elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
 elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  if [[ ! -z "${WITH_ABSEIL}" ]]; then
-    CMAKE_OPTIONS=(${CMAKE_OPTIONS[@]} "-DWITH_ABSEIL=${WITH_ABSEIL}")
-  fi
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
@@ -412,16 +445,71 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   cd exporters/otlp && make test
   exit 0
 elif [[ "$1" == "cmake.install.test" ]]; then
+  if [[ -n "${BUILD_SHARED_LIBS}" && "${BUILD_SHARED_LIBS}" == "ON" ]]; then
+    CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=ON")
+    echo "BUILD_SHARED_LIBS is set to: ON"
+  else
+    CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=OFF")
+    echo "BUILD_SHARED_LIBS is set to: OFF"
+  fi
+  CMAKE_OPTIONS+=("-DCMAKE_POSITION_INDEPENDENT_CODE=ON")
+
   cd "${BUILD_DIR}"
   rm -rf *
+  rm -rf ${INSTALL_TEST_DIR}/*
+
   cmake "${CMAKE_OPTIONS[@]}"  \
+        -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
+        -DWITH_ABI_VERSION_1=OFF \
+        -DWITH_ABI_VERSION_2=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_ABSEIL=ON \
+        -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
+        -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
+        -DWITH_OTLP_GRPC=ON \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
+        -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_HTTP_CLIENT_CURL=ON \
+        -DWITH_PROMETHEUS=ON \
+        -DWITH_ZIPKIN=ON \
+        -DWITH_ELASTICSEARCH=ON \
+        -DWITH_EXAMPLES=ON \
+        -DOPENTELEMETRY_INSTALL=ON \
         "${SRC_DIR}"
+
   make -j $(nproc)
-  sudo make install
+  make test
+  make install
+  export LD_LIBRARY_PATH="${INSTALL_TEST_DIR}/lib:$LD_LIBRARY_PATH"
+
+  CMAKE_OPTIONS_STRING=$(IFS=" "; echo "${CMAKE_OPTIONS[*]}")
+
+  EXPECTED_COMPONENTS=(
+    "api"
+    "sdk"
+    "ext_common"
+    "ext_http_curl"
+    "exporters_in_memory"
+    "exporters_ostream"
+    "exporters_otlp_common"
+    "exporters_otlp_file"
+    "exporters_otlp_grpc"
+    "exporters_otlp_http"
+    "exporters_prometheus"
+    "exporters_elasticsearch"
+    "exporters_zipkin"
+  )
+  EXPECTED_COMPONENTS_STRING=$(IFS=\;; echo "${EXPECTED_COMPONENTS[*]}")
+
+  cmake -S "${SRC_DIR}/install/test/cmake" \
+        -B "${BUILD_DIR}/install_test" \
+         "${CMAKE_OPTIONS[@]}" \
+         "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
+         "-DINSTALL_TEST_CMAKE_OPTIONS=${CMAKE_OPTIONS_STRING}" \
+         "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}"
+  ctest --test-dir "${BUILD_DIR}/install_test" --output-on-failure
   exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin

@@ -68,8 +68,8 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeFunction = "code.func
  *   <li>Java method: @code com.example.MyHttpService.serveRequest @endcode</li>
  *   <li>Java anonymous class method: @code com.mycompany.Main$1.myMethod @endcode</li>
  *   <li>Java lambda method: @code com.mycompany.Main$$Lambda/0x0000748ae4149c00.myMethod
- * @endcode</li> <li>PHP function: `GuzzleHttp\Client::transfer</li> <li>Go function: @code
- * github.com/my/repo/pkg.foo.func5 @endcode</li> <li>Elixir: @code OpenTelemetry.Ctx.new
+ * @endcode</li> <li>PHP function: @code GuzzleHttp\Client::transfer @endcode</li> <li>Go function:
+ * @code github.com/my/repo/pkg.foo.func5 @endcode</li> <li>Elixir: @code OpenTelemetry.Ctx.new
  * @endcode</li> <li>Erlang: @code opentelemetry_ctx:new @endcode</li> <li>Rust: @code
  * playground::my_module::my_cool_func @endcode</li> <li>C function: @code fopen @endcode</li>
  * </ul>

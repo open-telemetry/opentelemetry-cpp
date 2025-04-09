@@ -13,7 +13,7 @@ jobs:
 #    name: CMake test arm64 (with modern protobuf,grpc and abseil)
 #    runs-on: actuated-arm64-4cpu-16gb
 #    steps:
-#    - uses: actions/checkout@v4
+#    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 #      with:
 #        submodules: 'recursive'
 #    - name: setup
@@ -25,20 +25,11 @@ jobs:
 #        CXX: /usr/bin/g++-10
 #      run: |
 #        sudo -E ./ci/setup_gcc10.sh
-#        sudo -E ./ci/setup_cmake.sh
 #        sudo -E ./ci/setup_ci_environment.sh
+#        sudo -E ./ci/setup_cmake.sh
 #        sudo -E ./ci/setup_googletest.sh
 #        sudo -E ./ci/install_abseil.sh
 #        sudo -E ./ci/install_protobuf.sh
-#    - name: run otlp exporter tests
-#      env:
-#        CC: /usr/bin/gcc-10
-#        CXX: /usr/bin/g++-10
-#        WITH_ABSEIL: 'ON'
-#        CXX_STANDARD: '14'
-#      run: |
-#        sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
-#        ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   cmake_test:
     name: CMake test (prometheus, elasticsearch, zipkin)
@@ -46,13 +37,14 @@ jobs:
     env:
       CXX_STANDARD: '17'
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run cmake tests
       run: |
         ./ci/do_ci.sh cmake.test
@@ -61,7 +53,7 @@ jobs:
     name: CMake gcc 14 (maintainer mode, sync)
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -71,8 +63,9 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -97,7 +90,7 @@ jobs:
     name: CMake gcc 14 (maintainer mode, async)
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -107,8 +100,9 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -133,7 +127,7 @@ jobs:
     name: CMake clang 18 (maintainer mode, sync)
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -143,8 +137,9 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -169,7 +164,7 @@ jobs:
     name: CMake clang 18 (maintainer mode, async)
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -179,8 +174,9 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -205,7 +201,7 @@ jobs:
     name: CMake clang 18 (maintainer mode, abiv2)
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -215,8 +211,9 @@ jobs:
         PROTOBUF_VERSION: 21.12
       run: |
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
     - name: setup grpc
       run: |
@@ -241,11 +238,12 @@ jobs:
     name: CMake msvc (maintainer mode)
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.maintainer.test
@@ -254,11 +252,12 @@ jobs:
     name: CMake msvc (maintainer mode) with C++20
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       env:
@@ -269,11 +268,12 @@ jobs:
     name: CMake msvc (maintainer mode, abiv2)
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       env:
@@ -284,7 +284,7 @@ jobs:
     name: CMake test (without otlp-exporter and with async export)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -292,8 +292,9 @@ jobs:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run cmake tests (without otlp-exporter)
       env:
         CC: /usr/bin/gcc-12
@@ -301,46 +302,32 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.with_async_export.test
 
-  cmake_abseil_stl_test:
-    name: CMake test (with abseil)
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: run cmake tests (enable abseil-cpp)
-      run: |
-        sudo ./ci/install_abseil.sh
-        ./ci/do_ci.sh cmake.abseil.test
-
   cmake_opentracing_shim_test:
     name: CMake test (with opentracing-shim)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run cmake tests (enable opentracing-shim)
       run: ./ci/do_ci.sh cmake.opentracing_shim.test
 
   cmake_test_cxx14_gcc:
     name: CMake C++14 test(GCC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: run tests (enable stl)
       env:
@@ -349,14 +336,15 @@ jobs:
 
   cmake_test_cxx17_gcc:
     name: CMake C++17 test(GCC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: run tests (enable stl)
       env:
@@ -365,14 +353,15 @@ jobs:
 
   cmake_test_cxx20_gcc:
     name: CMake C++20 test(GCC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
@@ -387,7 +376,7 @@ jobs:
     name: CMake C++20 test(Clang with libc++)
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -397,6 +386,7 @@ jobs:
         CXXFLAGS: "-stdlib=libc++"
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
@@ -417,12 +407,13 @@ jobs:
     name: CMake C++23 test(GCC)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
@@ -437,7 +428,7 @@ jobs:
     name: CMake C++23 test(Clang with libc++)
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -447,6 +438,7 @@ jobs:
         CXXFLAGS: "-stdlib=libc++"
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
@@ -465,15 +457,16 @@ jobs:
 
   cmake_otprotocol_test:
     name: CMake test (with otlp-exporter)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh
@@ -492,7 +485,7 @@ jobs:
     name: CMake test (with modern protobuf,grpc and abseil)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -501,13 +494,13 @@ jobs:
         ABSEIL_CPP_VERSION: '20230125.3'
         CXX_STANDARD: '14'
       run: |
-        sudo ./ci/setup_googletest.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_abseil.sh
         sudo -E ./ci/install_protobuf.sh
     - name: run otlp exporter tests
       env:
-        WITH_ABSEIL: 'ON'
         CXX_STANDARD: '14'
       run: |
         sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
@@ -515,15 +508,16 @@ jobs:
 
   cmake_do_not_install_test:
     name: CMake do not install test (with otlp-exporter)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh
@@ -531,44 +525,26 @@ jobs:
 
   cmake_otprotocol_shared_libs_with_static_grpc_test:
     name: CMake test (build shared libraries with otlp-exporter and static gRPC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh -T
         ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
 
-  cmake_install_test:
-    name: CMake install test (with abseil)
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: run cmake install (with abseil)
-      run: |
-        sudo ./ci/install_abseil.sh
-        ./ci/do_ci.sh cmake.install.test
-    - name: verify packages
-      run: |
-        ./ci/verify_packages.sh
-
   plugin_test:
     name: Plugin -> CMake
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -576,8 +552,9 @@ jobs:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
         CC: /usr/bin/gcc-12
@@ -588,11 +565,11 @@ jobs:
     name: Bazel
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -601,6 +578,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
@@ -609,11 +587,11 @@ jobs:
     name: Bazel without bzlmod
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -622,6 +600,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.no_bzlmod.test
@@ -630,11 +609,11 @@ jobs:
     name: Bazel with async export
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -643,6 +622,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.with_async_export.test
@@ -651,11 +631,11 @@ jobs:
     name: Bazel valgrind
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -664,6 +644,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.valgrind
@@ -672,11 +653,11 @@ jobs:
     name: Bazel noexcept
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -685,6 +666,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.noexcept
@@ -693,11 +675,11 @@ jobs:
     name: Bazel nortti
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -706,6 +688,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.nortti
@@ -714,11 +697,11 @@ jobs:
     name: Bazel asan config
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -727,6 +710,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.asan
@@ -735,11 +719,11 @@ jobs:
     name: Bazel tsan config
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -748,6 +732,7 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.tsan
@@ -756,11 +741,11 @@ jobs:
     name: Bazel on MacOS
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -773,11 +758,11 @@ jobs:
     name: Benchmark
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       env:
         cache-name: bazel_cache
       with:
@@ -792,7 +777,7 @@ jobs:
         env BENCHMARK_DIR=/benchmark
         ./ci/do_ci.sh benchmark
     - name: Upload benchmark results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: benchmark_reports
         path: /home/runner/benchmark
@@ -801,7 +786,7 @@ jobs:
     name: Format
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: setup
       run: sudo apt remove needrestart && sudo ./ci/install_format_tools.sh #refer: https://github.com/actions/runner-images/issues/9937
     - name: run tests
@@ -809,9 +794,9 @@ jobs:
 
   copyright:
     name: Copyright
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: check copyright
       run: ./tools/check_copyright.sh
 
@@ -819,11 +804,12 @@ jobs:
     name: CMake -> exporter proto
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test
@@ -835,11 +821,12 @@ jobs:
     name: CMake -> exporter proto (Build as DLL)
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test (DLL build)
@@ -853,11 +840,12 @@ jobs:
     name: CMake (With async export) -> exporter proto
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test
@@ -869,7 +857,7 @@ jobs:
     name: Bazel Windows
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -882,11 +870,12 @@ jobs:
     name: Plugin -> CMake Windows
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.test_example_plugin
@@ -895,7 +884,7 @@ jobs:
     name: Code coverage
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
@@ -903,15 +892,16 @@ jobs:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run tests and generate report
       env:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
       with:
         files: /home/runner/build/coverage.info
 
@@ -920,7 +910,7 @@ jobs:
 
     steps:
     - name: check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - name: install markdownlint-cli
       run: sudo npm install -g markdownlint-cli
@@ -932,7 +922,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: install shellcheck
       run: sudo apt install --assume-yes shellcheck
     - name: run shellcheck
@@ -942,7 +932,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: install misspell
       run: |
         curl -L -o ./install-misspell.sh https://git.io/misspell
@@ -954,7 +944,7 @@ jobs:
     name: DocFX check
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: install docfx
       run: choco install docfx -y --version=2.58.5
     - name: run ./ci/docfx.cmd
@@ -966,7 +956,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout open-telemetry/opentelemetry-cpp
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           submodules: 'recursive'
       - name: setup
@@ -974,8 +964,9 @@ jobs:
           CC: /usr/bin/gcc-12
           CXX: /usr/bin/g++-12
         run: |
-          sudo -E ./ci/setup_googletest.sh
           sudo -E ./ci/setup_ci_environment.sh
+          sudo -E ./ci/setup_cmake.sh
+          sudo -E ./ci/setup_googletest.sh
       - name: run w3c trace-context test server (background)
         env:
           CXX_STANDARD: '14'
@@ -984,7 +975,7 @@ jobs:
           cd $HOME/build/ext/test/w3c_tracecontext_http_test_server
           ./w3c_tracecontext_http_test_server &
       - name: Checkout w3c/trace-context repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: w3c/trace-context
           path: trace-context
