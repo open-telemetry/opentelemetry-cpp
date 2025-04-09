@@ -426,10 +426,11 @@ if(WITH_OTLP_GRPC
   # https://github.com/grpc/grpc/pull/33361 for more details.
   include(CMakeFindDependencyMacro)
 
-  # Protobuf 3.22+ and depends on abseil-cpp and must be found using the CONFIG
-  # search mode. The following attempts to find Protobuf using the CONFIG mode
-  # first, and if not found, falls back to the MODULE mode. See
-  # https://gitlab.kitware.com/cmake/cmake/-/issues/24321 for more details.
+  # Protobuf 3.22+ depends on abseil-cpp and must be found using the cmake
+  # find_package CONFIG search mode. The following attempts to find Protobuf
+  # using the CONFIG mode first, and if not found, falls back to the MODULE
+  # mode. See https://gitlab.kitware.com/cmake/cmake/-/issues/24321 for more
+  # details.
   find_package(Protobuf CONFIG)
   if(NOT Protobuf_FOUND)
     find_package(Protobuf MODULE)
