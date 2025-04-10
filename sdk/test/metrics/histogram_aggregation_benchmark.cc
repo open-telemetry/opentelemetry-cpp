@@ -7,24 +7,29 @@
 #include <chrono>
 #include <functional>
 #include <random>
+#include <string>
 #include <thread>
 #include <utility>
 #include <vector>
 #include "common.h"
-
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/sync_instruments.h"
-#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
@@ -32,9 +37,11 @@ using namespace opentelemetry::sdk::metrics;
 
 namespace
 {
-void BM_HistogramAggregation(benchmark::State &state)
+
+template <class T>
+void HistogramAggregation(benchmark::State &state, std::unique_ptr<ViewRegistry> views)
 {
-  MeterProvider mp;
+  MeterProvider mp(std::move(views));
   auto m = mp.GetMeter("meter1", "version1", "schema1");
 
   std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
@@ -50,7 +57,7 @@ void BM_HistogramAggregation(benchmark::State &state)
   {
     measurements[i] = static_cast<double>(distribution(generator));
   }
-  std::vector<HistogramPointData> actuals;
+  std::vector<T> actuals;
   std::vector<std::thread> collectionThreads;
   std::function<void()> collectMetrics = [&reader, &actuals]() {
     reader->Collect([&](ResourceMetrics &rm) {
@@ -60,7 +67,7 @@ void BM_HistogramAggregation(benchmark::State &state)
         {
           for (const PointDataAttributes &dp : md.point_data_attr_)
           {
-            actuals.push_back(opentelemetry::nostd::get<HistogramPointData>(dp.point_data));
+            actuals.push_back(opentelemetry::nostd::get<T>(dp.point_data));
           }
         }
       }
@@ -68,7 +75,7 @@ void BM_HistogramAggregation(benchmark::State &state)
     });
   };
 
-  while (state.KeepRunning())
+  while (state.KeepRunningBatch(TOTAL_MEASUREMENTS))
   {
     for (size_t i = 0; i < TOTAL_MEASUREMENTS; i++)
     {
@@ -85,7 +92,74 @@ void BM_HistogramAggregation(benchmark::State &state)
   }
 }
 
+void BM_HistogramAggregation(benchmark::State &state)
+{
+  std::unique_ptr<ViewRegistry> views{new ViewRegistry()};
+  HistogramAggregation<HistogramPointData>(state, std::move(views));
+}
+
 BENCHMARK(BM_HistogramAggregation);
+
+// Add this helper function before your benchmark functions
+
+void RunBase2ExponentialHistogramAggregation(benchmark::State &state, int scale)
+{
+  std::string instrument_unit = "histogram1_unit";
+  std::unique_ptr<InstrumentSelector> histogram_instrument_selector{
+      new InstrumentSelector(InstrumentType::kHistogram, ".*", instrument_unit)};
+  std::unique_ptr<MeterSelector> histogram_meter_selector{
+      new MeterSelector("meter1", "version1", "schema1")};
+
+  Base2ExponentialHistogramAggregationConfig config;
+  config.max_scale_ = scale;
+
+  std::unique_ptr<View> histogram_view{
+      new View("base2_expohisto", "description", instrument_unit,
+               AggregationType::kBase2ExponentialHistogram,
+               std::make_shared<Base2ExponentialHistogramAggregationConfig>(config))};
+
+  std::unique_ptr<ViewRegistry> views{new ViewRegistry()};
+  views->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
+                 std::move(histogram_view));
+
+  HistogramAggregation<Base2ExponentialHistogramPointData>(state, std::move(views));
+}
+
+void BM_Base2ExponentialHistogramAggregationZeroScale(benchmark::State &state)
+{
+  RunBase2ExponentialHistogramAggregation(state, 0);
+}
+BENCHMARK(BM_Base2ExponentialHistogramAggregationZeroScale);
+
+void BM_Base2ExponentialHistogramAggregationOneScale(benchmark::State &state)
+{
+  RunBase2ExponentialHistogramAggregation(state, 1);
+}
+BENCHMARK(BM_Base2ExponentialHistogramAggregationOneScale);
+
+void BM_Base2ExponentialHistogramAggregationTwoScale(benchmark::State &state)
+{
+  RunBase2ExponentialHistogramAggregation(state, 2);
+}
+BENCHMARK(BM_Base2ExponentialHistogramAggregationTwoScale);
+
+void BM_Base2ExponentialHistogramAggregationFourScale(benchmark::State &state)
+{
+  RunBase2ExponentialHistogramAggregation(state, 4);
+}
+BENCHMARK(BM_Base2ExponentialHistogramAggregationFourScale);
+
+void BM_Base2ExponentialHistogramAggregationEightScale(benchmark::State &state)
+{
+  RunBase2ExponentialHistogramAggregation(state, 8);
+}
+BENCHMARK(BM_Base2ExponentialHistogramAggregationEightScale);
+
+void BM_Base2ExponentialHistogramAggregationSixteenScale(benchmark::State &state)
+{
+  RunBase2ExponentialHistogramAggregation(state, 16);
+}
+BENCHMARK(BM_Base2ExponentialHistogramAggregationSixteenScale);
 
 }  // namespace
 BENCHMARK_MAIN();

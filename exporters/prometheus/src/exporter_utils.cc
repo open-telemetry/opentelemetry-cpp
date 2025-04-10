@@ -562,6 +562,10 @@ metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
   {
     return metric_sdk::AggregationType::kHistogram;
   }
+  else if (nostd::holds_alternative<sdk::metrics::Base2ExponentialHistogramPointData>(point_type))
+  {
+    return metric_sdk::AggregationType::kBase2ExponentialHistogram;
+  }
   else if (nostd::holds_alternative<sdk::metrics::LastValuePointData>(point_type))
   {
     return metric_sdk::AggregationType::kLastValue;
