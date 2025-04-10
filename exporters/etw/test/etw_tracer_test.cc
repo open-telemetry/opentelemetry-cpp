@@ -183,8 +183,9 @@ TEST(ETWTracer, TracerCheck)
     }
     EXPECT_NO_THROW(topSpan->End());
   }
-
-  //malkia EXPECT_NO_THROW(tracer->CloseWithMicroseconds(0));
+#  if OPENTELEMETRY_ABI_VERSION_NO == 1
+  EXPECT_NO_THROW(tracer->CloseWithMicroseconds(0));
+#  endif
 }
 
 // Lowest decoration level -> smaller ETW event size.
@@ -233,7 +234,9 @@ TEST(ETWTracer, TracerCheckMinDecoration)
     }
     EXPECT_NO_THROW(aSpan->End());
 }
-  //malkia tracer->CloseWithMicroseconds(0);
+#  if OPENTELEMETRY_ABI_VERSION_NO == 1
+  tracer->CloseWithMicroseconds(0);
+#  endif
 }
 
 // Highest decoration level -> larger ETW event size
@@ -284,7 +287,9 @@ TEST(ETWTracer, TracerCheckMaxDecoration)
     }
     EXPECT_NO_THROW(aSpan->End());
   }
-  //malkia tracer->CloseWithMicroseconds(0);
+#  if OPENTELEMETRY_ABI_VERSION_NO == 1
+  tracer->CloseWithMicroseconds(0);
+#  endif
 }
 
 TEST(ETWTracer, TracerCheckMsgPack)
@@ -322,7 +327,9 @@ TEST(ETWTracer, TracerCheckMsgPack)
       }
       EXPECT_NO_THROW(aSpan->End());
   }
-  //malkia tracer->CloseWithMicroseconds(0);
+#  if OPENTELEMETRY_ABI_VERSION_NO == 1
+  tracer->CloseWithMicroseconds(0);
+#  endif
 }
 
 /**
@@ -451,8 +458,10 @@ TEST(ETWTracer, GlobalSingletonTracer)
   EXPECT_NE(traceId1, traceId2);
   EXPECT_EQ(traceId1, traceId3);
 
-  //malkia localTracer->CloseWithMicroseconds(0);
-  //malkia globalTracer.CloseWithMicroseconds(0);
+#  if OPENTELEMETRY_ABI_VERSION_NO == 1
+  localTracer->CloseWithMicroseconds(0);
+  globalTracer.CloseWithMicroseconds(0);
+#  endif
 }
 
 TEST(ETWTracer, AlwayOffSampler)

@@ -160,6 +160,7 @@ TEST(Logger, LogMethodOverloads)
                 opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
 TEST(Logger, EventLogMethodOverloads)
 {
   auto lp = Provider::GetLoggerProvider();
@@ -191,6 +192,7 @@ TEST(Logger, EventLogMethodOverloads)
   event_logger->EmitEvent("event name", Severity::kDebug,
                           opentelemetry::common::MakeAttributes(vec));
 }
+#endif
 
 // Define a basic Logger class
 class TestLogger : public Logger

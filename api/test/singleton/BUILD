@@ -174,9 +174,10 @@ otel_cc_test(
         "component_g",
         "component_h",
     ],
-    linkopts = [
-        "-ldl",
-    ],
+    linkopts = select({
+        "//bazel:windows": [],
+        "//conditions:default": ["-ldl"],
+    }),
     linkstatic = False,
     tags = [
         "api",
@@ -193,4 +194,8 @@ otel_cc_test(
         "@googletest//:gtest_main",
         "//:windows_only",
     ]),
+    target_compatible_with = select({
+        "//:with_dll_enabled": None,
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )

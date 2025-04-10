@@ -360,6 +360,13 @@ void OtlpGrpcForwardProxy::Start()
     assert(impl->server != nullptr);
 }
 
+bool OtlpGrpcForwardProxy::Start2()
+{
+    assert(impl->server == nullptr);
+    impl->server = impl->serverBuilder.BuildAndStart();
+    return impl->server != nullptr;
+}
+
 void OtlpGrpcForwardProxy::Wait()
 {
     assert(impl->server != nullptr);

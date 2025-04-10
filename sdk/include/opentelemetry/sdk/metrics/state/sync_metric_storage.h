@@ -83,7 +83,7 @@ public:
 
   void RecordLong(int64_t value,
                   const opentelemetry::context::Context &context
-                      OPENTELEMETRY_MAYBE_UNUSED) noexcept override
+                  OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
@@ -95,15 +95,15 @@ public:
       exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
     }
 #endif
-    static size_t hash = opentelemetry::sdk::common::GetHash("");
+    static MetricAttributes attr = MetricAttributes{};
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
-    attributes_hashmap_->GetOrSetDefault(create_default_aggregation_, hash)->Aggregate(value);
+    attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
   void RecordLong(int64_t value,
                   const opentelemetry::common::KeyValueIterable &attributes,
                   const opentelemetry::context::Context &context
-                      OPENTELEMETRY_MAYBE_UNUSED) noexcept override
+                  OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
@@ -116,27 +116,16 @@ public:
                                             std::chrono::system_clock::now());
     }
 #endif
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
-        attributes, [this](nostd::string_view key) {
-          if (attributes_processor_)
-          {
-            return attributes_processor_->isPresent(key);
-          }
-          else
-          {
-            return true;
-          }
-        });
 
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     attributes_hashmap_
-        ->GetOrSetDefault(attributes, attributes_processor_, create_default_aggregation_, hash)
+        ->GetOrSetDefault(attributes, attributes_processor_, create_default_aggregation_)
         ->Aggregate(value);
   }
 
   void RecordDouble(double value,
                     const opentelemetry::context::Context &context
-                        OPENTELEMETRY_MAYBE_UNUSED) noexcept override
+                    OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
@@ -148,15 +137,15 @@ public:
       exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
     }
 #endif
-    static size_t hash = opentelemetry::sdk::common::GetHash("");
+    static MetricAttributes attr = MetricAttributes{};
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
-    attributes_hashmap_->GetOrSetDefault(create_default_aggregation_, hash)->Aggregate(value);
+    attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
   void RecordDouble(double value,
                     const opentelemetry::common::KeyValueIterable &attributes,
                     const opentelemetry::context::Context &context
-                        OPENTELEMETRY_MAYBE_UNUSED) noexcept override
+                    OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
@@ -169,20 +158,9 @@ public:
                                             std::chrono::system_clock::now());
     }
 #endif
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
-        attributes, [this](nostd::string_view key) {
-          if (attributes_processor_)
-          {
-            return attributes_processor_->isPresent(key);
-          }
-          else
-          {
-            return true;
-          }
-        });
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     attributes_hashmap_
-        ->GetOrSetDefault(attributes, attributes_processor_, create_default_aggregation_, hash)
+        ->GetOrSetDefault(attributes, attributes_processor_, create_default_aggregation_)
         ->Aggregate(value);
   }
 

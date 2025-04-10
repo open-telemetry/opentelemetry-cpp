@@ -87,6 +87,8 @@ public:
           }
           return true;
         });
+
+    result.UpdateHash();
     return result;
   }
 

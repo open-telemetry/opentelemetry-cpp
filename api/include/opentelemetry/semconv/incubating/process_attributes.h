@@ -56,12 +56,11 @@ static constexpr const char *kProcessContextSwitchType = "process.context_switch
 
 /**
  * Deprecated, use @code cpu.mode @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code cpu.mode @endcode
+ * {"note": "Replaced by @code cpu.mode @endcode", "reason": "uncategorized"}
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kProcessCpuState = "process.cpu.state";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kProcessCpuState = "process.cpu.state";
 
 /**
  * The date and time the process was created, in ISO 8601 format.
@@ -87,18 +86,18 @@ static constexpr const char *kProcessExecutableBuildIdHtlhash =
 
 /**
  * "Deprecated, use @code process.executable.build_id.htlhash @endcode instead."
- * <p>
+ *
  * @deprecated
- * Replaced by @code process.executable.build_id.htlhash @endcode
+ * {"note": "Replaced by @code process.executable.build_id.htlhash @endcode", "reason":
+ * "uncategorized"}
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kProcessExecutableBuildIdProfiling =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kProcessExecutableBuildIdProfiling =
     "process.executable.build_id.profiling";
 
 /**
- * The name of the process executable. On Linux based systems, can be set to the @code Name @endcode
- * in @code proc/[pid]/status @endcode. On Windows, can be set to the base name of @code
- * GetProcessImageFileNameW @endcode.
+ * The name of the process executable. On Linux based systems, this SHOULD be set to the base name
+ * of the target of @code /proc/[pid]/exe @endcode. On Windows, this SHOULD be set to the base name
+ * of @code GetProcessImageFileNameW @endcode.
  */
 static constexpr const char *kProcessExecutableName = "process.executable.name";
 

@@ -8,7 +8,7 @@ local_path_override(
     module_name = "otel_sdk",
     path = "..",
 )
-bazel_dep(name = "abseil-cpp", version = "20250127.0")
+bazel_dep(name = "abseil-cpp", version = "20250127.1")
 single_version_override(
     module_name = "abseil-cpp",
     patch_strip = 1,
@@ -16,49 +16,39 @@ single_version_override(
         "bazel/absl_win10_cache_zone.patch",
     ],
 )
-bazel_dep(name = "aspect_bazel_lib", version = "2.13.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.14.0")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
-bazel_dep(name = "boringssl", version = "0.20250212.0")
-bazel_dep(name = "curl", version = "8.8.0.bcr.2")
-bazel_dep(name = "depend_on_what_you_use", version = "0.7.0")
-bazel_dep(name = "google_benchmark", version = "1.9.1")
+bazel_dep(name = "boringssl", version = "0.20250311.0")
+bazel_dep(name = "curl", version = "8.8.0.bcr.3")
+bazel_dep(name = "depend_on_what_you_use", version = "0.8.0")
+bazel_dep(name = "google_benchmark", version = "1.9.2")
 bazel_dep(name = "googletest", version = "1.16.0")
-bazel_dep(name = "rules_apple", version = "3.18.0")
+bazel_dep(name = "rules_apple", version = "3.19.1")
 # Getting "No 'swiftc.exe' executable found in Path" with 3.18.0
 single_version_override(module_name = "rules_apple", version = "3.17.1")
 bazel_dep(name = "re2", version = "2024-07-02.bcr.1")
 bazel_dep(name = "rules_go", version = "0.53.0")
 bazel_dep(name = "gazelle", version = "0.42.0")
 bazel_dep(name = "stardoc", version = "0.8.0")
-bazel_dep(name = "rules_android", version = "0.6.1")
-
-bazel_dep(name = "grpc", version = "1.70.1")
-
+bazel_dep(name = "rules_android", version = "0.6.3")
+bazel_dep(name = "grpc", version = "1.71.0")
 bazel_dep(name = "nlohmann_json", version = "3.11.3.bcr.1")
 bazel_dep(name = "platforms", version = "0.0.11")
-bazel_dep(name = "rules_cc", version = "0.1.0")
-single_version_override(
-    module_name = "rules_cc", version = "0.0.17"
-)
-bazel_dep(name = "rules_pkg", version = "1.0.1")
+bazel_dep(name = "rules_cc", version = "0.1.1")
+bazel_dep(name = "rules_pkg", version = "1.1.0")
 bazel_dep(name = "rules_proto", version = "7.1.0")
 bazel_dep(name = "zlib", version = "1.3.1.bcr.5")
 bazel_dep(name = "opentracing-cpp", version = "1.6.0")
-bazel_dep(name = "rules_multitool", version = "1.0.0")
-bazel_dep(name = "protoc-gen-validate", version = "1.0.4.bcr.2")
-
+bazel_dep(name = "rules_multitool", version = "1.2.0")
+bazel_dep(name = "protoc-gen-validate", version = "1.2.1.bcr.1")
 bazel_dep(name = "c-ares", version = "1.16.1")
 archive_override(
     module_name = "c-ares", 
-    urls=["https://github.com/malkia/c-ares/archive/548f7f9d3fa42bd4874b6c4b2979ea1fd2cd6952.zip"], 
-    integrity = "sha256-sO3H/U6fRoXGntJujkdyVMel636mDOJhB27rutS8r98=",
-    strip_prefix="c-ares-548f7f9d3fa42bd4874b6c4b2979ea1fd2cd6952"
+    urls=["https://github.com/malkia/c-ares/archive/0b0d375f08edfc73d2f37090e9325c5bd600c043.zip"],
+    integrity = "sha256-BAWtdpkKHShUobytt64s4gqoCFZTuV/Jim2jlfAesnw=",
+    strip_prefix="c-ares-0b0d375f08edfc73d2f37090e9325c5bd600c043"
 )
-
-# ERROR: Q:/b/u/c56xnmzt/external/protobuf+/src/google/protobuf/BUILD.bazel:462:11: Compiling src/google/protobuf/any_lite.cc [for tool] failed: undeclared inclusion(s) in rule '@@protobuf+//src/google/protobuf:protobuf_lite':
-# this rule is missing dependency declarations for the following files included by 'src/google/protobuf/any_lite.cc':
-#   'bazel-out/x64_windows-opt-exec-ST-d610928244b0/bin/external/protobuf+/src/google/protobuf/_virtual_includes/protobuf_lite/google/protobuf/port.h'
-bazel_dep(name = "protobuf", version = "29.3")
+bazel_dep(name = "protobuf", version = "30.2")
 bazel_dep(name = "opentelemetry-proto", version = "1.5.0")
 archive_override(
     module_name = "opentelemetry-proto",
@@ -70,8 +60,7 @@ archive_override(
     strip_prefix = "opentelemetry-proto-1.5.0",
     urls = ["https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.5.0.tar.gz"]
 )
-
-bazel_dep(name = "prometheus-cpp", version = "1.3.0.bcr.1")
+bazel_dep(name = "prometheus-cpp", version = "1.3.0.bcr.2")
 bazel_dep(name = "civetweb", version = "1.16.bcr.1")
 
 use_repo(
@@ -88,6 +77,6 @@ use_repo(
 #        '@com_google_protobuf_javalite//:protobuf_javalite' in attribute 'target' of tag 'override'.
 #      Is the module 'grpc-java' missing a bazel_dep or use_repo(..., "com_google_protobuf_javalite")?.
 #
-bazel_dep(name = "grpc-java", version = "1.69.0")
+bazel_dep(name = "grpc-java", version = "1.71.0")
 
 bazel_dep(name = "rules_cue", version = "0.11.0")

@@ -1,0 +1,287 @@
+name: CMake Install Tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  windows_2022_vcpkg:
+    name: Windows 2022 vcpkg cxx17 (static libs - dll)
+    runs-on: windows-2025
+    env:
+      CXX_STANDARD: '17'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: 'recursive'
+      - name: Build dependencies with vcpkg submodule
+        run: |
+          ./ci/setup_cmake.ps1
+          ./ci/setup_windows_ci_environment.ps1
+      - name: Run Tests
+        run: ./ci/do_ci.ps1 cmake.install.test
+      - name: Run DLL Tests
+        run: ./ci/do_ci.ps1 cmake.dll.install.test
+
+  windows_2019_vcpkg:
+    name: Windows 2019 vcpkg cxx14 (static libs)
+    runs-on: windows-2025
+    env:
+      CXX_STANDARD: '14'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: 'recursive'
+      - name: Build dependencies with vcpkg submodule
+        run: |
+          ./ci/setup_cmake.ps1
+          ./ci/setup_windows_ci_environment.ps1
+      - name: Run Tests
+        run: ./ci/do_ci.ps1 cmake.install.test
+
+  ubuntu_2404_system_packages:
+    name: Ubuntu 24.04 apt packages cxx17 (static libs - shared libs)
+    runs-on: ubuntu-24.04
+    env:
+      INSTALL_TEST_DIR: '/home/runner/install_test'
+      CXX_STANDARD: '17'
+      BUILD_TYPE: 'Debug'
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        submodules: 'recursive'
+    - name: Install libcurl, zlib, nlohmann-json with apt
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
+    - name: Install abseil, protobuf, and grpc with apt
+      run: |
+        sudo -E apt-get update
+        sudo -E apt-get install -y libabsl-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
+    - name: Run Tests (static libs)
+      env:
+        BUILD_SHARED_LIBS: 'OFF'
+      run: ./ci/do_ci.sh cmake.install.test
+    - name: Run Tests (shared libs)
+      env:
+        BUILD_SHARED_LIBS: 'ON'
+      run: ./ci/do_ci.sh cmake.install.test
+
+  ubuntu_2404_script_build_grpc_1_71_0:
+    name: Ubuntu 24.04 script grpc 1.71.0 cxx17 (static libs)
+    runs-on: ubuntu-24.04
+    env:
+      INSTALL_TEST_DIR: '/home/runner/install_test'
+      CXX_STANDARD: '20'
+      BUILD_TYPE: 'Debug'
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        submodules: 'recursive'
+    - name: Install gtest, libcurl, zlib, nlohmann-json with apt
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
+    - name: Build abseil, protobuf, and grpc with ci scripts
+      env:
+        ABSEIL_CPP_VERSION: '20240722.1'
+        PROTOBUF_VERSION: '29.0'
+        GRPC_VERSION: 'v1.71.0'
+      run: |
+        sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/install_protobuf.sh
+        sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
+    - name: Run Tests (static libs)
+      env:
+        BUILD_SHARED_LIBS: 'OFF'
+      run: ./ci/do_ci.sh cmake.install.test
+
+  ubuntu_2204_script_build_grpc_1_55_0:
+    name: Ubuntu 22.04 script grpc 1.55.0 cxx17 (static libs - shared libs)
+    runs-on: ubuntu-24.04
+    env:
+      INSTALL_TEST_DIR: '/home/runner/install_test'
+      CXX_STANDARD: '17'
+      BUILD_TYPE: 'Debug'
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        submodules: 'recursive'
+    - name: Install gtest, libcurl, zlib, nlohmann-json with apt
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
+    - name: Build abseil, protobuf, and grpc with ci scripts
+      env:
+        ABSEIL_CPP_VERSION: '20230125.3'
+        PROTOBUF_VERSION: '23.3'
+        GRPC_VERSION: 'v1.55.0'
+      run: |
+        sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/install_protobuf.sh
+        sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
+    - name: Run Tests (static libs)
+      env:
+        BUILD_SHARED_LIBS: 'OFF'
+      run: ./ci/do_ci.sh cmake.install.test
+    - name: Run Tests (shared libs)
+      env:
+        BUILD_SHARED_LIBS: 'ON'
+      run: ./ci/do_ci.sh cmake.install.test
+
+  ubuntu_2204_script_build_grpc_1_49_2:
+    name: Ubuntu 22.04 script grpc 1.49.2 cxx14 (static libs - shared libs)
+    runs-on: ubuntu-24.04
+    env:
+      INSTALL_TEST_DIR: '/home/runner/install_test'
+      CXX_STANDARD: '14'
+      BUILD_TYPE: 'Debug'
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        submodules: 'recursive'
+    - name: Install gtest, libcurl, zlib, nlohmann-json with apt
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
+    - name: Build abseil, protobuf, and grpc with ci scripts
+      env:
+        ABSEIL_CPP_VERSION: '20220623.2'
+        PROTOBUF_VERSION: '21.12'
+        GRPC_VERSION: 'v1.49.2'
+      run: |
+        sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/install_protobuf.sh
+        sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
+    - name: Run Tests (static libs)
+      env:
+          BUILD_SHARED_LIBS: 'OFF'
+      run: ./ci/do_ci.sh cmake.install.test
+    - name: Run Tests (shared libs)
+      env:
+          BUILD_SHARED_LIBS: 'ON'
+      run: ./ci/do_ci.sh cmake.install.test
+
+  ubuntu_2404_conan_stable:
+    name: Ubuntu 24.04 conan stable cxx17 (static libs - shared libs - opentracing shim)
+    runs-on: ubuntu-24.04
+    env:
+      INSTALL_TEST_DIR: '/home/runner/install_test'
+      CXX_STANDARD: '17'
+      CMAKE_TOOLCHAIN_FILE: /home/runner/conan/build/Debug/generators/conan_toolchain.cmake
+      BUILD_TYPE: 'Debug'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: 'recursive'
+      - name: Install Conan
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install "conan>=2.0,<3"
+          conan profile detect --force
+      - name: Install or build all dependencies with Conan
+        run: |
+          sudo -E ./ci/setup_cmake.sh
+          conan install install/conan/conanfile_stable.txt --build=missing -of /home/runner/conan -s build_type=Debug
+      - name: Run Tests (static libs)
+        env:
+          BUILD_SHARED_LIBS: 'OFF'
+        run: ./ci/do_ci.sh cmake.install.test
+      - name: Run Tests (shared libs)
+        env:
+          BUILD_SHARED_LIBS: 'ON'
+        run: ./ci/do_ci.sh cmake.install.test
+      - name: verify pkgconfig packages
+        run: |
+          export PKG_CONFIG_PATH=$INSTALL_TEST_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
+          ./ci/verify_packages.sh
+      - name: Run OpenTracing Shim Test
+        run: ./ci/do_ci.sh cmake.opentracing_shim.install.test
+
+  ubuntu_2404_conan_latest:
+    name: Ubuntu 24.04 conan latest cxx17 (static libs)
+    runs-on: ubuntu-24.04
+    env:
+      INSTALL_TEST_DIR: '/home/runner/install_test'
+      CXX_STANDARD: '17'
+      CMAKE_TOOLCHAIN_FILE: /home/runner/conan/build/Debug/generators/conan_toolchain.cmake
+      BUILD_TYPE: 'Debug'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: 'recursive'
+      - name: Install Conan
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install "conan>=2.0,<3"
+          conan profile detect --force
+      - name: Install or build all dependencies with Conan
+        run: |
+          sudo -E ./ci/setup_cmake.sh
+          conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=Debug
+      - name: Run Tests (static libs)
+        env:
+          BUILD_SHARED_LIBS: 'OFF'
+        run: ./ci/do_ci.sh cmake.install.test
+      - name: verify pkgconfig packages
+        run: |
+          export PKG_CONFIG_PATH=$INSTALL_TEST_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
+          ./ci/verify_packages.sh
+
+  macos_14_conan_stable:
+    name: macOS 14 conan stable cxx17 (static libs)
+    runs-on: macos-14
+    env:
+      INSTALL_TEST_DIR: '/Users/runner/install_test'
+      CXX_STANDARD: '17'
+      CMAKE_TOOLCHAIN_FILE: '/Users/runner/conan/build/Debug/generators/conan_toolchain.cmake'
+      BUILD_TYPE: 'Debug'
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        submodules: 'recursive'
+    - name: Install Conan and tools
+      run: |
+        brew install conan autoconf automake libtool coreutils
+        sudo -E ./ci/setup_cmake_macos.sh
+        conan profile detect --force
+    - name: Install or build all dependencies with Conan
+      run: conan install install/conan/conanfile_stable.txt --build=missing -of /Users/runner/conan -s build_type=Debug
+    - name: Run Tests (static libs)
+      env:
+        BUILD_SHARED_LIBS: 'OFF'
+      run: ./ci/do_ci.sh cmake.install.test
+
+  macos_14_brew_packages:
+    name: macOS 14 brew packages cxx17 (static libs)
+    runs-on: macos-14
+    env:
+      CXX_STANDARD: '17'
+      BUILD_TYPE: 'Debug'
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        submodules: 'recursive'
+    - name: Install Dependencies with Homebrew
+      run: |
+        sudo -E ./ci/setup_cmake_macos.sh
+        brew install coreutils
+        brew install googletest
+        brew install google-benchmark
+        brew install zlib
+        brew install abseil
+        brew install protobuf
+        brew install grpc
+        brew install nlohmann-json
+        brew install prometheus-cpp
+    - name: Run Tests (static libs)
+      env:
+        BUILD_SHARED_LIBS: 'OFF'
+      run: ./ci/do_ci.sh cmake.install.test

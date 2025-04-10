@@ -21,12 +21,11 @@ namespace other
 
 /**
  * Deprecated, use @code db.client.connection.state @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code db.client.connection.state @endcode.
+ * {"note": "Replaced by @code db.client.connection.state @endcode.", "reason": "uncategorized"}
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kState = "state";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kState = "state";
 
 namespace StateValues
 {

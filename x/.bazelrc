@@ -1,14 +1,17 @@
 import %workspace%/../.bazelrc
 build --@otel_sdk//:with_dll=true
 try-import %workspace%/../../top.bazelrc
-test --test_output=streamed --test_timeout=36000,36000,36000,36000
+# test --test_output=streamed --test_timeout=36000,36000,36000,36000
+
+test --nocache_test_results
 
 common:devenv --run_under='"c:/windows/system32/cmd.exe" /D /C start /wait devenv /debugexe '
 
 # Make sure XCode is started first, then this works, otherwise fails the first time.
 common:xcode  --run_under='/usr/bin/xcdebug'
 
-#test:devenv --run_under='"c:/windows/system32/cmd.exe" /c start /wait devenv /debugexe '
+test:devenv --run_under='"c:/windows/system32/cmd.exe" /c start /wait devenv /debugexe '
 #common:slrun --run_under='sudo -E --inline q:/superluminal/SuperluminalCmd.exe run windows --symbol-location q:/symbols --resolve --symbol-cache-dir q:/symcache '
 #common:test1 --run_under='"c:/windows/system32/cmd.exe" /k set 1>d:\\1.txt 2>d:\\2.txt && echo a '
 
+common --incompatible_disable_target_provider_fields=false

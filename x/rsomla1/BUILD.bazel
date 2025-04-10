@@ -26,10 +26,10 @@ cc_import(
 )
 
 cc_test(
-    name = "try",
-    srcs = ["try.cc"],
-    deps = [
-        "@otel_sdk//:dll", 
-        ":lib",
-    ],
+   name = "try",
+   srcs = ["try.cc"],
+   deps = [
+       "@otel_sdk//:dll", 
+       ":lib",
+   ],
 )

@@ -4,33 +4,48 @@ load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_test(
-    name = "x",
-    srcs = ["x.cpp"],
-    deps = ["@otel_sdk//:dll"],
-    local = True,
-    tags = ["manual", "external"],
+#cc_test(
+#    name = "x",
+#    srcs = ["x.cpp"],
+#    deps = ["@otel_sdk//:dll"],
+#    local = True,
+#    tags = ["manual", "external", "no-cache"],
+#
+#    # Minimal set of env vars for Visual Studio
+#    env_inherit = [ 
+#        "windir", # Mandatory
+#        #"USERPROFILE", # In order to avoid creating %USERPROFILE%
+#    ],
+#)
 
+[cc_test(
+    name = "t" + index,
+    srcs = ["t.cpp"],
+    deps = ["@otel_sdk//:dll"],
+    args = [index],
+#    local = True,
+#    tags = ["manual", "external", "no-cache"],
     # Minimal set of env vars for Visual Studio
     env_inherit = [ 
         "windir", # Mandatory
         #"USERPROFILE", # In order to avoid creating %USERPROFILE%
     ],
 )
+for (index) in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]]
 
-cc_test(
-    name = "m",
-    srcs = ["m.cpp"],
-    deps = ["@otel_sdk//:dll"],
-    local = True,
-    tags = ["manual", "external"],
-
-    # Minimal set of env vars for Visual Studio
-    env_inherit = [ 
-        "windir", # Mandatory
-        #"USERPROFILE", # In order to avoid creating %USERPROFILE%
-    ],
-)
+#cc_test(
+#    name = "m",
+#    srcs = ["m.cpp"],
+#    deps = ["@otel_sdk//:dll"],
+#    local = True,
+#    tags = ["manual", "external", "no-cache"],
+#
+#    # Minimal set of env vars for Visual Studio
+#    env_inherit = [ 
+#        "windir", # Mandatory
+#        #"USERPROFILE", # In order to avoid creating %USERPROFILE%
+#    ],
+#)
 
 # copy_directory(
 #     name = "dashboards_dir",

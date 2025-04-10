@@ -534,6 +534,7 @@ otel_cc_test(
         "@opentelemetry-proto//:metrics_service_grpc_cc",
         "@opentelemetry-proto//:logs_service_grpc_cc",
         "@opentelemetry-proto//:trace_service_grpc_cc",
+        "@grpc//:grpc++",
     ]),
 )
 
@@ -705,6 +706,7 @@ otel_cc_test(
         "@opentelemetry-proto//:logs_service_grpc_cc",
         "@opentelemetry-proto//:metrics_service_grpc_cc",
         "@opentelemetry-proto//:trace_service_grpc_cc",
+        "@grpc//:grpc++",
     ]),
 )
 
@@ -740,6 +742,7 @@ otel_cc_test(
         "@opentelemetry-proto//:metrics_service_grpc_cc",
         "@opentelemetry-proto//:logs_service_grpc_cc",
         "@opentelemetry-proto//:trace_service_grpc_cc",
+        "@grpc//:grpc++",
     ]),
 )
 

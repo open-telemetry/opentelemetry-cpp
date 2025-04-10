@@ -2,12 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//:dll_deps.bzl", "dll_deps")
-load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_test")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_test_library", "otel_cc_test")
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
-otel_cc_library(
+otel_cc_test_library(
     name = "metrics_common_test_utils",
-    testonly = 1,
     srcs = [
         "common.cc",
     ],
@@ -24,6 +23,9 @@ otel_cc_library(
 otel_cc_test(
     name = "all_tests",
     srcs = glob(["*_test.cc"]),
+    copts = [
+        "-DUNIT_TESTING",
+    ],
     tags = [
         "metrics",
         "test",

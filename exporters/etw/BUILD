@@ -1,23 +1,20 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 load("//:dll_deps.bzl", "dll_deps")
-load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_test")
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 package(default_visibility = ["//visibility:public"])
 
 otel_cc_library(
     name = "etw_exporter",
-    hdrs = glob([
-        "include/opentelemetry/exporters/etw/*.h",
-    ]),
-    includes = ["include"],
     local_defines = [
         "HAVE_MSGPACK",
     ],
     tags = ["etw"],
     deps = [
+        "headers",
         "//:windows_only",
         "//api",
         "//sdk/src/trace",

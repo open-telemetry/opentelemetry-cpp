@@ -1,0 +1,9 @@
+cc_test(
+   name = "hang",
+   srcs = ["hang.cpp", "otel_sdk.cpp", "otel_api.cpp", "otel_sdk.h", "otel_api.h"],
+   deps = ["@otel_sdk//:dll"],
+   env = {
+      "OTEL_LOG_LEVEL": "5",
+      "OTEL_ENABLED": "1",
+   }
+)

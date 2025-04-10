@@ -18,10 +18,10 @@ jobs:
       - run: systeminfo
       - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize -Wrap
       - run: choco uninstall bazel --yes
-      - uses: Cyberboss/install-winget@1c6f189175e9f015bf1aa113cd1cc6c73efb9d47
+      - uses: Cyberboss/install-winget@d1b590c5dd8bf4f814102464129f281a64566065
       - run: winget list --accept-source-agreements --disable-interactivity
       - run: winget install bazelisk -r bazel --accept-package-agreements --disable-interactivity --silent
-      - run: winget install -e LLVM.LLVM -v 19.1.7 --accept-package-agreements --disable-interactivity --silent || echo swalloing errors
+      - run: winget install -e LLVM.LLVM -v 20.1.1 --accept-package-agreements --disable-interactivity --silent || echo swalloing errors
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
         with:
@@ -53,12 +53,12 @@ jobs:
           echo empty > d:\d\empty.txt
           cmd /c dir d:\d || echo "swallowing errors"
           refsutil dedup d:\d /s
-      - name: test otel_sdk
+      - name: build minimal otel_sdk
         run: |
           echo "build --disk_cache=d:/d" >> ../top.bazelrc
           echo "common --repository_cache=d:/r" >> ../top.bazelrc
           echo "startup --output_user_root=d:/b" >> ../top.bazelrc
-          ./otel_sdk_build.cmd test
+          ./otel_sdk_build.cmd minimal
           ./otel_sdk_build.cmd shutdown
       - run: |
           cmd /c dir d:\d || echo "swallowing errors"
@@ -81,11 +81,10 @@ jobs:
           name: tracing-profiles
           path: ./*.tracing.json
           if-no-files-found: warn
-      - name: build otel_sdk.zip
-        run: |
-          ./otel_sdk_build.cmd zip
-          ./otel_sdk_build.cmd shutdown
-          ls d:/d.vhdx
+      - run: ./otel_sdk_build.cmd test
+      - run: ./otel_sdk_build.cmd zip
+      - run: ./otel_sdk_build.cmd shutdown
+      - run: ls d:/d.vhdx
       - uses: actions/upload-artifact@v4
         if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
         with:

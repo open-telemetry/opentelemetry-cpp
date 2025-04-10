@@ -14,7 +14,9 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/processor.h"
@@ -26,18 +28,27 @@ namespace sdk
 namespace logs
 {
 
-LoggerProvider::LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
-                               const opentelemetry::sdk::resource::Resource &resource) noexcept
+LoggerProvider::LoggerProvider(
+    std::unique_ptr<LogRecordProcessor> &&processor,
+    const opentelemetry::sdk::resource::Resource &resource,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>>
+        logger_configurator) noexcept
 {
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.emplace_back(std::move(processor));
-  context_ = std::make_shared<LoggerContext>(std::move(processors), resource);
+  context_ = std::make_shared<LoggerContext>(std::move(processors), resource,
+                                             std::move(logger_configurator));
   OTEL_INTERNAL_LOG_DEBUG("[LoggerProvider] LoggerProvider created.");
 }
 
-LoggerProvider::LoggerProvider(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
-                               const opentelemetry::sdk::resource::Resource &resource) noexcept
-    : context_{std::make_shared<LoggerContext>(std::move(processors), resource)}
+LoggerProvider::LoggerProvider(
+    std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
+    const opentelemetry::sdk::resource::Resource &resource,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>>
+        logger_configurator) noexcept
+    : context_{std::make_shared<LoggerContext>(std::move(processors),
+                                               resource,
+                                               std::move(logger_configurator))}
 {}
 
 LoggerProvider::LoggerProvider() noexcept

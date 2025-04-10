@@ -6,6 +6,7 @@ target_link_libraries(metrics_common_test_utils opentelemetry_metrics)
 
 foreach(
   testname
+  meter_config_test
   meter_provider_set_test
   meter_provider_sdk_test
   meter_test
@@ -28,6 +29,7 @@ foreach(
   observer_result_test
   sync_instruments_test
   async_instruments_test
+  metric_collector_test
   metric_reader_test
   observable_registry_test
   periodic_exporting_metric_reader_test
@@ -36,6 +38,7 @@ foreach(
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     metrics_common_test_utils opentelemetry_resources)
+  target_compile_definitions(${testname} PRIVATE UNIT_TESTING)
   gtest_add_tests(
     TARGET ${testname}
     TEST_PREFIX metrics.

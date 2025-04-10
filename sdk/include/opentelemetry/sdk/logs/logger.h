@@ -6,9 +6,11 @@
 #include <memory>
 #include <string>
 
+#include "logger_config.h"
 #include "opentelemetry/version.h"
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/noop.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
@@ -65,6 +67,8 @@ private:
   // logger-context.
   std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope_;
   std::shared_ptr<LoggerContext> context_;
+  LoggerConfig logger_config_;
+  static opentelemetry::logs::NoopLogger kNoopLogger;
 };
 
 }  // namespace logs

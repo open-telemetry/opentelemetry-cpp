@@ -21,12 +21,13 @@ namespace deployment
 
 /**
  * 'Deprecated, use @code deployment.environment.name @endcode instead.'
- * <p>
+ *
  * @deprecated
- * Deprecated, use @code deployment.environment.name @endcode instead.
+ * {"note": "Deprecated, use @code deployment.environment.name @endcode instead.", "reason":
+ * "uncategorized"}
  */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kDeploymentEnvironment = "deployment.environment";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kDeploymentEnvironment =
+    "deployment.environment";
 
 /**
  * Name of the <a href="https://wikipedia.org/wiki/Deployment_environment">deployment

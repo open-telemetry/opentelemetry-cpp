@@ -13,8 +13,10 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
 using opentelemetry::logs::EventLogger;
 using opentelemetry::logs::EventLoggerProvider;
+#endif
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
 using opentelemetry::logs::Provider;
@@ -71,6 +73,7 @@ TEST(Provider, GetLogger)
   EXPECT_EQ(nullptr, logger2);
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
 class TestEventLoggerProvider : public EventLoggerProvider
 {
 public:
@@ -112,3 +115,4 @@ TEST(Provider, CreateEventLogger)
 
   EXPECT_EQ(nullptr, logger);
 }
+#endif

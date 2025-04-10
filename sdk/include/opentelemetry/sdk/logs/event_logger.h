@@ -18,7 +18,8 @@ namespace sdk
 {
 namespace logs
 {
-class OPENTELEMETRY_EXPORT_TYPE EventLogger final : public opentelemetry::logs::EventLogger
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+class OPENTELEMETRY_EXPORT_TYPE OPENTELEMETRY_DEPRECATED EventLogger final : public opentelemetry::logs::EventLogger
 {
 public:
   /**
@@ -45,6 +46,7 @@ private:
   nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger_;
   std::string event_domain_;
 };
+#endif
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

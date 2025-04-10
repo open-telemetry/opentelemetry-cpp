@@ -2,8 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//:dll_deps.bzl", "dll_deps")
-load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
-load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_test_library", "otel_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -68,9 +67,8 @@ otel_cc_library(
     ],
 )
 
-otel_cc_library(
+otel_cc_test_library(
     name = "prometheus_test_helper",
-    testonly = 1,
     hdrs = [
         "test/prometheus_test_helper.h",
     ],
@@ -163,9 +161,8 @@ otel_cc_library(
     ],
 )
 
-otel_cc_library(
+otel_cc_test_library(
     name = "prometheus_push_test_helper",
-    testonly = 1,
     hdrs = [
         "test/prometheus_push_test_helper.h",
     ],

@@ -96,3 +96,18 @@ otel_cc_test(
         "@googletest//:gtest_main",
     ]),
 )
+
+cc_test(
+    name = "logger_config_test",
+    srcs = [
+        "logger_config_test.cc",
+    ],
+    tags = [
+        "logs",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/logs",
+        "@googletest//:gtest_main",
+    ],
+)

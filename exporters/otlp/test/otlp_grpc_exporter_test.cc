@@ -39,6 +39,7 @@
 
 #  include <grpcpp/grpcpp.h>
 #  include <gtest/gtest.h>
+#  include <future>
 
 #  if defined(_MSC_VER)
 #    include "opentelemetry/sdk/common/env_variables.h"
@@ -512,14 +513,20 @@ TEST_P(OtlpGrpcExporterRetryIntegrationTests, StatusCodes)
   TestTraceService service(status_codes);
   std::unique_ptr<grpc::Server> server;
 
-  std::thread server_thread([&server, &service]() {
+  std::promise<void> server_ready;
+  auto server_ready_future = server_ready.get_future();
+
+  std::thread server_thread([&server, &service, &server_ready]() {
     std::string address("localhost:4317");
     grpc::ServerBuilder builder;
     builder.RegisterService(&service);
     builder.AddListeningPort(address, grpc::InsecureServerCredentials());
     server = builder.BuildAndStart();
+    server_ready.set_value();
     server->Wait();
   });
+
+  server_ready_future.wait();
 
   otlp::OtlpGrpcExporterOptions opts{};
 

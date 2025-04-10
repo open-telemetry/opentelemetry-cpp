@@ -8,6 +8,7 @@ add_library(
   meter_provider.cc
   meter_provider_factory.cc
   meter.cc
+  meter_config.cc
   meter_context.cc
   meter_context_factory.cc
   metric_reader.cc
@@ -44,10 +45,10 @@ target_include_directories(
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS opentelemetry_metrics
-    EXPORT "${PROJECT_NAME}-target"
+    EXPORT "${PROJECT_NAME}-sdk-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk)
 
   opentelemetry_add_pkgconfig(
     metrics "OpenTelemetry SDK - Metrics"

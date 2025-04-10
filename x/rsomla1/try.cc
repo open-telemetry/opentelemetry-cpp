@@ -20,7 +20,6 @@ namespace trace_sdk  = opentelemetry::sdk::trace;
 namespace nostd      = opentelemetry::nostd;
 
 
-void setup_exporter();
 extern "C" IMPORT void foo();
 
 

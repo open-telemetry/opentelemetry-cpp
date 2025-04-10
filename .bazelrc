@@ -4,7 +4,7 @@
 # Track changes in folders referenced by copy_directory
 startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
 
-build --features=parse_headers
+#build --features=parse_headers
 #build --features=layering_check
 
 # Don't try to build .so and .dylib shared libs (instead of static) libs on Linux/OSX
@@ -26,8 +26,9 @@ test --test_tag_filters=-jaeger,-opentracing,-opentracing_shim
 build --experimental_convenience_symlinks=clean
 
 build:windows      --copt="/Brepro"      --copt="/guard:cf"      --copt="/guard:ehcont"      --copt="/Z7"      --copt="/JMC-"      --copt="/sdl" 
-build:windows      --linkopt="/Brepro"      --linkopt="/guard:cf"      --linkopt="/guard:ehcont" --linkopt="/DEBUG:FULL" --linkopt="/CETCOMPAT" --linkopt="/SWAPRUN:NET,CD" --linkopt="/OPT:REF,ICF" --linkopt="/RELEASE" --linkopt="/DEBUGTYPE:CV,PDATA,FIXUP" 
+build:windows      --linkopt="/Brepro"      --linkopt="/guard:cf"      --linkopt="/guard:ehcont" --linkopt="/DEBUG:FULL" --linkopt="/CETCOMPAT" --linkopt="/SWAPRUN:NET,CD" --linkopt="/OPT:REF,NOICF" --linkopt="/RELEASE" --linkopt="/DEBUGTYPE:CV,PDATA,FIXUP" 
 build:windows --copt="/Zc:strictStrings"
+build:windows --copt="/Gy"
 build:windows --host_linkopt="shell32.lib" 
 # Requires Visual Studio 2019 Build Tools installed in default location with the latest compiler (14.29.30133) for x64
 build:windows      --action_env=BAZEL_VC_FULL_VERSION=14.29.30133      --action_env=BAZEL_WINSDK_FULL_VERSION=10.0.22621.0
@@ -51,9 +52,9 @@ build:macos --strip=never --copt=-g --cxxopt=-g
 # Does not yet compoile with the Developer command-line tools, needs clang from homebrew
 #build:macos --action_env=/Library/Developer/CommandLineTools/usr/bin/clang
 #build:macos --host_action_env=/Library/Developer/CommandLineTools/usr/bin/clang
-build:macos --action_env=CC=/opt/homebrew/bin/clang
-build:macos --host_action_env=CC=/opt/homebrew/bin/clang
-build:macos --apple_generate_dsym --output_groups=+dsyms
+build:macos --action_env=CC=/opt/homebrew/opt/llvm/bin/clang
+build:macos --host_action_env=CC=/opt/homebrew/opt/llvm/bin/clang
+#build:macos --apple_generate_dsym --output_groups=+dsyms
 
 # --config=asan : Address Sanitizer.
 common:asan --copt -DADDRESS_SANITIZER
@@ -115,10 +116,6 @@ common --incompatible_modify_execution_info_additive
 common --modify_execution_info=CppCompile=+supports-path-mapping
 common --skip_incompatible_explicit_targets
 
-build --@curl//:use_mbedtls=true 
-# build --@curl//:http_only=true
-
-
 # build --experimental_save_feature_state
 # saves .s and .ii files but tends to be super slow
 # build --save_temps
@@ -129,12 +126,12 @@ mod --lockfile_mode=refresh
 build:windows --config=clang-cl
 
 # See MODULE.bazel where we've disabled the platform/toolchain setup, but made it back here
+build:clang-cl --host_copt=-Wno-dynamic-class-memaccess --copt=-Wno-dynamic-class-memaccess
+build:clang-cl --host_copt=-Wno-microsoft-cast --copt=-Wno-microsoft-cast
+build:clang-cl --host_copt=-Wno-invalid-offsetof --copt=-Wno-invalid-offsetof
+
 build:clang-cl --host_platform=@otel_sdk//:x64_windows-clang-cl
 build:clang-cl --extra_toolchains=@local_config_cc//:cc-toolchain-x64_windows-clang-cl
-build:clang-cl --per_file_copt="protobuf\\+/.*@-Wno-invalid-offsetof"
-build:clang-cl --host_per_file_copt="protobuf\\+/.*@-Wno-invalid-offsetof"
-build:clang-cl --per_file_copt="c-ares\\+/.*@-Wno-macro-redefined"
-build:clang-cl --host_per_file_copt="c-ares\\+/.*@-Wno-macro-redefined"
 
 common --experimental_enable_android_migration_apis
 
@@ -144,6 +141,9 @@ common:macos --force_pic
 startup --client_debug
 
 common --flag_alias=dll=@otel_sdk//:with_dll
+
+# disable GRPC experiments
+build --define=grpc_experiments_are_final=true
 
 ## This is what my ../top.bazelrc contains (not in the repo as local to my machine)
 # build --disk_cache=f:/b/d

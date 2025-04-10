@@ -42,10 +42,12 @@ static constexpr const char *kJvm = "jvm";
 static constexpr const char *kKernel = "kernel";
 
 /**
- * <a href="https://wikipedia.org/wiki/C_(programming_language)">C</a>, <a
+ * Can be one of but not limited to <a
+ * href="https://wikipedia.org/wiki/C_(programming_language)">C</a>, <a
  * href="https://wikipedia.org/wiki/C%2B%2B">C++</a>, <a
- * href="https://wikipedia.org/wiki/Go_(programming_language)">Go</a>, <a
- * href="https://wikipedia.org/wiki/Rust_(programming_language)">Rust</a>
+ * href="https://wikipedia.org/wiki/Go_(programming_language)">Go</a> or <a
+ * href="https://wikipedia.org/wiki/Rust_(programming_language)">Rust</a>. If possible, a more
+ * precise value MUST be used.
  */
 static constexpr const char *kNative = "native";
 
@@ -78,6 +80,16 @@ static constexpr const char *kV8js = "v8js";
  * <a href="https://en.wikipedia.org/wiki/BEAM_(Erlang_virtual_machine)">Erlang</a>
  */
 static constexpr const char *kBeam = "beam";
+
+/**
+ * <a href="https://wikipedia.org/wiki/Go_(programming_language)">Go</a>,
+ */
+static constexpr const char *kGo = "go";
+
+/**
+ * <a href="https://wikipedia.org/wiki/Rust_(programming_language)">Rust</a>
+ */
+static constexpr const char *kRust = "rust";
 
 }  // namespace ProfileFrameTypeValues
 
