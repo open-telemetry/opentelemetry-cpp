@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <algorithm>
+#include <cctype>
 #include <functional>
 #include <string>
 
@@ -62,6 +64,71 @@ struct InstrumentDescriptor
   std::string unit_;
   InstrumentType type_;
   InstrumentValueType value_type_;
+};
+
+inline std::ostream &operator<<(std::ostream &os,
+                                const InstrumentDescriptor &instrument_descriptor) noexcept
+{
+  os << "InstrumentDescriptor{" << "name: " << instrument_descriptor.name_ << ", "
+     << "description: " << instrument_descriptor.description_ << ", "
+     << "unit: " << instrument_descriptor.unit_ << ", "
+     << "type: " << static_cast<int>(instrument_descriptor.type_) << ", "
+     << "value_type: " << static_cast<int>(instrument_descriptor.value_type_) << "}";
+  return os;
+}
+
+inline bool LowerCaseEquals(const std::string &lhs, const std::string &rhs)
+{
+  return lhs.size() == rhs.size() &&
+         std::equal(lhs.begin(), lhs.end(), rhs.begin(), [](char a, char b) {
+           return std::tolower(static_cast<unsigned char>(a)) ==
+                  std::tolower(static_cast<unsigned char>(b));
+         });
+}
+
+inline bool IsInstrumentDuplicate(const InstrumentDescriptor &lhs,
+                                  const InstrumentDescriptor &rhs) noexcept
+{
+  const bool names_match        = LowerCaseEquals(lhs.name_, rhs.name_);
+  const bool kinds_match        = (lhs.type_ == rhs.type_) && (lhs.value_type_ == rhs.value_type_);
+  const bool units_match        = (lhs.unit_ == rhs.unit_);
+  const bool descriptions_match = (lhs.description_ == rhs.description_);
+
+  return names_match && (!kinds_match || !units_match || !descriptions_match);
+}
+
+struct InstrumentEqualNameCaseInsensitive
+{
+  bool operator()(const InstrumentDescriptor &lhs, const InstrumentDescriptor &rhs) const noexcept
+  {
+    const bool names_match = LowerCaseEquals(lhs.name_, rhs.name_);
+    const bool kinds_match = (lhs.type_ == rhs.type_) && (lhs.value_type_ == rhs.value_type_);
+    const bool units_match = (lhs.unit_ == rhs.unit_);
+    const bool descriptions_match = (lhs.description_ == rhs.description_);
+
+    return names_match && kinds_match && units_match && descriptions_match;
+  }
+};
+
+struct InstrumentDescriptorHash
+{
+  std::size_t operator()(const InstrumentDescriptor &instrument_descriptor) const noexcept
+  {
+    const std::string seed_string =
+        instrument_descriptor.description_ + instrument_descriptor.unit_;
+    std::size_t hashcode{};
+    sdk::common::GetHash(hashcode, seed_string);
+
+    for (char c : instrument_descriptor.name_)
+    {
+      sdk::common::GetHash(hashcode,
+                           static_cast<char>(std::tolower(static_cast<unsigned char>(c))));
+    }
+
+    sdk::common::GetHash(hashcode, static_cast<uint32_t>(instrument_descriptor.type_));
+    sdk::common::GetHash(hashcode, static_cast<uint32_t>(instrument_descriptor.value_type_));
+    return hashcode;
+  }
 };
 
 using MetricAttributes               = opentelemetry::sdk::metrics::FilteredOrderedAttributeMap;

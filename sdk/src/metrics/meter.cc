@@ -486,23 +486,20 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
         {
           view_instr_desc.description_ = view.GetDescription();
         }
-        auto multi_storage = static_cast<SyncMultiMetricStorage *>(storages.get());
-
-        if (auto storage_iter = storage_registry_.find(view_instr_desc.name_);
-            storage_iter != storage_registry_.end())
+        auto storage_iter = storage_registry_.find(view_instr_desc);
+        if (storage_iter != storage_registry_.end())
         {
+          WarnOnNameCaseConflict(storage_iter->first, view_instr_desc);
           auto storage = std::dynamic_pointer_cast<SyncMetricStorage>(storage_iter->second);
           if (!storage)
           {
-            OTEL_INTERNAL_LOG_ERROR(
-                "[Meter::RegisterSyncMetricStorage] - Error during finding matching views."
-                << "The storage is not of type SyncMetricStorage");
             return false;
           }
-          multi_storage->AddStorage(storage);
+          static_cast<SyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
         }
         else
         {
+          WarnOnDuplicateInstrument(storage_registry_, view_instr_desc);
           auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
               view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -511,8 +508,8 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
                                    instrument_descriptor),
 #endif
               view.GetAggregationConfig()));
-          storage_registry_.insert({instrument_descriptor.name_, storage});
-          multi_storage->AddStorage(storage);
+          storage_registry_.insert({instrument_descriptor, storage});
+          static_cast<SyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
         }
         return true;
       });
@@ -562,15 +559,13 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         {
           view_instr_desc.description_ = view.GetDescription();
         }
-        if (auto storage_iter = storage_registry_.find(view_instr_desc.name_);
-            storage_iter != storage_registry_.end())
+        auto storage_iter = storage_registry_.find(view_instr_desc);
+        if (storage_iter != storage_registry_.end())
         {
+          WarnOnNameCaseConflict(storage_iter->first, view_instr_desc);
           auto storage = std::dynamic_pointer_cast<AsyncMetricStorage>(storage_iter->second);
           if (!storage)
           {
-            OTEL_INTERNAL_LOG_ERROR(
-                "[Meter::RegisterAsyncMetricStorage] - Error during finding matching views."
-                << "The storage is not of type AsyncMetricStorage");
             return false;
           }
           static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
@@ -578,6 +573,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         }
         else
         {
+          WarnOnDuplicateInstrument(storage_registry_, view_instr_desc);
           auto storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
               view_instr_desc, view.GetAggregationType(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -586,7 +582,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
                                    instrument_descriptor),
 #endif
               view.GetAggregationConfig()));
-          storage_registry_[instrument_descriptor.name_] = storage;
+          storage_registry_.insert({instrument_descriptor, storage});
           static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
         }
         return true;
@@ -627,6 +623,34 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
                                    });
   }
   return metric_data_list;
+}
+
+void Meter::WarnOnDuplicateInstrument(const MetricStorageMap &storage_registry,
+                                      const InstrumentDescriptor &new_instrument) const
+{
+  for (const auto &element : storage_registry)
+  {
+    const auto &existing_instrument = element.first;
+    if (IsInstrumentDuplicate(existing_instrument, new_instrument))
+    {
+      OTEL_INTERNAL_LOG_WARN("[Meter::WarnOnDuplicateInstrument] Creating a duplicate instrument. "
+                             << "Meter: " << scope_->GetName() << ", Existing instrument: "
+                             << existing_instrument << ", New instrument: " << new_instrument);
+      return;
+    }
+  }
+}
+
+void Meter::WarnOnNameCaseConflict(const InstrumentDescriptor &existing_instrument,
+                                   const InstrumentDescriptor &new_instrument) const
+{
+  if (existing_instrument.name_ != new_instrument.name_)
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[Meter::WarnOnNameCaseConflict] Instrument name case conflict detected. "
+        << "Meter: " << scope_->GetName() << ", Existing instrument: " << existing_instrument
+        << ", New instrument: " << new_instrument);
+  }
 }
 
 }  // namespace metrics
