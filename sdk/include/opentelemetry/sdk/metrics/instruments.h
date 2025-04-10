@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cctype>
 #include <functional>
+#include <ostream>
 #include <string>
 
 #include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
@@ -77,7 +78,7 @@ inline std::ostream &operator<<(std::ostream &os,
   return os;
 }
 
-inline bool LowerCaseEquals(const std::string &lhs, const std::string &rhs)
+inline bool CaseInsensitiveEquals(const std::string &lhs, const std::string &rhs) noexcept
 {
   return lhs.size() == rhs.size() &&
          std::equal(lhs.begin(), lhs.end(), rhs.begin(), [](char a, char b) {
@@ -89,7 +90,7 @@ inline bool LowerCaseEquals(const std::string &lhs, const std::string &rhs)
 inline bool IsInstrumentDuplicate(const InstrumentDescriptor &lhs,
                                   const InstrumentDescriptor &rhs) noexcept
 {
-  const bool names_match        = LowerCaseEquals(lhs.name_, rhs.name_);
+  const bool names_match        = CaseInsensitiveEquals(lhs.name_, rhs.name_);
   const bool kinds_match        = (lhs.type_ == rhs.type_) && (lhs.value_type_ == rhs.value_type_);
   const bool units_match        = (lhs.unit_ == rhs.unit_);
   const bool descriptions_match = (lhs.description_ == rhs.description_);
@@ -101,7 +102,7 @@ struct InstrumentEqualNameCaseInsensitive
 {
   bool operator()(const InstrumentDescriptor &lhs, const InstrumentDescriptor &rhs) const noexcept
   {
-    const bool names_match = LowerCaseEquals(lhs.name_, rhs.name_);
+    const bool names_match = CaseInsensitiveEquals(lhs.name_, rhs.name_);
     const bool kinds_match = (lhs.type_ == rhs.type_) && (lhs.value_type_ == rhs.value_type_);
     const bool units_match = (lhs.unit_ == rhs.unit_);
     const bool descriptions_match = (lhs.description_ == rhs.description_);
@@ -114,10 +115,7 @@ struct InstrumentDescriptorHash
 {
   std::size_t operator()(const InstrumentDescriptor &instrument_descriptor) const noexcept
   {
-    const std::string seed_string =
-        instrument_descriptor.description_ + instrument_descriptor.unit_;
     std::size_t hashcode{};
-    sdk::common::GetHash(hashcode, seed_string);
 
     for (char c : instrument_descriptor.name_)
     {
@@ -125,6 +123,8 @@ struct InstrumentDescriptorHash
                            static_cast<char>(std::tolower(static_cast<unsigned char>(c))));
     }
 
+    sdk::common::GetHash(hashcode, instrument_descriptor.description_);
+    sdk::common::GetHash(hashcode, instrument_descriptor.unit_);
     sdk::common::GetHash(hashcode, static_cast<uint32_t>(instrument_descriptor.type_));
     sdk::common::GetHash(hashcode, static_cast<uint32_t>(instrument_descriptor.value_type_));
     return hashcode;

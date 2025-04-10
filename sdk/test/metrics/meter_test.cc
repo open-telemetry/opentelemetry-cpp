@@ -93,10 +93,10 @@ class TestLogHandler : public LogHandler
 {
 public:
   void Handle(LogLevel level,
-              const char *file,
-              int line,
+              const char * /*file*/,
+              int /*line*/,
               const char *msg,
-              const sdk::common::AttributeMap &attributes) noexcept override
+              const sdk::common::AttributeMap & /*attributes*/) noexcept override
 
   {
     if (LogLevel::Warning == level)
@@ -129,17 +129,22 @@ protected:
   void SetUp() override
   {
     ASSERT_TRUE(log_handler_ != nullptr);
+    ASSERT_TRUE(metric_reader_ptr_ != nullptr);
+    ASSERT_TRUE(provider_ != nullptr);
     GlobalLogHandler::SetLogHandler(std::static_pointer_cast<LogHandler>(log_handler_));
     GlobalLogHandler::SetLogLevel(LogLevel::Warning);
-    meter_ = InitMeter(&metric_reader_ptr_, "test_meter");
+
+    provider_->AddMetricReader(metric_reader_ptr_);
+    meter_ = provider_->GetMeter("test_meter");
     ASSERT_TRUE(meter_ != nullptr);
   }
 
   void TearDown() override {}
 
+  std::shared_ptr<sdk::metrics::MeterProvider> provider_{new sdk::metrics::MeterProvider()};
   std::shared_ptr<TestLogHandler> log_handler_{new TestLogHandler()};
   opentelemetry::nostd::shared_ptr<opentelemetry::metrics::Meter> meter_{nullptr};
-  MetricReader *metric_reader_ptr_{nullptr};
+  std::shared_ptr<MetricReader> metric_reader_ptr_{new MockMetricReader()};
 };
 
 }  // namespace
