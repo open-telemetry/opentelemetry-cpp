@@ -490,11 +490,10 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
         if (storage_iter != storage_registry_.end())
         {
           WarnOnNameCaseConflict(storage_iter->first, view_instr_desc);
-          auto storage = std::dynamic_pointer_cast<SyncMetricStorage>(storage_iter->second);
-          if (!storage)
-          {
-            return false;
-          }
+          // static cast is okay here. If storage_registry_.find is successful
+          // InstrumentEqualNameCaseInsensitive ensures that the
+          // instrument type and value type are the same.
+          auto storage = std::static_pointer_cast<SyncMetricStorage>(storage_iter->second);
           static_cast<SyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
         }
         else
@@ -563,11 +562,10 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         if (storage_iter != storage_registry_.end())
         {
           WarnOnNameCaseConflict(storage_iter->first, view_instr_desc);
-          auto storage = std::dynamic_pointer_cast<AsyncMetricStorage>(storage_iter->second);
-          if (!storage)
-          {
-            return false;
-          }
+          // static cast is okay here. If storage_registry_.find is successful
+          // InstrumentEqualNameCaseInsensitive ensures that the
+          // instrument type and value type are the same.
+          auto storage = std::static_pointer_cast<AsyncMetricStorage>(storage_iter->second);
           static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
           return true;
         }
