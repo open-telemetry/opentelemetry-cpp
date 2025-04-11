@@ -13,7 +13,7 @@
       {
         "kind": "archive",
         "url": "https://github.com/theoremlp/multitool/releases/download/v0.9.0/multitool-x86_64-unknown-linux-gnu.tar.xz",
-        "file": "multitool",
+        "file": "multitool-x86_64-unknown-linux-gnu/multitool",
         "sha256": "34dc5968dad458a4050ebde58e484ebb7c624a119e4031347683eeb80922e6df",
         "os": "linux",
         "cpu": "x86_64"
@@ -52,6 +52,14 @@
         "file": "otelcol-contrib.exe",
         "sha256": "45719e65e5c247e14b252031f3bc59c19afa1bd7503676f1bb821a7d08583eaf",
         "os": "windows",
+        "cpu": "x86_64"
+      },
+      {
+        "kind": "archive",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.123.1/otelcol-contrib_0.123.1_linux_amd64.tar.gz",
+        "sha256": "5362e106390ff2a35cc472e948e8c894e06277bfc8a1f7cbc49f1ee0aadd0b45",
+        "file": "otelcol-contrib",
+        "os": "linux",
         "cpu": "x86_64"
       }
     ]
