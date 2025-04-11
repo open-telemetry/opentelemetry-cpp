@@ -24,7 +24,7 @@ You can link OpenTelemetry C++ SDK with libraries provided in
   Git](https://help.github.com/articles/set-up-git/) guide on GitHub.
 - [CMake](https://cmake.org/) for building opentelemetry-cpp API, SDK with their
   unittests. The minimum CMake version is 3.14.
-  Cmake 3.15+ is recommended on Windows due to known ci test failures with 3.14.
+  CMake 3.15+ is recommended on Windows due to known CI test failures with 3.14.
   To install CMake,
   consult the [Installing CMake](https://cmake.org/install/) guide.
 - [GoogleTest](https://github.com/google/googletest) framework to build and run
