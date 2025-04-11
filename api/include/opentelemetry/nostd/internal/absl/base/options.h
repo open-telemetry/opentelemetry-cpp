@@ -80,10 +80,20 @@
 #  if _MSC_VER >= 1922
 #    include <version>
 #  endif
-#elif defined(__cplusplus) && __cplusplus < 201703L
-#  include <ciso646>
 #else
-#  include <iso646.h>
+#  if defined(__GNUC__) && !defined(__clang__) && !defined(__apple_build_version__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wcpp"
+#  elif defined(__clang__) || defined(__apple_build_version__)
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wcpp"
+#  endif
+#  include <ciso646>
+#  if defined(__GNUC__) && !defined(__clang__) && !defined(__apple_build_version__)
+#      pragma GCC diagnostic pop
+#  elif defined(__clang__) || defined(__apple_build_version__)
+#    pragma clang diagnostic pop
+#  endif
 #endif
 
 // -----------------------------------------------------------------------------
