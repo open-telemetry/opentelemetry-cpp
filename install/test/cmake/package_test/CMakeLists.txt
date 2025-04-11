@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 
 project(opentelemetry-cpp-full-package-install-test LANGUAGES CXX)
 
@@ -60,7 +60,7 @@ message(
     "Testing the full package install on components = ${INSTALL_TEST_COMPONENTS}"
 )
 
-find_package(GTest REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 include(GoogleTest)
 
 add_executable(full_test)

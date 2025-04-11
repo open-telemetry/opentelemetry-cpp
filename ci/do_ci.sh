@@ -265,13 +265,14 @@ elif [[ "$1" == "cmake.opentracing_shim.install.test" ]]; then
     "shims_opentracing"
   )
   EXPECTED_COMPONENTS_STRING=$(IFS=\;; echo "${EXPECTED_COMPONENTS[*]}")
-  cmake -S "${SRC_DIR}/install/test/cmake" \
-        -B "${BUILD_DIR}/install_test" \
-        "${CMAKE_OPTIONS[@]}" \
+  mkdir -p "${BUILD_DIR}/install_test"
+  cd "${BUILD_DIR}/install_test"
+  cmake "${CMAKE_OPTIONS[@]}" \
         "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
         "-DINSTALL_TEST_CMAKE_OPTIONS=${CMAKE_OPTIONS_STRING}" \
-        "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}"
-  ctest --test-dir "${BUILD_DIR}/install_test" --output-on-failure
+        "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}" \
+        -S "${SRC_DIR}/install/test/cmake"
+  ctest --output-on-failure
   exit 0
 elif [[ "$1" == "cmake.c++20.test" ]]; then
   cd "${BUILD_DIR}"
@@ -476,6 +477,8 @@ elif [[ "$1" == "cmake.install.test" ]]; then
         -DWITH_ZIPKIN=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_EXAMPLES=ON \
+        -DWITH_EXAMPLES_HTTP=ON \
+        -DBUILD_W3CTRACECONTEXT_TEST=ON \
         -DOPENTELEMETRY_INSTALL=ON \
         "${SRC_DIR}"
 
@@ -502,14 +505,14 @@ elif [[ "$1" == "cmake.install.test" ]]; then
     "exporters_zipkin"
   )
   EXPECTED_COMPONENTS_STRING=$(IFS=\;; echo "${EXPECTED_COMPONENTS[*]}")
-
-  cmake -S "${SRC_DIR}/install/test/cmake" \
-        -B "${BUILD_DIR}/install_test" \
-         "${CMAKE_OPTIONS[@]}" \
+  mkdir -p "${BUILD_DIR}/install_test"
+  cd "${BUILD_DIR}/install_test"
+  cmake  "${CMAKE_OPTIONS[@]}" \
          "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
          "-DINSTALL_TEST_CMAKE_OPTIONS=${CMAKE_OPTIONS_STRING}" \
-         "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}"
-  ctest --test-dir "${BUILD_DIR}/install_test" --output-on-failure
+         "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}" \
+         -S "${SRC_DIR}/install/test/cmake"
+  ctest --output-on-failure
   exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin

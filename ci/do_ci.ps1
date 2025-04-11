@@ -388,6 +388,8 @@ switch ($action) {
       -DWITH_ELASTICSEARCH=ON `
       -DWITH_ETW=ON `
       -DWITH_EXAMPLES=ON `
+      -DWITH_EXAMPLES_HTTP=ON `
+      -DBUILD_W3CTRACECONTEXT_TEST=ON `
       -DOPENTELEMETRY_INSTALL=ON
 
     $exit = $LASTEXITCODE
@@ -435,19 +437,21 @@ switch ($action) {
     )
     $EXPECTED_COMPONENTS_STRING = $EXPECTED_COMPONENTS -join ";"
 
-    cmake -S "$SRC_DIR\install\test\cmake" `
-          -B "$BUILD_DIR\install_test" `
-          $CMAKE_OPTIONS `
+    mkdir "$BUILD_DIR\install_test"
+    cd "$BUILD_DIR\install_test"
+
+    cmake $CMAKE_OPTIONS `
           "-DCMAKE_PREFIX_PATH=$INSTALL_TEST_DIR" `
           "-DINSTALL_TEST_CMAKE_OPTIONS=$CMAKE_OPTIONS_STRING" `
-          "-DINSTALL_TEST_COMPONENTS=$EXPECTED_COMPONENTS_STRING" 
+          "-DINSTALL_TEST_COMPONENTS=$EXPECTED_COMPONENTS_STRING" `
+          -S "$SRC_DIR\install\test\cmake"
           
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
 
-    ctest -C Debug --test-dir "$BUILD_DIR\install_test" --output-on-failure
+    ctest -C Debug --output-on-failure
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -528,20 +532,22 @@ switch ($action) {
       "ext_dll" 
     )
     $EXPECTED_COMPONENTS_STRING = $EXPECTED_COMPONENTS -join ";"
-   
-    cmake -S "$SRC_DIR\install\test\cmake" `
-          -B "$BUILD_DIR\install_test" `
-          $CMAKE_OPTIONS `
+
+    mkdir "$BUILD_DIR\install_test"
+    cd "$BUILD_DIR\install_test"
+
+    cmake $CMAKE_OPTIONS `
           "-DCMAKE_PREFIX_PATH=$INSTALL_TEST_DIR" `
           "-DINSTALL_TEST_CMAKE_OPTIONS=$CMAKE_OPTIONS_STRING" `
-          "-DINSTALL_TEST_COMPONENTS=$EXPECTED_COMPONENTS_STRING"
+          "-DINSTALL_TEST_COMPONENTS=$EXPECTED_COMPONENTS_STRING" `
+          -S "$SRC_DIR\install\test\cmake"
           
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
 
-    ctest -C Debug --test-dir "$BUILD_DIR\install_test" --output-on-failure
+    ctest -C Debug --output-on-failure
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
