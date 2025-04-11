@@ -638,6 +638,9 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
   return metric_data_list;
 }
 
+// Implementation of the log message recommended by the SDK specification for duplicate instruments.
+// See
+// https://github.com/open-telemetry/opentelemetry-specification/blob/9c8c30631b0e288de93df7452f91ed47f6fba330/specification/metrics/sdk.md?plain=1#L882
 void Meter::WarnOnDuplicateInstrument(const MetricStorageMap &storage_registry,
                                       const InstrumentDescriptor &new_instrument) const
 {
@@ -654,6 +657,9 @@ void Meter::WarnOnDuplicateInstrument(const MetricStorageMap &storage_registry,
   }
 }
 
+// Implementation of the log message recommended by the SDK specification for name case conflicts.
+// See
+// https://github.com/open-telemetry/opentelemetry-specification/blob/9c8c30631b0e288de93df7452f91ed47f6fba330/specification/metrics/sdk.md?plain=1#L910
 void Meter::WarnOnNameCaseConflict(const InstrumentDescriptor &existing_instrument,
                                    const InstrumentDescriptor &new_instrument) const
 {

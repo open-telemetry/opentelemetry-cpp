@@ -75,6 +75,10 @@ inline bool CaseInsensitiveEquals(const std::string &lhs, const std::string &rhs
          });
 }
 
+// Implementation of the specification requirements on duplicate instruments
+// An instrument is a duplicate if it has the same name (case-insensitive) as another instrument,
+// but different instrument kind, unit, or description.
+// https://github.com/open-telemetry/opentelemetry-specification/blob/9c8c30631b0e288de93df7452f91ed47f6fba330/specification/metrics/sdk.md?plain=1#L869
 inline bool IsInstrumentDuplicate(const InstrumentDescriptor &lhs,
                                   const InstrumentDescriptor &rhs) noexcept
 {
@@ -99,6 +103,10 @@ struct InstrumentEqualNameCaseInsensitive
   }
 };
 
+// Hash function for InstrumentDescriptor
+// Identical instruments must have the same hash value
+// Two instruments are identical when all identifying fields (case-insensitive name , kind,
+// description, unit) are equal.
 struct InstrumentDescriptorHash
 {
   std::size_t operator()(const InstrumentDescriptor &instrument_descriptor) const noexcept
