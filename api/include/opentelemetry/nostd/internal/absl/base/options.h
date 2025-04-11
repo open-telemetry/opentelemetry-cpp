@@ -69,8 +69,21 @@
 
 // Include a standard library header to allow configuration based on the
 // standard library in use.
-#ifdef __cplusplus
-#include <ciso646>
+// Using C++20 feature-test macros when possible, otherwise fall back to
+// ciso646/iso646.h.There are warnings when includeing ciso646 in C++17 mode
+#ifdef __has_include
+#  if __has_include(<version>)
+#    include <version>
+#  endif
+#elif defined(_MSC_VER) && \
+    ((defined(__cplusplus) && __cplusplus >= 202002L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L))
+#  if _MSC_VER >= 1922
+#    include <version>
+#  endif
+#elif defined(__cplusplus) && __cplusplus < 201703L
+#  include <ciso646>
+#else
+#  include <iso646.h>
 #endif
 
 // -----------------------------------------------------------------------------
