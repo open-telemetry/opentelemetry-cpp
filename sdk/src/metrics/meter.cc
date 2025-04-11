@@ -43,6 +43,21 @@
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_utils.h"
 #endif
 
+namespace
+{
+std::ostream &operator<<(
+    std::ostream &os,
+    const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor) noexcept
+{
+  os << "InstrumentDescriptor{" << "name: " << instrument_descriptor.name_ << ", "
+     << "description: " << instrument_descriptor.description_ << ", "
+     << "unit: " << instrument_descriptor.unit_ << ", "
+     << "type: " << static_cast<uint32_t>(instrument_descriptor.type_) << ", "
+     << "value_type: " << static_cast<uint32_t>(instrument_descriptor.value_type_) << "}";
+  return os;
+}
+}  // namespace
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {

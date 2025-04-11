@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <cctype>
 #include <functional>
-#include <ostream>
 #include <string>
 
 #include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
@@ -66,17 +65,6 @@ struct InstrumentDescriptor
   InstrumentType type_;
   InstrumentValueType value_type_;
 };
-
-inline std::ostream &operator<<(std::ostream &os,
-                                const InstrumentDescriptor &instrument_descriptor) noexcept
-{
-  os << "InstrumentDescriptor{" << "name: " << instrument_descriptor.name_ << ", "
-     << "description: " << instrument_descriptor.description_ << ", "
-     << "unit: " << instrument_descriptor.unit_ << ", "
-     << "type: " << static_cast<int>(instrument_descriptor.type_) << ", "
-     << "value_type: " << static_cast<int>(instrument_descriptor.value_type_) << "}";
-  return os;
-}
 
 inline bool CaseInsensitiveEquals(const std::string &lhs, const std::string &rhs) noexcept
 {
