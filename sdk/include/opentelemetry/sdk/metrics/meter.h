@@ -136,8 +136,12 @@ private:
   // meter-context.
   std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> scope_;
   std::weak_ptr<sdk::metrics::MeterContext> meter_context_;
-  // Mapping between instrument-name and Aggregation Storage.
-  std::unordered_map<std::string, std::shared_ptr<MetricStorage>> storage_registry_;
+  // Mapping between instrument descriptor and Aggregation Storage.
+  using MetricStorageMap = std::unordered_map<InstrumentDescriptor,
+                                              std::shared_ptr<MetricStorage>,
+                                              InstrumentDescriptorHash,
+                                              InstrumentEqualNameCaseInsensitive>;
+  MetricStorageMap storage_registry_;
   std::shared_ptr<ObservableRegistry> observable_registry_;
   MeterConfig meter_config_;
   std::unique_ptr<SyncWritableMetricStorage> RegisterSyncMetricStorage(
@@ -164,6 +168,16 @@ private:
     return instrument_validator.ValidateName(name) && instrument_validator.ValidateUnit(unit) &&
            instrument_validator.ValidateDescription(description);
   }
+
+  // This function checks if the instrument is a duplicate of an existing one
+  // and emits a warning through the internal logger.
+  void WarnOnDuplicateInstrument(const MetricStorageMap &storage_registry,
+                                 const InstrumentDescriptor &new_instrument) const;
+
+  // This function checks if the instrument has a name case conflict with an existing one
+  // and emits a warning through the internal logger.
+  void WarnOnNameCaseConflict(const InstrumentDescriptor &existing_instrument,
+                              const InstrumentDescriptor &new_instrument) const;
 };
 }  // namespace metrics
 }  // namespace sdk

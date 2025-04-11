@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <algorithm>
+#include <cctype>
 #include <functional>
 #include <string>
 
@@ -62,6 +64,67 @@ struct InstrumentDescriptor
   std::string unit_;
   InstrumentType type_;
   InstrumentValueType value_type_;
+};
+
+inline bool CaseInsensitiveEquals(const std::string &lhs, const std::string &rhs) noexcept
+{
+  return lhs.size() == rhs.size() &&
+         std::equal(lhs.begin(), lhs.end(), rhs.begin(), [](char a, char b) {
+           return std::tolower(static_cast<unsigned char>(a)) ==
+                  std::tolower(static_cast<unsigned char>(b));
+         });
+}
+
+// Implementation of the specification requirements on duplicate instruments
+// An instrument is a duplicate if it has the same name (case-insensitive) as another instrument,
+// but different instrument kind, unit, or description.
+// https://github.com/open-telemetry/opentelemetry-specification/blob/9c8c30631b0e288de93df7452f91ed47f6fba330/specification/metrics/sdk.md?plain=1#L869
+inline bool IsInstrumentDuplicate(const InstrumentDescriptor &lhs,
+                                  const InstrumentDescriptor &rhs) noexcept
+{
+  const bool names_match        = CaseInsensitiveEquals(lhs.name_, rhs.name_);
+  const bool kinds_match        = (lhs.type_ == rhs.type_) && (lhs.value_type_ == rhs.value_type_);
+  const bool units_match        = (lhs.unit_ == rhs.unit_);
+  const bool descriptions_match = (lhs.description_ == rhs.description_);
+
+  return names_match && (!kinds_match || !units_match || !descriptions_match);
+}
+
+struct InstrumentEqualNameCaseInsensitive
+{
+  bool operator()(const InstrumentDescriptor &lhs, const InstrumentDescriptor &rhs) const noexcept
+  {
+    const bool names_match = CaseInsensitiveEquals(lhs.name_, rhs.name_);
+    const bool kinds_match = (lhs.type_ == rhs.type_) && (lhs.value_type_ == rhs.value_type_);
+    const bool units_match = (lhs.unit_ == rhs.unit_);
+    const bool descriptions_match = (lhs.description_ == rhs.description_);
+
+    return names_match && kinds_match && units_match && descriptions_match;
+  }
+};
+
+// Hash function for InstrumentDescriptor
+// Identical instruments must have the same hash value
+// Two instruments are identical when all identifying fields (case-insensitive name , kind,
+// description, unit) are equal.
+struct InstrumentDescriptorHash
+{
+  std::size_t operator()(const InstrumentDescriptor &instrument_descriptor) const noexcept
+  {
+    std::size_t hashcode{};
+
+    for (char c : instrument_descriptor.name_)
+    {
+      sdk::common::GetHash(hashcode,
+                           static_cast<char>(std::tolower(static_cast<unsigned char>(c))));
+    }
+
+    sdk::common::GetHash(hashcode, instrument_descriptor.description_);
+    sdk::common::GetHash(hashcode, instrument_descriptor.unit_);
+    sdk::common::GetHash(hashcode, static_cast<uint32_t>(instrument_descriptor.type_));
+    sdk::common::GetHash(hashcode, static_cast<uint32_t>(instrument_descriptor.value_type_));
+    return hashcode;
+  }
 };
 
 using MetricAttributes               = opentelemetry::sdk::metrics::FilteredOrderedAttributeMap;

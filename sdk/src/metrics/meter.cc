@@ -43,6 +43,21 @@
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_utils.h"
 #endif
 
+namespace
+{
+std::ostream &operator<<(
+    std::ostream &os,
+    const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor) noexcept
+{
+  os << "InstrumentDescriptor{" << "name: " << instrument_descriptor.name_ << ", "
+     << "description: " << instrument_descriptor.description_ << ", "
+     << "unit: " << instrument_descriptor.unit_ << ", "
+     << "type: " << static_cast<uint32_t>(instrument_descriptor.type_) << ", "
+     << "value_type: " << static_cast<uint32_t>(instrument_descriptor.value_type_) << "}";
+  return os;
+}
+}  // namespace
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -486,18 +501,30 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
         {
           view_instr_desc.description_ = view.GetDescription();
         }
-        auto multi_storage = static_cast<SyncMultiMetricStorage *>(storages.get());
-
-        auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
-            view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
+        auto storage_iter = storage_registry_.find(view_instr_desc);
+        if (storage_iter != storage_registry_.end())
+        {
+          WarnOnNameCaseConflict(storage_iter->first, view_instr_desc);
+          // static cast is okay here. If storage_registry_.find is successful
+          // InstrumentEqualNameCaseInsensitive ensures that the
+          // instrument type and value type are the same.
+          auto storage = std::static_pointer_cast<SyncMetricStorage>(storage_iter->second);
+          static_cast<SyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
+        }
+        else
+        {
+          WarnOnDuplicateInstrument(storage_registry_, view_instr_desc);
+          auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
+              view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-            exemplar_filter_type,
-            GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
-                                 instrument_descriptor),
+              exemplar_filter_type,
+              GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
+                                   instrument_descriptor),
 #endif
-            view.GetAggregationConfig()));
-        storage_registry_[instrument_descriptor.name_] = storage;
-        multi_storage->AddStorage(storage);
+              view.GetAggregationConfig()));
+          storage_registry_.insert({instrument_descriptor, storage});
+          static_cast<SyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
+        }
         return true;
       });
 
@@ -546,16 +573,31 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         {
           view_instr_desc.description_ = view.GetDescription();
         }
-        auto storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
-            view_instr_desc, view.GetAggregationType(),
+        auto storage_iter = storage_registry_.find(view_instr_desc);
+        if (storage_iter != storage_registry_.end())
+        {
+          WarnOnNameCaseConflict(storage_iter->first, view_instr_desc);
+          // static cast is okay here. If storage_registry_.find is successful
+          // InstrumentEqualNameCaseInsensitive ensures that the
+          // instrument type and value type are the same.
+          auto storage = std::static_pointer_cast<AsyncMetricStorage>(storage_iter->second);
+          static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
+          return true;
+        }
+        else
+        {
+          WarnOnDuplicateInstrument(storage_registry_, view_instr_desc);
+          auto storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
+              view_instr_desc, view.GetAggregationType(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-            exemplar_filter_type,
-            GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
-                                 instrument_descriptor),
+              exemplar_filter_type,
+              GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
+                                   instrument_descriptor),
 #endif
-            view.GetAggregationConfig()));
-        storage_registry_[instrument_descriptor.name_] = storage;
-        static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
+              view.GetAggregationConfig()));
+          storage_registry_.insert({instrument_descriptor, storage});
+          static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
+        }
         return true;
       });
   if (!success)
@@ -594,6 +636,40 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
                                    });
   }
   return metric_data_list;
+}
+
+// Implementation of the log message recommended by the SDK specification for duplicate instruments.
+// See
+// https://github.com/open-telemetry/opentelemetry-specification/blob/9c8c30631b0e288de93df7452f91ed47f6fba330/specification/metrics/sdk.md?plain=1#L882
+void Meter::WarnOnDuplicateInstrument(const MetricStorageMap &storage_registry,
+                                      const InstrumentDescriptor &new_instrument) const
+{
+  for (const auto &element : storage_registry)
+  {
+    const auto &existing_instrument = element.first;
+    if (IsInstrumentDuplicate(existing_instrument, new_instrument))
+    {
+      OTEL_INTERNAL_LOG_WARN("[Meter::WarnOnDuplicateInstrument] Creating a duplicate instrument. "
+                             << "Meter: " << scope_->GetName() << ", Existing instrument: "
+                             << existing_instrument << ", New instrument: " << new_instrument);
+      return;
+    }
+  }
+}
+
+// Implementation of the log message recommended by the SDK specification for name case conflicts.
+// See
+// https://github.com/open-telemetry/opentelemetry-specification/blob/9c8c30631b0e288de93df7452f91ed47f6fba330/specification/metrics/sdk.md?plain=1#L910
+void Meter::WarnOnNameCaseConflict(const InstrumentDescriptor &existing_instrument,
+                                   const InstrumentDescriptor &new_instrument) const
+{
+  if (existing_instrument.name_ != new_instrument.name_)
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[Meter::WarnOnNameCaseConflict] Instrument name case conflict detected. "
+        << "Meter: " << scope_->GetName() << ", Existing instrument: " << existing_instrument
+        << ", New instrument: " << new_instrument);
+  }
 }
 
 }  // namespace metrics
