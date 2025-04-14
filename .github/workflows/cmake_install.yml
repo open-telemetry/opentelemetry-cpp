@@ -8,10 +8,13 @@ on:
     branches: [ main ]
 
 jobs:
-  windows_2022_vcpkg:
-    name: Windows 2022 vcpkg cxx17 (static libs - dll)
-    runs-on: windows-2025
+  windows_2022_vcpkg_submodule:
+    name: Windows 2022 vcpkg submodule versions cxx17 (static libs - dll)
+    runs-on: windows-2022
     env:
+      # Set to the latest version of cmake 3.x
+      CMAKE_VERSION: '3.31.6'
+      # cxx17 is the default for windows-2022
       CXX_STANDARD: '17'
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -26,10 +29,13 @@ jobs:
       - name: Run DLL Tests
         run: ./ci/do_ci.ps1 cmake.dll.install.test
 
-  windows_2019_vcpkg:
-    name: Windows 2019 vcpkg cxx14 (static libs)
-    runs-on: windows-2025
+  windows_2019_vcpkg_submodule_min_cmake:
+    name: Windows 2019 vcpkg submodule versions minimum cmake cxx14 (static libs)
+    runs-on: windows-2019
     env:
+      # cmake 3.15 is the minimum for windows builds (See https://github.com/open-telemetry/opentelemetry-cpp/pull/3349#discussion_r2030319430)
+      CMAKE_VERSION: '3.15.0'
+      # cxx14 is the default for windows-2019
       CXX_STANDARD: '14'
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -47,6 +53,9 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
+      # CMake 3.28 is apt package version for Ubuntu 24.04
+      CMAKE_VERSION: '3.28.3'
+      # cxx17 is the default for Ubuntu 24.04
       CXX_STANDARD: '17'
       BUILD_TYPE: 'Debug'
     steps:
@@ -71,12 +80,22 @@ jobs:
         BUILD_SHARED_LIBS: 'ON'
       run: ./ci/do_ci.sh cmake.install.test
 
-  ubuntu_2404_script_build_grpc_1_71_0:
-    name: Ubuntu 24.04 script grpc 1.71.0 cxx17 (static libs)
+  ubuntu_2404_latest:
+    name: Ubuntu 24.04 latest versions cxx20 (static libs)
     runs-on: ubuntu-24.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
+      # Set to the latest version of cmake 3.x
+      CMAKE_VERSION: '3.31.6'
+      # Set to the latest cxx standard supported by opentelemetry-cpp
       CXX_STANDARD: '20'
+      # Versions below set to the latest version available
+      # The abseil and protobuf versions are taken from
+      # the grpc submodules at the GRPC_VERSION tag
+      GOOGLETEST_VERSION: '1.16.0'
+      ABSEIL_CPP_VERSION: '20240722.1'
+      PROTOBUF_VERSION: '29.0'
+      GRPC_VERSION: 'v1.71.0'
       BUILD_TYPE: 'Debug'
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -88,10 +107,6 @@ jobs:
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: Build abseil, protobuf, and grpc with ci scripts
-      env:
-        ABSEIL_CPP_VERSION: '20240722.1'
-        PROTOBUF_VERSION: '29.0'
-        GRPC_VERSION: 'v1.71.0'
       run: |
         sudo -E ./ci/install_abseil.sh
         sudo -E ./ci/install_protobuf.sh
@@ -101,12 +116,20 @@ jobs:
         BUILD_SHARED_LIBS: 'OFF'
       run: ./ci/do_ci.sh cmake.install.test
 
-  ubuntu_2204_script_build_grpc_1_55_0:
-    name: Ubuntu 22.04 script grpc 1.55.0 cxx17 (static libs - shared libs)
-    runs-on: ubuntu-24.04
+  ubuntu_2204_stable:
+    name: Ubuntu 22.04 stable versions cxx17 (static libs - shared libs)
+    runs-on: ubuntu-22.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
+      # CMake 3.22 is the apt package version for Ubuntu 22.04
+      CMAKE_VERSION: '3.22.0'
       CXX_STANDARD: '17'
+      # These are stable versions tested in the main ci workflow
+      # and defaults in the devcontainer
+      GOOGLETEST_VERSION: '1.14.0'
+      ABSEIL_CPP_VERSION: '20230125.3'
+      PROTOBUF_VERSION: '23.3'
+      GRPC_VERSION: 'v1.55.0'
       BUILD_TYPE: 'Debug'
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -118,10 +141,6 @@ jobs:
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: Build abseil, protobuf, and grpc with ci scripts
-      env:
-        ABSEIL_CPP_VERSION: '20230125.3'
-        PROTOBUF_VERSION: '23.3'
-        GRPC_VERSION: 'v1.55.0'
       run: |
         sudo -E ./ci/install_abseil.sh
         sudo -E ./ci/install_protobuf.sh
@@ -135,12 +154,21 @@ jobs:
         BUILD_SHARED_LIBS: 'ON'
       run: ./ci/do_ci.sh cmake.install.test
 
-  ubuntu_2204_script_build_grpc_1_49_2:
-    name: Ubuntu 22.04 script grpc 1.49.2 cxx14 (static libs - shared libs)
-    runs-on: ubuntu-24.04
+  ubuntu_2204_minimum:
+    name: Ubuntu 22.04 minimum versions cxx14 (static libs - shared libs)
+    runs-on: ubuntu-22.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
+      # Set to the current minimum version of cmake
+      CMAKE_VERSION: '3.14.0'
+      # cxx14 is the default for Ubuntu 22.04
       CXX_STANDARD: '14'
+      # This is the apt package version of googletest for Ubuntu 22.04
+      GOOGLETEST_VERSION: '1.11.0'
+      # These are minimum versions tested in the main ci workflow
+      ABSEIL_CPP_VERSION: '20220623.2'
+      PROTOBUF_VERSION: '21.12'
+      GRPC_VERSION: 'v1.49.2'
       BUILD_TYPE: 'Debug'
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -152,10 +180,6 @@ jobs:
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
     - name: Build abseil, protobuf, and grpc with ci scripts
-      env:
-        ABSEIL_CPP_VERSION: '20220623.2'
-        PROTOBUF_VERSION: '21.12'
-        GRPC_VERSION: 'v1.49.2'
       run: |
         sudo -E ./ci/install_abseil.sh
         sudo -E ./ci/install_protobuf.sh
@@ -170,10 +194,12 @@ jobs:
       run: ./ci/do_ci.sh cmake.install.test
 
   ubuntu_2404_conan_stable:
-    name: Ubuntu 24.04 conan stable cxx17 (static libs - shared libs - opentracing shim)
+    name: Ubuntu 24.04 conan stable versions cxx17 (static libs - shared libs - opentracing shim)
     runs-on: ubuntu-24.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
+       # CMake 3.28 is apt package version for Ubuntu 24.04
+      CMAKE_VERSION: '3.28.3'
       CXX_STANDARD: '17'
       CMAKE_TOOLCHAIN_FILE: /home/runner/conan/build/Debug/generators/conan_toolchain.cmake
       BUILD_TYPE: 'Debug'
@@ -189,7 +215,7 @@ jobs:
       - name: Install or build all dependencies with Conan
         run: |
           sudo -E ./ci/setup_cmake.sh
-          conan install install/conan/conanfile_stable.txt --build=missing -of /home/runner/conan -s build_type=Debug
+          conan install install/conan/conanfile_stable.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
       - name: Run Tests (static libs)
         env:
           BUILD_SHARED_LIBS: 'OFF'
@@ -206,10 +232,12 @@ jobs:
         run: ./ci/do_ci.sh cmake.opentracing_shim.install.test
 
   ubuntu_2404_conan_latest:
-    name: Ubuntu 24.04 conan latest cxx17 (static libs)
+    name: Ubuntu 24.04 conan latest versions cxx17 (static libs)
     runs-on: ubuntu-24.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
+      # Set to the latest version of cmake 3.x
+      CMAKE_VERSION: '3.31.6'
       CXX_STANDARD: '17'
       CMAKE_TOOLCHAIN_FILE: /home/runner/conan/build/Debug/generators/conan_toolchain.cmake
       BUILD_TYPE: 'Debug'
@@ -225,7 +253,7 @@ jobs:
       - name: Install or build all dependencies with Conan
         run: |
           sudo -E ./ci/setup_cmake.sh
-          conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=Debug
+          conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
       - name: Run Tests (static libs)
         env:
           BUILD_SHARED_LIBS: 'OFF'
@@ -236,10 +264,11 @@ jobs:
           ./ci/verify_packages.sh
 
   macos_14_conan_stable:
-    name: macOS 14 conan stable cxx17 (static libs)
+    name: macOS 14 conan stable versions cxx17 (static libs)
     runs-on: macos-14
     env:
       INSTALL_TEST_DIR: '/Users/runner/install_test'
+      CMAKE_VERSION: '3.28.3'
       CXX_STANDARD: '17'
       CMAKE_TOOLCHAIN_FILE: '/Users/runner/conan/build/Debug/generators/conan_toolchain.cmake'
       BUILD_TYPE: 'Debug'
@@ -250,19 +279,22 @@ jobs:
     - name: Install Conan and tools
       run: |
         brew install conan autoconf automake libtool coreutils
-        sudo -E ./ci/setup_cmake_macos.sh
+        ./ci/setup_cmake_macos.sh
         conan profile detect --force
     - name: Install or build all dependencies with Conan
-      run: conan install install/conan/conanfile_stable.txt --build=missing -of /Users/runner/conan -s build_type=Debug
+      run: conan install install/conan/conanfile_stable.txt --build=missing -of /Users/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
       run: ./ci/do_ci.sh cmake.install.test
 
   macos_14_brew_packages:
-    name: macOS 14 brew packages cxx17 (static libs)
+    name: macOS 14 brew latest versions cxx17 (static libs)
     runs-on: macos-14
     env:
+      INSTALL_TEST_DIR: '/Users/runner/install_test'
+      # Set to the latest version of cmake 3.x
+      CMAKE_VERSION: '3.31.6'
       CXX_STANDARD: '17'
       BUILD_TYPE: 'Debug'
     steps:
@@ -271,7 +303,7 @@ jobs:
         submodules: 'recursive'
     - name: Install Dependencies with Homebrew
       run: |
-        sudo -E ./ci/setup_cmake_macos.sh
+        ./ci/setup_cmake_macos.sh
         brew install coreutils
         brew install googletest
         brew install google-benchmark
