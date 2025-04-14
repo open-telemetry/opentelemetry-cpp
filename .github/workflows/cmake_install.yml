@@ -10,7 +10,7 @@ on:
 jobs:
   windows_2022_vcpkg_submodule:
     name: Windows 2022 vcpkg submodule versions cxx17 (static libs - dll)
-    runs-on: windows-2022
+    runs-on: windows-2025
     env:
       # Set to the latest version of cmake 3.x
       CMAKE_VERSION: '3.31.6'
@@ -31,7 +31,7 @@ jobs:
 
   windows_2019_vcpkg_submodule_min_cmake:
     name: Windows 2019 vcpkg submodule versions minimum cmake cxx14 (static libs)
-    runs-on: windows-2019
+    runs-on: windows-2025
     env:
       # cmake 3.15 is the minimum for windows builds (See https://github.com/open-telemetry/opentelemetry-cpp/pull/3349#discussion_r2030319430)
       CMAKE_VERSION: '3.15.0'
