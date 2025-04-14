@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 project(opentelemetry-cpp-sdk-install-test LANGUAGES CXX)
 
 find_package(opentelemetry-cpp REQUIRED COMPONENTS sdk)
@@ -10,7 +10,7 @@ if(NOT TARGET Threads::Threads)
   message(FATAL_ERROR "Threads::Threads target not found")
 endif()
 
-find_package(GTest REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 include(GoogleTest)
 
 add_executable(sdk_test ${INSTALL_TEST_SRC_DIR}/test_sdk.cc)

@@ -29,6 +29,9 @@ Increment the:
 * [API] Remove `WITH_ABSEIL` and `HAVE_ABSEIL`
   [#3318](https://github.com/open-telemetry/opentelemetry-cpp/pull/3318)
 
+* [CMAKE] Bump cmake minimum required version to 3.14
+  [#3349](https://github.com/open-telemetry/opentelemetry-cpp/pull/3349)
+
 ## [1.20 2025-04-01]
 
 * [BUILD] Update opentelemetry-proto version
