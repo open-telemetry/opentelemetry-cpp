@@ -32,6 +32,13 @@ bazel_dep(name = "gazelle", version = "0.42.0")
 bazel_dep(name = "stardoc", version = "0.8.0")
 bazel_dep(name = "rules_android", version = "0.6.3")
 bazel_dep(name = "grpc", version = "1.71.0")
+single_version_override(
+    module_name = "grpc",
+    patch_strip = 1,
+    patches = [
+        "bazel/grpc_no_absl_sync.patch",
+    ],
+)
 bazel_dep(name = "nlohmann_json", version = "3.11.3.bcr.1")
 bazel_dep(name = "platforms", version = "0.0.11")
 bazel_dep(name = "rules_cc", version = "0.1.1")

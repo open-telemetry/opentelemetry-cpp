@@ -11,7 +11,7 @@ startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
 # For some reason, with clang-cl, it also tried to do on Windows, where dynamic linking just does not support it.
 build --dynamic_mode=off
 
-common --remote_download_minimal
+common --remote_download_all
 
 # Avoid using c:\windows\system32\bash.exe
 common:windows --shell_executable="c:\\program files\\git\\usr\\bin\\bash.exe"
@@ -142,8 +142,13 @@ startup --client_debug
 
 common --flag_alias=dll=@otel_sdk//:with_dll
 
-# disable GRPC experiments
-build --define=grpc_experiments_are_final=true
+# Compiling GRPC without using ABSL sync primitives, as this causes rare hang on Windows
+# x/hang/hang_callstack.png
+build --copt="-DGRPC_NO_ABSL_SYNC"
+build --host_copt="-DGRPC_NO_ABSL_SYNC"
+
+# disable all GRPC experiments
+# build --define=grpc_experiments_are_final=true
 
 ## This is what my ../top.bazelrc contains (not in the repo as local to my machine)
 # build --disk_cache=f:/b/d
