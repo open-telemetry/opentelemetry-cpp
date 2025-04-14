@@ -171,13 +171,16 @@ private:
 
   // This function checks if the instrument is a duplicate of an existing one
   // and emits a warning through the internal logger.
-  void WarnOnDuplicateInstrument(const MetricStorageMap &storage_registry,
-                                 const InstrumentDescriptor &new_instrument) const;
+  static void WarnOnDuplicateInstrument(
+      const sdk::instrumentationscope::InstrumentationScope *scope,
+      const MetricStorageMap &storage_registry,
+      const InstrumentDescriptor &new_instrument);
 
   // This function checks if the instrument has a name case conflict with an existing one
   // and emits a warning through the internal logger.
-  void WarnOnNameCaseConflict(const InstrumentDescriptor &existing_instrument,
-                              const InstrumentDescriptor &new_instrument) const;
+  static void WarnOnNameCaseConflict(const sdk::instrumentationscope::InstrumentationScope *scope,
+                                     const InstrumentDescriptor &existing_instrument,
+                                     const InstrumentDescriptor &new_instrument);
 };
 }  // namespace metrics
 }  // namespace sdk

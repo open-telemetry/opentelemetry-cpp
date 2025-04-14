@@ -18,48 +18,62 @@ InstrumentDescriptor CreateInstrumentDescriptor(
   return {name, description, unit, type, value_type};
 }
 
-TEST(InstrumentDescriptorTest, CaseInsensitiveEquals)
+TEST(InstrumentDescriptorUtilTest, CaseInsensitiveEquals)
 {
-  EXPECT_TRUE(CaseInsensitiveEquals("counter", "COUNTer"));
-  EXPECT_TRUE(CaseInsensitiveEquals("CountER", "counter"));
-  EXPECT_FALSE(CaseInsensitiveEquals("counter1", "counter2"));
-  EXPECT_FALSE(CaseInsensitiveEquals("counter", "Counter1"));
-  EXPECT_FALSE(CaseInsensitiveEquals("Counter1", "counter"));
+  // same name
+  EXPECT_TRUE(InstrumentDescriptorUtil::CaseInsensitiveEquals("counter", "counter"));
+
+  // same case-insensitive name
+  EXPECT_TRUE(InstrumentDescriptorUtil::CaseInsensitiveEquals("counter", "COUNTer"));
+  EXPECT_TRUE(InstrumentDescriptorUtil::CaseInsensitiveEquals("CountER", "counter"));
+
+  // different case-insensitive name same string length
+  EXPECT_FALSE(InstrumentDescriptorUtil::CaseInsensitiveEquals("Counter_1", "counter_2"));
+  EXPECT_FALSE(InstrumentDescriptorUtil::CaseInsensitiveEquals("counter_1", "counter_2"));
+
+  // different case-sensitive name different string length
+  EXPECT_FALSE(InstrumentDescriptorUtil::CaseInsensitiveEquals("counter", "Counter1"));
+  EXPECT_FALSE(InstrumentDescriptorUtil::CaseInsensitiveEquals("Counter1", "counter"));
 }
 
 // The following tests cover the spec requirements on detecting identical and duplicate instruments
 // https://github.com/open-telemetry/opentelemetry-specification/blob/9c8c30631b0e288de93df7452f91ed47f6fba330/specification/metrics/sdk.md?plain=1#L869
-TEST(InstrumentDescriptorTest, IsDuplicate)
+TEST(InstrumentDescriptorUtilTest, IsDuplicate)
 {
   auto instrument_existing = CreateInstrumentDescriptor();
 
   // not a duplicate - different name
   auto instrument_different_name  = instrument_existing;
   instrument_different_name.name_ = "another_name";
-  EXPECT_FALSE(IsInstrumentDuplicate(instrument_existing, instrument_different_name));
+  EXPECT_FALSE(
+      InstrumentDescriptorUtil::IsDuplicate(instrument_existing, instrument_different_name));
 
   // not a duplicate - identical instrument
   auto instrument_identical = instrument_existing;
-  EXPECT_FALSE(IsInstrumentDuplicate(instrument_existing, instrument_identical));
+  EXPECT_FALSE(InstrumentDescriptorUtil::IsDuplicate(instrument_existing, instrument_identical));
 
   // is duplicate by description
   auto instrument_different_desc         = instrument_existing;
   instrument_different_desc.description_ = "another_description";
-  EXPECT_TRUE(IsInstrumentDuplicate(instrument_existing, instrument_different_desc));
+  EXPECT_TRUE(
+      InstrumentDescriptorUtil::IsDuplicate(instrument_existing, instrument_different_desc));
 
   // is duplicate by unit
   auto instrument_different_unit  = instrument_existing;
   instrument_different_unit.unit_ = "another_unit";
-  EXPECT_TRUE(IsInstrumentDuplicate(instrument_existing, instrument_different_unit));
+  EXPECT_TRUE(
+      InstrumentDescriptorUtil::IsDuplicate(instrument_existing, instrument_different_unit));
 
   // is duplicate by kind
   auto instrument_different_type  = instrument_existing;
   instrument_different_type.type_ = InstrumentType::kHistogram;
-  EXPECT_TRUE(IsInstrumentDuplicate(instrument_existing, instrument_different_type));
+  EXPECT_TRUE(
+      InstrumentDescriptorUtil::IsDuplicate(instrument_existing, instrument_different_type));
 
   auto instrument_different_valuetype        = instrument_existing;
   instrument_different_valuetype.value_type_ = InstrumentValueType::kDouble;
-  EXPECT_TRUE(IsInstrumentDuplicate(instrument_existing, instrument_different_valuetype));
+  EXPECT_TRUE(
+      InstrumentDescriptorUtil::IsDuplicate(instrument_existing, instrument_different_valuetype));
 }
 
 TEST(InstrumentDescriptorTest, EqualNameCaseInsensitiveOperator)
