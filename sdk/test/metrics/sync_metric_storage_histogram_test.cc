@@ -322,10 +322,12 @@ TEST_P(WritableMetricStorageHistogramTestFixture, DoubleHistogram)
       });
   EXPECT_EQ(count_attributes, 2);  // GET and PUT
 }
+
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageHistogramTestDouble,
-  WritableMetricStorageHistogramTestFixture,
-  ::testing::Values(AggregationTemporality::kCumulative,
-                    AggregationTemporality::kDelta));
+                         WritableMetricStorageHistogramTestFixture,
+                         ::testing::Values(AggregationTemporality::kCumulative,
+                                           AggregationTemporality::kDelta));
+
 TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogram)
 {
   AggregationTemporality temporality = GetParam();
@@ -377,17 +379,28 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<Base2ExponentialHistogramPointData>(data_attr.point_data);
+          const auto &data =
+              opentelemetry::nostd::get<Base2ExponentialHistogramPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
             EXPECT_EQ(data.sum_, expected_total_get_requests);
+            EXPECT_EQ(data.count_, 2);
+            EXPECT_EQ(data.min_, 10);
+            EXPECT_EQ(data.max_, 20);
+            EXPECT_EQ(data.positive_buckets_.Empty(), false);
+            EXPECT_EQ(data.negative_buckets_.Empty(), true);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
             EXPECT_EQ(data.sum_, expected_total_put_requests);
+            EXPECT_EQ(data.count_, 2);
+            EXPECT_EQ(data.min_, 30);
+            EXPECT_EQ(data.max_, 40);
+            EXPECT_EQ(data.positive_buckets_.Empty(), false);
+            EXPECT_EQ(data.negative_buckets_.Empty(), true);
             count_attributes++;
           }
         }
@@ -414,7 +427,8 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
         }
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<Base2ExponentialHistogramPointData>(data_attr.point_data);
+          const auto &data =
+              opentelemetry::nostd::get<Base2ExponentialHistogramPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
@@ -450,7 +464,8 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<Base2ExponentialHistogramPointData>(data_attr.point_data);
+          const auto &data =
+              opentelemetry::nostd::get<Base2ExponentialHistogramPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
