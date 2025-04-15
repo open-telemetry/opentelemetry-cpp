@@ -70,7 +70,7 @@
 // Include a standard library header to allow configuration based on the
 // standard library in use.
 // Using C++20 feature-test macros when possible, otherwise fall back to
-// ciso646/iso646.h.There are warnings when includeing ciso646 in C++17 mode
+// ciso646/iso646.h.There are warnings when including ciso646 in C++17 mode
 #ifdef __has_include
 #  if __has_include(<version>)
 #    include <version>
