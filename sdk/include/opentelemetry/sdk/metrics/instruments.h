@@ -90,6 +90,47 @@ struct InstrumentDescriptorUtil
 
     return names_match && (!kinds_match || !units_match || !descriptions_match);
   }
+
+  static opentelemetry::nostd::string_view GetInstrumentTypeString(InstrumentType type) noexcept
+  {
+    switch (type)
+    {
+      case InstrumentType::kCounter:
+        return "Counter";
+      case InstrumentType::kUpDownCounter:
+        return "UpDownCounter";
+      case InstrumentType::kHistogram:
+        return "Histogram";
+      case InstrumentType::kObservableCounter:
+        return "ObservableCounter";
+      case InstrumentType::kObservableUpDownCounter:
+        return "ObservableUpDownCounter";
+      case InstrumentType::kObservableGauge:
+        return "ObservableGauge";
+      case InstrumentType::kGauge:
+        return "Gauge";
+      default:
+        return "Unknown";
+    }
+  }
+
+  static opentelemetry::nostd::string_view GetInstrumentValueTypeString(
+      InstrumentValueType value_type) noexcept
+  {
+    switch (value_type)
+    {
+      case InstrumentValueType::kInt:
+        return "Int";
+      case InstrumentValueType::kLong:
+        return "Long";
+      case InstrumentValueType::kFloat:
+        return "Float";
+      case InstrumentValueType::kDouble:
+        return "Double";
+      default:
+        return "Unknown";
+    }
+  }
 };
 
 struct InstrumentEqualNameCaseInsensitive

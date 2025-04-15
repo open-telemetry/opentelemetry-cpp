@@ -40,7 +40,7 @@ TEST(InstrumentDescriptorUtilTest, CaseInsensitiveEquals)
 // https://github.com/open-telemetry/opentelemetry-specification/blob/9c8c30631b0e288de93df7452f91ed47f6fba330/specification/metrics/sdk.md?plain=1#L869
 TEST(InstrumentDescriptorUtilTest, IsDuplicate)
 {
-  auto instrument_existing = CreateInstrumentDescriptor();
+  auto instrument_existing = CreateInstrumentDescriptor("counter");
 
   // not a duplicate - different name
   auto instrument_different_name  = instrument_existing;
@@ -51,6 +51,12 @@ TEST(InstrumentDescriptorUtilTest, IsDuplicate)
   // not a duplicate - identical instrument
   auto instrument_identical = instrument_existing;
   EXPECT_FALSE(InstrumentDescriptorUtil::IsDuplicate(instrument_existing, instrument_identical));
+
+  // not a duplicate - instrument with same case-insensitive name
+  auto instrument_same_name_case_insensitive  = instrument_existing;
+  instrument_same_name_case_insensitive.name_ = "COUNTER";
+  EXPECT_FALSE(InstrumentDescriptorUtil::IsDuplicate(instrument_existing,
+                                                     instrument_same_name_case_insensitive));
 
   // is duplicate by description
   auto instrument_different_desc         = instrument_existing;
@@ -64,12 +70,13 @@ TEST(InstrumentDescriptorUtilTest, IsDuplicate)
   EXPECT_TRUE(
       InstrumentDescriptorUtil::IsDuplicate(instrument_existing, instrument_different_unit));
 
-  // is duplicate by kind
+  // is duplicate by kind - instrument type
   auto instrument_different_type  = instrument_existing;
   instrument_different_type.type_ = InstrumentType::kHistogram;
   EXPECT_TRUE(
       InstrumentDescriptorUtil::IsDuplicate(instrument_existing, instrument_different_type));
 
+  // is duplicate by kind - instrument value_type
   auto instrument_different_valuetype        = instrument_existing;
   instrument_different_valuetype.value_type_ = InstrumentValueType::kDouble;
   EXPECT_TRUE(
@@ -79,7 +86,7 @@ TEST(InstrumentDescriptorUtilTest, IsDuplicate)
 TEST(InstrumentDescriptorTest, EqualNameCaseInsensitiveOperator)
 {
   // equal by name, description, unit, type and value type
-  InstrumentEqualNameCaseInsensitive equal_operator;
+  InstrumentEqualNameCaseInsensitive equal_operator{};
   auto instrument_existing  = CreateInstrumentDescriptor("counter");
   auto instrument_identical = instrument_existing;
   EXPECT_TRUE(equal_operator(instrument_existing, instrument_identical));
@@ -88,6 +95,11 @@ TEST(InstrumentDescriptorTest, EqualNameCaseInsensitiveOperator)
   auto instrument_name_case_conflict  = instrument_existing;
   instrument_name_case_conflict.name_ = "COUNTER";
   EXPECT_TRUE(equal_operator(instrument_existing, instrument_name_case_conflict));
+
+  // not equal by name
+  auto instrument_different_name  = instrument_existing;
+  instrument_different_name.name_ = "another_counter";
+  EXPECT_FALSE(equal_operator(instrument_existing, instrument_different_name));
 
   // not equal by instrument value type
   auto instrument_different_valuetype        = instrument_existing;
@@ -112,35 +124,40 @@ TEST(InstrumentDescriptorTest, EqualNameCaseInsensitiveOperator)
 
 TEST(InstrumentDescriptorTest, HashOperator)
 {
-  InstrumentDescriptorHash hash_op{};
+  InstrumentDescriptorHash hash_operator{};
 
-  // identical instrument
+  // identical instrument - hash must match
   auto instrument_existing  = CreateInstrumentDescriptor("counter");
   auto instrument_identical = instrument_existing;
-  EXPECT_EQ(hash_op(instrument_existing), hash_op(instrument_identical));
+  EXPECT_EQ(hash_operator(instrument_existing), hash_operator(instrument_identical));
 
   // name case conflict - hash must match
   auto instrument_name_case_conflict  = instrument_existing;
   instrument_name_case_conflict.name_ = "COUNTER";
-  EXPECT_EQ(hash_op(instrument_existing), hash_op(instrument_name_case_conflict));
+  EXPECT_EQ(hash_operator(instrument_existing), hash_operator(instrument_name_case_conflict));
 
-  // not equal by kind - instrument value type
+  // different name
+  auto instrument_different_name  = instrument_existing;
+  instrument_different_name.name_ = "another_counter";
+  EXPECT_NE(hash_operator(instrument_existing), hash_operator(instrument_different_name));
+
+  // different kind - instrument value type
   auto instrument_different_valuetype        = instrument_existing;
   instrument_different_valuetype.value_type_ = InstrumentValueType::kFloat;
-  EXPECT_NE(hash_op(instrument_existing), hash_op(instrument_different_valuetype));
+  EXPECT_NE(hash_operator(instrument_existing), hash_operator(instrument_different_valuetype));
 
-  // not equal by kind - instrument type
+  // different kind - instrument type
   auto instrument_different_type  = instrument_existing;
   instrument_different_type.type_ = InstrumentType::kObservableUpDownCounter;
-  EXPECT_NE(hash_op(instrument_existing), hash_op(instrument_different_type));
+  EXPECT_NE(hash_operator(instrument_existing), hash_operator(instrument_different_type));
 
-  // not equal by description
+  // different description
   auto instrument_different_desc         = instrument_existing;
   instrument_different_desc.description_ = "another description";
-  EXPECT_NE(hash_op(instrument_existing), hash_op(instrument_different_desc));
+  EXPECT_NE(hash_operator(instrument_existing), hash_operator(instrument_different_desc));
 
-  // not equal by unit
+  // different unit
   auto instrument_different_unit  = instrument_existing;
   instrument_different_unit.unit_ = "another unit";
-  EXPECT_NE(hash_op(instrument_existing), hash_op(instrument_different_unit));
+  EXPECT_NE(hash_operator(instrument_existing), hash_operator(instrument_different_unit));
 }

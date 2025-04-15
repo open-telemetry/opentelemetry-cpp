@@ -59,8 +59,8 @@ struct InstrumentDescriptorLogStreamable
 std::ostream &operator<<(std::ostream &os,
                          const InstrumentationScopeLogStreamable &streamable) noexcept
 {
-  os << "name=\"" << streamable.scope.GetName() << "\", " << "schema_url=\""
-     << streamable.scope.GetSchemaURL() << "\", " << "version=\"" << streamable.scope.GetVersion()
+  os << "\n  name=\"" << streamable.scope.GetName() << "\"" << "\n  schema_url=\""
+     << streamable.scope.GetSchemaURL() << "\"" << "\n  version=\"" << streamable.scope.GetVersion()
      << "\"";
   return os;
 }
@@ -68,10 +68,14 @@ std::ostream &operator<<(std::ostream &os,
 std::ostream &operator<<(std::ostream &os,
                          const InstrumentDescriptorLogStreamable &streamable) noexcept
 {
-  os << "name=\"" << streamable.instrument.name_ << "\", " << "description=\""
-     << streamable.instrument.description_ << "\", " << "unit=\"" << streamable.instrument.unit_
-     << "\", " << "type=" << static_cast<uint32_t>(streamable.instrument.type_) << ", "
-     << "value_type=" << static_cast<uint32_t>(streamable.instrument.value_type_);
+  os << "\n  name=\"" << streamable.instrument.name_ << "\"" << "\n  description=\""
+     << streamable.instrument.description_ << "\"" << "\n  unit=\"" << streamable.instrument.unit_
+     << "\"" << "\n  kind=\""
+     << opentelemetry::sdk::metrics::InstrumentDescriptorUtil::GetInstrumentValueTypeString(
+            streamable.instrument.value_type_)
+     << opentelemetry::sdk::metrics::InstrumentDescriptorUtil::GetInstrumentTypeString(
+            streamable.instrument.type_)
+     << "\"";
   return os;
 }
 
@@ -670,12 +674,33 @@ void Meter::WarnOnDuplicateInstrument(const sdk::instrumentationscope::Instrumen
     const auto &existing_instrument = element.first;
     if (InstrumentDescriptorUtil::IsDuplicate(existing_instrument, new_instrument))
     {
+      std::string resolution_info{""};
+
+      if (existing_instrument.type_ != new_instrument.type_ ||
+          existing_instrument.value_type_ != new_instrument.value_type_)
+      {
+        resolution_info +=
+            "\nDifferent instrument kinds found. Consider configuring a View to change the name of "
+            "the duplicate instrument.";
+      }
+
+      if (existing_instrument.unit_ != new_instrument.unit_)
+      {
+        resolution_info += "\nDifferent instrument units found.";
+      }
+
+      if (existing_instrument.description_ != new_instrument.description_)
+      {
+        resolution_info +=
+            "\nDifferent instrument descriptions found. Consider configuring a View to change the "
+            "description of the duplicate instrument.";
+      }
+
       OTEL_INTERNAL_LOG_WARN(
-          "[Meter::WarnOnDuplicateInstrument] Creating a duplicate instrument. This may cause "
-          "semantic errors in the data exported from this meter. To resolve this "
-          "warning consider configuring a View to set the name or description of the "
-          "duplicate instrument."
-          << "\nScope: " << InstrumentationScopeLogStreamable{*scope}
+          "[Meter::WarnOnDuplicateInstrument] Creating a duplicate instrument of the same "
+          "case-insensitive name. This may cause "
+          "semantic errors in the data exported from this meter."
+          << resolution_info << "\nScope: " << InstrumentationScopeLogStreamable{*scope}
           << "\nExisting instrument: " << InstrumentDescriptorLogStreamable{existing_instrument}
           << "\nDuplicate instrument: " << InstrumentDescriptorLogStreamable{new_instrument});
       return;

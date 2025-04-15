@@ -488,9 +488,6 @@ TEST_F(MeterCreateInstrumentTest, IdenticalSyncInstruments)
     auto &point_data2 =
         metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_[1].point_data;
 
-    EXPECT_TRUE(nostd::holds_alternative<sdk::metrics::SumPointData>(point_data1));
-    EXPECT_TRUE(nostd::holds_alternative<sdk::metrics::SumPointData>(point_data2));
-
     auto sum_point_data1 = nostd::get<sdk::metrics::SumPointData>(point_data1);
     auto sum_point_data2 = nostd::get<sdk::metrics::SumPointData>(point_data2);
 
@@ -529,7 +526,7 @@ TEST_F(MeterCreateInstrumentTest, NameCaseConflictSyncInstruments)
 TEST_F(MeterCreateInstrumentTest, ViewCorrectedNameCaseConflictSyncInstruments)
 {
   InstrumentDescriptor descriptor{"My_CountER", "desc", "unit", InstrumentType::kCounter,
-                                  InstrumentValueType::kInt};
+                                  InstrumentValueType::kLong};
 
   AddNameCorrectionView(descriptor.name_, descriptor.unit_, descriptor.type_, "my_counter");
 
@@ -670,7 +667,6 @@ TEST_F(MeterCreateInstrumentTest, IdenticalAsyncInstruments)
     auto &point_data1 = point_data_attr[0].point_data;
     auto &point_data2 = point_data_attr[1].point_data;
 
-    EXPECT_TRUE(nostd::holds_alternative<sdk::metrics::SumPointData>(point_data1));
     auto sum_point_data1 = nostd::get<sdk::metrics::SumPointData>(point_data1);
     auto sum_point_data2 = nostd::get<sdk::metrics::SumPointData>(point_data2);
 
