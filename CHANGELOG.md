@@ -21,6 +21,9 @@ Increment the:
 * [CMAKE] Bump cmake minimum required version to 3.14
   [#3349](https://github.com/open-telemetry/opentelemetry-cpp/pull/3349)
 
+* [API] Add Enabled method to Tracer
+  [#3357](https://github.com/open-telemetry/opentelemetry-cpp/pull/3357)
+
 ## [1.20 2025-04-01]
 
 * [BUILD] Update opentelemetry-proto version
