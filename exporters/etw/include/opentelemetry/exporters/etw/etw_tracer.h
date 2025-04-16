@@ -590,6 +590,22 @@ public:
     return result;
   }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  /**
+   * Reports if the tracer is enabled or not. A disabled tracer will not create spans.
+   * Note: The etw_tracer currently does not accept a TracerConfig and can therefore not be disabled
+   * based on the instrumentation scope.
+   *
+   * The instrumentation authors must call this method very time before creating a span to
+   * potentially avoid performing computationally expensive operations for disabled tracers.
+   *
+   * @since ABI_VERSION 2
+   */
+  virtual bool Enabled() noexcept {
+    return true;
+  }
+#endif
+
 #if OPENTELEMETRY_ABI_VERSION_NO == 1
   /**
    * @brief Force flush data to Tracer, spending up to given amount of microseconds to flush.
