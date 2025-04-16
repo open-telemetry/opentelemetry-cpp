@@ -25,6 +25,7 @@ add_library(
   aggregation/lastvalue_aggregation.cc
   aggregation/sum_aggregation.cc
   data/circular_buffer.cc
+  data/metric_data.cc
   exemplar/reservoir.cc
   view/instrument_selector_factory.cc
   view/meter_selector_factory.cc

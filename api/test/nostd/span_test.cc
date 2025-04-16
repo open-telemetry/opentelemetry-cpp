@@ -95,7 +95,7 @@ TEST(SpanTest, ArrayConstruction)
   EXPECT_EQ(s4.data(), array2.data());
   EXPECT_EQ(s4.size(), array2.size());
 
-  EXPECT_FALSE((std::is_constructible<span<int, 2>, int(&)[3]>::value));
+  EXPECT_FALSE((std::is_constructible<span<int, 2>, int (&)[3]>::value));
 }
 
 TEST(SpanTest, ContainerConstruction)

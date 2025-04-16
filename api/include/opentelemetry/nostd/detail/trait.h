@@ -21,10 +21,8 @@ enum class Trait
 };
 
 template <typename T,
-          template <typename>
-          class IsTriviallyAvailable,
-          template <typename>
-          class IsAvailable>
+          template <typename> class IsTriviallyAvailable,
+          template <typename> class IsAvailable>
 inline constexpr Trait trait()
 {
   return IsTriviallyAvailable<T>::value ? Trait::TriviallyAvailable

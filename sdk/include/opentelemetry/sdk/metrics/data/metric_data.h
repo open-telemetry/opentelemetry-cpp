@@ -37,6 +37,9 @@ public:
   std::vector<PointDataAttributes> point_data_attr_;
 };
 
+// GTest uses `PrintTo` functions to print values.
+void PrintTo(const PointDataAttributes &point_data_attributes, std::ostream *os);
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
