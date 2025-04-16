@@ -246,9 +246,28 @@ TEST(aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(histo_point.scale_, SCALE0);
   EXPECT_EQ(histo_point.max_buckets_, MAX_BUCKETS0);
   ASSERT_TRUE(histo_point.positive_buckets_.Empty());
+  ASSERT_TRUE(histo_point.negative_buckets_.Empty());
+
+  // Create a new aggreagte based in point data
+  {
+    auto point_data = histo_point;
+    Base2ExponentialHistogramAggregation scale0_aggr2(point_data);
+    scale0_aggr2.Aggregate(0.0, {});
+
+    auto histo_point2 = nostd::get<Base2ExponentialHistogramPointData>(point);
+    EXPECT_EQ(histo_point2.count_, 0);
+    EXPECT_EQ(histo_point2.sum_, 0.0);
+    EXPECT_EQ(histo_point2.zero_count_, 0);
+    EXPECT_EQ(histo_point2.min_, (std::numeric_limits<double>::max)());
+    EXPECT_EQ(histo_point2.max_, (std::numeric_limits<double>::min)());
+    EXPECT_EQ(histo_point2.scale_, SCALE0);
+    EXPECT_EQ(histo_point2.max_buckets_, MAX_BUCKETS0);
+    ASSERT_TRUE(histo_point2.positive_buckets_.Empty());
+    ASSERT_TRUE(histo_point2.negative_buckets_.Empty());
+  }
 
   // zero point
-  scale0_aggr.Aggregate(0.0, {});
+  scale0_aggr.Aggregate(static_cast<int64_t>(0.0), {});
   histo_point = nostd::get<Base2ExponentialHistogramPointData>(scale0_aggr.ToPoint());
   EXPECT_EQ(histo_point.count_, 1);
   EXPECT_EQ(histo_point.zero_count_, 1);
