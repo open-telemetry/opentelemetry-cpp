@@ -5,9 +5,9 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <algorithm>
+#include <iostream>
 #include <limits>
 #include <memory>
-#include <iostream>
 #include <mutex>
 #include <utility>
 #include "opentelemetry/common/spin_lock_mutex.h"
@@ -189,7 +189,9 @@ void Base2ExponentialHistogramAggregation::Downscale(uint32_t by) noexcept
 
 // Merge A and B into a new circular buffer C.
 // Caller must ensure that A and B are used as buckets at the same scale.
-AdaptingCircularBufferCounter MergeBuckets(size_t max_buckets, const AdaptingCircularBufferCounter &A, const AdaptingCircularBufferCounter &B)
+AdaptingCircularBufferCounter MergeBuckets(size_t max_buckets,
+                                           const AdaptingCircularBufferCounter &A,
+                                           const AdaptingCircularBufferCounter &B)
 {
   AdaptingCircularBufferCounter C = AdaptingCircularBufferCounter(max_buckets);
   C.Clear();
@@ -217,7 +219,7 @@ AdaptingCircularBufferCounter MergeBuckets(size_t max_buckets, const AdaptingCir
     {
       C.Increment(i, count);
     }
- }
+  }
 
   return C;
 }
@@ -234,13 +236,12 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
   auto scale_reduction = high_res.scale_ - low_res.scale_;
 
   Base2ExponentialHistogramPointData result_value;
-  result_value.count_          = low_res.count_ + high_res.count_;
-  result_value.sum_            = low_res.sum_ + high_res.sum_;
-  result_value.zero_count_     = low_res.zero_count_ + high_res.zero_count_;
-  result_value.scale_          = (std::min)(low_res.scale_, high_res.scale_);
-  result_value.max_buckets_    = low_res.max_buckets_ >= high_res.max_buckets_
-                                     ? low_res.max_buckets_
-                                     : high_res.max_buckets_;
+  result_value.count_      = low_res.count_ + high_res.count_;
+  result_value.sum_        = low_res.sum_ + high_res.sum_;
+  result_value.zero_count_ = low_res.zero_count_ + high_res.zero_count_;
+  result_value.scale_      = (std::min)(low_res.scale_, high_res.scale_);
+  result_value.max_buckets_ =
+      low_res.max_buckets_ >= high_res.max_buckets_ ? low_res.max_buckets_ : high_res.max_buckets_;
   result_value.record_min_max_ = low_res.record_min_max_ && high_res.record_min_max_;
   if (result_value.record_min_max_)
   {
@@ -255,15 +256,21 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
     high_res.scale_ -= scale_reduction;
   }
 
-  auto pos_min_index = (std::min)(low_res.positive_buckets_.StartIndex(), high_res.positive_buckets_.StartIndex());
-  auto pos_max_index = (std::max)(low_res.positive_buckets_.EndIndex(), high_res.positive_buckets_.EndIndex());
-  auto neg_min_index = (std::min)(low_res.negative_buckets_.StartIndex(), high_res.negative_buckets_.StartIndex());
-  auto neg_max_index = (std::max)(low_res.negative_buckets_.EndIndex(), high_res.negative_buckets_.EndIndex());
+  auto pos_min_index =
+      (std::min)(low_res.positive_buckets_.StartIndex(), high_res.positive_buckets_.StartIndex());
+  auto pos_max_index =
+      (std::max)(low_res.positive_buckets_.EndIndex(), high_res.positive_buckets_.EndIndex());
+  auto neg_min_index =
+      (std::min)(low_res.negative_buckets_.StartIndex(), high_res.negative_buckets_.StartIndex());
+  auto neg_max_index =
+      (std::max)(low_res.negative_buckets_.EndIndex(), high_res.negative_buckets_.EndIndex());
 
-  if (pos_max_index > pos_min_index + result_value.max_buckets_ || neg_max_index > neg_min_index + result_value.max_buckets_)
+  if (pos_max_index > pos_min_index + result_value.max_buckets_ ||
+      neg_max_index > neg_min_index + result_value.max_buckets_)
   {
     // We need to downscale the buckets to fit into the new max_buckets_.
-    const uint32_t scale_reduction = GetScaleReduction(pos_min_index, pos_max_index, result_value.max_buckets_);
+    const uint32_t scale_reduction =
+        GetScaleReduction(pos_min_index, pos_max_index, result_value.max_buckets_);
     DownscaleBuckets(&low_res.positive_buckets_, scale_reduction);
     DownscaleBuckets(&high_res.positive_buckets_, scale_reduction);
     DownscaleBuckets(&low_res.negative_buckets_, scale_reduction);
@@ -273,10 +280,10 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
     result_value.scale_ -= scale_reduction;
   }
 
-  result_value.positive_buckets_ = MergeBuckets(result_value.max_buckets_, low_res.positive_buckets_,
-      high_res.positive_buckets_);
-  result_value.negative_buckets_ = MergeBuckets(result_value.max_buckets_, low_res.negative_buckets_,
-      high_res.negative_buckets_);
+  result_value.positive_buckets_ = MergeBuckets(
+      result_value.max_buckets_, low_res.positive_buckets_, high_res.positive_buckets_);
+  result_value.negative_buckets_ = MergeBuckets(
+      result_value.max_buckets_, low_res.negative_buckets_, high_res.negative_buckets_);
 
   return std::unique_ptr<Base2ExponentialHistogramAggregation>{
       new Base2ExponentialHistogramAggregation(std::move(result_value))};
@@ -300,15 +307,21 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
     high_res.scale_ -= scale_reduction;
   }
 
-  auto pos_min_index = (std::min)(left.positive_buckets_.StartIndex(), right.positive_buckets_.StartIndex());
-  auto pos_max_index = (std::max)(left.positive_buckets_.EndIndex(), right.positive_buckets_.EndIndex());
-  auto neg_min_index = (std::min)(left.negative_buckets_.StartIndex(), right.negative_buckets_.StartIndex());
-  auto neg_max_index = (std::max)(left.negative_buckets_.EndIndex(), right.negative_buckets_.EndIndex());
+  auto pos_min_index =
+      (std::min)(left.positive_buckets_.StartIndex(), right.positive_buckets_.StartIndex());
+  auto pos_max_index =
+      (std::max)(left.positive_buckets_.EndIndex(), right.positive_buckets_.EndIndex());
+  auto neg_min_index =
+      (std::min)(left.negative_buckets_.StartIndex(), right.negative_buckets_.StartIndex());
+  auto neg_max_index =
+      (std::max)(left.negative_buckets_.EndIndex(), right.negative_buckets_.EndIndex());
 
-  if (pos_max_index > pos_min_index + low_res.max_buckets_ || neg_max_index > neg_min_index + low_res.max_buckets_)
+  if (pos_max_index > pos_min_index + low_res.max_buckets_ ||
+      neg_max_index > neg_min_index + low_res.max_buckets_)
   {
     // We need to downscale the buckets to fit into the new max_buckets_.
-    const uint32_t scale_reduction = GetScaleReduction(pos_min_index, pos_max_index, low_res.max_buckets_);
+    const uint32_t scale_reduction =
+        GetScaleReduction(pos_min_index, pos_max_index, low_res.max_buckets_);
     DownscaleBuckets(&left.positive_buckets_, scale_reduction);
     DownscaleBuckets(&right.positive_buckets_, scale_reduction);
     DownscaleBuckets(&left.negative_buckets_, scale_reduction);
@@ -322,7 +335,8 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
   result_value.max_buckets_    = low_res.max_buckets_;
   result_value.record_min_max_ = false;
   // caution for underflow
-  // expect right.{sum, count} >= left.{sum, count} since metric points should be monotonically increasing
+  // expect right.{sum, count} >= left.{sum, count} since metric points should be monotonically
+  // increasing
   result_value.count_ = (right.count_ >= left.count_) ? (right.count_ - left.count_) : 0.0;
   result_value.sum_   = (right.sum_ >= left.sum_) ? (right.sum_ - left.sum_) : 0.0;
   result_value.zero_count_ =
