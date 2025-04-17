@@ -24,6 +24,15 @@ public:
   std::vector<double> boundaries_;
   bool record_min_max_ = true;
 };
+
+class Base2ExponentialHistogramAggregationConfig : public AggregationConfig
+{
+public:
+  size_t max_buckets_  = 160;
+  int32_t max_scale_   = 20;
+  bool record_min_max_ = true;
+};
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
