@@ -58,8 +58,8 @@ void InitMetrics(std::string &name)
   auto provider = metric_sdk::MeterProviderFactory::Create(std::move(context));
 
   // histogram view
-  std::string histogram_name = name + "_histogram";
-  std::string unit           = "unit";
+  std::string histogram_name = name + "_exponential_histogram";
+  std::string unit           = "histogram-unit";
 
   auto histogram_instrument_selector = metric_sdk::InstrumentSelectorFactory::Create(
       metric_sdk::InstrumentType::kHistogram, histogram_name, unit);
@@ -79,7 +79,7 @@ void InitMetrics(std::string &name)
       std::move(histogram_aggregation_config));
 
   auto histogram_view = metric_sdk::ViewFactory::Create(
-      name, "description", unit, metric_sdk::AggregationType::kBase2ExponentialHistogram,
+      name, "des", unit, metric_sdk::AggregationType::kBase2ExponentialHistogram,
       aggregation_config);
 
   provider->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
@@ -151,13 +151,15 @@ int main(int argc, char *argv[])
     std::thread counter_example{&foo_library::counter_example, name};
     std::thread observable_counter_example{&foo_library::observable_counter_example, name};
     std::thread histogram_example{&foo_library::histogram_example, name};
+    std::thread histogram_exp_example{&foo_library::histogram_exp_example, name};
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
     std::thread gauge_example{&foo_library::gauge_example, name};
 #endif
 
-    // counter_example.join();
-    // observable_counter_example.join();
+    counter_example.join();
+    observable_counter_example.join();
     histogram_example.join();
+    histogram_exp_example.join();
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
     gauge_example.join();
 #endif
