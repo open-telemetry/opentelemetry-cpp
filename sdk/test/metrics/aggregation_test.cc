@@ -327,13 +327,23 @@ TEST(aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(merged_point.negative_buckets_.Get(-2), 1);
   EXPECT_EQ(merged_point.positive_buckets_.Get(2), 0);
 
-  auto diffd       = merged->Diff(scale1_aggr);
+  // Diff test
+  Base2ExponentialHistogramAggregation scale2_aggr(&scale1_config);
+  Base2ExponentialHistogramAggregation scale3_aggr(&scale1_config);
+  scale2_aggr.Aggregate(2.0, {});
+  scale2_aggr.Aggregate(4.0, {});
+  scale2_aggr.Aggregate(2.5, {});
+
+  scale3_aggr.Aggregate(2.0, {});
+  scale3_aggr.Aggregate(2.3, {});
+  scale3_aggr.Aggregate(2.5, {});
+  scale3_aggr.Aggregate(4.0, {});
+
+  auto diffd       = scale2_aggr.Diff(scale3_aggr);
   auto diffd_point = nostd::get<Base2ExponentialHistogramPointData>(diffd->ToPoint());
-  EXPECT_EQ(diffd_point.count_, 4);
-  EXPECT_EQ(diffd_point.sum_, 6.2);
-  EXPECT_EQ(diffd_point.zero_count_, 1);
-  EXPECT_EQ(diffd_point.scale_, 0);
-  EXPECT_EQ(diffd_point.positive_buckets_.Get(1), 2);
-  EXPECT_EQ(diffd_point.negative_buckets_.Get(-2), 1);
-  EXPECT_EQ(diffd_point.positive_buckets_.Get(2), 0);
+  EXPECT_EQ(diffd_point.count_, 1);
+  EXPECT_NEAR(diffd_point.sum_, 2.3, 1e-9);
+  EXPECT_EQ(diffd_point.zero_count_, 0);
+  EXPECT_EQ(diffd_point.scale_, 1);
+  EXPECT_EQ(diffd_point.positive_buckets_.Get(2), 1);
 }
