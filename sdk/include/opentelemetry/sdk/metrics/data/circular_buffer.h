@@ -137,7 +137,7 @@ public:
    *
    * @return the number of recordings for the index, or 0 if the index is out of bounds.
    */
-  uint64_t Get(int32_t index);
+  uint64_t Get(int32_t index) const;
 
 private:
   size_t ToBufferIndex(int32_t index) const;
