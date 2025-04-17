@@ -265,8 +265,10 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
   auto neg_max_index =
       (std::max)(low_res.negative_buckets_.EndIndex(), high_res.negative_buckets_.EndIndex());
 
-  if (pos_max_index > pos_min_index + result_value.max_buckets_ ||
-      neg_max_index > neg_min_index + result_value.max_buckets_)
+  if (static_cast<size_t>(pos_max_index) >
+          static_cast<size_t>(pos_min_index) + result_value.max_buckets_ ||
+      static_cast<size_t>(neg_max_index) >
+          static_cast<size_t>(neg_min_index) + result_value.max_buckets_)
   {
     // We need to downscale the buckets to fit into the new max_buckets_.
     const uint32_t scale_reduction =
@@ -316,8 +318,10 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
   auto neg_max_index =
       (std::max)(left.negative_buckets_.EndIndex(), right.negative_buckets_.EndIndex());
 
-  if (pos_max_index > pos_min_index + low_res.max_buckets_ ||
-      neg_max_index > neg_min_index + low_res.max_buckets_)
+  if (static_cast<size_t>(pos_max_index) >
+          static_cast<size_t>(pos_min_index) + low_res.max_buckets_ ||
+      static_cast<size_t>(neg_max_index) >
+          static_cast<size_t>(neg_min_index) + low_res.max_buckets_)
   {
     // We need to downscale the buckets to fit into the new max_buckets_.
     const uint32_t scale_reduction =
@@ -351,7 +355,7 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
       auto l_cnt = left.positive_buckets_.Get(i);
       auto r_cnt = right.positive_buckets_.Get(i);
       // expect right >= left since metric points should be monotonically increasing
-      auto delta = (std::max)((uint64_t)(0), r_cnt - l_cnt);
+      auto delta = (std::max)(static_cast<uint64_t>(0), r_cnt - l_cnt);
       if (l_cnt > 0)
       {
         result_value.positive_buckets_.Increment(i, delta);
@@ -366,7 +370,7 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
       auto l_cnt = left.negative_buckets_.Get(i);
       auto r_cnt = right.negative_buckets_.Get(i);
       // expect right >= left since metric points should be monotonically increasing
-      auto delta = (std::max)((uint64_t)(0), r_cnt - l_cnt);
+      auto delta = (std::max)(static_cast<uint64_t>(0), r_cnt - l_cnt);
       if (delta > 0)
       {
         result_value.negative_buckets_.Increment(i, delta);
