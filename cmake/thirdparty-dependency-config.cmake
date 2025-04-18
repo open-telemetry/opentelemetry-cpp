@@ -37,7 +37,7 @@ set(OTEL_prometheus-cpp_SEARCH_MODE "CONFIG")
 set(OTEL_OpenTracing_SEARCH_MODE "CONFIG")
 
 # The search mode is set to "CONFIG" for Protobuf versions >= 3.22.0
-# to find Protobuf's abseil depedency properly.
+# to find Protobuf's abseil dependency properly until the FindProtobuf module is updated support the upstream protobuf-config.cmake.
 # See https://gitlab.kitware.com/cmake/cmake/-/issues/24321
 if(DEFINED Protobuf_VERSION AND Protobuf_VERSION VERSION_GREATER_EQUAL 3.22.0)
     set(OTEL_Protobuf_SEARCH_MODE "CONFIG")
