@@ -601,7 +601,7 @@ public:
    *
    * @since ABI_VERSION 2
    */
-  virtual bool Enabled() noexcept { return true; }
+  virtual bool Enabled() const noexcept { return true; }
 #endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO == 1

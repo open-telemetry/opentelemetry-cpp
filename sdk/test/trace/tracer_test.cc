@@ -510,7 +510,6 @@ TEST(Tracer, StartSpanWithDisabledConfig)
   EXPECT_TRUE(span.get() == noop_span.get());
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  std::cout << "Running tests for APPI v2 \n";
   EXPECT_FALSE(noop_tracer->Enabled());
   EXPECT_FALSE(tracer->Enabled());
 #endif

@@ -93,7 +93,7 @@ nostd::shared_ptr<trace::Span> Tracer::StartSpan(nostd::string_view name,
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-bool Tracer::Enabled() noexcept
+bool Tracer::Enabled() const noexcept
 {
   return true;
 }

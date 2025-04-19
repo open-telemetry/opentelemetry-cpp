@@ -287,7 +287,7 @@ public:
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-  bool Enabled() noexcept override { return true; }
+  bool Enabled() const noexcept override { return true; }
 
 #endif
 

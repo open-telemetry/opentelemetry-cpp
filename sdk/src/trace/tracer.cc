@@ -164,7 +164,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-bool Tracer::Enabled() noexcept
+bool Tracer::Enabled() const noexcept
 {
   return tracer_config_.IsEnabled();
 }

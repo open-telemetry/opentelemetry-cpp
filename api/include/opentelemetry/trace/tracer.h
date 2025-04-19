@@ -172,7 +172,7 @@ public:
    *
    * @since ABI_VERSION 2
    */
-  virtual bool Enabled() noexcept = 0;
+  virtual bool Enabled() const noexcept = 0;
 #endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO == 1
