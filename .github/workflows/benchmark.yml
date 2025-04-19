@@ -1,6 +1,6 @@
 name: OpenTelemetry-cpp benchmarks
 on:
-  pull_request:
+  push:
     branches:
       - main
 
