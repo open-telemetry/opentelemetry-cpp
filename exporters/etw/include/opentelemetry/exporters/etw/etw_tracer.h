@@ -596,7 +596,7 @@ public:
    * Note: The etw_tracer currently does not accept a TracerConfig and can therefore not be disabled
    * based on the instrumentation scope.
    *
-   * The instrumentation authors must call this method very time before creating a span to
+   * The instrumentation authors should call this method before creating a spans to
    * potentially avoid performing computationally expensive operations for disabled tracers.
    *
    * @since ABI_VERSION 2

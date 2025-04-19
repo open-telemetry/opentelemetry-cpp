@@ -167,7 +167,7 @@ public:
   /**
    * Reports if the tracer is enabled or not. A disabled tracer will not create spans.
    *
-   * The instrumentation authors must call this method very time before creating a span to
+   * The instrumentation authors should call this method before creating a spans to
    * potentially avoid performing computationally expensive operations for disabled tracers.
    *
    * @since ABI_VERSION 2
