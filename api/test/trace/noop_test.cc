@@ -70,6 +70,8 @@ TEST(NoopTest, UseNoopTracersAbiv2)
   s1->AddLink(target, {{"noop1", 1}});
 
   s1->AddLinks({{trace_api::SpanContext(false, false), {{"noop2", 2}}}});
+
+  EXPECT_FALSE(tracer->Enabled());
 }
 #endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
