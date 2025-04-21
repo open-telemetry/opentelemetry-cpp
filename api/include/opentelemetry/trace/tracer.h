@@ -172,7 +172,7 @@ public:
    *
    * @since ABI_VERSION 2
    */
-  virtual bool Enabled() const noexcept = 0;
+  bool Enabled() const noexcept { return this->enabled_; }
 #endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO == 1
@@ -209,6 +209,30 @@ public:
   virtual void CloseWithMicroseconds(uint64_t timeout) noexcept = 0;
 
 #endif /* OPENTELEMETRY_ABI_VERSION_NO */
+
+protected:
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+  /**
+   * Updates the enabled state of the tracer. Calling this method will affect the result of the
+   * subsequent calls to {@code opentelemetry::v2::trace::Tracer::Enabled()}.
+   *
+   * This method should be used by SDK implementations to indicate the tracer's updated state
+   * whenever a tracer transitions from enabled to disabled state and vice versa.
+   *
+   * @param enabled The new state of the tracer. False would indicate that the tracer is no longer
+   * enabled and will not produce as
+   *
+   * @since ABI_VERSION 2
+   */
+  void UpdateEnabled(const bool enabled) noexcept { this->enabled_ = enabled; }
+#endif
+
+private:
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  // variable to support implementation of Enabled method introduced in ABI V2.
+  bool enabled_ = true;
+#endif
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

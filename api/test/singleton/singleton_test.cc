@@ -169,6 +169,13 @@ void reset_counts()
 class MyTracer : public trace::Tracer
 {
 public:
+  MyTracer()
+  {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    UpdateEnabled(true);
+#endif
+  }
+
   nostd::shared_ptr<trace::Span> StartSpan(
       nostd::string_view name,
       const common::KeyValueIterable & /* attributes */,
@@ -284,12 +291,6 @@ public:
 
     return result;
   }
-
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-
-  bool Enabled() const noexcept override { return true; }
-
-#endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO == 1
 
