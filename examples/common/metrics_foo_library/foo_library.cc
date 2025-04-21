@@ -116,7 +116,7 @@ void foo_library::histogram_exp_example(const std::string &name)
 {
   std::string histogram_name = name + "_exponential_histogram";
   auto provider              = metrics_api::Provider::GetMeterProvider();
-  auto meter = provider->GetMeter(name, "1.2.0");
+  auto meter                 = provider->GetMeter(name, "1.2.0");
   auto histogram_counter = meter->CreateDoubleHistogram(histogram_name, "des", "histogram-unit");
   auto context           = opentelemetry::context::Context{};
   for (uint32_t i = 0; i < 20; ++i)

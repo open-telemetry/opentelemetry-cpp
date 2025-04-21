@@ -45,7 +45,7 @@ public:
   PointType ToPoint() const noexcept override;
 
 private:
-  void AggregateIntoBuckets(AdaptingCircularBufferCounter *buckets, double value) noexcept;
+  void AggregateIntoBuckets(AdaptingCircularBufferCounter &buckets, double value) noexcept;
   void Downscale(uint32_t by) noexcept;
 
   mutable opentelemetry::common::SpinLockMutex lock_;

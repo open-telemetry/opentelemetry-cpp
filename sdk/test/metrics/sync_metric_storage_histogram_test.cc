@@ -485,8 +485,8 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
               EXPECT_EQ(data.count_, 3);
               EXPECT_EQ(data.min_, 10);
               EXPECT_EQ(data.max_, 50);
-              auto count = 0;
-              for (int i = start_index; i <= end_index; ++i)
+              uint64_t count = 0;
+              for (auto i = start_index; i <= end_index; ++i)
               {
                 count += data.positive_buckets_.Get(i);
               }
@@ -513,8 +513,8 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
               EXPECT_EQ(data.count_, 3);
               EXPECT_EQ(data.min_, 30);
               EXPECT_EQ(data.max_, 40);
-              auto count = 0;
-              for (int i = start_index; i <= end_index; ++i)
+              uint64_t count = 0;
+              for (auto i = start_index; i <= end_index; ++i)
               {
                 count += data.positive_buckets_.Get(i);
               }

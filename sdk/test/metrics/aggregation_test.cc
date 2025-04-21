@@ -225,7 +225,7 @@ TEST(Aggregation, DoubleHistogramAggregation)
   EXPECT_EQ(histogram_data.counts_[7], 1);  // aggr2(105.0) - aggr1(0)
 }
 
-TEST(aggregation, Base2ExponentialHistogramAggregation)
+TEST(Aggregation, Base2ExponentialHistogramAggregation)
 {
   // Low res histo
   auto SCALE0       = 0;
