@@ -16,7 +16,7 @@ def _filter_libs(deps):
 def dll_deps(deps):
     """ When building with --//:with_dll=true replaces the references to the api/sdk/exporters/ext static libraries with the single //:dll shared library """
     return select({
-        "//:with_dll_enabled": ["//:dll"] + _filter_libs(deps),
+        "@otel_sdk//:with_dll_enabled": ["@otel_sdk//:dll"] + _filter_libs(deps),
         "//conditions:default": deps,
     })
 

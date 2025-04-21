@@ -15,3 +15,8 @@ test:devenv --run_under='"c:/windows/system32/cmd.exe" /c start /wait devenv /de
 #common:test1 --run_under='"c:/windows/system32/cmd.exe" /k set 1>d:\\1.txt 2>d:\\2.txt && echo a '
 
 common --incompatible_disable_target_provider_fields=false
+
+# This disables the gprc hanging fix
+build:hangbug --copt="-UGRPC_NO_ABSL_SYNC"
+build:hangbug --host_copt="-UGRPC_NO_ABSL_SYNC"
+build:hangbug --platform_suffix=hangbug
