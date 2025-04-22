@@ -233,8 +233,11 @@ protected:
 
 private:
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  // variable to support implementation of Enabled method introduced in ABI V2.
-  bool enabled_ = true;
+  // Variable to support implementation of Enabled method introduced in ABI V2.
+  // Mutable allows enabled_ to be used as 'bool *' (instead of 'const bool *'), with the
+  // OPENTELEMETRY_ATOMIC_READ_8 macro's internal casts when used from a const function.
+  // std::atomic can not be used here because it is not ABI compatible for OpenTelemetry C++ API.
+  mutable bool enabled_ = true;
 #endif
 };
 }  // namespace trace
