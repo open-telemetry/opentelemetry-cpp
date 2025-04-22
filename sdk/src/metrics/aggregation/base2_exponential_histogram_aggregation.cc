@@ -78,7 +78,7 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
     ac = &default_config;
   }
 
-  point_data_.max_buckets_    = ac->max_buckets_;
+  point_data_.max_buckets_    = (std::max)(ac->max_buckets_, static_cast<size_t>(2));
   point_data_.scale_          = ac->max_scale_;
   point_data_.record_min_max_ = ac->record_min_max_;
   point_data_.min_            = (std::numeric_limits<double>::max)();
