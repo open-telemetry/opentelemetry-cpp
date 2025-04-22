@@ -105,8 +105,12 @@ private:
 };
 }  // namespace
 
-Tracer::Tracer(nostd::string_view /*output*/) {
-    std::cout << "Tracer...\n";
+Tracer::Tracer(nostd::string_view /*output*/)
+{
+  std::cout << "Tracer...\n";
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  UpdateEnabled(true);
+#endif
 }
 
 nostd::shared_ptr<trace::Span> Tracer::StartSpan(nostd::string_view name,
