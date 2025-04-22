@@ -69,23 +69,34 @@ public:
 class Base2ExponentialHistogramPointData
 {
 public:
-  // TODO: remove ctors and initializers when GCC<5 stops shipping on Ubuntu
-  Base2ExponentialHistogramPointData(Base2ExponentialHistogramPointData &&)            = default;
-  Base2ExponentialHistogramPointData &operator=(Base2ExponentialHistogramPointData &&) = default;
-  Base2ExponentialHistogramPointData(const Base2ExponentialHistogramPointData &)       = default;
-  Base2ExponentialHistogramPointData()                                                 = default;
+  // Delete copy constructor and copy assignment operator
+  Base2ExponentialHistogramPointData(const Base2ExponentialHistogramPointData &) = delete;
+  Base2ExponentialHistogramPointData &operator=(const Base2ExponentialHistogramPointData &) =
+      delete;
 
-  uint64_t count_      = {};
-  double sum_          = {};
-  int32_t scale_       = {};
-  uint64_t zero_count_ = {};
-  AdaptingCircularBufferCounter positive_buckets_{0};
-  AdaptingCircularBufferCounter negative_buckets_{0};
+  // Default move constructor and move assignment operator
+  Base2ExponentialHistogramPointData(Base2ExponentialHistogramPointData &&) noexcept = default;
+  Base2ExponentialHistogramPointData &operator=(Base2ExponentialHistogramPointData &&) noexcept =
+      default;
+
+  // Default constructor
+  Base2ExponentialHistogramPointData() = default;
+
+  double sum_            = {};
   double min_            = {};
   double max_            = {};
   double zero_threshold_ = {};
-  bool record_min_max_   = true;
-  size_t max_buckets_    = {};
+  uint64_t count_        = {};
+  uint64_t zero_count_   = {};
+
+  std::unique_ptr<AdaptingCircularBufferCounter> positive_buckets_ =
+      std::make_unique<AdaptingCircularBufferCounter>(0);
+  std::unique_ptr<AdaptingCircularBufferCounter> negative_buckets_ =
+      std::make_unique<AdaptingCircularBufferCounter>(0);
+
+  size_t max_buckets_  = {};
+  int32_t scale_       = {};
+  bool record_min_max_ = true;
 };
 
 class DropPointData
