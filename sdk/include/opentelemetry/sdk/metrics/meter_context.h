@@ -150,7 +150,7 @@ public:
    * NOTE - INTERNAL method, can change in future.
    * Adds a meter to the list of configured meters in thread safe manner.
    *
-   * @param meter
+   * @param meter The meter to be added.
    */
   void AddMeter(const std::shared_ptr<Meter> &meter);
 

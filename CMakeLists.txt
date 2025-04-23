@@ -603,6 +603,14 @@ if(OTELCPP_MAINTAINER_MODE)
     add_compile_options(-Werror)
     add_compile_options(-Wextra)
 
+    # Check if the compiler supports -Wdocumentation
+    include(CheckCXXCompilerFlag)
+    check_cxx_compiler_flag("-Wdocumentation" CLANG_SUPPORTS_DOCUMENTATION)
+    if(CLANG_SUPPORTS_DOCUMENTATION)
+      message(STATUS "Adding -Wdocumentation flag for Clang")
+      add_compile_options(-Wdocumentation)
+    endif()
+
     # Tested with Clang 11.0 on github.
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0)
       message(STATUS "Building with additional warnings for clang.")

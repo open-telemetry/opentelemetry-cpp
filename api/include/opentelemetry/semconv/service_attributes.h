@@ -23,8 +23,8 @@ namespace service
  * Logical name of the service.
  * <p>
  * MUST be the same for all instances of horizontally scaled services. If the value was not
- * specified, SDKs MUST fallback to @code unknown_service: @endcode concatenated with <a
- * href="process.md">@code process.executable.name @endcode</a>, e.g. @code unknown_service:bash
+ * specified, SDKs MUST fallback to @code unknown_service: @endcode concatenated 
+ * with <a href="process.md">@code process.executable.name @endcode</a>, e.g. @code unknown_service:bash
  * @endcode. If @code process.executable.name @endcode is not available, the value MUST be set to
  * @code unknown_service @endcode.
  */

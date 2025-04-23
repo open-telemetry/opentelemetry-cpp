@@ -23,7 +23,7 @@ namespace common
 ///    (IEEE 754-1985) or signed 64 bit integer.
 ///  - Homogenous arrays of primitive type values.
 ///
-/// \warning
+/// \warning The OpenTelemetry C++ API does not support the following attribute
 /// \parblock The OpenTelemetry C++ API currently supports several attribute
 /// value types that are not covered by the OpenTelemetry specification:
 ///  - \c uint64_t
