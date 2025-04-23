@@ -69,8 +69,31 @@
 
 // Include a standard library header to allow configuration based on the
 // standard library in use.
-#ifdef __cplusplus
-#include <ciso646>
+// Using C++20 feature-test macros when possible, otherwise fall back to
+// ciso646/iso646.h.There are warnings when including ciso646 in C++17 mode
+#ifdef __has_include
+#  if __has_include(<version>)
+#    include <version>
+#  endif
+#elif defined(_MSC_VER) && \
+    ((defined(__cplusplus) && __cplusplus >= 202002L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L))
+#  if _MSC_VER >= 1922
+#    include <version>
+#  endif
+#else
+#  if defined(__GNUC__) && !defined(__clang__) && !defined(__apple_build_version__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wcpp"
+#  elif defined(__clang__) || defined(__apple_build_version__)
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wcpp"
+#  endif
+#  include <ciso646>
+#  if defined(__GNUC__) && !defined(__clang__) && !defined(__apple_build_version__)
+#      pragma GCC diagnostic pop
+#  elif defined(__clang__) || defined(__apple_build_version__)
+#    pragma clang diagnostic pop
+#  endif
 #endif
 
 // -----------------------------------------------------------------------------
