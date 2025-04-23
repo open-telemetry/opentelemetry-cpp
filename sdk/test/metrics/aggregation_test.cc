@@ -245,8 +245,10 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(histo_point.max_, (std::numeric_limits<double>::min)());
   EXPECT_EQ(histo_point.scale_, SCALE0);
   EXPECT_EQ(histo_point.max_buckets_, MAX_BUCKETS0);
-  ASSERT_TRUE(histo_point.positive_buckets_.Empty());
-  ASSERT_TRUE(histo_point.negative_buckets_.Empty());
+  ASSERT_TRUE(histo_point.positive_buckets_ != nullptr);
+  ASSERT_TRUE(histo_point.negative_buckets_ != nullptr);
+  ASSERT_TRUE(histo_point.positive_buckets_->Empty());
+  ASSERT_TRUE(histo_point.negative_buckets_->Empty());
 
   // Create a new aggreagte based in point data
   {
@@ -262,8 +264,8 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
     EXPECT_EQ(histo_point2.max_, (std::numeric_limits<double>::min)());
     EXPECT_EQ(histo_point2.scale_, SCALE0);
     EXPECT_EQ(histo_point2.max_buckets_, MAX_BUCKETS0);
-    ASSERT_TRUE(histo_point2.positive_buckets_.Empty());
-    ASSERT_TRUE(histo_point2.negative_buckets_.Empty());
+    ASSERT_TRUE(histo_point2.positive_buckets_->Empty());
+    ASSERT_TRUE(histo_point2.negative_buckets_->Empty());
   }
 
   // zero point
@@ -280,12 +282,14 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(histo_point.sum_, 6.5);
   EXPECT_EQ(histo_point.min_, 0.0);
   EXPECT_EQ(histo_point.max_, 3.5);
-  ASSERT_FALSE(histo_point.positive_buckets_.Empty());
-  auto start_index = histo_point.positive_buckets_.StartIndex();
-  auto end_index   = histo_point.positive_buckets_.EndIndex();
+  ASSERT_TRUE(histo_point.positive_buckets_ != nullptr);
+  ASSERT_TRUE(histo_point.negative_buckets_ != nullptr);
+  ASSERT_FALSE(histo_point.positive_buckets_->Empty());
+  auto start_index = histo_point.positive_buckets_->StartIndex();
+  auto end_index   = histo_point.positive_buckets_->EndIndex();
   EXPECT_EQ(start_index, 1);
   EXPECT_EQ(end_index, 1);
-  EXPECT_EQ(histo_point.positive_buckets_.Get(start_index), 2);
+  EXPECT_EQ(histo_point.positive_buckets_->Get(start_index), 2);
 
   // Recording in a different bucket (bucket -2 at scale 0)
   scale0_aggr.Aggregate(-0.3, {});
@@ -294,8 +298,10 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(histo_point.sum_, 6.2);
   EXPECT_EQ(histo_point.min_, -0.3);
   EXPECT_EQ(histo_point.max_, 3.5);
-  EXPECT_EQ(histo_point.negative_buckets_.Get(-2), 1);
-  EXPECT_EQ(histo_point.positive_buckets_.Get(1), 2);
+  ASSERT_TRUE(histo_point.positive_buckets_ != nullptr);
+  ASSERT_TRUE(histo_point.negative_buckets_ != nullptr);
+  EXPECT_EQ(histo_point.negative_buckets_->Get(-2), 1);
+  EXPECT_EQ(histo_point.positive_buckets_->Get(1), 2);
 
   Base2ExponentialHistogramAggregationConfig scale1_config;
   scale1_config.max_scale_      = 1;
@@ -323,9 +329,11 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(merged_point.min_, -0.3);
   EXPECT_EQ(merged_point.max_, 3.5);
   EXPECT_EQ(merged_point.scale_, 0);
-  EXPECT_EQ(merged_point.positive_buckets_.Get(1), 4);
-  EXPECT_EQ(merged_point.negative_buckets_.Get(-2), 1);
-  EXPECT_EQ(merged_point.positive_buckets_.Get(2), 0);
+  ASSERT_TRUE(merged_point.positive_buckets_ != nullptr);
+  ASSERT_TRUE(merged_point.negative_buckets_ != nullptr);
+  EXPECT_EQ(merged_point.positive_buckets_->Get(1), 4);
+  EXPECT_EQ(merged_point.negative_buckets_->Get(-2), 1);
+  EXPECT_EQ(merged_point.positive_buckets_->Get(2), 0);
 
   // Diff test
   Base2ExponentialHistogramAggregation scale2_aggr(&scale1_config);
@@ -345,5 +353,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_NEAR(diffd_point.sum_, 2.3, 1e-9);
   EXPECT_EQ(diffd_point.zero_count_, 0);
   EXPECT_EQ(diffd_point.scale_, 1);
-  EXPECT_EQ(diffd_point.positive_buckets_.Get(2), 1);
+  ASSERT_TRUE(diffd_point.positive_buckets_ != nullptr);
+  ASSERT_TRUE(diffd_point.negative_buckets_ != nullptr);
+  EXPECT_EQ(diffd_point.positive_buckets_->Get(2), 1);
 }

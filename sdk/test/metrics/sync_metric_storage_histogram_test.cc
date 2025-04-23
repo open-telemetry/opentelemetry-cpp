@@ -389,11 +389,11 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
             EXPECT_EQ(data.count_, 2);
             EXPECT_EQ(data.min_, 10);
             EXPECT_EQ(data.max_, 20);
-            EXPECT_EQ(data.negative_buckets_.Empty(), true);
-            auto start_index = data.positive_buckets_.StartIndex();
-            auto end_index   = data.positive_buckets_.EndIndex();
-            EXPECT_EQ(data.positive_buckets_.Get(start_index), 1);
-            EXPECT_EQ(data.positive_buckets_.Get(end_index), 1);
+            EXPECT_EQ(data.negative_buckets_->Empty(), true);
+            auto start_index = data.positive_buckets_->StartIndex();
+            auto end_index   = data.positive_buckets_->EndIndex();
+            EXPECT_EQ(data.positive_buckets_->Get(start_index), 1);
+            EXPECT_EQ(data.positive_buckets_->Get(end_index), 1);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
@@ -403,11 +403,11 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
             EXPECT_EQ(data.count_, 2);
             EXPECT_EQ(data.min_, 30);
             EXPECT_EQ(data.max_, 40);
-            auto start_index = data.positive_buckets_.StartIndex();
-            auto end_index   = data.positive_buckets_.EndIndex();
-            EXPECT_EQ(data.positive_buckets_.Get(start_index), 1);
-            EXPECT_EQ(data.positive_buckets_.Get(end_index), 1);
-            EXPECT_EQ(data.negative_buckets_.Empty(), true);
+            auto start_index = data.positive_buckets_->StartIndex();
+            auto end_index   = data.positive_buckets_->EndIndex();
+            EXPECT_EQ(data.positive_buckets_->Get(start_index), 1);
+            EXPECT_EQ(data.positive_buckets_->Get(end_index), 1);
+            EXPECT_EQ(data.negative_buckets_->Empty(), true);
             count_attributes++;
           }
         }
@@ -478,8 +478,8 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
           {
             EXPECT_EQ(data.sum_, expected_total_get_requests);
             count_attributes++;
-            auto start_index = data.positive_buckets_.StartIndex();
-            auto end_index   = data.positive_buckets_.EndIndex();
+            auto start_index = data.positive_buckets_->StartIndex();
+            auto end_index   = data.positive_buckets_->EndIndex();
             if (temporality == AggregationTemporality::kCumulative)
             {
               EXPECT_EQ(data.count_, 3);
@@ -488,7 +488,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
               uint64_t count = 0;
               for (auto i = start_index; i <= end_index; ++i)
               {
-                count += data.positive_buckets_.Get(i);
+                count += data.positive_buckets_->Get(i);
               }
               EXPECT_EQ(count, 3);
             }
@@ -497,7 +497,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
               EXPECT_EQ(data.count_, 1);
               EXPECT_EQ(data.min_, 50);
               EXPECT_EQ(data.max_, 50);
-              EXPECT_EQ(data.positive_buckets_.Get(start_index), 1);
+              EXPECT_EQ(data.positive_buckets_->Get(start_index), 1);
               EXPECT_EQ(end_index, start_index);
             }
           }
@@ -506,8 +506,8 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
           {
             EXPECT_EQ(data.sum_, expected_total_put_requests);
             count_attributes++;
-            auto start_index = data.positive_buckets_.StartIndex();
-            auto end_index   = data.positive_buckets_.EndIndex();
+            auto start_index = data.positive_buckets_->StartIndex();
+            auto end_index   = data.positive_buckets_->EndIndex();
             if (temporality == AggregationTemporality::kCumulative)
             {
               EXPECT_EQ(data.count_, 3);
@@ -516,7 +516,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
               uint64_t count = 0;
               for (auto i = start_index; i <= end_index; ++i)
               {
-                count += data.positive_buckets_.Get(i);
+                count += data.positive_buckets_->Get(i);
               }
               EXPECT_EQ(count, 3);
             }
@@ -525,7 +525,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
               EXPECT_EQ(data.count_, 1);
               EXPECT_EQ(data.min_, 40);
               EXPECT_EQ(data.max_, 40);
-              EXPECT_EQ(data.positive_buckets_.Get(start_index), 1);
+              EXPECT_EQ(data.positive_buckets_->Get(start_index), 1);
               EXPECT_EQ(end_index, start_index);
             }
           }

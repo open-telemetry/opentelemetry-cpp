@@ -199,6 +199,11 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
     proto_histogram_point_data->set_time_unix_nano(ts);
     auto histogram_data = nostd::get<sdk::metrics::Base2ExponentialHistogramPointData>(
         point_data_with_attributes.point_data);
+    if (histogram_data.positive_buckets_ == nullptr &&
+        histogram_data.negative_buckets_ == nullptr)
+    {
+      continue;
+    }
     // sum
     proto_histogram_point_data->set_sum(histogram_data.sum_);
     proto_histogram_point_data->set_count(histogram_data.count_);
@@ -208,27 +213,27 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
       proto_histogram_point_data->set_max(histogram_data.max_);
     }
     // negative buckets
-    if (!histogram_data.negative_buckets_.Empty())
+    if (!histogram_data.negative_buckets_->Empty())
     {
       auto negative_buckets = proto_histogram_point_data->mutable_negative();
-      negative_buckets->set_offset(histogram_data.negative_buckets_.StartIndex());
+      negative_buckets->set_offset(histogram_data.negative_buckets_->StartIndex());
 
-      for (auto index = histogram_data.negative_buckets_.StartIndex();
-           index <= histogram_data.negative_buckets_.EndIndex(); ++index)
+      for (auto index = histogram_data.negative_buckets_->StartIndex();
+           index <= histogram_data.negative_buckets_->EndIndex(); ++index)
       {
-        negative_buckets->add_bucket_counts(histogram_data.negative_buckets_.Get(index));
+        negative_buckets->add_bucket_counts(histogram_data.negative_buckets_->Get(index));
       }
     }
     // positive buckets
-    if (!histogram_data.positive_buckets_.Empty())
+    if (!histogram_data.positive_buckets_->Empty())
     {
       auto positive_buckets = proto_histogram_point_data->mutable_positive();
-      positive_buckets->set_offset(histogram_data.positive_buckets_.StartIndex());
+      positive_buckets->set_offset(histogram_data.positive_buckets_->StartIndex());
 
-      for (auto index = histogram_data.positive_buckets_.StartIndex();
-           index <= histogram_data.positive_buckets_.EndIndex(); ++index)
+      for (auto index = histogram_data.positive_buckets_->StartIndex();
+           index <= histogram_data.positive_buckets_->EndIndex(); ++index)
       {
-        positive_buckets->add_bucket_counts(histogram_data.positive_buckets_.Get(index));
+        positive_buckets->add_bucket_counts(histogram_data.positive_buckets_->Get(index));
       }
     }
     proto_histogram_point_data->set_scale(histogram_data.scale_);

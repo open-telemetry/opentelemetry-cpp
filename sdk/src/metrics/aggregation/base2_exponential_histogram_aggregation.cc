@@ -8,6 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <utility>
+#include <iostream>
 
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/variant.h"
@@ -84,22 +85,46 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
   point_data_.min_            = (std::numeric_limits<double>::max)();
   point_data_.max_            = (std::numeric_limits<double>::min)();
 
+  // Initialize buckets
+  point_data_.positive_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(point_data_.max_buckets_);
+  point_data_.negative_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(point_data_.max_buckets_);
+
   indexer_ = Base2ExponentialHistogramIndexer(point_data_.scale_);
 }
 
-// Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
-//     const Base2ExponentialHistogramPointData &point_data)
-//     : point_data_{point_data},
-//       indexer_(point_data.scale_),
-//       record_min_max_{point_data.record_min_max_}
-// {}
+Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
+    const Base2ExponentialHistogramPointData &point_data)
+    : point_data_{},
+      indexer_(point_data.scale_),
+      record_min_max_{point_data.record_min_max_}
+{
+  point_data_.sum_ = point_data.sum_;
+  point_data_.min_ = point_data.min_;
+  point_data_.max_ = point_data.max_;
+  point_data_.zero_threshold_ = point_data.zero_threshold_;
+  point_data_.count_ = point_data.count_;
+  point_data_.zero_count_ = point_data.zero_count_;
+  point_data_.max_buckets_ = point_data.max_buckets_;
+  point_data_.scale_ = point_data.scale_;
+  point_data_.record_min_max_ = point_data.record_min_max_;
 
-// Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
-//     Base2ExponentialHistogramPointData &&point_data)
-//     : point_data_{std::move(point_data)},
-//       indexer_(point_data_.scale_),
-//       record_min_max_{point_data_.record_min_max_}
-// {}
+  // Deep copy the unique_ptr members
+  if (point_data.positive_buckets_)
+  {
+    point_data_.positive_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(*point_data.positive_buckets_);
+  }
+  if (point_data.negative_buckets_)
+  {
+    point_data_.negative_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(*point_data.negative_buckets_);
+  }
+}
+
+Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
+    Base2ExponentialHistogramPointData &&point_data)
+    : point_data_{std::move(point_data)},
+      indexer_(point_data_.scale_),
+      record_min_max_{point_data_.record_min_max_}
+{}
 
 void Base2ExponentialHistogramAggregation::Aggregate(
     int64_t value,
@@ -129,11 +154,17 @@ void Base2ExponentialHistogramAggregation::Aggregate(
   }
   else if (value > 0)
   {
-    AggregateIntoBuckets(point_data_.positive_buckets_, value);
+    if (point_data_.positive_buckets_)
+    {
+      AggregateIntoBuckets(point_data_.positive_buckets_, value);
+    }
   }
   else
   {
-    AggregateIntoBuckets(point_data_.negative_buckets_, -value);
+    if (point_data_.negative_buckets_)
+    {
+      AggregateIntoBuckets(point_data_.negative_buckets_, -value);
+    }
   }
 }
 
@@ -141,6 +172,11 @@ void Base2ExponentialHistogramAggregation::AggregateIntoBuckets(
     std::unique_ptr<AdaptingCircularBufferCounter> &buckets,
     double value) noexcept
 {
+  if (!buckets)
+  {
+    buckets = std::make_unique<AdaptingCircularBufferCounter>(point_data_.max_buckets_);
+  }
+
   if (buckets->MaxSize() == 0)
   {
     buckets = std::make_unique<AdaptingCircularBufferCounter>(point_data_.max_buckets_);
@@ -166,8 +202,14 @@ void Base2ExponentialHistogramAggregation::Downscale(uint32_t by) noexcept
     return;
   }
 
-  DownscaleBuckets(point_data_.positive_buckets_, by);
-  DownscaleBuckets(point_data_.negative_buckets_, by);
+  if (point_data_.positive_buckets_)
+  {
+    DownscaleBuckets(point_data_.positive_buckets_, by);
+  }
+  if (point_data_.negative_buckets_)
+  {
+    DownscaleBuckets(point_data_.negative_buckets_, by);
+  }
 
   point_data_.scale_ -= by;
   indexer_ = Base2ExponentialHistogramIndexer(point_data_.scale_);
@@ -296,33 +338,61 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
 
     if (scale_reduction > 0)
     {
-      DownscaleBuckets(high_res.positive_buckets_, scale_reduction);
-      DownscaleBuckets(high_res.negative_buckets_, scale_reduction);
+      if (high_res.positive_buckets_)
+      {
+        DownscaleBuckets(high_res.positive_buckets_, scale_reduction);
+      }
+
+      if (high_res.negative_buckets_)
+      {
+        DownscaleBuckets(high_res.negative_buckets_, scale_reduction);
+      }
+
       high_res.scale_ -= scale_reduction;
     }
   }
 
   auto pos_min_index =
-      (std::min)(left.positive_buckets_->StartIndex(), right.positive_buckets_->StartIndex());
+      (left.positive_buckets_ && right.positive_buckets_)
+          ? (std::min)(left.positive_buckets_->StartIndex(), right.positive_buckets_->StartIndex())
+          : 0;
   auto pos_max_index =
-      (std::max)(left.positive_buckets_->EndIndex(), right.positive_buckets_->EndIndex());
+      (left.positive_buckets_ && right.positive_buckets_)
+          ? (std::max)(left.positive_buckets_->EndIndex(), right.positive_buckets_->EndIndex())
+          : 0;
   auto neg_min_index =
-      (std::min)(left.negative_buckets_->StartIndex(), right.negative_buckets_->StartIndex());
+      (left.negative_buckets_ && right.negative_buckets_)
+          ? (std::min)(left.negative_buckets_->StartIndex(), right.negative_buckets_->StartIndex())
+          : 0;
   auto neg_max_index =
-      (std::max)(left.negative_buckets_->EndIndex(), right.negative_buckets_->EndIndex());
+      (left.negative_buckets_ && right.negative_buckets_)
+          ? (std::max)(left.negative_buckets_->EndIndex(), right.negative_buckets_->EndIndex())
+          : 0;
 
   if (static_cast<size_t>(pos_max_index) >
           static_cast<size_t>(pos_min_index) + low_res.max_buckets_ ||
       static_cast<size_t>(neg_max_index) >
           static_cast<size_t>(neg_min_index) + low_res.max_buckets_)
   {
-    // We need to downscale the buckets to fit into the new max_buckets_.
     const uint32_t scale_reduction =
         GetScaleReduction(pos_min_index, pos_max_index, low_res.max_buckets_);
-    DownscaleBuckets(left.positive_buckets_, scale_reduction);
-    DownscaleBuckets(right.positive_buckets_, scale_reduction);
-    DownscaleBuckets(left.negative_buckets_, scale_reduction);
-    DownscaleBuckets(right.negative_buckets_, scale_reduction);
+
+    if (left.positive_buckets_)
+    {
+      DownscaleBuckets(left.positive_buckets_, scale_reduction);
+    }
+    if (right.positive_buckets_)
+    {
+      DownscaleBuckets(right.positive_buckets_, scale_reduction);
+    }
+    if (left.negative_buckets_)
+    {
+      DownscaleBuckets(left.negative_buckets_, scale_reduction);
+    }
+    if (right.negative_buckets_)
+    {
+      DownscaleBuckets(right.negative_buckets_, scale_reduction);
+    }
     left.scale_ -= scale_reduction;
     right.scale_ -= scale_reduction;
   }
@@ -331,13 +401,11 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
   result_value.scale_          = low_res.scale_;
   result_value.max_buckets_    = low_res.max_buckets_;
   result_value.record_min_max_ = false;
-  // caution for underflow
-  // expect right.{sum, count} >= left.{sum, count} since metric points should be monotonically
-  // increasing
   result_value.count_ = (right.count_ >= left.count_) ? (right.count_ - left.count_) : 0;
   result_value.sum_   = (right.sum_ >= left.sum_) ? (right.sum_ - left.sum_) : 0.0;
   result_value.zero_count_ =
       (right.zero_count_ >= left.zero_count_) ? (right.zero_count_ - left.zero_count_) : 0;
+
   result_value.positive_buckets_ =
       std::make_unique<AdaptingCircularBufferCounter>(right.max_buckets_);
   result_value.negative_buckets_ =
@@ -349,7 +417,6 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
     {
       auto l_cnt = left.positive_buckets_->Get(i);
       auto r_cnt = right.positive_buckets_->Get(i);
-      // expect right >= left since metric points should be monotonically increasing
       auto delta = std::max(static_cast<uint64_t>(0), r_cnt - l_cnt);
       if (delta > 0)
       {
@@ -364,7 +431,6 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
     {
       auto l_cnt = left.negative_buckets_->Get(i);
       auto r_cnt = right.negative_buckets_->Get(i);
-      // expect right >= left since metric points should be monotonically increasing
       auto delta = std::max(static_cast<uint64_t>(0), r_cnt - l_cnt);
       if (delta > 0)
       {

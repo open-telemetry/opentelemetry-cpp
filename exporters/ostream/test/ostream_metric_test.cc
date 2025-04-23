@@ -194,11 +194,11 @@ TEST(OStreamMetricsExporter, ExportBase2ExponentialHistogramPointData)
   histogram_point_data1.record_min_max_ = true;
   histogram_point_data1.zero_count_     = 1;
   histogram_point_data1.positive_buckets_ =
-      opentelemetry::sdk::metrics::AdaptingCircularBufferCounter(10);
+    std::make_unique<opentelemetry::sdk::metrics::AdaptingCircularBufferCounter>(10);
   histogram_point_data1.negative_buckets_ =
-      opentelemetry::sdk::metrics::AdaptingCircularBufferCounter(10);
-  histogram_point_data1.positive_buckets_.Increment(1, 1);
-  histogram_point_data1.negative_buckets_.Increment(-2, 1);
+    std::make_unique<opentelemetry::sdk::metrics::AdaptingCircularBufferCounter>(10);
+  histogram_point_data1.positive_buckets_->Increment(1, 1);
+  histogram_point_data1.negative_buckets_->Increment(-2, 1);
 
   metric_sdk::Base2ExponentialHistogramPointData histogram_point_data2;
   histogram_point_data2.count_          = 4;
@@ -209,12 +209,12 @@ TEST(OStreamMetricsExporter, ExportBase2ExponentialHistogramPointData)
   histogram_point_data2.record_min_max_ = false;
   histogram_point_data2.zero_count_     = 2;
   histogram_point_data2.positive_buckets_ =
-      opentelemetry::sdk::metrics::AdaptingCircularBufferCounter(10);
+    std::make_unique<opentelemetry::sdk::metrics::AdaptingCircularBufferCounter>(10);
   histogram_point_data2.negative_buckets_ =
-      opentelemetry::sdk::metrics::AdaptingCircularBufferCounter(10);
-  histogram_point_data2.positive_buckets_.Increment(3, 1);
-  histogram_point_data2.negative_buckets_.Increment(-2, 1);
-  histogram_point_data2.negative_buckets_.Increment(-4, 2);
+    std::make_unique<opentelemetry::sdk::metrics::AdaptingCircularBufferCounter>(10);
+  histogram_point_data2.positive_buckets_->Increment(3, 1);
+  histogram_point_data2.negative_buckets_->Increment(-2, 1);
+  histogram_point_data2.negative_buckets_->Increment(-4, 2);
 
   metric_sdk::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(
