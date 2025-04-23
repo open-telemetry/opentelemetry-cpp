@@ -253,7 +253,7 @@ void OStreamMetricExporter::printPointData(const opentelemetry::sdk::metrics::Po
     auto histogram_point_data =
         nostd::get<sdk::metrics::Base2ExponentialHistogramPointData>(point_data);
     if (!histogram_point_data.positive_buckets_ && !histogram_point_data.negative_buckets_)
-    { 
+    {
       return;
     }
     sout_ << "\n  type: Base2ExponentialHistogramPointData";

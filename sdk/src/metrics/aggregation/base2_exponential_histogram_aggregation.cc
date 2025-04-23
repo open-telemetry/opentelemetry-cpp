@@ -4,11 +4,11 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <algorithm>
+#include <iostream>
 #include <limits>
 #include <memory>
 #include <mutex>
 #include <utility>
-#include <iostream>
 
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/variant.h"
@@ -86,36 +86,38 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
   point_data_.max_            = (std::numeric_limits<double>::min)();
 
   // Initialize buckets
-  point_data_.positive_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(point_data_.max_buckets_);
-  point_data_.negative_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(point_data_.max_buckets_);
+  point_data_.positive_buckets_ =
+      std::make_unique<AdaptingCircularBufferCounter>(point_data_.max_buckets_);
+  point_data_.negative_buckets_ =
+      std::make_unique<AdaptingCircularBufferCounter>(point_data_.max_buckets_);
 
   indexer_ = Base2ExponentialHistogramIndexer(point_data_.scale_);
 }
 
 Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
     const Base2ExponentialHistogramPointData &point_data)
-    : point_data_{},
-      indexer_(point_data.scale_),
-      record_min_max_{point_data.record_min_max_}
+    : point_data_{}, indexer_(point_data.scale_), record_min_max_{point_data.record_min_max_}
 {
-  point_data_.sum_ = point_data.sum_;
-  point_data_.min_ = point_data.min_;
-  point_data_.max_ = point_data.max_;
+  point_data_.sum_            = point_data.sum_;
+  point_data_.min_            = point_data.min_;
+  point_data_.max_            = point_data.max_;
   point_data_.zero_threshold_ = point_data.zero_threshold_;
-  point_data_.count_ = point_data.count_;
-  point_data_.zero_count_ = point_data.zero_count_;
-  point_data_.max_buckets_ = point_data.max_buckets_;
-  point_data_.scale_ = point_data.scale_;
+  point_data_.count_          = point_data.count_;
+  point_data_.zero_count_     = point_data.zero_count_;
+  point_data_.max_buckets_    = point_data.max_buckets_;
+  point_data_.scale_          = point_data.scale_;
   point_data_.record_min_max_ = point_data.record_min_max_;
 
   // Deep copy the unique_ptr members
   if (point_data.positive_buckets_)
   {
-    point_data_.positive_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(*point_data.positive_buckets_);
+    point_data_.positive_buckets_ =
+        std::make_unique<AdaptingCircularBufferCounter>(*point_data.positive_buckets_);
   }
   if (point_data.negative_buckets_)
   {
-    point_data_.negative_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(*point_data.negative_buckets_);
+    point_data_.negative_buckets_ =
+        std::make_unique<AdaptingCircularBufferCounter>(*point_data.negative_buckets_);
   }
 }
 
@@ -401,8 +403,8 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
   result_value.scale_          = low_res.scale_;
   result_value.max_buckets_    = low_res.max_buckets_;
   result_value.record_min_max_ = false;
-  result_value.count_ = (right.count_ >= left.count_) ? (right.count_ - left.count_) : 0;
-  result_value.sum_   = (right.sum_ >= left.sum_) ? (right.sum_ - left.sum_) : 0.0;
+  result_value.count_          = (right.count_ >= left.count_) ? (right.count_ - left.count_) : 0;
+  result_value.sum_            = (right.sum_ >= left.sum_) ? (right.sum_ - left.sum_) : 0.0;
   result_value.zero_count_ =
       (right.zero_count_ >= left.zero_count_) ? (right.zero_count_ - left.zero_count_) : 0;
 
@@ -448,23 +450,25 @@ PointType Base2ExponentialHistogramAggregation::ToPoint() const noexcept
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
 
   Base2ExponentialHistogramPointData copy;
-  copy.sum_ = point_data_.sum_;
-  copy.min_ = point_data_.min_;
-  copy.max_ = point_data_.max_;
+  copy.sum_            = point_data_.sum_;
+  copy.min_            = point_data_.min_;
+  copy.max_            = point_data_.max_;
   copy.zero_threshold_ = point_data_.zero_threshold_;
-  copy.count_ = point_data_.count_;
-  copy.zero_count_ = point_data_.zero_count_;
-  copy.max_buckets_ = point_data_.max_buckets_;
-  copy.scale_ = point_data_.scale_;
+  copy.count_          = point_data_.count_;
+  copy.zero_count_     = point_data_.zero_count_;
+  copy.max_buckets_    = point_data_.max_buckets_;
+  copy.scale_          = point_data_.scale_;
   copy.record_min_max_ = point_data_.record_min_max_;
 
   if (point_data_.positive_buckets_)
   {
-    copy.positive_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(*point_data_.positive_buckets_);
+    copy.positive_buckets_ =
+        std::make_unique<AdaptingCircularBufferCounter>(*point_data_.positive_buckets_);
   }
   if (point_data_.negative_buckets_)
   {
-    copy.negative_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(*point_data_.negative_buckets_);
+    copy.negative_buckets_ =
+        std::make_unique<AdaptingCircularBufferCounter>(*point_data_.negative_buckets_);
   }
 
   return copy;

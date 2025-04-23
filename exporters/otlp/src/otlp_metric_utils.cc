@@ -199,8 +199,7 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
     proto_histogram_point_data->set_time_unix_nano(ts);
     auto histogram_data = nostd::get<sdk::metrics::Base2ExponentialHistogramPointData>(
         point_data_with_attributes.point_data);
-    if (histogram_data.positive_buckets_ == nullptr &&
-        histogram_data.negative_buckets_ == nullptr)
+    if (histogram_data.positive_buckets_ == nullptr && histogram_data.negative_buckets_ == nullptr)
     {
       continue;
     }

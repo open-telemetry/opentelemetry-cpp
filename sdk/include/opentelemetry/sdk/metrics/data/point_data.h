@@ -70,7 +70,8 @@ class Base2ExponentialHistogramPointData
 {
 public:
   Base2ExponentialHistogramPointData(Base2ExponentialHistogramPointData &&) noexcept = default;
-  Base2ExponentialHistogramPointData &operator=(Base2ExponentialHistogramPointData &&) noexcept = default;
+  Base2ExponentialHistogramPointData &operator=(Base2ExponentialHistogramPointData &&) noexcept =
+      default;
 
   Base2ExponentialHistogramPointData(const Base2ExponentialHistogramPointData &other)
       : sum_(other.sum_),
@@ -97,19 +98,20 @@ public:
   {
     if (this != &other)
     {
-      sum_ = other.sum_;
-      min_ = other.min_;
-      max_ = other.max_;
+      sum_            = other.sum_;
+      min_            = other.min_;
+      max_            = other.max_;
       zero_threshold_ = other.zero_threshold_;
-      count_ = other.count_;
-      zero_count_ = other.zero_count_;
-      max_buckets_ = other.max_buckets_;
-      scale_ = other.scale_;
+      count_          = other.count_;
+      zero_count_     = other.zero_count_;
+      max_buckets_    = other.max_buckets_;
+      scale_          = other.scale_;
       record_min_max_ = other.record_min_max_;
 
       if (other.positive_buckets_)
       {
-        positive_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(*other.positive_buckets_);
+        positive_buckets_ =
+            std::make_unique<AdaptingCircularBufferCounter>(*other.positive_buckets_);
       }
       else
       {
@@ -118,7 +120,8 @@ public:
 
       if (other.negative_buckets_)
       {
-        negative_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(*other.negative_buckets_);
+        negative_buckets_ =
+            std::make_unique<AdaptingCircularBufferCounter>(*other.negative_buckets_);
       }
       else
       {
@@ -132,16 +135,18 @@ public:
   Base2ExponentialHistogramPointData() = default;
 
   // Members
-  double sum_ = {};
-  double min_ = {};
-  double max_ = {};
+  double sum_            = {};
+  double min_            = {};
+  double max_            = {};
   double zero_threshold_ = {};
-  uint64_t count_ = {};
-  uint64_t zero_count_ = {};
-  std::unique_ptr<AdaptingCircularBufferCounter> positive_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(0);
-  std::unique_ptr<AdaptingCircularBufferCounter> negative_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(0);
-  size_t max_buckets_ = {};
-  int32_t scale_ = {};
+  uint64_t count_        = {};
+  uint64_t zero_count_   = {};
+  std::unique_ptr<AdaptingCircularBufferCounter> positive_buckets_ =
+      std::make_unique<AdaptingCircularBufferCounter>(0);
+  std::unique_ptr<AdaptingCircularBufferCounter> negative_buckets_ =
+      std::make_unique<AdaptingCircularBufferCounter>(0);
+  size_t max_buckets_  = {};
+  int32_t scale_       = {};
   bool record_min_max_ = true;
 };
 
