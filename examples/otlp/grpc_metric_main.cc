@@ -70,11 +70,6 @@ void InitMetrics(std::string &name)
       std::unique_ptr<metric_sdk::Base2ExponentialHistogramAggregationConfig>(
           new metric_sdk::Base2ExponentialHistogramAggregationConfig);
 
-  histogram_aggregation_config->max_scale_ = 3;
-
-  // histogram_aggregation_config->boundaries_ = std::vector<double>{
-  //     0.0, 50.0, 100.0, 250.0, 500.0, 750.0, 1000.0, 2500.0, 5000.0, 10000.0, 20000.0};
-
   std::shared_ptr<metric_sdk::AggregationConfig> aggregation_config(
       std::move(histogram_aggregation_config));
 
