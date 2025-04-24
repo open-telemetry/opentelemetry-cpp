@@ -8,6 +8,7 @@
 #include <ctime>
 #include <iterator>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <ostream>
 #include <string>
