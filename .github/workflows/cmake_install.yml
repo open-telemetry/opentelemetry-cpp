@@ -17,6 +17,11 @@ jobs:
       # cxx17 is the default for windows-2022
       CXX_STANDARD: '17'
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           submodules: 'recursive'
@@ -38,6 +43,11 @@ jobs:
       # cxx14 is the default for windows-2019
       CXX_STANDARD: '14'
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           submodules: 'recursive'
@@ -59,6 +69,11 @@ jobs:
       CXX_STANDARD: '17'
       BUILD_TYPE: 'Debug'
     steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      with:
+        egress-policy: audit
+
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
@@ -98,6 +113,11 @@ jobs:
       GRPC_VERSION: 'v1.71.0'
       BUILD_TYPE: 'Debug'
     steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      with:
+        egress-policy: audit
+
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
@@ -132,6 +152,11 @@ jobs:
       GRPC_VERSION: 'v1.55.0'
       BUILD_TYPE: 'Debug'
     steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      with:
+        egress-policy: audit
+
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
@@ -171,6 +196,11 @@ jobs:
       GRPC_VERSION: 'v1.49.2'
       BUILD_TYPE: 'Debug'
     steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      with:
+        egress-policy: audit
+
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
@@ -204,6 +234,11 @@ jobs:
       CMAKE_TOOLCHAIN_FILE: /home/runner/conan/build/Debug/generators/conan_toolchain.cmake
       BUILD_TYPE: 'Debug'
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           submodules: 'recursive'
@@ -242,6 +277,11 @@ jobs:
       CMAKE_TOOLCHAIN_FILE: /home/runner/conan/build/Debug/generators/conan_toolchain.cmake
       BUILD_TYPE: 'Debug'
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        with:
+          egress-policy: audit
+
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           submodules: 'recursive'
@@ -273,6 +313,11 @@ jobs:
       CMAKE_TOOLCHAIN_FILE: '/Users/runner/conan/build/Debug/generators/conan_toolchain.cmake'
       BUILD_TYPE: 'Debug'
     steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      with:
+        egress-policy: audit
+
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
@@ -298,6 +343,11 @@ jobs:
       CXX_STANDARD: '17'
       BUILD_TYPE: 'Debug'
     steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      with:
+        egress-policy: audit
+
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
