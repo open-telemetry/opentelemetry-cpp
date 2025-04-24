@@ -19,7 +19,7 @@ RUN apt update && apt install -y \
 	libtool \
 	python3-pip
 
-	RUN pip install "conan==2.15.1" --break-system-packages
+RUN pip install "conan==2.15.1" --break-system-packages
 
 ARG USER_UID=1000
 ARG USER_GID=1000
