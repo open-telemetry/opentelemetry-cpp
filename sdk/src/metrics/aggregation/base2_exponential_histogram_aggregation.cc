@@ -4,7 +4,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <algorithm>
-#include <iostream>
 #include <limits>
 #include <memory>
 #include <mutex>
@@ -419,7 +418,7 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
     {
       auto l_cnt = left.positive_buckets_->Get(i);
       auto r_cnt = right.positive_buckets_->Get(i);
-      auto delta = std::max(static_cast<uint64_t>(0), r_cnt - l_cnt);
+      auto delta = (std::max)(static_cast<uint64_t>(0), r_cnt - l_cnt);
       if (delta > 0)
       {
         result_value.positive_buckets_->Increment(i, delta);
@@ -433,7 +432,7 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
     {
       auto l_cnt = left.negative_buckets_->Get(i);
       auto r_cnt = right.negative_buckets_->Get(i);
-      auto delta = std::max(static_cast<uint64_t>(0), r_cnt - l_cnt);
+      auto delta = (std::max)(static_cast<uint64_t>(0), r_cnt - l_cnt);
       if (delta > 0)
       {
         result_value.negative_buckets_->Increment(i, delta);
