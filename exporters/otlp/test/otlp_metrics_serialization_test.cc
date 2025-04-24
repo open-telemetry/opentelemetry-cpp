@@ -137,27 +137,31 @@ static metrics_sdk::MetricData CreateExponentialHistogramAggregationData(
                                                  metrics_sdk::InstrumentType::kHistogram,
                                                  metrics_sdk::InstrumentValueType::kDouble};
   metrics_sdk::Base2ExponentialHistogramPointData s_data_1, s_data_2;
-  s_data_1.count_            = 3;
-  s_data_1.sum_              = 6.5;
-  s_data_1.min_              = 0.0;
-  s_data_1.max_              = 3.5;
-  s_data_1.scale_            = 3;
-  s_data_1.record_min_max_   = true;
-  s_data_1.zero_count_       = 1;
-  s_data_1.positive_buckets_ = std::make_unique<opentelemetry::sdk::metrics::AdaptingCircularBufferCounter>(10);
-  s_data_1.negative_buckets_ = std::make_unique<opentelemetry::sdk::metrics::AdaptingCircularBufferCounter>(10);
+  s_data_1.count_          = 3;
+  s_data_1.sum_            = 6.5;
+  s_data_1.min_            = 0.0;
+  s_data_1.max_            = 3.5;
+  s_data_1.scale_          = 3;
+  s_data_1.record_min_max_ = true;
+  s_data_1.zero_count_     = 1;
+  s_data_1.positive_buckets_ =
+      std::make_unique<opentelemetry::sdk::metrics::AdaptingCircularBufferCounter>(10);
+  s_data_1.negative_buckets_ =
+      std::make_unique<opentelemetry::sdk::metrics::AdaptingCircularBufferCounter>(10);
   s_data_1.positive_buckets_->Increment(1, 1);
   s_data_1.negative_buckets_->Increment(-2, 1);
 
-  s_data_2.count_            = 4;
-  s_data_2.sum_              = 6.2;
-  s_data_2.min_              = -0.03;
-  s_data_2.max_              = 3.5;
-  s_data_2.scale_            = 3;
-  s_data_2.record_min_max_   = false;
-  s_data_2.zero_count_       = 2;
-  s_data_2.positive_buckets_ = std::make_unique<opentelemetry::sdk::metrics::AdaptingCircularBufferCounter>(10);
-  s_data_2.negative_buckets_ = std::make_unique<opentelemetry::sdk::metrics::AdaptingCircularBufferCounter>(10);
+  s_data_2.count_          = 4;
+  s_data_2.sum_            = 6.2;
+  s_data_2.min_            = -0.03;
+  s_data_2.max_            = 3.5;
+  s_data_2.scale_          = 3;
+  s_data_2.record_min_max_ = false;
+  s_data_2.zero_count_     = 2;
+  s_data_2.positive_buckets_ =
+      std::make_unique<opentelemetry::sdk::metrics::AdaptingCircularBufferCounter>(10);
+  s_data_2.negative_buckets_ =
+      std::make_unique<opentelemetry::sdk::metrics::AdaptingCircularBufferCounter>(10);
   s_data_2.positive_buckets_->Increment(3, 1);
   s_data_2.negative_buckets_->Increment(-2, 1);
   s_data_2.negative_buckets_->Increment(-4, 2);
