@@ -81,7 +81,12 @@ private:
 };
 }  // namespace
 
-Tracer::Tracer(nostd::string_view /*output*/) {}
+Tracer::Tracer(nostd::string_view /*output*/)
+{
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  UpdateEnabled(true);
+#endif
+}
 
 nostd::shared_ptr<trace::Span> Tracer::StartSpan(nostd::string_view name,
                                                  const common::KeyValueIterable &attributes,
