@@ -33,6 +33,10 @@ Increment the:
 * [API] Add Enabled method to Tracer
   [#3357](https://github.com/open-telemetry/opentelemetry-cpp/pull/3357)
 
+* [INSTALL] Add CMake components to the opentelemetry-cpp package
+  [#3320](https://github.com/open-telemetry/opentelemetry-cpp/pull/3220)
+  [#3368](https://github.com/open-telemetry/opentelemetry-cpp/pull/3368)
+
 ## [1.20 2025-04-01]
 
 * [BUILD] Update opentelemetry-proto version
