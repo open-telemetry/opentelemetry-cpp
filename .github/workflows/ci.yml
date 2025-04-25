@@ -913,7 +913,7 @@ jobs:
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - name: install markdownlint-cli
-      run: sudo npm install -g markdownlint-cli
+      run: sudo npm install -g markdownlint-cli@0.44.0
 
     - name: run markdownlint
       run: markdownlint .
@@ -982,7 +982,7 @@ jobs:
       - name: install dependencies
         run: |
           sudo apt update && sudo apt install python3-pip
-          sudo pip3 install aiohttp
+          sudo pip3 install aiohttp==3.11.18
       - name: run w3c trace-context test suite
         env:
           SPEC_LEVEL: 1

@@ -47,7 +47,7 @@ ENV IS_CONTAINER_BUILD=true
 
 COPY ./.devcontainer/customize_container.sh /tmp/opentelemetry_cpp/devcontainer/customize_container.sh
 RUN /tmp/opentelemetry_cpp/devcontainer/customize_container.sh
-RUN apt install -y npm && npm install -g markdownlint-cli
+RUN apt install -y npm && npm install -g markdownlint-cli@0.44.0
 
 USER devuser
 
