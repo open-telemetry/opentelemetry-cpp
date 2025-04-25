@@ -3,6 +3,9 @@ on:
   schedule:
     - cron: "0 3 * * 6"
 
+permissions:
+  contents: read
+
 jobs:
   docker_image:
     name: Docker Image

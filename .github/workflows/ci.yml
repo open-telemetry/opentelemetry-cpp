@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
 
 # Commented 2024-11-06, lack of workers in github causes CI failures
