@@ -7,6 +7,9 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   windows_2022_vcpkg_submodule:
     name: Windows 2022 vcpkg submodule versions cxx17 (static libs - dll)
