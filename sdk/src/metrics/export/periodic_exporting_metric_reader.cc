@@ -98,8 +98,8 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
     worker_thread_instrumentation_->OnStart();
   }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
-
-  do
+  std::unique_lock<std::mutex> lk(cv_m_);
+  while(true)
   {
     auto start = std::chrono::steady_clock::now();
 
@@ -134,8 +134,6 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
       worker_thread_instrumentation_->BeforeWait();
     }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
-
-    std::unique_lock<std::mutex> lk(cv_m_);
     cv_.wait_for(lk, remaining_wait_interval_ms, [this]() {
       if (is_force_wakeup_background_worker_.load(std::memory_order_acquire))
       {
@@ -151,8 +149,11 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
       worker_thread_instrumentation_->AfterWait();
     }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
-
-  } while (IsShutdown() != true);
+    if(IsShutdown())
+    {
+      return;
+    }
+  }
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   if (worker_thread_instrumentation_ != nullptr)
@@ -164,61 +165,40 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
 
 bool PeriodicExportingMetricReader::CollectAndExportOnce()
 {
-  std::atomic<bool> cancel_export_for_timeout{false};
-
   std::uint64_t notify_force_flush = force_flush_pending_sequence_.load(std::memory_order_acquire);
-  std::unique_ptr<std::thread> task_thread;
-
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
   {
 #endif
-    std::promise<void> sender;
-    auto receiver = sender.get_future();
-
-    task_thread.reset(
-        new std::thread([this, &cancel_export_for_timeout, sender = std::move(sender)] {
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
-          if (collect_thread_instrumentation_ != nullptr)
-          {
-            collect_thread_instrumentation_->OnStart();
-            collect_thread_instrumentation_->BeforeLoad();
-          }
+  if (collect_thread_instrumentation_ != nullptr)
+  {
+    collect_thread_instrumentation_->OnStart();
+    collect_thread_instrumentation_->BeforeLoad();
+  }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
-
-          this->Collect([this, &cancel_export_for_timeout](ResourceMetrics &metric_data) {
-            if (cancel_export_for_timeout.load(std::memory_order_acquire))
-            {
-              OTEL_INTERNAL_LOG_ERROR(
-                  "[Periodic Exporting Metric Reader] Collect took longer configured time: "
-                  << this->export_timeout_millis_.count() << " ms, and timed out");
-              return false;
-            }
-            this->exporter_->Export(metric_data);
-            return true;
-          });
-
-          const_cast<std::promise<void> &>(sender).set_value();
-
-#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
-          if (collect_thread_instrumentation_ != nullptr)
-          {
-            collect_thread_instrumentation_->AfterLoad();
-            collect_thread_instrumentation_->OnEnd();
-          }
-#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
-        }));
-
-    std::future_status status;
-    do
+  auto start = std::chrono::steady_clock::now();
+  this->Collect([this, &start](ResourceMetrics &metric_data) {
+    auto end = std::chrono::steady_clock::now();
+    if ((end - start) > this->export_timeout_millis_)
     {
-      status = receiver.wait_for(std::chrono::milliseconds(export_timeout_millis_));
-      if (status == std::future_status::timeout)
-      {
-        cancel_export_for_timeout.store(true, std::memory_order_release);
-        break;
-      }
-    } while (status != std::future_status::ready);
+      OTEL_INTERNAL_LOG_ERROR(
+        "[Periodic Exporting Metric Reader] Collect took longer configured time: "
+        << this->export_timeout_millis_.count() << " ms, and timed out");
+        return false;
+    }
+      this->exporter_->Export(metric_data);
+      return true;
+  });
+
+
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+  if (collect_thread_instrumentation_ != nullptr)
+  {
+    collect_thread_instrumentation_->AfterLoad();
+    collect_thread_instrumentation_->OnEnd();
+  }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   }
   catch (std::exception &e)
@@ -234,11 +214,6 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
     return false;
   }
 #endif
-
-  if (task_thread && task_thread->joinable())
-  {
-    task_thread->join();
-  }
 
   std::uint64_t notified_sequence = force_flush_notified_sequence_.load(std::memory_order_acquire);
   while (notify_force_flush > notified_sequence)
