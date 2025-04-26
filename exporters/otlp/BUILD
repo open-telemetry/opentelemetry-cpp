@@ -448,6 +448,7 @@ otel_cc_test(
     deps = dll_deps([
         ":otlp_recordable",
         ":otlp_grpc_client",
+        "//sdk/src/metrics",
         "@googletest//:gtest_main",
         "@opentelemetry-proto//:trace_service_proto_cc",
         "@opentelemetry-proto//:logs_service_grpc_cc",
@@ -463,8 +464,9 @@ otel_cc_test(
     ],
     deps = dll_deps([
         ":otlp_recordable",
-        "@opentelemetry-proto//:metrics_service_proto_cc",
+        "//sdk/src/metrics",
         "@googletest//:gtest_main",
+        "@opentelemetry-proto//:metrics_service_proto_cc",
     ]),
 )
 
@@ -479,6 +481,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         ":otlp_recordable",
+        "//sdk/src/metrics",
         "@opentelemetry-proto//:logs_service_proto_cc",
         "@googletest//:gtest_main",
     ]),
@@ -497,6 +500,7 @@ otel_cc_test(
         ":otlp_file_exporter",
         ":otlp_recordable",
         "//api",
+        "//sdk/src/metrics",
         "@googletest//:gtest_main",
         "@opentelemetry-proto//:trace_service_proto_cc",
         "@opentelemetry-proto//:logs_service_proto_cc",
@@ -515,6 +519,7 @@ otel_cc_test(
     deps = dll_deps([
         ":otlp_grpc_exporter",
         "//api",
+        "//sdk/src/metrics",
         "@googletest//:gtest_main",
     ]),
 )
@@ -530,6 +535,7 @@ otel_cc_test(
     deps = dll_deps([
         ":otlp_grpc_exporter",
         "//api",
+        "//sdk/src/metrics",
         "@googletest//:gtest_main",
         "@opentelemetry-proto//:metrics_service_grpc_cc",
         "@opentelemetry-proto//:logs_service_grpc_cc",
@@ -549,6 +555,7 @@ otel_cc_test(
     deps = dll_deps([
         ":otlp_http_exporter",
         "//api",
+        "//sdk/src/metrics",
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@googletest//:gtest_main",
     ]),
@@ -565,6 +572,7 @@ otel_cc_test(
     deps = dll_deps([
         ":otlp_http_exporter",
         "//api",
+        "//sdk/src/metrics",
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@googletest//:gtest_main",
     ]),
@@ -581,6 +589,7 @@ otel_cc_test(
     deps = dll_deps([
         ":otlp_file_exporter",
         "//api",
+        "//sdk/src/metrics",
         "@googletest//:gtest_main",
         "@nlohmann_json//:json",
         "@opentelemetry-proto//:trace_service_grpc_cc",
@@ -599,6 +608,7 @@ otel_cc_test(
     deps = dll_deps([
         ":otlp_file_exporter",
         "//api",
+        "//sdk/src/metrics",
         "@googletest//:gtest_main",
     ]),
 )
@@ -614,6 +624,7 @@ otel_cc_test(
     deps = dll_deps([
         ":otlp_http_log_record_exporter",
         "//api",
+        "//sdk/src/metrics",
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@googletest//:gtest_main",
         "@opentelemetry-proto//:logs_service_grpc_cc",
@@ -631,6 +642,7 @@ otel_cc_test(
     deps = dll_deps([
         ":otlp_http_log_record_exporter",
         "//api",
+        "//sdk/src/metrics",
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@googletest//:gtest_main",
         "@opentelemetry-proto//:logs_service_grpc_cc",
@@ -648,6 +660,7 @@ otel_cc_test(
     deps = dll_deps([
         ":otlp_file_log_record_exporter",
         "//api",
+        "//sdk/src/metrics",
         "@googletest//:gtest_main",
         "@opentelemetry-proto//:logs_service_proto_cc",
         "@nlohmann_json//:json",
@@ -665,6 +678,7 @@ otel_cc_test(
     deps = dll_deps([
         ":otlp_file_log_record_exporter",
         "//api",
+        "//sdk/src/metrics",
         "@googletest//:gtest_main",
     ]),
 )
@@ -682,6 +696,7 @@ otel_cc_test(
         ":otlp_grpc_log_record_exporter",
         "//api",
         "//sdk/src/logs",
+        "//sdk/src/metrics",
         "@googletest//:gtest_main",
         "@opentelemetry-proto//:logs_service_grpc_cc",
         "@opentelemetry-proto//:metrics_service_grpc_cc",
@@ -702,6 +717,7 @@ otel_cc_test(
         ":otlp_grpc_log_record_exporter",
         "//api",
         "//sdk/src/logs",
+        "//sdk/src/metrics",
         "@googletest//:gtest_main",
         "@opentelemetry-proto//:logs_service_grpc_cc",
         "@opentelemetry-proto//:metrics_service_grpc_cc",
@@ -822,6 +838,7 @@ otel_cc_benchmark(
     deps = dll_deps([
         ":otlp_grpc_exporter",
         "//examples/common/foo_library:common_foo_library",
+        "//sdk/src/metrics",
         "@grpc//:grpc++",
         "@opentelemetry-proto//:trace_service_grpc_cc",
     ]),

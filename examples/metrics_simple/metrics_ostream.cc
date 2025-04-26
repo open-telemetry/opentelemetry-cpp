@@ -15,6 +15,8 @@
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/sdk/metrics/meter_context_factory.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
@@ -52,9 +54,9 @@ void InitMetrics(const std::string &name)
   auto reader =
       metrics_sdk::PeriodicExportingMetricReaderFactory::Create(std::move(exporter), options);
 
-  auto provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
-
-  provider->AddMetricReader(std::move(reader));
+  auto context = metrics_sdk::MeterContextFactory::Create();
+  context->AddMetricReader(std::move(reader));
+  auto provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create(std::move(context));
 
   // counter view
   std::string counter_name = name + "_counter";
@@ -108,6 +110,30 @@ void InitMetrics(const std::string &name)
   provider->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
                     std::move(histogram_view));
 
+  // hisogram view with base2 exponential aggregation
+  std::string histogram_base2_name         = name + "_exponential_histogram";
+  unit                                     = "histogram-unit";
+  auto histogram_base2_instrument_selector = metrics_sdk::InstrumentSelectorFactory::Create(
+      metrics_sdk::InstrumentType::kHistogram, histogram_base2_name, unit);
+  auto histogram_base2_meter_selector =
+      metrics_sdk::MeterSelectorFactory::Create(name, version, schema);
+  auto histogram_base2_aggregation_config =
+      std::unique_ptr<metrics_sdk::Base2ExponentialHistogramAggregationConfig>(
+          new metrics_sdk::Base2ExponentialHistogramAggregationConfig);
+  histogram_base2_aggregation_config->max_scale_      = 3;
+  histogram_base2_aggregation_config->record_min_max_ = true;
+  histogram_base2_aggregation_config->max_buckets_    = 100;
+
+  std::shared_ptr<metrics_sdk::AggregationConfig> base2_aggregation_config(
+      std::move(histogram_base2_aggregation_config));
+
+  auto histogram_base2_view = metrics_sdk::ViewFactory::Create(
+      name, "description", unit, metrics_sdk::AggregationType::kBase2ExponentialHistogram,
+      base2_aggregation_config);
+
+  provider->AddView(std::move(histogram_base2_instrument_selector),
+                    std::move(histogram_base2_meter_selector), std::move(histogram_base2_view));
+
   std::shared_ptr<opentelemetry::metrics::MeterProvider> api_provider(std::move(provider));
 
   metrics_sdk::Provider::SetMeterProvider(api_provider);
@@ -143,6 +169,10 @@ int main(int argc, char **argv)
   {
     foo_library::histogram_example(name);
   }
+  else if (example_type == "exponential_histogram")
+  {
+    foo_library::histogram_exp_example(name);
+  }
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   else if (example_type == "gauge")
   {
@@ -166,6 +196,7 @@ int main(int argc, char **argv)
     std::thread counter_example{&foo_library::counter_example, name};
     std::thread observable_counter_example{&foo_library::observable_counter_example, name};
     std::thread histogram_example{&foo_library::histogram_example, name};
+    std::thread histogram_exp_example{&foo_library::histogram_exp_example, name};
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
     std::thread gauge_example{&foo_library::gauge_example, name};
 #endif
@@ -177,6 +208,7 @@ int main(int argc, char **argv)
     counter_example.join();
     observable_counter_example.join();
     histogram_example.join();
+    histogram_exp_example.join();
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
     gauge_example.join();
 #endif

@@ -16,6 +16,7 @@ otel_cc_binary(
     ],
     tags = ["otlp"],
     deps = dll_deps([
+        "//sdk/src/metrics",
         "//exporters/otlp:otlp_http_exporter",
     ]),
 )
@@ -30,6 +31,7 @@ otel_cc_binary(
     ],
     tags = ["otlp"],
     deps = dll_deps([
+        "//sdk/src/metrics",
         "//exporters/otlp:otlp_grpc_exporter",
     ]),
 )

@@ -18,6 +18,7 @@ otel_cc_binary(
         "//api",
         "//examples/common/foo_library:common_foo_library",
         "//exporters/otlp:otlp_grpc_exporter",
+        "//sdk/src/metrics",
         "//sdk/src/trace",
     ]),
 )
@@ -36,6 +37,7 @@ otel_cc_binary(
         "//api",
         "//examples/common/foo_library:common_foo_library",
         "//exporters/otlp:otlp_http_exporter",
+        "//sdk/src/metrics",
         "//sdk/src/trace",
     ]),
 )
@@ -54,6 +56,7 @@ otel_cc_binary(
         "//api",
         "//examples/common/foo_library:common_foo_library",
         "//exporters/otlp:otlp_file_exporter",
+        "//sdk/src/metrics",
         "//sdk/src/trace",
     ]),
 )
@@ -73,6 +76,7 @@ otel_cc_binary(
         "//examples/common/logs_foo_library:common_logs_foo_library",
         "//exporters/otlp:otlp_http_exporter",
         "//exporters/otlp:otlp_http_log_record_exporter",
+        "//sdk/src/metrics",
         "//sdk/src/trace",
     ]),
 )
@@ -92,6 +96,7 @@ otel_cc_binary(
         "//examples/common/logs_foo_library:common_logs_foo_library",
         "//exporters/otlp:otlp_grpc_exporter",
         "//exporters/otlp:otlp_grpc_log_record_exporter",
+        "//sdk/src/metrics",
         "//sdk/src/trace",
         "@grpc//:grpc++",
         "@opentelemetry-proto//:logs_service_grpc_cc",
@@ -115,6 +120,7 @@ otel_cc_binary(
         "//examples/common/logs_foo_library:common_logs_foo_library",
         "//exporters/otlp:otlp_file_exporter",
         "//exporters/otlp:otlp_file_log_record_exporter",
+        "//sdk/src/metrics",
         "//sdk/src/trace",
     ]),
 )
@@ -135,6 +141,10 @@ otel_cc_binary(
         "//exporters/otlp:otlp_grpc_exporter",
         "//exporters/otlp:otlp_grpc_metric_exporter",
         "//sdk/src/metrics",
+        "@grpc//:grpc++",
+        "@opentelemetry-proto//:logs_service_grpc_cc",
+        "@opentelemetry-proto//:metrics_service_grpc_cc",
+        "@opentelemetry-proto//:trace_service_grpc_cc",
     ]),
 )
 
