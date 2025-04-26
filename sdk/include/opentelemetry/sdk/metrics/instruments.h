@@ -45,7 +45,8 @@ enum class AggregationType
   kHistogram,
   kLastValue,
   kSum,
-  kDefault
+  kDefault,
+  kBase2ExponentialHistogram
 };
 
 enum class AggregationTemporality
