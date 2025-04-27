@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 project(opentelemetry-cpp-exporters-prometheus-install-test LANGUAGES CXX)
 
 find_package(opentelemetry-cpp REQUIRED COMPONENTS exporters_prometheus)
@@ -10,7 +10,7 @@ if(NOT TARGET prometheus-cpp::core)
   message(FATAL_ERROR "prometheus-cpp::core target not found")
 endif()
 
-find_package(GTest REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 include(GoogleTest)
 
 add_executable(exporters_prometheus_test

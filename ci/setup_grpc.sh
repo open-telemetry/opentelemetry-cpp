@@ -114,7 +114,9 @@ if [[ $build_internal_abseil_cpp -ne 0 ]]; then
         ABSEIL_CPP_BUILD_OPTIONS=(${ABSEIL_CPP_BUILD_OPTIONS[@]} "-DBUILD_SHARED_LIBS=$build_shared_libs")
     fi
     cmake  "${ABSEIL_CPP_BUILD_OPTIONS[@]}" ..
-    cmake --build . -j${nproc} --target install && popd
+    make -j $(nproc)
+    make install
+    popd
 fi
 mkdir -p build && pushd build
 
@@ -144,8 +146,8 @@ echo "Building gRPC ${install_grpc_version}"
 echo "CMake build options:" "${GRPC_BUILD_OPTIONS[@]}"
 
 cmake "${GRPC_BUILD_OPTIONS[@]}" ..
-cmake --build . -j$(nproc)
-cmake --install .
+make -j $(nproc)
+make install
 popd
 popd
 

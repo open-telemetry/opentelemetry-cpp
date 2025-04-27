@@ -42,7 +42,7 @@ public:
   /**
    * Emit a Log Record object
    *
-   * @param log_record
+   * @param log_record Log record
    */
   virtual void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record) noexcept = 0;
 
@@ -50,7 +50,7 @@ public:
    * Emit a Log Record object with arguments
    *
    * @param log_record Log record
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  Severity                                -> severity, severity_text
    *  string_view                             -> body
    *  AttributeValue                          -> body
@@ -96,7 +96,7 @@ public:
   /**
    * Emit a Log Record object with arguments
    *
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  Severity                                -> severity, severity_text
    *  string_view                             -> body
    *  AttributeValue                          -> body
@@ -120,7 +120,7 @@ public:
 
   /**
    * Writes a log with a severity of trace.
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,trace_id and trace_flags
@@ -144,7 +144,7 @@ public:
 
   /**
    * Writes a log with a severity of debug.
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,trace_id and trace_flags
@@ -168,7 +168,7 @@ public:
 
   /**
    * Writes a log with a severity of info.
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,trace_id and trace_flags
@@ -192,7 +192,7 @@ public:
 
   /**
    * Writes a log with a severity of warn.
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,trace_id and trace_flags
@@ -216,7 +216,7 @@ public:
 
   /**
    * Writes a log with a severity of error.
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,trace_id and trace_flags
@@ -240,7 +240,7 @@ public:
 
   /**
    * Writes a log with a severity of fatal.
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,trace_id and trace_flags

@@ -15,8 +15,23 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Base2 exponential histogram aggregation
+  [#3175](https://github.com/open-telemetry/opentelemetry-cpp/pull/3346)
+
+  New Features:
+
+  Add base2 exponential histogram aggregation. Includes a new aggregation type,
+  ostream exporter, and otlp/grpc exporter. Updated histogram aggregation and
+  benchmark tests.
+
 * [API] Remove `WITH_ABSEIL` and `HAVE_ABSEIL`
   [#3318](https://github.com/open-telemetry/opentelemetry-cpp/pull/3318)
+
+* [CMAKE] Bump cmake minimum required version to 3.14
+  [#3349](https://github.com/open-telemetry/opentelemetry-cpp/pull/3349)
+
+* [API] Add Enabled method to Tracer
+  [#3357](https://github.com/open-telemetry/opentelemetry-cpp/pull/3357)
 
 ## [1.20 2025-04-01]
 

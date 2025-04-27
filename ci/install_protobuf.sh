@@ -70,7 +70,7 @@ if [ -e "../CMakeLists.txt" ]; then
 else
   cmake ../cmake "${CPP_PROTOBUF_BUILD_OPTIONS[@]}"
 fi
-cmake --build . -j $(nproc)
-cmake --install .
+make -j $(nproc)
+make install
 popd
 ldconfig
