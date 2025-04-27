@@ -25,4 +25,7 @@ $VCPKG_DIR = (Get-Item -Path ".\").FullName
 # curl
 ./vcpkg "--vcpkg-root=$VCPKG_DIR" install curl:x64-windows
 
+# prometheus-cpp
+./vcpkg "--vcpkg-root=$VCPKG_DIR" install prometheus-cpp:x64-windows
+
 Pop-Location

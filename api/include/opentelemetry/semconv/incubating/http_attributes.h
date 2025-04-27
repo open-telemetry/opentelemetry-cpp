@@ -21,9 +21,9 @@ namespace http
 
 /**
  * Deprecated, use @code client.address @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code client.address @endcode.
+ * {"note": "Replaced by @code client.address @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpClientIp = "http.client_ip";
 
@@ -34,26 +34,27 @@ static constexpr const char *kHttpConnectionState = "http.connection.state";
 
 /**
  * Deprecated, use @code network.protocol.name @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code network.protocol.name @endcode.
+ * {"note": "Replaced by @code network.protocol.name @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpFlavor = "http.flavor";
 
 /**
  * Deprecated, use one of @code server.address @endcode, @code client.address @endcode or @code
- * http.request.header.host @endcode instead, depending on the usage. <p>
+ * http.request.header.host @endcode instead, depending on the usage.
+ *
  * @deprecated
- * Replaced by one of @code server.address @endcode, @code client.address @endcode or @code
- * http.request.header.host @endcode, depending on the usage.
+ * {"note": "Replaced by one of @code server.address @endcode, @code client.address @endcode or
+ * @code http.request.header.host @endcode, depending on the usage.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpHost = "http.host";
 
 /**
  * Deprecated, use @code http.request.method @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code http.request.method @endcode.
+ * {"note": "Replaced by @code http.request.method @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpMethod = "http.method";
 
@@ -123,18 +124,18 @@ static constexpr const char *kHttpRequestSize = "http.request.size";
 
 /**
  * Deprecated, use @code http.request.header.<key> @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code http.request.header.<key> @endcode.
+ * {"note": "Replaced by @code http.request.header.<key> @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpRequestContentLength =
     "http.request_content_length";
 
 /**
  * Deprecated, use @code http.request.body.size @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code http.request.body.size @endcode.
+ * {"note": "Replaced by @code http.request.body.size @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpRequestContentLengthUncompressed =
     "http.request_content_length_uncompressed";
@@ -173,18 +174,18 @@ static constexpr const char *kHttpResponseStatusCode = "http.response.status_cod
 
 /**
  * Deprecated, use @code http.response.header.<key> @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code http.response.header.<key> @endcode.
+ * {"note": "Replaced by @code http.response.header.<key> @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpResponseContentLength =
     "http.response_content_length";
 
 /**
  * Deprecated, use @code http.response.body.size @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replace by @code http.response.body.size @endcode.
+ * {"note": "Replace by @code http.response.body.size @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpResponseContentLengthUncompressed =
     "http.response_content_length_uncompressed";
@@ -200,49 +201,49 @@ static constexpr const char *kHttpRoute = "http.route";
 
 /**
  * Deprecated, use @code url.scheme @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code url.scheme @endcode instead.
+ * {"note": "Replaced by @code url.scheme @endcode instead.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpScheme = "http.scheme";
 
 /**
  * Deprecated, use @code server.address @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code server.address @endcode.
+ * {"note": "Replaced by @code server.address @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpServerName = "http.server_name";
 
 /**
  * Deprecated, use @code http.response.status_code @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code http.response.status_code @endcode.
+ * {"note": "Replaced by @code http.response.status_code @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpStatusCode = "http.status_code";
 
 /**
  * Deprecated, use @code url.path @endcode and @code url.query @endcode instead.
- * <p>
+ *
  * @deprecated
- * Split to @code url.path @endcode and `url.query.
+ * {"note": "Split to @code url.path @endcode and `url.query.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpTarget = "http.target";
 
 /**
  * Deprecated, use @code url.full @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code url.full @endcode.
+ * {"note": "Replaced by @code url.full @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpUrl = "http.url";
 
 /**
  * Deprecated, use @code user_agent.original @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code user_agent.original @endcode.
+ * {"note": "Replaced by @code user_agent.original @endcode.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpUserAgent = "http.user_agent";
 

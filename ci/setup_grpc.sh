@@ -50,6 +50,9 @@ while getopts ":v:hi:mp:r:s:TH" o; do
             elif [ "${OPTARG}" == "abseil-cpp" ]; then
                 GRPC_BUILD_OPTIONS=(${GRPC_BUILD_OPTIONS[@]} "-DgRPC_ABSL_PROVIDER=package")
                 build_internal_abseil_cpp=0
+            else
+                usage
+                exit 1;
             fi
             ;;
         r)
@@ -101,6 +104,9 @@ if [[ $build_internal_abseil_cpp -ne 0 ]]; then
 
     ABSEIL_CPP_BUILD_OPTIONS=(
         -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_CXX_STANDARD=${std_version}
+        -DCMAKE_CXX_STANDARD_REQUIRED=ON
+        -DCMAKE_CXX_EXTENSIONS=OFF
         -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE
         -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
     )
@@ -108,7 +114,9 @@ if [[ $build_internal_abseil_cpp -ne 0 ]]; then
         ABSEIL_CPP_BUILD_OPTIONS=(${ABSEIL_CPP_BUILD_OPTIONS[@]} "-DBUILD_SHARED_LIBS=$build_shared_libs")
     fi
     cmake  "${ABSEIL_CPP_BUILD_OPTIONS[@]}" ..
-    cmake --build . -j${nproc} --target install && popd
+    make -j $(nproc)
+    make install
+    popd
 fi
 mkdir -p build && pushd build
 
@@ -116,7 +124,17 @@ GRPC_BUILD_OPTIONS=(
     ${GRPC_BUILD_OPTIONS[@]}
     -DgRPC_INSTALL=ON
     -DCMAKE_CXX_STANDARD=${std_version}
+    -DCMAKE_CXX_STANDARD_REQUIRED=ON
+    -DCMAKE_CXX_EXTENSIONS=OFF
     -DgRPC_BUILD_TESTS=OFF
+    -DgRPC_BUILD_GRPC_CPP_PLUGIN=ON
+    -DgRPC_BUILD_GRPC_CSHARP_PLUGIN=OFF
+    -DgRPC_BUILD_GRPC_OBJECTIVE_C_PLUGIN=OFF
+    -DgRPC_BUILD_GRPC_PHP_PLUGIN=OFF
+    -DgRPC_BUILD_GRPC_NODE_PLUGIN=OFF
+    -DgRPC_BUILD_GRPC_PYTHON_PLUGIN=OFF
+    -DgRPC_BUILD_GRPC_RUBY_PLUGIN=OFF
+    -DgRPC_BUILD_GRPCPP_OTEL_PLUGIN=OFF
     -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
     -DCMAKE_PREFIX_PATH=$INSTALL_DIR
 )
@@ -124,9 +142,12 @@ if [ ! -z "$build_shared_libs" ]; then
     GRPC_BUILD_OPTIONS=(${GRPC_BUILD_OPTIONS[@]} "-DBUILD_SHARED_LIBS=$build_shared_libs")
 fi
 
+echo "Building gRPC ${install_grpc_version}"
+echo "CMake build options:" "${GRPC_BUILD_OPTIONS[@]}"
+
 cmake "${GRPC_BUILD_OPTIONS[@]}" ..
-cmake --build . -j$(nproc)
-cmake --install .
+make -j $(nproc)
+make install
 popd
 popd
 

@@ -16,10 +16,10 @@ target_include_directories(
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS opentelemetry_version
-    EXPORT "${PROJECT_NAME}-target"
+    EXPORT "${PROJECT_NAME}-sdk-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk)
 
   opentelemetry_add_pkgconfig(
     version "OpenTelemetry SDK - Version"

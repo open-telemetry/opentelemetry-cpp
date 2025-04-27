@@ -8,6 +8,7 @@
 #include <ctime>
 #include <iterator>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <ostream>
 #include <string>
@@ -24,6 +25,7 @@
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/data/circular_buffer.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -245,6 +247,43 @@ void OStreamMetricExporter::printPointData(const opentelemetry::sdk::metrics::Po
     else if (nostd::holds_alternative<int64_t>(last_point_data.value_))
     {
       sout_ << nostd::get<int64_t>(last_point_data.value_);
+    }
+  }
+  else if (nostd::holds_alternative<sdk::metrics::Base2ExponentialHistogramPointData>(point_data))
+  {
+    auto histogram_point_data =
+        nostd::get<sdk::metrics::Base2ExponentialHistogramPointData>(point_data);
+    if (!histogram_point_data.positive_buckets_ && !histogram_point_data.negative_buckets_)
+    {
+      return;
+    }
+    sout_ << "\n  type: Base2ExponentialHistogramPointData";
+    sout_ << "\n  count: " << histogram_point_data.count_;
+    sout_ << "\n  sum: " << histogram_point_data.sum_;
+    sout_ << "\n  zero_count: " << histogram_point_data.zero_count_;
+    if (histogram_point_data.record_min_max_)
+    {
+      sout_ << "\n  min: " << histogram_point_data.min_;
+      sout_ << "\n  max: " << histogram_point_data.max_;
+    }
+    sout_ << "\n  scale: " << histogram_point_data.scale_;
+    sout_ << "\n  positive buckets:";
+    if (!histogram_point_data.positive_buckets_->Empty())
+    {
+      for (auto i = histogram_point_data.positive_buckets_->StartIndex();
+           i <= histogram_point_data.positive_buckets_->EndIndex(); ++i)
+      {
+        sout_ << "\n\t" << i << ": " << histogram_point_data.positive_buckets_->Get(i);
+      }
+    }
+    sout_ << "\n  negative buckets:";
+    if (!histogram_point_data.negative_buckets_->Empty())
+    {
+      for (auto i = histogram_point_data.negative_buckets_->StartIndex();
+           i <= histogram_point_data.negative_buckets_->EndIndex(); ++i)
+      {
+        sout_ << "\n\t" << i << ": " << histogram_point_data.negative_buckets_->Get(i);
+      }
     }
   }
 }

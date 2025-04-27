@@ -3,10 +3,8 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <map>
 #include <mutex>
 #include <ostream>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -14,7 +12,6 @@
 #include "opentelemetry/metrics/async_instruments.h"
 #include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/async_instruments.h"
 #include "opentelemetry/sdk/metrics/instruments.h"

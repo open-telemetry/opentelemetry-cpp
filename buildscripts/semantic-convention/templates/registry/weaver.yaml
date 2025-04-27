@@ -34,7 +34,7 @@ templates:
     filter: >
       semconv_grouped_attributes({
         "exclude_root_namespace": $excluded_namespaces,
-        "exclude_stability": if $filter == "any" then [] else ["experimental"] end,
+        "stable_only": if $filter == "stable" then true else false end,
       })
       | map({
           root_namespace: .root_namespace,
@@ -49,7 +49,7 @@ templates:
     filter: >
       semconv_grouped_metrics({
         "exclude_root_namespace": $excluded_namespaces,
-        "exclude_stability": if $filter == "any" then [] else ["experimental"] end,
+        "stable_only": if $filter == "stable" then true else false end,
       })
       | map({
         root_namespace: .root_namespace,

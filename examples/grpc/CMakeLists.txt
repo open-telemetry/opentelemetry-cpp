@@ -42,9 +42,6 @@ else()
   target_link_libraries(example_grpc_proto PUBLIC gRPC::grpc++
                                                   ${Protobuf_LIBRARIES})
 endif()
-if(WITH_ABSEIL OR WITH_OTLP_GRPC)
-  target_link_libraries(example_grpc_proto PUBLIC absl::bad_variant_access)
-endif()
 
 foreach(_target client server)
   add_executable(${_target} "${_target}.cc")

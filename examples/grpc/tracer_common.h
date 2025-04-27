@@ -59,7 +59,7 @@ public:
     auto it = context_->client_metadata().find({key.data(), key.size()});
     if (it != context_->client_metadata().end())
     {
-      return it->second.data();
+      return opentelemetry::nostd::string_view(it->second.data(), it->second.size());
     }
     return "";
   }

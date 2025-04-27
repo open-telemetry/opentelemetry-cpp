@@ -20,6 +20,7 @@ add_library(
   state/observable_registry.cc
   state/sync_metric_storage.cc
   state/temporal_metric_storage.cc
+  aggregation/base2_exponential_histogram_aggregation.cc
   aggregation/base2_exponential_histogram_indexer.cc
   aggregation/histogram_aggregation.cc
   aggregation/lastvalue_aggregation.cc
@@ -45,10 +46,10 @@ target_include_directories(
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS opentelemetry_metrics
-    EXPORT "${PROJECT_NAME}-target"
+    EXPORT "${PROJECT_NAME}-sdk-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk)
 
   opentelemetry_add_pkgconfig(
     metrics "OpenTelemetry SDK - Metrics"

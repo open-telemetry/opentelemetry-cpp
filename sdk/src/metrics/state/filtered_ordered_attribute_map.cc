@@ -3,6 +3,7 @@
 
 #include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -23,6 +24,8 @@ FilteredOrderedAttributeMap::FilteredOrderedAttributeMap(
         }
         return true;
       });
+
+  UpdateHash();
 }
 
 FilteredOrderedAttributeMap::FilteredOrderedAttributeMap(
@@ -38,6 +41,8 @@ FilteredOrderedAttributeMap::FilteredOrderedAttributeMap(
       SetAttribute(kv.first, kv.second);
     }
   }
+
+  UpdateHash();
 }
 }  // namespace metrics
 }  // namespace sdk

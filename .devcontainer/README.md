@@ -3,6 +3,13 @@
 Customize your dev container using build arguments (for direct Docker builds) or
 environment variables (for evaluation in `devcontainer.json`).
 
+* **CMake version:**
+  The version of cmake to install. (Default: 3.31.6)
+  * Docker ARG:
+   `CMAKE_VERSION`
+  * Host Environment Variable:
+   `OTEL_CPP_DEVCONTAINER_CMAKE_VERSION`
+
 * **CXX standard:**
   This is the C++ standard to build from (eg: 17, 20, ...). (Default: 17)
   * Docker ARG:
@@ -12,7 +19,7 @@ environment variables (for evaluation in `devcontainer.json`).
 
 * **abseil-cpp version:**
   This is the version of abseil-cpp that will be used to build protobuf, gRPC,
-  and opentelemetry-cpp (when WITH_ABSEIL is set).
+  and opentelemetry-cpp.
   * Docker ARG:
    `ABSEIL_CPP_VERSION`
   * Host Environment Variable:

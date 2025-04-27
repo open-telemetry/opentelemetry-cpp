@@ -20,24 +20,42 @@ namespace gen_ai
 {
 
 /**
+ * Free-form description of the GenAI agent provided by the application.
+ */
+static constexpr const char *kGenAiAgentDescription = "gen_ai.agent.description";
+
+/**
+ * The unique identifier of the GenAI agent.
+ */
+static constexpr const char *kGenAiAgentId = "gen_ai.agent.id";
+
+/**
+ * Human-readable name of the GenAI agent provided by the application.
+ */
+static constexpr const char *kGenAiAgentName = "gen_ai.agent.name";
+
+/**
  * Deprecated, use Event API to report completions contents.
- * <p>
+ *
  * @deprecated
- * Removed, no replacement at this time.
+ * {"note": "Removed, no replacement at this time.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiCompletion = "gen_ai.completion";
 
 /**
- * The response format that is requested.
+ * Deprecated, use @code gen_ai.output.type @endcode.
+ *
+ * @deprecated
+ * {"note": "Replaced by @code gen_ai.output.type @endcode.", "reason": "uncategorized"}
  */
-static constexpr const char *kGenAiOpenaiRequestResponseFormat =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiOpenaiRequestResponseFormat =
     "gen_ai.openai.request.response_format";
 
 /**
  * Deprecated, use @code gen_ai.request.seed @endcode.
- * <p>
+ *
  * @deprecated
- * Replaced by @code gen_ai.request.seed @endcode attribute.
+ * {"note": "Replaced by @code gen_ai.request.seed @endcode attribute.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiOpenaiRequestSeed =
     "gen_ai.openai.request.seed";
@@ -70,12 +88,28 @@ static constexpr const char *kGenAiOpenaiResponseSystemFingerprint =
 static constexpr const char *kGenAiOperationName = "gen_ai.operation.name";
 
 /**
- * Deprecated, use Event API to report prompt contents.
+ * Represents the content type requested by the client.
  * <p>
+ * This attribute SHOULD be used when the client requests output of a specific type. The model may
+ * return zero or more outputs of this type. This attribute specifies the output modality and not
+ * the actual output format. For example, if an image is requested, the actual output could be a URL
+ * pointing to an image file. Additional output format details may be recorded in the future in the
+ * @code gen_ai.output.{type}.* @endcode attributes.
+ */
+static constexpr const char *kGenAiOutputType = "gen_ai.output.type";
+
+/**
+ * Deprecated, use Event API to report prompt contents.
+ *
  * @deprecated
- * Removed, no replacement at this time.
+ * {"note": "Removed, no replacement at this time.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiPrompt = "gen_ai.prompt";
+
+/**
+ * The target number of candidate completions to return.
+ */
+static constexpr const char *kGenAiRequestChoiceCount = "gen_ai.request.choice.count";
 
 /**
  * The encoding formats requested in an embeddings operation, if specified.
@@ -166,10 +200,34 @@ static constexpr const char *kGenAiSystem = "gen_ai.system";
 static constexpr const char *kGenAiTokenType = "gen_ai.token.type";
 
 /**
- * Deprecated, use @code gen_ai.usage.output_tokens @endcode instead.
+ * The tool call identifier.
+ */
+static constexpr const char *kGenAiToolCallId = "gen_ai.tool.call.id";
+
+/**
+ * Name of the tool utilized by the agent.
+ */
+static constexpr const char *kGenAiToolName = "gen_ai.tool.name";
+
+/**
+ * Type of the tool utilized by the agent
  * <p>
+ * Extension: A tool executed on the agent-side to directly call external APIs, bridging the gap
+ * between the agent and real-world systems. Agent-side operations involve actions that are
+ * performed by the agent on the server or within the agent's controlled environment. Function: A
+ * tool executed on the client-side, where the agent generates parameters for a predefined function,
+ * and the client executes the logic. Client-side operations are actions taken on the user's end or
+ * within the client application. Datastore: A tool used by the agent to access and query structured
+ * or unstructured external data for retrieval-augmented tasks or knowledge updates.
+ */
+static constexpr const char *kGenAiToolType = "gen_ai.tool.type";
+
+/**
+ * Deprecated, use @code gen_ai.usage.output_tokens @endcode instead.
+ *
  * @deprecated
- * Replaced by @code gen_ai.usage.output_tokens @endcode attribute.
+ * {"note": "Replaced by @code gen_ai.usage.output_tokens @endcode attribute.", "reason":
+ * "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiUsageCompletionTokens =
     "gen_ai.usage.completion_tokens";
@@ -186,9 +244,10 @@ static constexpr const char *kGenAiUsageOutputTokens = "gen_ai.usage.output_toke
 
 /**
  * Deprecated, use @code gen_ai.usage.input_tokens @endcode instead.
- * <p>
+ *
  * @deprecated
- * Replaced by @code gen_ai.usage.input_tokens @endcode attribute.
+ * {"note": "Replaced by @code gen_ai.usage.input_tokens @endcode attribute.", "reason":
+ * "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiUsagePromptTokens =
     "gen_ai.usage.prompt_tokens";
@@ -248,7 +307,41 @@ static constexpr const char *kTextCompletion = "text_completion";
  */
 static constexpr const char *kEmbeddings = "embeddings";
 
+/**
+ * Create GenAI agent
+ */
+static constexpr const char *kCreateAgent = "create_agent";
+
+/**
+ * Execute a tool
+ */
+static constexpr const char *kExecuteTool = "execute_tool";
+
 }  // namespace GenAiOperationNameValues
+
+namespace GenAiOutputTypeValues
+{
+/**
+ * Plain text
+ */
+static constexpr const char *kText = "text";
+
+/**
+ * JSON object with known or unknown schema
+ */
+static constexpr const char *kJson = "json";
+
+/**
+ * Image
+ */
+static constexpr const char *kImage = "image";
+
+/**
+ * Speech
+ */
+static constexpr const char *kSpeech = "speech";
+
+}  // namespace GenAiOutputTypeValues
 
 namespace GenAiSystemValues
 {
@@ -335,6 +428,11 @@ static constexpr const char *kInput = "input";
  * Output tokens (completion, response, etc.)
  */
 static constexpr const char *kCompletion = "output";
+
+/**
+ * Output tokens (completion, response, etc.)
+ */
+static constexpr const char *kOutput = "output";
 
 }  // namespace GenAiTokenTypeValues
 

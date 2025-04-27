@@ -21,7 +21,9 @@ ABSEIL_CPP_BUILD_OPTIONS=(
 )
 
 if [ ! -z "${CXX_STANDARD}" ]; then
-    ABSEIL_CPP_BUILD_OPTIONS=(${ABSEIL_CPP_BUILD_OPTIONS[@]} "-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
+    ABSEIL_CPP_BUILD_OPTIONS+=("-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
+    ABSEIL_CPP_BUILD_OPTIONS+=("-DCMAKE_CXX_STANDARD_REQUIRED=ON")
+    ABSEIL_CPP_BUILD_OPTIONS+=("-DCMAKE_CXX_EXTENSIONS=OFF")
 fi
 
 #
@@ -58,6 +60,9 @@ if [ "${ABSEIL_CPP_VERSION}" = "20240116.1" ] || [ "${ABSEIL_CPP_VERSION}" = "20
 else
   echo "Not patching abseil"
 fi
+
+echo "Building abseil ${ABSEIL_CPP_VERSION}"
+echo "CMake build options:" "${ABSEIL_CPP_BUILD_OPTIONS[@]}"
 
 mkdir build && pushd build
 cmake "${ABSEIL_CPP_BUILD_OPTIONS[@]}" ..
