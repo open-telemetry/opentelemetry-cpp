@@ -193,13 +193,8 @@ Important changes:
 
   * All the example code has been updated to reflect the new usage.
 
-  * With ABI version 2, `opentelemetry::sdk::logs::ReadableLogRecord::GetAttributes()`
-    will returns a `std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>`
-    instead of a `std::unordered_map<std::string, opentelemetry::common::AttributeValue>`
-    to keep the same type as the `opentelemetry::sdk::trace::SpanData`. And
-    `opentelemetry::sdk::logs::ReadableLogRecord::GetBody()` will returns a
-    `const opentelemetry::sdk::common::OwnedAttributeValue &` instead of a
-    `const opentelemetry::common::AttributeValue &`.
+* [SDK] Implement spec: MetricFilter
+  [#3235](https://github.com/open-telemetry/opentelemetry-cpp/pull/3235)
 
 ## [1.19 2025-01-22]
 
