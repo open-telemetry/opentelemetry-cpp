@@ -151,7 +151,7 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
     if(IsShutdown())
     {
-      return;
+      break;
     }
   }
 
