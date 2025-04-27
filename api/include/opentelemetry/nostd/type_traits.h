@@ -142,7 +142,8 @@ using std::is_trivially_move_constructible;
 template <typename T>
 struct is_trivially_copy_constructible
 {
-  static constexpr bool value = std::is_copy_constructible<T>::value && __has_trivial_copy(T);
+  static constexpr bool value = std::is_copy_constructible<T>::value
+      && __is_trivially_assignable(T&, const T&);
 };
 
 template <typename T>
@@ -154,7 +155,8 @@ struct is_trivially_move_constructible
 template <typename T>
 struct is_trivially_copy_assignable
 {
-  static constexpr bool value = std::is_copy_assignable<T>::value && __has_trivial_assign(T);
+  static constexpr bool value = std::is_copy_assignable<T>::value
+      && __is_trivially_assignable(T&, const T&);
 };
 
 template <typename T>
