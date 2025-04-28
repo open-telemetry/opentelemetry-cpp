@@ -10,7 +10,6 @@
 #include <ostream>
 #include <ratio>
 #include <thread>
-#include <type_traits>
 #include <utility>
 
 #include "opentelemetry/common/timestamp.h"
@@ -23,13 +22,6 @@
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/version.h"
-
-#if defined(_MSC_VER)
-#  pragma warning(suppress : 5204)
-#  include <future>
-#else
-#  include <future>
-#endif
 
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
 #  include <exception>
@@ -99,7 +91,7 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
   }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
   std::unique_lock<std::mutex> lk(cv_m_);
-  while(true)
+  while (true)
   {
     auto start = std::chrono::steady_clock::now();
 
@@ -149,7 +141,7 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
       worker_thread_instrumentation_->AfterWait();
     }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
-    if(IsShutdown())
+    if (IsShutdown())
     {
       break;
     }
@@ -171,33 +163,32 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
   {
 #endif
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
-  if (collect_thread_instrumentation_ != nullptr)
-  {
-    collect_thread_instrumentation_->OnStart();
-    collect_thread_instrumentation_->BeforeLoad();
-  }
-#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
-  auto start = std::chrono::steady_clock::now();
-  this->Collect([this, &start](ResourceMetrics &metric_data) {
-    auto end = std::chrono::steady_clock::now();
-    if ((end - start) > this->export_timeout_millis_)
+    if (collect_thread_instrumentation_ != nullptr)
     {
-      OTEL_INTERNAL_LOG_ERROR(
-        "[Periodic Exporting Metric Reader] Collect took longer configured time: "
-        << this->export_timeout_millis_.count() << " ms, and timed out");
-        return false;
+      collect_thread_instrumentation_->OnStart();
+      collect_thread_instrumentation_->BeforeLoad();
     }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+    auto start = std::chrono::steady_clock::now();
+    this->Collect([this, &start](ResourceMetrics &metric_data) {
+      auto end = std::chrono::steady_clock::now();
+      if ((end - start) > this->export_timeout_millis_)
+      {
+        OTEL_INTERNAL_LOG_ERROR(
+            "[Periodic Exporting Metric Reader] Collect took longer configured time: "
+            << this->export_timeout_millis_.count() << " ms, and timed out");
+        return false;
+      }
       this->exporter_->Export(metric_data);
       return true;
-  });
-
+    });
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
-  if (collect_thread_instrumentation_ != nullptr)
-  {
-    collect_thread_instrumentation_->AfterLoad();
-    collect_thread_instrumentation_->OnEnd();
-  }
+    if (collect_thread_instrumentation_ != nullptr)
+    {
+      collect_thread_instrumentation_->AfterLoad();
+      collect_thread_instrumentation_->OnEnd();
+    }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   }
