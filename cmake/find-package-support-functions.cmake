@@ -132,6 +132,10 @@ include(CMakeFindDependencyMacro)
 
 function(find_required_dependencies components_in)
   foreach(_dependency IN LISTS OTEL_THIRDPARTY_DEPENDENCIES_SUPPORTED)
+    if(${_dependency}_FOUND)
+      # The dependency is already found by another component. Continue.
+      continue()
+    endif()
     set(is_required FALSE)
     is_dependency_required(${_dependency} ${components_in} is_required)
     message(DEBUG "find_required_dependencies: dependency = ${_dependency}, is_required = ${is_required}")

@@ -9,7 +9,7 @@ include("${PROJECT_SOURCE_DIR}/cmake/thirdparty-dependency-config.cmake")
 #-----------------------------------------------------------------------
 # _otel_set_component_properties:
 #   Sets the component properties used for install.
-#   Properties set on CMAKE_SOURCE_DIR directory include:
+#   Properties set on PROJECT_SOURCE_DIR directory include:
 #     OTEL_COMPONENTS_LIST: List of components added using otel_add_component
 #     OTEL_COMPONENT_TARGETS_<component>: List of targets associated with the component
 #     OTEL_COMPONENT_TARGETS_ALIAS_<component>: List of targets aliases associated with the component
@@ -26,23 +26,23 @@ function(_otel_set_component_properties)
     cmake_parse_arguments(_PROPERTIES "${optionArgs}" "${oneValueArgs}" "${multiValueArgs}" "${ARGN}")
 
     # Add the component to the current components list
-    get_property(existing_components DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENTS_LIST)
+    get_property(existing_components DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENTS_LIST)
     if(_PROPERTIES_COMPONENT IN_LIST existing_components)
       message(FATAL_ERROR "  component ${_PROPERTIES_COMPONENT} has already been created.")
     endif()
     list(APPEND existing_components "${_PROPERTIES_COMPONENT}")
-    set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENTS_LIST "${existing_components}")
+    set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENTS_LIST "${existing_components}")
 
     # Set the component targets property
     if(_PROPERTIES_TARGETS)
-      set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_TARGETS_${_PROPERTIES_COMPONENT} "${_PROPERTIES_TARGETS}")
+      set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_TARGETS_${_PROPERTIES_COMPONENT} "${_PROPERTIES_TARGETS}")
     else()
       message(FATAL_ERROR "  component ${_PROPERTIES_COMPONENT} does not have any targets.")
     endif()
 
     # Set the component targets alias property
     if(_PROPERTIES_TARGETS_ALIAS)
-      set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_TARGETS_ALIAS_${_PROPERTIES_COMPONENT} "${_PROPERTIES_TARGETS_ALIAS}")
+      set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_TARGETS_ALIAS_${_PROPERTIES_COMPONENT} "${_PROPERTIES_TARGETS_ALIAS}")
     endif()
 
     # Set the component files property
@@ -54,17 +54,17 @@ function(_otel_set_component_properties)
         message(FATAL_ERROR "  component ${_PROPERTIES_COMPONENT} has FILES_DIRECTORY set and must have FILES_MATCHING set.")
       endif()
 
-      set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_DIRECTORY_${_PROPERTIES_COMPONENT} "${_PROPERTIES_FILES_DIRECTORY}")
-      set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_DESTINATION_${_PROPERTIES_COMPONENT} "${_PROPERTIES_FILES_DESTINATION}")
-      set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_MATCHING_${_PROPERTIES_COMPONENT} "${_PROPERTIES_FILES_MATCHING}")
+      set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_DIRECTORY_${_PROPERTIES_COMPONENT} "${_PROPERTIES_FILES_DIRECTORY}")
+      set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_DESTINATION_${_PROPERTIES_COMPONENT} "${_PROPERTIES_FILES_DESTINATION}")
+      set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_MATCHING_${_PROPERTIES_COMPONENT} "${_PROPERTIES_FILES_MATCHING}")
     endif()
 
     if(_PROPERTIES_COMPONENT_DEPENDS)
-      set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_DEPENDS_${_PROPERTIES_COMPONENT} "${_PROPERTIES_COMPONENT_DEPENDS}")
+      set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_DEPENDS_${_PROPERTIES_COMPONENT} "${_PROPERTIES_COMPONENT_DEPENDS}")
     endif()
 
     if(_PROPERTIES_THIRDPARTY_DEPENDS)
-      set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_THIRDPARTY_DEPENDS_${_PROPERTIES_COMPONENT} "${_PROPERTIES_THIRDPARTY_DEPENDS}")
+      set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_THIRDPARTY_DEPENDS_${_PROPERTIES_COMPONENT} "${_PROPERTIES_THIRDPARTY_DEPENDS}")
     endif()
 endfunction()
 
@@ -87,10 +87,10 @@ endfunction()
 # _otel_append_dependent_components:
 #   Appends the dependent component to the OUT_COMPONENTS variable.
 #   The dependent component is defined in the OTEL_COMPONENT_DEPENDS_<component> property
-#   on the CMAKE_SOURCE_DIR directory.
+#   on the PROJECT_SOURCE_DIR directory.
 #-----------------------------------------------------------------------
 function(_otel_append_dependent_components _COMPONENT OUT_COMPONENTS)
-  get_property(_COMPONENT_DEPENDS DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_DEPENDS_${_COMPONENT})
+  get_property(_COMPONENT_DEPENDS DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_DEPENDS_${_COMPONENT})
   if(_COMPONENT_DEPENDS)
     set(_output_components "${${OUT_COMPONENTS}}")
     message(DEBUG "  - adding dependent component ${_COMPONENT_DEPENDS} from component ${_COMPONENT}")
@@ -388,20 +388,20 @@ endfunction()
 #    otel_install_components()
 #-----------------------------------------------------------------------
 function(otel_install_components)
-  get_property(OTEL_BUILT_COMPONENTS_LIST DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENTS_LIST)
+  get_property(OTEL_BUILT_COMPONENTS_LIST DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENTS_LIST)
   message(STATUS "Installing components:")
   set(OTEL_COMPONENTS_TARGETS_BLOCK "")
   set(OTEL_COMPONENTS_INTERNAL_DEPENDENCIES_BLOCK "")
   set(OTEL_COMPONENTS_THIRDPARTY_DEPENDENCIES_BLOCK "")
 
   foreach(_COMPONENT ${OTEL_BUILT_COMPONENTS_LIST})
-    get_property(_COMPONENT_DEPENDS DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_DEPENDS_${_COMPONENT})
-    get_property(_COMPONENT_TARGETS DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_TARGETS_${_COMPONENT})
-    get_property(_COMPONENT_TARGETS_ALIAS DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_TARGETS_ALIAS_${_COMPONENT})
-    get_property(_COMPONENT_THIRDPARTY_DEPENDS DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_THIRDPARTY_DEPENDS_${_COMPONENT})
-    get_property(_COMPONENT_FILES_DIRECTORY DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_DIRECTORY_${_COMPONENT})
-    get_property(_COMPONENT_FILES_DESTINATION DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_DESTINATION_${_COMPONENT})
-    get_property(_COMPONENT_FILES_MATCHING DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_MATCHING_${_COMPONENT})
+    get_property(_COMPONENT_DEPENDS DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_DEPENDS_${_COMPONENT})
+    get_property(_COMPONENT_TARGETS DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_TARGETS_${_COMPONENT})
+    get_property(_COMPONENT_TARGETS_ALIAS DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_TARGETS_ALIAS_${_COMPONENT})
+    get_property(_COMPONENT_THIRDPARTY_DEPENDS DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_THIRDPARTY_DEPENDS_${_COMPONENT})
+    get_property(_COMPONENT_FILES_DIRECTORY DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_DIRECTORY_${_COMPONENT})
+    get_property(_COMPONENT_FILES_DESTINATION DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_DESTINATION_${_COMPONENT})
+    get_property(_COMPONENT_FILES_MATCHING DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_MATCHING_${_COMPONENT})
 
     message(STATUS "Install COMPONENT ${_COMPONENT}")
     message(STATUS "  TARGETS: ${_COMPONENT_TARGETS}")
@@ -419,7 +419,7 @@ function(otel_install_components)
   endforeach()
 
   configure_file(
-    "${CMAKE_SOURCE_DIR}/cmake/templates/component-definitions.cmake.in"
+    "${PROJECT_SOURCE_DIR}/cmake/templates/component-definitions.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/cmake/component-definitions.cmake"
     @ONLY
   )
@@ -460,7 +460,7 @@ function(otel_install_thirdparty_definitions)
   endforeach()
 
   configure_file(
-    "${CMAKE_SOURCE_DIR}/cmake/templates/thirdparty-dependency-definitions.cmake.in"
+    "${PROJECT_SOURCE_DIR}/cmake/templates/thirdparty-dependency-definitions.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/cmake/thirdparty-dependency-definitions.cmake"
     @ONLY)
 
@@ -482,7 +482,7 @@ function(otel_install_cmake_config)
   # Write config file for find_package(opentelemetry-cpp CONFIG)
   set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
   configure_package_config_file(
-    "${CMAKE_CURRENT_LIST_DIR}/cmake/templates/opentelemetry-cpp-config.cmake.in"
+    "${PROJECT_SOURCE_DIR}/cmake/templates/opentelemetry-cpp-config.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config.cmake"
     INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     PATH_VARS OPENTELEMETRY_ABI_VERSION_NO OPENTELEMETRY_VERSION PROJECT_NAME
