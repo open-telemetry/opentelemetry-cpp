@@ -85,12 +85,33 @@ struct InstrumentDescriptorUtil
   // https://github.com/open-telemetry/opentelemetry-specification/blob/9c8c30631b0e288de93df7452f91ed47f6fba330/specification/metrics/sdk.md?plain=1#L869
   static bool IsDuplicate(const InstrumentDescriptor &lhs, const InstrumentDescriptor &rhs) noexcept
   {
-    const bool names_match = CaseInsensitiveAsciiEquals(lhs.name_, rhs.name_);
-    const bool kinds_match = (lhs.type_ == rhs.type_) && (lhs.value_type_ == rhs.value_type_);
-    const bool units_match = (lhs.unit_ == rhs.unit_);
-    const bool descriptions_match = (lhs.description_ == rhs.description_);
+    // Not a duplicate if case-insensitive names are not equal
+    if (!InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals(lhs.name_, rhs.name_))
+    {
+      return false;
+    }
 
-    return names_match && (!kinds_match || !units_match || !descriptions_match);
+    // Dulicate if names equal and kinds (Type and ValueType) are not equal
+    if (lhs.type_ != rhs.type_ || lhs.value_type_ != rhs.value_type_)
+    {
+      return true;
+    }
+
+    // Dulicate if names equal and units (case-sensitive) are not equal
+    if (lhs.unit_ != rhs.unit_)
+    {
+      return true;
+    }
+
+    // Dulicate if names equal and descriptions (case-sensitive) are not equal
+    if (lhs.description_ != rhs.description_)
+    {
+      return true;
+    }
+
+    // All identifying fields are equal
+    // These are identical instruments or only have a name case conflict
+    return false;
   }
 
   static opentelemetry::nostd::string_view GetInstrumentTypeString(InstrumentType type) noexcept
@@ -139,13 +160,32 @@ struct InstrumentEqualNameCaseInsensitive
 {
   bool operator()(const InstrumentDescriptor &lhs, const InstrumentDescriptor &rhs) const noexcept
   {
-    const bool names_match =
-        InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals(lhs.name_, rhs.name_);
-    const bool kinds_match = (lhs.type_ == rhs.type_) && (lhs.value_type_ == rhs.value_type_);
-    const bool units_match = (lhs.unit_ == rhs.unit_);
-    const bool descriptions_match = (lhs.description_ == rhs.description_);
+    // Names (case-insensitive)
+    if (!InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals(lhs.name_, rhs.name_))
+    {
+      return false;
+    }
 
-    return names_match && kinds_match && units_match && descriptions_match;
+    // Kinds (Type and ValueType)
+    if (lhs.type_ != rhs.type_ || lhs.value_type_ != rhs.value_type_)
+    {
+      return false;
+    }
+
+    // Units (case-sensitive)
+    if (lhs.unit_ != rhs.unit_)
+    {
+      return false;
+    }
+
+    // Descriptions (case-sensitive)
+    if (lhs.description_ != rhs.description_)
+    {
+      return false;
+    }
+
+    // All identifying fields are equal
+    return true;
   }
 };
 
