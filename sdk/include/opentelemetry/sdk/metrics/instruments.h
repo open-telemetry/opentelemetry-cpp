@@ -91,19 +91,19 @@ struct InstrumentDescriptorUtil
       return false;
     }
 
-    // Dulicate if names equal and kinds (Type and ValueType) are not equal
+    // Duplicate if names equal and kinds (Type and ValueType) are not equal
     if (lhs.type_ != rhs.type_ || lhs.value_type_ != rhs.value_type_)
     {
       return true;
     }
 
-    // Dulicate if names equal and units (case-sensitive) are not equal
+    // Duplicate if names equal and units (case-sensitive) are not equal
     if (lhs.unit_ != rhs.unit_)
     {
       return true;
     }
 
-    // Dulicate if names equal and descriptions (case-sensitive) are not equal
+    // Duplicate if names equal and descriptions (case-sensitive) are not equal
     if (lhs.description_ != rhs.description_)
     {
       return true;
