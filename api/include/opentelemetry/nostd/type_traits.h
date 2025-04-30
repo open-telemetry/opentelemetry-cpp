@@ -5,25 +5,11 @@
 
 #include "opentelemetry/version.h"
 
-#if defined(OPENTELEMETRY_STL_VERSION)
-#  if OPENTELEMETRY_STL_VERSION >= 2011
-#    include "opentelemetry/std/type_traits.h"
-#    define OPENTELEMETRY_HAVE_STD_TYPE_TRAITS
-#  endif
+#if !defined(OPENTELEMETRY_STL_VERSION) || (OPENTELEMETRY_STL_VERSION < 2017)
+#error OPENTELEMETRY_STL_VERSION must be >= 2017
 #endif
 
 #include <type_traits>
-
-#if !defined(OPENTELEMETRY_HAVE_STD_TYPE_TRAITS)
-#  include <array>
-
-#  include "opentelemetry/nostd/detail/void.h"  // IWYU pragma: export
-#endif
-
-#if !defined(__GLIBCXX__) || (defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE >= 7) || \
-    (defined(__GLIBCXX__) && __GLIBCXX__ >= 20150422)  // >= libstdc++-5
-#  define OPENTELEMETRY_TRIVIALITY_TYPE_TRAITS
-#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
@@ -77,60 +63,8 @@ struct remove_all_extents<std::array<T, N>> : remove_all_extents<T>
 template <typename T>
 using remove_all_extents_t = typename remove_all_extents<T>::type;
 
-#if defined(OPENTELEMETRY_STL_VERSION) && OPENTELEMETRY_STL_VERSION >= 2017
 using std::is_nothrow_swappable;
 using std::is_swappable;
-#else
-/**
- * Back port of std::is_swappable
- */
-namespace detail
-{
-namespace swappable
-{
-
-using std::swap;
-
-template <typename T>
-struct is_swappable
-{
-private:
-  template <typename U, typename = decltype(swap(std::declval<U &>(), std::declval<U &>()))>
-  inline static std::true_type test(int);
-
-  template <typename U>
-  inline static std::false_type test(...);
-
-public:
-  static constexpr bool value = decltype(test<T>(0))::value;
-};
-
-}  // namespace swappable
-}  // namespace detail
-
-using detail::swappable::is_swappable;
-
-/**
- * Back port of std::is_swappable
- */
-namespace detail
-{
-namespace swappable
-{
-template <bool IsSwappable, typename T>
-struct is_nothrow_swappable
-{
-  static constexpr bool value = noexcept(swap(std::declval<T &>(), std::declval<T &>()));
-};
-
-template <typename T>
-struct is_nothrow_swappable<false, T> : std::false_type
-{};
-}  // namespace swappable
-}  // namespace detail
-template <typename T>
-using is_nothrow_swappable = detail::swappable::is_nothrow_swappable<is_swappable<T>::value, T>;
-#endif
 
 /**
  * Back port of
@@ -139,35 +73,9 @@ using is_nothrow_swappable = detail::swappable::is_nothrow_swappable<is_swappabl
  *  std::is_trivialy_copy_assignable
  *  std::is_trivialy_move_assignable
  */
-#ifdef OPENTELEMETRY_TRIVIALITY_TYPE_TRAITS
 using std::is_trivially_copy_assignable;
 using std::is_trivially_copy_constructible;
 using std::is_trivially_move_assignable;
 using std::is_trivially_move_constructible;
-#else
-template <typename T>
-struct is_trivially_copy_constructible
-{
-  static constexpr bool value = std::is_copy_constructible<T>::value && __has_trivial_copy(T);
-};
-
-template <typename T>
-struct is_trivially_move_constructible
-{
-  static constexpr bool value = __is_trivial(T);
-};
-
-template <typename T>
-struct is_trivially_copy_assignable
-{
-  static constexpr bool value = std::is_copy_assignable<T>::value && __has_trivial_assign(T);
-};
-
-template <typename T>
-struct is_trivially_move_assignable
-{
-  static constexpr bool value = __is_trivial(T);
-};
-#endif
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
