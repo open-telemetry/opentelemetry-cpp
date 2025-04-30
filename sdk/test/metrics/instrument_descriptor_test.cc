@@ -18,22 +18,22 @@ InstrumentDescriptor CreateInstrumentDescriptor(
   return {name, description, unit, type, value_type};
 }
 
-TEST(InstrumentDescriptorUtilTest, CaseInsensitiveEquals)
+TEST(InstrumentDescriptorUtilTest, CaseInsensitiveAsciiEquals)
 {
   // same name
-  EXPECT_TRUE(InstrumentDescriptorUtil::CaseInsensitiveEquals("counter", "counter"));
+  EXPECT_TRUE(InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals("counter", "counter"));
 
   // same case-insensitive name
-  EXPECT_TRUE(InstrumentDescriptorUtil::CaseInsensitiveEquals("counter", "COUNTer"));
-  EXPECT_TRUE(InstrumentDescriptorUtil::CaseInsensitiveEquals("CountER", "counter"));
+  EXPECT_TRUE(InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals("counter", "COUNTer"));
+  EXPECT_TRUE(InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals("CountER", "counter"));
 
   // different case-insensitive name same string length
-  EXPECT_FALSE(InstrumentDescriptorUtil::CaseInsensitiveEquals("Counter_1", "counter_2"));
-  EXPECT_FALSE(InstrumentDescriptorUtil::CaseInsensitiveEquals("counter_1", "counter_2"));
+  EXPECT_FALSE(InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals("Counter_1", "counter_2"));
+  EXPECT_FALSE(InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals("counter_1", "counter_2"));
 
   // different case-sensitive name different string length
-  EXPECT_FALSE(InstrumentDescriptorUtil::CaseInsensitiveEquals("counter", "Counter1"));
-  EXPECT_FALSE(InstrumentDescriptorUtil::CaseInsensitiveEquals("Counter1", "counter"));
+  EXPECT_FALSE(InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals("counter", "Counter1"));
+  EXPECT_FALSE(InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals("Counter1", "counter"));
 }
 
 // The following tests cover the spec requirements on detecting identical and duplicate instruments

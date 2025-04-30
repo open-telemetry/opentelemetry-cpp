@@ -69,7 +69,8 @@ struct InstrumentDescriptor
 
 struct InstrumentDescriptorUtil
 {
-  static bool CaseInsensitiveEquals(const std::string &lhs, const std::string &rhs) noexcept
+  // Case-insensitive comparison of two ASCII strings used to evaluate equality of instrument names
+  static bool CaseInsensitiveAsciiEquals(const std::string &lhs, const std::string &rhs) noexcept
   {
     return lhs.size() == rhs.size() &&
            std::equal(lhs.begin(), lhs.end(), rhs.begin(), [](char a, char b) {
@@ -84,7 +85,7 @@ struct InstrumentDescriptorUtil
   // https://github.com/open-telemetry/opentelemetry-specification/blob/9c8c30631b0e288de93df7452f91ed47f6fba330/specification/metrics/sdk.md?plain=1#L869
   static bool IsDuplicate(const InstrumentDescriptor &lhs, const InstrumentDescriptor &rhs) noexcept
   {
-    const bool names_match = CaseInsensitiveEquals(lhs.name_, rhs.name_);
+    const bool names_match = CaseInsensitiveAsciiEquals(lhs.name_, rhs.name_);
     const bool kinds_match = (lhs.type_ == rhs.type_) && (lhs.value_type_ == rhs.value_type_);
     const bool units_match = (lhs.unit_ == rhs.unit_);
     const bool descriptions_match = (lhs.description_ == rhs.description_);
@@ -138,7 +139,8 @@ struct InstrumentEqualNameCaseInsensitive
 {
   bool operator()(const InstrumentDescriptor &lhs, const InstrumentDescriptor &rhs) const noexcept
   {
-    const bool names_match = InstrumentDescriptorUtil::CaseInsensitiveEquals(lhs.name_, rhs.name_);
+    const bool names_match =
+        InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals(lhs.name_, rhs.name_);
     const bool kinds_match = (lhs.type_ == rhs.type_) && (lhs.value_type_ == rhs.value_type_);
     const bool units_match = (lhs.unit_ == rhs.unit_);
     const bool descriptions_match = (lhs.description_ == rhs.description_);

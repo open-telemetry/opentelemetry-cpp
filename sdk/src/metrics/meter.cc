@@ -715,8 +715,8 @@ void Meter::WarnOnNameCaseConflict(const sdk::instrumentationscope::Instrumentat
                                    const InstrumentDescriptor &existing_instrument,
                                    const InstrumentDescriptor &new_instrument)
 {
-  if (InstrumentDescriptorUtil::CaseInsensitiveEquals(existing_instrument.name_,
-                                                      new_instrument.name_) &&
+  if (InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals(existing_instrument.name_,
+                                                           new_instrument.name_) &&
       existing_instrument.name_ != new_instrument.name_)
   {
     OTEL_INTERNAL_LOG_WARN(
