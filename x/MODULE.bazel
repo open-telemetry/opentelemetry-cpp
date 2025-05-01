@@ -36,7 +36,7 @@ single_version_override(
         "bazel/grpc_no_absl_sync.patch",
     ],
 )
-bazel_dep(name = "nlohmann_json", version = "3.11.3.bcr.1")
+bazel_dep(name = "nlohmann_json", version = "3.12.0")
 bazel_dep(name = "platforms", version = "0.0.11")
 bazel_dep(name = "rules_cc", version = "0.1.1")
 bazel_dep(name = "rules_pkg", version = "1.1.0")
