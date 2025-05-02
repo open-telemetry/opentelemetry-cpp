@@ -27,7 +27,10 @@ public:
   }
 
   opentelemetry::sdk::common::ExportResult Export(
-      const opentelemetry::sdk::metrics::ResourceMetrics &) noexcept override { return opentelemetry::sdk::common::ExportResult::kSuccess; }
+      const opentelemetry::sdk::metrics::ResourceMetrics &) noexcept override
+  {
+    return opentelemetry::sdk::common::ExportResult::kSuccess;
+  }
 
   bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
 
@@ -47,7 +50,7 @@ TEST(HistogramStress, UnsignedInt64)
 
   std::vector<HistogramPointData> actuals;
   auto stop_collecting = std::make_shared<bool>(false);
-  auto collect_thread = std::thread([&reader, &actuals, stop_collecting]() {
+  auto collect_thread  = std::thread([&reader, &actuals, stop_collecting]() {
     while (!*stop_collecting)
     {
       std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -79,7 +82,7 @@ TEST(HistogramStress, UnsignedInt64)
   }
 
   constexpr int iterations_per_core = 2000000;
-  auto expected_sum = std::make_shared<std::atomic<uint64_t>>(0);
+  auto expected_sum                 = std::make_shared<std::atomic<uint64_t>>(0);
 
   for (int i = 0; i < hardware_concurrency; ++i)
   {
@@ -128,9 +131,9 @@ TEST(HistogramStress, UnsignedInt64)
   //
   // Aggregate the results
   //
-  int64_t expected_count = hardware_concurrency * iterations_per_core;
+  int64_t expected_count  = hardware_concurrency * iterations_per_core;
   int64_t collected_count = 0;
-  int64_t collected_sum = 0;
+  int64_t collected_sum   = 0;
   for (const auto &actual : actuals)
   {
     collected_count += actual.count_;
