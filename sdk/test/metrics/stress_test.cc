@@ -1,0 +1,142 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+#include <gtest/gtest.h>
+
+#include <atomic>
+#include <random>
+#include <thread>
+#include <vector>
+
+#include "common.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
+
+using namespace opentelemetry;
+using namespace opentelemetry::sdk::instrumentationscope;
+using namespace opentelemetry::sdk::metrics;
+
+class MockMetricExporterForStress : public opentelemetry::sdk::metrics::PushMetricExporter
+{
+public:
+  MockMetricExporterForStress() = default;
+
+  opentelemetry::sdk::metrics::AggregationTemporality GetAggregationTemporality(
+      opentelemetry::sdk::metrics::InstrumentType) const noexcept override
+  {
+    return AggregationTemporality::kDelta;
+  }
+
+  opentelemetry::sdk::common::ExportResult Export(
+      const opentelemetry::sdk::metrics::ResourceMetrics &) noexcept override { return opentelemetry::sdk::common::ExportResult::kSuccess; }
+
+  bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
+
+  bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
+};
+
+TEST(HistogramStress, UnsignedInt64)
+{
+  MeterProvider mp;
+  auto m = mp.GetMeter("meter1", "version1", "schema1");
+
+  std::unique_ptr<MockMetricExporterForStress> exporter(new MockMetricExporterForStress());
+  std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
+  mp.AddMetricReader(reader);
+
+  auto h = m->CreateUInt64Histogram("histogram1", "histogram1_description", "histogram1_unit");
+
+  std::vector<HistogramPointData> actuals;
+  auto stop_collecting = std::make_shared<bool>(false);
+  auto collect_thread = std::thread([&reader, &actuals, stop_collecting]() {
+    while (!*stop_collecting)
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+      reader->Collect([&](ResourceMetrics &rm) {
+        for (const ScopeMetrics &smd : rm.scope_metric_data_)
+        {
+          for (const MetricData &md : smd.metric_data_)
+          {
+            for (const PointDataAttributes &dp : md.point_data_attr_)
+            {
+              actuals.push_back(opentelemetry::nostd::get<HistogramPointData>(dp.point_data));
+            }
+          }
+        }
+        return true;
+      });
+    }
+  });
+
+  //
+  // Start logging threads
+  //
+  int hardware_concurrency = std::thread::hardware_concurrency() - 1;
+  std::vector<std::thread> threads(hardware_concurrency);
+
+  if (hardware_concurrency <= 0)
+  {
+    hardware_concurrency = 1;
+  }
+
+  constexpr int iterations_per_core = 2000000;
+  auto expected_sum = std::make_shared<std::atomic<uint64_t>>(0);
+
+  for (int i = 0; i < hardware_concurrency; ++i)
+  {
+    threads[i] = std::thread([&h, expected_sum]() {
+      std::random_device rd;
+      std::mt19937 random_engine(rd());
+      std::uniform_int_distribution<> gen_random(1, 20000);
+
+      for (int j = 0; j < iterations_per_core; ++j)
+      {
+        int64_t val = gen_random(random_engine);
+        expected_sum->fetch_add(val, std::memory_order_relaxed);
+        h->Record(val, {});
+      }
+    });
+  }
+
+  for (int i = 0; i < hardware_concurrency; ++i)
+  {
+    threads[i].join();
+  }
+
+  //
+  // Stop the dedicated collection thread
+  //
+  *stop_collecting = true;
+  collect_thread.join();
+
+  //
+  // run the the final collection
+  //
+  reader->Collect([&](ResourceMetrics &rm) {
+    for (const ScopeMetrics &smd : rm.scope_metric_data_)
+    {
+      for (const MetricData &md : smd.metric_data_)
+      {
+        for (const PointDataAttributes &dp : md.point_data_attr_)
+        {
+          actuals.push_back(opentelemetry::nostd::get<HistogramPointData>(dp.point_data));
+        }
+      }
+    }
+    return true;
+  });
+
+  //
+  // Aggregate the results
+  //
+  int64_t expected_count = hardware_concurrency * iterations_per_core;
+  int64_t collected_count = 0;
+  int64_t collected_sum = 0;
+  for (const auto &actual : actuals)
+  {
+    collected_count += actual.count_;
+    collected_sum += opentelemetry::nostd::get<int64_t>(actual.sum_);
+  }
+
+  ASSERT_EQ(expected_count, collected_count);
+  ASSERT_EQ(*expected_sum, collected_sum);
+}
