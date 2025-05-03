@@ -51,6 +51,7 @@ cc_test(
 
 cc_test(
     name = "stress_tests",
+    timeout = "long",
     srcs = glob(["*_test_stress.cc"]),
     copts = [
         "-DUNIT_TESTING",
@@ -63,7 +64,6 @@ cc_test(
         "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
     ],
-    timeout = "long",
 )
 
 otel_cc_benchmark(
