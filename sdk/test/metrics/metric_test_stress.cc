@@ -107,7 +107,7 @@ TEST(HistogramStress, UnsignedInt64)
 
   for (int i = 0; i < hardware_concurrency; ++i)
   {
-    threads[i] = std::thread([&h, expected_sum, iterations_per_core] {
+    threads[i] = std::thread([&h, expected_sum] {
       std::random_device rd;
       std::mt19937 random_engine(rd());
       std::uniform_int_distribution<> gen_random(1, 20000);
