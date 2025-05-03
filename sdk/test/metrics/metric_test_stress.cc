@@ -94,25 +94,25 @@ TEST(HistogramStress, UnsignedInt64)
   //
   // Start logging threads
   //
-  int hardware_concurrency = std::thread::hardware_concurrency() - 1;
-  std::vector<std::thread> threads(hardware_concurrency);
+  int record_thread_count = std::thread::hardware_concurrency() - 1;
+  std::vector<std::thread> threads(record_thread_count);
 
-  if (hardware_concurrency <= 0)
+  if (record_thread_count <= 0)
   {
-    hardware_concurrency = 1;
+    record_thread_count = 1;
   }
 
-  constexpr int iterations_per_core = 2000000;
+  constexpr int iterations_per_thread = 2000000;
   auto expected_sum                 = std::make_shared<std::atomic<uint64_t>>(0);
 
-  for (int i = 0; i < hardware_concurrency; ++i)
+  for (int i = 0; i < record_thread_count; ++i)
   {
     threads[i] = std::thread([&] {
       std::random_device rd;
       std::mt19937 random_engine(rd());
       std::uniform_int_distribution<> gen_random(1, 20000);
 
-      for (int j = 0; j < iterations_per_core; ++j)
+      for (int j = 0; j < iterations_per_thread; ++j)
       {
         int64_t val = gen_random(random_engine);
         expected_sum->fetch_add(val, std::memory_order_relaxed);
@@ -121,7 +121,7 @@ TEST(HistogramStress, UnsignedInt64)
     });
   }
 
-  for (int i = 0; i < hardware_concurrency; ++i)
+  for (int i = 0; i < record_thread_count; ++i)
   {
     threads[i].join();
   }
@@ -152,7 +152,7 @@ TEST(HistogramStress, UnsignedInt64)
   //
   // Aggregate the results
   //
-  int64_t expected_count  = hardware_concurrency * iterations_per_core;
+  int64_t expected_count  = record_thread_count * iterations_per_thread;
   int64_t collected_count = 0;
   int64_t collected_sum   = 0;
   for (const auto &actual : actuals)
