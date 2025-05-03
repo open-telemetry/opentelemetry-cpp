@@ -36,7 +36,7 @@ otel_cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "stress_tests",
     timeout = "long",
     srcs = glob(["*_test_stress.cc"]),
@@ -47,10 +47,10 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
-        "@com_google_googletest//:gtest_main",
-    ],
+        "@googletest//:gtest_main",
+    ]),
 )
 
 otel_cc_benchmark(
