@@ -102,7 +102,7 @@ TEST(HistogramStress, UnsignedInt64)
 
   std::vector<std::thread> threads(record_thread_count);
   constexpr int iterations_per_thread = 2000000;
-  auto expected_sum                 = std::make_shared<std::atomic<uint64_t>>(0);
+  auto expected_sum                   = std::make_shared<std::atomic<uint64_t>>(0);
 
   for (int i = 0; i < record_thread_count; ++i)
   {
