@@ -7,9 +7,6 @@ load("//bazel:otel_cc.bzl", "otel_cc_library")
 package(default_visibility = ["//visibility:public"])
 
 CPP_STDLIBS = [
-    "none",
-    "best",
-    "2014",
     "2017",
     "2020",
     "2023",
@@ -17,20 +14,13 @@ CPP_STDLIBS = [
 
 string_flag(
     name = "with_cxx_stdlib",
-    build_setting_default = "best",
+    build_setting_default = "2017",
     values = CPP_STDLIBS,
 )
 
 otel_cc_library(
     name = "api",
     defines = select({
-        ":set_cxx_stdlib_none": [],
-        ### automatic selection
-        ":set_cxx_stdlib_best": ["OPENTELEMETRY_STL_VERSION=(__cplusplus/100)"],
-        # See https://learn.microsoft.com/en-us/cpp/build/reference/zc-cplusplus
-        ":set_cxx_stdlib_best_and_msvc": ["OPENTELEMETRY_STL_VERSION=(_MSVC_LANG/100)"],
-        ### manual selection
-        ":set_cxx_stdlib_2014": ["OPENTELEMETRY_STL_VERSION=2014"],
         ":set_cxx_stdlib_2017": ["OPENTELEMETRY_STL_VERSION=2017"],
         ":set_cxx_stdlib_2020": ["OPENTELEMETRY_STL_VERSION=2020"],
         ":set_cxx_stdlib_2023": ["OPENTELEMETRY_STL_VERSION=2023"],
@@ -71,15 +61,9 @@ filegroup(
     },
 ) for v in CPP_STDLIBS]
 
-config_setting(
-    name = "set_cxx_stdlib_best_and_msvc",
-    constraint_values = ["@bazel_tools//tools/cpp:msvc"],
-    flag_values = {":with_cxx_stdlib": "best"},
-)
-
 int_flag(
     name = "abi_version_no",
-    build_setting_default = 1,
+    build_setting_default = 2,
 )
 
 config_setting(
