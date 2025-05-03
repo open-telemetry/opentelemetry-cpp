@@ -56,6 +56,22 @@
       },
       {
         "kind": "archive",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.125.0/otelcol-contrib_0.125.0_darwin_arm64.tar.gz",
+        "file": "otelcol-contrib",
+        "sha256": "5498c95f742e687391ad692edc4414ea921b7104c3fa7ac13b60f602699ba9c8",
+        "os": "macos",
+        "cpu": "arm64"
+      },
+      {
+        "kind": "archive",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.125.0/otelcol-contrib_0.125.0_darwin_amd64.tar.gz",
+        "file": "otelcol-contrib",
+        "sha256": "988289ec5563e971aa076495d9cac0d3d964c70ef039f135d57de9f4cfb25ff6",
+        "os": "macos",
+        "cpu": "x86_64"
+      },
+      {
+        "kind": "archive",
         "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.125.0/otelcol-contrib_0.125.0_windows_amd64.tar.gz",
         "file": "otelcol-contrib.exe",
         "sha256": "fcf1f0bb73035ebbfbc727c54a3f97d2c09c3b2c69c33bc7137994a4d8ba11f7",
