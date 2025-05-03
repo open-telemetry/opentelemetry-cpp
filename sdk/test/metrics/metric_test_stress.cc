@@ -156,8 +156,15 @@ TEST(HistogramStress, UnsignedInt64)
   int64_t collected_sum   = 0;
   for (const auto &actual : actuals)
   {
-    collected_count += actual.count_;
+    int64_t collected_bucket_sum = 0;
+    for (const auto &count : actual.counts_)
+    {
+      collected_bucket_sum += count;
+    }
+    ASSERT_EQ(collected_bucket_sum, actual.count_);
+
     collected_sum += opentelemetry::nostd::get<int64_t>(actual.sum_);
+    collected_count += actual.count_;
   }
 
   ASSERT_EQ(expected_count, collected_count);
