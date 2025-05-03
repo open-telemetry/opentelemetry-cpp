@@ -90,11 +90,9 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
     worker_thread_instrumentation_->OnStart();
   }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
-  std::unique_lock<std::mutex> lk(cv_m_);
-  while (true)
+  do
   {
     auto start = std::chrono::steady_clock::now();
-
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
     if (worker_thread_instrumentation_ != nullptr)
     {
@@ -126,6 +124,7 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
       worker_thread_instrumentation_->BeforeWait();
     }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+    std::unique_lock<std::mutex> lk(cv_m_);
     cv_.wait_for(lk, remaining_wait_interval_ms, [this]() {
       if (is_force_wakeup_background_worker_.load(std::memory_order_acquire))
       {
@@ -141,11 +140,7 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
       worker_thread_instrumentation_->AfterWait();
     }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
-    if (IsShutdown())
-    {
-      break;
-    }
-  }
+  } while (IsShutdown() != true);
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   if (worker_thread_instrumentation_ != nullptr)
