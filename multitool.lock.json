@@ -21,7 +21,7 @@
       {
         "kind": "archive",
         "url": "https://github.com/theoremlp/multitool/releases/download/v0.9.0/multitool-aarch64-apple-darwin.tar.xz",
-        "file": "multitool",
+        "file": "multitool-aarch64-apple-darwin/multitool",
         "sha256": "8f5e0cd033b0fcc128c762f8d527110433523da378619cecf40e91c1df5c0686",
         "os": "macos",
         "cpu": "arm64"

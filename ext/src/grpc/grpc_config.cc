@@ -1,7 +1,7 @@
 #include "opentelemetry/ext/grpc/grpc_config.h"
 
 // including from grpc's innards
-#include <src/core/config/config_vars.h>
+#include "src/core/config/config_vars.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
