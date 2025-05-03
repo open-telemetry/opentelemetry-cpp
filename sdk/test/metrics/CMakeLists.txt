@@ -34,7 +34,7 @@ foreach(
   observable_registry_test
   periodic_exporting_metric_reader_test
   instrument_metadata_validator_test
-  metric_test_stress.cc)
+  metric_test_stress)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
