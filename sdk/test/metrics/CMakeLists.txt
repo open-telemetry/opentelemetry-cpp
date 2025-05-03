@@ -34,6 +34,7 @@ foreach(
   observable_registry_test
   periodic_exporting_metric_reader_test
   instrument_metadata_validator_test
+  metric_test_stress
   instrument_descriptor_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
