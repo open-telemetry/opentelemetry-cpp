@@ -95,13 +95,12 @@ TEST(HistogramStress, UnsignedInt64)
   // Start logging threads
   //
   int record_thread_count = std::thread::hardware_concurrency() - 1;
-  std::vector<std::thread> threads(record_thread_count);
-
   if (record_thread_count <= 0)
   {
     record_thread_count = 1;
   }
 
+  std::vector<std::thread> threads(record_thread_count);
   constexpr int iterations_per_thread = 2000000;
   auto expected_sum                 = std::make_shared<std::atomic<uint64_t>>(0);
 
