@@ -49,6 +49,23 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "stress_tests",
+    srcs = glob(["*_test_stress.cc"]),
+    copts = [
+        "-DUNIT_TESTING",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "metrics_common_test_utils",
+        "@com_google_googletest//:gtest_main",
+    ],
+    timeout = "long",
+)
+
 otel_cc_benchmark(
     name = "attributes_processor_benchmark",
     srcs = [
