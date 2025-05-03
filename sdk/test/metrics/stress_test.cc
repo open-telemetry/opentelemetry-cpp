@@ -67,7 +67,7 @@ TEST(HistogramStress, UnsignedInt64)
   auto h = m->CreateUInt64Histogram("histogram1", "histogram1_description", "histogram1_unit");
 
   std::vector<HistogramPointData> actuals;
-  auto stop_collecting = std::make_shared<bool>(false);
+  auto stop_collecting = std::make_shared<std::atomic<bool>>(false);
   auto collect_thread  = std::thread([&reader, &actuals, stop_collecting]() {
     while (!*stop_collecting)
     {
