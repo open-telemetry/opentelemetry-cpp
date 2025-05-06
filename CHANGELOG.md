@@ -33,6 +33,9 @@ Increment the:
 * [API] Add Enabled method to Tracer
   [#3357](https://github.com/open-telemetry/opentelemetry-cpp/pull/3357)
 
+* [SDK] Optimize PeriodicExportingMetricReader thread usage
+  [#3383](https://github.com/open-telemetry/opentelemetry-cpp/pull/3383)
+
 * [SDK] Aggregate identical metrics instruments and detect duplicates
   [#3358](https://github.com/open-telemetry/opentelemetry-cpp/pull/3358)
 
