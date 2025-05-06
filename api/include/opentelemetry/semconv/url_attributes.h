@@ -25,7 +25,7 @@ namespace url
 static constexpr const char *kUrlFragment = "url.fragment";
 
 /**
- * Absolute URL describing a network resource according to 
+ * Absolute URL describing a network resource according to
  * <a href="https://www.rfc-editor.org/rfc/rfc3986">RFC3986</a> <p> For network calls, URL usually has
  * @code scheme://host[:port][path][?query][#fragment] @endcode format, where the fragment is not
  * transmitted over HTTP, but if it is known, it SHOULD be included nevertheless. <p>

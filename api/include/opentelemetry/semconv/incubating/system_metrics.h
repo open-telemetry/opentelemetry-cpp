@@ -277,13 +277,13 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  * Time disk spent activated
  * <p>
  * The real elapsed time ("wall clock") used in the I/O path (time from operations running in
- * parallel are not counted). Measured as: 
- * <ul> 
- *  <li>Linux: Field 13 from 
+ * parallel are not counted). Measured as:
+ * <ul>
+ *  <li>Linux: Field 13 from
  *    <a href="https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats">procfs-diskstats</a>
  *  </li>
- *  <li>Windows: The complement of 
- *    <a href="https://learn.microsoft.com/archive/blogs/askcore/ windows-performance-monitor-disk-counters-explained#windows-performance-monitor-disk-counters-explained">"Disk% Idle Time"</a> 
+ *  <li>Windows: The complement of
+ *    <a href="https://learn.microsoft.com/archive/blogs/askcore/ windows-performance-monitor-disk-counters-explained#windows-performance-monitor-disk-counters-explained">"Disk% Idle Time"</a>
  * performance counter: @code uptime * (100 - "Disk\% Idle Time") / 100 @endcode</li>
  * </ul>
  * <p>
@@ -397,7 +397,7 @@ CreateAsyncDoubleMetricSystemDiskMerged(metrics::Meter *meter)
  * Sum of the time each operation took to complete
  * <p>
  * Because it is the sum of time each request took, parallel-issued requests each contribute to make
- * the count grow. Measured as: <ul> <li>Linux: Fields 7 & 11 from 
+ * the count grow. Measured as: <ul> <li>Linux: Fields 7 & 11 from
  * <a href="https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats">procfs-diskstats</a></li>
  *   <li>Windows: "Avg. Disk sec/Read" perf counter multiplied by "Disk Reads/sec" perf counter
  * (similar for Writes)</li>
@@ -610,8 +610,8 @@ CreateAsyncDoubleMetricSystemFilesystemUtilization(metrics::Meter *meter)
  * swapping <p> This is an alternative to @code system.memory.usage @endcode metric with @code
  * state=free @endcode. Linux starting from 3.14 exports "available" memory. It takes "free" memory
  * as a baseline, and then factors in kernel-specific values. This is supposed to be more accurate
- * than just "free" memory. For reference, see the calculations 
- * <a href="https://superuser.com/a/980821">here</a>. See also @code MemAvailable @endcode in 
+ * than just "free" memory. For reference, see the calculations
+ * <a href="https://superuser.com/a/980821">here</a>. See also @code MemAvailable @endcode in
  * <a href="https://man7.org/linux/man-pages/man5/proc.5.html">/proc/meminfo</a>. <p> updowncounter
  */
 static constexpr const char *kMetricSystemLinuxMemoryAvailable = "system.linux.memory.available";
@@ -657,9 +657,9 @@ CreateAsyncDoubleMetricSystemLinuxMemoryAvailable(metrics::Meter *meter)
  * <p>
  * The sum over the @code reclaimable @endcode and @code unreclaimable @endcode state values in
  * @code linux.memory.slab.usage @endcode SHOULD be equal to the total slab memory available on the
- * system. Note that the total slab memory is not constant and may vary over time. See also the 
- * <a href="https://blogs.oracle.com/linux/post/understanding-linux-kernel-memory-statistics">Slab allocator</a> 
- * and @code Slab @endcode in 
+ * system. Note that the total slab memory is not constant and may vary over time. See also the
+ * <a href="https://blogs.oracle.com/linux/post/understanding-linux-kernel-memory-statistics">Slab allocator</a>
+ * and @code Slab @endcode in
  * <a href="https://man7.org/linux/man-pages/man5/proc.5.html">/proc/meminfo</a>. <p> updowncounter
  */
 static constexpr const char *kMetricSystemLinuxMemorySlabUsage = "system.linux.memory.slab.usage";
@@ -741,9 +741,9 @@ CreateAsyncDoubleMetricSystemMemoryLimit(metrics::Meter *meter)
 /**
  * Shared memory used (mostly by tmpfs).
  * <p>
- * Equivalent of @code shared @endcode from 
+ * Equivalent of @code shared @endcode from
  * <a href="https://man7.org/linux/man-pages/man1/free.1.html"> @code free @endcode command</a> or
- * @code Shmem @endcode from 
+ * @code Shmem @endcode from
  * <a href="https://man7.org/linux/man-pages/man5/proc.5.html"> @code /proc/meminfo @endcode</a>" <p> updowncounter
  */
 static constexpr const char *kMetricSystemMemoryShared = "system.memory.shared";
@@ -906,8 +906,8 @@ CreateAsyncDoubleMetricSystemNetworkConnections(metrics::Meter *meter)
  * <ul>
  *   <li>Linux: the @code drop @endcode column in @code /proc/dev/net @endcode (
  *   <a href="https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html">source</a>)</li>
- *   <li>Windows: 
- * <a href="https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2"> @code InDiscards @endcode/@code OutDiscards @endcode</a> 
+ *   <li>Windows:
+ * <a href="https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2"> @code InDiscards @endcode/@code OutDiscards @endcode</a>
  * from <a href="https://docs.microsoft.com/windows/win32/api/netioapi/nf-netioapi-getifentry2"> @code GetIfEntry2 @endcode</a></li>
  * </ul>
  * <p>
@@ -953,8 +953,8 @@ CreateAsyncDoubleMetricSystemNetworkDropped(metrics::Meter *meter)
  * <ul>
  *   <li>Linux: the @code errs @endcode column in @code /proc/dev/net @endcode (
  * <a href="https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html">source</a>).</li>
- *   <li>Windows: 
- * <a href="https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2"> @code InErrors @endcode/@code OutErrors @endcode</a> 
+ *   <li>Windows:
+ * <a href="https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2"> @code InErrors @endcode/@code OutErrors @endcode</a>
  * from <a href="https://docs.microsoft.com/windows/win32/api/netioapi/nf-netioapi-getifentry2"> @code GetIfEntry2 @endcode</a>.</li>
  * </ul>
  * <p>

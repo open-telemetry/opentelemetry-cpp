@@ -85,7 +85,8 @@ private:
    * @param size Size of each data element.
    * @param nmemb Number of data elements.
    * @param userp Pointer to the user-defined data structure for storing the received data.
-   * @return The number of bytes actually taken care of. If this differs from size * nmemb, it signals an error to libcurl.
+   * @return The number of bytes actually taken care of. If this differs from size * nmemb, it
+   * signals an error to libcurl.
    */
   static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 
@@ -96,7 +97,8 @@ private:
    * @param size Size of each data element.
    * @param nmemb Number of data elements.
    * @param userp Pointer to the user-defined data structure for storing the received data.
-   * @return The number of bytes actually taken care of. If this differs from size * nmemb, it signals an error to libcurl.
+   * @return The number of bytes actually taken care of. If this differs from size * nmemb, it
+   * signals an error to libcurl.
    */
   static size_t WriteVectorHeaderCallback(void *ptr, size_t size, size_t nmemb, void *userp);
   static size_t WriteVectorBodyCallback(void *ptr, size_t size, size_t nmemb, void *userp);
