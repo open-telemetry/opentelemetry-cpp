@@ -277,7 +277,8 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  * Time disk spent activated
  * <p>
  * The real elapsed time ("wall clock") used in the I/O path (time from operations running in
- * parallel are not counted). Measured as: <ul> 
+ * parallel are not counted). Measured as: 
+ * <ul> 
  *  <li>Linux: Field 13 from 
  *    <a href="https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats">procfs-diskstats</a>
  *  </li>
