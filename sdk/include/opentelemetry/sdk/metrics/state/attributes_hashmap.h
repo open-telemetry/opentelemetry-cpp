@@ -48,7 +48,7 @@ class AttributesHashMapWithCustomHash
 {
 public:
   AttributesHashMapWithCustomHash(size_t attributes_limit = kAggregationCardinalityLimit)
-      : attributes_limit_(attributes_limit)
+      : hash_map_(1), attributes_limit_(attributes_limit)
   {}
   Aggregation *Get(const MetricAttributes &attributes) const
   {
