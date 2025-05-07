@@ -33,6 +33,9 @@ Increment the:
 * [API] Add Enabled method to Tracer
   [#3357](https://github.com/open-telemetry/opentelemetry-cpp/pull/3357)
 
+* [SDK] Optimize PeriodicExportingMetricReader thread usage
+  [#3383](https://github.com/open-telemetry/opentelemetry-cpp/pull/3383)
+
 * [INSTALL] Add CMake components to the opentelemetry-cpp package
   [#3320](https://github.com/open-telemetry/opentelemetry-cpp/pull/3220)
   [#3368](https://github.com/open-telemetry/opentelemetry-cpp/pull/3368)
