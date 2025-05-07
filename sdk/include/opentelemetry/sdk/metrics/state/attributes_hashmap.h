@@ -203,7 +203,7 @@ public:
 #endif
 
 private:
-  std::unordered_map<MetricAttributes, std::unique_ptr<Aggregation>, CustomHash> hash_map_;
+  std::unordered_map<MetricAttributes, std::unique_ptr<Aggregation>, CustomHash> hash_map_(1);
   size_t attributes_limit_;
 
   Aggregation *GetOrSetOveflowAttributes(
