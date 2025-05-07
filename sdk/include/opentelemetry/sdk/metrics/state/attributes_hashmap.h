@@ -48,7 +48,7 @@ class AttributesHashMapWithCustomHash
 {
 public:
   AttributesHashMapWithCustomHash(size_t attributes_limit = kAggregationCardinalityLimit)
-      : attributes_limit_(attributes_limit)
+      : hash_map_(1), attributes_limit_(attributes_limit)
   {}
   Aggregation *Get(const MetricAttributes &attributes) const
   {
@@ -203,7 +203,7 @@ public:
 #endif
 
 private:
-  std::unordered_map<MetricAttributes, std::unique_ptr<Aggregation>, CustomHash> hash_map_(1);
+  std::unordered_map<MetricAttributes, std::unique_ptr<Aggregation>, CustomHash> hash_map_;
   size_t attributes_limit_;
 
   Aggregation *GetOrSetOveflowAttributes(
