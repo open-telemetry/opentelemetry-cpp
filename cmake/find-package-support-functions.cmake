@@ -130,7 +130,7 @@ endfunction()
 # Function to get all supported third party dependencies
 #-------------------------------------------------------------------------
 function(get_supported_third_party_dependencies dependencies_out)
-  set(${dependencies_out} ${THIRD_PARTY_DEPNDENCIES_SUPPORTED} PARENT_SCOPE)
+  set(${dependencies_out} ${THIRD_PARTY_DEPENDENCIES_SUPPORTED} PARENT_SCOPE)
 endfunction()
 
 #-------------------------------------------------------------------------
