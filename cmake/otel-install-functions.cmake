@@ -218,12 +218,14 @@ endfunction()
 #------------------------------------------------------------------------
 function(_otel_add_target_alias _TARGET OUT_ALIAS_TARGETS)
   get_target_property(_TARGET_EXPORT_NAME ${_TARGET} EXPORT_NAME)
-  if(_TARGET_EXPORT_NAME AND NOT TARGET "${PROJECT_NAME}::${_TARGET_EXPORT_NAME}")
-    set(_alias_targets "${${OUT_ALIAS_TARGETS}}")
+  if(NOT _TARGET_EXPORT_NAME)
+    message(FATAL_ERROR "  Target ${_TARGET} does not have an EXPORT_NAME property.")
+  elseif(NOT TARGET "${PROJECT_NAME}::${_TARGET_EXPORT_NAME}")
     add_library("${PROJECT_NAME}::${_TARGET_EXPORT_NAME}" ALIAS ${_TARGET})
-    list(APPEND _alias_targets "${PROJECT_NAME}::${_TARGET_EXPORT_NAME}")
-    set(${OUT_ALIAS_TARGETS} "${_alias_targets}" PARENT_SCOPE)
   endif()
+  set(_alias_targets "${${OUT_ALIAS_TARGETS}}")
+  list(APPEND _alias_targets "${PROJECT_NAME}::${_TARGET_EXPORT_NAME}")
+  set(${OUT_ALIAS_TARGETS} "${_alias_targets}" PARENT_SCOPE)
 endfunction()
 
 #-----------------------------------------------------------------------
