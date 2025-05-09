@@ -75,7 +75,12 @@ public:
    * Get body field of this log.
    * @return the body field for this log.
    */
-  virtual const opentelemetry::common::AttributeValue &GetBody() const noexcept = 0;
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  virtual const common::OwnedAttributeValue &
+#else
+  virtual const opentelemetry::common::AttributeValue &
+#endif
+  GetBody() const noexcept = 0;
 
   /**
    * Get the Event id.
@@ -111,7 +116,11 @@ public:
    * Get attributes of this log.
    * @return the body field of this log
    */
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  virtual const std::unordered_map<std::string, common::OwnedAttributeValue> &
+#else
   virtual const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &
+#endif
   GetAttributes() const noexcept = 0;
 
   /**
