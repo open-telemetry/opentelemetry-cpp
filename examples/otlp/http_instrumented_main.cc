@@ -58,9 +58,9 @@
 namespace
 {
 
-std::mutex serialize;
-
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+
+std::mutex serialize;
 
 /**
  The purpose of MyThreadInstrumentation is to demonstrate
