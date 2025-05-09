@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [Metrics SDK] Use nostd::function_ref in AttributesHashMap
+  [#3393](https://github.com/open-telemetry/opentelemetry-cpp/pull/3393)
+
 * [SDK] Base2 exponential histogram aggregation
   [#3175](https://github.com/open-telemetry/opentelemetry-cpp/pull/3346)
 
