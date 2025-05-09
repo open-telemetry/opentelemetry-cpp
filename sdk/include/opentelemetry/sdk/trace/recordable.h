@@ -59,7 +59,7 @@ public:
    * @param name the name of the attribute
    * @param value the attribute value
    */
-  virtual void SetAttribute(nostd::string_view key,
+  virtual void SetAttribute(nostd::string_view name,
                             const opentelemetry::common::AttributeValue &value) noexcept = 0;
 
   /**
@@ -137,7 +137,6 @@ public:
 
   /**
    * Set the trace flags of the span.
-   * @param flags the flags to set
    */
   virtual void SetTraceFlags(opentelemetry::trace::TraceFlags /* flags */) noexcept {}
 
@@ -149,7 +148,7 @@ public:
 
   /**
    * Set Resource of the span
-   * @param Resource the resource to set
+   * @param resource the resource to set
    */
   virtual void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept = 0;
 

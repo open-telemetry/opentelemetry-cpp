@@ -81,22 +81,24 @@ private:
   /**
    * Old-school memory allocator
    *
-   * @param contents
-   * @param size
-   * @param nmemb
-   * @param userp
-   * @return
+   * @param contents Pointer to the data received from the server.
+   * @param size Size of each data element.
+   * @param nmemb Number of data elements.
+   * @param userp Pointer to the user-defined data structure for storing the received data.
+   * @return The number of bytes actually taken care of. If this differs from size * nmemb, it
+   * signals an error to libcurl.
    */
   static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 
   /**
    * C++ STL std::vector allocator
    *
-   * @param ptr
-   * @param size
-   * @param nmemb
-   * @param data
-   * @return
+   * @param ptr Pointer to the data received from the server.
+   * @param size Size of each data element.
+   * @param nmemb Number of data elements.
+   * @param userp Pointer to the user-defined data structure for storing the received data.
+   * @return The number of bytes actually taken care of. If this differs from size * nmemb, it
+   * signals an error to libcurl.
    */
   static size_t WriteVectorHeaderCallback(void *ptr, size_t size, size_t nmemb, void *userp);
   static size_t WriteVectorBodyCallback(void *ptr, size_t size, size_t nmemb, void *userp);
@@ -138,11 +140,9 @@ public:
    * Create local CURL instance for url and body
    * @param method   HTTP Method
    * @param url   HTTP URL
-   * @param callback
-   * @param request_mode   Sync or async
-   * @param request   Request Headers
-   * @param body   Request Body
-   * @param raw_response   Whether to parse the response
+   * @param request_headers   Request Headers
+   * @param request_body   Request Body
+   * @param is_raw_response   Whether to parse the response
    * @param http_conn_timeout   HTTP connection timeout in seconds
    * @param reuse_connection   Whether connection should be reused or closed
    * @param is_log_enabled   To intercept some information from cURL request
@@ -232,22 +232,16 @@ public:
 
   /**
    * Return a copy of response headers
-   *
-   * @return
    */
   Headers GetResponseHeaders();
 
   /**
    * Return a copy of response body
-   *
-   * @return
    */
   inline const std::vector<uint8_t> &GetResponseBody() const noexcept { return response_body_; }
 
   /**
    * Return a raw copy of response headers+body
-   *
-   * @return
    */
   inline const std::vector<uint8_t> &GetRawResponse() const noexcept { return raw_response_; }
 
@@ -265,7 +259,7 @@ public:
    * Perform curl message, this function only can be called in the polling thread and it can only
    * be called when got a CURLMSG_DONE.
    *
-   * @param code
+   * @param code CURLcode
    */
   void PerformCurlMessage(CURLcode code);
 

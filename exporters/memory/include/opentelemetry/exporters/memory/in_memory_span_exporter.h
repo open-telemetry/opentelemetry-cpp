@@ -81,7 +81,7 @@ public:
   }
 
   /**
-   * @param timeout an optional value containing the timeout of the exporter
+   * Timeout is an optional value containing the timeout of the exporter
    * note: passing custom timeout values is not currently supported for this exporter
    * @return Returns the status of the operation
    */
