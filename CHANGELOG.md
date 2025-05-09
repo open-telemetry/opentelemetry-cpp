@@ -39,6 +39,9 @@ Increment the:
 * [SDK] Optimize PeriodicExportingMetricReader thread usage
   [#3383](https://github.com/open-telemetry/opentelemetry-cpp/pull/3383)
 
+* [SDK] Aggregate identical metrics instruments and detect duplicates
+  [#3358](https://github.com/open-telemetry/opentelemetry-cpp/pull/3358)
+
 ## [1.20 2025-04-01]
 
 * [BUILD] Update opentelemetry-proto version
