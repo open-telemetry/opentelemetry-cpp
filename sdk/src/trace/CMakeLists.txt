@@ -35,13 +35,6 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
 if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_trace
-    EXPORT "${PROJECT_NAME}-sdk-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk)
-
   opentelemetry_add_pkgconfig(
     trace "OpenTelemetry SDK - Trace"
     "Components for exporting traces in the OpenTelemetry SDK."
