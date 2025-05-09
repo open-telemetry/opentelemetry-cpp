@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [Metrics SDK] Use nostd::function_ref in AttributesHashMap
+  [#3393](https://github.com/open-telemetry/opentelemetry-cpp/pull/3393)
+
 * [SDK] Base2 exponential histogram aggregation
   [#3175](https://github.com/open-telemetry/opentelemetry-cpp/pull/3346)
 
@@ -33,6 +36,10 @@ Increment the:
 * [API] Add Enabled method to Tracer
   [#3357](https://github.com/open-telemetry/opentelemetry-cpp/pull/3357)
 
+
+* [SDK] Optimize PeriodicExportingMetricReader thread usage
+  [#3383](https://github.com/open-telemetry/opentelemetry-cpp/pull/3383)
+
 * [SDK] Fix lifetime for sdk::ReadWriteLogRecord
   [#3147](https://github.com/open-telemetry/opentelemetry-cpp/pull/3245)
 
@@ -48,6 +55,7 @@ Important changes:
     `opentelemetry::sdk::logs::ReadableLogRecord::GetBody()` will returns a
     `const opentelemetry::sdk::common::OwnedAttributeValue &` instead of a
     `const opentelemetry::common::AttributeValue &`.
+
 
 ## [1.20 2025-04-01]
 
