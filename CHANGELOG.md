@@ -18,6 +18,9 @@ Increment the:
 * [SDK] Set small initial value for AttributesHashMap::hash_map_
   [#3391](https://github.com/open-telemetry/opentelemetry-cpp/pull/3391)
 
+* [Metrics SDK] Use nostd::function_ref in AttributesHashMap
+  [#3393](https://github.com/open-telemetry/opentelemetry-cpp/pull/3393)
+
 * [SDK] Base2 exponential histogram aggregation
   [#3175](https://github.com/open-telemetry/opentelemetry-cpp/pull/3346)
 
@@ -38,6 +41,9 @@ Increment the:
 
 * [SDK] Optimize PeriodicExportingMetricReader thread usage
   [#3383](https://github.com/open-telemetry/opentelemetry-cpp/pull/3383)
+
+* [SDK] Aggregate identical metrics instruments and detect duplicates
+  [#3358](https://github.com/open-telemetry/opentelemetry-cpp/pull/3358)
 
 ## [1.20 2025-04-01]
 

@@ -11,6 +11,7 @@
 #include <thread>
 #include <vector>
 
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"

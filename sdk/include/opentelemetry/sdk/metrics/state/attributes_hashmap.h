@@ -74,9 +74,10 @@ public:
    * If not present, it uses the provided callback to generate
    * value and store in the hash
    */
-  Aggregation *GetOrSetDefault(const opentelemetry::common::KeyValueIterable &attributes,
-                               const AttributesProcessor *attributes_processor,
-                               std::function<std::unique_ptr<Aggregation>()> aggregation_callback)
+  Aggregation *GetOrSetDefault(
+      const opentelemetry::common::KeyValueIterable &attributes,
+      const AttributesProcessor *attributes_processor,
+      nostd::function_ref<std::unique_ptr<Aggregation>()> aggregation_callback)
   {
     // TODO: avoid constructing MetricAttributes from KeyValueIterable for
     // hash_map_.find which is a heavy operation
@@ -97,8 +98,9 @@ public:
     return result.first->second.get();
   }
 
-  Aggregation *GetOrSetDefault(const MetricAttributes &attributes,
-                               std::function<std::unique_ptr<Aggregation>()> aggregation_callback)
+  Aggregation *GetOrSetDefault(
+      const MetricAttributes &attributes,
+      nostd::function_ref<std::unique_ptr<Aggregation>()> aggregation_callback)
   {
     auto it = hash_map_.find(attributes);
     if (it != hash_map_.end())
@@ -115,8 +117,9 @@ public:
     return hash_map_[attributes].get();
   }
 
-  Aggregation *GetOrSetDefault(MetricAttributes &&attributes,
-                               std::function<std::unique_ptr<Aggregation>()> aggregation_callback)
+  Aggregation *GetOrSetDefault(
+      MetricAttributes &&attributes,
+      nostd::function_ref<std::unique_ptr<Aggregation>()> aggregation_callback)
   {
     auto it = hash_map_.find(attributes);
     if (it != hash_map_.end())
@@ -207,7 +210,7 @@ private:
   size_t attributes_limit_;
 
   Aggregation *GetOrSetOveflowAttributes(
-      std::function<std::unique_ptr<Aggregation>()> aggregation_callback)
+      nostd::function_ref<std::unique_ptr<Aggregation>()> aggregation_callback)
   {
     auto agg = aggregation_callback();
     return GetOrSetOveflowAttributes(std::move(agg));
