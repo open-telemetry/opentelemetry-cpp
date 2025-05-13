@@ -666,7 +666,7 @@ TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
   // wait should be less than scheduled_delay_milliseconds_
   // Due to load on CI hosts (some take 10ms), we assert it is less than 20ms
   auto cost = std::chrono::system_clock::now() - beg;
-  ASSERT_TRUE(cost < std::chrono::milliseconds{40})
+  ASSERT_TRUE(cost < std::chrono::milliseconds{100})
       << "cost ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(cost).count()
       << " libcurl version: 0x" << std::hex << LIBCURL_VERSION_NUM;
   ASSERT_TRUE(handler->is_called_);

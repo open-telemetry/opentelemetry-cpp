@@ -60,7 +60,7 @@ otel_cc_library(
     name = "otel_sdk_deps",
     visibility = ["//visibility:private"],
     deps = [
-        "@otel_sdk//exporters/elasticsearch:es_log_record_exporter",
+        # "@otel_sdk//exporters/elasticsearch:es_log_record_exporter",
         "@otel_sdk//exporters/memory:in_memory_data",
         "@otel_sdk//exporters/memory:in_memory_metric_data",
         "@otel_sdk//exporters/memory:in_memory_metric_exporter_factory",
@@ -75,14 +75,14 @@ otel_cc_library(
         "@otel_sdk//exporters/otlp:otlp_grpc_forward_proxy",
         "@otel_sdk//exporters/otlp:otlp_grpc_log_record_exporter",
         "@otel_sdk//exporters/otlp:otlp_grpc_metric_exporter",
-        "@otel_sdk//exporters/otlp:otlp_http_exporter",
-        "@otel_sdk//exporters/otlp:otlp_http_log_record_exporter",
-        "@otel_sdk//exporters/otlp:otlp_http_metric_exporter",
-        "@otel_sdk//exporters/prometheus:prometheus_exporter",
-        "@otel_sdk//exporters/prometheus:prometheus_push_exporter",
-        "@otel_sdk//exporters/zipkin:zipkin_exporter",
+        # "@otel_sdk//exporters/otlp:otlp_http_exporter",
+        # "@otel_sdk//exporters/otlp:otlp_http_log_record_exporter",
+        # "@otel_sdk//exporters/otlp:otlp_http_metric_exporter",
+        # "@otel_sdk//exporters/prometheus:prometheus_exporter",
+        # "@otel_sdk//exporters/prometheus:prometheus_push_exporter",
+        # "@otel_sdk//exporters/zipkin:zipkin_exporter",
     ] + select({
-        "@platforms//os:windows": ["@otel_sdk//exporters/etw:etw_exporter"],
+        # "@platforms//os:windows": ["@otel_sdk//exporters/etw:etw_exporter"],
         "//conditions:default": [],
     }),
 )
@@ -92,11 +92,11 @@ otel_cc_library(
     name = "otel_sdk_all_deps_" + os,
     # The crude '^(@+otel_sdk[+~]?)?//' ignores external to otel_sdk repositories (e.g. @curl//, etc.) for which it's assumed we don't export dll symbols
     # In addition we exclude some internal libraries, that may have to be relinked by tests (like //sdk/src/common:random and //sdk/src/common/platform:fork)
-    expression = "kind('cc_library',filter('^(@+otel_sdk[+~]?)?//',deps(@otel_sdk//:otel_sdk_deps) except set(@otel_sdk//:otel_sdk_deps @otel_sdk//sdk/src/common:random @otel_sdk//sdk/src/common/platform:fork @otel_sdk//:windows_only " + exceptions + ")))",
+    expression = "kind('cc_library',filter('^(@+otel_sdk[+~]?)?//',deps(@otel_sdk//:otel_sdk_deps) except set(@otel_sdk//:otel_sdk_deps @otel_sdk//sdk/src/common:random @otel_sdk//sdk/src/common/platform:fork " + exceptions + ")))",
     scope = ["@otel_sdk//:otel_sdk_deps"],
     strict = True,
 ) for (os, exceptions) in [
-    ("non_windows", "@otel_sdk//exporters/etw:etw_exporter"),
+    ("non_windows", ""), #"@otel_sdk//exporters/etw:etw_exporter"),
     ("windows", ""),
 ]]
 

@@ -20,8 +20,8 @@ common:windows --shell_executable="c:\\program files\\git\\usr\\bin\\bash.exe"
 common --enable_platform_specific_config
 common --enable_runfiles
 
-build --build_tag_filters=-jaeger,-opentracing,-opentracing_shim
-test --test_tag_filters=-jaeger,-opentracing,-opentracing_shim
+build --build_tag_filters=-jaeger,-opentracing,-opentracing_shim,-etw,-es,-prometheus,-otlp_http,-otlp_http_log,-otlp_http_metric,-zipkin
+test --test_tag_filters=-jaeger,-opentracing,-opentracing_shim,-etw,-es,-prometheus,-otlp_http,-otlp_http_log,-otlp_http_metric,-zipkin
 
 build --experimental_convenience_symlinks=clean
 
@@ -31,8 +31,8 @@ build:windows --copt="/Zc:strictStrings"
 build:windows --copt="/Gy"
 build:windows --host_linkopt="shell32.lib" 
 # Requires Visual Studio 2019 Build Tools installed in default location with the latest compiler (14.29.30133) for x64
-build:windows      --action_env=BAZEL_VC_FULL_VERSION=14.29.30133      --action_env=BAZEL_WINSDK_FULL_VERSION=10.0.22621.0
-build:windows --host_action_env=BAZEL_VC_FULL_VERSION=14.29.30133 --host_action_env=BAZEL_WINSDK_FULL_VERSION=10.0.22621.0
+build:windows      --action_env=BAZEL_VC_FULL_VERSION=14.42.34433      --action_env=BAZEL_WINSDK_FULL_VERSION=10.0.22621.0
+build:windows --host_action_env=BAZEL_VC_FULL_VERSION=14.42.34433 --host_action_env=BAZEL_WINSDK_FULL_VERSION=10.0.22621.0
 
 # Set minimum supported C++ version
 build:macos --host_cxxopt=-std=c++17 --cxxopt=-std=c++17

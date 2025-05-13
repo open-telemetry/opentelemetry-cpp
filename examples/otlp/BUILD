@@ -157,6 +157,8 @@ otel_cc_binary(
         "examples",
         "metrics",
         "otlp",
+        "otlp_http",
+        "otlp_http_metric",
     ],
     deps = dll_deps([
         "//api",
