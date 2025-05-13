@@ -11,11 +11,12 @@ on:
 jobs:
   otel_sdk_build:
     name: build otel_sdk
-    runs-on: windows-2025
+    runs-on: windows-latest
     permissions:
       contents: write
     steps:
       - run: systeminfo
+      - run: ls "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC"
       - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize -Wrap
       - run: choco uninstall bazel --yes
       - uses: Cyberboss/install-winget@6f566e9e227561d5d31e45d65f9b777b3fa8f56f
