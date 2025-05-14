@@ -55,9 +55,9 @@ jobs:
           cmd /c dir d:\d || echo "swallowing errors"
           refsutil dedup d:\d /s
       - name: build minimal otel_sdk
-        # On the CI, the gibhub windows image uses 14.42.34438 while for some reason what I have on my machine is 14.42.34433
+        # On the CI, the github runner does not have constant vs2022 msvc release, but has the same vs2019 (14.29.30133)
         run: |
-          echo "build:windows --action_env=BAZEL_VC_FULL_VERSION=14.42.34438" >> ../top.bazelrc
+          echo "build:windows --action_env=BAZEL_VC_FULL_VERSION=14.29.30133" >> ../top.bazelrc
           echo "build:windows --host_action_env=BAZEL_VC_FULL_VERSION=14.42.34438" >> ../top.bazelrc
           echo "build --disk_cache=d:/d" >> ../top.bazelrc
           echo "common --repository_cache=d:/r" >> ../top.bazelrc
