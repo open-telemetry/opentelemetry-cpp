@@ -37,28 +37,18 @@ endif()
 target_link_libraries(opentelemetry_exporter_prometheus
                       PUBLIC opentelemetry_metrics ${PROMETHEUS_CPP_TARGETS})
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS ${PROMETHEUS_EXPORTER_TARGETS}
-    EXPORT "${PROJECT_NAME}-exporters_prometheus-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT exporters_prometheus)
-
-  install(
-    DIRECTORY include/opentelemetry/exporters/prometheus
-    DESTINATION include/opentelemetry/exporters/
-    COMPONENT exporters_prometheus
-    FILES_MATCHING
-    PATTERN "*.h")
-
-  install(
-    EXPORT "${PROJECT_NAME}-exporters_prometheus-target"
-    FILE "${PROJECT_NAME}-exporters_prometheus-target.cmake"
-    NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-    COMPONENT exporters_prometheus)
-endif()
+otel_add_component(
+  COMPONENT
+  exporters_prometheus
+  TARGETS
+  opentelemetry_exporter_prometheus
+  FILES_DIRECTORY
+  "include/opentelemetry/exporters/prometheus"
+  FILES_DESTINATION
+  "include/opentelemetry/exporters"
+  FILES_MATCHING
+  PATTERN
+  "*.h")
 
 if(BUILD_TESTING)
   add_subdirectory(test)
