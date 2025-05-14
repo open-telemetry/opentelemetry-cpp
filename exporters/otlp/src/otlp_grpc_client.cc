@@ -335,10 +335,13 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
   std::shared_ptr<grpc::Channel> channel;
   std::string grpc_target;
 
-  if (url.scheme_ == "unix") {
-     grpc_target = "unix:" + url.path_;
-  } else {
-     grpc_target = url.host_ + ":" + std::to_string(static_cast<int>(url.port_));
+  if (url.scheme_ == "unix")
+  {
+    grpc_target = "unix:" + url.path_;
+  }
+  else
+  {
+    grpc_target = url.host_ + ":" + std::to_string(static_cast<int>(url.port_));
   }
   grpc::ChannelArguments grpc_arguments;
   grpc_arguments.SetUserAgentPrefix(options.user_agent);
