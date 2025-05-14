@@ -46,6 +46,9 @@ Increment the:
   [#3320](https://github.com/open-telemetry/opentelemetry-cpp/pull/3220)
   [#3368](https://github.com/open-telemetry/opentelemetry-cpp/pull/3368)
 
+* [BUILD] Upgrade opentelemetry-proto to 1.6.0
+  [#3407](https://github.com/open-telemetry/opentelemetry-cpp/pull/3407)
+
 ## [1.20 2025-04-01]
 
 * [BUILD] Update opentelemetry-proto version
