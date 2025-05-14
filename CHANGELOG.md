@@ -46,6 +46,9 @@ Increment the:
   [#3320](https://github.com/open-telemetry/opentelemetry-cpp/pull/3220)
   [#3368](https://github.com/open-telemetry/opentelemetry-cpp/pull/3368)
 
+* [BUILD] Upgrade nlohmann_json to 3.12.0
+  [#3406](https://github.com/open-telemetry/opentelemetry-cpp/pull/3406)
+
 * [CMAKE] Add generated protobuf headers to the opentelemetry_proto target
   [#3400](https://github.com/open-telemetry/opentelemetry-cpp/pull/3400)
 
