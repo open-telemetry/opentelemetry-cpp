@@ -6,6 +6,9 @@ set(OPENTELEMETRY_EXPORT_DEF
 
 add_library(opentelemetry_cpp SHARED dllmain.cc ${OPENTELEMETRY_EXPORT_DEF})
 
+set_target_properties(opentelemetry_cpp PROPERTIES EXPORT_NAME
+                                                   opentelemetry_cpp)
+
 target_link_libraries(
   opentelemetry_cpp PRIVATE opentelemetry_trace
                             opentelemetry_exporter_ostream_span)
@@ -116,18 +119,4 @@ add_custom_command(
     "-targetfile" ${OPENTELEMETRY_EXPORT_DEF}
   VERBATIM)
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_cpp
-    EXPORT "${PROJECT_NAME}-ext_dll-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ext_dll)
-
-  install(
-    EXPORT "${PROJECT_NAME}-ext_dll-target"
-    FILE "${PROJECT_NAME}-ext_dll-target.cmake"
-    NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-    COMPONENT ext_dll)
-endif()
+otel_add_component(COMPONENT ext_dll TARGETS opentelemetry_cpp)

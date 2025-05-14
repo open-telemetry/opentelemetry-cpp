@@ -19,13 +19,6 @@ target_link_libraries(
                               Threads::Threads)
 
 if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_common
-    EXPORT "${PROJECT_NAME}-sdk-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk)
-
   opentelemetry_add_pkgconfig(
     common
     "OpenTelemetry SDK - Common"
