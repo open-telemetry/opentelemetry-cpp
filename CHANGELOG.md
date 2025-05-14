@@ -42,6 +42,10 @@ Increment the:
 * [SDK] Aggregate identical metrics instruments and detect duplicates
   [#3358](https://github.com/open-telemetry/opentelemetry-cpp/pull/3358)
 
+* [INSTALL] Add CMake components to the opentelemetry-cpp package
+  [#3320](https://github.com/open-telemetry/opentelemetry-cpp/pull/3220)
+  [#3368](https://github.com/open-telemetry/opentelemetry-cpp/pull/3368)
+
 * [CMAKE] Add generated protobuf headers to the opentelemetry_proto target
   [#3400](https://github.com/open-telemetry/opentelemetry-cpp/pull/3400)
 

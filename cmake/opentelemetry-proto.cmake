@@ -369,24 +369,6 @@ patch_protobuf_targets(opentelemetry_proto)
 
 if(OPENTELEMETRY_INSTALL)
   install(
-    TARGETS opentelemetry_proto
-    EXPORT "${PROJECT_NAME}-exporters_otlp_common-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    COMPONENT exporters_otlp_common)
-
-  if(WITH_OTLP_GRPC)
-    install(
-      TARGETS opentelemetry_proto_grpc
-      EXPORT "${PROJECT_NAME}-exporters_otlp_grpc-target"
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      COMPONENT exporters_otlp_grpc)
-  endif()
-
-  install(
     DIRECTORY ${GENERATED_PROTOBUF_PATH}/opentelemetry
     DESTINATION include
     COMPONENT exporters_otlp_common
