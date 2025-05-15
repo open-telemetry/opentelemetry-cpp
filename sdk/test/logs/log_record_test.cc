@@ -72,13 +72,9 @@ TEST(ReadWriteLogRecord, SetAndGet)
 
   // Test that all fields match what was set
   ASSERT_EQ(record.GetSeverity(), logs_api::Severity::kInvalid);
-  if (nostd::holds_alternative<const char *>(record.GetBody()))
+  if (nostd::holds_alternative<std::string>(record.GetBody()))
   {
-    ASSERT_EQ(std::string(nostd::get<const char *>(record.GetBody())), "Message");
-  }
-  else if (nostd::holds_alternative<nostd::string_view>(record.GetBody()))
-  {
-    ASSERT_TRUE(nostd::get<nostd::string_view>(record.GetBody()) == "Message");
+    ASSERT_EQ(std::string(nostd::get<std::string>(record.GetBody())), "Message");
   }
   ASSERT_TRUE(nostd::get<bool>(record.GetResource().GetAttributes().at("res1")));
   ASSERT_EQ(nostd::get<int64_t>(record.GetAttributes().at("attr1")), 314159);
@@ -109,13 +105,13 @@ public:
     }
   }
 
-  const opentelemetry::common::AttributeValue &GetLastLogRecord() const noexcept
+  const opentelemetry::sdk::common::OwnedAttributeValue &GetLastLogRecord() const noexcept
   {
     return last_body_;
   }
 
 private:
-  opentelemetry::common::AttributeValue last_body_;
+  opentelemetry::sdk::common::OwnedAttributeValue last_body_;
 };
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
@@ -173,28 +169,19 @@ TEST(LogBody, BodyConversation)
 
   real_logger->EmitLogRecord(opentelemetry::logs::Severity::kInfo, "128");
   ASSERT_TRUE(
-      opentelemetry::nostd::holds_alternative<const char *>(real_logger->GetLastLogRecord()) ||
-      opentelemetry::nostd::holds_alternative<nostd::string_view>(real_logger->GetLastLogRecord()));
-  if (opentelemetry::nostd::holds_alternative<const char *>(real_logger->GetLastLogRecord()))
-  {
-    ASSERT_EQ(nostd::string_view{"128"},
-              opentelemetry::nostd::get<const char *>(real_logger->GetLastLogRecord()));
-  }
-  else
-  {
-    ASSERT_EQ(nostd::string_view{"128"},
-              opentelemetry::nostd::get<nostd::string_view>(real_logger->GetLastLogRecord()));
-  }
+      opentelemetry::nostd::holds_alternative<std::string>(real_logger->GetLastLogRecord()));
+  ASSERT_EQ(nostd::string_view{"128"},
+            opentelemetry::nostd::get<std::string>(real_logger->GetLastLogRecord()));
 
   {
     bool data[]                       = {true, false, true};
     nostd::span<const bool> data_span = data;
     real_logger->EmitLogRecord(opentelemetry::logs::Severity::kInfo, data_span);
-    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<nostd::span<const bool>>(
+    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<std::vector<bool>>(
         real_logger->GetLastLogRecord()));
 
-    nostd::span<const bool> output =
-        opentelemetry::nostd::get<nostd::span<const bool>>(real_logger->GetLastLogRecord());
+    std::vector<bool> output =
+        opentelemetry::nostd::get<std::vector<bool>>(real_logger->GetLastLogRecord());
 
     ASSERT_EQ(data_span.size(), output.size());
 
@@ -208,11 +195,11 @@ TEST(LogBody, BodyConversation)
     int32_t data[]                       = {221, 222, 223};
     nostd::span<const int32_t> data_span = data;
     real_logger->EmitLogRecord(opentelemetry::logs::Severity::kInfo, data_span);
-    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<nostd::span<const int32_t>>(
+    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<std::vector<int32_t>>(
         real_logger->GetLastLogRecord()));
 
     nostd::span<const int32_t> output =
-        opentelemetry::nostd::get<nostd::span<const int32_t>>(real_logger->GetLastLogRecord());
+        opentelemetry::nostd::get<std::vector<int32_t>>(real_logger->GetLastLogRecord());
 
     ASSERT_EQ(data_span.size(), output.size());
 
@@ -226,11 +213,11 @@ TEST(LogBody, BodyConversation)
     uint32_t data[]                       = {231, 232, 233};
     nostd::span<const uint32_t> data_span = data;
     real_logger->EmitLogRecord(opentelemetry::logs::Severity::kInfo, data_span);
-    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<nostd::span<const uint32_t>>(
+    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<std::vector<uint32_t>>(
         real_logger->GetLastLogRecord()));
 
-    nostd::span<const uint32_t> output =
-        opentelemetry::nostd::get<nostd::span<const uint32_t>>(real_logger->GetLastLogRecord());
+    std::vector<uint32_t> output =
+        opentelemetry::nostd::get<std::vector<uint32_t>>(real_logger->GetLastLogRecord());
 
     ASSERT_EQ(data_span.size(), output.size());
 
@@ -244,11 +231,11 @@ TEST(LogBody, BodyConversation)
     int64_t data[]                       = {241, 242, 243};
     nostd::span<const int64_t> data_span = data;
     real_logger->EmitLogRecord(opentelemetry::logs::Severity::kInfo, data_span);
-    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<nostd::span<const int64_t>>(
+    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<std::vector<int64_t>>(
         real_logger->GetLastLogRecord()));
 
-    nostd::span<const int64_t> output =
-        opentelemetry::nostd::get<nostd::span<const int64_t>>(real_logger->GetLastLogRecord());
+    std::vector<int64_t> output =
+        opentelemetry::nostd::get<std::vector<int64_t>>(real_logger->GetLastLogRecord());
 
     ASSERT_EQ(data_span.size(), output.size());
 
@@ -262,11 +249,11 @@ TEST(LogBody, BodyConversation)
     uint64_t data[]                       = {251, 252, 253};
     nostd::span<const uint64_t> data_span = data;
     real_logger->EmitLogRecord(opentelemetry::logs::Severity::kInfo, data_span);
-    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<nostd::span<const uint64_t>>(
+    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<std::vector<uint64_t>>(
         real_logger->GetLastLogRecord()));
 
-    nostd::span<const uint64_t> output =
-        opentelemetry::nostd::get<nostd::span<const uint64_t>>(real_logger->GetLastLogRecord());
+    std::vector<uint64_t> output =
+        opentelemetry::nostd::get<std::vector<uint64_t>>(real_logger->GetLastLogRecord());
 
     ASSERT_EQ(data_span.size(), output.size());
 
@@ -280,11 +267,11 @@ TEST(LogBody, BodyConversation)
     uint8_t data[]                       = {161, 162, 163};
     nostd::span<const uint8_t> data_span = data;
     real_logger->EmitLogRecord(opentelemetry::logs::Severity::kInfo, data_span);
-    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<nostd::span<const uint8_t>>(
+    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<std::vector<uint8_t>>(
         real_logger->GetLastLogRecord()));
 
-    nostd::span<const uint8_t> output =
-        opentelemetry::nostd::get<nostd::span<const uint8_t>>(real_logger->GetLastLogRecord());
+    std::vector<uint8_t> output =
+        opentelemetry::nostd::get<std::vector<uint8_t>>(real_logger->GetLastLogRecord());
 
     ASSERT_EQ(data_span.size(), output.size());
 
@@ -298,11 +285,11 @@ TEST(LogBody, BodyConversation)
     double data[]                       = {271.0, 272.0, 273.0};
     nostd::span<const double> data_span = data;
     real_logger->EmitLogRecord(opentelemetry::logs::Severity::kInfo, data_span);
-    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<nostd::span<const double>>(
+    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<std::vector<double>>(
         real_logger->GetLastLogRecord()));
 
-    nostd::span<const double> output =
-        opentelemetry::nostd::get<nostd::span<const double>>(real_logger->GetLastLogRecord());
+    std::vector<double> output =
+        opentelemetry::nostd::get<std::vector<double>>(real_logger->GetLastLogRecord());
 
     ASSERT_EQ(data_span.size(), output.size());
 
@@ -317,12 +304,11 @@ TEST(LogBody, BodyConversation)
     nostd::string_view data[] = {data_origin[0], data_origin[1], data_origin[2]};
     nostd::span<const nostd::string_view> data_span = data;
     real_logger->EmitLogRecord(opentelemetry::logs::Severity::kInfo, data_span);
-    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<nostd::span<const nostd::string_view>>(
+    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<std::vector<std::string>>(
         real_logger->GetLastLogRecord()));
 
-    nostd::span<const nostd::string_view> output =
-        opentelemetry::nostd::get<nostd::span<const nostd::string_view>>(
-            real_logger->GetLastLogRecord());
+    std::vector<std::string> output =
+        opentelemetry::nostd::get<std::vector<std::string>>(real_logger->GetLastLogRecord());
 
     ASSERT_EQ(data_span.size(), output.size());
 
