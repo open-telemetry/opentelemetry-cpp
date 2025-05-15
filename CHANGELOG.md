@@ -55,6 +55,9 @@ Increment the:
 * [CMAKE] Add generated protobuf headers to the opentelemetry_proto target
   [#3400](https://github.com/open-telemetry/opentelemetry-cpp/pull/3400)
 
+* [EXPORTER] ostream log exporter, fixed memory ownership issues
+  [#3417](https://github.com/open-telemetry/opentelemetry-cpp/pull/3417)
+
 ## [1.20 2025-04-01]
 
 * [BUILD] Update opentelemetry-proto version
