@@ -11,7 +11,7 @@ on:
 jobs:
   otel_sdk_build:
     name: build otel_sdk
-    runs-on: windows-latest
+    runs-on: windows-2025
     permissions:
       contents: write
     steps:
@@ -19,10 +19,10 @@ jobs:
       - run: ls "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC"
       - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize -Wrap
       - run: choco uninstall bazel --yes
-      - uses: Cyberboss/install-winget@6f566e9e227561d5d31e45d65f9b777b3fa8f56f
+      # - uses: Cyberboss/install-winget@6f566e9e227561d5d31e45d65f9b777b3fa8f56f
       - run: winget list --accept-source-agreements --disable-interactivity
       - run: winget install bazelisk -r bazel --accept-package-agreements --disable-interactivity --silent
-      - run: winget install -e LLVM.LLVM -v 20.1.4 --accept-package-agreements --disable-interactivity --silent || echo swalloing errors
+      - run: winget install -e LLVM.LLVM -v 20.1.5 --accept-package-agreements --disable-interactivity --silent || echo swalloing errors
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
         with:
