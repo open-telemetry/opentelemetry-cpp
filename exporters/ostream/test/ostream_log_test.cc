@@ -27,10 +27,10 @@
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/log_record_data.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/provider.h"
-#include "opentelemetry/sdk/logs/read_write_log_record.h"
 #include "opentelemetry/sdk/logs/readable_log_record.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor.h"
@@ -82,7 +82,7 @@ TEST(OStreamLogRecordExporter, Shutdown)
 
   // After processor/exporter is shutdown, no logs should be sent to stream
   auto record = exporter->MakeRecordable();
-  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())->SetBody("Log record not empty");
+  static_cast<sdklogs::LogRecordData *>(record.get())->SetBody("Log record not empty");
   exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
 
   // Restore original stringstream buffer
@@ -171,12 +171,12 @@ TEST(OStreamLogRecordExporter, SimpleLogToCout)
   // Create a log record and manually timestamp, severity, name, message
   common::SystemTimestamp now(std::chrono::system_clock::now());
 
-  auto record = std::unique_ptr<sdklogs::Recordable>(new sdklogs::ReadWriteLogRecord());
-  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())->SetTimestamp(now);
-  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())->SetObservedTimestamp(now);
-  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())
+  auto record = std::unique_ptr<sdklogs::Recordable>(new sdklogs::LogRecordData());
+  static_cast<sdklogs::LogRecordData *>(record.get())->SetTimestamp(now);
+  static_cast<sdklogs::LogRecordData *>(record.get())->SetObservedTimestamp(now);
+  static_cast<sdklogs::LogRecordData *>(record.get())
       ->SetSeverity(logs_api::Severity::kTrace);  // kTrace has enum value of 1
-  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())->SetBody("Message");
+  static_cast<sdklogs::LogRecordData *>(record.get())->SetBody("Message");
 
   opentelemetry::sdk::instrumentationscope::InstrumentationScope instrumentation_scope =
       GetTestInstrumentationScope();
@@ -248,10 +248,10 @@ TEST(OStreamLogRecordExporter, LogWithStringAttributesToCerr)
 
   // Set resources for this log record only of type <string, string>
   auto resource = opentelemetry::sdk::resource::Resource::Create({{"key1", "val1"}});
-  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())->SetResource(resource);
+  static_cast<sdklogs::LogRecordData *>(record.get())->SetResource(resource);
 
   // Set attributes to this log record of type <string, AttributeValue>
-  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())->SetAttribute("a", true);
+  static_cast<sdklogs::LogRecordData *>(record.get())->SetAttribute("a", true);
 
   opentelemetry::sdk::instrumentationscope::InstrumentationScope instrumentation_scope =
       GetTestInstrumentationScope();
@@ -326,12 +326,12 @@ TEST(OStreamLogRecordExporter, LogWithVariantTypesToClog)
   nostd::span<int> data1{array1.data(), array1.size()};
 
   auto resource = opentelemetry::sdk::resource::Resource::Create({{"res1", data1}});
-  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())->SetResource(resource);
+  static_cast<sdklogs::LogRecordData *>(record.get())->SetResource(resource);
 
   // Set resources for this log record of bool types as the value
   // e.g. key/value is a par of type <string, array of bools>
   std::array<bool, 3> array = {false, true, false};
-  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())
+  static_cast<sdklogs::LogRecordData *>(record.get())
       ->SetAttribute("attr1", nostd::span<bool>{array.data(), array.size()});
 
   opentelemetry::sdk::instrumentationscope::InstrumentationScope instrumentation_scope =
