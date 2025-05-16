@@ -20,14 +20,6 @@ namespace code
 {
 
 /**
- * Deprecated, use @code code.column.number @endcode
- *
- * @deprecated
- * {"note": "Replaced by @code code.column.number @endcode", "reason": "uncategorized"}
- */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeColumn = "code.column";
-
-/**
  * The column number in @code code.file.path @endcode best representing the operation. It SHOULD
  * point within the code unit named in @code code.function.name @endcode. This attribute MUST NOT be
  * used on the Profile signal since the data is already captured in 'message Line'. This constraint
@@ -42,22 +34,6 @@ static constexpr const char *kCodeColumnNumber = "code.column.number";
  * maintain data integrity.
  */
 static constexpr const char *kCodeFilePath = "code.file.path";
-
-/**
- * Deprecated, use @code code.file.path @endcode instead
- *
- * @deprecated
- * {"note": "Replaced by @code code.file.path @endcode", "reason": "uncategorized"}
- */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeFilepath = "code.filepath";
-
-/**
- * Deprecated, use @code code.function.name @endcode instead
- *
- * @deprecated
- * {"note": "Replaced by @code code.function.name @endcode", "reason": "uncategorized"}
- */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeFunction = "code.function";
 
 /**
  * The method or function fully-qualified name without arguments. The value should fit the natural
@@ -89,23 +65,6 @@ static constexpr const char *kCodeFunctionName = "code.function.name";
  * imposed to prevent redundancy and maintain data integrity.
  */
 static constexpr const char *kCodeLineNumber = "code.line.number";
-
-/**
- * Deprecated, use @code code.line.number @endcode instead
- *
- * @deprecated
- * {"note": "Replaced by @code code.line.number @endcode", "reason": "uncategorized"}
- */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeLineno = "code.lineno";
-
-/**
- * Deprecated, namespace is now included into @code code.function.name @endcode
- *
- * @deprecated
- * {"note": "Value should be included in @code code.function.name @endcode which is expected to be a
- * fully-qualified name.", "reason": "uncategorized"}
- */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeNamespace = "code.namespace";
 
 /**
  * A stacktrace as a string in the natural representation for the language runtime. The
