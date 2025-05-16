@@ -35,19 +35,6 @@ static constexpr const char *kMessagingBatchMessageCount = "messaging.batch.mess
  */
 static constexpr const char *kMessagingClientId = "messaging.client.id";
 
-#if 0
-// Excluded attribute:
-/**
- * Deprecated, use @code messaging.client.id @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code messaging.client.id @endcode.", "reason": "uncategorized"}
- */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessagingClientId
- = "messaging.client_id";
-#endif
-
 /**
  * The name of the consumer group with which a consumer is associated.
  * <p>
