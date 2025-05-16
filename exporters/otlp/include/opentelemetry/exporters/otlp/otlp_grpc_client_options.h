@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <grpcpp/security/credentials.h>
+
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/version.h"
 
@@ -42,6 +44,9 @@ struct OtlpGrpcClientOptions
   /** CLIENT CERT, as a string. */
   std::string ssl_client_cert_string;
 #endif
+
+  /** Use custom ChannelCredentials, instead of the SSL options above. */
+  std::shared_ptr<grpc::ChannelCredentials> credentials;
 
   /** Export timeout. */
   std::chrono::system_clock::duration timeout;
