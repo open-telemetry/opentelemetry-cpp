@@ -76,7 +76,7 @@ MetricProducer::Result MetricCollector::Produce() noexcept
     ScopeMetrics scope_metrics;
     scope_metrics.metric_data_ = std::move(metric_data);
     scope_metrics.scope_       = meter->GetInstrumentationScope();
-    if (!this->metric_filter_)
+    if (!metric_filter_)
     {
       resource_metrics.scope_metric_data_.emplace_back(std::move(scope_metrics));
       return true;
@@ -93,7 +93,7 @@ MetricProducer::Result MetricCollector::Produce() noexcept
       opentelemetry::nostd::string_view unit = metric.instrument_descriptor.unit_;
 
       MetricFilter::MetricFilterResult metric_filter_result =
-          this->metric_filter_->TestMetric(scope, name, type, unit);
+          metric_filter_->TestMetric(scope, name, type, unit);
       if (metric_filter_result == MetricFilter::MetricFilterResult::kAccept)
       {
         filtered_scope_metrics.metric_data_.emplace_back(std::move(metric));
@@ -109,7 +109,7 @@ MetricProducer::Result MetricCollector::Produce() noexcept
       {
         const PointAttributes &attributes = point_data_attr.attributes;
         MetricFilter::AttributesFilterResult attributes_filter_result =
-            this->metric_filter_->TestAttributes(scope, name, type, unit, attributes);
+            metric_filter_->TestAttributes(scope, name, type, unit, attributes);
         if (attributes_filter_result == MetricFilter::AttributesFilterResult::kAccept)
         {
           filtered_point_data_attrs.emplace_back(std::move(point_data_attr));
