@@ -93,11 +93,14 @@ startup --windows_enable_symlinks
 # common --incompatible_disable_target_default_provider_fields
 # common --incompatible_no_rule_outputs_param
 # common --incompatible_stop_exporting_language_modules
+# common --incompatible_check_visibility_for_toolchains
+# common --incompatible_disable_autoloads_in_main_repo
+# common --incompatible_stop_exporting_build_file_path
+# common --incompatible_autoload_externally
 
 common --experimental_disable_external_package
 common --experimental_platforms_api
 common --experimental_repository_cache_hardlinks 
-
 common --incompatible_auto_exec_groups
 common --incompatible_config_setting_private_default_visibility
 common --incompatible_disable_native_repo_rules 
@@ -111,7 +114,12 @@ common --incompatible_no_implicit_file_export
 common --incompatible_strict_action_env
 common --incompatible_top_level_aspects_require_providers
 common --incompatible_use_cc_configure_from_rules_cc
-
+common --incompatible_bazel_test_exec_run_under
+common --incompatible_check_testonly_for_output_files
+common --incompatible_python_disallow_native_rules
+common --incompatible_default_to_explicit_init_py
+common --incompatible_disable_non_executable_java_binary
+common --incompatible_dont_use_javasourceinfoprovider
 common --incompatible_modify_execution_info_additive
 common --modify_execution_info=CppCompile=+supports-path-mapping
 common --skip_incompatible_explicit_targets
@@ -149,6 +157,7 @@ build --host_copt="-DGRPC_NO_ABSL_SYNC"
 
 # disable all GRPC experiments
 # build --define=grpc_experiments_are_final=true
+
 
 ## This is what my ../top.bazelrc contains (not in the repo as local to my machine)
 # build --disk_cache=f:/b/d
