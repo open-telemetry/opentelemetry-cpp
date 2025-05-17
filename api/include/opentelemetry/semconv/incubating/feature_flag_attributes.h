@@ -25,9 +25,12 @@ namespace feature_flag
 static constexpr const char *kFeatureFlagContextId = "feature_flag.context.id";
 
 /**
- * A message explaining the nature of an error occurring during flag evaluation.
+ * Deprecated, use @code error.message @endcode instead.
+ *
+ * @deprecated
+ * {"note": "Replaced by @code error.message @endcode.", "reason": "uncategorized"}
  */
-static constexpr const char *kFeatureFlagEvaluationErrorMessage =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kFeatureFlagEvaluationErrorMessage =
     "feature_flag.evaluation.error.message";
 
 /**
@@ -47,7 +50,7 @@ static constexpr const char *kFeatureFlagKey = "feature_flag.key";
 /**
  * Identifies the feature flag provider.
  */
-static constexpr const char *kFeatureFlagProviderName = "feature_flag.provider_name";
+static constexpr const char *kFeatureFlagProviderName = "feature_flag.provider.name";
 
 /**
  * The reason code which shows how a feature flag value was determined.

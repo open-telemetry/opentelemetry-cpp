@@ -205,6 +205,11 @@ static constexpr const char *kGenAiTokenType = "gen_ai.token.type";
 static constexpr const char *kGenAiToolCallId = "gen_ai.tool.call.id";
 
 /**
+ * The tool description.
+ */
+static constexpr const char *kGenAiToolDescription = "gen_ai.tool.description";
+
+/**
  * Name of the tool utilized by the agent.
  */
 static constexpr const char *kGenAiToolName = "gen_ai.tool.name";
@@ -294,6 +299,12 @@ namespace GenAiOperationNameValues
 static constexpr const char *kChat = "chat";
 
 /**
+ * Multimodal content generation operation such as <a
+ * href="https://ai.google.dev/api/generate-content">Gemini Generate Content</a>
+ */
+static constexpr const char *kGenerateContent = "generate_content";
+
+/**
  * Text completions operation such as <a
  * href="https://platform.openai.com/docs/api-reference/completions">OpenAI Completions API
  * (Legacy)</a>
@@ -311,6 +322,11 @@ static constexpr const char *kEmbeddings = "embeddings";
  * Create GenAI agent
  */
 static constexpr const char *kCreateAgent = "create_agent";
+
+/**
+ * Invoke GenAI agent
+ */
+static constexpr const char *kInvokeAgent = "invoke_agent";
 
 /**
  * Execute a tool
@@ -349,6 +365,21 @@ namespace GenAiSystemValues
  * OpenAI
  */
 static constexpr const char *kOpenai = "openai";
+
+/**
+ * Any Google generative AI endpoint
+ */
+static constexpr const char *kGcpGenAi = "gcp.gen_ai";
+
+/**
+ * Vertex AI
+ */
+static constexpr const char *kGcpVertexAi = "gcp.vertex_ai";
+
+/**
+ * Gemini
+ */
+static constexpr const char *kGcpGemini = "gcp.gemini";
 
 /**
  * Vertex AI
