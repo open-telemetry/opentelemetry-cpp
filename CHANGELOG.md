@@ -58,6 +58,25 @@ Increment the:
 * [EXPORTER] ostream log exporter, fixed memory ownership issues
   [#3417](https://github.com/open-telemetry/opentelemetry-cpp/pull/3417)
 
+Important changes:
+
+* [EXPORTER] ostream log exporter, fixed memory ownership issues
+  [#3417](https://github.com/open-telemetry/opentelemetry-cpp/pull/3417)
+
+  * In the SDK, the following classes implementation has changed:
+
+    * opentelemetry::sdk::logs::ReadableLogRecord
+    * opentelemetry::sdk::logs::ReadWriteLogRecord
+
+  * An application implementing a custom log record exporter,
+    that reuses these classes from the opentelemetry-cpp SDK,
+    will need code adjustments, in particular for methods:
+
+    * GetBody()
+    * GetAttributes()
+
+  * Applications not using these SDK classes directly are not affected.
+
 ## [1.20 2025-04-01]
 
 * [BUILD] Update opentelemetry-proto version
