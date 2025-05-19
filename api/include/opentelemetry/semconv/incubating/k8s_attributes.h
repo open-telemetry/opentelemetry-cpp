@@ -67,6 +67,28 @@ static constexpr const char *kK8sContainerStatusLastTerminatedReason =
     "k8s.container.status.last_terminated_reason";
 
 /**
+ * The cronjob annotation placed on the CronJob, the @code <key> @endcode being the annotation name,
+ * the value being the annotation value. <p> Examples: <ul> <li>An annotation @code retries @endcode
+ * with value @code 4 @endcode SHOULD be recorded as the
+ * @code k8s.cronjob.annotation.retries @endcode attribute with value @code "4" @endcode.</li>
+ *   <li>An annotation @code data @endcode with empty string value SHOULD be recorded as
+ * the @code k8s.cronjob.annotation.data @endcode attribute with value @code "" @endcode.</li>
+ * </ul>
+ */
+static constexpr const char *kK8sCronjobAnnotation = "k8s.cronjob.annotation";
+
+/**
+ * The label placed on the CronJob, the @code <key> @endcode being the label name, the value being
+ * the label value. <p> Examples: <ul> <li>A label @code type @endcode with value @code weekly
+ * @endcode SHOULD be recorded as the
+ * @code k8s.cronjob.label.type @endcode attribute with value @code "weekly" @endcode.</li>
+ *   <li>A label @code automated @endcode with empty string value SHOULD be recorded as
+ * the @code k8s.cronjob.label.automated @endcode attribute with value @code "" @endcode.</li>
+ * </ul>
+ */
+static constexpr const char *kK8sCronjobLabel = "k8s.cronjob.label";
+
+/**
  * The name of the CronJob.
  */
 static constexpr const char *kK8sCronjobName = "k8s.cronjob.name";
@@ -77,6 +99,22 @@ static constexpr const char *kK8sCronjobName = "k8s.cronjob.name";
 static constexpr const char *kK8sCronjobUid = "k8s.cronjob.uid";
 
 /**
+ * The annotation key-value pairs placed on the DaemonSet.
+ * <p>
+ * The @code <key> @endcode being the annotation name, the value being the annotation value, even if
+ * the value is empty.
+ */
+static constexpr const char *kK8sDaemonsetAnnotation = "k8s.daemonset.annotation";
+
+/**
+ * The label key-value pairs placed on the DaemonSet.
+ * <p>
+ * The @code <key> @endcode being the label name, the value being the label value, even if the value
+ * is empty.
+ */
+static constexpr const char *kK8sDaemonsetLabel = "k8s.daemonset.label";
+
+/**
  * The name of the DaemonSet.
  */
 static constexpr const char *kK8sDaemonsetName = "k8s.daemonset.name";
@@ -85,6 +123,22 @@ static constexpr const char *kK8sDaemonsetName = "k8s.daemonset.name";
  * The UID of the DaemonSet.
  */
 static constexpr const char *kK8sDaemonsetUid = "k8s.daemonset.uid";
+
+/**
+ * The annotation key-value pairs placed on the Deployment.
+ * <p>
+ * The @code <key> @endcode being the annotation name, the value being the annotation value, even if
+ * the value is empty.
+ */
+static constexpr const char *kK8sDeploymentAnnotation = "k8s.deployment.annotation";
+
+/**
+ * The label key-value pairs placed on the Deployment.
+ * <p>
+ * The @code <key> @endcode being the label name, the value being the label value, even if the value
+ * is empty.
+ */
+static constexpr const char *kK8sDeploymentLabel = "k8s.deployment.label";
 
 /**
  * The name of the Deployment.
@@ -107,6 +161,22 @@ static constexpr const char *kK8sHpaName = "k8s.hpa.name";
 static constexpr const char *kK8sHpaUid = "k8s.hpa.uid";
 
 /**
+ * The annotation key-value pairs placed on the Job.
+ * <p>
+ * The @code <key> @endcode being the annotation name, the value being the annotation value, even if
+ * the value is empty.
+ */
+static constexpr const char *kK8sJobAnnotation = "k8s.job.annotation";
+
+/**
+ * The label key-value pairs placed on the Job.
+ * <p>
+ * The @code <key> @endcode being the label name, the value being the label value, even if the value
+ * is empty.
+ */
+static constexpr const char *kK8sJobLabel = "k8s.job.label";
+
+/**
  * The name of the Job.
  */
 static constexpr const char *kK8sJobName = "k8s.job.name";
@@ -115,6 +185,22 @@ static constexpr const char *kK8sJobName = "k8s.job.name";
  * The UID of the Job.
  */
 static constexpr const char *kK8sJobUid = "k8s.job.uid";
+
+/**
+ * The annotation key-value pairs placed on the Namespace.
+ * <p>
+ * The @code <key> @endcode being the annotation name, the value being the annotation value, even if
+ * the value is empty.
+ */
+static constexpr const char *kK8sNamespaceAnnotation = "k8s.namespace.annotation";
+
+/**
+ * The label key-value pairs placed on the Namespace.
+ * <p>
+ * The @code <key> @endcode being the label name, the value being the label value, even if the value
+ * is empty.
+ */
+static constexpr const char *kK8sNamespaceLabel = "k8s.namespace.label";
 
 /**
  * The name of the namespace that the pod is running in.
@@ -132,6 +218,28 @@ static constexpr const char *kK8sNamespaceName = "k8s.namespace.name";
 static constexpr const char *kK8sNamespacePhase = "k8s.namespace.phase";
 
 /**
+ * The annotation placed on the Node, the @code <key> @endcode being the annotation name, the value
+ * being the annotation value, even if the value is empty. <p> Examples: <ul> <li>An annotation
+ * @code node.alpha.kubernetes.io/ttl @endcode with value @code 0 @endcode SHOULD be recorded as the
+ * @code k8s.node.annotation.node.alpha.kubernetes.io/ttl @endcode attribute with value @code "0"
+ * @endcode.</li> <li>An annotation @code data @endcode with empty string value SHOULD be recorded
+ * as the @code k8s.node.annotation.data @endcode attribute with value @code "" @endcode.</li>
+ * </ul>
+ */
+static constexpr const char *kK8sNodeAnnotation = "k8s.node.annotation";
+
+/**
+ * The label placed on the Node, the @code <key> @endcode being the label name, the value being the
+ * label value, even if the value is empty. <p> Examples: <ul> <li>A label @code kubernetes.io/arch
+ * @endcode with value @code arm64 @endcode SHOULD be recorded as the @code
+ * k8s.node.label.kubernetes.io/arch @endcode attribute with value @code "arm64" @endcode.</li>
+ *   <li>A label @code data @endcode with empty string value SHOULD be recorded as
+ * the @code k8s.node.label.data @endcode attribute with value @code "" @endcode.</li>
+ * </ul>
+ */
+static constexpr const char *kK8sNodeLabel = "k8s.node.label";
+
+/**
  * The name of the Node.
  */
 static constexpr const char *kK8sNodeName = "k8s.node.name";
@@ -142,14 +250,28 @@ static constexpr const char *kK8sNodeName = "k8s.node.name";
 static constexpr const char *kK8sNodeUid = "k8s.node.uid";
 
 /**
- * The annotation key-value pairs placed on the Pod, the @code <key> @endcode being the annotation
- * name, the value being the annotation value.
+ * The annotation placed on the Pod, the @code <key> @endcode being the annotation name, the value
+ * being the annotation value. <p> Examples: <ul> <li>An annotation @code
+ * kubernetes.io/enforce-mountable-secrets @endcode with value @code true @endcode SHOULD be
+ * recorded as the @code k8s.pod.annotation.kubernetes.io/enforce-mountable-secrets @endcode
+ * attribute with value @code "true" @endcode.</li> <li>An annotation @code mycompany.io/arch
+ * @endcode with value @code x64 @endcode SHOULD be recorded as the @code
+ * k8s.pod.annotation.mycompany.io/arch @endcode attribute with value @code "x64" @endcode.</li>
+ *   <li>An annotation @code data @endcode with empty string value SHOULD be recorded as
+ * the @code k8s.pod.annotation.data @endcode attribute with value @code "" @endcode.</li>
+ * </ul>
  */
 static constexpr const char *kK8sPodAnnotation = "k8s.pod.annotation";
 
 /**
- * The label key-value pairs placed on the Pod, the @code <key> @endcode being the label name, the
- * value being the label value.
+ * The label placed on the Pod, the @code <key> @endcode being the label name, the value being the
+ * label value. <p> Examples: <ul> <li>A label @code app @endcode with value @code my-app @endcode
+ * SHOULD be recorded as the @code k8s.pod.label.app @endcode attribute with value @code "my-app"
+ * @endcode.</li> <li>A label @code mycompany.io/arch @endcode with value @code x64 @endcode SHOULD
+ * be recorded as the @code k8s.pod.label.mycompany.io/arch @endcode attribute with value @code
+ * "x64" @endcode.</li> <li>A label @code data @endcode with empty string value SHOULD be recorded
+ * as the @code k8s.pod.label.data @endcode attribute with value @code "" @endcode.</li>
+ * </ul>
  */
 static constexpr const char *kK8sPodLabel = "k8s.pod.label";
 
@@ -170,6 +292,22 @@ static constexpr const char *kK8sPodName = "k8s.pod.name";
  * The UID of the Pod.
  */
 static constexpr const char *kK8sPodUid = "k8s.pod.uid";
+
+/**
+ * The annotation key-value pairs placed on the ReplicaSet.
+ * <p>
+ * The @code <key> @endcode being the annotation name, the value being the annotation value, even if
+ * the value is empty.
+ */
+static constexpr const char *kK8sReplicasetAnnotation = "k8s.replicaset.annotation";
+
+/**
+ * The label key-value pairs placed on the ReplicaSet.
+ * <p>
+ * The @code <key> @endcode being the label name, the value being the label value, even if the value
+ * is empty.
+ */
+static constexpr const char *kK8sReplicasetLabel = "k8s.replicaset.label";
 
 /**
  * The name of the ReplicaSet.
@@ -200,6 +338,22 @@ static constexpr const char *kK8sResourcequotaName = "k8s.resourcequota.name";
  * The UID of the resource quota.
  */
 static constexpr const char *kK8sResourcequotaUid = "k8s.resourcequota.uid";
+
+/**
+ * The annotation key-value pairs placed on the StatefulSet.
+ * <p>
+ * The @code <key> @endcode being the annotation name, the value being the annotation value, even if
+ * the value is empty.
+ */
+static constexpr const char *kK8sStatefulsetAnnotation = "k8s.statefulset.annotation";
+
+/**
+ * The label key-value pairs placed on the StatefulSet.
+ * <p>
+ * The @code <key> @endcode being the label name, the value being the label value, even if the value
+ * is empty.
+ */
+static constexpr const char *kK8sStatefulsetLabel = "k8s.statefulset.label";
 
 /**
  * The name of the StatefulSet.

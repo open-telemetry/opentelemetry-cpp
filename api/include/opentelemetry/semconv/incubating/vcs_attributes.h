@@ -251,9 +251,14 @@ static constexpr const char *kGithub = "github";
 static constexpr const char *kGitlab = "gitlab";
 
 /**
- * <a href="https://gitea.io">Gitea</a>
+ * Deprecated, use @code gitea @endcode instead.
  */
 static constexpr const char *kGittea = "gittea";
+
+/**
+ * <a href="https://gitea.io">Gitea</a>
+ */
+static constexpr const char *kGitea = "gitea";
 
 /**
  * <a href="https://bitbucket.org">Bitbucket</a>

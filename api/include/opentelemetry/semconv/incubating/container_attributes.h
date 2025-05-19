@@ -108,6 +108,10 @@ static constexpr const char *kContainerImageTags = "container.image.tags";
 
 /**
  * Container labels, @code <key> @endcode being the label name, the value being the label value.
+ * <p>
+ * For example, a docker container label @code app @endcode with value @code nginx @endcode SHOULD
+ * be recorded as the @code container.label.app @endcode attribute with value @code "nginx"
+ * @endcode.
  */
 static constexpr const char *kContainerLabel = "container.label";
 

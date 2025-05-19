@@ -47,6 +47,29 @@ namespace app
  */
 static constexpr const char *kAppInstallationId = "app.installation.id";
 
+/**
+ * The x (horizontal) coordinate of a screen coordinate, in screen pixels.
+ */
+static constexpr const char *kAppScreenCoordinateX = "app.screen.coordinate.x";
+
+/**
+ * The y (vertical) component of a screen coordinate, in screen pixels.
+ */
+static constexpr const char *kAppScreenCoordinateY = "app.screen.coordinate.y";
+
+/**
+ * An identifier that uniquely differentiates this widget from other widgets in the same
+ * application. <p> A widget is an application component, typically an on-screen visual GUI element.
+ */
+static constexpr const char *kAppWidgetId = "app.widget.id";
+
+/**
+ * The name of an application widget.
+ * <p>
+ * A widget is an application component, typically an on-screen visual GUI element.
+ */
+static constexpr const char *kAppWidgetName = "app.widget.name";
+
 }  // namespace app
 }  // namespace semconv
 OPENTELEMETRY_END_NAMESPACE

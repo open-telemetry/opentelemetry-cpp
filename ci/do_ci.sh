@@ -514,6 +514,45 @@ elif [[ "$1" == "cmake.install.test" ]]; then
          -S "${SRC_DIR}/install/test/cmake"
   ctest --output-on-failure
   exit 0
+elif [[ "$1" == "cmake.fetch_content.test" ]]; then
+  if [[ -n "${BUILD_SHARED_LIBS}" && "${BUILD_SHARED_LIBS}" == "ON" ]]; then
+    CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=ON")
+    echo "BUILD_SHARED_LIBS is set to: ON"
+  else
+    CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=OFF")
+    echo "BUILD_SHARED_LIBS is set to: OFF"
+  fi
+  CMAKE_OPTIONS+=("-DCMAKE_POSITION_INDEPENDENT_CODE=ON")
+
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
+        -DWITH_ABI_VERSION_1=OFF \
+        -DWITH_ABI_VERSION_2=ON \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
+        -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
+        -DWITH_OTLP_GRPC=OFF \
+        -DWITH_OTLP_HTTP=OFF \
+        -DWITH_OTLP_FILE=OFF \
+        -DWITH_OTLP_HTTP_COMPRESSION=OFF \
+        -DWITH_HTTP_CLIENT_CURL=OFF \
+        -DWITH_PROMETHEUS=OFF \
+        -DWITH_ZIPKIN=OFF \
+        -DWITH_ELASTICSEARCH=OFF \
+        -DWITH_EXAMPLES=OFF \
+        -DWITH_EXAMPLES_HTTP=OFF \
+        -DBUILD_W3CTRACECONTEXT_TEST=OFF \
+        -DOPENTELEMETRY_INSTALL=OFF \
+        -DOPENTELEMETRY_CPP_SRC_DIR="${SRC_DIR}" \
+        "${SRC_DIR}/install/test/cmake/fetch_content_test"
+  make -j $(nproc)
+  make test
+  exit 0
+
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
   cd "${BUILD_DIR}"

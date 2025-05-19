@@ -122,7 +122,8 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kDbClientConnectionsState 
  * without attempting to do any case normalization.
  * <p>
  * The collection name SHOULD NOT be extracted from @code db.query.text @endcode,
- * when the database system supports cross-table queries in non-batch operations.
+ * when the database system supports query text with multiple collections
+ * in non-batch operations.
  * <p>
  * For batch operations, if the individual operations are known to have the same
  * collection name then that collection name SHOULD be used.
@@ -308,10 +309,9 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kDbName = "db.name";
 /**
  * The name of the database, fully qualified within the server address and port.
  * <p>
- * If a database system has multiple namespace components, they SHOULD be concatenated (potentially
- * using database system specific conventions) from most general to most specific namespace
- * component, and more specific namespaces SHOULD NOT be captured without the more general
- * namespaces, to ensure that "startswith" queries for the more general namespaces will be valid.
+ * If a database system has multiple namespace components, they SHOULD be concatenated from the most
+ * general to the most specific namespace component, using @code | @endcode as a separator between
+ * the components. Any missing components (and their associated separators) SHOULD be omitted.
  * Semantic conventions for individual database systems SHOULD document what @code db.namespace
  * @endcode means in the context of that system. It is RECOMMENDED to capture the value as provided
  * by the application without attempting to do any case normalization.
@@ -341,7 +341,8 @@ static constexpr const char *kDbOperationBatchSize = "db.operation.batch.size";
  * without attempting to do any case normalization.
  * <p>
  * The operation name SHOULD NOT be extracted from @code db.query.text @endcode,
- * when the database system supports cross-table queries in non-batch operations.
+ * when the database system supports query text with multiple operations
+ * in non-batch operations.
  * <p>
  * If spaces can occur in the operation name, multiple consecutive spaces
  * SHOULD be normalized to a single space.
@@ -355,33 +356,47 @@ static constexpr const char *kDbOperationName = "db.operation.name";
 
 /**
  * A database operation parameter, with @code <key> @endcode being the parameter name, and the
- * attribute value being a string representation of the parameter value. <p> If a parameter has no
- * name and instead is referenced only by index, then @code <key> @endcode SHOULD be the 0-based
- * index. If @code db.query.text @endcode is also captured, then @code db.operation.parameter.<key>
- * @endcode SHOULD match up with the parameterized placeholders present in @code db.query.text
- * @endcode.
- * @code db.operation.parameter.<key> @endcode SHOULD NOT be captured on batch operations.
+ * attribute value being a string representation of the parameter value. <p> For example, a
+ * client-side maximum number of rows to read from the database MAY be recorded as the @code
+ * db.operation.parameter.max_rows @endcode attribute. <p>
+ * @code db.query.text @endcode parameters SHOULD be captured using @code db.query.parameter.<key>
+ * @endcode instead of @code db.operation.parameter.<key> @endcode.
  */
 static constexpr const char *kDbOperationParameter = "db.operation.parameter";
 
 /**
- * A query parameter used in @code db.query.text @endcode, with @code <key> @endcode being the
- * parameter name, and the attribute value being a string representation of the parameter value.
- *
- * @deprecated
- * {"note": "Replaced by @code db.operation.parameter @endcode.", "reason": "uncategorized"}
+ * A database query parameter, with @code <key> @endcode being the parameter name, and the attribute
+ * value being a string representation of the parameter value. <p> If a query parameter has no name
+ * and instead is referenced only by index, then @code <key> @endcode SHOULD be the 0-based index.
+ * <p>
+ * @code db.query.parameter.<key> @endcode SHOULD match
+ * up with the parameterized placeholders present in @code db.query.text @endcode.
+ * <p>
+ * @code db.query.parameter.<key> @endcode SHOULD NOT be captured on batch operations.
+ * <p>
+ * Examples:
+ * <ul>
+ *   <li>For a query @code SELECT * FROM users where username =  %s @endcode with the parameter
+ * @code "jdoe" @endcode, the attribute @code db.query.parameter.0 @endcode SHOULD be set to @code
+ * "jdoe" @endcode.</li> <li>For a query @code "SELECT * FROM users WHERE username = %(username)s;
+ * @endcode with parameter
+ * @code username = "jdoe" @endcode, the attribute @code db.query.parameter.username @endcode SHOULD
+ * be set to @code "jdoe" @endcode.</li>
+ * </ul>
  */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kDbQueryParameter = "db.query.parameter";
+static constexpr const char *kDbQueryParameter = "db.query.parameter";
 
 /**
- * Low cardinality representation of a database query text.
+ * Low cardinality summary of a database query.
  * <p>
- * @code db.query.summary @endcode provides static summary of the query text. It describes a class
- * of database queries and is useful as a grouping key, especially when analyzing telemetry for
- * database calls involving complex queries. Summary may be available to the instrumentation through
- * instrumentation hooks or other means. If it is not available, instrumentations that support query
- * parsing SHOULD generate a summary following <a
- * href="../database/database-spans.md#generating-a-summary-of-the-query-text">Generating query
+ * The query summary describes a class of database queries and is useful
+ * as a grouping key, especially when analyzing telemetry for database
+ * calls involving complex queries.
+ * <p>
+ * Summary may be available to the instrumentation through
+ * instrumentation hooks or other means. If it is not available, instrumentations
+ * that support query parsing SHOULD generate a summary following
+ * <a href="/docs/database/database-spans.md#generating-a-summary-of-the-query">Generating query
  * summary</a> section.
  */
 static constexpr const char *kDbQuerySummary = "db.query.summary";
@@ -390,14 +405,15 @@ static constexpr const char *kDbQuerySummary = "db.query.summary";
  * The database query being executed.
  * <p>
  * For sanitization see <a
- * href="../database/database-spans.md#sanitization-of-dbquerytext">Sanitization of @code
+ * href="/docs/database/database-spans.md#sanitization-of-dbquerytext">Sanitization of @code
  * db.query.text @endcode</a>. For batch operations, if the individual operations are known to have
  * the same query text then that query text SHOULD be used, otherwise all of the individual query
  * texts SHOULD be concatenated with separator @code ;  @endcode or some other database system
- * specific separator if more applicable. Even though parameterized query text can potentially have
- * sensitive data, by using a parameterized query the user is giving a strong signal that any
- * sensitive data will be passed as parameter values, and the benefit to observability of capturing
- * the static part of the query text by default outweighs the risk.
+ * specific separator if more applicable. Parameterized query text SHOULD NOT be sanitized. Even
+ * though parameterized query text can potentially have sensitive data, by using a parameterized
+ * query the user is giving a strong signal that any sensitive data will be passed as parameter
+ * values, and the benefit to observability of capturing the static part of the query text by
+ * default outweighs the risk.
  */
 static constexpr const char *kDbQueryText = "db.query.text";
 
@@ -846,7 +862,7 @@ static constexpr const char *kInstantdb = "instantdb";
 static constexpr const char *kInterbase = "interbase";
 
 /**
- * MariaDB (This value has stability level RELEASE CANDIDATE)
+ * MariaDB
  */
 static constexpr const char *kMariadb = "mariadb";
 
@@ -866,7 +882,7 @@ static constexpr const char *kMemcached = "memcached";
 static constexpr const char *kMongodb = "mongodb";
 
 /**
- * Microsoft SQL Server (This value has stability level RELEASE CANDIDATE)
+ * Microsoft SQL Server
  */
 static constexpr const char *kMssql = "mssql";
 
@@ -876,7 +892,7 @@ static constexpr const char *kMssql = "mssql";
 static constexpr const char *kMssqlcompact = "mssqlcompact";
 
 /**
- * MySQL (This value has stability level RELEASE CANDIDATE)
+ * MySQL
  */
 static constexpr const char *kMysql = "mysql";
 
@@ -911,7 +927,7 @@ static constexpr const char *kPervasive = "pervasive";
 static constexpr const char *kPointbase = "pointbase";
 
 /**
- * PostgreSQL (This value has stability level RELEASE CANDIDATE)
+ * PostgreSQL
  */
 static constexpr const char *kPostgresql = "postgresql";
 

@@ -151,21 +151,55 @@ If building and installing Protobuf and gRPC manually with cmake the
    $
    ```
 
-### Incorporating into an existing CMake Project
+### Incorporating into an external CMake Project
 
-To use the library from a CMake project, you can locate it directly with
- `find_package` and use the imported targets from generated package
- configurations. As of now, this will import targets for both API and SDK. In
- future, there may be separate packages for API and SDK which can be installed
- and imported separately according to need.
+There are two approaches to incoporate `opentelemetry-cpp` into
+ an external CMake project:
 
-```cmake
-# CMakeLists.txt
-find_package(opentelemetry-cpp CONFIG REQUIRED)
-...
-target_include_directories(foo PRIVATE ${OPENTELEMETRY_CPP_INCLUDE_DIRS})
-target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
-```
+1. Build and install `opentelemetry-cpp` then use `find_package`
+ to import its targets
+
+   ```cmake
+   # Find all installed components and link all imported targets
+   find_package(opentelemetry-cpp CONFIG REQUIRED)
+   ...
+   target_include_directories(foo PRIVATE ${OPENTELEMETRY_CPP_INCLUDE_DIRS})
+   target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
+   ```
+
+   ```cmake
+   # Find a specific component and link its imported target(s)
+   find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS api)
+   ...
+   target_link_libraries(foo PRIVATE opentelemetry-cpp::api)
+   ```
+
+2. Use CMake's [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html)
+ module to fetch and build `opentelemetry-cpp` then make its targets available
+
+   ```cmake
+   # Fetch from an existing clone and build
+   include(FetchContent)
+   FetchContent_Declare(opentelemetry-cpp SOURCE_DIR "<path/to/opentelemetry-cpp>")
+   FetchContent_MakeAvailable(opentelemetry-cpp)
+   ...
+   target_link_libraries(foo PRIVATE opentelemetry-cpp::api)
+   ```
+
+   ```cmake
+   # Clone and build opentelemetry-cpp from a git tag
+   include(FetchContent)
+   FetchContent_Declare(
+   opentelemetry-cpp
+   GIT_REPOSITORY https://github.com/open-telemetry/opentelemetry-cpp.git
+   GIT_TAG        v1.20.0)
+   FetchContent_MakeAvailable(opentelemetry-cpp)
+   ...
+   target_link_libraries(foo PRIVATE opentelemetry-cpp::api)
+   ```
+
+In both cases the project's built or imported CMake targets will be
+ available in the `opentelemetry-cpp` namespace (ie: `opentelemetry-cpp::api`)
 
 #### Using opentelemetry-cpp package components
 
@@ -187,12 +221,16 @@ target_link_libraries(foo_lib PRIVATE opentelemetry-cpp::api)
 # foo_app/CMakeLists.txt
 find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS api sdk exporters_otlp_grpc)
 add_executable(foo_app main.cpp)
-target_link_libraries(foo_app PRIVATE foo_lib opentelemetry-cpp::api opentelemetry-cpp::sdk opentelemetry-cpp::otlp_grpc_exporter )
+target_link_libraries(foo_app PRIVATE foo_lib opentelemetry-cpp::api opentelemetry-cpp::trace opentelemetry-cpp::otlp_grpc_exporter )
 ```
 
 The following table provides the mapping between components and targets. Components
 and targets available in the installation depends on the opentelemetry-cpp package
 build configuration.
+
+> **Note:** components `exporters_elasticsearch` and `exporters_etw`
+ may be moved out of the core package and to `opentelemetry-cpp-contrib`
+  in a future release
 
 | Component                  | Targets                                                                                          |
 |----------------------------|--------------------------------------------------------------------------------------------------|

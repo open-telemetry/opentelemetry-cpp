@@ -56,7 +56,7 @@ if(WITH_OTLP_GRPC)
            "$<INSTALL_INTERFACE:include>")
 
   list(APPEND OPENTELEMETRY_OTLP_GRPC_TARGETS
-       opentelemetry_exporter_otlp_grpc_client)
+       opentelemetry_exporter_otlp_grpc_client opentelemetry_proto_grpc)
 
   add_library(
     opentelemetry_exporter_otlp_grpc
@@ -270,75 +270,72 @@ target_link_libraries(
   opentelemetry_otlp_recordable
   PUBLIC opentelemetry_trace opentelemetry_resources opentelemetry_proto)
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_otlp_recordable
-    EXPORT "${PROJECT_NAME}-exporters_otlp_common-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT exporters_otlp_common)
+otel_add_component(
+  COMPONENT
+  exporters_otlp_common
+  TARGETS
+  opentelemetry_otlp_recordable
+  opentelemetry_proto
+  FILES_DIRECTORY
+  "include/opentelemetry/exporters/otlp"
+  FILES_DESTINATION
+  "include/opentelemetry/exporters"
+  FILES_MATCHING
+  PATTERN
+  "*.h"
+  PATTERN
+  "otlp_http*.h"
+  EXCLUDE
+  PATTERN
+  "otlp_grpc*.h"
+  EXCLUDE
+  PATTERN
+  "otlp_file*.h"
+  EXCLUDE)
 
-  install(
-    DIRECTORY include/opentelemetry/exporters/otlp
-    DESTINATION include/opentelemetry/exporters
-    COMPONENT exporters_otlp_common
+if(WITH_OTLP_GRPC)
+  otel_add_component(
+    COMPONENT
+    exporters_otlp_grpc
+    TARGETS
+    ${OPENTELEMETRY_OTLP_GRPC_TARGETS}
+    FILES_DIRECTORY
+    "include/opentelemetry/exporters/otlp"
+    FILES_DESTINATION
+    "include/opentelemetry/exporters"
     FILES_MATCHING
-    PATTERN "*.h")
+    PATTERN
+    "otlp_grpc*.h")
+endif()
 
-  install(
-    EXPORT "${PROJECT_NAME}-exporters_otlp_common-target"
-    FILE "${PROJECT_NAME}-exporters_otlp_common-target.cmake"
-    NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-    COMPONENT exporters_otlp_common)
+if(WITH_OTLP_HTTP)
+  otel_add_component(
+    COMPONENT
+    exporters_otlp_http
+    TARGETS
+    ${OPENTELEMETRY_OTLP_HTTP_TARGETS}
+    FILES_DIRECTORY
+    "include/opentelemetry/exporters/otlp"
+    FILES_DESTINATION
+    "include/opentelemetry/exporters"
+    FILES_MATCHING
+    PATTERN
+    "otlp_http*.h")
+endif()
 
-  if(WITH_OTLP_GRPC)
-    install(
-      TARGETS ${OPENTELEMETRY_OTLP_GRPC_TARGETS}
-      EXPORT "${PROJECT_NAME}-exporters_otlp_grpc-target"
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT exporters_otlp_grpc)
-
-    install(
-      EXPORT "${PROJECT_NAME}-exporters_otlp_grpc-target"
-      FILE "${PROJECT_NAME}-exporters_otlp_grpc-target.cmake"
-      NAMESPACE "${PROJECT_NAME}::"
-      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-      COMPONENT exporters_otlp_grpc)
-  endif()
-
-  if(WITH_OTLP_FILE)
-    install(
-      TARGETS ${OPENTELEMETRY_OTLP_FILE_TARGETS}
-      EXPORT "${PROJECT_NAME}-exporters_otlp_file-target"
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT exporters_otlp_file)
-
-    install(
-      EXPORT "${PROJECT_NAME}-exporters_otlp_file-target"
-      FILE "${PROJECT_NAME}-exporters_otlp_file-target.cmake"
-      NAMESPACE "${PROJECT_NAME}::"
-      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-      COMPONENT exporters_otlp_file)
-  endif()
-
-  if(WITH_OTLP_HTTP)
-    install(
-      TARGETS ${OPENTELEMETRY_OTLP_HTTP_TARGETS}
-      EXPORT "${PROJECT_NAME}-exporters_otlp_http-target"
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT exporters_otlp_http)
-
-    install(
-      EXPORT "${PROJECT_NAME}-exporters_otlp_http-target"
-      FILE "${PROJECT_NAME}-exporters_otlp_http-target.cmake"
-      NAMESPACE "${PROJECT_NAME}::"
-      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-      COMPONENT exporters_otlp_http)
-  endif()
+if(WITH_OTLP_FILE)
+  otel_add_component(
+    COMPONENT
+    exporters_otlp_file
+    TARGETS
+    ${OPENTELEMETRY_OTLP_FILE_TARGETS}
+    FILES_DIRECTORY
+    "include/opentelemetry/exporters/otlp"
+    FILES_DESTINATION
+    "include/opentelemetry/exporters"
+    FILES_MATCHING
+    PATTERN
+    "otlp_file*.h")
 endif()
 
 if(BUILD_TESTING)
