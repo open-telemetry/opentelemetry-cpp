@@ -28,11 +28,8 @@ patch_protobuf_targets(example_grpc_proto)
 # Disable include-what-you-use on generated code.
 set_target_properties(example_grpc_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "")
 
-include_directories(
-  ${CMAKE_SOURCE_DIR}/exporters/ostream/include ${CMAKE_SOURCE_DIR}/ext/include
-  ${CMAKE_SOURCE_DIR}/api/include/ ${CMAKE_SOURCE_DIR/})
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(
+  example_grpc_proto PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>")
 
 if(TARGET protobuf::libprotobuf)
   target_link_libraries(example_grpc_proto PUBLIC gRPC::grpc++
@@ -45,7 +42,8 @@ endif()
 
 foreach(_target client server)
   add_executable(${_target} "${_target}.cc")
-  target_link_libraries(${_target} example_grpc_proto opentelemetry_trace
-                        opentelemetry_exporter_ostream_span)
+  target_link_libraries(
+    ${_target} PRIVATE example_grpc_proto
+                       opentelemetry-cpp::ostream_span_exporter)
   patch_protobuf_targets(${_target})
 endforeach()

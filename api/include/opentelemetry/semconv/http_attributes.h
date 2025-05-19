@@ -23,12 +23,18 @@ namespace http
  * HTTP request headers, @code <key> @endcode being the normalized HTTP Header name (lowercase), the
  * value being the header values. <p> Instrumentations SHOULD require an explicit configuration of
  * which headers are to be captured. Including all request headers can be a security risk - explicit
- * configuration helps avoid leaking sensitive information. The @code User-Agent @endcode header is
- * already captured in the @code user_agent.original @endcode attribute. Users MAY explicitly
- * configure instrumentations to capture them even though it is not recommended. The attribute value
- * MUST consist of either multiple header values as an array of strings or a single-item array
+ * configuration helps avoid leaking sensitive information. <p> The @code User-Agent @endcode header
+ * is already captured in the @code user_agent.original @endcode attribute. Users MAY explicitly
+ * configure instrumentations to capture them even though it is not recommended. <p> The attribute
+ * value MUST consist of either multiple header values as an array of strings or a single-item array
  * containing a possibly comma-concatenated string, depending on the way the HTTP library provides
- * access to headers.
+ * access to headers. <p> Examples: <ul> <li>A header @code Content-Type: application/json @endcode
+ * SHOULD be recorded as the @code http.request.header.content-type @endcode attribute with value
+ * @code ["application/json"] @endcode.</li> <li>A header @code X-Forwarded-For: 1.2.3.4, 1.2.3.5
+ * @endcode SHOULD be recorded as the @code http.request.header.x-forwarded-for @endcode attribute
+ * with value @code ["1.2.3.4", "1.2.3.5"] @endcode or @code ["1.2.3.4, 1.2.3.5"] @endcode depending
+ * on the HTTP library.</li>
+ * </ul>
  */
 static constexpr const char *kHttpRequestHeader = "http.request.header";
 
@@ -72,11 +78,17 @@ static constexpr const char *kHttpRequestResendCount = "http.request.resend_coun
  * HTTP response headers, @code <key> @endcode being the normalized HTTP Header name (lowercase),
  * the value being the header values. <p> Instrumentations SHOULD require an explicit configuration
  * of which headers are to be captured. Including all response headers can be a security risk -
- * explicit configuration helps avoid leaking sensitive information. Users MAY explicitly configure
- * instrumentations to capture them even though it is not recommended. The attribute value MUST
- * consist of either multiple header values as an array of strings or a single-item array containing
- * a possibly comma-concatenated string, depending on the way the HTTP library provides access to
- * headers.
+ * explicit configuration helps avoid leaking sensitive information. <p> Users MAY explicitly
+ * configure instrumentations to capture them even though it is not recommended. <p> The attribute
+ * value MUST consist of either multiple header values as an array of strings or a single-item array
+ * containing a possibly comma-concatenated string, depending on the way the HTTP library provides
+ * access to headers. <p> Examples: <ul> <li>A header @code Content-Type: application/json @endcode
+ * header SHOULD be recorded as the @code http.request.response.content-type @endcode attribute with
+ * value @code ["application/json"] @endcode.</li> <li>A header @code My-custom-header: abc, def
+ * @endcode header SHOULD be recorded as the @code http.response.header.my-custom-header @endcode
+ * attribute with value @code ["abc", "def"] @endcode or @code ["abc, def"] @endcode depending on
+ * the HTTP library.</li>
+ * </ul>
  */
 static constexpr const char *kHttpResponseHeader = "http.response.header";
 

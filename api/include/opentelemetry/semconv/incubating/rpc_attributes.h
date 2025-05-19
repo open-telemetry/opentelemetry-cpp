@@ -29,7 +29,10 @@ static constexpr const char *kRpcConnectRpcErrorCode = "rpc.connect_rpc.error_co
  * Connect request metadata, @code <key> @endcode being the normalized Connect Metadata key
  * (lowercase), the value being the metadata values. <p> Instrumentations SHOULD require an explicit
  * configuration of which metadata values are to be captured. Including all request metadata values
- * can be a security risk - explicit configuration helps avoid leaking sensitive information.
+ * can be a security risk - explicit configuration helps avoid leaking sensitive information. <p>
+ * For example, a property @code my-custom-key @endcode with value @code ["1.2.3.4", "1.2.3.5"]
+ * @endcode SHOULD be recorded as the @code rpc.connect_rpc.request.metadata.my-custom-key @endcode
+ * attribute with value @code ["1.2.3.4", "1.2.3.5"] @endcode
  */
 static constexpr const char *kRpcConnectRpcRequestMetadata = "rpc.connect_rpc.request.metadata";
 
@@ -37,7 +40,10 @@ static constexpr const char *kRpcConnectRpcRequestMetadata = "rpc.connect_rpc.re
  * Connect response metadata, @code <key> @endcode being the normalized Connect Metadata key
  * (lowercase), the value being the metadata values. <p> Instrumentations SHOULD require an explicit
  * configuration of which metadata values are to be captured. Including all response metadata values
- * can be a security risk - explicit configuration helps avoid leaking sensitive information.
+ * can be a security risk - explicit configuration helps avoid leaking sensitive information. <p>
+ * For example, a property @code my-custom-key @endcode with value @code "attribute_value" @endcode
+ * SHOULD be recorded as the @code rpc.connect_rpc.response.metadata.my-custom-key @endcode
+ * attribute with value @code ["attribute_value"] @endcode
  */
 static constexpr const char *kRpcConnectRpcResponseMetadata = "rpc.connect_rpc.response.metadata";
 
@@ -45,7 +51,11 @@ static constexpr const char *kRpcConnectRpcResponseMetadata = "rpc.connect_rpc.r
  * gRPC request metadata, @code <key> @endcode being the normalized gRPC Metadata key (lowercase),
  * the value being the metadata values. <p> Instrumentations SHOULD require an explicit
  * configuration of which metadata values are to be captured. Including all request metadata values
- * can be a security risk - explicit configuration helps avoid leaking sensitive information.
+ * can be a security risk - explicit configuration helps avoid leaking sensitive information. <p>
+ * For example, a property @code my-custom-key @endcode with value @code ["1.2.3.4", "1.2.3.5"]
+ * @endcode SHOULD be recorded as
+ * @code rpc.grpc.request.metadata.my-custom-key @endcode attribute with value @code ["1.2.3.4",
+ * "1.2.3.5"] @endcode
  */
 static constexpr const char *kRpcGrpcRequestMetadata = "rpc.grpc.request.metadata";
 
@@ -53,7 +63,10 @@ static constexpr const char *kRpcGrpcRequestMetadata = "rpc.grpc.request.metadat
  * gRPC response metadata, @code <key> @endcode being the normalized gRPC Metadata key (lowercase),
  * the value being the metadata values. <p> Instrumentations SHOULD require an explicit
  * configuration of which metadata values are to be captured. Including all response metadata values
- * can be a security risk - explicit configuration helps avoid leaking sensitive information.
+ * can be a security risk - explicit configuration helps avoid leaking sensitive information. <p>
+ * For example, a property @code my-custom-key @endcode with value @code ["attribute_value"]
+ * @endcode SHOULD be recorded as the @code rpc.grpc.response.metadata.my-custom-key @endcode
+ * attribute with value @code ["attribute_value"] @endcode
  */
 static constexpr const char *kRpcGrpcResponseMetadata = "rpc.grpc.response.metadata";
 

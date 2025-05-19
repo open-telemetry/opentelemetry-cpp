@@ -221,12 +221,16 @@ target_link_libraries(foo_lib PRIVATE opentelemetry-cpp::api)
 # foo_app/CMakeLists.txt
 find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS api sdk exporters_otlp_grpc)
 add_executable(foo_app main.cpp)
-target_link_libraries(foo_app PRIVATE foo_lib opentelemetry-cpp::api opentelemetry-cpp::sdk opentelemetry-cpp::otlp_grpc_exporter )
+target_link_libraries(foo_app PRIVATE foo_lib opentelemetry-cpp::api opentelemetry-cpp::trace opentelemetry-cpp::otlp_grpc_exporter )
 ```
 
 The following table provides the mapping between components and targets. Components
 and targets available in the installation depends on the opentelemetry-cpp package
 build configuration.
+
+> **Note:** components `exporters_elasticsearch` and `exporters_etw`
+ may be moved out of the core package and to `opentelemetry-cpp-contrib`
+  in a future release
 
 | Component                  | Targets                                                                                          |
 |----------------------------|--------------------------------------------------------------------------------------------------|
