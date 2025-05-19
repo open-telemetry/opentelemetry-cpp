@@ -16,6 +16,7 @@
 #include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/circular_buffer.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 
 using namespace opentelemetry::sdk::metrics;
 namespace nostd = opentelemetry::nostd;
