@@ -1,8 +1,6 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-include_directories(${CMAKE_SOURCE_DIR}/exporters/ostream/include)
-
 add_executable(w3c_tracecontext_http_test_server main.cc)
 target_link_libraries(
   w3c_tracecontext_http_test_server
