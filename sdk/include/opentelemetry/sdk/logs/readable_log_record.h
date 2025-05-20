@@ -75,7 +75,7 @@ public:
    * Get body field of this log.
    * @return the body field for this log.
    */
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   virtual const common::OwnedAttributeValue &
 #else
   virtual const opentelemetry::common::AttributeValue &
@@ -116,7 +116,7 @@ public:
    * Get attributes of this log.
    * @return the body field of this log
    */
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   virtual const std::unordered_map<std::string, common::OwnedAttributeValue> &
 #else
   virtual const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &

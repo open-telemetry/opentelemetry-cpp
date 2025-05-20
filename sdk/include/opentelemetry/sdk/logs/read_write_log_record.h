@@ -82,7 +82,7 @@ public:
    * Get body field of this log.
    * @return the body field for this log.
    */
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   const common::OwnedAttributeValue &
 #else
   const opentelemetry::common::AttributeValue &
@@ -156,7 +156,7 @@ public:
    * Get attributes of this log.
    * @return the body field of this log
    */
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   const std::unordered_map<std::string, common::OwnedAttributeValue> &
 #else
   const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &
@@ -196,7 +196,7 @@ private:
   const opentelemetry::sdk::resource::Resource *resource_;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_;
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   common::AttributeMap attributes_map_;
   // We resue the same utility functions of MixedAttributeMap with key="" for the body field
   common::OwnedAttributeValue body_;

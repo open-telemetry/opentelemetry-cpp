@@ -36,7 +36,7 @@ LogRecordData::LogRecordData()
       event_name_("")
 {
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   body_ = std::string();
 #else
   body_.SetAttribute("", nostd::string_view());
@@ -77,21 +77,21 @@ opentelemetry::logs::Severity LogRecordData::GetSeverity() const noexcept
 
 void LogRecordData::SetBody(const opentelemetry::common::AttributeValue &message) noexcept
 {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   body_ = nostd::visit(attribute_converter_, message);
 #else
   body_.SetAttribute("", message);
 #endif
 }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
 const common::OwnedAttributeValue &
 #else
 const opentelemetry::common::AttributeValue &
 #endif
 LogRecordData::GetBody() const noexcept
 {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   return body_;
 #else
   return body_.GetAttributes().begin()->second;
@@ -183,7 +183,7 @@ void LogRecordData::SetAttribute(nostd::string_view key,
   attributes_map_.SetAttribute(key, value);
 }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
 const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
 #else
 const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &

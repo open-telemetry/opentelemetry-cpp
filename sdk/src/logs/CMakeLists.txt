@@ -31,6 +31,11 @@ target_link_libraries(opentelemetry_logs PUBLIC opentelemetry_resources
                                                 opentelemetry_common)
 set_target_version(opentelemetry_logs)
 
+if(NOT WITH_NO_DEPRECATED_CODE AND WITH_DEPRECATED_SDK_LOG_RECORD)
+  target_compile_definitions(opentelemetry_logs
+                             PUBLIC OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
+endif()
+
 target_include_directories(
   opentelemetry_logs
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")

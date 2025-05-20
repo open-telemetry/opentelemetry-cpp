@@ -63,13 +63,15 @@ Important changes:
 * [SDK] Fix lifetime for sdk::ReadWriteLogRecord
   [#3147](https://github.com/open-telemetry/opentelemetry-cpp/pull/3245)
 
-  * With ABI version 2, `opentelemetry::sdk::logs::ReadableLogRecord::GetAttributes()`
+  * `opentelemetry::sdk::logs::ReadableLogRecord::GetAttributes()`
     will returns a `std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>`
     instead of a `std::unordered_map<std::string, opentelemetry::common::AttributeValue>`
     to keep the same type as the `opentelemetry::sdk::trace::SpanData`. And
     `opentelemetry::sdk::logs::ReadableLogRecord::GetBody()` will returns a
     `const opentelemetry::sdk::common::OwnedAttributeValue &` instead of a
-    `const opentelemetry::common::AttributeValue &`.
+    `const opentelemetry::common::AttributeValue &` now, we switch to the old
+    APIs by add `-DWITH_DEPRECATED_SDK_LOG_RECORD=ON` for cmake or add
+    `--copt -DOPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD` for bazel.
 
 ## [1.20 2025-04-01]
 

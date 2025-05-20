@@ -30,7 +30,7 @@ ReadWriteLogRecord::ReadWriteLogRecord()
     : severity_(opentelemetry::logs::Severity::kInvalid),
       resource_(nullptr),
       instrumentation_scope_(nullptr),
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
       body_(std::string()),
 #else
       body_(nostd::string_view()),
@@ -75,14 +75,14 @@ opentelemetry::logs::Severity ReadWriteLogRecord::GetSeverity() const noexcept
 
 void ReadWriteLogRecord::SetBody(const opentelemetry::common::AttributeValue &message) noexcept
 {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   body_ = nostd::visit(attribute_converter_, message);
 #else
   body_ = message;
 #endif
 }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
 const common::OwnedAttributeValue &
 #else
 const opentelemetry::common::AttributeValue &
@@ -174,21 +174,21 @@ const opentelemetry::trace::TraceFlags &ReadWriteLogRecord::GetTraceFlags() cons
 void ReadWriteLogRecord::SetAttribute(nostd::string_view key,
                                       const opentelemetry::common::AttributeValue &value) noexcept
 {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   attributes_map_.SetAttribute(key, value);
 #else
   attributes_map_[std::string(key)] = value;
 #endif
 }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
 const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
 #else
 const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &
 #endif
 ReadWriteLogRecord::GetAttributes() const noexcept
 {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   return attributes_map_.GetAttributes();
 #else
   return attributes_map_;

@@ -74,7 +74,7 @@ TEST(ReadWriteLogRecord, SetAndGet)
 
   // Test that all fields match what was set
   ASSERT_EQ(record.GetSeverity(), logs_api::Severity::kInvalid);
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   if (nostd::holds_alternative<std::string>(record.GetBody()))
   {
     ASSERT_EQ(nostd::get<std::string>(record.GetBody()), "Message");
@@ -119,7 +119,7 @@ public:
     }
   }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   const opentelemetry::sdk::common::OwnedAttributeValue &
 #else
   const opentelemetry::common::AttributeValue &
@@ -135,7 +135,7 @@ public:
   }
 
 private:
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   opentelemetry::sdk::common::OwnedAttributeValue empty_ = std::string();
 #else
   opentelemetry::common::AttributeValue empty_ = nostd::string_view();
@@ -198,7 +198,7 @@ TEST(ReadWriteLogRecord, BodyConversation)
               0.0001);
 
   real_logger->EmitLogRecord(opentelemetry::logs::Severity::kInfo, "128");
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   ASSERT_TRUE(
       opentelemetry::nostd::holds_alternative<std::string>(real_logger->GetLastLogRecord()));
   if (opentelemetry::nostd::holds_alternative<std::string>(real_logger->GetLastLogRecord()))
@@ -259,7 +259,7 @@ TEST(ReadWriteLogRecord, BodyConversation)
 #endif
 
   {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
     using value_type = std::vector<int32_t>;
 #else
     using value_type = nostd::span<const int32_t>;
@@ -282,7 +282,7 @@ TEST(ReadWriteLogRecord, BodyConversation)
   }
 
   {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
     using value_type = std::vector<uint32_t>;
 #else
     using value_type = nostd::span<const uint32_t>;
@@ -305,7 +305,7 @@ TEST(ReadWriteLogRecord, BodyConversation)
   }
 
   {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
     using value_type = std::vector<int64_t>;
 #else
     using value_type = nostd::span<const int64_t>;
@@ -328,7 +328,7 @@ TEST(ReadWriteLogRecord, BodyConversation)
   }
 
   {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
     using value_type = std::vector<uint64_t>;
 #else
     using value_type = nostd::span<const uint64_t>;
@@ -351,7 +351,7 @@ TEST(ReadWriteLogRecord, BodyConversation)
   }
 
   {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
     using value_type = std::vector<uint8_t>;
 #else
     using value_type = nostd::span<const uint8_t>;
@@ -374,7 +374,7 @@ TEST(ReadWriteLogRecord, BodyConversation)
   }
 
   {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
     using value_type = std::vector<double>;
 #else
     using value_type = nostd::span<const double>;
@@ -397,7 +397,7 @@ TEST(ReadWriteLogRecord, BodyConversation)
   }
 
   {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
     using value_type = std::vector<std::string>;
 #else
     using value_type = nostd::span<const nostd::string_view>;
@@ -460,7 +460,7 @@ TEST(LogRecordData, SetAndGet)
 
   // Test that all fields match what was set
   ASSERT_EQ(record.GetSeverity(), logs_api::Severity::kInvalid);
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   if (nostd::holds_alternative<std::string>(record.GetBody()))
   {
     ASSERT_EQ(nostd::get<std::string>(record.GetBody()), "Message");
@@ -520,7 +520,7 @@ TEST(LogRecordData, BodyConversation)
               0.0001);
 
   real_logger->EmitLogRecord(opentelemetry::logs::Severity::kInfo, "128");
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   ASSERT_TRUE(
       opentelemetry::nostd::holds_alternative<std::string>(real_logger->GetLastLogRecord()));
   if (opentelemetry::nostd::holds_alternative<std::string>(real_logger->GetLastLogRecord()))
@@ -581,7 +581,7 @@ TEST(LogRecordData, BodyConversation)
 #endif
 
   {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
     using value_type = std::vector<int32_t>;
 #else
     using value_type = nostd::span<const int32_t>;
@@ -604,7 +604,7 @@ TEST(LogRecordData, BodyConversation)
   }
 
   {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
     using value_type = std::vector<uint32_t>;
 #else
     using value_type = nostd::span<const uint32_t>;
@@ -627,7 +627,7 @@ TEST(LogRecordData, BodyConversation)
   }
 
   {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
     using value_type = std::vector<int64_t>;
 #else
     using value_type = nostd::span<const int64_t>;
@@ -650,7 +650,7 @@ TEST(LogRecordData, BodyConversation)
   }
 
   {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
     using value_type = std::vector<uint64_t>;
 #else
     using value_type = nostd::span<const uint64_t>;
@@ -673,7 +673,7 @@ TEST(LogRecordData, BodyConversation)
   }
 
   {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
     using value_type = std::vector<uint8_t>;
 #else
     using value_type = nostd::span<const uint8_t>;
@@ -696,7 +696,7 @@ TEST(LogRecordData, BodyConversation)
   }
 
   {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
     using value_type = std::vector<double>;
 #else
     using value_type = nostd::span<const double>;
@@ -719,7 +719,7 @@ TEST(LogRecordData, BodyConversation)
   }
 
   {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
     using value_type = std::vector<std::string>;
 #else
     using value_type = nostd::span<const nostd::string_view>;

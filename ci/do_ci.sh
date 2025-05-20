@@ -228,6 +228,7 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_DEPRECATED_SDK_LOG_RECORD=ON \
         "${SRC_DIR}"
   make -j $(nproc)
   make test
@@ -281,6 +282,7 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=CXX20 \
+        -DWITH_DEPRECATED_SDK_LOG_RECORD=ON \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -292,6 +294,7 @@ elif [[ "$1" == "cmake.c++23.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=CXX23 \
+        -DWITH_DEPRECATED_SDK_LOG_RECORD=ON \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -304,6 +307,7 @@ elif [[ "$1" == "cmake.c++14.stl.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=CXX14 \
+        -DWITH_DEPRECATED_SDK_LOG_RECORD=ON \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -316,6 +320,7 @@ elif [[ "$1" == "cmake.c++17.stl.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=CXX17 \
+        -DWITH_DEPRECATED_SDK_LOG_RECORD=ON \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
