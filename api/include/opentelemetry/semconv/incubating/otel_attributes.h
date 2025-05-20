@@ -89,22 +89,22 @@ static constexpr const char *kOtelStatusDescription = "otel.status_description";
 namespace OtelComponentTypeValues
 {
 /**
- * The builtin SDK Batching Span Processor
+ * The builtin SDK batching span processor
  */
 static constexpr const char *kBatchingSpanProcessor = "batching_span_processor";
 
 /**
- * The builtin SDK Simple Span Processor
+ * The builtin SDK simple span processor
  */
 static constexpr const char *kSimpleSpanProcessor = "simple_span_processor";
 
 /**
- * The builtin SDK Batching LogRecord Processor
+ * The builtin SDK batching log record processor
  */
 static constexpr const char *kBatchingLogProcessor = "batching_log_processor";
 
 /**
- * The builtin SDK Simple LogRecord Processor
+ * The builtin SDK simple log record processor
  */
 static constexpr const char *kSimpleLogProcessor = "simple_log_processor";
 
@@ -124,19 +124,39 @@ static constexpr const char *kOtlpHttpSpanExporter = "otlp_http_span_exporter";
 static constexpr const char *kOtlpHttpJsonSpanExporter = "otlp_http_json_span_exporter";
 
 /**
- * OTLP LogRecord exporter over gRPC with protobuf serialization
+ * OTLP log record exporter over gRPC with protobuf serialization
  */
 static constexpr const char *kOtlpGrpcLogExporter = "otlp_grpc_log_exporter";
 
 /**
- * OTLP LogRecord exporter over HTTP with protobuf serialization
+ * OTLP log record exporter over HTTP with protobuf serialization
  */
 static constexpr const char *kOtlpHttpLogExporter = "otlp_http_log_exporter";
 
 /**
- * OTLP LogRecord exporter over HTTP with JSON serialization
+ * OTLP log record exporter over HTTP with JSON serialization
  */
 static constexpr const char *kOtlpHttpJsonLogExporter = "otlp_http_json_log_exporter";
+
+/**
+ * The builtin SDK periodically exporting metric reader
+ */
+static constexpr const char *kPeriodicMetricReader = "periodic_metric_reader";
+
+/**
+ * OTLP metric exporter over gRPC with protobuf serialization
+ */
+static constexpr const char *kOtlpGrpcMetricExporter = "otlp_grpc_metric_exporter";
+
+/**
+ * OTLP metric exporter over HTTP with protobuf serialization
+ */
+static constexpr const char *kOtlpHttpMetricExporter = "otlp_http_metric_exporter";
+
+/**
+ * OTLP metric exporter over HTTP with JSON serialization
+ */
+static constexpr const char *kOtlpHttpJsonMetricExporter = "otlp_http_json_metric_exporter";
 
 }  // namespace OtelComponentTypeValues
 

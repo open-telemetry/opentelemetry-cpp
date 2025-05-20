@@ -68,6 +68,18 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kProcessCpuState = "proces
 static constexpr const char *kProcessCreationTime = "process.creation.time";
 
 /**
+ * Process environment variables, <key> being the environment variable name, the value being the
+ * environment variable value. <p> Examples: <ul> <li>an environment variable @code USER @endcode
+ * with value @code "ubuntu" @endcode SHOULD be recorded as the @code
+ * process.environment_variable.USER @endcode attribute with value @code "ubuntu" @endcode.</li>
+ *   <li>an environment variable @code PATH @endcode with value @code "/usr/local/bin:/usr/bin"
+ * @endcode SHOULD be recorded as the @code process.environment_variable.PATH @endcode attribute
+ * with value @code "/usr/local/bin:/usr/bin" @endcode.</li>
+ * </ul>
+ */
+static constexpr const char *kProcessEnvironmentVariable = "process.environment_variable";
+
+/**
  * The GNU build ID as found in the @code .note.gnu.build-id @endcode ELF section (hex string).
  */
 static constexpr const char *kProcessExecutableBuildIdGnu = "process.executable.build_id.gnu";
