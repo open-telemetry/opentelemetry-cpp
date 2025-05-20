@@ -82,15 +82,11 @@ struct ResourceMetrics
 class MetricProducer
 {
 public:
-  MetricProducer(std::unique_ptr<MetricFilter> metric_filter = nullptr)
-      : metric_filter_(std::move(metric_filter))
-  {}
+  MetricProducer()          = default;
   virtual ~MetricProducer() = default;
 
   MetricProducer(const MetricProducer &)  = delete;
   MetricProducer(const MetricProducer &&) = delete;
-  void operator=(const MetricProducer &)  = delete;
-  void operator=(const MetricProducer &&) = delete;
 
   enum class Status
   {
@@ -111,8 +107,6 @@ public:
    * partial failure.
    */
   virtual Result Produce() noexcept = 0;
-
-  std::unique_ptr<MetricFilter> metric_filter_;
 };
 
 }  // namespace metrics

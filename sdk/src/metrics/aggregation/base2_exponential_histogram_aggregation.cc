@@ -260,6 +260,16 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
   auto right = nostd::get<Base2ExponentialHistogramPointData>(
       (static_cast<const Base2ExponentialHistogramAggregation &>(delta).ToPoint()));
 
+  if (left.count_ == 0)
+  {
+    return std::make_unique<Base2ExponentialHistogramAggregation>(std::move(right));
+  }
+
+  if (right.count_ == 0)
+  {
+    return std::make_unique<Base2ExponentialHistogramAggregation>(std::move(left));
+  }
+
   auto &low_res  = left.scale_ < right.scale_ ? left : right;
   auto &high_res = left.scale_ < right.scale_ ? right : left;
 
@@ -289,30 +299,33 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
     }
   }
 
-  auto pos_min_index =
-      (std::min)(low_res.positive_buckets_->StartIndex(), high_res.positive_buckets_->StartIndex());
-  auto pos_max_index =
-      (std::max)(low_res.positive_buckets_->EndIndex(), high_res.positive_buckets_->EndIndex());
-  auto neg_min_index =
-      (std::min)(low_res.negative_buckets_->StartIndex(), high_res.negative_buckets_->StartIndex());
-  auto neg_max_index =
-      (std::max)(low_res.negative_buckets_->EndIndex(), high_res.negative_buckets_->EndIndex());
-
-  if (static_cast<size_t>(pos_max_index) >
-          static_cast<size_t>(pos_min_index) + result_value.max_buckets_ ||
-      static_cast<size_t>(neg_max_index) >
-          static_cast<size_t>(neg_min_index) + result_value.max_buckets_)
+  if (!low_res.positive_buckets_->Empty() && !high_res.positive_buckets_->Empty())
   {
-    // We need to downscale the buckets to fit into the new max_buckets_.
-    const uint32_t scale_reduction =
-        GetScaleReduction(pos_min_index, pos_max_index, result_value.max_buckets_);
-    DownscaleBuckets(low_res.positive_buckets_, scale_reduction);
-    DownscaleBuckets(high_res.positive_buckets_, scale_reduction);
-    DownscaleBuckets(low_res.negative_buckets_, scale_reduction);
-    DownscaleBuckets(high_res.negative_buckets_, scale_reduction);
-    low_res.scale_ -= scale_reduction;
-    high_res.scale_ -= scale_reduction;
-    result_value.scale_ -= scale_reduction;
+    auto pos_min_index = (std::min)(low_res.positive_buckets_->StartIndex(),
+                                    high_res.positive_buckets_->StartIndex());
+    auto pos_max_index =
+        (std::max)(low_res.positive_buckets_->EndIndex(), high_res.positive_buckets_->EndIndex());
+    auto neg_min_index = (std::min)(low_res.negative_buckets_->StartIndex(),
+                                    high_res.negative_buckets_->StartIndex());
+    auto neg_max_index =
+        (std::max)(low_res.negative_buckets_->EndIndex(), high_res.negative_buckets_->EndIndex());
+
+    if (static_cast<size_t>(pos_max_index) >
+            static_cast<size_t>(pos_min_index) + result_value.max_buckets_ ||
+        static_cast<size_t>(neg_max_index) >
+            static_cast<size_t>(neg_min_index) + result_value.max_buckets_)
+    {
+      // We need to downscale the buckets to fit into the new max_buckets_.
+      const uint32_t scale_reduction =
+          GetScaleReduction(pos_min_index, pos_max_index, result_value.max_buckets_);
+      DownscaleBuckets(low_res.positive_buckets_, scale_reduction);
+      DownscaleBuckets(high_res.positive_buckets_, scale_reduction);
+      DownscaleBuckets(low_res.negative_buckets_, scale_reduction);
+      DownscaleBuckets(high_res.negative_buckets_, scale_reduction);
+      low_res.scale_ -= scale_reduction;
+      high_res.scale_ -= scale_reduction;
+      result_value.scale_ -= scale_reduction;
+    }
   }
 
   result_value.positive_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(MergeBuckets(
