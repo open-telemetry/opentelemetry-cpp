@@ -31,14 +31,14 @@ LogRecordData::LogRecordData()
     : severity_(opentelemetry::logs::Severity::kInvalid),
       resource_(nullptr),
       instrumentation_scope_(nullptr),
+#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
+      body_(std::string()),
+#endif
       observed_timestamp_(std::chrono::system_clock::now()),
       event_id_(0),
       event_name_("")
 {
-
-#if !defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
-  body_ = std::string();
-#else
+#if defined(OPENTELEMETRY_DEPRECATED_SDK_LOG_RECORD)
   body_.SetAttribute("", nostd::string_view());
 #endif
 }
