@@ -14,6 +14,9 @@ add_library(opentelemetry_common ${COMMON_SRCS})
 set_target_properties(opentelemetry_common PROPERTIES EXPORT_NAME common)
 set_target_version(opentelemetry_common)
 
+target_include_directories(opentelemetry_common
+                           PUBLIC "$<BUILD_INTERFACE:${OTEL_SDK_DIR}>")
+
 target_link_libraries(
   opentelemetry_common PUBLIC opentelemetry_api opentelemetry_sdk
                               Threads::Threads)

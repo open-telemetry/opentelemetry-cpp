@@ -896,9 +896,6 @@ endif()
 
 if(NOT WITH_API_ONLY)
   set(BUILD_TESTING ${BUILD_TESTING})
-  include_directories(sdk/include)
-  include_directories(sdk)
-  include_directories(ext/include)
 
   add_subdirectory(sdk)
   add_subdirectory(ext)
