@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <initializer_list>
 #include <map>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -48,6 +49,8 @@ using OwnedAttributeValue = nostd::variant<bool,
                                            uint64_t,
                                            std::vector<uint64_t>,
                                            std::vector<uint8_t>>;
+
+using OwnedAttributeView = nostd::variant<std::vector<nostd::string_view>, std::unique_ptr<bool[]>>;
 
 enum OwnedAttributeType
 {
@@ -295,6 +298,248 @@ public:
   }
 
 private:
+  AttributeConverter converter_;
+};
+
+/**
+ * Class for storing attributes.
+ */
+struct MixedAttributeMapStorage
+{
+  std::unordered_map<std::string, opentelemetry::common::AttributeValue> attributes;
+  AttributeMap owned_attributes;
+  std::unordered_map<std::string, OwnedAttributeView> owened_attributes_view;
+};
+
+/**
+ * Set an owned copy (OwnedAttributeValue) and attribute view of a non-owning AttributeValue.
+ */
+class MixedAttributeViewSetter
+{
+public:
+  inline MixedAttributeViewSetter(const nostd::string_view &key,
+                                  MixedAttributeMapStorage &storage,
+                                  AttributeConverter &converter) noexcept
+      : key_(&key), storage_(&storage), converter_(&converter)
+  {}
+
+  void operator()(bool v)
+  {
+    storage_->owned_attributes[std::string(*key_)] = (*converter_)(v);
+    storage_->attributes[std::string(*key_)]       = v;
+  }
+
+  void operator()(int32_t v)
+  {
+    storage_->owned_attributes[std::string(*key_)] = (*converter_)(v);
+    storage_->attributes[std::string(*key_)]       = v;
+  }
+
+  void operator()(uint32_t v)
+  {
+    storage_->owned_attributes[std::string(*key_)] = (*converter_)(v);
+    storage_->attributes[std::string(*key_)]       = v;
+  }
+
+  void operator()(int64_t v)
+  {
+    storage_->owned_attributes[std::string(*key_)] = (*converter_)(v);
+    storage_->attributes[std::string(*key_)]       = v;
+  }
+
+  void operator()(uint64_t v)
+  {
+    storage_->owned_attributes[std::string(*key_)] = (*converter_)(v);
+    storage_->attributes[std::string(*key_)]       = v;
+  }
+
+  void operator()(double v)
+  {
+    storage_->owned_attributes[std::string(*key_)] = (*converter_)(v);
+    storage_->attributes[std::string(*key_)]       = v;
+  }
+
+  void operator()(nostd::string_view v)
+  {
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
+    owned_value                              = (*converter_)(v);
+    storage_->attributes[std::string(*key_)] = nostd::get<std::string>(owned_value);
+  }
+
+  void operator()(const char *v)
+  {
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
+    owned_value                              = (*converter_)(v);
+    storage_->attributes[std::string(*key_)] = nostd::get<std::string>(owned_value).c_str();
+  }
+
+  void operator()(nostd::span<const uint8_t> v)
+  {
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
+    owned_value                              = (*converter_)(v);
+    storage_->attributes[std::string(*key_)] = nostd::get<std::vector<uint8_t>>(owned_value);
+  }
+
+  void operator()(nostd::span<const bool> v)
+  {
+    storage_->owned_attributes[std::string(*key_)] = (*converter_)(v);
+    if (v.empty())
+    {
+      storage_->attributes[std::string(*key_)] = nostd::span<const bool>{};
+    }
+    else
+    {
+      std::unique_ptr<bool[]> owned_view{new bool[v.size()]};
+      for (size_t i = 0; i < v.size(); i++)
+      {
+        owned_view[i] = v[i];
+      }
+
+      storage_->attributes[std::string(*key_)] =
+          nostd::span<const bool>{owned_view.get(), v.size()};
+      storage_->owened_attributes_view[std::string(*key_)] = std::move(owned_view);
+    }
+  }
+
+  void operator()(nostd::span<const int32_t> v)
+  {
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
+    owned_value                              = (*converter_)(v);
+    storage_->attributes[std::string(*key_)] = nostd::get<std::vector<int32_t>>(owned_value);
+  }
+
+  void operator()(nostd::span<const uint32_t> v)
+  {
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
+    owned_value                              = (*converter_)(v);
+    storage_->attributes[std::string(*key_)] = nostd::get<std::vector<uint32_t>>(owned_value);
+  }
+
+  void operator()(nostd::span<const int64_t> v)
+  {
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
+    owned_value                              = (*converter_)(v);
+    storage_->attributes[std::string(*key_)] = nostd::get<std::vector<int64_t>>(owned_value);
+  }
+
+  void operator()(nostd::span<const uint64_t> v)
+  {
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
+    owned_value                              = (*converter_)(v);
+    storage_->attributes[std::string(*key_)] = nostd::get<std::vector<uint64_t>>(owned_value);
+  }
+
+  void operator()(nostd::span<const double> v)
+  {
+    auto &owned_value                        = storage_->owned_attributes[std::string(*key_)];
+    owned_value                              = (*converter_)(v);
+    storage_->attributes[std::string(*key_)] = nostd::get<std::vector<double>>(owned_value);
+  }
+
+  void operator()(nostd::span<const nostd::string_view> v)
+  {
+    auto &owned_value = storage_->owned_attributes[std::string(*key_)];
+    owned_value       = (*converter_)(v);
+
+    if (v.empty())
+    {
+      storage_->attributes[std::string(*key_)] = nostd::span<const nostd::string_view>{};
+    }
+    else
+    {
+      auto &owned_view   = storage_->owened_attributes_view[std::string(*key_)];
+      owned_view         = std::vector<nostd::string_view>{};
+      auto &owned_vector = nostd::get<std::vector<nostd::string_view>>(owned_view);
+
+      owned_vector.reserve(v.size());
+      for (auto &data : nostd::get<std::vector<std::string>>(owned_value))
+      {
+        owned_vector.push_back(data);
+      }
+
+      storage_->attributes[std::string(*key_)] =
+          nostd::span<const nostd::string_view>{owned_vector.data(), owned_vector.size()};
+    }
+  }
+
+private:
+  const nostd::string_view *key_;
+  MixedAttributeMapStorage *storage_;
+  AttributeConverter *converter_;
+};
+
+/**
+ * Class for storing attributes and attribute view.
+ */
+class MixedAttributeMap
+{
+public:
+  // Construct empty attribute map
+  MixedAttributeMap() {}
+
+  // Construct attribute map and populate with attributes
+  MixedAttributeMap(const opentelemetry::common::KeyValueIterable &attributes) : MixedAttributeMap()
+  {
+    attributes.ForEachKeyValue(
+        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+          nostd::visit(MixedAttributeViewSetter(key, storage_, converter_), value);
+          return true;
+        });
+  }
+
+  // Construct attribute map and populate with optional attributes
+  MixedAttributeMap(const opentelemetry::common::KeyValueIterable *attributes) : MixedAttributeMap()
+  {
+    if (attributes != nullptr)
+    {
+      attributes->ForEachKeyValue(
+          [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+            nostd::visit(MixedAttributeViewSetter(key, storage_, converter_), value);
+            return true;
+          });
+    }
+  }
+
+  // Construct map from initializer list by applying `SetAttribute` transform for every attribute
+  MixedAttributeMap(
+      std::initializer_list<std::pair<nostd::string_view, opentelemetry::common::AttributeValue>>
+          attributes)
+      : MixedAttributeMap()
+  {
+    for (auto &kv : attributes)
+    {
+      nostd::visit(MixedAttributeViewSetter(kv.first, storage_, converter_), kv.second);
+    }
+  }
+
+  // Returns a reference to this map
+  const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &GetAttributes()
+      const noexcept
+  {
+    return storage_.attributes;
+  }
+
+  const AttributeMap &GetOwnedAttributes() const noexcept { return storage_.owned_attributes; }
+
+  // Convert non-owning key-value to owning std::string(key) and OwnedAttributeValue(value)
+  void SetAttribute(nostd::string_view key,
+                    const opentelemetry::common::AttributeValue &value) noexcept
+  {
+    nostd::visit(MixedAttributeViewSetter(key, storage_, converter_), value);
+  }
+
+  void Reserve(AttributeMap::size_type size)
+  {
+    storage_.attributes.reserve(size);
+    storage_.owned_attributes.reserve(size);
+  }
+
+  AttributeMap::size_type Size() const noexcept { return storage_.attributes.size(); }
+
+  bool Empty() const noexcept { return storage_.attributes.empty(); }
+
+private:
+  MixedAttributeMapStorage storage_;
   AttributeConverter converter_;
 };
 

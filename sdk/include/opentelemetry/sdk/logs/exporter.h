@@ -28,8 +28,8 @@ public:
   /**
    * Create a log recordable. This object will be used to record log data and
    * will subsequently be passed to LogRecordExporter::Export. Vendors can implement
-   * custom recordables or use the default ReadWriteLogRecord recordable provided by the
-   * SDK.
+   * custom recordables or use the default ReadWriteLogRecord/LogRecordData recordable provided by
+   * the SDK.
    * @return a newly initialized Recordable object
    *
    * Note: This method must be callable from multiple threads.

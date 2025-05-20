@@ -18,6 +18,7 @@ add_library(
   logger_config.cc
   logger_context.cc
   logger_context_factory.cc
+  log_record_data.cc
   multi_log_record_processor.cc
   multi_log_record_processor_factory.cc
   multi_recordable.cc

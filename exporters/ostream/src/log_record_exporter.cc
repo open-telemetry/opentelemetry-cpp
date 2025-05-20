@@ -22,7 +22,7 @@
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/logs/log_record_data.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/trace/span_id.h"
@@ -47,7 +47,7 @@ OStreamLogRecordExporter::OStreamLogRecordExporter(std::ostream &sout) noexcept 
 
 std::unique_ptr<sdklogs::Recordable> OStreamLogRecordExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<sdklogs::Recordable>(new sdklogs::ReadWriteLogRecord());
+  return std::unique_ptr<sdklogs::Recordable>(new sdklogs::LogRecordData());
 }
 
 sdk::common::ExportResult OStreamLogRecordExporter::Export(
@@ -62,8 +62,8 @@ sdk::common::ExportResult OStreamLogRecordExporter::Export(
 
   for (auto &record : records)
   {
-    auto log_record = std::unique_ptr<sdklogs::ReadWriteLogRecord>(
-        static_cast<sdklogs::ReadWriteLogRecord *>(record.release()));
+    auto log_record = std::unique_ptr<sdklogs::LogRecordData>(
+        static_cast<sdklogs::LogRecordData *>(record.release()));
 
     if (log_record == nullptr)
     {

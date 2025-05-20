@@ -121,8 +121,10 @@ if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
   include("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
 endif()
 
-option(WITH_ABI_VERSION_1 "ABI version 1" ON)
+include(CMakeDependentOption)
 option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
+cmake_dependent_option(WITH_ABI_VERSION_1 "ABI version 1" ON
+                       "NOT WITH_ABI_VERSION_2" OFF)
 
 file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
      OPENTELEMETRY_CPP_HEADER_VERSION_H)
@@ -490,7 +492,6 @@ if(WITH_OTLP_GRPC
     # Some versions of FindProtobuf.cmake uses mixed case instead of uppercase
     set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
   endif()
-  include(CMakeDependentOption)
 
   message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
   set(SAVED_CMAKE_CXX_CLANG_TIDY ${CMAKE_CXX_CLANG_TIDY})
