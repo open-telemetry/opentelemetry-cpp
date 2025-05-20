@@ -44,9 +44,10 @@ static constexpr const char *kCloudPlatform = "cloud.platform";
 static constexpr const char *kCloudProvider = "cloud.provider";
 
 /**
- * The geographical region the resource is running.
- * <p>
- * Refer to your provider's docs to see the available regions, for example <a
+ * The geographical region within a cloud provider. When associated with a resource, this attribute
+ * specifies the region where the resource operates. When calling services or APIs deployed on a
+ * cloud, this attribute identifies the region where the called destination is deployed. <p> Refer
+ * to your provider's docs to see the available regions, for example <a
  * href="https://www.alibabacloud.com/help/doc-detail/40654.htm">Alibaba Cloud regions</a>, <a
  * href="https://aws.amazon.com/about-aws/global-infrastructure/regions_az/">AWS regions</a>, <a
  * href="https://azure.microsoft.com/global-infrastructure/geographies/">Azure regions</a>, <a

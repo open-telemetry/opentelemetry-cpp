@@ -89,7 +89,8 @@ static constexpr const char *kTlsClientNotBefore = "tls.client.not_before";
  * Deprecated, use @code server.address @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code server.address @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code server.address @endcode.", "reason": "renamed", "renamed_to":
+ * "server.address"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kTlsClientServerName =
     "tls.client.server_name";

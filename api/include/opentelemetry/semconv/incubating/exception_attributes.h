@@ -24,7 +24,7 @@ namespace exception
  *
  * @deprecated
  * {"note": "It's no longer recommended to record exceptions that are handled and do not escape the
- * scope of a span.", "reason": "uncategorized"}
+ * scope of a span.\n", "reason": "obsoleted"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kExceptionEscaped = "exception.escaped";
 

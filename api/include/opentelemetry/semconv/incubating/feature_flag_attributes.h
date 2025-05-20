@@ -28,7 +28,8 @@ static constexpr const char *kFeatureFlagContextId = "feature_flag.context.id";
  * Deprecated, use @code error.message @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code error.message @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code error.message @endcode.", "reason": "renamed", "renamed_to":
+ * "error.message"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kFeatureFlagEvaluationErrorMessage =
     "feature_flag.evaluation.error.message";
@@ -37,7 +38,8 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kFeatureFlagEvaluationErro
  * Deprecated, use @code feature_flag.result.reason @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code feature_flag.result.reason @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code feature_flag.result.reason @endcode.", "reason": "renamed",
+ * "renamed_to": "feature_flag.result.reason"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kFeatureFlagEvaluationReason =
     "feature_flag.evaluation.reason";
@@ -56,6 +58,18 @@ static constexpr const char *kFeatureFlagProviderName = "feature_flag.provider.n
  * The reason code which shows how a feature flag value was determined.
  */
 static constexpr const char *kFeatureFlagResultReason = "feature_flag.result.reason";
+
+/**
+ * The evaluated value of the feature flag.
+ * <p>
+ * With some feature flag providers, feature flag results can be quite large or contain private or
+ * sensitive details. Because of this, @code feature_flag.result.variant @endcode is often the
+ * preferred attribute if it is available. <p> It may be desirable to redact or otherwise limit the
+ * size and scope of @code feature_flag.result.value @endcode if possible. Because the evaluated
+ * flag value is unstructured and may be any type, it is left to the instrumentation author to
+ * determine how best to achieve this.
+ */
+static constexpr const char *kFeatureFlagResultValue = "feature_flag.result.value";
 
 /**
  * A semantic identifier for an evaluated flag value.
@@ -77,7 +91,8 @@ static constexpr const char *kFeatureFlagSetId = "feature_flag.set.id";
  * Deprecated, use @code feature_flag.result.variant @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code feature_flag.result.variant @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code feature_flag.result.variant @endcode.", "reason": "renamed",
+ * "renamed_to": "feature_flag.result.variant"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kFeatureFlagVariant = "feature_flag.variant";
 
