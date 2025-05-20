@@ -3,7 +3,6 @@
 
 if(WITH_HTTP_CLIENT_CURL)
   set(FILENAME curl_http_test)
-  add_compile_definitions(WITH_CURL)
   add_executable(${FILENAME} ${FILENAME}.cc)
   target_link_libraries(${FILENAME} ${GMOCK_LIB} ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT})
