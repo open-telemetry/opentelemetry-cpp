@@ -859,8 +859,6 @@ if(DEFINED OPENTELEMETRY_BUILD_DLL)
   add_definitions(-DOPENTELEMETRY_BUILD_EXPORT_DLL)
 endif()
 
-include_directories(api/include)
-
 add_subdirectory(api)
 
 if(WITH_OPENTRACING)
@@ -893,9 +891,6 @@ endif()
 
 if(NOT WITH_API_ONLY)
   set(BUILD_TESTING ${BUILD_TESTING})
-  include_directories(sdk/include)
-  include_directories(sdk)
-  include_directories(ext/include)
 
   add_subdirectory(sdk)
   add_subdirectory(ext)

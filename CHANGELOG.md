@@ -55,6 +55,9 @@ Increment the:
 * [CMAKE] Add generated protobuf headers to the opentelemetry_proto target
   [#3400](https://github.com/open-telemetry/opentelemetry-cpp/pull/3400)
 
+* [CMAKE] Remove include_directories usage and rely on target properties
+  [#3426](https://github.com/open-telemetry/opentelemetry-cpp/pull/3426)
+
 * [EXPORTER] ostream log exporter, fixed memory ownership issues
   [#3417](https://github.com/open-telemetry/opentelemetry-cpp/pull/3417)
 
