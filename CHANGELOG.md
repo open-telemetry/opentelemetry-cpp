@@ -58,6 +58,9 @@ Increment the:
 * [CMAKE] Remove include_directories usage and rely on target properties
   [#3426](https://github.com/open-telemetry/opentelemetry-cpp/pull/3426)
 
+* [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.34.0
+  [#3428](https://github.com/open-telemetry/opentelemetry-cpp/pull/3428)
+
 * [EXPORTER] ostream log exporter, fixed memory ownership issues
   [#3417](https://github.com/open-telemetry/opentelemetry-cpp/pull/3417)
 

@@ -23,7 +23,8 @@ namespace code
  * Deprecated, use @code code.column.number @endcode
  *
  * @deprecated
- * {"note": "Replaced by @code code.column.number @endcode", "reason": "uncategorized"}
+ * {"note": "Replaced by @code code.column.number @endcode.", "reason": "renamed", "renamed_to":
+ * "code.column.number"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeColumn = "code.column";
 
@@ -47,7 +48,8 @@ static constexpr const char *kCodeFilePath = "code.file.path";
  * Deprecated, use @code code.file.path @endcode instead
  *
  * @deprecated
- * {"note": "Replaced by @code code.file.path @endcode", "reason": "uncategorized"}
+ * {"note": "Replaced by @code code.file.path @endcode.", "reason": "renamed", "renamed_to":
+ * "code.file.path"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeFilepath = "code.filepath";
 
@@ -55,7 +57,8 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeFilepath = "code.file
  * Deprecated, use @code code.function.name @endcode instead
  *
  * @deprecated
- * {"note": "Replaced by @code code.function.name @endcode", "reason": "uncategorized"}
+ * {"note": "Value should be included in @code code.function.name @endcode which is expected to be a
+ * fully-qualified name.\n", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeFunction = "code.function";
 
@@ -94,7 +97,8 @@ static constexpr const char *kCodeLineNumber = "code.line.number";
  * Deprecated, use @code code.line.number @endcode instead
  *
  * @deprecated
- * {"note": "Replaced by @code code.line.number @endcode", "reason": "uncategorized"}
+ * {"note": "Replaced by @code code.line.number @endcode.", "reason": "renamed", "renamed_to":
+ * "code.line.number"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeLineno = "code.lineno";
 
@@ -103,7 +107,7 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeLineno = "code.lineno
  *
  * @deprecated
  * {"note": "Value should be included in @code code.function.name @endcode which is expected to be a
- * fully-qualified name.", "reason": "uncategorized"}
+ * fully-qualified name.\n", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kCodeNamespace = "code.namespace";
 

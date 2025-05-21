@@ -288,9 +288,8 @@ CreateAsyncDoubleMetricOtelSdkExporterSpanExported(metrics::Meter *meter)
  * Deprecated, use @code otel.sdk.exporter.span.exported @endcode instead.
  *
  * @deprecated
- * {"note": "Renamed to @code otel.sdk.exporter.span.exported @endcode.", "reason": "uncategorized"}
- * <p>
- * updowncounter
+ * {"note": "Replaced by @code otel.sdk.exporter.span.exported @endcode.", "reason": "renamed",
+ * "renamed_to": "otel.sdk.exporter.span.exported"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricOtelSdkExporterSpanExportedCount =
     "otel.sdk.exporter.span.exported.count";
@@ -379,9 +378,8 @@ CreateAsyncDoubleMetricOtelSdkExporterSpanInflight(metrics::Meter *meter)
  * Deprecated, use @code otel.sdk.exporter.span.inflight @endcode instead.
  *
  * @deprecated
- * {"note": "Renamed to @code otel.sdk.exporter.span.inflight @endcode.", "reason": "uncategorized"}
- * <p>
- * updowncounter
+ * {"note": "Replaced by @code otel.sdk.exporter.span.inflight @endcode.", "reason": "renamed",
+ * "renamed_to": "otel.sdk.exporter.span.inflight"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricOtelSdkExporterSpanInflightCount =
     "otel.sdk.exporter.span.inflight.count";
@@ -674,8 +672,8 @@ CreateAsyncDoubleMetricOtelSdkProcessorSpanProcessed(metrics::Meter *meter)
  * Deprecated, use @code otel.sdk.processor.span.processed @endcode instead.
  *
  * @deprecated
- * {"note": "Renamed to @code otel.sdk.processor.span.processed @endcode.", "reason":
- * "uncategorized"} <p> updowncounter
+ * {"note": "Replaced by @code otel.sdk.processor.span.processed @endcode.", "reason": "renamed",
+ * "renamed_to": "otel.sdk.processor.span.processed"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricOtelSdkProcessorSpanProcessedCount =
     "otel.sdk.processor.span.processed.count";
@@ -852,9 +850,8 @@ CreateAsyncDoubleMetricOtelSdkSpanEnded(metrics::Meter *meter)
  * Deprecated, use @code otel.sdk.span.ended @endcode instead.
  *
  * @deprecated
- * {"note": "Renamed to @code otel.sdk.span.ended @endcode.", "reason": "uncategorized"}
- * <p>
- * counter
+ * {"note": "Replaced by @code otel.sdk.span.ended @endcode.", "reason": "renamed", "renamed_to":
+ * "otel.sdk.span.ended"} <p> counter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricOtelSdkSpanEndedCount =
     "otel.sdk.span.ended.count";
@@ -937,9 +934,8 @@ CreateAsyncDoubleMetricOtelSdkSpanLive(metrics::Meter *meter)
  * Deprecated, use @code otel.sdk.span.live @endcode instead.
  *
  * @deprecated
- * {"note": "Renamed to @code otel.sdk.span.live @endcode.", "reason": "uncategorized"}
- * <p>
- * updowncounter
+ * {"note": "Replaced by @code otel.sdk.span.live @endcode.", "reason": "renamed", "renamed_to":
+ * "otel.sdk.span.live"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricOtelSdkSpanLiveCount =
     "otel.sdk.span.live.count";

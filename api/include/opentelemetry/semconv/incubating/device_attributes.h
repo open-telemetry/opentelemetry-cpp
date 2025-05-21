@@ -38,7 +38,7 @@ namespace device
  * for specific enterprise scenarios, such as kiosk devices or enterprise-managed devices, with
  * appropriate compliance clearance. Any instrumentation providing this identifier MUST implement it
  * as an opt-in feature. <p> See <a
- * href="/docs/attributes-registry/app.md#app-installation-id">@code app.installation.id
+ * href="/docs/registry/attributes/app.md#app-installation-id">@code app.installation.id
  * @endcode</a> for a more privacy-preserving alternative.</blockquote>
  */
 static constexpr const char *kDeviceId = "device.id";

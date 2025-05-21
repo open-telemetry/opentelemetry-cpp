@@ -99,9 +99,8 @@ CreateSyncDoubleMetricMessagingClientOperationDuration(metrics::Meter *meter)
  * Deprecated. Use @code messaging.client.sent.messages @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code messaging.client.sent.messages @endcode.", "reason": "uncategorized"}
- * <p>
- * counter
+ * {"note": "Replaced by @code messaging.client.sent.messages @endcode.", "reason": "renamed",
+ * "renamed_to": "messaging.client.sent.messages"} <p> counter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricMessagingClientPublishedMessages =
     "messaging.client.published.messages";
@@ -217,8 +216,8 @@ CreateSyncDoubleMetricMessagingProcessDuration(metrics::Meter *meter)
  * Deprecated. Use @code messaging.client.consumed.messages @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code messaging.client.consumed.messages @endcode.", "reason":
- * "uncategorized"} <p> counter
+ * {"note": "Replaced by @code messaging.client.consumed.messages @endcode.", "reason": "renamed",
+ * "renamed_to": "messaging.client.consumed.messages"} <p> counter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricMessagingProcessMessages =
     "messaging.process.messages";
@@ -263,8 +262,8 @@ CreateAsyncDoubleMetricMessagingProcessMessages(metrics::Meter *meter)
  * Deprecated. Use @code messaging.client.operation.duration @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code messaging.client.operation.duration @endcode.", "reason":
- * "uncategorized"} <p> histogram
+ * {"note": "Replaced by @code messaging.client.operation.duration @endcode.", "reason": "renamed",
+ * "renamed_to": "messaging.client.operation.duration"} <p> histogram
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricMessagingPublishDuration =
     "messaging.publish.duration";
@@ -289,16 +288,16 @@ CreateSyncDoubleMetricMessagingPublishDuration(metrics::Meter *meter)
 }
 
 /**
- * Deprecated. Use @code messaging.client.produced.messages @endcode instead.
+ * Deprecated. Use @code messaging.client.sent.messages @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code messaging.client.produced.messages @endcode.", "reason":
- * "uncategorized"} <p> counter
+ * {"note": "Replaced by @code messaging.client.sent.messages @endcode.", "reason": "renamed",
+ * "renamed_to": "messaging.client.sent.messages"} <p> counter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricMessagingPublishMessages =
     "messaging.publish.messages";
 OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricMessagingPublishMessages =
-    "Deprecated. Use `messaging.client.produced.messages` instead.";
+    "Deprecated. Use `messaging.client.sent.messages` instead.";
 OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricMessagingPublishMessages =
     "{message}";
 
@@ -338,8 +337,8 @@ CreateAsyncDoubleMetricMessagingPublishMessages(metrics::Meter *meter)
  * Deprecated. Use @code messaging.client.operation.duration @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code messaging.client.operation.duration @endcode.", "reason":
- * "uncategorized"} <p> histogram
+ * {"note": "Replaced by @code messaging.client.operation.duration @endcode.", "reason": "renamed",
+ * "renamed_to": "messaging.client.operation.duration"} <p> histogram
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricMessagingReceiveDuration =
     "messaging.receive.duration";
@@ -367,8 +366,8 @@ CreateSyncDoubleMetricMessagingReceiveDuration(metrics::Meter *meter)
  * Deprecated. Use @code messaging.client.consumed.messages @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code messaging.client.consumed.messages @endcode.", "reason":
- * "uncategorized"} <p> counter
+ * {"note": "Replaced by @code messaging.client.consumed.messages @endcode.", "reason": "renamed",
+ * "renamed_to": "messaging.client.consumed.messages"} <p> counter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricMessagingReceiveMessages =
     "messaging.receive.messages";
