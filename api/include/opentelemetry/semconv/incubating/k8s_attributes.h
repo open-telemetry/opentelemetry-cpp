@@ -279,7 +279,8 @@ static constexpr const char *kK8sPodLabel = "k8s.pod.label";
  * Deprecated, use @code k8s.pod.label @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code k8s.pod.label @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code k8s.pod.label @endcode.", "reason": "renamed", "renamed_to":
+ * "k8s.pod.label"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kK8sPodLabels = "k8s.pod.labels";
 
