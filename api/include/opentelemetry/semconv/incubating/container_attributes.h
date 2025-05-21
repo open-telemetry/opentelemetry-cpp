@@ -41,7 +41,7 @@ static constexpr const char *kContainerCommandLine = "container.command_line";
  * Deprecated, use @code cpu.mode @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code cpu.mode @endcode", "reason": "uncategorized"}
+ * {"note": "Replaced by @code cpu.mode @endcode.", "reason": "renamed", "renamed_to": "cpu.mode"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kContainerCpuState = "container.cpu.state";
 
@@ -119,7 +119,8 @@ static constexpr const char *kContainerLabel = "container.label";
  * Deprecated, use @code container.label @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code container.label @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code container.label @endcode.", "reason": "renamed", "renamed_to":
+ * "container.label"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kContainerLabels = "container.labels";
 

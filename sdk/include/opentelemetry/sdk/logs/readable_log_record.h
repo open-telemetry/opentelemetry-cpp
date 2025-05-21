@@ -75,7 +75,7 @@ public:
    * Get body field of this log.
    * @return the body field for this log.
    */
-  virtual const opentelemetry::common::AttributeValue &GetBody() const noexcept = 0;
+  virtual const opentelemetry::sdk::common::OwnedAttributeValue &GetBody() const noexcept = 0;
 
   /**
    * Get the Event id.
@@ -111,7 +111,7 @@ public:
    * Get attributes of this log.
    * @return the body field of this log
    */
-  virtual const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &
+  virtual const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
   GetAttributes() const noexcept = 0;
 
   /**

@@ -13,7 +13,6 @@ otel_cc_library(
         "http_operation_curl.cc",
     ],
     local_defines = [
-        "WITH_CURL", 
         "ENABLE_CURL_LOGGING",
     ],
     include_prefix = "src/http/client/curl",

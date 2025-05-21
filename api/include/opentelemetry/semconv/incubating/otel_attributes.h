@@ -49,7 +49,8 @@ static constexpr const char *kOtelComponentType = "otel.component.type";
  * Deprecated. Use the @code otel.scope.name @endcode attribute
  *
  * @deprecated
- * {"note": "Use the @code otel.scope.name @endcode attribute.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code otel.scope.name @endcode.", "reason": "renamed", "renamed_to":
+ * "otel.scope.name"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kOtelLibraryName = "otel.library.name";
 
@@ -57,7 +58,8 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kOtelLibraryName = "otel.l
  * Deprecated. Use the @code otel.scope.version @endcode attribute.
  *
  * @deprecated
- * {"note": "Use the @code otel.scope.version @endcode attribute.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code otel.scope.version @endcode.", "reason": "renamed", "renamed_to":
+ * "otel.scope.version"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kOtelLibraryVersion = "otel.library.version";
 

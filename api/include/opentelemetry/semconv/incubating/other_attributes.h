@@ -23,7 +23,8 @@ namespace other
  * Deprecated, use @code db.client.connection.state @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code db.client.connection.state @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code db.client.connection.state @endcode.", "reason": "renamed",
+ * "renamed_to": "db.client.connection.state"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kState = "state";
 
