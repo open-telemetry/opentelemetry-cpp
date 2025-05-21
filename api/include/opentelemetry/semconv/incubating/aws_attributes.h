@@ -20,6 +20,21 @@ namespace aws
 {
 
 /**
+ * The unique identifier of the AWS Bedrock Guardrail. A <a
+ * href="https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html">guardrail</a> helps
+ * safeguard and prevent unwanted behavior from model responses or user messages.
+ */
+static constexpr const char *kAwsBedrockGuardrailId = "aws.bedrock.guardrail.id";
+
+/**
+ * The unique identifier of the AWS Bedrock Knowledge base. A <a
+ * href="https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html">knowledge
+ * base</a> is a bank of information that can be queried by models to generate more relevant
+ * responses and augment prompts.
+ */
+static constexpr const char *kAwsBedrockKnowledgeBaseId = "aws.bedrock.knowledge_base.id";
+
+/**
  * The JSON-serialized value of each item in the @code AttributeDefinitions @endcode request field.
  */
 static constexpr const char *kAwsDynamodbAttributeDefinitions =
@@ -192,12 +207,32 @@ static constexpr const char *kAwsEksClusterArn = "aws.eks.cluster.arn";
 static constexpr const char *kAwsExtendedRequestId = "aws.extended_request_id";
 
 /**
+ * The name of the AWS Kinesis <a
+ * href="https://docs.aws.amazon.com/streams/latest/dev/introduction.html">stream</a> the request
+ * refers to. Corresponds to the @code --stream-name @endcode parameter of the Kinesis <a
+ * href="https://docs.aws.amazon.com/cli/latest/reference/kinesis/describe-stream.html">describe-stream</a>
+ * operation.
+ */
+static constexpr const char *kAwsKinesisStreamName = "aws.kinesis.stream_name";
+
+/**
  * The full invoked ARN as provided on the @code Context @endcode passed to the function (@code
  * Lambda-Runtime-Invoked-Function-Arn @endcode header on the @code /runtime/invocation/next
  * @endcode applicable). <p> This may be different from @code cloud.resource_id @endcode if an alias
  * is involved.
  */
 static constexpr const char *kAwsLambdaInvokedArn = "aws.lambda.invoked_arn";
+
+/**
+ * The UUID of the <a
+ * href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html">AWS
+ * Lambda EvenSource Mapping</a>. An event source is mapped to a lambda function. It's contents are
+ * read by Lambda and used to trigger a function. This isn't available in the lambda execution
+ * context or the lambda runtime environtment. This is going to be populated by the AWS SDK for each
+ * language when that UUID is present. Some of these operations are Create/Delete/Get/List/Update
+ * EventSourceMapping.
+ */
+static constexpr const char *kAwsLambdaResourceMappingId = "aws.lambda.resource_mapping.id";
 
 /**
  * The Amazon Resource Name(s) (ARN) of the AWS log group(s).
@@ -341,6 +376,35 @@ static constexpr const char *kAwsS3PartNumber = "aws.s3.part_number";
  * </ul>
  */
 static constexpr const char *kAwsS3UploadId = "aws.s3.upload_id";
+
+/**
+ * The ARN of the Secret stored in the Secrets Mangger
+ */
+static constexpr const char *kAwsSecretsmanagerSecretArn = "aws.secretsmanager.secret.arn";
+
+/**
+ * The ARN of the AWS SNS Topic. An Amazon SNS <a
+ * href="https://docs.aws.amazon.com/sns/latest/dg/sns-create-topic.html">topic</a> is a logical
+ * access point that acts as a communication channel.
+ */
+static constexpr const char *kAwsSnsTopicArn = "aws.sns.topic.arn";
+
+/**
+ * The URL of the AWS SQS Queue. It's a unique identifier for a queue in Amazon Simple Queue Service
+ * (SQS) and is used to access the queue and perform actions on it.
+ */
+static constexpr const char *kAwsSqsQueueUrl = "aws.sqs.queue.url";
+
+/**
+ * The ARN of the AWS Step Functions Activity.
+ */
+static constexpr const char *kAwsStepFunctionsActivityArn = "aws.step_functions.activity.arn";
+
+/**
+ * The ARN of the AWS Step Functions State Machine.
+ */
+static constexpr const char *kAwsStepFunctionsStateMachineArn =
+    "aws.step_functions.state_machine.arn";
 
 namespace AwsEcsLaunchtypeValues
 {

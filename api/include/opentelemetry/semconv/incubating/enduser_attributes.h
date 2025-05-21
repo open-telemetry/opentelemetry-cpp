@@ -40,7 +40,7 @@ static constexpr const char *kEnduserPseudoId = "enduser.pseudo.id";
  * Deprecated, use @code user.roles @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code user.roles @endcode attribute.", "reason": "uncategorized"}
+ * {"note": "Use @code user.roles @endcode attribute instead.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kEnduserRole = "enduser.role";
 
@@ -48,7 +48,7 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kEnduserRole = "enduser.ro
  * Deprecated, no replacement at this time.
  *
  * @deprecated
- * {"note": "Removed.", "reason": "uncategorized"}
+ * {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kEnduserScope = "enduser.scope";
 
