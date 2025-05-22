@@ -222,9 +222,9 @@ elseif(PROTOBUF_VERSION AND PROTOBUF_VERSION VERSION_LESS "3.16")
 endif()
 
 # protobuf uses numerous global variables, which can lead to conflicts when a
-# user's dynamic libraries, executables, and otel-cpp are all built with
-# -fvisibility=hidden and linked against a statically built protobuf library.
-# This may result in crashes. To prevent such conflicts, we also need to build
+# user's dynamic libraries, executables, and otel-cpp are all built as dynamic
+# libraries and linked against a statically built protobuf library. This may
+# result in crashes. To prevent such conflicts, we also need to build
 # opentelemetry_exporter_otlp_grpc_client as a static library.
 if(TARGET protobuf::libprotobuf)
   get_target_property(protobuf_lib_type protobuf::libprotobuf TYPE)
