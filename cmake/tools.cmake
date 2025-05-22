@@ -99,7 +99,9 @@ function(project_build_tools_get_imported_location OUTPUT_VAR_NAME TARGET_NAME)
   get_target_property(TARGET_TYPE ${TARGET_NAME} TYPE)
   if(TARGET_TYPE STREQUAL "INTERFACE_LIBRARY")
     # For interface libraries, do not attempt to retrieve imported location.
-    set(${OUTPUT_VAR_NAME} "" PARENT_SCOPE)
+    set(${OUTPUT_VAR_NAME}
+        ""
+        PARENT_SCOPE)
     return()
   endif()
 
@@ -219,4 +221,98 @@ function(project_build_tools_patch_default_imported_config)
       endforeach()
     endif()
   endforeach()
+endfunction()
+
+function(__project_build_tools_recursive_scan_unwrap OUTPUT_VAR INPUT_VAR)
+  # With sub-expressions
+  if(INPUT_VAR MATCHES "^\\\$<.*>:([^>]+)>?$")
+    set(${OUTPUT_VAR}
+        "${CMAKE_MATCH_1}"
+        PARENT_SCOPE)
+  elseif(INPUT_VAR MATCHES "^\\\$<[^:]+:([^>]+)>?$")
+    set(${OUTPUT_VAR}
+        "${CMAKE_MATCH_1}"
+        PARENT_SCOPE)
+  else()
+    set(${OUTPUT_VAR}
+        "${INPUT_VAR}"
+        PARENT_SCOPE)
+  endif()
+endfunction()
+
+macro(__project_build_tools_recursive_scan_imported_locations)
+  if(NOT DEFINED __project_build_tools_recursive_call_level)
+    set(__project_build_tools_recursive_call_level 1)
+  else()
+    math(EXPR __project_build_tools_recursive_call_level
+         "${__project_build_tools_recursive_call_level} + 1")
+  endif()
+  foreach(TARGET_NAME_ORIGIN_${__project_build_tools_recursive_call_level}
+          ${ARGN})
+    if(TARGET_NAME_ORIGIN_${__project_build_tools_recursive_call_level} MATCHES
+       "^\\\$<.*>?$")
+      __project_build_tools_recursive_scan_unwrap(
+        TARGET_NAME
+        "${TARGET_NAME_ORIGIN_${__project_build_tools_recursive_call_level}}")
+    else()
+      set(TARGET_NAME
+          "${TARGET_NAME_ORIGIN_${__project_build_tools_recursive_call_level}}")
+    endif()
+    if(NOT DEFINED
+       __project_build_tools_recursive_scan_imported_locations_${TARGET_NAME})
+      set(__project_build_tools_recursive_scan_imported_locations_${TARGET_NAME}
+          TRUE)
+      set(__lib_path)
+      project_build_tools_get_imported_location(__lib_path ${TARGET_NAME})
+      if(__lib_path)
+        list(APPEND __OUTPUT_VAR ${__lib_path})
+      endif()
+
+      set(__TARGET_LINK_LIBRARIES)
+      get_target_property(__TARGET_LINK_LIBRARIES ${TARGET_NAME}
+                          INTERFACE_LINK_LIBRARIES)
+      if(__SCAN_OPTION_TARGET_MATCH)
+        set(__TARGET_LINK_LIBRARIES_SELECTED)
+        foreach(__TARGET_LINK_LIBRARIES_ITEM IN LISTS __TARGET_LINK_LIBRARIES)
+          set(__TARGET_MATCHED FALSE)
+          foreach(__MATCH_RULE ${__SCAN_OPTION_TARGET_MATCH})
+            if(__TARGET_LINK_LIBRARIES_ITEM MATCHES "${__MATCH_RULE}")
+              set(__TARGET_MATCHED TRUE)
+              break()
+            endif()
+          endforeach()
+          if(__TARGET_MATCHED)
+            list(APPEND __TARGET_LINK_LIBRARIES_SELECTED
+                 ${__TARGET_LINK_LIBRARIES_ITEM})
+          endif()
+        endforeach(__TARGET_LINK_LIBRARIES_ITEM IN LISTS
+                   __TARGET_LINK_LIBRARIES)
+      else()
+        set(__TARGET_LINK_LIBRARIES_SELECTED ${__TARGET_LINK_LIBRARIES})
+      endif()
+
+      if(__TARGET_LINK_LIBRARIES_SELECTED)
+        __project_build_tools_recursive_scan_imported_locations(
+          ${__TARGET_LINK_LIBRARIES_SELECTED})
+      endif()
+    endif()
+  endforeach()
+  math(EXPR __project_build_tools_recursive_call_level
+       "${__project_build_tools_recursive_call_level} - 1")
+endmacro()
+
+function(project_build_tools_recursive_scan_imported_locations OUTPUT_VAR)
+  set(optionArgs)
+  set(oneValueArgs)
+  set(multiValueArgs TARGET_NAME TARGET_MATCH)
+  cmake_parse_arguments(__SCAN_OPTION "${optionArgs}" "${oneValueArgs}"
+                        "${multiValueArgs}" "${ARGN}")
+  set(__OUTPUT_VAR)
+
+  __project_build_tools_recursive_scan_imported_locations(
+    ${__SCAN_OPTION_TARGET_NAME})
+
+  set(${OUTPUT_VAR}
+      ${__OUTPUT_VAR}
+      PARENT_SCOPE)
 endfunction()

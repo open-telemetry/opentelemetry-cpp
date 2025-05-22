@@ -1,10 +1,20 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+if(protobuf_lib_type STREQUAL "STATIC_LIBRARY")
+  set(OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE STATIC)
+else()
+  set(OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE)
+endif()
+
 add_library(
   opentelemetry_otlp_recordable
-  src/otlp_environment.cc src/otlp_log_recordable.cc src/otlp_recordable.cc
-  src/otlp_populate_attribute_utils.cc src/otlp_recordable_utils.cc
+  ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE}
+  src/otlp_environment.cc
+  src/otlp_log_recordable.cc
+  src/otlp_recordable.cc
+  src/otlp_populate_attribute_utils.cc
+  src/otlp_recordable_utils.cc
   src/otlp_metric_utils.cc)
 set_target_properties(opentelemetry_otlp_recordable PROPERTIES EXPORT_NAME
                                                                otlp_recordable)
@@ -23,10 +33,34 @@ target_link_libraries(opentelemetry_otlp_recordable
 
 if(WITH_OTLP_GRPC)
   find_package(gRPC REQUIRED)
+  # gRPC uses numerous global variables, which can lead to conflicts when a
+  # user's dynamic libraries, executables, and otel-cpp are all built with
+  # -fvisibility=hidden and linked against a statically built gRPC library. This
+  # may result in crashes. To prevent such conflicts, we also need to build
+  # opentelemetry_exporter_otlp_grpc_client as a static library.
+  get_target_property(grpc_lib_type gRPC::grpc++ TYPE)
+  # grpc_lib_type may be "INTERFACE_LIBRARY" in some build systems, such as
+  # conan.
+  if(grpc_lib_type STREQUAL "INTERFACE_LIBRARY")
+    project_build_tools_recursive_scan_imported_locations(
+      grpc_lib_files TARGET_NAME gRPC::grpc++ TARGET_MATCH ".*(grpc|gRPC).*")
+    foreach(grpc_lib_file ${grpc_lib_files})
+      if(grpc_lib_file MATCHES "(^|[\\\\\\/])[^\\\\\\/]*grpc[^\\\\\\/]*.a$")
+        set(grpc_lib_type "STATIC_LIBRARY")
+        break()
+      endif()
+    endforeach()
+  endif()
+  if(grpc_lib_type STREQUAL "STATIC_LIBRARY" OR protobuf_lib_type STREQUAL
+                                                "STATIC_LIBRARY")
+    set(OPENTELEMETRY_OTLP_GRPC_CLIENT_LIB_TYPE STATIC)
+  else()
+    set(OPENTELEMETRY_OTLP_GRPC_CLIENT_LIB_TYPE)
+  endif()
   add_library(
     opentelemetry_exporter_otlp_grpc_client
-    src/otlp_grpc_client.cc src/otlp_grpc_client_factory.cc
-    src/otlp_grpc_utils.cc)
+    ${OPENTELEMETRY_OTLP_GRPC_CLIENT_LIB_TYPE} src/otlp_grpc_client.cc
+    src/otlp_grpc_client_factory.cc src/otlp_grpc_utils.cc)
   set_target_properties(opentelemetry_exporter_otlp_grpc_client
                         PROPERTIES EXPORT_NAME otlp_grpc_client)
   set_target_version(opentelemetry_exporter_otlp_grpc_client)
@@ -60,8 +94,8 @@ if(WITH_OTLP_GRPC)
 
   add_library(
     opentelemetry_exporter_otlp_grpc
-    src/otlp_grpc_exporter.cc src/otlp_grpc_exporter_factory.cc
-    src/otlp_grpc_exporter_options.cc)
+    ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE} src/otlp_grpc_exporter.cc
+    src/otlp_grpc_exporter_factory.cc src/otlp_grpc_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_grpc
                         PROPERTIES EXPORT_NAME otlp_grpc_exporter)
@@ -76,7 +110,7 @@ if(WITH_OTLP_GRPC)
 
   add_library(
     opentelemetry_exporter_otlp_grpc_log
-    src/otlp_grpc_log_record_exporter.cc
+    ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE} src/otlp_grpc_log_record_exporter.cc
     src/otlp_grpc_log_record_exporter_factory.cc
     src/otlp_grpc_log_record_exporter_options.cc)
 
@@ -94,7 +128,8 @@ if(WITH_OTLP_GRPC)
 
   add_library(
     opentelemetry_exporter_otlp_grpc_metrics
-    src/otlp_grpc_metric_exporter.cc src/otlp_grpc_metric_exporter_factory.cc
+    ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE} src/otlp_grpc_metric_exporter.cc
+    src/otlp_grpc_metric_exporter_factory.cc
     src/otlp_grpc_metric_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_grpc_metrics
@@ -111,8 +146,10 @@ if(WITH_OTLP_GRPC)
 endif()
 
 if(WITH_OTLP_HTTP)
-  add_library(opentelemetry_exporter_otlp_http_client src/otlp_http.cc
-                                                      src/otlp_http_client.cc)
+  add_library(
+    opentelemetry_exporter_otlp_http_client
+    ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE} src/otlp_http.cc
+    src/otlp_http_client.cc)
   set_target_properties(opentelemetry_exporter_otlp_http_client
                         PROPERTIES EXPORT_NAME otlp_http_client)
   set_target_version(opentelemetry_exporter_otlp_http_client)
@@ -141,8 +178,8 @@ if(WITH_OTLP_HTTP)
 
   add_library(
     opentelemetry_exporter_otlp_http
-    src/otlp_http_exporter.cc src/otlp_http_exporter_factory.cc
-    src/otlp_http_exporter_options.cc)
+    ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE} src/otlp_http_exporter.cc
+    src/otlp_http_exporter_factory.cc src/otlp_http_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_http
                         PROPERTIES EXPORT_NAME otlp_http_exporter)
@@ -157,7 +194,7 @@ if(WITH_OTLP_HTTP)
 
   add_library(
     opentelemetry_exporter_otlp_http_log
-    src/otlp_http_log_record_exporter.cc
+    ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE} src/otlp_http_log_record_exporter.cc
     src/otlp_http_log_record_exporter_factory.cc
     src/otlp_http_log_record_exporter_options.cc)
 
@@ -175,7 +212,8 @@ if(WITH_OTLP_HTTP)
 
   add_library(
     opentelemetry_exporter_otlp_http_metric
-    src/otlp_http_metric_exporter.cc src/otlp_http_metric_exporter_factory.cc
+    ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE} src/otlp_http_metric_exporter.cc
+    src/otlp_http_metric_exporter_factory.cc
     src/otlp_http_metric_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_http_metric
@@ -192,7 +230,8 @@ if(WITH_OTLP_HTTP)
 endif()
 
 if(WITH_OTLP_FILE)
-  add_library(opentelemetry_exporter_otlp_file_client src/otlp_file_client.cc)
+  add_library(opentelemetry_exporter_otlp_file_client
+              ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE} src/otlp_file_client.cc)
   set_target_properties(opentelemetry_exporter_otlp_file_client
                         PROPERTIES EXPORT_NAME otlp_file_client)
   set_target_version(opentelemetry_exporter_otlp_file_client)
@@ -216,8 +255,8 @@ if(WITH_OTLP_FILE)
 
   add_library(
     opentelemetry_exporter_otlp_file
-    src/otlp_file_exporter.cc src/otlp_file_exporter_factory.cc
-    src/otlp_file_exporter_options.cc)
+    ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE} src/otlp_file_exporter.cc
+    src/otlp_file_exporter_factory.cc src/otlp_file_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_file
                         PROPERTIES EXPORT_NAME otlp_file_exporter)
@@ -232,7 +271,7 @@ if(WITH_OTLP_FILE)
 
   add_library(
     opentelemetry_exporter_otlp_file_log
-    src/otlp_file_log_record_exporter.cc
+    ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE} src/otlp_file_log_record_exporter.cc
     src/otlp_file_log_record_exporter_factory.cc
     src/otlp_file_log_record_exporter_options.cc)
 
@@ -250,7 +289,8 @@ if(WITH_OTLP_FILE)
 
   add_library(
     opentelemetry_exporter_otlp_file_metric
-    src/otlp_file_metric_exporter.cc src/otlp_file_metric_exporter_factory.cc
+    ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE} src/otlp_file_metric_exporter.cc
+    src/otlp_file_metric_exporter_factory.cc
     src/otlp_file_metric_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_file_metric
