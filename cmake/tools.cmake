@@ -225,11 +225,19 @@ endfunction()
 
 function(__project_build_tools_recursive_scan_unwrap OUTPUT_VAR INPUT_VAR)
   # With sub-expressions
-  if(INPUT_VAR MATCHES "^\\\$<.*>:([^>]+)>?$")
+  if(INPUT_VAR MATCHES "^\\\$<.*>:([^>]+)>$")
     set(${OUTPUT_VAR}
         "${CMAKE_MATCH_1}"
         PARENT_SCOPE)
-  elseif(INPUT_VAR MATCHES "^\\\$<[^:]+:([^>]+)>?$")
+  elseif(INPUT_VAR MATCHES "^\\\$<.*>:([^>]+)$")
+    set(${OUTPUT_VAR}
+        "${CMAKE_MATCH_1}"
+        PARENT_SCOPE)
+  elseif(INPUT_VAR MATCHES "^\\\$<[^:]+:([^>]+)>$")
+    set(${OUTPUT_VAR}
+        "${CMAKE_MATCH_1}"
+        PARENT_SCOPE)
+  elseif(INPUT_VAR MATCHES "^\\\$<[^:]+:([^>]+)$")
     set(${OUTPUT_VAR}
         "${CMAKE_MATCH_1}"
         PARENT_SCOPE)
@@ -259,7 +267,8 @@ macro(__project_build_tools_recursive_scan_imported_locations)
           "${TARGET_NAME_ORIGIN_${__project_build_tools_recursive_call_level}}")
     endif()
     if(NOT DEFINED
-       __project_build_tools_recursive_scan_imported_locations_${TARGET_NAME})
+       __project_build_tools_recursive_scan_imported_locations_${TARGET_NAME}
+       AND TARGET ${TARGET_NAME})
       set(__project_build_tools_recursive_scan_imported_locations_${TARGET_NAME}
           TRUE)
       set(__lib_path)
