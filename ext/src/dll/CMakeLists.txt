@@ -1,6 +1,12 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+if (NOT MSVC)
+  message(
+    FATAL_ERROR
+      "The OpenTelemetry C++ SDK for Windows DLL is only supported on MSVC.")
+endif()
+
 set(OPENTELEMETRY_EXPORT_DEF
     "${CMAKE_CURRENT_BINARY_DIR}/opentelemetry_cpp.def")
 
