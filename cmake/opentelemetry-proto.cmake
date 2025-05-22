@@ -221,6 +221,39 @@ elseif(PROTOBUF_VERSION AND PROTOBUF_VERSION VERSION_LESS "3.16")
   list(APPEND PROTOBUF_COMMON_FLAGS "--experimental_allow_proto3_optional")
 endif()
 
+# protobuf uses numerous global variables, which can lead to conflicts when a
+# user's dynamic libraries, executables, and otel-cpp are all built with
+# -fvisibility=hidden and linked against a statically built protobuf library.
+# This may result in crashes. To prevent such conflicts, we also need to build
+# opentelemetry_exporter_otlp_grpc_client as a static library.
+if(TARGET protobuf::libprotobuf)
+  get_target_property(protobuf_lib_type protobuf::libprotobuf TYPE)
+  # protobuf_lib_type may be "INTERFACE_LIBRARY" in some build systems, such as
+  # conan.
+  if(protobuf_lib_type STREQUAL "INTERFACE_LIBRARY")
+    project_build_tools_recursive_scan_imported_locations(
+      protobuf_lib_files TARGET_NAME protobuf::libprotobuf TARGET_MATCH
+      ".*(protobuf).*")
+    foreach(protobuf_lib_file ${protobuf_lib_files})
+      if(protobuf_lib_file MATCHES
+         "(^|[\\\\\\/])[^\\\\\\/]*protobuf[^\\\\\\/]*.a$")
+        set(protobuf_lib_type "STATIC_LIBRARY")
+        break()
+      endif()
+    endforeach()
+  endif()
+else()
+  set(protobuf_lib_type "SHARED_LIBRARY")
+  target_link_libraries(opentelemetry_proto PUBLIC ${Protobuf_LIBRARIES})
+  foreach(protobuf_lib_file ${Protobuf_LIBRARIES})
+    if(protobuf_lib_file MATCHES
+       "(^|[\\\\\\/])[^\\\\\\/]*protobuf[^\\\\\\/]*.a$")
+      set(protobuf_lib_type "STATIC_LIBRARY")
+      break()
+    endif()
+  endforeach()
+endif()
+
 set(PROTOBUF_GENERATED_FILES
     ${COMMON_PB_H_FILE}
     ${COMMON_PB_CPP_FILE}
@@ -293,7 +326,8 @@ add_custom_command(
 unset(OTELCPP_PROTO_TARGET_OPTIONS)
 if(CMAKE_SYSTEM_NAME MATCHES "Windows|MinGW|WindowsStore")
   list(APPEND OTELCPP_PROTO_TARGET_OPTIONS STATIC)
-elseif(NOT DEFINED BUILD_SHARED_LIBS OR BUILD_SHARED_LIBS)
+elseif((NOT protobuf_lib_type STREQUAL "STATIC_LIBRARY")
+       AND (NOT DEFINED BUILD_SHARED_LIBS OR BUILD_SHARED_LIBS))
   list(APPEND OTELCPP_PROTO_TARGET_OPTIONS SHARED)
 else()
   list(APPEND OTELCPP_PROTO_TARGET_OPTIONS STATIC)
@@ -302,6 +336,7 @@ endif()
 set(OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto)
 add_library(
   opentelemetry_proto
+  ${OPENTELEMETRY_OTLP_PROTO_LIB_TYPE}
   ${OTELCPP_PROTO_TARGET_OPTIONS}
   ${COMMON_PB_CPP_FILE}
   ${RESOURCE_PB_CPP_FILE}
@@ -314,9 +349,8 @@ add_library(
 set_target_version(opentelemetry_proto)
 
 target_include_directories(
-  opentelemetry_proto
-  PUBLIC "$<BUILD_INTERFACE:${GENERATED_PROTOBUF_PATH}>"
-         "$<INSTALL_INTERFACE:include>")
+  opentelemetry_proto PUBLIC "$<BUILD_INTERFACE:${GENERATED_PROTOBUF_PATH}>"
+                             "$<INSTALL_INTERFACE:include>")
 
 # Disable include-what-you-use and clang-tidy on generated code.
 set_target_properties(opentelemetry_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE
@@ -334,8 +368,9 @@ endif()
 if(WITH_OTLP_GRPC)
   add_library(
     opentelemetry_proto_grpc
-    ${OTELCPP_PROTO_TARGET_OPTIONS} ${TRACE_SERVICE_GRPC_PB_CPP_FILE}
-    ${LOGS_SERVICE_GRPC_PB_CPP_FILE} ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
+    ${OPENTELEMETRY_OTLP_PROTO_LIB_TYPE} ${OTELCPP_PROTO_TARGET_OPTIONS}
+    ${TRACE_SERVICE_GRPC_PB_CPP_FILE} ${LOGS_SERVICE_GRPC_PB_CPP_FILE}
+    ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
   set_target_version(opentelemetry_proto_grpc)
 
   # Disable include-what-you-use and clang-tidy on generated code.
@@ -382,7 +417,8 @@ else() # cmake 3.8 or lower
   target_link_libraries(opentelemetry_proto PUBLIC ${Protobuf_LIBRARIES})
 endif()
 
-# this is needed on some older grcp versions specifically conan recipe for grpc/1.54.3
+# this is needed on some older grcp versions specifically conan recipe for
+# grpc/1.54.3
 if(WITH_OTLP_GRPC)
   if(TARGET absl::synchronization)
     target_link_libraries(opentelemetry_proto_grpc
