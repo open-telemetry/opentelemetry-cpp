@@ -64,6 +64,9 @@ Increment the:
 * [EXPORTER] ostream log exporter, fixed memory ownership issues
   [#3417](https://github.com/open-telemetry/opentelemetry-cpp/pull/3417)
 
+* [TEST] Test all components in a CMake super build
+  [#3433](https://github.com/open-telemetry/opentelemetry-cpp/pull/3433)
+
 Important changes:
 
 * [EXPORTER] ostream log exporter, fixed memory ownership issues
