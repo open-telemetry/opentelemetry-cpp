@@ -75,6 +75,9 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_googletest.sh
+        sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/install_protobuf.sh
+        sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
     - name: run fetch content cmake test
       run: |
         ./ci/do_ci.sh cmake.fetch_content.test
