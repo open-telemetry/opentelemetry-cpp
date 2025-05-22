@@ -34,9 +34,9 @@ target_link_libraries(opentelemetry_otlp_recordable
 if(WITH_OTLP_GRPC)
   find_package(gRPC REQUIRED)
   # gRPC uses numerous global variables, which can lead to conflicts when a
-  # user's dynamic libraries, executables, and otel-cpp are all built with
-  # -fvisibility=hidden and linked against a statically built gRPC library. This
-  # may result in crashes. To prevent such conflicts, we also need to build
+  # user's dynamic libraries, executables, and otel-cpp are all built as dynamic
+  # libraries and linked against a statically built gRPC library. This may
+  # result in crashes. To prevent such conflicts, we also need to build
   # opentelemetry_exporter_otlp_grpc_client as a static library.
   get_target_property(grpc_lib_type gRPC::grpc++ TYPE)
   # grpc_lib_type may be "INTERFACE_LIBRARY" in some build systems, such as
