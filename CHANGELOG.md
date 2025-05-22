@@ -16,7 +16,7 @@ Increment the:
 ## [Unreleased]
 
 * [BUILD] Error out when building DLL without MSVC
-  [#3438] (https://github.com/open-telemetry/opentelemetry-cpp/pull/3438)
+  [#3438](https://github.com/open-telemetry/opentelemetry-cpp/pull/3438)
 
 * [Metrics SDK] Use nostd::function_ref in AttributesHashMap
   [#3393](https://github.com/open-telemetry/opentelemetry-cpp/pull/3393)
