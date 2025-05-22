@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Set small initial value for AttributesHashMap::hash_map_
+  [#3391](https://github.com/open-telemetry/opentelemetry-cpp/pull/3391)
+
 * [Metrics SDK] Use nostd::function_ref in AttributesHashMap
   [#3393](https://github.com/open-telemetry/opentelemetry-cpp/pull/3393)
 
