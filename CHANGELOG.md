@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Propagate INTERFACE_COMPILE_DEFINITIONS from API through common_foo_library
+  [#3450](https://github.com/open-telemetry/opentelemetry-cpp/pull/3450)
+
 * [Metrics SDK] Use nostd::function_ref in AttributesHashMap
   [#3393](https://github.com/open-telemetry/opentelemetry-cpp/pull/3393)
 
