@@ -24,7 +24,6 @@ public:
   /// temporality selector.
   /// @param [out] data the InMemoryMetricData the exporter will write to,
   ///                   for the caller to inspect
-  /// @param [in] buffer_size number of entries to save in the circular buffer
   /// @param [in] temporality output temporality as a function of instrument kind
   static std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Create(
       const std::shared_ptr<InMemoryMetricData> &data,

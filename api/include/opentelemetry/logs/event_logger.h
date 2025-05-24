@@ -42,7 +42,7 @@ public:
    * Emit a event Log Record object with arguments
    *
    * @param event_name Event name
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  Severity                                -> severity, severity_text
    *  string_view                             -> body
    *  AttributeValue                          -> body
