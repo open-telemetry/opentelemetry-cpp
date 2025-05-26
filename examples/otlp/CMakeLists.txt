@@ -115,7 +115,7 @@ if(WITH_OTLP_HTTP)
     target_compile_definitions(example_otlp_instrumented_http
                                PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
     target_link_libraries(example_otlp_instrumented_http
-                          opentelemetry-cpp::opentelemetry_cpp)
+                          PRIVATE opentelemetry-cpp::opentelemetry_cpp)
   else()
     target_link_libraries(
       example_otlp_instrumented_http
