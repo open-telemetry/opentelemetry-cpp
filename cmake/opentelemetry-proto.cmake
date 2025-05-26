@@ -49,7 +49,7 @@ else()
          "opentelemetry-proto=[ \\t]*([A-Za-z0-9_\\.\\-]+)")
         set(opentelemetry-proto "${CMAKE_MATCH_1}")
       else()
-        set(opentelemetry-proto "v1.5.0")
+        set(opentelemetry-proto "v1.6.0")
       endif()
       unset(OTELCPP_THIRD_PARTY_RELEASE_CONTENT)
     endif()
@@ -290,8 +290,6 @@ add_custom_command(
   COMMENT "[Run]: ${PROTOBUF_RUN_PROTOC_COMMAND}"
   DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE})
 
-include_directories("${GENERATED_PROTOBUF_PATH}")
-
 unset(OTELCPP_PROTO_TARGET_OPTIONS)
 if(CMAKE_SYSTEM_NAME MATCHES "Windows|MinGW|WindowsStore")
   list(APPEND OTELCPP_PROTO_TARGET_OPTIONS STATIC)
@@ -314,6 +312,11 @@ add_library(
   ${LOGS_SERVICE_PB_CPP_FILE}
   ${METRICS_SERVICE_PB_CPP_FILE})
 set_target_version(opentelemetry_proto)
+
+target_include_directories(
+  opentelemetry_proto
+  PUBLIC "$<BUILD_INTERFACE:${GENERATED_PROTOBUF_PATH}>"
+         "$<INSTALL_INTERFACE:include>")
 
 # Disable include-what-you-use on generated code.
 set_target_properties(opentelemetry_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE
@@ -365,24 +368,6 @@ set_target_properties(opentelemetry_proto PROPERTIES EXPORT_NAME proto)
 patch_protobuf_targets(opentelemetry_proto)
 
 if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_proto
-    EXPORT "${PROJECT_NAME}-exporters_otlp_common-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    COMPONENT exporters_otlp_common)
-
-  if(WITH_OTLP_GRPC)
-    install(
-      TARGETS opentelemetry_proto_grpc
-      EXPORT "${PROJECT_NAME}-exporters_otlp_grpc-target"
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      COMPONENT exporters_otlp_grpc)
-  endif()
-
   install(
     DIRECTORY ${GENERATED_PROTOBUF_PATH}/opentelemetry
     DESTINATION include

@@ -28,7 +28,7 @@ static constexpr const char *kSystemCpuLogicalNumber = "system.cpu.logical_numbe
  * Deprecated, use @code cpu.mode @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code cpu.mode @endcode", "reason": "uncategorized"}
+ * {"note": "Replaced by @code cpu.mode @endcode.", "reason": "renamed", "renamed_to": "cpu.mode"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemCpuState = "system.cpu.state";
 
@@ -66,8 +66,8 @@ static constexpr const char *kSystemMemoryState = "system.memory.state";
  * Deprecated, use @code network.connection.state @endcode instead.
  *
  * @deprecated
- * {"note": "Removed, report network connection state with @code network.connection.state @endcode
- * attribute", "reason": "uncategorized"}
+ * {"note": "Replaced by @code network.connection.state @endcode.", "reason": "renamed",
+ * "renamed_to": "network.connection.state"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemNetworkState = "system.network.state";
 
@@ -97,7 +97,8 @@ static constexpr const char *kSystemProcessStatus = "system.process.status";
  * Deprecated, use @code system.process.status @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code system.process.status @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code system.process.status @endcode.", "reason": "renamed", "renamed_to":
+ * "system.process.status"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemProcessesStatus =
     "system.processes.status";

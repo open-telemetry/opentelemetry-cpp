@@ -9,38 +9,29 @@ target_include_directories(
 
 set_target_properties(opentelemetry_sdk PROPERTIES EXPORT_NAME sdk)
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_sdk
-    EXPORT "${PROJECT_NAME}-sdk-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk)
+target_link_libraries(opentelemetry_sdk INTERFACE opentelemetry_api)
 
-  install(
-    DIRECTORY include/opentelemetry/
-    DESTINATION include/opentelemetry
-    COMPONENT sdk
-    FILES_MATCHING
-    PATTERN "*config.h")
-
-  install(
-    DIRECTORY include/opentelemetry/sdk
-    DESTINATION include/opentelemetry
-    COMPONENT sdk
-    FILES_MATCHING
-    PATTERN "*.h")
-
-  install(
-    EXPORT "${PROJECT_NAME}-sdk-target"
-    FILE "${PROJECT_NAME}-sdk-target.cmake"
-    NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-    COMPONENT sdk)
-
-endif()
-
+set(OTEL_SDK_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(src)
+
+otel_add_component(
+  COMPONENT
+  sdk
+  TARGETS
+  opentelemetry_sdk
+  opentelemetry_common
+  opentelemetry_resources
+  opentelemetry_version
+  opentelemetry_logs
+  opentelemetry_trace
+  opentelemetry_metrics
+  FILES_DIRECTORY
+  "include/opentelemetry/"
+  FILES_DESTINATION
+  "include/opentelemetry"
+  FILES_MATCHING
+  PATTERN
+  "*.h")
 
 if(BUILD_TESTING)
   add_subdirectory(test)

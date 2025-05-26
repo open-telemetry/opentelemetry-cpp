@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 add_subdirectory(common)
-include_directories(common)
+
 if(WITH_OTLP_GRPC
    OR WITH_OTLP_HTTP
    OR WITH_OTLP_FILE)

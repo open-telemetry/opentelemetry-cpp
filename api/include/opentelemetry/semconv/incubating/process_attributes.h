@@ -38,14 +38,16 @@ static constexpr const char *kProcessCommand = "process.command";
  * All the command arguments (including the command/executable itself) as received by the process.
  * On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according
  * to the list of null-delimited strings extracted from @code proc/[pid]/cmdline @endcode. For
- * libc-based executables, this would be the full argv vector passed to @code main @endcode.
+ * libc-based executables, this would be the full argv vector passed to @code main @endcode. SHOULD
+ * NOT be collected by default unless there is sanitization that excludes sensitive data.
  */
 static constexpr const char *kProcessCommandArgs = "process.command_args";
 
 /**
  * The full command used to launch the process as a single string representing the full command. On
  * Windows, can be set to the result of @code GetCommandLineW @endcode. Do not set this if you have
- * to assemble it just for monitoring; use @code process.command_args @endcode instead.
+ * to assemble it just for monitoring; use @code process.command_args @endcode instead. SHOULD NOT
+ * be collected by default unless there is sanitization that excludes sensitive data.
  */
 static constexpr const char *kProcessCommandLine = "process.command_line";
 
@@ -58,7 +60,7 @@ static constexpr const char *kProcessContextSwitchType = "process.context_switch
  * Deprecated, use @code cpu.mode @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code cpu.mode @endcode", "reason": "uncategorized"}
+ * {"note": "Replaced by @code cpu.mode @endcode.", "reason": "renamed", "renamed_to": "cpu.mode"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kProcessCpuState = "process.cpu.state";
 
@@ -66,6 +68,18 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kProcessCpuState = "proces
  * The date and time the process was created, in ISO 8601 format.
  */
 static constexpr const char *kProcessCreationTime = "process.creation.time";
+
+/**
+ * Process environment variables, <key> being the environment variable name, the value being the
+ * environment variable value. <p> Examples: <ul> <li>an environment variable @code USER @endcode
+ * with value @code "ubuntu" @endcode SHOULD be recorded as the @code
+ * process.environment_variable.USER @endcode attribute with value @code "ubuntu" @endcode.</li>
+ *   <li>an environment variable @code PATH @endcode with value @code "/usr/local/bin:/usr/bin"
+ * @endcode SHOULD be recorded as the @code process.environment_variable.PATH @endcode attribute
+ * with value @code "/usr/local/bin:/usr/bin" @endcode.</li>
+ * </ul>
+ */
+static constexpr const char *kProcessEnvironmentVariable = "process.environment_variable";
 
 /**
  * The GNU build ID as found in the @code .note.gnu.build-id @endcode ELF section (hex string).
@@ -88,8 +102,8 @@ static constexpr const char *kProcessExecutableBuildIdHtlhash =
  * "Deprecated, use @code process.executable.build_id.htlhash @endcode instead."
  *
  * @deprecated
- * {"note": "Replaced by @code process.executable.build_id.htlhash @endcode", "reason":
- * "uncategorized"}
+ * {"note": "Replaced by @code process.executable.build_id.htlhash @endcode.", "reason": "renamed",
+ * "renamed_to": "process.executable.build_id.htlhash"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kProcessExecutableBuildIdProfiling =
     "process.executable.build_id.profiling";

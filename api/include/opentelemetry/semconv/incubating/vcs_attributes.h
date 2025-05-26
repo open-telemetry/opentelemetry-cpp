@@ -42,6 +42,16 @@ static constexpr const char *kVcsChangeTitle = "vcs.change.title";
 static constexpr const char *kVcsLineChangeType = "vcs.line_change.type";
 
 /**
+ * The group owner within the version control system.
+ */
+static constexpr const char *kVcsOwnerName = "vcs.owner.name";
+
+/**
+ * The name of the version control system provider.
+ */
+static constexpr const char *kVcsProviderName = "vcs.provider.name";
+
+/**
  * The name of the <a href="https://git-scm.com/docs/gitglossary#def_ref">reference</a> such as
  * <strong>branch</strong> or <strong>tag</strong> in the repository. <p>
  * @code base @endcode refers to the starting point of a change. For example, @code main @endcode
@@ -122,7 +132,8 @@ static constexpr const char *kVcsRefType = "vcs.ref.type";
  * Deprecated, use @code vcs.change.id @endcode instead.
  *
  * @deprecated
- * {"note": "Deprecated, use @code vcs.change.id @endcode instead.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code vcs.change.id @endcode.", "reason": "renamed", "renamed_to":
+ * "vcs.change.id"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryChangeId =
     "vcs.repository.change.id";
@@ -131,7 +142,8 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryChangeId =
  * Deprecated, use @code vcs.change.title @endcode instead.
  *
  * @deprecated
- * {"note": "Deprecated, use @code vcs.change.title @endcode instead.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code vcs.change.title @endcode.", "reason": "renamed", "renamed_to":
+ * "vcs.change.title"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryChangeTitle =
     "vcs.repository.change.title";
@@ -148,7 +160,8 @@ static constexpr const char *kVcsRepositoryName = "vcs.repository.name";
  * Deprecated, use @code vcs.ref.head.name @endcode instead.
  *
  * @deprecated
- * {"note": "Deprecated, use @code vcs.ref.head.name @endcode instead.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code vcs.ref.head.name @endcode.", "reason": "renamed", "renamed_to":
+ * "vcs.ref.head.name"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryRefName =
     "vcs.repository.ref.name";
@@ -157,8 +170,8 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryRefName =
  * Deprecated, use @code vcs.ref.head.revision @endcode instead.
  *
  * @deprecated
- * {"note": "Deprecated, use @code vcs.ref.head.revision @endcode instead.", "reason":
- * "uncategorized"}
+ * {"note": "Replaced by @code vcs.ref.head.revision @endcode.", "reason": "renamed", "renamed_to":
+ * "vcs.ref.head.revision"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryRefRevision =
     "vcs.repository.ref.revision";
@@ -167,7 +180,8 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryRefRevision 
  * Deprecated, use @code vcs.ref.head.type @endcode instead.
  *
  * @deprecated
- * {"note": "Deprecated, use @code vcs.ref.head.type @endcode instead.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code vcs.ref.head.type @endcode.", "reason": "renamed", "renamed_to":
+ * "vcs.ref.head.type"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kVcsRepositoryRefType =
     "vcs.repository.ref.type";
@@ -227,6 +241,35 @@ static constexpr const char *kAdded = "added";
 static constexpr const char *kRemoved = "removed";
 
 }  // namespace VcsLineChangeTypeValues
+
+namespace VcsProviderNameValues
+{
+/**
+ * <a href="https://github.com">GitHub</a>
+ */
+static constexpr const char *kGithub = "github";
+
+/**
+ * <a href="https://gitlab.com">GitLab</a>
+ */
+static constexpr const char *kGitlab = "gitlab";
+
+/**
+ * Deprecated, use @code gitea @endcode instead.
+ */
+static constexpr const char *kGittea = "gittea";
+
+/**
+ * <a href="https://gitea.io">Gitea</a>
+ */
+static constexpr const char *kGitea = "gitea";
+
+/**
+ * <a href="https://bitbucket.org">Bitbucket</a>
+ */
+static constexpr const char *kBitbucket = "bitbucket";
+
+}  // namespace VcsProviderNameValues
 
 namespace VcsRefBaseTypeValues
 {

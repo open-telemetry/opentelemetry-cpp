@@ -14,18 +14,14 @@ add_library(opentelemetry_common ${COMMON_SRCS})
 set_target_properties(opentelemetry_common PROPERTIES EXPORT_NAME common)
 set_target_version(opentelemetry_common)
 
+target_include_directories(opentelemetry_common
+                           PUBLIC "$<BUILD_INTERFACE:${OTEL_SDK_DIR}>")
+
 target_link_libraries(
   opentelemetry_common PUBLIC opentelemetry_api opentelemetry_sdk
                               Threads::Threads)
 
 if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_common
-    EXPORT "${PROJECT_NAME}-sdk-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk)
-
   opentelemetry_add_pkgconfig(
     common
     "OpenTelemetry SDK - Common"

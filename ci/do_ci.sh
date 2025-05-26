@@ -289,13 +289,14 @@ elif [[ "$1" == "cmake.opentracing_shim.install.test" ]]; then
     "shims_opentracing"
   )
   EXPECTED_COMPONENTS_STRING=$(IFS=\;; echo "${EXPECTED_COMPONENTS[*]}")
-  cmake -S "${SRC_DIR}/install/test/cmake" \
-        -B "${BUILD_DIR}/install_test" \
-        "${CMAKE_OPTIONS[@]}" \
+  mkdir -p "${BUILD_DIR}/install_test"
+  cd "${BUILD_DIR}/install_test"
+  cmake "${CMAKE_OPTIONS[@]}" \
         "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
         "-DINSTALL_TEST_CMAKE_OPTIONS=${CMAKE_OPTIONS_STRING}" \
-        "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}"
-  ctest --test-dir "${BUILD_DIR}/install_test" --output-on-failure
+        "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}" \
+        -S "${SRC_DIR}/install/test/cmake"
+  ctest --output-on-failure
   exit 0
 elif [[ "$1" == "cmake.c++20.test" ]]; then
   cd "${BUILD_DIR}"
@@ -500,6 +501,8 @@ elif [[ "$1" == "cmake.install.test" ]]; then
         -DWITH_ZIPKIN=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_EXAMPLES=ON \
+        -DWITH_EXAMPLES_HTTP=ON \
+        -DBUILD_W3CTRACECONTEXT_TEST=ON \
         -DOPENTELEMETRY_INSTALL=ON \
         "${SRC_DIR}"
 
@@ -526,15 +529,54 @@ elif [[ "$1" == "cmake.install.test" ]]; then
     "exporters_zipkin"
   )
   EXPECTED_COMPONENTS_STRING=$(IFS=\;; echo "${EXPECTED_COMPONENTS[*]}")
-
-  cmake -S "${SRC_DIR}/install/test/cmake" \
-        -B "${BUILD_DIR}/install_test" \
-         "${CMAKE_OPTIONS[@]}" \
+  mkdir -p "${BUILD_DIR}/install_test"
+  cd "${BUILD_DIR}/install_test"
+  cmake  "${CMAKE_OPTIONS[@]}" \
          "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
          "-DINSTALL_TEST_CMAKE_OPTIONS=${CMAKE_OPTIONS_STRING}" \
-         "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}"
-  ctest --test-dir "${BUILD_DIR}/install_test" --output-on-failure
+         "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}" \
+         -S "${SRC_DIR}/install/test/cmake"
+  ctest --output-on-failure
   exit 0
+elif [[ "$1" == "cmake.fetch_content.test" ]]; then
+  if [[ -n "${BUILD_SHARED_LIBS}" && "${BUILD_SHARED_LIBS}" == "ON" ]]; then
+    CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=ON")
+    echo "BUILD_SHARED_LIBS is set to: ON"
+  else
+    CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=OFF")
+    echo "BUILD_SHARED_LIBS is set to: OFF"
+  fi
+  CMAKE_OPTIONS+=("-DCMAKE_POSITION_INDEPENDENT_CODE=ON")
+
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
+        -DWITH_ABI_VERSION_1=OFF \
+        -DWITH_ABI_VERSION_2=ON \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
+        -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
+        -DWITH_OTLP_GRPC=ON \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
+        -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_HTTP_CLIENT_CURL=ON \
+        -DWITH_PROMETHEUS=ON \
+        -DWITH_ZIPKIN=ON \
+        -DWITH_ELASTICSEARCH=ON \
+        -DWITH_EXAMPLES=ON \
+        -DWITH_EXAMPLES_HTTP=ON \
+        -DBUILD_W3CTRACECONTEXT_TEST=ON \
+        -DOPENTELEMETRY_INSTALL=OFF \
+        -DOPENTELEMETRY_CPP_SRC_DIR="${SRC_DIR}" \
+        "${SRC_DIR}/install/test/cmake/fetch_content_test"
+  make -j $(nproc)
+  make test
+  exit 0
+
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
   cd "${BUILD_DIR}"

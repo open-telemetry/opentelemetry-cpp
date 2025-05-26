@@ -357,8 +357,8 @@ CreateSyncDoubleMetricDbClientConnectionWaitTime(metrics::Meter *meter)
  * changed from @code ms @endcode to @code s @endcode.
  *
  * @deprecated
- * {"note": "Replaced by @code db.client.connection.create_time @endcode. Note: the unit also
- * changed from @code ms @endcode to @code s @endcode.", "reason": "uncategorized"} <p> histogram
+ * {"note": "Replaced by @code db.client.connection.create_time @endcode with unit @code s
+ * @endcode.", "reason": "uncategorized"} <p> histogram
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricDbClientConnectionsCreateTime =
     "db.client.connections.create_time";
@@ -388,9 +388,8 @@ CreateSyncDoubleMetricDbClientConnectionsCreateTime(metrics::Meter *meter)
  * Deprecated, use @code db.client.connection.idle.max @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code db.client.connection.idle.max @endcode.", "reason": "uncategorized"}
- * <p>
- * updowncounter
+ * {"note": "Replaced by @code db.client.connection.idle.max @endcode.", "reason": "renamed",
+ * "renamed_to": "db.client.connection.idle.max"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricDbClientConnectionsIdleMax =
     "db.client.connections.idle.max";
@@ -435,9 +434,8 @@ CreateAsyncDoubleMetricDbClientConnectionsIdleMax(metrics::Meter *meter)
  * Deprecated, use @code db.client.connection.idle.min @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code db.client.connection.idle.min @endcode.", "reason": "uncategorized"}
- * <p>
- * updowncounter
+ * {"note": "Replaced by @code db.client.connection.idle.min @endcode.", "reason": "renamed",
+ * "renamed_to": "db.client.connection.idle.min"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricDbClientConnectionsIdleMin =
     "db.client.connections.idle.min";
@@ -482,9 +480,8 @@ CreateAsyncDoubleMetricDbClientConnectionsIdleMin(metrics::Meter *meter)
  * Deprecated, use @code db.client.connection.max @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code db.client.connection.max @endcode.", "reason": "uncategorized"}
- * <p>
- * updowncounter
+ * {"note": "Replaced by @code db.client.connection.max @endcode.", "reason": "renamed",
+ * "renamed_to": "db.client.connection.max"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricDbClientConnectionsMax =
     "db.client.connections.max";
@@ -530,7 +527,7 @@ CreateAsyncDoubleMetricDbClientConnectionsMax(metrics::Meter *meter)
  *
  * @deprecated
  * {"note": "Replaced by @code db.client.connection.pending_requests @endcode.", "reason":
- * "uncategorized"} <p> updowncounter
+ * "renamed", "renamed_to": "db.client.connection.pending_requests"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricDbClientConnectionsPendingRequests =
     "db.client.connections.pending_requests";
@@ -576,9 +573,8 @@ CreateAsyncDoubleMetricDbClientConnectionsPendingRequests(metrics::Meter *meter)
  * Deprecated, use @code db.client.connection.timeouts @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code db.client.connection.timeouts @endcode.", "reason": "uncategorized"}
- * <p>
- * counter
+ * {"note": "Replaced by @code db.client.connection.timeouts @endcode.", "reason": "renamed",
+ * "renamed_to": "db.client.connection.timeouts"} <p> counter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricDbClientConnectionsTimeouts =
     "db.client.connections.timeouts";
@@ -623,9 +619,8 @@ CreateAsyncDoubleMetricDbClientConnectionsTimeouts(metrics::Meter *meter)
  * Deprecated, use @code db.client.connection.count @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code db.client.connection.count @endcode.", "reason": "uncategorized"}
- * <p>
- * updowncounter
+ * {"note": "Replaced by @code db.client.connection.count @endcode.", "reason": "renamed",
+ * "renamed_to": "db.client.connection.count"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricDbClientConnectionsUsage =
     "db.client.connections.usage";
@@ -671,8 +666,8 @@ CreateAsyncDoubleMetricDbClientConnectionsUsage(metrics::Meter *meter)
  * from @code ms @endcode to @code s @endcode.
  *
  * @deprecated
- * {"note": "Replaced by @code db.client.connection.use_time @endcode. Note: the unit also changed
- * from @code ms @endcode to @code s @endcode.", "reason": "uncategorized"} <p> histogram
+ * {"note": "Replaced by @code db.client.connection.use_time @endcode with unit @code s @endcode.",
+ * "reason": "uncategorized"} <p> histogram
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricDbClientConnectionsUseTime =
     "db.client.connections.use_time";
@@ -702,8 +697,8 @@ CreateSyncDoubleMetricDbClientConnectionsUseTime(metrics::Meter *meter)
  * changed from @code ms @endcode to @code s @endcode.
  *
  * @deprecated
- * {"note": "Replaced by @code db.client.connection.wait_time @endcode. Note: the unit also changed
- * from @code ms @endcode to @code s @endcode.", "reason": "uncategorized"} <p> histogram
+ * {"note": "Replaced by @code db.client.connection.wait_time @endcode with unit @code s @endcode.",
+ * "reason": "uncategorized"} <p> histogram
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricDbClientConnectionsWaitTime =
     "db.client.connections.wait_time";
@@ -733,7 +728,7 @@ CreateSyncDoubleMetricDbClientConnectionsWaitTime(metrics::Meter *meter)
  *
  * @deprecated
  * {"note": "Replaced by @code azure.cosmosdb.client.active_instance.count @endcode.", "reason":
- * "uncategorized"} <p> updowncounter
+ * "renamed", "renamed_to": "azure.cosmosdb.client.active_instance.count"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricDbClientCosmosdbActiveInstanceCount =
     "db.client.cosmosdb.active_instance.count";
@@ -780,7 +775,7 @@ CreateAsyncDoubleMetricDbClientCosmosdbActiveInstanceCount(metrics::Meter *meter
  *
  * @deprecated
  * {"note": "Replaced by @code azure.cosmosdb.client.operation.request_charge @endcode.", "reason":
- * "uncategorized"} <p> histogram
+ * "renamed", "renamed_to": "azure.cosmosdb.client.operation.request_charge"} <p> histogram
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char
     *kMetricDbClientCosmosdbOperationRequestCharge = "db.client.cosmosdb.operation.request_charge";
