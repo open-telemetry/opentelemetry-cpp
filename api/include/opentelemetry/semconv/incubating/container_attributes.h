@@ -41,7 +41,7 @@ static constexpr const char *kContainerCommandLine = "container.command_line";
  * Deprecated, use @code cpu.mode @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code cpu.mode @endcode", "reason": "uncategorized"}
+ * {"note": "Replaced by @code cpu.mode @endcode.", "reason": "renamed", "renamed_to": "cpu.mode"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kContainerCpuState = "container.cpu.state";
 
@@ -108,6 +108,10 @@ static constexpr const char *kContainerImageTags = "container.image.tags";
 
 /**
  * Container labels, @code <key> @endcode being the label name, the value being the label value.
+ * <p>
+ * For example, a docker container label @code app @endcode with value @code nginx @endcode SHOULD
+ * be recorded as the @code container.label.app @endcode attribute with value @code "nginx"
+ * @endcode.
  */
 static constexpr const char *kContainerLabel = "container.label";
 
@@ -115,7 +119,8 @@ static constexpr const char *kContainerLabel = "container.label";
  * Deprecated, use @code container.label @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code container.label @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code container.label @endcode.", "reason": "renamed", "renamed_to":
+ * "container.label"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kContainerLabels = "container.labels";
 

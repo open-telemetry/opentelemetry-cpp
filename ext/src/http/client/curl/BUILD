@@ -10,9 +10,6 @@ cc_library(
         "http_client_factory_curl.cc",
         "http_operation_curl.cc",
     ],
-    copts = [
-        "-DWITH_CURL",
-    ],
     include_prefix = "src/http/client/curl",
     linkopts = select({
         "//bazel:windows": [

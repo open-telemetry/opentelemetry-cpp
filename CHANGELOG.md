@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Error out when building DLL without MSVC
+  [#3438](https://github.com/open-telemetry/opentelemetry-cpp/pull/3438)
+
+* [Metrics SDK] Use nostd::function_ref in AttributesHashMap
+  [#3393](https://github.com/open-telemetry/opentelemetry-cpp/pull/3393)
+
 * [SDK] Base2 exponential histogram aggregation
   [#3175](https://github.com/open-telemetry/opentelemetry-cpp/pull/3346)
 
@@ -32,6 +38,56 @@ Increment the:
 
 * [API] Add Enabled method to Tracer
   [#3357](https://github.com/open-telemetry/opentelemetry-cpp/pull/3357)
+
+* [SDK] Optimize PeriodicExportingMetricReader thread usage
+  [#3383](https://github.com/open-telemetry/opentelemetry-cpp/pull/3383)
+
+* [SDK] Aggregate identical metrics instruments and detect duplicates
+  [#3358](https://github.com/open-telemetry/opentelemetry-cpp/pull/3358)
+
+* [INSTALL] Add CMake components to the opentelemetry-cpp package
+  [#3320](https://github.com/open-telemetry/opentelemetry-cpp/pull/3220)
+  [#3368](https://github.com/open-telemetry/opentelemetry-cpp/pull/3368)
+
+* [BUILD] Upgrade opentelemetry-proto to 1.6.0
+  [#3407](https://github.com/open-telemetry/opentelemetry-cpp/pull/3407)
+
+* [BUILD] Upgrade nlohmann_json to 3.12.0
+  [#3406](https://github.com/open-telemetry/opentelemetry-cpp/pull/3406)
+
+* [CMAKE] Add generated protobuf headers to the opentelemetry_proto target
+  [#3400](https://github.com/open-telemetry/opentelemetry-cpp/pull/3400)
+
+* [CMAKE] Remove include_directories usage and rely on target properties
+  [#3426](https://github.com/open-telemetry/opentelemetry-cpp/pull/3426)
+
+* [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.34.0
+  [#3428](https://github.com/open-telemetry/opentelemetry-cpp/pull/3428)
+
+* [EXPORTER] ostream log exporter, fixed memory ownership issues
+  [#3417](https://github.com/open-telemetry/opentelemetry-cpp/pull/3417)
+
+* [TEST] Test all components in a CMake super build
+  [#3433](https://github.com/open-telemetry/opentelemetry-cpp/pull/3433)
+
+Important changes:
+
+* [EXPORTER] ostream log exporter, fixed memory ownership issues
+  [#3417](https://github.com/open-telemetry/opentelemetry-cpp/pull/3417)
+
+  * In the SDK, the following classes implementation has changed:
+
+    * opentelemetry::sdk::logs::ReadableLogRecord
+    * opentelemetry::sdk::logs::ReadWriteLogRecord
+
+  * An application implementing a custom log record exporter,
+    that reuses these classes from the opentelemetry-cpp SDK,
+    will need code adjustments, in particular for methods:
+
+    * GetBody()
+    * GetAttributes()
+
+  * Applications not using these SDK classes directly are not affected.
 
 ## [1.20 2025-04-01]
 

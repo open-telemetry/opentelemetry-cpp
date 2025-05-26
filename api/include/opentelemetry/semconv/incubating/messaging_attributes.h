@@ -35,19 +35,6 @@ static constexpr const char *kMessagingBatchMessageCount = "messaging.batch.mess
  */
 static constexpr const char *kMessagingClientId = "messaging.client.id";
 
-#if 0
-// Excluded attribute:
-/**
- * Deprecated, use @code messaging.client.id @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code messaging.client.id @endcode.", "reason": "uncategorized"}
- */
-OPENTELEMETRY_DEPRECATED
-static constexpr const char *kMessagingClientId
- = "messaging.client_id";
-#endif
-
 /**
  * The name of the consumer group with which a consumer is associated.
  * <p>
@@ -109,7 +96,7 @@ static constexpr const char *kMessagingDestinationTemporary = "messaging.destina
  * Deprecated, no replacement at this time.
  *
  * @deprecated
- * {"note": "No replacement at this time.", "reason": "uncategorized"}
+ * {"note": "Removed. No replacement at this time.", "reason": "obsoleted"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingDestinationPublishAnonymous =
     "messaging.destination_publish.anonymous";
@@ -118,7 +105,7 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingDestinationPubli
  * Deprecated, no replacement at this time.
  *
  * @deprecated
- * {"note": "No replacement at this time.", "reason": "uncategorized"}
+ * {"note": "Removed. No replacement at this time.", "reason": "obsoleted"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingDestinationPublishName =
     "messaging.destination_publish.name";
@@ -127,7 +114,8 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingDestinationPubli
  * Deprecated, use @code messaging.consumer.group.name @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code messaging.consumer.group.name @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code messaging.consumer.group.name @endcode.", "reason": "renamed",
+ * "renamed_to": "messaging.consumer.group.name"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingEventhubsConsumerGroup =
     "messaging.eventhubs.consumer.group";
@@ -167,7 +155,8 @@ static constexpr const char *kMessagingGcpPubsubMessageOrderingKey =
  * Deprecated, use @code messaging.consumer.group.name @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code messaging.consumer.group.name @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code messaging.consumer.group.name @endcode.", "reason": "renamed",
+ * "renamed_to": "messaging.consumer.group.name"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingKafkaConsumerGroup =
     "messaging.kafka.consumer.group";
@@ -176,8 +165,8 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingKafkaConsumerGro
  * Deprecated, use @code messaging.destination.partition.id @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code messaging.destination.partition.id @endcode.", "reason":
- * "uncategorized"}
+ * {"note": "Replaced by @code messaging.destination.partition.id @endcode.", "reason": "renamed",
+ * "renamed_to": "messaging.destination.partition.id"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingKafkaDestinationPartition =
     "messaging.kafka.destination.partition";
@@ -195,7 +184,8 @@ static constexpr const char *kMessagingKafkaMessageKey = "messaging.kafka.messag
  * Deprecated, use @code messaging.kafka.offset @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code messaging.kafka.offset @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code messaging.kafka.offset @endcode.", "reason": "renamed", "renamed_to":
+ * "messaging.kafka.offset"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingKafkaMessageOffset =
     "messaging.kafka.message.offset";
@@ -241,7 +231,8 @@ static constexpr const char *kMessagingMessageId = "messaging.message.id";
  * Deprecated, use @code messaging.operation.type @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code messaging.operation.type @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code messaging.operation.type @endcode.", "reason": "renamed",
+ * "renamed_to": "messaging.operation.type"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingOperation = "messaging.operation";
 
@@ -274,7 +265,7 @@ static constexpr const char *kMessagingRabbitmqMessageDeliveryTag =
  *
  * @deprecated
  * {"note": "Replaced by @code messaging.consumer.group.name @endcode on the consumer spans. No
- * replacement for producer spans.", "reason": "uncategorized"}
+ * replacement for producer spans.\n", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessagingRocketmqClientGroup =
     "messaging.rocketmq.client_group";
@@ -328,7 +319,7 @@ static constexpr const char *kMessagingRocketmqNamespace = "messaging.rocketmq.n
  *
  * @deprecated
  * {"note": "Replaced by @code messaging.destination.subscription.name @endcode.", "reason":
- * "uncategorized"}
+ * "renamed", "renamed_to": "messaging.destination.subscription.name"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char
     *kMessagingServicebusDestinationSubscriptionName =

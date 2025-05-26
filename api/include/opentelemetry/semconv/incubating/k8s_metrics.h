@@ -1347,11 +1347,7 @@ CreateAsyncDoubleMetricK8sReplicasetDesiredPods(metrics::Meter *meter)
  *
  * @deprecated
  * {"note": "Replaced by @code k8s.replicationcontroller.available_pods @endcode.", "reason":
- * "uncategorized"} <p> This metric aligns with the @code availableReplicas @endcode field of the <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerstatus-v1-core">K8s
- * ReplicationControllerStatus</a> <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#replicationcontroller">@code k8s.replicationcontroller @endcode</a>
- * resource. <p> updowncounter
+ * "renamed", "renamed_to": "k8s.replicationcontroller.available_pods"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sReplicationControllerAvailablePods =
     "k8s.replication_controller.available_pods";
@@ -1399,11 +1395,7 @@ CreateAsyncDoubleMetricK8sReplicationControllerAvailablePods(metrics::Meter *met
  *
  * @deprecated
  * {"note": "Replaced by @code k8s.replicationcontroller.desired_pods @endcode.", "reason":
- * "uncategorized"} <p> This metric aligns with the @code replicas @endcode field of the <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerspec-v1-core">K8s
- * ReplicationControllerSpec</a> <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#replicationcontroller">@code k8s.replicationcontroller @endcode</a>
- * resource. <p> updowncounter
+ * "renamed", "renamed_to": "k8s.replicationcontroller.desired_pods"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sReplicationControllerDesiredPods =
     "k8s.replication_controller.desired_pods";

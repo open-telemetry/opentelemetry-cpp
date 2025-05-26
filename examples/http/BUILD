@@ -7,9 +7,6 @@ cc_binary(
         "client.cc",
         "tracer_common.h",
     ],
-    copts = [
-        "-DWITH_CURL",
-    ],
     linkopts = select({
         "//bazel:windows": [
             "-DEFAULTLIB:advapi32.lib",

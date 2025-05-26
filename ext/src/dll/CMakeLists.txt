@@ -1,69 +1,142 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+if(NOT MSVC)
+  message(
+    FATAL_ERROR
+      "The OpenTelemetry C++ SDK for Windows DLL is only supported on MSVC.")
+endif()
+
 set(OPENTELEMETRY_EXPORT_DEF
     "${CMAKE_CURRENT_BINARY_DIR}/opentelemetry_cpp.def")
 
 add_library(opentelemetry_cpp SHARED dllmain.cc ${OPENTELEMETRY_EXPORT_DEF})
 
+set_target_properties(opentelemetry_cpp PROPERTIES EXPORT_NAME
+                                                   opentelemetry_cpp)
+
 target_link_libraries(
   opentelemetry_cpp PRIVATE opentelemetry_trace
                             opentelemetry_exporter_ostream_span)
 
+target_include_directories(
+  opentelemetry_cpp
+  PUBLIC
+    $<TARGET_PROPERTY:opentelemetry_trace,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:opentelemetry_exporter_ostream_span,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
 if(WITH_OTLP_GRPC)
-  add_compile_definitions(WITH_OTLP_GRPC)
+  target_compile_definitions(opentelemetry_cpp PRIVATE WITH_OTLP_GRPC)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_grpc)
+  target_include_directories(
+    opentelemetry_cpp
+    PUBLIC
+      $<TARGET_PROPERTY:opentelemetry_exporter_otlp_grpc,INTERFACE_INCLUDE_DIRECTORIES>
+  )
 endif()
 
 if(WITH_OTLP_HTTP)
-  add_compile_definitions(WITH_OTLP_HTTP)
+  target_compile_definitions(opentelemetry_cpp PRIVATE WITH_OTLP_HTTP)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_http)
+  target_include_directories(
+    opentelemetry_cpp
+    PUBLIC
+      $<TARGET_PROPERTY:opentelemetry_exporter_otlp_http,INTERFACE_INCLUDE_DIRECTORIES>
+  )
 endif()
 
 if(WITH_OTLP_FILE)
-  add_compile_definitions(WITH_OTLP_FILE)
+  target_compile_definitions(opentelemetry_cpp PRIVATE WITH_OTLP_FILE)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_file)
+  target_include_directories(
+    opentelemetry_cpp
+    PUBLIC
+      $<TARGET_PROPERTY:opentelemetry_exporter_otlp_file,INTERFACE_INCLUDE_DIRECTORIES>
+  )
 endif()
 
 target_link_libraries(
   opentelemetry_cpp PRIVATE opentelemetry_metrics
                             opentelemetry_exporter_ostream_metrics)
+target_include_directories(
+  opentelemetry_cpp
+  PUBLIC
+    $<TARGET_PROPERTY:opentelemetry_metrics,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:opentelemetry_exporter_ostream_metrics,INTERFACE_INCLUDE_DIRECTORIES>
+)
 
 if(WITH_OTLP_GRPC)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_grpc_metrics)
+  target_include_directories(
+    opentelemetry_cpp
+    PUBLIC
+      $<TARGET_PROPERTY:opentelemetry_exporter_otlp_grpc_metrics,INTERFACE_INCLUDE_DIRECTORIES>
+  )
 endif()
 
 if(WITH_OTLP_HTTP)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_http_metric)
+  target_include_directories(
+    opentelemetry_cpp
+    PUBLIC
+      $<TARGET_PROPERTY:opentelemetry_exporter_otlp_http_metric,INTERFACE_INCLUDE_DIRECTORIES>
+  )
 endif()
 
 if(WITH_OTLP_FILE)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_file_metric)
+  target_include_directories(
+    opentelemetry_cpp
+    PUBLIC
+      $<TARGET_PROPERTY:opentelemetry_exporter_otlp_file_metric,INTERFACE_INCLUDE_DIRECTORIES>
+  )
 endif()
 
 target_link_libraries(
   opentelemetry_cpp PRIVATE opentelemetry_logs
                             opentelemetry_exporter_ostream_logs)
+target_include_directories(
+  opentelemetry_cpp
+  PUBLIC
+    $<TARGET_PROPERTY:opentelemetry_logs,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:opentelemetry_exporter_ostream_logs,INTERFACE_INCLUDE_DIRECTORIES>
+)
 
 if(WITH_OTLP_GRPC)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_grpc_log)
+  target_include_directories(
+    opentelemetry_cpp
+    PUBLIC
+      $<TARGET_PROPERTY:opentelemetry_exporter_otlp_grpc_log,INTERFACE_INCLUDE_DIRECTORIES>
+  )
 endif()
 
 if(WITH_OTLP_HTTP)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_http_log)
+  target_include_directories(
+    opentelemetry_cpp
+    PUBLIC
+      $<TARGET_PROPERTY:opentelemetry_exporter_otlp_http_log,INTERFACE_INCLUDE_DIRECTORIES>
+  )
 endif()
 
 if(WITH_OTLP_FILE)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_file_log)
+  target_include_directories(
+    opentelemetry_cpp
+    PUBLIC
+      $<TARGET_PROPERTY:opentelemetry_exporter_otlp_file_log,INTERFACE_INCLUDE_DIRECTORIES>
+  )
 endif()
 
 find_program(
@@ -116,18 +189,4 @@ add_custom_command(
     "-targetfile" ${OPENTELEMETRY_EXPORT_DEF}
   VERBATIM)
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_cpp
-    EXPORT "${PROJECT_NAME}-ext_dll-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ext_dll)
-
-  install(
-    EXPORT "${PROJECT_NAME}-ext_dll-target"
-    FILE "${PROJECT_NAME}-ext_dll-target.cmake"
-    NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-    COMPONENT ext_dll)
-endif()
+otel_add_component(COMPONENT ext_dll TARGETS opentelemetry_cpp)

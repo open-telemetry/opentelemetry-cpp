@@ -3,7 +3,6 @@
 
 if(WITH_HTTP_CLIENT_CURL)
   set(FILENAME curl_http_test)
-  add_compile_definitions(WITH_CURL)
   add_executable(${FILENAME} ${FILENAME}.cc)
   target_link_libraries(${FILENAME} ${GMOCK_LIB} ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT})
@@ -22,7 +21,7 @@ if(WITH_HTTP_CLIENT_CURL)
     target_link_libraries(${FILENAME} opentelemetry_http_client_curl
                           opentelemetry_common ${CURL_IMPORTED_TARGET_NAME})
   else()
-    include_directories(${CURL_INCLUDE_DIRS})
+    target_include_directories(${FILENAME} PRIVATE ${CURL_INCLUDE_DIRS})
     target_link_libraries(${FILENAME} ${CURL_LIBRARIES}
                           opentelemetry_http_client_curl opentelemetry_common)
   endif()
@@ -35,7 +34,7 @@ endif()
 
 set(URL_PARSER_FILENAME url_parser_test)
 add_executable(${URL_PARSER_FILENAME} ${URL_PARSER_FILENAME}.cc)
-target_link_libraries(${URL_PARSER_FILENAME} opentelemetry_api ${GMOCK_LIB}
+target_link_libraries(${URL_PARSER_FILENAME} opentelemetry_ext ${GMOCK_LIB}
                       ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 gtest_add_tests(
   TARGET ${URL_PARSER_FILENAME}
