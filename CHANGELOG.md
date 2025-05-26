@@ -64,6 +64,9 @@ Increment the:
 * [EXPORTER] ostream log exporter, fixed memory ownership issues
   [#3417](https://github.com/open-telemetry/opentelemetry-cpp/pull/3417)
 
+* [BUILD] Upgrade opentelemetry-proto to 1.7.0
+  [#XXXX](https://github.com/open-telemetry/opentelemetry-cpp/pull/XXXX)
+
 Important changes:
 
 * [EXPORTER] ostream log exporter, fixed memory ownership issues
