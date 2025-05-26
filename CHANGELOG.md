@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Error out when building DLL without MSVC
+  [#3438](https://github.com/open-telemetry/opentelemetry-cpp/pull/3438)
+
 * [Metrics SDK] Use nostd::function_ref in AttributesHashMap
   [#3393](https://github.com/open-telemetry/opentelemetry-cpp/pull/3393)
 
@@ -64,8 +67,11 @@ Increment the:
 * [EXPORTER] ostream log exporter, fixed memory ownership issues
   [#3417](https://github.com/open-telemetry/opentelemetry-cpp/pull/3417)
 
+* [TEST] Test all components in a CMake super build
+  [#3433](https://github.com/open-telemetry/opentelemetry-cpp/pull/3433)
+
 * [BUILD] Upgrade opentelemetry-proto to 1.7.0
-  [#XXXX](https://github.com/open-telemetry/opentelemetry-cpp/pull/XXXX)
+  [#3443](https://github.com/open-telemetry/opentelemetry-cpp/pull/3443)
 
 Important changes:
 
