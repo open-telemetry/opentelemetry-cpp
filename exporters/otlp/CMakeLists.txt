@@ -133,8 +133,7 @@ if(WITH_OTLP_GRPC)
   target_link_libraries(opentelemetry_otlp_grpc_builder
                         PUBLIC opentelemetry_exporter_otlp_grpc_log)
 
-  list(APPEND OPENTELEMETRY_OTLP_GRPC_TARGETS
-       opentelemetry_otlp_grpc_builder)
+  list(APPEND OPENTELEMETRY_OTLP_GRPC_TARGETS opentelemetry_otlp_grpc_builder)
 
 endif()
 
@@ -242,8 +241,7 @@ if(WITH_OTLP_HTTP)
   target_link_libraries(opentelemetry_otlp_http_builder
                         PUBLIC opentelemetry_exporter_otlp_http_log)
 
-  list(APPEND OPENTELEMETRY_OTLP_HTTP_TARGETS
-       opentelemetry_otlp_http_builder)
+  list(APPEND OPENTELEMETRY_OTLP_HTTP_TARGETS opentelemetry_otlp_http_builder)
 endif()
 
 if(WITH_OTLP_FILE)
