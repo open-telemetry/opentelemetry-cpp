@@ -21,9 +21,9 @@ namespace http
 {
 
 /**
- * Duration of HTTP client requests.
- * <p>
- * histogram
+  Duration of HTTP client requests.
+  <p>
+  histogram
  */
 static constexpr const char *kMetricHttpClientRequestDuration = "http.client.request.duration";
 static constexpr const char *descrMetricHttpClientRequestDuration =
@@ -47,9 +47,9 @@ CreateSyncDoubleMetricHttpClientRequestDuration(metrics::Meter *meter)
 }
 
 /**
- * Duration of HTTP server requests.
- * <p>
- * histogram
+  Duration of HTTP server requests.
+  <p>
+  histogram
  */
 static constexpr const char *kMetricHttpServerRequestDuration = "http.server.request.duration";
 static constexpr const char *descrMetricHttpServerRequestDuration =

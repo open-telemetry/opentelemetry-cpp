@@ -21,9 +21,9 @@ namespace azure
 {
 
 /**
- * Number of active client instances
- * <p>
- * updowncounter
+  Number of active client instances
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricAzureCosmosdbClientActiveInstanceCount =
     "azure.cosmosdb.client.active_instance.count";
@@ -66,8 +66,8 @@ CreateAsyncDoubleMetricAzureCosmosdbClientActiveInstanceCount(metrics::Meter *me
 }
 
 /**
- * <a href="https://learn.microsoft.com/azure/cosmos-db/request-units">Request units</a> consumed by
- * the operation <p> histogram
+  <a href="https://learn.microsoft.com/azure/cosmos-db/request-units">Request units</a> consumed by
+  the operation <p> histogram
  */
 static constexpr const char *kMetricAzureCosmosdbClientOperationRequestCharge =
     "azure.cosmosdb.client.operation.request_charge";

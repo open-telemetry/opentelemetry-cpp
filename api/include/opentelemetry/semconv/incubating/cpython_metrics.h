@@ -21,11 +21,11 @@ namespace cpython
 {
 
 /**
- * The total number of objects collected inside a generation since interpreter start.
- * <p>
- * This metric reports data from <a
- * href="https://docs.python.org/3/library/gc.html#gc.get_stats">@code gc.stats() @endcode</a>. <p>
- * counter
+  The total number of objects collected inside a generation since interpreter start.
+  <p>
+  This metric reports data from <a
+  href="https://docs.python.org/3/library/gc.html#gc.get_stats">@code gc.stats() @endcode</a>. <p>
+  counter
  */
 static constexpr const char *kMetricCpythonGcCollectedObjects = "cpython.gc.collected_objects";
 static constexpr const char *descrMetricCpythonGcCollectedObjects =
@@ -65,11 +65,11 @@ CreateAsyncDoubleMetricCpythonGcCollectedObjects(metrics::Meter *meter)
 }
 
 /**
- * The number of times a generation was collected since interpreter start.
- * <p>
- * This metric reports data from <a
- * href="https://docs.python.org/3/library/gc.html#gc.get_stats">@code gc.stats() @endcode</a>. <p>
- * counter
+  The number of times a generation was collected since interpreter start.
+  <p>
+  This metric reports data from <a
+  href="https://docs.python.org/3/library/gc.html#gc.get_stats">@code gc.stats() @endcode</a>. <p>
+  counter
  */
 static constexpr const char *kMetricCpythonGcCollections = "cpython.gc.collections";
 static constexpr const char *descrMetricCpythonGcCollections =
@@ -105,10 +105,10 @@ CreateAsyncDoubleMetricCpythonGcCollections(metrics::Meter *meter)
 }
 
 /**
- * The total number of objects which were found to be uncollectable inside a generation since
- * interpreter start. <p> This metric reports data from <a
- * href="https://docs.python.org/3/library/gc.html#gc.get_stats">@code gc.stats() @endcode</a>. <p>
- * counter
+  The total number of objects which were found to be uncollectable inside a generation since
+  interpreter start. <p> This metric reports data from <a
+  href="https://docs.python.org/3/library/gc.html#gc.get_stats">@code gc.stats() @endcode</a>. <p>
+  counter
  */
 static constexpr const char *kMetricCpythonGcUncollectableObjects =
     "cpython.gc.uncollectable_objects";
