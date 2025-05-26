@@ -16,7 +16,7 @@ ROOT_DIR="${SCRIPT_DIR}/../../"
 # freeze the spec & generator tools versions to make the generation reproducible
 
 # repository: https://github.com/open-telemetry/semantic-conventions
-SEMCONV_VERSION=1.33.0
+SEMCONV_VERSION=1.34.0
 
 # repository: https://github.com/open-telemetry/weaver
 WEAVER_VERSION=0.15.0

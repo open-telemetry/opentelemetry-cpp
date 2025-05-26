@@ -9,6 +9,9 @@ target_include_directories(
 
 set_target_properties(opentelemetry_sdk PROPERTIES EXPORT_NAME sdk)
 
+target_link_libraries(opentelemetry_sdk INTERFACE opentelemetry_api)
+
+set(OTEL_SDK_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(src)
 
 otel_add_component(

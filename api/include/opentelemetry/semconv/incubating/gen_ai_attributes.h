@@ -38,15 +38,35 @@ static constexpr const char *kGenAiAgentName = "gen_ai.agent.name";
  * Deprecated, use Event API to report completions contents.
  *
  * @deprecated
- * {"note": "Removed, no replacement at this time.", "reason": "uncategorized"}
+ * {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiCompletion = "gen_ai.completion";
+
+/**
+ * The unique identifier for a conversation (session, thread), used to store and correlate messages
+ * within this conversation.
+ */
+static constexpr const char *kGenAiConversationId = "gen_ai.conversation.id";
+
+/**
+ * The data source identifier.
+ * <p>
+ * Data sources are used by AI agents and RAG applications to store grounding data. A data source
+ * may be an external database, object store, document collection, website, or any other storage
+ * system used by the GenAI agent or application. The @code gen_ai.data_source.id @endcode SHOULD
+ * match the identifier used by the GenAI system rather than a name specific to the external
+ * storage, such as a database or object store. Semantic conventions referencing @code
+ * gen_ai.data_source.id @endcode MAY also leverage additional attributes, such as @code db.*
+ * @endcode, to further identify and describe the data source.
+ */
+static constexpr const char *kGenAiDataSourceId = "gen_ai.data_source.id";
 
 /**
  * Deprecated, use @code gen_ai.output.type @endcode.
  *
  * @deprecated
- * {"note": "Replaced by @code gen_ai.output.type @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code gen_ai.output.type @endcode.", "reason": "renamed", "renamed_to":
+ * "gen_ai.output.type"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiOpenaiRequestResponseFormat =
     "gen_ai.openai.request.response_format";
@@ -55,7 +75,8 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiOpenaiRequestRespons
  * Deprecated, use @code gen_ai.request.seed @endcode.
  *
  * @deprecated
- * {"note": "Replaced by @code gen_ai.request.seed @endcode attribute.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code gen_ai.request.seed @endcode.", "reason": "renamed", "renamed_to":
+ * "gen_ai.request.seed"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiOpenaiRequestSeed =
     "gen_ai.openai.request.seed";
@@ -102,7 +123,7 @@ static constexpr const char *kGenAiOutputType = "gen_ai.output.type";
  * Deprecated, use Event API to report prompt contents.
  *
  * @deprecated
- * {"note": "Removed, no replacement at this time.", "reason": "uncategorized"}
+ * {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiPrompt = "gen_ai.prompt";
 
@@ -231,8 +252,8 @@ static constexpr const char *kGenAiToolType = "gen_ai.tool.type";
  * Deprecated, use @code gen_ai.usage.output_tokens @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code gen_ai.usage.output_tokens @endcode attribute.", "reason":
- * "uncategorized"}
+ * {"note": "Replaced by @code gen_ai.usage.output_tokens @endcode.", "reason": "renamed",
+ * "renamed_to": "gen_ai.usage.output_tokens"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiUsageCompletionTokens =
     "gen_ai.usage.completion_tokens";
@@ -251,8 +272,8 @@ static constexpr const char *kGenAiUsageOutputTokens = "gen_ai.usage.output_toke
  * Deprecated, use @code gen_ai.usage.input_tokens @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code gen_ai.usage.input_tokens @endcode attribute.", "reason":
- * "uncategorized"}
+ * {"note": "Replaced by @code gen_ai.usage.input_tokens @endcode.", "reason": "renamed",
+ * "renamed_to": "gen_ai.usage.input_tokens"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiUsagePromptTokens =
     "gen_ai.usage.prompt_tokens";

@@ -24,9 +24,8 @@ namespace system
  * Deprecated. Use @code cpu.frequency @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code cpu.frequency @endcode.", "reason": "uncategorized"}
- * <p>
- * gauge
+ * {"note": "Replaced by @code cpu.frequency @endcode.", "reason": "renamed", "renamed_to":
+ * "cpu.frequency"} <p> gauge
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricSystemCpuFrequency =
     "system.cpu.frequency";
@@ -156,7 +155,7 @@ CreateAsyncDoubleMetricSystemCpuPhysicalCount(metrics::Meter *meter)
  * Deprecated. Use @code cpu.time @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code cpu.time @endcode.", "reason": "uncategorized"}
+ * {"note": "Replaced by @code cpu.time @endcode.", "reason": "renamed", "renamed_to": "cpu.time"}
  * <p>
  * counter
  */
@@ -197,9 +196,8 @@ CreateAsyncDoubleMetricSystemCpuTime(metrics::Meter *meter)
  * Deprecated. Use @code cpu.utilization @endcode instead.
  *
  * @deprecated
- * {"note": "Replaced by @code cpu.utilization @endcode.", "reason": "uncategorized"}
- * <p>
- * gauge
+ * {"note": "Replaced by @code cpu.utilization @endcode.", "reason": "renamed", "renamed_to":
+ * "cpu.utilization"} <p> gauge
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricSystemCpuUtilization =
     "system.cpu.utilization";
