@@ -20,7 +20,7 @@ namespace elasticsearch
 {
 
 /**
- * Represents the human-readable identifier of the node/instance to which a request was routed.
+  Represents the human-readable identifier of the node/instance to which a request was routed.
  */
 static constexpr const char *kElasticsearchNodeName = "elasticsearch.node.name";
 

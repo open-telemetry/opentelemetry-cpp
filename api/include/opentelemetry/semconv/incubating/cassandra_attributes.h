@@ -20,34 +20,34 @@ namespace cassandra
 {
 
 /**
- * The consistency level of the query. Based on consistency values from <a
- * href="https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html">CQL</a>.
+  The consistency level of the query. Based on consistency values from <a
+  href="https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html">CQL</a>.
  */
 static constexpr const char *kCassandraConsistencyLevel = "cassandra.consistency.level";
 
 /**
- * The data center of the coordinating node for a query.
+  The data center of the coordinating node for a query.
  */
 static constexpr const char *kCassandraCoordinatorDc = "cassandra.coordinator.dc";
 
 /**
- * The ID of the coordinating node for a query.
+  The ID of the coordinating node for a query.
  */
 static constexpr const char *kCassandraCoordinatorId = "cassandra.coordinator.id";
 
 /**
- * The fetch size used for paging, i.e. how many rows will be returned at once.
+  The fetch size used for paging, i.e. how many rows will be returned at once.
  */
 static constexpr const char *kCassandraPageSize = "cassandra.page.size";
 
 /**
- * Whether or not the query is idempotent.
+  Whether or not the query is idempotent.
  */
 static constexpr const char *kCassandraQueryIdempotent = "cassandra.query.idempotent";
 
 /**
- * The number of times a query was speculatively executed. Not set or @code 0 @endcode if the query
- * was not executed speculatively.
+  The number of times a query was speculatively executed. Not set or @code 0 @endcode if the query
+  was not executed speculatively.
  */
 static constexpr const char *kCassandraSpeculativeExecutionCount =
     "cassandra.speculative_execution.count";
@@ -55,57 +55,57 @@ static constexpr const char *kCassandraSpeculativeExecutionCount =
 namespace CassandraConsistencyLevelValues
 {
 /**
- * none
+  none
  */
 static constexpr const char *kAll = "all";
 
 /**
- * none
+  none
  */
 static constexpr const char *kEachQuorum = "each_quorum";
 
 /**
- * none
+  none
  */
 static constexpr const char *kQuorum = "quorum";
 
 /**
- * none
+  none
  */
 static constexpr const char *kLocalQuorum = "local_quorum";
 
 /**
- * none
+  none
  */
 static constexpr const char *kOne = "one";
 
 /**
- * none
+  none
  */
 static constexpr const char *kTwo = "two";
 
 /**
- * none
+  none
  */
 static constexpr const char *kThree = "three";
 
 /**
- * none
+  none
  */
 static constexpr const char *kLocalOne = "local_one";
 
 /**
- * none
+  none
  */
 static constexpr const char *kAny = "any";
 
 /**
- * none
+  none
  */
 static constexpr const char *kSerial = "serial";
 
 /**
- * none
+  none
  */
 static constexpr const char *kLocalSerial = "local_serial";
 

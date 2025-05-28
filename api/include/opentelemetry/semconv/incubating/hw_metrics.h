@@ -21,9 +21,9 @@ namespace hw
 {
 
 /**
- * Energy consumed by the component
- * <p>
- * counter
+  Energy consumed by the component
+  <p>
+  counter
  */
 static constexpr const char *kMetricHwEnergy     = "hw.energy";
 static constexpr const char *descrMetricHwEnergy = "Energy consumed by the component";
@@ -56,9 +56,9 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * Number of errors encountered by the component
- * <p>
- * counter
+  Number of errors encountered by the component
+  <p>
+  counter
  */
 static constexpr const char *kMetricHwErrors     = "hw.errors";
 static constexpr const char *descrMetricHwErrors = "Number of errors encountered by the component";
@@ -91,9 +91,9 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * Ambient (external) temperature of the physical host
- * <p>
- * gauge
+  Ambient (external) temperature of the physical host
+  <p>
+  gauge
  */
 static constexpr const char *kMetricHwHostAmbientTemperature = "hw.host.ambient_temperature";
 static constexpr const char *descrMetricHwHostAmbientTemperature =
@@ -136,12 +136,12 @@ CreateAsyncDoubleMetricHwHostAmbientTemperature(metrics::Meter *meter)
 }
 
 /**
- * Total energy consumed by the entire physical host, in joules
- * <p>
- * The overall energy usage of a host MUST be reported using the specific @code hw.host.energy
- * @endcode and @code hw.host.power @endcode metrics <strong>only</strong>, instead of the generic
- * @code hw.energy @endcode and @code hw.power @endcode described in the previous section, to
- * prevent summing up overlapping values. <p> counter
+  Total energy consumed by the entire physical host, in joules
+  <p>
+  The overall energy usage of a host MUST be reported using the specific @code hw.host.energy
+  @endcode and @code hw.host.power @endcode metrics <strong>only</strong>, instead of the generic
+  @code hw.energy @endcode and @code hw.power @endcode described in the previous section, to prevent
+  summing up overlapping values. <p> counter
  */
 static constexpr const char *kMetricHwHostEnergy = "hw.host.energy";
 static constexpr const char *descrMetricHwHostEnergy =
@@ -177,8 +177,8 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * By how many degrees Celsius the temperature of the physical host can be increased, before
- * reaching a warning threshold on one of the internal sensors <p> gauge
+  By how many degrees Celsius the temperature of the physical host can be increased, before reaching
+  a warning threshold on one of the internal sensors <p> gauge
  */
 static constexpr const char *kMetricHwHostHeatingMargin = "hw.host.heating_margin";
 static constexpr const char *descrMetricHwHostHeatingMargin =
@@ -218,11 +218,11 @@ CreateAsyncDoubleMetricHwHostHeatingMargin(metrics::Meter *meter)
 }
 
 /**
- * Instantaneous power consumed by the entire physical host in Watts (@code hw.host.energy @endcode
- * is preferred) <p> The overall energy usage of a host MUST be reported using the specific @code
- * hw.host.energy @endcode and @code hw.host.power @endcode metrics <strong>only</strong>, instead
- * of the generic @code hw.energy @endcode and @code hw.power @endcode described in the previous
- * section, to prevent summing up overlapping values. <p> gauge
+  Instantaneous power consumed by the entire physical host in Watts (@code hw.host.energy @endcode
+  is preferred) <p> The overall energy usage of a host MUST be reported using the specific @code
+  hw.host.energy @endcode and @code hw.host.power @endcode metrics <strong>only</strong>, instead of
+  the generic @code hw.energy @endcode and @code hw.power @endcode described in the previous
+  section, to prevent summing up overlapping values. <p> gauge
  */
 static constexpr const char *kMetricHwHostPower = "hw.host.power";
 static constexpr const char *descrMetricHwHostPower =
@@ -261,10 +261,10 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * Instantaneous power consumed by the component
- * <p>
- * It is recommended to report @code hw.energy @endcode instead of @code hw.power @endcode when
- * possible. <p> gauge
+  Instantaneous power consumed by the component
+  <p>
+  It is recommended to report @code hw.energy @endcode instead of @code hw.power @endcode when
+  possible. <p> gauge
  */
 static constexpr const char *kMetricHwPower     = "hw.power";
 static constexpr const char *descrMetricHwPower = "Instantaneous power consumed by the component";
@@ -298,15 +298,16 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * Operational status: @code 1 @endcode (true) or @code 0 @endcode (false) for each of the possible
- * states <p>
- * @code hw.status @endcode is currently specified as an <em>UpDownCounter</em> but would ideally be
- * represented using a <a
- * href="https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#stateset"><em>StateSet</em>
- * as defined in OpenMetrics</a>. This semantic convention will be updated once <em>StateSet</em> is
- * specified in OpenTelemetry. This planned change is not expected to have any consequence on the
- * way users query their timeseries backend to retrieve the values of @code hw.status @endcode over
- * time. <p> updowncounter
+  Operational status: @code 1 @endcode (true) or @code 0 @endcode (false) for each of the possible
+  states <p>
+  @code hw.status @endcode is currently specified as an <em>UpDownCounter</em> but would ideally be
+  represented using a <a
+  href="https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#stateset"><em>StateSet</em>
+  as defined in OpenMetrics</a>. This semantic convention will be updated once <em>StateSet</em> is
+  specified in OpenTelemetry. This planned change is not expected to have any consequence on the way
+  users query their timeseries backend to retrieve the values of @code hw.status @endcode over time.
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricHwStatus = "hw.status";
 static constexpr const char *descrMetricHwStatus =

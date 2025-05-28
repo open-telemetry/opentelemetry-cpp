@@ -21,9 +21,9 @@ namespace cpu
 {
 
 /**
- * Operating frequency of the logical CPU in Hertz.
- * <p>
- * gauge
+  Operating frequency of the logical CPU in Hertz.
+  <p>
+  gauge
  */
 static constexpr const char *kMetricCpuFrequency = "cpu.frequency";
 static constexpr const char *descrMetricCpuFrequency =
@@ -62,9 +62,9 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * Seconds each logical CPU spent on each mode
- * <p>
- * counter
+  Seconds each logical CPU spent on each mode
+  <p>
+  counter
  */
 static constexpr const char *kMetricCpuTime     = "cpu.time";
 static constexpr const char *descrMetricCpuTime = "Seconds each logical CPU spent on each mode";
@@ -96,8 +96,8 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * For each logical CPU, the utilization is calculated as the change in cumulative CPU time
- * (cpu.time) over a measurement interval, divided by the elapsed time. <p> gauge
+  For each logical CPU, the utilization is calculated as the change in cumulative CPU time
+  (cpu.time) over a measurement interval, divided by the elapsed time. <p> gauge
  */
 static constexpr const char *kMetricCpuUtilization = "cpu.utilization";
 static constexpr const char *descrMetricCpuUtilization =

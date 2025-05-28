@@ -21,8 +21,8 @@ namespace vcs
 {
 
 /**
- * The number of changes (pull requests/merge requests/changelists) in a repository, categorized by
- * their state (e.g. open or merged) <p> updowncounter
+  The number of changes (pull requests/merge requests/changelists) in a repository, categorized by
+  their state (e.g. open or merged) <p> updowncounter
  */
 static constexpr const char *kMetricVcsChangeCount = "vcs.change.count";
 static constexpr const char *descrMetricVcsChangeCount =
@@ -59,9 +59,9 @@ CreateAsyncDoubleMetricVcsChangeCount(metrics::Meter *meter)
 }
 
 /**
- * The time duration a change (pull request/merge request/changelist) has been in a given state.
- * <p>
- * gauge
+  The time duration a change (pull request/merge request/changelist) has been in a given state.
+  <p>
+  gauge
  */
 static constexpr const char *kMetricVcsChangeDuration = "vcs.change.duration";
 static constexpr const char *descrMetricVcsChangeDuration =
@@ -100,8 +100,8 @@ CreateAsyncDoubleMetricVcsChangeDuration(metrics::Meter *meter)
 }
 
 /**
- * The amount of time since its creation it took a change (pull request/merge request/changelist) to
- * get the first approval. <p> gauge
+  The amount of time since its creation it took a change (pull request/merge request/changelist) to
+  get the first approval. <p> gauge
  */
 static constexpr const char *kMetricVcsChangeTimeToApproval = "vcs.change.time_to_approval";
 static constexpr const char *descrMetricVcsChangeTimeToApproval =
@@ -144,8 +144,8 @@ CreateAsyncDoubleMetricVcsChangeTimeToApproval(metrics::Meter *meter)
 }
 
 /**
- * The amount of time since its creation it took a change (pull request/merge request/changelist) to
- * get merged into the target(base) ref. <p> gauge
+  The amount of time since its creation it took a change (pull request/merge request/changelist) to
+  get merged into the target(base) ref. <p> gauge
  */
 static constexpr const char *kMetricVcsChangeTimeToMerge = "vcs.change.time_to_merge";
 static constexpr const char *descrMetricVcsChangeTimeToMerge =
@@ -185,9 +185,9 @@ CreateAsyncDoubleMetricVcsChangeTimeToMerge(metrics::Meter *meter)
 }
 
 /**
- * The number of unique contributors to a repository
- * <p>
- * gauge
+  The number of unique contributors to a repository
+  <p>
+  gauge
  */
 static constexpr const char *kMetricVcsContributorCount = "vcs.contributor.count";
 static constexpr const char *descrMetricVcsContributorCount =
@@ -226,9 +226,9 @@ CreateAsyncDoubleMetricVcsContributorCount(metrics::Meter *meter)
 }
 
 /**
- * The number of refs of type branch or tag in a repository.
- * <p>
- * updowncounter
+  The number of refs of type branch or tag in a repository.
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricVcsRefCount = "vcs.ref.count";
 static constexpr const char *descrMetricVcsRefCount =
@@ -264,12 +264,12 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * The number of lines added/removed in a ref (branch) relative to the ref from the @code
- * vcs.ref.base.name @endcode attribute. <p> This metric should be reported for each @code
- * vcs.line_change.type @endcode value. For example if a ref added 3 lines and removed 2 lines,
- * instrumentation SHOULD report two measurements: 3 and 2 (both positive numbers).
- * If number of lines added/removed should be calculated from the start of time, then @code
- * vcs.ref.base.name @endcode SHOULD be set to an empty string. <p> gauge
+  The number of lines added/removed in a ref (branch) relative to the ref from the @code
+  vcs.ref.base.name @endcode attribute. <p> This metric should be reported for each @code
+  vcs.line_change.type @endcode value. For example if a ref added 3 lines and removed 2 lines,
+  instrumentation SHOULD report two measurements: 3 and 2 (both positive numbers).
+  If number of lines added/removed should be calculated from the start of time, then @code
+  vcs.ref.base.name @endcode SHOULD be set to an empty string. <p> gauge
  */
 static constexpr const char *kMetricVcsRefLinesDelta = "vcs.ref.lines_delta";
 static constexpr const char *descrMetricVcsRefLinesDelta =
@@ -309,12 +309,12 @@ CreateAsyncDoubleMetricVcsRefLinesDelta(metrics::Meter *meter)
 }
 
 /**
- * The number of revisions (commits) a ref (branch) is ahead/behind the branch from the @code
- * vcs.ref.base.name @endcode attribute <p> This metric should be reported for each @code
- * vcs.revision_delta.direction @endcode value. For example if branch @code a @endcode is 3 commits
- * behind and 2 commits ahead of @code trunk @endcode, instrumentation SHOULD report two
- * measurements: 3 and 2 (both positive numbers) and @code vcs.ref.base.name @endcode is set to
- * @code trunk @endcode. <p> gauge
+  The number of revisions (commits) a ref (branch) is ahead/behind the branch from the @code
+  vcs.ref.base.name @endcode attribute <p> This metric should be reported for each @code
+  vcs.revision_delta.direction @endcode value. For example if branch @code a @endcode is 3 commits
+  behind and 2 commits ahead of @code trunk @endcode, instrumentation SHOULD report two
+  measurements: 3 and 2 (both positive numbers) and @code vcs.ref.base.name @endcode is set to @code
+  trunk @endcode. <p> gauge
  */
 static constexpr const char *kMetricVcsRefRevisionsDelta = "vcs.ref.revisions_delta";
 static constexpr const char *descrMetricVcsRefRevisionsDelta =
@@ -354,8 +354,8 @@ CreateAsyncDoubleMetricVcsRefRevisionsDelta(metrics::Meter *meter)
 }
 
 /**
- * Time a ref (branch) created from the default branch (trunk) has existed. The @code ref.type
- * @endcode attribute will always be @code branch @endcode <p> gauge
+  Time a ref (branch) created from the default branch (trunk) has existed. The @code ref.type
+  @endcode attribute will always be @code branch @endcode <p> gauge
  */
 static constexpr const char *kMetricVcsRefTime = "vcs.ref.time";
 static constexpr const char *descrMetricVcsRefTime =
@@ -393,9 +393,9 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * The number of repositories in an organization.
- * <p>
- * updowncounter
+  The number of repositories in an organization.
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricVcsRepositoryCount = "vcs.repository.count";
 static constexpr const char *descrMetricVcsRepositoryCount =

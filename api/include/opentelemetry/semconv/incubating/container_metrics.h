@@ -21,11 +21,11 @@ namespace container
 {
 
 /**
- * Total CPU time consumed
- * <p>
- * Total CPU time consumed by the specific container on all available CPU cores
- * <p>
- * counter
+  Total CPU time consumed
+  <p>
+  Total CPU time consumed by the specific container on all available CPU cores
+  <p>
+  counter
  */
 static constexpr const char *kMetricContainerCpuTime     = "container.cpu.time";
 static constexpr const char *descrMetricContainerCpuTime = "Total CPU time consumed";
@@ -60,11 +60,11 @@ CreateAsyncDoubleMetricContainerCpuTime(metrics::Meter *meter)
 }
 
 /**
- * Container's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs
- * <p>
- * CPU usage of the specific container on all available CPU cores, averaged over the sample window
- * <p>
- * gauge
+  Container's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs
+  <p>
+  CPU usage of the specific container on all available CPU cores, averaged over the sample window
+  <p>
+  gauge
  */
 static constexpr const char *kMetricContainerCpuUsage = "container.cpu.usage";
 static constexpr const char *descrMetricContainerCpuUsage =
@@ -103,11 +103,11 @@ CreateAsyncDoubleMetricContainerCpuUsage(metrics::Meter *meter)
 }
 
 /**
- * Disk bytes for the container.
- * <p>
- * The total number of bytes read/written successfully (aggregated from all disks).
- * <p>
- * counter
+  Disk bytes for the container.
+  <p>
+  The total number of bytes read/written successfully (aggregated from all disks).
+  <p>
+  counter
  */
 static constexpr const char *kMetricContainerDiskIo     = "container.disk.io";
 static constexpr const char *descrMetricContainerDiskIo = "Disk bytes for the container.";
@@ -142,11 +142,11 @@ CreateAsyncDoubleMetricContainerDiskIo(metrics::Meter *meter)
 }
 
 /**
- * Memory usage of the container.
- * <p>
- * Memory usage of the container.
- * <p>
- * counter
+  Memory usage of the container.
+  <p>
+  Memory usage of the container.
+  <p>
+  counter
  */
 static constexpr const char *kMetricContainerMemoryUsage     = "container.memory.usage";
 static constexpr const char *descrMetricContainerMemoryUsage = "Memory usage of the container.";
@@ -181,11 +181,11 @@ CreateAsyncDoubleMetricContainerMemoryUsage(metrics::Meter *meter)
 }
 
 /**
- * Network bytes for the container.
- * <p>
- * The number of bytes sent/received on all network interfaces by the container.
- * <p>
- * counter
+  Network bytes for the container.
+  <p>
+  The number of bytes sent/received on all network interfaces by the container.
+  <p>
+  counter
  */
 static constexpr const char *kMetricContainerNetworkIo     = "container.network.io";
 static constexpr const char *descrMetricContainerNetworkIo = "Network bytes for the container.";
@@ -220,11 +220,11 @@ CreateAsyncDoubleMetricContainerNetworkIo(metrics::Meter *meter)
 }
 
 /**
- * The time the container has been running
- * <p>
- * Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
- * as a floating point number with the highest precision available. The actual accuracy would depend
- * on the instrumentation and operating system. <p> gauge
+  The time the container has been running
+  <p>
+  Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
+  as a floating point number with the highest precision available. The actual accuracy would depend
+  on the instrumentation and operating system. <p> gauge
  */
 static constexpr const char *kMetricContainerUptime     = "container.uptime";
 static constexpr const char *descrMetricContainerUptime = "The time the container has been running";
