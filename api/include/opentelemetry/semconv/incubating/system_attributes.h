@@ -20,85 +20,85 @@ namespace system
 {
 
 /**
- * Deprecated, use @code cpu.logical_number @endcode instead.
+  Deprecated, use @code cpu.logical_number @endcode instead.
  */
 static constexpr const char *kSystemCpuLogicalNumber = "system.cpu.logical_number";
 
 /**
- * Deprecated, use @code cpu.mode @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code cpu.mode @endcode.", "reason": "renamed", "renamed_to": "cpu.mode"}
+  Deprecated, use @code cpu.mode @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code cpu.mode @endcode.", "reason": "renamed", "renamed_to": "cpu.mode"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemCpuState = "system.cpu.state";
 
 /**
- * The device identifier
+  The device identifier
  */
 static constexpr const char *kSystemDevice = "system.device";
 
 /**
- * The filesystem mode
+  The filesystem mode
  */
 static constexpr const char *kSystemFilesystemMode = "system.filesystem.mode";
 
 /**
- * The filesystem mount path
+  The filesystem mount path
  */
 static constexpr const char *kSystemFilesystemMountpoint = "system.filesystem.mountpoint";
 
 /**
- * The filesystem state
+  The filesystem state
  */
 static constexpr const char *kSystemFilesystemState = "system.filesystem.state";
 
 /**
- * The filesystem type
+  The filesystem type
  */
 static constexpr const char *kSystemFilesystemType = "system.filesystem.type";
 
 /**
- * The memory state
+  The memory state
  */
 static constexpr const char *kSystemMemoryState = "system.memory.state";
 
 /**
- * Deprecated, use @code network.connection.state @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code network.connection.state @endcode.", "reason": "renamed",
- * "renamed_to": "network.connection.state"}
+  Deprecated, use @code network.connection.state @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code network.connection.state @endcode.", "reason": "renamed",
+  "renamed_to": "network.connection.state"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemNetworkState = "system.network.state";
 
 /**
- * The paging access direction
+  The paging access direction
  */
 static constexpr const char *kSystemPagingDirection = "system.paging.direction";
 
 /**
- * The memory paging state
+  The memory paging state
  */
 static constexpr const char *kSystemPagingState = "system.paging.state";
 
 /**
- * The memory paging type
+  The memory paging type
  */
 static constexpr const char *kSystemPagingType = "system.paging.type";
 
 /**
- * The process state, e.g., <a
- * href="https://man7.org/linux/man-pages/man1/ps.1.html#PROCESS_STATE_CODES">Linux Process State
- * Codes</a>
+  The process state, e.g., <a
+  href="https://man7.org/linux/man-pages/man1/ps.1.html#PROCESS_STATE_CODES">Linux Process State
+  Codes</a>
  */
 static constexpr const char *kSystemProcessStatus = "system.process.status";
 
 /**
- * Deprecated, use @code system.process.status @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code system.process.status @endcode.", "reason": "renamed", "renamed_to":
- * "system.process.status"}
+  Deprecated, use @code system.process.status @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code system.process.status @endcode.", "reason": "renamed", "renamed_to":
+  "system.process.status"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemProcessesStatus =
     "system.processes.status";
@@ -106,37 +106,37 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kSystemProcessesStatus =
 namespace SystemCpuStateValues
 {
 /**
- * none
+  none
  */
 static constexpr const char *kUser = "user";
 
 /**
- * none
+  none
  */
 static constexpr const char *kSystem = "system";
 
 /**
- * none
+  none
  */
 static constexpr const char *kNice = "nice";
 
 /**
- * none
+  none
  */
 static constexpr const char *kIdle = "idle";
 
 /**
- * none
+  none
  */
 static constexpr const char *kIowait = "iowait";
 
 /**
- * none
+  none
  */
 static constexpr const char *kInterrupt = "interrupt";
 
 /**
- * none
+  none
  */
 static constexpr const char *kSteal = "steal";
 
@@ -145,17 +145,17 @@ static constexpr const char *kSteal = "steal";
 namespace SystemFilesystemStateValues
 {
 /**
- * none
+  none
  */
 static constexpr const char *kUsed = "used";
 
 /**
- * none
+  none
  */
 static constexpr const char *kFree = "free";
 
 /**
- * none
+  none
  */
 static constexpr const char *kReserved = "reserved";
 
@@ -164,32 +164,32 @@ static constexpr const char *kReserved = "reserved";
 namespace SystemFilesystemTypeValues
 {
 /**
- * none
+  none
  */
 static constexpr const char *kFat32 = "fat32";
 
 /**
- * none
+  none
  */
 static constexpr const char *kExfat = "exfat";
 
 /**
- * none
+  none
  */
 static constexpr const char *kNtfs = "ntfs";
 
 /**
- * none
+  none
  */
 static constexpr const char *kRefs = "refs";
 
 /**
- * none
+  none
  */
 static constexpr const char *kHfsplus = "hfsplus";
 
 /**
- * none
+  none
  */
 static constexpr const char *kExt4 = "ext4";
 
@@ -198,27 +198,27 @@ static constexpr const char *kExt4 = "ext4";
 namespace SystemMemoryStateValues
 {
 /**
- * none
+  none
  */
 static constexpr const char *kUsed = "used";
 
 /**
- * none
+  none
  */
 static constexpr const char *kFree = "free";
 
 /**
- * none
+  none
  */
 static constexpr const char *kShared = "shared";
 
 /**
- * none
+  none
  */
 static constexpr const char *kBuffers = "buffers";
 
 /**
- * none
+  none
  */
 static constexpr const char *kCached = "cached";
 
@@ -227,62 +227,62 @@ static constexpr const char *kCached = "cached";
 namespace SystemNetworkStateValues
 {
 /**
- * none
+  none
  */
 static constexpr const char *kClose = "close";
 
 /**
- * none
+  none
  */
 static constexpr const char *kCloseWait = "close_wait";
 
 /**
- * none
+  none
  */
 static constexpr const char *kClosing = "closing";
 
 /**
- * none
+  none
  */
 static constexpr const char *kDelete = "delete";
 
 /**
- * none
+  none
  */
 static constexpr const char *kEstablished = "established";
 
 /**
- * none
+  none
  */
 static constexpr const char *kFinWait1 = "fin_wait_1";
 
 /**
- * none
+  none
  */
 static constexpr const char *kFinWait2 = "fin_wait_2";
 
 /**
- * none
+  none
  */
 static constexpr const char *kLastAck = "last_ack";
 
 /**
- * none
+  none
  */
 static constexpr const char *kListen = "listen";
 
 /**
- * none
+  none
  */
 static constexpr const char *kSynRecv = "syn_recv";
 
 /**
- * none
+  none
  */
 static constexpr const char *kSynSent = "syn_sent";
 
 /**
- * none
+  none
  */
 static constexpr const char *kTimeWait = "time_wait";
 
@@ -291,12 +291,12 @@ static constexpr const char *kTimeWait = "time_wait";
 namespace SystemPagingDirectionValues
 {
 /**
- * none
+  none
  */
 static constexpr const char *kIn = "in";
 
 /**
- * none
+  none
  */
 static constexpr const char *kOut = "out";
 
@@ -305,12 +305,12 @@ static constexpr const char *kOut = "out";
 namespace SystemPagingStateValues
 {
 /**
- * none
+  none
  */
 static constexpr const char *kUsed = "used";
 
 /**
- * none
+  none
  */
 static constexpr const char *kFree = "free";
 
@@ -319,12 +319,12 @@ static constexpr const char *kFree = "free";
 namespace SystemPagingTypeValues
 {
 /**
- * none
+  none
  */
 static constexpr const char *kMajor = "major";
 
 /**
- * none
+  none
  */
 static constexpr const char *kMinor = "minor";
 
@@ -333,22 +333,22 @@ static constexpr const char *kMinor = "minor";
 namespace SystemProcessStatusValues
 {
 /**
- * none
+  none
  */
 static constexpr const char *kRunning = "running";
 
 /**
- * none
+  none
  */
 static constexpr const char *kSleeping = "sleeping";
 
 /**
- * none
+  none
  */
 static constexpr const char *kStopped = "stopped";
 
 /**
- * none
+  none
  */
 static constexpr const char *kDefunct = "defunct";
 
@@ -357,22 +357,22 @@ static constexpr const char *kDefunct = "defunct";
 namespace SystemProcessesStatusValues
 {
 /**
- * none
+  none
  */
 static constexpr const char *kRunning = "running";
 
 /**
- * none
+  none
  */
 static constexpr const char *kSleeping = "sleeping";
 
 /**
- * none
+  none
  */
 static constexpr const char *kStopped = "stopped";
 
 /**
- * none
+  none
  */
 static constexpr const char *kDefunct = "defunct";
 

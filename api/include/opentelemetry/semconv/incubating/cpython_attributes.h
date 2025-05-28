@@ -20,24 +20,24 @@ namespace cpython
 {
 
 /**
- * Value of the garbage collector collection generation.
+  Value of the garbage collector collection generation.
  */
 static constexpr const char *kCpythonGcGeneration = "cpython.gc.generation";
 
 namespace CpythonGcGenerationValues
 {
 /**
- * Generation 0
+  Generation 0
  */
 static constexpr int kGeneration0 = 0;
 
 /**
- * Generation 1
+  Generation 1
  */
 static constexpr int kGeneration1 = 1;
 
 /**
- * Generation 2
+  Generation 2
  */
 static constexpr int kGeneration2 = 2;
 

@@ -73,6 +73,9 @@ Increment the:
 * [TEST] Test all components in a CMake super build
   [#3433](https://github.com/open-telemetry/opentelemetry-cpp/pull/3433)
 
+* [SEMANTIC CONVENTIONS] Fix comment style to preserve markup.
+  [#3444](https://github.com/open-telemetry/opentelemetry-cpp/pull/3444)
+
 Important changes:
 
 * [EXPORTER] ostream log exporter, fixed memory ownership issues
