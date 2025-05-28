@@ -198,8 +198,6 @@ switch ($action) {
       -DWITH_OTLP_GRPC=ON `
       -DWITH_OTLP_HTTP=ON `
       -DWITH_OTLP_RETRY_PREVIEW=ON `
-      -DOTELCPP_MAINTAINER_MODE=ON `
-      -DWITH_NO_DEPRECATED_CODE=ON `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
