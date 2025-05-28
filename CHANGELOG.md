@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Propagate INTERFACE_COMPILE_DEFINITIONS from API through common_foo_library
+  [#3440](https://github.com/open-telemetry/opentelemetry-cpp/pull/3440)
+
 * [BUILD] Error out when building DLL without MSVC
   [#3438](https://github.com/open-telemetry/opentelemetry-cpp/pull/3438)
 
@@ -69,6 +72,9 @@ Increment the:
 
 * [TEST] Test all components in a CMake super build
   [#3433](https://github.com/open-telemetry/opentelemetry-cpp/pull/3433)
+
+* [SEMANTIC CONVENTIONS] Fix comment style to preserve markup.
+  [#3444](https://github.com/open-telemetry/opentelemetry-cpp/pull/3444)
 
 * [BUILD] Upgrade opentelemetry-proto to 1.7.0
   [#3443](https://github.com/open-telemetry/opentelemetry-cpp/pull/3443)

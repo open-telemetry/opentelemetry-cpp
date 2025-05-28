@@ -20,11 +20,11 @@ namespace pool
 {
 
 /**
- * Deprecated, use @code db.client.connection.pool.name @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code db.client.connection.pool.name @endcode.", "reason": "renamed",
- * "renamed_to": "db.client.connection.pool.name"}
+  Deprecated, use @code db.client.connection.pool.name @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code db.client.connection.pool.name @endcode.", "reason": "renamed",
+  "renamed_to": "db.client.connection.pool.name"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kPoolName = "pool.name";
 
