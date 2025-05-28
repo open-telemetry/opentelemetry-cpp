@@ -309,7 +309,7 @@ OtlpGrpcClient::~OtlpGrpcClient()
 #endif
 }
 
-std::string OtlpGrpcClient::GetGrpcTarget(const std::string endpoint)
+std::string OtlpGrpcClient::GetGrpcTarget(const std::string &endpoint)
 {
   //
   // Scheme is allowed in OTLP endpoint definition, but is not allowed for creating gRPC
