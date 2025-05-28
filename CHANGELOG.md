@@ -182,7 +182,6 @@ Increment the:
 * [EXPORTER] support unix sockets in grpc client
   [#3410](https://github.com/open-telemetry/opentelemetry-cpp/pull/3410)
 
-
 New Features:
 
 * [SDK] Base2 exponential histogram aggregation
@@ -221,7 +220,7 @@ Important changes:
   * Instead, opentelemetry-cpp will only use an internal abseil version.
 
   * This change resolves long standing binary integrity issues,
-    that occured in the past when mixing several versions of abseil
+    that occurred in the past when mixing several versions of abseil
     in the build.
 
 ## [1.20 2025-04-01]
