@@ -76,6 +76,9 @@ Increment the:
 * [SEMANTIC CONVENTIONS] Fix comment style to preserve markup.
   [#3444](https://github.com/open-telemetry/opentelemetry-cpp/pull/3444)
 
+* [BUILD] Upgrade opentelemetry-proto to 1.7.0
+  [#3443](https://github.com/open-telemetry/opentelemetry-cpp/pull/3443)
+
 Important changes:
 
 * [EXPORTER] ostream log exporter, fixed memory ownership issues
