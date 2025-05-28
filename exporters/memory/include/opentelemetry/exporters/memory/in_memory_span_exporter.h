@@ -81,12 +81,14 @@ public:
   }
 
   /**
-   * Timeout is an optional value containing the timeout of the exporter
+   * Attempt to shut down the in-memory span exporter.
+   * @param timeout Timeout is an optional value containing the timeout of the exporter
    * note: passing custom timeout values is not currently supported for this exporter
    * @return Returns the status of the operation
    */
-  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
+  bool Shutdown(std::chrono::microseconds timeout) noexcept override
   {
+    (void)timeout;
     is_shutdown_ = true;
     return true;
   }

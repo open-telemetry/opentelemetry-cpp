@@ -56,10 +56,10 @@ public:
 
   /**
    * Set an attribute of a span.
-   * @param name the name of the attribute
+   * @param key the name of the attribute
    * @param value the attribute value
    */
-  virtual void SetAttribute(nostd::string_view name,
+  virtual void SetAttribute(nostd::string_view key,
                             const opentelemetry::common::AttributeValue &value) noexcept = 0;
 
   /**
