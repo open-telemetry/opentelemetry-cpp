@@ -21,14 +21,14 @@ namespace rpc
 {
 
 /**
- * Measures the duration of outbound RPC.
- * <p>
- * While streaming RPCs may record this metric as start-of-batch
- * to end-of-batch, it's hard to interpret in practice.
- * <p>
- * <strong>Streaming</strong>: N/A.
- * <p>
- * histogram
+  Measures the duration of outbound RPC.
+  <p>
+  While streaming RPCs may record this metric as start-of-batch
+  to end-of-batch, it's hard to interpret in practice.
+  <p>
+  <strong>Streaming</strong>: N/A.
+  <p>
+  histogram
  */
 static constexpr const char *kMetricRpcClientDuration = "rpc.client.duration";
 static constexpr const char *descrMetricRpcClientDuration =
@@ -50,11 +50,11 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
 }
 
 /**
- * Measures the size of RPC request messages (uncompressed).
- * <p>
- * <strong>Streaming</strong>: Recorded per message in a streaming batch
- * <p>
- * histogram
+  Measures the size of RPC request messages (uncompressed).
+  <p>
+  <strong>Streaming</strong>: Recorded per message in a streaming batch
+  <p>
+  histogram
  */
 static constexpr const char *kMetricRpcClientRequestSize = "rpc.client.request.size";
 static constexpr const char *descrMetricRpcClientRequestSize =
@@ -76,13 +76,13 @@ CreateSyncDoubleMetricRpcClientRequestSize(metrics::Meter *meter)
 }
 
 /**
- * Measures the number of messages received per RPC.
- * <p>
- * Should be 1 for all non-streaming RPCs.
- * <p>
- * <strong>Streaming</strong>: This metric is required for server and client streaming RPCs
- * <p>
- * histogram
+  Measures the number of messages received per RPC.
+  <p>
+  Should be 1 for all non-streaming RPCs.
+  <p>
+  <strong>Streaming</strong>: This metric is required for server and client streaming RPCs
+  <p>
+  histogram
  */
 static constexpr const char *kMetricRpcClientRequestsPerRpc = "rpc.client.requests_per_rpc";
 static constexpr const char *descrMetricRpcClientRequestsPerRpc =
@@ -106,11 +106,11 @@ CreateSyncDoubleMetricRpcClientRequestsPerRpc(metrics::Meter *meter)
 }
 
 /**
- * Measures the size of RPC response messages (uncompressed).
- * <p>
- * <strong>Streaming</strong>: Recorded per response in a streaming batch
- * <p>
- * histogram
+  Measures the size of RPC response messages (uncompressed).
+  <p>
+  <strong>Streaming</strong>: Recorded per response in a streaming batch
+  <p>
+  histogram
  */
 static constexpr const char *kMetricRpcClientResponseSize = "rpc.client.response.size";
 static constexpr const char *descrMetricRpcClientResponseSize =
@@ -134,13 +134,13 @@ CreateSyncDoubleMetricRpcClientResponseSize(metrics::Meter *meter)
 }
 
 /**
- * Measures the number of messages sent per RPC.
- * <p>
- * Should be 1 for all non-streaming RPCs.
- * <p>
- * <strong>Streaming</strong>: This metric is required for server and client streaming RPCs
- * <p>
- * histogram
+  Measures the number of messages sent per RPC.
+  <p>
+  Should be 1 for all non-streaming RPCs.
+  <p>
+  <strong>Streaming</strong>: This metric is required for server and client streaming RPCs
+  <p>
+  histogram
  */
 static constexpr const char *kMetricRpcClientResponsesPerRpc = "rpc.client.responses_per_rpc";
 static constexpr const char *descrMetricRpcClientResponsesPerRpc =
@@ -164,14 +164,14 @@ CreateSyncDoubleMetricRpcClientResponsesPerRpc(metrics::Meter *meter)
 }
 
 /**
- * Measures the duration of inbound RPC.
- * <p>
- * While streaming RPCs may record this metric as start-of-batch
- * to end-of-batch, it's hard to interpret in practice.
- * <p>
- * <strong>Streaming</strong>: N/A.
- * <p>
- * histogram
+  Measures the duration of inbound RPC.
+  <p>
+  While streaming RPCs may record this metric as start-of-batch
+  to end-of-batch, it's hard to interpret in practice.
+  <p>
+  <strong>Streaming</strong>: N/A.
+  <p>
+  histogram
  */
 static constexpr const char *kMetricRpcServerDuration     = "rpc.server.duration";
 static constexpr const char *descrMetricRpcServerDuration = "Measures the duration of inbound RPC.";
@@ -192,11 +192,11 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
 }
 
 /**
- * Measures the size of RPC request messages (uncompressed).
- * <p>
- * <strong>Streaming</strong>: Recorded per message in a streaming batch
- * <p>
- * histogram
+  Measures the size of RPC request messages (uncompressed).
+  <p>
+  <strong>Streaming</strong>: Recorded per message in a streaming batch
+  <p>
+  histogram
  */
 static constexpr const char *kMetricRpcServerRequestSize = "rpc.server.request.size";
 static constexpr const char *descrMetricRpcServerRequestSize =
@@ -218,13 +218,13 @@ CreateSyncDoubleMetricRpcServerRequestSize(metrics::Meter *meter)
 }
 
 /**
- * Measures the number of messages received per RPC.
- * <p>
- * Should be 1 for all non-streaming RPCs.
- * <p>
- * <strong>Streaming</strong> : This metric is required for server and client streaming RPCs
- * <p>
- * histogram
+  Measures the number of messages received per RPC.
+  <p>
+  Should be 1 for all non-streaming RPCs.
+  <p>
+  <strong>Streaming</strong> : This metric is required for server and client streaming RPCs
+  <p>
+  histogram
  */
 static constexpr const char *kMetricRpcServerRequestsPerRpc = "rpc.server.requests_per_rpc";
 static constexpr const char *descrMetricRpcServerRequestsPerRpc =
@@ -248,11 +248,11 @@ CreateSyncDoubleMetricRpcServerRequestsPerRpc(metrics::Meter *meter)
 }
 
 /**
- * Measures the size of RPC response messages (uncompressed).
- * <p>
- * <strong>Streaming</strong>: Recorded per response in a streaming batch
- * <p>
- * histogram
+  Measures the size of RPC response messages (uncompressed).
+  <p>
+  <strong>Streaming</strong>: Recorded per response in a streaming batch
+  <p>
+  histogram
  */
 static constexpr const char *kMetricRpcServerResponseSize = "rpc.server.response.size";
 static constexpr const char *descrMetricRpcServerResponseSize =
@@ -276,13 +276,13 @@ CreateSyncDoubleMetricRpcServerResponseSize(metrics::Meter *meter)
 }
 
 /**
- * Measures the number of messages sent per RPC.
- * <p>
- * Should be 1 for all non-streaming RPCs.
- * <p>
- * <strong>Streaming</strong>: This metric is required for server and client streaming RPCs
- * <p>
- * histogram
+  Measures the number of messages sent per RPC.
+  <p>
+  Should be 1 for all non-streaming RPCs.
+  <p>
+  <strong>Streaming</strong>: This metric is required for server and client streaming RPCs
+  <p>
+  histogram
  */
 static constexpr const char *kMetricRpcServerResponsesPerRpc = "rpc.server.responses_per_rpc";
 static constexpr const char *descrMetricRpcServerResponsesPerRpc =
