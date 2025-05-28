@@ -22,9 +22,10 @@
 #include <unordered_set>
 
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -309,6 +310,32 @@ OtlpGrpcClient::~OtlpGrpcClient()
 #endif
 }
 
+std::string OtlpGrpcClient::GetGrpcTarget(const std::string endpoint)
+{
+  //
+  // Scheme is allowed in OTLP endpoint definition, but is not allowed for creating gRPC
+  // channel. Passing URI with scheme to grpc::CreateChannel could resolve the endpoint to some
+  // unexpected address.
+  //
+  ext::http::common::UrlParser url(endpoint);
+  if (!url.success_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] invalid endpoint: " << endpoint);
+    return "";
+  }
+
+  std::string grpc_target;
+  if (url.scheme_ == "unix")
+  {
+    grpc_target = "unix:" + url.path_;
+  }
+  else
+  {
+    grpc_target = url.host_ + ":" + std::to_string(static_cast<int>(url.port_));
+  }
+  return grpc_target;
+}
+
 std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientOptions &options)
 {
 
@@ -318,31 +345,16 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
 
     return nullptr;
   }
-  //
-  // Scheme is allowed in OTLP endpoint definition, but is not allowed for creating gRPC
-  // channel. Passing URI with scheme to grpc::CreateChannel could resolve the endpoint to some
-  // unexpected address.
-  //
 
-  ext::http::common::UrlParser url(options.endpoint);
-  if (!url.success_)
+  std::shared_ptr<grpc::Channel> channel;
+  std::string grpc_target = GetGrpcTarget(options.endpoint);
+
+  if (grpc_target.empty())
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] invalid endpoint: " << options.endpoint);
-
     return nullptr;
   }
 
-  std::shared_ptr<grpc::Channel> channel;
-  std::string grpc_target;
-
-  if (url.scheme_ == "unix")
-  {
-    grpc_target = "unix:" + url.path_;
-  }
-  else
-  {
-    grpc_target = url.host_ + ":" + std::to_string(static_cast<int>(url.port_));
-  }
   grpc::ChannelArguments grpc_arguments;
   grpc_arguments.SetUserAgentPrefix(options.user_agent);
 
