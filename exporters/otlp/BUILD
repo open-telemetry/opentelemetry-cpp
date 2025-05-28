@@ -1,9 +1,9 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-package(default_visibility = ["//visibility:public"])
-
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "otlp_recordable",
@@ -470,6 +470,20 @@ cc_test(
         ":otlp_grpc_exporter",
         "//api",
         "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "otlp_grpc_target_test",
+    srcs = ["test/otlp_grpc_target_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_grpc",
+        "test",
+    ],
+    deps = [
+        ":otlp_grpc_client",
         "@com_google_googletest//:gtest_main",
     ],
 )

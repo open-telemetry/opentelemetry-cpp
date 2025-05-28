@@ -22,10 +22,9 @@
 #include <unordered_set>
 
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
