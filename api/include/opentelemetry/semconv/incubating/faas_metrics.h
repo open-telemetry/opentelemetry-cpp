@@ -21,9 +21,9 @@ namespace faas
 {
 
 /**
- * Number of invocation cold starts
- * <p>
- * counter
+  Number of invocation cold starts
+  <p>
+  counter
  */
 static constexpr const char *kMetricFaasColdstarts     = "faas.coldstarts";
 static constexpr const char *descrMetricFaasColdstarts = "Number of invocation cold starts";
@@ -58,9 +58,9 @@ CreateAsyncDoubleMetricFaasColdstarts(metrics::Meter *meter)
 }
 
 /**
- * Distribution of CPU usage per invocation
- * <p>
- * histogram
+  Distribution of CPU usage per invocation
+  <p>
+  histogram
  */
 static constexpr const char *kMetricFaasCpuUsage     = "faas.cpu_usage";
 static constexpr const char *descrMetricFaasCpuUsage = "Distribution of CPU usage per invocation";
@@ -81,9 +81,9 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
 }
 
 /**
- * Number of invocation errors
- * <p>
- * counter
+  Number of invocation errors
+  <p>
+  counter
  */
 static constexpr const char *kMetricFaasErrors     = "faas.errors";
 static constexpr const char *descrMetricFaasErrors = "Number of invocation errors";
@@ -116,9 +116,9 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * Measures the duration of the function's initialization, such as a cold start
- * <p>
- * histogram
+  Measures the duration of the function's initialization, such as a cold start
+  <p>
+  histogram
  */
 static constexpr const char *kMetricFaasInitDuration = "faas.init_duration";
 static constexpr const char *descrMetricFaasInitDuration =
@@ -140,9 +140,9 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
 }
 
 /**
- * Number of successful invocations
- * <p>
- * counter
+  Number of successful invocations
+  <p>
+  counter
  */
 static constexpr const char *kMetricFaasInvocations     = "faas.invocations";
 static constexpr const char *descrMetricFaasInvocations = "Number of successful invocations";
@@ -177,9 +177,9 @@ CreateAsyncDoubleMetricFaasInvocations(metrics::Meter *meter)
 }
 
 /**
- * Measures the duration of the function's logic execution
- * <p>
- * histogram
+  Measures the duration of the function's logic execution
+  <p>
+  histogram
  */
 static constexpr const char *kMetricFaasInvokeDuration = "faas.invoke_duration";
 static constexpr const char *descrMetricFaasInvokeDuration =
@@ -201,9 +201,9 @@ CreateSyncDoubleMetricFaasInvokeDuration(metrics::Meter *meter)
 }
 
 /**
- * Distribution of max memory usage per invocation
- * <p>
- * histogram
+  Distribution of max memory usage per invocation
+  <p>
+  histogram
  */
 static constexpr const char *kMetricFaasMemUsage = "faas.mem_usage";
 static constexpr const char *descrMetricFaasMemUsage =
@@ -225,9 +225,9 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
 }
 
 /**
- * Distribution of net I/O usage per invocation
- * <p>
- * histogram
+  Distribution of net I/O usage per invocation
+  <p>
+  histogram
  */
 static constexpr const char *kMetricFaasNetIo     = "faas.net_io";
 static constexpr const char *descrMetricFaasNetIo = "Distribution of net I/O usage per invocation";
@@ -246,9 +246,9 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
 }
 
 /**
- * Number of invocation timeouts
- * <p>
- * counter
+  Number of invocation timeouts
+  <p>
+  counter
  */
 static constexpr const char *kMetricFaasTimeouts     = "faas.timeouts";
 static constexpr const char *descrMetricFaasTimeouts = "Number of invocation timeouts";

@@ -21,9 +21,9 @@ namespace cicd
 {
 
 /**
- * The number of pipeline runs currently active in the system by state.
- * <p>
- * updowncounter
+  The number of pipeline runs currently active in the system by state.
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricCicdPipelineRunActive = "cicd.pipeline.run.active";
 static constexpr const char *descrMetricCicdPipelineRunActive =
@@ -63,9 +63,9 @@ CreateAsyncDoubleMetricCicdPipelineRunActive(metrics::Meter *meter)
 }
 
 /**
- * Duration of a pipeline run grouped by pipeline, state and result.
- * <p>
- * histogram
+  Duration of a pipeline run grouped by pipeline, state and result.
+  <p>
+  histogram
  */
 static constexpr const char *kMetricCicdPipelineRunDuration = "cicd.pipeline.run.duration";
 static constexpr const char *descrMetricCicdPipelineRunDuration =
@@ -89,12 +89,12 @@ CreateSyncDoubleMetricCicdPipelineRunDuration(metrics::Meter *meter)
 }
 
 /**
- * The number of errors encountered in pipeline runs (eg. compile, test failures).
- * <p>
- * There might be errors in a pipeline run that are non fatal (eg. they are suppressed) or in a
- * parallel stage multiple stages could have a fatal error. This means that this error count might
- * not be the same as the count of metric @code cicd.pipeline.run.duration @endcode with run result
- * @code failure @endcode. <p> counter
+  The number of errors encountered in pipeline runs (eg. compile, test failures).
+  <p>
+  There might be errors in a pipeline run that are non fatal (eg. they are suppressed) or in a
+  parallel stage multiple stages could have a fatal error. This means that this error count might
+  not be the same as the count of metric @code cicd.pipeline.run.duration @endcode with run result
+  @code failure @endcode. <p> counter
  */
 static constexpr const char *kMetricCicdPipelineRunErrors = "cicd.pipeline.run.errors";
 static constexpr const char *descrMetricCicdPipelineRunErrors =
@@ -132,10 +132,10 @@ CreateAsyncDoubleMetricCicdPipelineRunErrors(metrics::Meter *meter)
 }
 
 /**
- * The number of errors in a component of the CICD system (eg. controller, scheduler, agent).
- * <p>
- * Errors in pipeline run execution are explicitly excluded. Ie a test failure is not counted in
- * this metric. <p> counter
+  The number of errors in a component of the CICD system (eg. controller, scheduler, agent).
+  <p>
+  Errors in pipeline run execution are explicitly excluded. Ie a test failure is not counted in this
+  metric. <p> counter
  */
 static constexpr const char *kMetricCicdSystemErrors = "cicd.system.errors";
 static constexpr const char *descrMetricCicdSystemErrors =
@@ -171,9 +171,9 @@ CreateAsyncDoubleMetricCicdSystemErrors(metrics::Meter *meter)
 }
 
 /**
- * The number of workers on the CICD system by state.
- * <p>
- * updowncounter
+  The number of workers on the CICD system by state.
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricCicdWorkerCount = "cicd.worker.count";
 static constexpr const char *descrMetricCicdWorkerCount =

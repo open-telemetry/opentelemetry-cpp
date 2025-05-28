@@ -20,12 +20,12 @@ namespace session
 {
 
 /**
- * A unique id to identify a session.
+  A unique id to identify a session.
  */
 static constexpr const char *kSessionId = "session.id";
 
 /**
- * The previous @code session.id @endcode for this user, when known.
+  The previous @code session.id @endcode for this user, when known.
  */
 static constexpr const char *kSessionPreviousId = "session.previous_id";
 

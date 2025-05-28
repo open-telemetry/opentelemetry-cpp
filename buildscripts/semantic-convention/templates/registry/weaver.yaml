@@ -137,7 +137,7 @@ comment_formats:
   cpp:
     format: html
     header: "/**"
-    prefix: " * "
+    prefix: "  "
     footer: " */"
     indent_type: Space
     trim: true

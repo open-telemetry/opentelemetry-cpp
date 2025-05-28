@@ -20,9 +20,9 @@ namespace peer
 {
 
 /**
- * The <a href="/docs/resource/README.md#service">@code service.name @endcode</a> of the remote
- * service. SHOULD be equal to the actual @code service.name @endcode resource attribute of the
- * remote service if any.
+  The <a href="/docs/resource/README.md#service">@code service.name @endcode</a> of the remote
+  service. SHOULD be equal to the actual @code service.name @endcode resource attribute of the
+  remote service if any.
  */
 static constexpr const char *kPeerService = "peer.service";
 
