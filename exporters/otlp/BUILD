@@ -3,7 +3,7 @@
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 load("//:dll_deps.bzl", "dll_deps")
-load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
+load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_library", "otel_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -521,6 +521,24 @@ otel_cc_test(
         "//api",
         "//sdk/src/metrics",
         "@googletest//:gtest_main",
+    ]),
+)
+
+otel_cc_test(
+    name = "otlp_grpc_target_test",
+    srcs = ["test/otlp_grpc_target_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_grpc",
+        "test",
+    ],
+    deps = dll_deps([
+        ":otlp_grpc_client",
+        "@googletest//:gtest_main",
+        "@opentelemetry-proto//:metrics_service_grpc_cc",
+        "@opentelemetry-proto//:logs_service_grpc_cc",
+        "@opentelemetry-proto//:trace_service_grpc_cc",
+        "@grpc//:grpc++",
     ]),
 )
 
