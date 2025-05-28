@@ -24,6 +24,7 @@ public:
   std::vector<std::unique_ptr<MetricReaderConfiguration>> readers;
   std::vector<std::unique_ptr<ViewConfiguration>> views;
   // FIXME: exemplar_filter
+  // FIXME: meter_configurator
 };
 
 }  // namespace configuration

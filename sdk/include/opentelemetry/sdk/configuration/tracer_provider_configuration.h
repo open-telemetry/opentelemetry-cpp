@@ -25,6 +25,7 @@ public:
   std::vector<std::unique_ptr<SpanProcessorConfiguration>> processors;
   std::unique_ptr<SpanLimitsConfiguration> limits;
   std::unique_ptr<SamplerConfiguration> sampler;
+  // FIXME: tracer_configurator
 };
 
 }  // namespace configuration

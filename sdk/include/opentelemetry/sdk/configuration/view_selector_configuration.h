@@ -23,11 +23,13 @@ enum enum_instrument_type
   up_down_counter
 };
 
-class SelectorConfiguration
+// YAML-SCHEMA: schema/meter_provider.json
+// YAML-NODE: ViewSelector
+class ViewSelectorConfiguration
 {
 public:
-  SelectorConfiguration()  = default;
-  ~SelectorConfiguration() = default;
+  ViewSelectorConfiguration()  = default;
+  ~ViewSelectorConfiguration() = default;
 
   std::string instrument_name;
   enum_instrument_type instrument_type{counter};

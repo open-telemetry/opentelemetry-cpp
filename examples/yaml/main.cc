@@ -39,6 +39,12 @@
 #  include "opentelemetry/exporters/otlp/otlp_grpc_span_builder.h"
 #endif
 
+#ifdef OTEL_HAVE_OTLP_FILE
+#  include "opentelemetry/exporters/otlp/otlp_file_log_record_builder.h"
+#  include "opentelemetry/exporters/otlp/otlp_file_push_metric_builder.h"
+#  include "opentelemetry/exporters/otlp/otlp_file_span_builder.h"
+#endif
+
 #ifdef OTEL_HAVE_ZIPKIN
 #  include "opentelemetry/exporters/zipkin/zipkin_builder.h"
 #endif
@@ -82,6 +88,12 @@ void InitOtel(const std::string &config_file)
   opentelemetry::exporter::otlp::OtlpGrpcSpanBuilder::Register(registry.get());
   opentelemetry::exporter::otlp::OtlpGrpcPushMetricBuilder::Register(registry.get());
   opentelemetry::exporter::otlp::OtlpGrpcLogRecordBuilder::Register(registry.get());
+#endif
+
+#ifdef OTEL_HAVE_OTLP_FILE
+  opentelemetry::exporter::otlp::OtlpFileSpanBuilder::Register(registry.get());
+  opentelemetry::exporter::otlp::OtlpFilePushMetricBuilder::Register(registry.get());
+  opentelemetry::exporter::otlp::OtlpFileLogRecordBuilder::Register(registry.get());
 #endif
 
 #ifdef OTEL_HAVE_ZIPKIN

@@ -446,7 +446,7 @@ meter_provider:
 propagator:
   # Configure the set of propagators to include in the composite text map propagator.
   # Built-in values include: tracecontext, baggage, b3, b3multi, jaeger, none. Known third party values include: xray, ottrace. For behavior of values see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration.
-  composite: [ tracecontext, baggage, b3, b3multi, jaeger, xray, ottrace ]
+  composite: [ tracecontext, baggage, b3, b3multi, jaeger ]
 # Configure tracer provider.
 # If omitted, a noop tracer provider is used.
 tracer_provider:

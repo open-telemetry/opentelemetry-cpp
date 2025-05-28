@@ -56,17 +56,17 @@
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
-#include "opentelemetry/sdk/configuration/selector_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration_visitor.h"
-#include "opentelemetry/sdk/configuration/stream_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
+#include "opentelemetry/sdk/configuration/view_selector_configuration.h"
+#include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/sdk/init/configured_sdk.h"
 #include "opentelemetry/sdk/init/console_log_record_exporter_builder.h"
@@ -79,6 +79,9 @@
 #include "opentelemetry/sdk/init/extension_sampler_builder.h"
 #include "opentelemetry/sdk/init/extension_span_exporter_builder.h"
 #include "opentelemetry/sdk/init/extension_span_processor_builder.h"
+#include "opentelemetry/sdk/init/otlp_file_log_record_exporter_builder.h"
+#include "opentelemetry/sdk/init/otlp_file_push_metric_exporter_builder.h"
+#include "opentelemetry/sdk/init/otlp_file_span_exporter_builder.h"
 #include "opentelemetry/sdk/init/otlp_grpc_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/init/otlp_grpc_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/init/otlp_grpc_span_exporter_builder.h"
@@ -234,6 +237,12 @@ public:
     exporter = m_sdk_builder->CreateOtlpGrpcSpanExporter(model);
   }
 
+  void VisitOtlpFile(
+      const opentelemetry::sdk::configuration::OtlpFileSpanExporterConfiguration *model) override
+  {
+    exporter = m_sdk_builder->CreateOtlpFileSpanExporter(model);
+  }
+
   void VisitConsole(
       const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) override
   {
@@ -302,6 +311,13 @@ public:
       override
   {
     exporter = m_sdk_builder->CreateOtlpGrpcPushMetricExporter(model);
+  }
+
+  void VisitOtlpFile(
+      const opentelemetry::sdk::configuration::OtlpFilePushMetricExporterConfiguration *model)
+      override
+  {
+    exporter = m_sdk_builder->CreateOtlpFilePushMetricExporter(model);
   }
 
   void VisitConsole(const opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration
@@ -399,6 +415,12 @@ public:
                          *model) override
   {
     exporter = m_sdk_builder->CreateOtlpGrpcLogRecordExporter(model);
+  }
+
+  void VisitOtlpFile(const opentelemetry::sdk::configuration::OtlpFileLogRecordExporterConfiguration
+                         *model) override
+  {
+    exporter = m_sdk_builder->CreateOtlpFileLogRecordExporter(model);
   }
 
   void VisitConsole(const opentelemetry::sdk::configuration::ConsoleLogRecordExporterConfiguration
@@ -524,7 +546,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpH
   builder = m_registry->GetOtlpHttpSpanBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpSpanExporter() using registered http builder");
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpHttpSpanExporter() using registered http builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -543,12 +565,31 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpG
   builder = m_registry->GetOtlpGrpcSpanBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpSpanExporter() using registered grpc builder");
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpGrpcSpanExporter() using registered grpc builder");
     sdk = builder->Build(model);
     return sdk;
   }
 
   std::string die("No builder for OtlpGrpcSpanExporter");
+  OTEL_INTERNAL_LOG_ERROR(die);
+  throw UnsupportedException(die);
+}
+
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpFileSpanExporter(
+    const opentelemetry::sdk::configuration::OtlpFileSpanExporterConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
+  const OtlpFileSpanExporterBuilder *builder;
+
+  builder = m_registry->GetOtlpFileSpanBuilder();
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpFileSpanExporter() using registered file builder");
+    sdk = builder->Build(model);
+    return sdk;
+  }
+
+  std::string die("No builder for OtlpFileSpanExporter");
   OTEL_INTERNAL_LOG_ERROR(die);
   throw UnsupportedException(die);
 }
@@ -812,7 +853,7 @@ SdkBuilder::CreateOtlpHttpPushMetricExporter(
   builder = m_registry->GetOtlpHttpPushMetricExporterBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpPushMetricExporter() using registered http builder");
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpHttpPushMetricExporter() using registered http builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -832,12 +873,32 @@ SdkBuilder::CreateOtlpGrpcPushMetricExporter(
   builder = m_registry->GetOtlpGrpcPushMetricExporterBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpPushMetricExporter() using registered grpc builder");
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpGrpcPushMetricExporter() using registered grpc builder");
     sdk = builder->Build(model);
     return sdk;
   }
 
   std::string die("No grpc builder for OtlpPushMetricExporter");
+  OTEL_INTERNAL_LOG_ERROR(die);
+  throw UnsupportedException(die);
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
+SdkBuilder::CreateOtlpFilePushMetricExporter(
+    const opentelemetry::sdk::configuration::OtlpFilePushMetricExporterConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
+  const OtlpFilePushMetricExporterBuilder *builder;
+
+  builder = m_registry->GetOtlpFilePushMetricExporterBuilder();
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpFilePushMetricExporter() using registered file builder");
+    sdk = builder->Build(model);
+    return sdk;
+  }
+
+  std::string die("No file builder for OtlpPushMetricExporter");
   OTEL_INTERNAL_LOG_ERROR(die);
   throw UnsupportedException(die);
 }
@@ -1094,7 +1155,7 @@ SdkBuilder::CreateOtlpHttpLogRecordExporter(
   builder = m_registry->GetOtlpHttpLogRecordBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpLogRecordExporter() using registered http builder");
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpHttpLogRecordExporter() using registered http builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1114,13 +1175,32 @@ SdkBuilder::CreateOtlpGrpcLogRecordExporter(
   builder = m_registry->GetOtlpGrpcLogRecordBuilder();
   if (builder != nullptr)
   {
-    builder = m_registry->GetOtlpGrpcLogRecordBuilder();
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpLogRecordExporter() using registered grpc builder");
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpGrpcLogRecordExporter() using registered grpc builder");
     sdk = builder->Build(model);
     return sdk;
   }
 
   std::string die("No grpc builder for OtlpLogRecordExporter");
+  OTEL_INTERNAL_LOG_ERROR(die);
+  throw UnsupportedException(die);
+}
+
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
+SdkBuilder::CreateOtlpFileLogRecordExporter(
+    const opentelemetry::sdk::configuration::OtlpFileLogRecordExporterConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> sdk;
+  const OtlpFileLogRecordExporterBuilder *builder;
+
+  builder = m_registry->GetOtlpFileLogRecordBuilder();
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpFileLogRecordExporter() using registered file builder");
+    sdk = builder->Build(model);
+    return sdk;
+  }
+
+  std::string die("No file builder for OtlpLogRecordExporter");
   OTEL_INTERNAL_LOG_ERROR(die);
   throw UnsupportedException(die);
 }

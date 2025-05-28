@@ -38,6 +38,12 @@ if(WITH_OTLP_GRPC)
   target_link_libraries(example_yaml opentelemetry_otlp_grpc_builder)
 endif()
 
+if(WITH_OTLP_FILE)
+  include_directories(${CMAKE_SOURCE_DIR}/exporters/otlp/include)
+  add_definitions(-DOTEL_HAVE_OTLP_FILE)
+  target_link_libraries(example_yaml opentelemetry_otlp_file_builder)
+endif()
+
 if(WITH_ZIPKIN)
   include_directories(${CMAKE_SOURCE_DIR}/exporters/zipkin/include)
   add_definitions(-DOTEL_HAVE_ZIPKIN)

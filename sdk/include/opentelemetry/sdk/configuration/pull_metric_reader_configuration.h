@@ -32,6 +32,7 @@ public:
 
   std::unique_ptr<PullMetricExporterConfiguration> exporter;
   std::vector<std::unique_ptr<MetricProducerConfiguration>> producers;
+  // FIXME: cardinality_limits
 };
 
 }  // namespace configuration

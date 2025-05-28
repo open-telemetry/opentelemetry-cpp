@@ -14,15 +14,18 @@ namespace sdk
 namespace configuration
 {
 
-class StreamConfiguration
+// YAML-SCHEMA: schema/meter_provider.json
+// YAML-NODE: ViewStream
+class ViewStreamConfiguration
 {
 public:
-  StreamConfiguration()  = default;
-  ~StreamConfiguration() = default;
+  ViewStreamConfiguration()  = default;
+  ~ViewStreamConfiguration() = default;
 
   std::string name;
   std::string description;
   std::unique_ptr<AggregationConfiguration> aggregation;
+  size_t aggregation_cardinality_limit;
   std::vector<std::string> attribute_keys;
 };
 

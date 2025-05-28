@@ -23,6 +23,7 @@ class LoggerProviderConfiguration
 public:
   std::vector<std::unique_ptr<LogRecordProcessorConfiguration>> processors;
   std::unique_ptr<LogRecordLimitsConfiguration> limits;
+  // FIXME: logger_configurator
 };
 
 }  // namespace configuration

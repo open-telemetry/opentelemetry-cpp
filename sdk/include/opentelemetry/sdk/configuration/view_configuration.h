@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include "opentelemetry/sdk/configuration/selector_configuration.h"
-#include "opentelemetry/sdk/configuration/stream_configuration.h"
+#include "opentelemetry/sdk/configuration/view_selector_configuration.h"
+#include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -15,14 +15,16 @@ namespace sdk
 namespace configuration
 {
 
+// YAML-SCHEMA: schema/meter_provider.json
+// YAML-NODE: View
 class ViewConfiguration
 {
 public:
   ViewConfiguration()  = default;
   ~ViewConfiguration() = default;
 
-  std::unique_ptr<SelectorConfiguration> selector;
-  std::unique_ptr<StreamConfiguration> stream;
+  std::unique_ptr<ViewSelectorConfiguration> selector;
+  std::unique_ptr<ViewStreamConfiguration> stream;
 };
 
 }  // namespace configuration

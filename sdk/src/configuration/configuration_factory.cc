@@ -47,6 +47,9 @@
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_configuration.h"
@@ -62,18 +65,18 @@
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/selector_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
-#include "opentelemetry/sdk/configuration/stream_configuration.h"
 #include "opentelemetry/sdk/configuration/string_array_configuration.h"
 #include "opentelemetry/sdk/configuration/sum_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
+#include "opentelemetry/sdk/configuration/view_selector_configuration.h"
+#include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/version.h"
 
@@ -177,6 +180,18 @@ ParseOtlpGrpcLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> 
   return model;
 }
 
+static std::unique_ptr<OtlpFileLogRecordExporterConfiguration>
+ParseOtlpFileLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<OtlpFileLogRecordExporterConfiguration> model(
+      new OtlpFileLogRecordExporterConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  model->output_stream = node->GetString("output_stream", "");
+
+  return model;
+}
+
 static std::unique_ptr<ConsoleLogRecordExporterConfiguration>
 ParseConsoleLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> & /* node */)
 {
@@ -226,6 +241,10 @@ static std::unique_ptr<LogRecordExporterConfiguration> ParseLogRecordExporterCon
   else if (name == "otlp_grpc")
   {
     model = ParseOtlpGrpcLogRecordExporterConfiguration(child);
+  }
+  else if (name == "otlp_file/development")
+  {
+    model = ParseOtlpFileLogRecordExporterConfiguration(child);
   }
   else if (name == "console")
   {
@@ -437,6 +456,24 @@ ParseOtlpGrpcPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
   return model;
 }
 
+static std::unique_ptr<OtlpFilePushMetricExporterConfiguration>
+ParseOtlpFilePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<OtlpFilePushMetricExporterConfiguration> model(
+      new OtlpFilePushMetricExporterConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  model->output_stream = node->GetString("output_stream", "");
+
+  model->temporality_preference = node->GetString("temporality_preference", "");
+
+  std::string default_histogram_aggregation = node->GetString("default_histogram_aggregation", "");
+  model->default_histogram_aggregation =
+      ParseDefaultHistogramAggregation(default_histogram_aggregation);
+
+  return model;
+}
+
 static std::unique_ptr<ConsolePushMetricExporterConfiguration>
 ParseConsolePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> & /* node */)
 {
@@ -512,6 +549,10 @@ static std::unique_ptr<PushMetricExporterConfiguration> ParsePushMetricExporterC
   else if (name == "otlp_grpc")
   {
     model = ParseOtlpGrpcPushMetricExporterConfiguration(child);
+  }
+  else if (name == "otlp_file/development")
+  {
+    model = ParseOtlpFilePushMetricExporterConfiguration(child);
   }
   else if (name == "console")
   {
@@ -661,10 +702,10 @@ static enum_instrument_type ParseInstrumentType(const std::string &name)
   throw InvalidSchemaException("Illegal instrument_type");
 }
 
-static std::unique_ptr<SelectorConfiguration> ParseSelectorConfiguration(
+static std::unique_ptr<ViewSelectorConfiguration> ParseViewSelectorConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<SelectorConfiguration> model(new SelectorConfiguration);
+  std::unique_ptr<ViewSelectorConfiguration> model(new ViewSelectorConfiguration);
 
   model->instrument_name = node->GetString("instrument_name", "");
 
@@ -801,10 +842,10 @@ static std::unique_ptr<AggregationConfiguration> ParseAggregationConfiguration(
   return model;
 }
 
-static std::unique_ptr<StreamConfiguration> ParseStreamConfiguration(
+static std::unique_ptr<ViewStreamConfiguration> ParseViewStreamConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<StreamConfiguration> model(new StreamConfiguration);
+  std::unique_ptr<ViewStreamConfiguration> model(new ViewStreamConfiguration);
   std::unique_ptr<DocumentNode> child;
 
   model->name        = node->GetString("name", "");
@@ -820,7 +861,7 @@ static std::unique_ptr<StreamConfiguration> ParseStreamConfiguration(
 
   if (child)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseStreamConfiguration: FIXME");
+    OTEL_INTERNAL_LOG_ERROR("ParseViewStreamConfiguration: FIXME");
 
     // Schema has changed
 #ifdef NEVER
@@ -845,10 +886,10 @@ static std::unique_ptr<ViewConfiguration> ParseViewConfiguration(
   std::unique_ptr<DocumentNode> child;
 
   child           = node->GetRequiredChildNode("selector");
-  model->selector = ParseSelectorConfiguration(child);
+  model->selector = ParseViewSelectorConfiguration(child);
 
   child         = node->GetRequiredChildNode("stream");
-  model->stream = ParseStreamConfiguration(child);
+  model->stream = ParseViewStreamConfiguration(child);
 
   return model;
 }
@@ -1130,6 +1171,17 @@ static std::unique_ptr<OtlpGrpcSpanExporterConfiguration> ParseOtlpGrpcSpanExpor
   return model;
 }
 
+static std::unique_ptr<OtlpFileSpanExporterConfiguration> ParseOtlpFileSpanExporterConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<OtlpFileSpanExporterConfiguration> model(new OtlpFileSpanExporterConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  model->output_stream = node->GetString("output_stream", "");
+
+  return model;
+}
+
 static std::unique_ptr<ConsoleSpanExporterConfiguration> ParseConsoleSpanExporterConfiguration(
     const std::unique_ptr<DocumentNode> & /* node */)
 {
@@ -1188,6 +1240,10 @@ static std::unique_ptr<SpanExporterConfiguration> ParseSpanExporterConfiguration
   else if (name == "otlp_grpc")
   {
     model = ParseOtlpGrpcSpanExporterConfiguration(child);
+  }
+  else if (name == "otlp_file/development")
+  {
+    model = ParseOtlpFileSpanExporterConfiguration(child);
   }
   else if (name == "console")
   {
@@ -1331,7 +1387,6 @@ static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
   std::unique_ptr<DocumentNode> value_child;
   std::unique_ptr<DocumentNode> type_child;
   std::string name;
-  std::string value;
   std::string type;
 
   for (auto it = node->begin(); it != node->end(); ++it)
@@ -1342,8 +1397,7 @@ static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
     value_child = attribute_name_value->GetRequiredChildNode("value");
     type_child  = attribute_name_value->GetChildNode("type");
 
-    name  = name_child->AsString();
-    value = value_child->AsString();
+    name = name_child->AsString();
     if (type_child)
     {
       type = type_child->AsString();
@@ -1355,6 +1409,8 @@ static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
 
     if (type == "string")
     {
+      std::string value;
+      value = value_child->AsString();
       OTEL_INTERNAL_LOG_DEBUG("ParseAttributesConfiguration() name = " << name
                                                                        << ", value = " << value);
       std::pair<std::string, std::string> entry(name, value);

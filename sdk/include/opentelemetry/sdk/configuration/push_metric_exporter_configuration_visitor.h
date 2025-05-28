@@ -13,6 +13,7 @@ namespace configuration
 
 class OtlpHttpPushMetricExporterConfiguration;
 class OtlpGrpcPushMetricExporterConfiguration;
+class OtlpFilePushMetricExporterConfiguration;
 class ConsolePushMetricExporterConfiguration;
 class ExtensionPushMetricExporterConfiguration;
 
@@ -24,6 +25,7 @@ public:
 
   virtual void VisitOtlpHttp(const OtlpHttpPushMetricExporterConfiguration *model)   = 0;
   virtual void VisitOtlpGrpc(const OtlpGrpcPushMetricExporterConfiguration *model)   = 0;
+  virtual void VisitOtlpFile(const OtlpFilePushMetricExporterConfiguration *model)   = 0;
   virtual void VisitConsole(const ConsolePushMetricExporterConfiguration *model)     = 0;
   virtual void VisitExtension(const ExtensionPushMetricExporterConfiguration *model) = 0;
 };
