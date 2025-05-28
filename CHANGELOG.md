@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Propagate INTERFACE_COMPILE_DEFINITIONS from API through common_foo_library
+  [#3440](https://github.com/open-telemetry/opentelemetry-cpp/pull/3440)
+
 * [BUILD] Error out when building DLL without MSVC
   [#3438](https://github.com/open-telemetry/opentelemetry-cpp/pull/3438)
 
