@@ -20,35 +20,35 @@ namespace otel
 {
 
 /**
- * The name of the instrumentation scope - (@code InstrumentationScope.Name @endcode in OTLP).
+  The name of the instrumentation scope - (@code InstrumentationScope.Name @endcode in OTLP).
  */
 static constexpr const char *kOtelScopeName = "otel.scope.name";
 
 /**
- * The version of the instrumentation scope - (@code InstrumentationScope.Version @endcode in OTLP).
+  The version of the instrumentation scope - (@code InstrumentationScope.Version @endcode in OTLP).
  */
 static constexpr const char *kOtelScopeVersion = "otel.scope.version";
 
 /**
- * Name of the code, either "OK" or "ERROR". MUST NOT be set if the status code is UNSET.
+  Name of the code, either "OK" or "ERROR". MUST NOT be set if the status code is UNSET.
  */
 static constexpr const char *kOtelStatusCode = "otel.status_code";
 
 /**
- * Description of the Status if it has a value, otherwise not set.
+  Description of the Status if it has a value, otherwise not set.
  */
 static constexpr const char *kOtelStatusDescription = "otel.status_description";
 
 namespace OtelStatusCodeValues
 {
 /**
- * The operation has been validated by an Application developer or Operator to have completed
- * successfully.
+  The operation has been validated by an Application developer or Operator to have completed
+  successfully.
  */
 static constexpr const char *kOk = "OK";
 
 /**
- * The operation contains an error.
+  The operation contains an error.
  */
 static constexpr const char *kError = "ERROR";
 

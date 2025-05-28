@@ -21,9 +21,9 @@ namespace gen_ai
 {
 
 /**
- * GenAI operation duration
- * <p>
- * histogram
+  GenAI operation duration
+  <p>
+  histogram
  */
 static constexpr const char *kMetricGenAiClientOperationDuration =
     "gen_ai.client.operation.duration";
@@ -47,9 +47,9 @@ CreateSyncDoubleMetricGenAiClientOperationDuration(metrics::Meter *meter)
 }
 
 /**
- * Measures number of input and output tokens used
- * <p>
- * histogram
+  Measures number of input and output tokens used
+  <p>
+  histogram
  */
 static constexpr const char *kMetricGenAiClientTokenUsage = "gen_ai.client.token.usage";
 static constexpr const char *descrMetricGenAiClientTokenUsage =
@@ -73,9 +73,9 @@ CreateSyncDoubleMetricGenAiClientTokenUsage(metrics::Meter *meter)
 }
 
 /**
- * Generative AI server request duration such as time-to-last byte or last output token
- * <p>
- * histogram
+  Generative AI server request duration such as time-to-last byte or last output token
+  <p>
+  histogram
  */
 static constexpr const char *kMetricGenAiServerRequestDuration = "gen_ai.server.request.duration";
 static constexpr const char *descrMetricGenAiServerRequestDuration =
@@ -99,9 +99,9 @@ CreateSyncDoubleMetricGenAiServerRequestDuration(metrics::Meter *meter)
 }
 
 /**
- * Time per output token generated after the first token for successful responses
- * <p>
- * histogram
+  Time per output token generated after the first token for successful responses
+  <p>
+  histogram
  */
 static constexpr const char *kMetricGenAiServerTimePerOutputToken =
     "gen_ai.server.time_per_output_token";
@@ -126,9 +126,9 @@ CreateSyncDoubleMetricGenAiServerTimePerOutputToken(metrics::Meter *meter)
 }
 
 /**
- * Time to generate first token for successful responses
- * <p>
- * histogram
+  Time to generate first token for successful responses
+  <p>
+  histogram
  */
 static constexpr const char *kMetricGenAiServerTimeToFirstToken =
     "gen_ai.server.time_to_first_token";
