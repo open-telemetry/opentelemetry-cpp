@@ -62,7 +62,7 @@ public:
 
   ~OtlpGrpcClient();
 
-  static std::string GetGrpcTarget(const std::string endpoint);
+  static std::string GetGrpcTarget(const std::string &endpoint);
 
   /**
    * Create gRPC channel from the exporter options.
