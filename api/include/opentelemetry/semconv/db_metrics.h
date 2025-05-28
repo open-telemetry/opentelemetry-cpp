@@ -21,11 +21,11 @@ namespace db
 {
 
 /**
- * Duration of database client operations.
- * <p>
- * Batch operations SHOULD be recorded as a single operation.
- * <p>
- * histogram
+  Duration of database client operations.
+  <p>
+  Batch operations SHOULD be recorded as a single operation.
+  <p>
+  histogram
  */
 static constexpr const char *kMetricDbClientOperationDuration = "db.client.operation.duration";
 static constexpr const char *descrMetricDbClientOperationDuration =

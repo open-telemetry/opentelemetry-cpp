@@ -20,17 +20,17 @@ namespace webengine
 {
 
 /**
- * Additional description of the web engine (e.g. detailed version and edition information).
+  Additional description of the web engine (e.g. detailed version and edition information).
  */
 static constexpr const char *kWebengineDescription = "webengine.description";
 
 /**
- * The name of the web engine.
+  The name of the web engine.
  */
 static constexpr const char *kWebengineName = "webengine.name";
 
 /**
- * The version of the web engine.
+  The version of the web engine.
  */
 static constexpr const char *kWebengineVersion = "webengine.version";
 

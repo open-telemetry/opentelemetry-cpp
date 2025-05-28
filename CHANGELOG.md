@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.21 2025-05-27]
+## [1.21 2025-05-28]
 
 * [BUILD] Remove WITH_ABSEIL
   [#3318](https://github.com/open-telemetry/opentelemetry-cpp/pull/3318)
@@ -173,6 +173,16 @@ Increment the:
 * [CMAKE] Remove third-party version mismatch warning
   [#3432](https://github.com/open-telemetry/opentelemetry-cpp/pull/3432)
 
+* Bump docker/build-push-action from 6.17.0 to 6.18.0
+  [#3446](https://github.com/open-telemetry/opentelemetry-cpp/pull/3446)
+
+* [SEMANTIC CONVENTIONS] Fix comment style to preserve markup.
+  [#3444](https://github.com/open-telemetry/opentelemetry-cpp/pull/3444)
+
+* [EXPORTER] support unix sockets in grpc client
+  [#3410](https://github.com/open-telemetry/opentelemetry-cpp/pull/3410)
+
+
 New Features:
 
 * [SDK] Base2 exponential histogram aggregation
@@ -200,6 +210,19 @@ Important changes:
     * GetAttributes()
 
   * Applications not using these SDK classes directly are not affected.
+
+* [BUILD] Remove WITH_ABSEIL
+  [#3318](https://github.com/open-telemetry/opentelemetry-cpp/pull/3318)
+
+  * The build option `WITH_ABSEIL` is no longer used, and opentelemetry-cpp
+    will no longer use any release of abseil provided externally,
+    for its own use.
+
+  * Instead, opentelemetry-cpp will only use an internal abseil version.
+
+  * This change resolves long standing binary integrity issues,
+    that occured in the past when mixing several versions of abseil
+    in the build.
 
 ## [1.20 2025-04-01]
 

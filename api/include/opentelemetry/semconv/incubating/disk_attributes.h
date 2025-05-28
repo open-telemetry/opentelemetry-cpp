@@ -20,19 +20,19 @@ namespace disk
 {
 
 /**
- * The disk IO operation direction.
+  The disk IO operation direction.
  */
 static constexpr const char *kDiskIoDirection = "disk.io.direction";
 
 namespace DiskIoDirectionValues
 {
 /**
- * none
+  none
  */
 static constexpr const char *kRead = "read";
 
 /**
- * none
+  none
  */
 static constexpr const char *kWrite = "write";
 
