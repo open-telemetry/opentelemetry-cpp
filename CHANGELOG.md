@@ -182,6 +182,9 @@ Increment the:
 * [EXPORTER] support unix sockets in grpc client
   [#3410](https://github.com/open-telemetry/opentelemetry-cpp/pull/3410)
 
+* [BUILD] Propagate INTERFACE_COMPILE_DEFINITIONS from API through common_foo_library
+  [#3440](https://github.com/open-telemetry/opentelemetry-cpp/pull/3440)
+
 New Features:
 
 * [SDK] Base2 exponential histogram aggregation

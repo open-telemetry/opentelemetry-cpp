@@ -13,4 +13,4 @@ endif()
 target_include_directories(common_logs_foo_library
                            PUBLIC $<BUILD_INTERFACE:${EXAMPLES_COMMON_DIR}>)
 
-target_link_libraries(common_logs_foo_library PRIVATE opentelemetry-cpp::api)
+target_link_libraries(common_logs_foo_library PUBLIC opentelemetry-cpp::api)
