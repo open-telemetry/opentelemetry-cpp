@@ -467,13 +467,13 @@ switch ($action) {
     $CMAKE_OPTIONS = @(
     "-DCMAKE_CXX_STANDARD=17",
     "-DVCPKG_TARGET_TRIPLET=x64-windows",
-    "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+    "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake",
+    "-DOPENTELEMETRY_BUILD_DLL=1"
     )
 
     cmake $SRC_DIR `
       $CMAKE_OPTIONS `
       "-DCMAKE_INSTALL_PREFIX=$INSTALL_TEST_DIR" `
-      -DOPENTELEMETRY_BUILD_DLL=1 `
       -DWITH_ABI_VERSION_1=ON `
       -DWITH_ABI_VERSION_2=OFF `
       -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON `

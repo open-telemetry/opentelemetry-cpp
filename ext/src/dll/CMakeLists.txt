@@ -16,8 +16,9 @@ set_target_properties(opentelemetry_cpp PROPERTIES EXPORT_NAME
                                                    opentelemetry_cpp)
 
 target_link_libraries(
-  opentelemetry_cpp PRIVATE opentelemetry_trace
-                            opentelemetry_exporter_ostream_span)
+  opentelemetry_cpp
+  PUBLIC opentelemetry_api
+  PRIVATE opentelemetry_trace opentelemetry_exporter_ostream_span)
 
 target_include_directories(
   opentelemetry_cpp
