@@ -16,3 +16,8 @@ else()
     metrics_ostream_example PRIVATE opentelemetry-cpp::metrics
                                     opentelemetry-cpp::ostream_metrics_exporter)
 endif()
+
+if(BUILD_TESTING)
+  add_test(NAME examples.metrics_simple
+           COMMAND "$<TARGET_FILE:metrics_ostream_example>")
+endif()
