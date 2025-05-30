@@ -236,7 +236,7 @@ if(TARGET protobuf::libprotobuf)
       ".*(protobuf).*")
     foreach(protobuf_lib_file ${protobuf_lib_files})
       if(protobuf_lib_file MATCHES
-         "(^|[\\\\\\/])[^\\\\\\/]*protobuf[^\\\\\\/]*.a$")
+         "(^|[\\\\\\/])[^\\\\\\/]*protobuf[^\\\\\\/]*\\.(a|lib)$")
         set(protobuf_lib_type "STATIC_LIBRARY")
         break()
       endif()
@@ -247,7 +247,7 @@ else()
   target_link_libraries(opentelemetry_proto PUBLIC ${Protobuf_LIBRARIES})
   foreach(protobuf_lib_file ${Protobuf_LIBRARIES})
     if(protobuf_lib_file MATCHES
-       "(^|[\\\\\\/])[^\\\\\\/]*protobuf[^\\\\\\/]*.a$")
+       "(^|[\\\\\\/])[^\\\\\\/]*protobuf[^\\\\\\/]*\\.(a|lib)$")
       set(protobuf_lib_type "STATIC_LIBRARY")
       break()
     endif()
@@ -380,7 +380,26 @@ if(WITH_OTLP_GRPC)
   list(APPEND OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto_grpc)
   target_link_libraries(opentelemetry_proto_grpc PUBLIC opentelemetry_proto)
 
+  # gRPC uses numerous global variables, which can lead to conflicts when a
+  # user's dynamic libraries, executables, and otel-cpp are all built as dynamic
+  # libraries and linked against a statically built gRPC library. This may
+  # result in crashes. To prevent such conflicts, we also need to build
+  # opentelemetry_exporter_otlp_grpc_client as a static library.
   get_target_property(grpc_lib_type gRPC::grpc++ TYPE)
+  # grpc_lib_type may be "INTERFACE_LIBRARY" in some build systems, such as
+  # conan.
+  if(grpc_lib_type STREQUAL "INTERFACE_LIBRARY")
+    project_build_tools_recursive_scan_imported_locations(
+      grpc_lib_files TARGET_NAME gRPC::grpc++ TARGET_MATCH ".*(grpc|gRPC).*")
+    foreach(grpc_lib_file ${grpc_lib_files})
+      if(grpc_lib_file MATCHES
+         "(^|[\\\\\\/])[^\\\\\\/]*grpc[^\\\\\\/]*\\.(a|lib)$")
+        set(grpc_lib_type "STATIC_LIBRARY")
+        break()
+      endif()
+    endforeach()
+  endif()
+
   if(grpc_lib_type STREQUAL "SHARED_LIBRARY")
     target_link_libraries(opentelemetry_proto_grpc PUBLIC gRPC::grpc++)
   endif()
