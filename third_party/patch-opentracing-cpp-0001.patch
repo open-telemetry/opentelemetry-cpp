@@ -1,17 +1,17 @@
-commit 340259ef9694f2cf87c63847e13bc9233ca4a684
+commit 42f2bbeeab910f2c108544387302f20c102a038d
 Author: Marc Alff <marc.alff@oracle.com>
-Date:   Fri May 30 23:38:21 2025 +0200
+Date:   Sat May 31 00:09:11 2025 +0200
 
     Modify opentracing to build for opentelemetry-cpp.
-    
+
     Modify opentracing as follows:
-    
+
     - file config.h is no longer generated, it is delivered as source.
     - file version.h is no longer generated, it is delivered as source.
     - CMake no longer generates config.h and version.h
     - Bazel no longer generates config.h and version.h
     - CMake minimal version bumped to 3.14
-    
+
     These changes are required to build opentracing
     using recent CMake versions.
 
@@ -70,7 +70,7 @@ index c57dc9f..26c4c62 100644
 +##     """,
 +## )
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index a451844..8c005ff 100644
+index a451844..1a2a673 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -1,5 +1,5 @@
@@ -80,17 +80,25 @@ index a451844..8c005ff 100644
  
  project(opentracing-cpp)
  
-@@ -120,8 +120,8 @@ endif()
+@@ -120,12 +120,12 @@ endif()
  # ==============================================================================
  # Set up generated header files config.h and version.h
  
 -configure_file(version.h.in include/opentracing/version.h)
 -configure_file(config.h.in include/opentracing/config.h)
+-include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
+-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/opentracing
+-        DESTINATION include
+-        COMPONENT DEVEL)
 +# configure_file(version.h.in include/opentracing/version.h)
 +# configure_file(config.h.in include/opentracing/config.h)
- include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
- install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/opentracing
-         DESTINATION include
++# include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
++# install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/opentracing
++#         DESTINATION include
++#         COMPONENT DEVEL)
+ 
+ # ==============================================================================
+ # OpenTracing library targets
 diff --git a/include/opentracing/config.h b/include/opentracing/config.h
 new file mode 100644
 index 0000000..cae3e61

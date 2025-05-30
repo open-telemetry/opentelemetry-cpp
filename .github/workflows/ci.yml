@@ -394,6 +394,11 @@ jobs:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
+
+    - name: patch opentracing
+      run: |
+        (cd third_party/opentracing-cpp; patch -p1 < ../patch-opentracing-cpp-0001.patch)
+
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
