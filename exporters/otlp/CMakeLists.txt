@@ -33,23 +33,9 @@ target_link_libraries(opentelemetry_otlp_recordable
 
 if(WITH_OTLP_GRPC)
   find_package(gRPC REQUIRED)
-  # gRPC uses numerous global variables, which can lead to conflicts when a
-  # user's dynamic libraries, executables, and otel-cpp are all built as dynamic
-  # libraries and linked against a statically built gRPC library. This may
-  # result in crashes. To prevent such conflicts, we also need to build
-  # opentelemetry_exporter_otlp_grpc_client as a static library.
-  get_target_property(grpc_lib_type gRPC::grpc++ TYPE)
-  # grpc_lib_type may be "INTERFACE_LIBRARY" in some build systems, such as
-  # conan.
-  if(grpc_lib_type STREQUAL "INTERFACE_LIBRARY")
-    project_build_tools_recursive_scan_imported_locations(
-      grpc_lib_files TARGET_NAME gRPC::grpc++ TARGET_MATCH ".*(grpc|gRPC).*")
-    foreach(grpc_lib_file ${grpc_lib_files})
-      if(grpc_lib_file MATCHES "(^|[\\\\\\/])[^\\\\\\/]*grpc[^\\\\\\/]*.a$")
-        set(grpc_lib_type "STATIC_LIBRARY")
-        break()
-      endif()
-    endforeach()
+  if(NOT DEFINED grpc_lib_type)
+    message(
+      FATAL_ERROR "cmake/opentelemetry-proto.cmake should be included first")
   endif()
   if(grpc_lib_type STREQUAL "STATIC_LIBRARY" OR protobuf_lib_type STREQUAL
                                                 "STATIC_LIBRARY")
@@ -74,8 +60,9 @@ if(WITH_OTLP_GRPC)
     opentelemetry_exporter_otlp_grpc_client
     PUBLIC opentelemetry_sdk opentelemetry_common
            # gRPC::grpc++ must be linked before opentelemetry_proto_grpc.
-           opentelemetry_proto_grpc
-    PRIVATE gRPC::grpc++ opentelemetry_ext)
+           "$<BUILD_INTERFACE:opentelemetry_proto_grpc>"
+    PRIVATE "$<INSTALL_INTERFACE:opentelemetry_proto_grpc>" gRPC::grpc++
+            opentelemetry_ext)
 
   get_target_property(GRPC_INCLUDE_DIRECTORY gRPC::grpc++
                       INTERFACE_INCLUDE_DIRECTORIES)
