@@ -77,23 +77,8 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    ctest -C Debug
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
     $env:PATH = "$BUILD_DIR\ext\src\dll\Debug;$env:PATH"
-    examples\simple\Debug\example_simple.exe
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
-    examples\metrics_simple\Debug\metrics_ostream_example.exe
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
-    examples\logs_simple\Debug\example_logs_simple.exe
+    ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -115,23 +100,8 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    ctest -C Debug
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
     $env:PATH = "$BUILD_DIR\ext\src\dll\Debug;$env:PATH"
-    examples\simple\Debug\example_simple.exe
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
-    examples\metrics_simple\Debug\metrics_ostream_example.exe
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
-    examples\logs_simple\Debug\example_logs_simple.exe
+    ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -277,6 +247,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
+    $env:PATH = "$BUILD_DIR\ext\src\dll\Debug;$env:PATH"
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
