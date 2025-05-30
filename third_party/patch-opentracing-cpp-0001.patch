@@ -1,0 +1,122 @@
+commit 340259ef9694f2cf87c63847e13bc9233ca4a684
+Author: Marc Alff <marc.alff@oracle.com>
+Date:   Fri May 30 23:38:21 2025 +0200
+
+    Modify opentracing to build for opentelemetry-cpp.
+    
+    Modify opentracing as follows:
+    
+    - file config.h is no longer generated, it is delivered as source.
+    - file version.h is no longer generated, it is delivered as source.
+    - CMake no longer generates config.h and version.h
+    - Bazel no longer generates config.h and version.h
+    - CMake minimal version bumped to 3.14
+    
+    These changes are required to build opentracing
+    using recent CMake versions.
+
+diff --git a/BUILD.bazel b/BUILD.bazel
+index c57dc9f..26c4c62 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -16,26 +16,26 @@ cc_library(
+     ],
+ )
+ 
+-genrule(
+-    name = "generate_version_h",
+-    srcs = glob([
+-        "*",
+-        "cmake/*",
+-        "src/**/*.cpp",
+-    ]),
+-    outs = [
+-      "include/opentracing/config.h",
+-      "include/opentracing/version.h"
+-    ],
+-    cmd = """
+-    TEMP_DIR=$$(mktemp -d)
+-    CONFIG_H_OUT=$${PWD}/$(location :include/opentracing/config.h)
+-    VERSION_H_OUT=$${PWD}/$(location :include/opentracing/version.h)
+-    OPENTRACING_ROOT=$$(dirname $${PWD}/$(location :CMakeLists.txt))
+-    cd $$TEMP_DIR
+-    cmake -DBUILD_TESTING=OFF -DBUILD_MOCKTRACER=OFF -L $$OPENTRACING_ROOT
+-    mv include/opentracing/config.h $$CONFIG_H_OUT
+-    mv include/opentracing/version.h $$VERSION_H_OUT
+-    rm -rf $$TEMP_DIR
+-    """,
+-)
++## genrule(
++##     name = "generate_version_h",
++##     srcs = glob([
++##         "*",
++##         "cmake/*",
++##         "src/**/*.cpp",
++##     ]),
++##     outs = [
++##       "include/opentracing/config.h",
++##       "include/opentracing/version.h"
++##     ],
++##     cmd = """
++##     TEMP_DIR=$$(mktemp -d)
++##     CONFIG_H_OUT=$${PWD}/$(location :include/opentracing/config.h)
++##     VERSION_H_OUT=$${PWD}/$(location :include/opentracing/version.h)
++##     OPENTRACING_ROOT=$$(dirname $${PWD}/$(location :CMakeLists.txt))
++##     cd $$TEMP_DIR
++##     cmake -DBUILD_TESTING=OFF -DBUILD_MOCKTRACER=OFF -L $$OPENTRACING_ROOT
++##     mv include/opentracing/config.h $$CONFIG_H_OUT
++##     mv include/opentracing/version.h $$VERSION_H_OUT
++##     rm -rf $$TEMP_DIR
++##     """,
++## )
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a451844..8c005ff 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,5 +1,5 @@
+ set(CPACK_RPM_COMPONENT_INSTALL ON)
+-cmake_minimum_required(VERSION 3.1)
++cmake_minimum_required(VERSION 3.14)
+ 
+ project(opentracing-cpp)
+ 
+@@ -120,8 +120,8 @@ endif()
+ # ==============================================================================
+ # Set up generated header files config.h and version.h
+ 
+-configure_file(version.h.in include/opentracing/version.h)
+-configure_file(config.h.in include/opentracing/config.h)
++# configure_file(version.h.in include/opentracing/version.h)
++# configure_file(config.h.in include/opentracing/config.h)
+ include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
+ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/opentracing
+         DESTINATION include
+diff --git a/include/opentracing/config.h b/include/opentracing/config.h
+new file mode 100644
+index 0000000..cae3e61
+--- /dev/null
++++ b/include/opentracing/config.h
+@@ -0,0 +1,3 @@
++#pragma once
++
++#define OPENTRACING_BUILD_DYNAMIC_LOADING
+diff --git a/include/opentracing/version.h b/include/opentracing/version.h
+new file mode 100644
+index 0000000..b6b493a
+--- /dev/null
++++ b/include/opentracing/version.h
+@@ -0,0 +1,14 @@
++#ifndef OPENTRACING_VERSION_H
++#define OPENTRACING_VERSION_H
++
++#define OPENTRACING_VERSION "1.6.0"
++#define OPENTRACING_ABI_VERSION "3"
++
++// clang-format off
++#define BEGIN_OPENTRACING_ABI_NAMESPACE \
++  inline namespace v3 {
++#define END_OPENTRACING_ABI_NAMESPACE \
++  }  // namespace v3
++// clang-format on
++
++#endif // OPENTRACING_VERSION_H
