@@ -1,11 +1,29 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/context/propagation/global_propagator.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/semconv/http_attributes.h"
 #include "opentelemetry/semconv/url_attributes.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/span_startoptions.h"
+#include "opentelemetry/trace/tracer.h"
 #include "tracer_common.h"
+
+#include <stdint.h>
+#include <stdlib.h>
+#include <map>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 namespace
 {
