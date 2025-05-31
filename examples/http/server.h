@@ -2,9 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+
+#include "opentelemetry/ext/http/server/http_server.h"
+
+#include <stdint.h>
 #include <atomic>
 #include <string>
-#include "opentelemetry/ext/http/server/http_server.h"
 
 namespace
 {
