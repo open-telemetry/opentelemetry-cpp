@@ -412,7 +412,11 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
   }
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
-  if (options.use_ssl_credentials)
+  if (options.credentials)
+  {
+    channel = grpc::CreateCustomChannel(grpc_target, options.credentials, grpc_arguments);
+  }
+  else if (options.use_ssl_credentials)
   {
     grpc::SslCredentialsOptions ssl_opts;
     ssl_opts.pem_root_certs = GetFileContentsOrInMemoryContents(
