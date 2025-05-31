@@ -16,3 +16,8 @@ else()
             opentelemetry-cpp::ostream_span_exporter
             opentelemetry-cpp::ostream_log_record_exporter)
 endif()
+
+if(BUILD_TESTING)
+  add_test(NAME examples.logs_simple
+           COMMAND "$<TARGET_FILE:example_logs_simple>")
+endif()
