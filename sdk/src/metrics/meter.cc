@@ -538,7 +538,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
         {
           WarnOnDuplicateInstrument(GetInstrumentationScope(), storage_registry_, view_instr_desc);
           sync_storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
-              view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
+              view_instr_desc, view.GetAggregationType(), view.GetAttributesProcessor(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
               exemplar_filter_type,
               GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
