@@ -184,6 +184,22 @@ protected:
   std::shared_ptr<MetricReader> metric_reader_ptr_{new MockMetricReader()};
 };
 
+class TestProcessor : public sdk::metrics::AttributesProcessor
+{
+public:
+  explicit TestProcessor()  = default;
+  ~TestProcessor() override = default;
+
+  sdk::metrics::MetricAttributes process(
+      const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
+  {
+    // Just forward attributes
+    return sdk::metrics::MetricAttributes(attributes);
+  }
+
+  bool isPresent(nostd::string_view key) const noexcept override { return true; }
+};
+
 }  // namespace
 
 TEST(MeterTest, BasicAsyncTests)
@@ -850,4 +866,47 @@ TEST_F(MeterCreateInstrumentTest, ViewCorrectedDuplicateAsyncInstrumentsByDescri
     EXPECT_FALSE(log_handler_->HasNameCaseConflictWarning());
     return true;
   });
+}
+
+TEST(MeterTest, RecordAfterProviderDestructionWithCustomProcessor_NoResetInMain)
+{
+  std::unique_ptr<AttributesProcessor> processor(new TestProcessor());
+
+  // MeterProvider is owned by unique_ptr for explicit control
+  std::unique_ptr<MeterProvider> provider(new MeterProvider());
+
+  // Register a View with custom processor
+  std::unique_ptr<View> view(
+      new View("my_counter", "", "", AggregationType::kSum, nullptr, std::move(processor)));
+  std::unique_ptr<InstrumentSelector> instr_selector(
+      new InstrumentSelector(InstrumentType::kCounter, "my_counter", ""));
+  std::unique_ptr<MeterSelector> meter_selector(new MeterSelector("test_meter", "", ""));
+  provider->AddView(std::move(instr_selector), std::move(meter_selector), std::move(view));
+
+  auto meter   = provider->GetMeter("test_meter");
+  auto counter = meter->CreateUInt64Counter("my_counter");
+
+  // Move the counter to the thread
+  std::atomic<bool> thread_ready{false};
+  std::atomic<bool> thread_done{false};
+
+  std::thread t([c = std::move(counter), &thread_ready, &thread_done]() mutable {
+    thread_ready = true;
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    // Safe after provider destruction
+    c->Add(12345, {{"thread", "after_provider_destruction"}});
+    thread_done = true;
+  });
+
+  // Wait for thread to be ready
+  while (!thread_ready.load())
+    std::this_thread::yield();
+
+  // Destroy the provider (and its storage etc)
+  provider.reset();
+
+  // Wait for thread to finish
+  while (!thread_done.load())
+    std::this_thread::yield();
+  t.join();
 }
