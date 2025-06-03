@@ -69,6 +69,7 @@ jobs:
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: Install abseil, protobuf, and grpc with apt
       run: |
         sudo -E apt-get update
@@ -100,6 +101,7 @@ jobs:
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
+        sudo apt install -y libbenchmark-dev zlib1g-dev libcurl4-openssl-dev
     - name: setup grpc
       run: |
         sudo -E ./ci/install_abseil.sh
@@ -141,6 +143,7 @@ jobs:
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
+        sudo apt install -y libbenchmark-dev zlib1g-dev libcurl4-openssl-dev
     - name: setup grpc
       run: |
         sudo -E ./ci/install_abseil.sh
@@ -182,6 +185,7 @@ jobs:
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
+        sudo apt install -y libbenchmark-dev zlib1g-dev libcurl4-openssl-dev
     - name: setup grpc
       run: |
         sudo -E ./ci/install_abseil.sh
@@ -223,6 +227,7 @@ jobs:
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
+        sudo apt install -y libbenchmark-dev zlib1g-dev libcurl4-openssl-dev
     - name: setup grpc
       run: |
         sudo -E ./ci/install_abseil.sh
@@ -264,6 +269,7 @@ jobs:
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
+        sudo apt install -y libbenchmark-dev zlib1g-dev libcurl4-openssl-dev
     - name: setup grpc
       run: |
         sudo -E ./ci/install_abseil.sh

@@ -40,8 +40,7 @@ jobs:
             libgmock-dev \
             libgtest-dev \
             libbenchmark-dev \
-            zlib1g-dev \
-            nlohmann-json3-dev
+            zlib1g-dev
           sudo ./ci/setup_cmake.sh
 
       - name: Prepare CMake

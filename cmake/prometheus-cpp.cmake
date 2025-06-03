@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+set(SAVED_ENABLE_TESTING ${ENABLE_TESTING})
+
 otel_add_thirdparty_package(
   PACKAGE_NAME "prometheus-cpp"
   PACKAGE_SEARCH_MODES "CONFIG"
@@ -15,14 +17,5 @@ otel_add_thirdparty_package(
   VERSION_FILE "\${prometheus-cpp_SOURCE_DIR}/CMakeLists.txt"
 )
 
-if(TARGET core)
-  set_target_properties(core PROPERTIES
-        CXX_INCLUDE_WHAT_YOU_USE ""
-        CXX_CLANG_TIDY "")
-endif()
-
-if(TARGET pull)
-  set_target_properties(pull PROPERTIES
-        CXX_INCLUDE_WHAT_YOU_USE ""
-        CXX_CLANG_TIDY "")
-endif()
+set(ENABLE_TESTING ${SAVED_ENABLE_TESTING} CACHE BOOL "" FORCE)
+unset(SAVED_ENABLE_TESTING)

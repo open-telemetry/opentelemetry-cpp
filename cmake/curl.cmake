@@ -7,7 +7,7 @@ else()
   set(_CURL_DISABLE_INSTALL ON)
 endif()
 
-set(_OTEL_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+set(SAVED_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 
 otel_add_thirdparty_package(
   PACKAGE_NAME "CURL"
@@ -27,8 +27,8 @@ otel_add_thirdparty_package(
   VERSION_FILE "\${curl_SOURCE_DIR}/include/curl/curlver.h"
 )
 
-set(BUILD_SHARED_LIBS ${_OTEL_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
-unset(_OTEL_BUILD_SHARED_LIBS)
+set(BUILD_SHARED_LIBS ${SAVED_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
+unset(SAVED_BUILD_SHARED_LIBS)
 unset(_CURL_DISABLE_INSTALL)
 
 if(NOT TARGET CURL::libcurl)
