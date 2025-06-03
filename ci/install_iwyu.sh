@@ -17,6 +17,7 @@ fi
 echo "LLVM_VERSION=$LLVM_VERSION"
 echo "Installing IWYU..."
 
+cd /tmp
 git clone --depth 1 --branch clang_$LLVM_VERSION https://github.com/include-what-you-use/include-what-you-use.git
 cd include-what-you-use
 mkdir -p build
