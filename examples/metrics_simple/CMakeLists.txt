@@ -20,4 +20,7 @@ endif()
 if(BUILD_TESTING)
   add_test(NAME examples.metrics_simple
            COMMAND "$<TARGET_FILE:metrics_ostream_example>")
+  # Disable the metrics_simple example test due to sporadic segfaults on Windows
+  # See https://github.com/open-telemetry/opentelemetry-cpp/issues/3458
+  set_tests_properties(examples.metrics_simple PROPERTIES DISABLED TRUE)
 endif()
