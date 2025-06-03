@@ -255,7 +255,7 @@ endfunction()
 #   <package>_SOURCE_DIR: Set if the package was fetched
 #   <package>_BINARY_DIR: Set if the package was fetched
 #   <package>_VERSION: The version of the package found or fetched
-#   <package>_PROVIDER: The provider of the package (package, fetch_source, fetch_respository)
+#   <package>_PROVIDER: The provider of the package (package, fetch_source, fetch_repository)
 function(otel_add_thirdparty_package)
 
   set(optionArgs )
@@ -336,7 +336,7 @@ function(otel_add_thirdparty_package)
           ${_THIRDPARTY_FETCH_GIT_TAG}
           GIT_SHALLOW ON
       )
-      set("${_THIRDPARTY_PACKAGE_NAME}_PROVIDER" "fetch_respository")
+      set("${_THIRDPARTY_PACKAGE_NAME}_PROVIDER" "fetch_repository")
     else()
       message(FATAL_ERROR "No valid source found for ${_THIRDPARTY_PACKAGE_NAME}")
     endif()

@@ -32,17 +32,17 @@ jobs:
             ninja-build \
             libssl-dev \
             libcurl4-openssl-dev \
+            libabsl-dev \
             libprotobuf-dev \
+            libgrpc++-dev \
             protobuf-compiler \
+            protobuf-compiler-grpc \
             libgmock-dev \
             libgtest-dev \
-            libbenchmark-dev
+            libbenchmark-dev \
+            zlib1g-dev \
+            nlohmann-json3-dev
           sudo ./ci/setup_cmake.sh
-
-
-      - name: setup grpc
-        run: |
-          sudo ./ci/setup_grpc.sh
 
       - name: Prepare CMake
         run: |
