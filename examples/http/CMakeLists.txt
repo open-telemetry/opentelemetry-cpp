@@ -7,7 +7,7 @@ add_executable(http_server server.cc)
 target_link_libraries(
   http_client
   PRIVATE opentelemetry-cpp::trace opentelemetry-cpp::http_client_curl
-          opentelemetry-cpp::ostream_span_exporter ${CURL_LIBRARIES})
+          opentelemetry-cpp::ostream_span_exporter CURL::libcurl)
 
 target_link_libraries(
   http_server

@@ -15,6 +15,8 @@ set(OTEL_THIRDPARTY_DEPENDENCIES_SUPPORTED
      gRPC
      prometheus-cpp
      OpenTracing
+     opentelemetry-proto
+     Microsoft.GSL
 )
 
 #-----------------------------------------------------------------------
@@ -35,6 +37,8 @@ set(OTEL_nlohmann_json_SEARCH_MODE "CONFIG")
 set(OTEL_gRPC_SEARCH_MODE "CONFIG")
 set(OTEL_prometheus-cpp_SEARCH_MODE "CONFIG")
 set(OTEL_OpenTracing_SEARCH_MODE "CONFIG")
+set(OTEL_opentelemetry-proto_SEARCH_MODE "")
+set(OTEL_Microsoft.GSL_SEARCH_MODE "CONFIG")
 
 # The search mode is set to "CONFIG" for Protobuf versions >= 3.22.0
 # to find Protobuf's abseil dependency properly until the FindProtobuf module is updated support the upstream protobuf-config.cmake.

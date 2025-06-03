@@ -454,7 +454,8 @@ elif [[ "$1" == "cmake.install.test" ]]; then
     echo "BUILD_SHARED_LIBS is set to: OFF"
   fi
   CMAKE_OPTIONS+=("-DCMAKE_POSITION_INDEPENDENT_CODE=ON")
-
+  read -r -a CMAKE_EXTRA_ARGS <<< "$CMAKE_EXTRA_ARGS"
+  echo "CMAKE_EXTRA_ARGS is set to: ${CMAKE_EXTRA_ARGS[*]}"
   cd "${BUILD_DIR}"
   rm -rf *
   rm -rf ${INSTALL_TEST_DIR}/*
@@ -480,6 +481,7 @@ elif [[ "$1" == "cmake.install.test" ]]; then
         -DWITH_EXAMPLES_HTTP=ON \
         -DBUILD_W3CTRACECONTEXT_TEST=ON \
         -DOPENTELEMETRY_INSTALL=ON \
+        "${CMAKE_EXTRA_ARGS[@]}" \
         "${SRC_DIR}"
 
   make -j $(nproc)

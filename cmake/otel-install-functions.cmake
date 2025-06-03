@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
+
 include("${PROJECT_SOURCE_DIR}/cmake/thirdparty-dependency-config.cmake")
+include(GNUInstallDirs)
 
 ########################################################################
 # INTERNAL FUNCTIONS - do not call directly. Use the otel_* "Main" functions
@@ -503,4 +505,102 @@ function(otel_install_cmake_config)
       "${CMAKE_CURRENT_LIST_DIR}/cmake/find-package-support-functions.cmake"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     COMPONENT cmake-config)
+endfunction()
+
+#-----------------------------------------------------------------------
+#  otel_print_build_config
+#   Prints the build configuration and options used to build opentelemetry-cpp.
+function(otel_print_build_config)
+    # Record build config and versions
+    message(STATUS "---------------------------------------------")
+    message(STATUS "build settings")
+    message(STATUS "---------------------------------------------")
+    message(STATUS "OpenTelemetry: ${OPENTELEMETRY_VERSION}")
+    message(STATUS "OpenTelemetry ABI: ${OPENTELEMETRY_ABI_VERSION_NO}")
+    message(STATUS "CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
+    message(STATUS "CXX: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
+    message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+    message(STATUS "CXXFLAGS: ${CMAKE_CXX_FLAGS}")
+    message(STATUS "CMAKE_CXX_STANDARD: ${CMAKE_CXX_STANDARD}")
+    message(STATUS "CMAKE_TOOLCHAIN_FILE: ${CMAKE_TOOLCHAIN_FILE}")
+    message(STATUS "BUILD_SHARED_LIBS: ${BUILD_SHARED_LIBS}")
+
+    message(STATUS "---------------------------------------------")
+    message(STATUS "opentelemetry-cpp build options")
+    message(STATUS "---------------------------------------------")
+    message(STATUS "WITH_API_ONLY: ${WITH_API_ONLY}")
+    message(STATUS "WITH_NO_DEPRECATED_CODE: ${WITH_NO_DEPRECATED_CODE}")
+    message(STATUS "WITH_ABI_VERSION_1: ${WITH_ABI_VERSION_1}")
+    message(STATUS "WITH_ABI_VERSION_2: ${WITH_ABI_VERSION_2}")
+    message(STATUS "OTELCPP_VERSIONED_LIBS: ${OTELCPP_VERSIONED_LIBS}")
+    message(STATUS "OTELCPP_MAINTAINER_MODE: ${OTELCPP_MAINTAINER_MODE}")
+    message(STATUS "WITH_STL: ${WITH_STL}")
+    message(STATUS "WITH_GSL: ${WITH_GSL}")
+    message(STATUS "WITH_NO_GETENV: ${WITH_NO_GETENV}")
+    message(STATUS "OTELCPP_FORCE_FETCH_DEPENDENCIES: ${OTELCPP_FORCE_FETCH_DEPENDENCIES}")
+    message(STATUS "OTELCPP_REQUIRE_LOCAL_DEPENDENCIES: ${OTELCPP_REQUIRE_LOCAL_DEPENDENCIES}")
+
+    message(STATUS "---------------------------------------------")
+    message(STATUS "opentelemetry-cpp cmake component options")
+    message(STATUS "---------------------------------------------")
+    message(STATUS "WITH_OTLP_GRPC: ${WITH_OTLP_GRPC}")
+    message(STATUS "WITH_OTLP_HTTP: ${WITH_OTLP_HTTP}")
+    message(STATUS "WITH_OTLP_FILE: ${WITH_OTLP_FILE}")
+    message(STATUS "WITH_HTTP_CLIENT_CURL: ${WITH_HTTP_CLIENT_CURL}")
+    message(STATUS "WITH_ZIPKIN: ${WITH_ZIPKIN}")
+    message(STATUS "WITH_PROMETHEUS: ${WITH_PROMETHEUS}")
+    message(STATUS "WITH_ELASTICSEARCH: ${WITH_ELASTICSEARCH}")
+    message(STATUS "WITH_OPENTRACING: ${WITH_OPENTRACING}")
+    message(STATUS "WITH_ETW: ${WITH_ETW}")
+    message(STATUS "OPENTELEMETRY_BUILD_DLL: ${OPENTELEMETRY_BUILD_DLL}")
+
+    message(STATUS "---------------------------------------------")
+    message(STATUS "feature preview options")
+    message(STATUS "---------------------------------------------")
+    message(STATUS "WITH_ASYNC_EXPORT_PREVIEW: ${WITH_ASYNC_EXPORT_PREVIEW}")
+    message(
+      STATUS
+        "WITH_THREAD_INSTRUMENTATION_PREVIEW: ${WITH_THREAD_INSTRUMENTATION_PREVIEW}"
+    )
+    message(
+      STATUS "WITH_METRICS_EXEMPLAR_PREVIEW: ${WITH_METRICS_EXEMPLAR_PREVIEW}")
+    message(STATUS "WITH_REMOVE_METER_PREVIEW: ${WITH_REMOVE_METER_PREVIEW}")
+    message(
+      STATUS "WITH_OTLP_GRPC_SSL_MTLS_PREVIEW: ${WITH_OTLP_GRPC_SSL_MTLS_PREVIEW}")
+    message(STATUS "WITH_OTLP_RETRY_PREVIEW: ${WITH_OTLP_RETRY_PREVIEW}")
+    message(STATUS "---------------------------------------------")
+    message(STATUS "third-party options")
+    message(STATUS "---------------------------------------------")
+    message(STATUS "WITH_NLOHMANN_JSON: ${USE_NLOHMANN_JSON}")
+    message(STATUS "WITH_CURL_LOGGING: ${WITH_CURL_LOGGING}")
+    message(STATUS "WITH_OTLP_HTTP_COMPRESSION: ${WITH_OTLP_HTTP_COMPRESSION}")
+    message(STATUS "---------------------------------------------")
+    message(STATUS "examples and test options")
+    message(STATUS "---------------------------------------------")
+    message(STATUS "WITH_BENCHMARK: ${WITH_BENCHMARK}")
+    message(STATUS "WITH_EXAMPLES: ${WITH_EXAMPLES}")
+    message(STATUS "WITH_EXAMPLES_HTTP: ${WITH_EXAMPLES_HTTP}")
+    message(STATUS "WITH_FUNC_TESTS: ${WITH_FUNC_TESTS}")
+    message(STATUS "BUILD_W3CTRACECONTEXT_TEST: ${BUILD_W3CTRACECONTEXT_TEST}")
+    message(STATUS "BUILD_TESTING: ${BUILD_TESTING}")
+    message(STATUS "---------------------------------------------")
+    message(STATUS "versions")
+    message(STATUS "---------------------------------------------")
+    message(STATUS "CMake: ${CMAKE_VERSION}")
+    if(BUILD_TESTING)
+      message(STATUS "GTest: ${GTest_VERSION} (${GTest_PROVIDER})")
+      message(STATUS "benchmark: ${benchmark_VERSION} (${benchmark_PROVIDER})")
+    endif()
+
+    foreach(_dependency ${OTEL_THIRDPARTY_DEPENDENCIES_SUPPORTED})
+        if(DEFINED ${_dependency}_VERSION)
+            if(DEFINED ${_dependency}_PROVIDER)
+              set(_provider ${${_dependency}_PROVIDER})
+            else()
+              set(_provider "package")
+            endif()
+            message(STATUS "${_dependency}: ${${_dependency}_VERSION} (${_provider})")
+        endif()
+    endforeach()
+    message(STATUS "---------------------------------------------")
 endfunction()
