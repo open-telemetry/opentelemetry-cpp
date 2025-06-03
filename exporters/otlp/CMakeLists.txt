@@ -108,6 +108,33 @@ if(WITH_OTLP_GRPC)
 
   list(APPEND OPENTELEMETRY_OTLP_GRPC_TARGETS
        opentelemetry_exporter_otlp_grpc_metrics)
+
+  add_library(
+    opentelemetry_otlp_grpc_builder
+    src/otlp_grpc_span_builder.cc src/otlp_grpc_push_metric_builder.cc
+    src/otlp_grpc_log_record_builder.cc)
+  set_target_properties(opentelemetry_otlp_grpc_builder
+                        PROPERTIES EXPORT_NAME otlp_grpc_builder)
+  set_target_version(opentelemetry_otlp_grpc_builder)
+
+  target_include_directories(
+    opentelemetry_otlp_grpc_builder
+    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+           "$<INSTALL_INTERFACE:include>")
+
+  # Make sure to build with the proper ABI
+  target_link_libraries(opentelemetry_otlp_grpc_builder
+                        PUBLIC opentelemetry_api)
+
+  target_link_libraries(opentelemetry_otlp_grpc_builder
+                        PUBLIC opentelemetry_exporter_otlp_grpc)
+  target_link_libraries(opentelemetry_otlp_grpc_builder
+                        PUBLIC opentelemetry_exporter_otlp_grpc_metrics)
+  target_link_libraries(opentelemetry_otlp_grpc_builder
+                        PUBLIC opentelemetry_exporter_otlp_grpc_log)
+
+  list(APPEND OPENTELEMETRY_OTLP_GRPC_TARGETS opentelemetry_otlp_grpc_builder)
+
 endif()
 
 if(WITH_OTLP_HTTP)
@@ -189,6 +216,32 @@ if(WITH_OTLP_HTTP)
 
   list(APPEND OPENTELEMETRY_OTLP_HTTP_TARGETS
        opentelemetry_exporter_otlp_http_metric)
+
+  add_library(
+    opentelemetry_otlp_http_builder
+    src/otlp_http_span_builder.cc src/otlp_http_push_metric_builder.cc
+    src/otlp_http_log_record_builder.cc)
+  set_target_properties(opentelemetry_otlp_http_builder
+                        PROPERTIES EXPORT_NAME otlp_http_builder)
+  set_target_version(opentelemetry_otlp_http_builder)
+
+  target_include_directories(
+    opentelemetry_otlp_http_builder
+    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+           "$<INSTALL_INTERFACE:include>")
+
+  # Make sure to build with the proper ABI
+  target_link_libraries(opentelemetry_otlp_http_builder
+                        PUBLIC opentelemetry_api)
+
+  target_link_libraries(opentelemetry_otlp_http_builder
+                        PUBLIC opentelemetry_exporter_otlp_http)
+  target_link_libraries(opentelemetry_otlp_http_builder
+                        PUBLIC opentelemetry_exporter_otlp_http_metric)
+  target_link_libraries(opentelemetry_otlp_http_builder
+                        PUBLIC opentelemetry_exporter_otlp_http_log)
+
+  list(APPEND OPENTELEMETRY_OTLP_HTTP_TARGETS opentelemetry_otlp_http_builder)
 endif()
 
 if(WITH_OTLP_FILE)
@@ -264,6 +317,34 @@ if(WITH_OTLP_FILE)
 
   list(APPEND OPENTELEMETRY_OTLP_FILE_TARGETS
        opentelemetry_exporter_otlp_file_metric)
+
+  add_library(
+    opentelemetry_otlp_file_builder
+    src/otlp_file_span_builder.cc src/otlp_file_push_metric_builder.cc
+    src/otlp_file_log_record_builder.cc)
+
+  set_target_properties(opentelemetry_otlp_file_builder
+                        PROPERTIES EXPORT_NAME otlp_file_builder)
+  set_target_version(opentelemetry_otlp_file_builder)
+
+  target_include_directories(
+    opentelemetry_otlp_file_builder
+    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+           "$<INSTALL_INTERFACE:include>")
+
+  # Make sure to build with the proper ABI
+  target_link_libraries(opentelemetry_otlp_file_builder
+                        PUBLIC opentelemetry_api)
+
+  target_link_libraries(opentelemetry_otlp_file_builder
+                        PUBLIC opentelemetry_exporter_otlp_file)
+  target_link_libraries(opentelemetry_otlp_file_builder
+                        PUBLIC opentelemetry_exporter_otlp_file_metric)
+  target_link_libraries(opentelemetry_otlp_file_builder
+                        PUBLIC opentelemetry_exporter_otlp_file_log)
+
+  list(APPEND OPENTELEMETRY_OTLP_FILE_TARGETS opentelemetry_otlp_file_builder)
+
 endif()
 
 target_link_libraries(
