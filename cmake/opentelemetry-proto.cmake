@@ -30,12 +30,12 @@ if(OTELCPP_PROTO_PATH)
       FATAL_ERROR
         "OTELCPP_PROTO_PATH does not point to a opentelemetry-proto repository")
   endif()
-  message(STATUS "opentelemetry-proto dependency satisfied by: external path")
   set(PROTO_PATH ${OTELCPP_PROTO_PATH})
+  message(STATUS "opentelemetry-proto dependency satisfied by OTELCPP_PROTO_PATH: ${PROTO_PATH}")
 elseif(EXISTS ${PROJECT_SOURCE_DIR}/third_party/opentelemetry-proto/.git)
-    message(STATUS "opentelemetry-proto dependency satisfied by: git submodule")
     set(PROTO_PATH
         "${PROJECT_SOURCE_DIR}/third_party/opentelemetry-proto")
+    message(STATUS "opentelemetry-proto dependency satisfied by git submodule: ${PROTO_PATH}")
 endif()
 
 otel_add_thirdparty_package(

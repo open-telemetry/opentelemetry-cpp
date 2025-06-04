@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-set(_OTEL_BUILD_TESTING ${BUILD_TESTING})
+set(_SAVED_BUILD_TESTING ${BUILD_TESTING})
 
 otel_add_thirdparty_package(
   PACKAGE_NAME "OpenTracing"
@@ -16,8 +16,8 @@ otel_add_thirdparty_package(
   VERSION_FILE "\${opentracing_BINARY_DIR}/include/opentracing/version.h"
 )
 
-set(BUILD_TESTING ${_OTEL_BUILD_TESTING} CACHE BOOL "" FORCE)
-unset(_OTEL_BUILD_TESTING)
+set(BUILD_TESTING ${_SAVED_BUILD_TESTING} CACHE BOOL "" FORCE)
+unset(_SAVED_BUILD_TESTING)
 
 if(NOT ${OpenTracing_PROVIDER} STREQUAL "package")
   if(TARGET opentracing AND NOT TARGET OpenTracing::opentracing)

@@ -588,26 +588,30 @@ jobs:
   cmake_modern_protobuf_grpc_with_abseil_test:
     name: CMake test (with modern protobuf,grpc and abseil)
     runs-on: ubuntu-latest
+    env:
+      ABSEIL_CPP_VERSION: '20230125.3'
+      PROTOBUF_VERSION: '23.3'
+      GRPC_VERSION: 'v1.55.0'
+      CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
       with:
         egress-policy: audit
-
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        PROTOBUF_VERSION: '23.3'
-        ABSEIL_CPP_VERSION: '20230125.3'
-        CXX_STANDARD: '14'
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
+    - name: Install Dependencies
+      run: |
+        sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/setup_googletest.sh
+        sudo -E ./ci/install_protobuf.sh
+        sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
     - name: run otlp exporter tests
-      env:
-        CXX_STANDARD: '14'
       run: |
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
 

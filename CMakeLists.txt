@@ -318,7 +318,6 @@ endif()
 #
 
 if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
-  # No specific version required.
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/curl.cmake")
 endif()
 
@@ -329,7 +328,6 @@ endif()
 if((NOT WITH_API_ONLY)
    AND WITH_HTTP_CLIENT_CURL
    AND WITH_OTLP_HTTP_COMPRESSION)
-  # No specific version required.
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/zlib.cmake")
 endif()
 
@@ -486,10 +484,11 @@ endif()
 
 add_subdirectory(api)
 
+if(WITH_OPENTRACING)
+  add_subdirectory(opentracing-shim)
+endif()
+
 if(NOT WITH_API_ONLY)
-  if(WITH_OPENTRACING)
-    add_subdirectory(opentracing-shim)
-  endif()
   add_subdirectory(sdk)
   add_subdirectory(ext)
   add_subdirectory(exporters)

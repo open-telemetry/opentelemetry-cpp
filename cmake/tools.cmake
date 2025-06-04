@@ -353,17 +353,17 @@ function(otel_add_thirdparty_package)
       endif()
     endforeach()
 
-    set(SAVED_CMAKE_CXX_CLANG_TIDY ${CMAKE_CXX_CLANG_TIDY})
-    set(SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE
+    set(_SAVED_CMAKE_CXX_CLANG_TIDY ${CMAKE_CXX_CLANG_TIDY})
+    set(_SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE
           ${CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
     set(CMAKE_CXX_CLANG_TIDY "")
     set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "")
 
     FetchContent_MakeAvailable(${_THIRDPARTY_FETCH_NAME})
 
-    set(CMAKE_CXX_CLANG_TIDY ${SAVED_CMAKE_CXX_CLANG_TIDY})
+    set(CMAKE_CXX_CLANG_TIDY ${_SAVED_CMAKE_CXX_CLANG_TIDY})
     set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE
-        ${SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
+        ${_SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
 
     set(${_THIRDPARTY_FETCH_NAME}_SOURCE_DIR ${${_THIRDPARTY_FETCH_NAME}_SOURCE_DIR} PARENT_SCOPE)
     set(${_THIRDPARTY_FETCH_NAME}_BINARY_DIR ${${_THIRDPARTY_FETCH_NAME}_BINARY_DIR} PARENT_SCOPE)
@@ -377,21 +377,25 @@ function(otel_add_thirdparty_package)
   endforeach()
 
   # Determine the package version if not already defined
-  if(NOT DEFINED ${_THIRDPARTY_PACKAGE_NAME}_VERSION AND NOT ${_THIRDPARTY_PACKAGE_NAME}_PROVIDER STREQUAL "package")
-    if(DEFINED _THIRDPARTY_VERSION_REGEX AND DEFINED _THIRDPARTY_VERSION_FILE)
-      string(CONFIGURE "${_THIRDPARTY_VERSION_FILE}" THIRDPARTY_VERSION_FILE)
-      if(NOT EXISTS "${THIRDPARTY_VERSION_FILE}")
-        message(WARNING "Version file ${THIRDPARTY_VERSION_FILE} does not exist")
-      else()
-        file(READ "${THIRDPARTY_VERSION_FILE}" _file_contents)
-        string(REGEX MATCH
-              "${_THIRDPARTY_VERSION_REGEX}"
-              _version_match
-              "${_file_contents}")
-        if(_version_match)
-          set("${_THIRDPARTY_PACKAGE_NAME}_VERSION" "${CMAKE_MATCH_1}")
+  if(NOT DEFINED ${_THIRDPARTY_PACKAGE_NAME}_VERSION)
+    if(${_THIRDPARTY_PACKAGE_NAME}_PROVIDER STREQUAL "package")
+      set("${_THIRDPARTY_PACKAGE_NAME}_VERSION" "unknown")
+    else()
+      if(DEFINED _THIRDPARTY_VERSION_REGEX AND DEFINED _THIRDPARTY_VERSION_FILE)
+        string(CONFIGURE "${_THIRDPARTY_VERSION_FILE}" THIRDPARTY_VERSION_FILE)
+        if(NOT EXISTS "${THIRDPARTY_VERSION_FILE}")
+          message(WARNING "Version file ${THIRDPARTY_VERSION_FILE} does not exist")
         else()
-          message(WARNING "Failed to parse version from ${_THIRDPARTY_VERSION_FILE} using regex ${_THIRDPARTY_VERSION_REGEX}")
+          file(READ "${THIRDPARTY_VERSION_FILE}" _file_contents)
+          string(REGEX MATCH
+                "${_THIRDPARTY_VERSION_REGEX}"
+                _version_match
+                "${_file_contents}")
+          if(_version_match)
+            set("${_THIRDPARTY_PACKAGE_NAME}_VERSION" "${CMAKE_MATCH_1}")
+          else()
+            message(WARNING "Failed to parse version from ${_THIRDPARTY_VERSION_FILE} using regex ${_THIRDPARTY_VERSION_REGEX}")
+          endif()
         endif()
       endif()
     endif()

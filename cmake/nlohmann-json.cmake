@@ -10,6 +10,7 @@ otel_add_thirdparty_package(
   FETCH_CMAKE_ARGS
     JSON_BuildTests=OFF
     JSON_Install=${OPENTELEMETRY_INSTALL}
+    JSON_MultipleHeaders=OFF
   REQUIRED_TARGETS "nlohmann_json::nlohmann_json"
   VERSION_REGEX "project\\([^\\)]*VERSION[ \t]*([0-9]+(\\.[0-9]+)*(\\.[0-9]+)*)"
   VERSION_FILE "\${nlohmann_json_SOURCE_DIR}/CMakeLists.txt"
