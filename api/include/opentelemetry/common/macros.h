@@ -14,21 +14,21 @@
    Note: Use this macro to avoid an extra level of #ifdef __has_builtin check.
    http://releases.llvm.org/3.3/tools/clang/docs/LanguageExtensions.html
 */
-#if !defined(OPENTELEMETRY_HAVE_BUILTIN)
-#  ifdef __has_builtin
-#    define OPENTELEMETRY_HAVE_BUILTIN(x) __has_builtin(x)
-#  else
-#    define OPENTELEMETRY_HAVE_BUILTIN(x) 0
-#  endif
-#endif
+// #if !defined(OPENTELEMETRY_HAVE_BUILTIN)
+// #  ifdef __has_builtin
+// #    define OPENTELEMETRY_HAVE_BUILTIN(x) __has_builtin(x)
+// #  else
+// #    define OPENTELEMETRY_HAVE_BUILTIN(x) 0
+// #  endif
+// #endif
 
-#if !defined(OPENTELEMETRY_HAVE_FEATURE)
-#  ifdef __has_feature
-#    define OPENTELEMETRY_HAVE_FEATURE(f) __has_feature(f)
-#  else
-#    define OPENTELEMETRY_HAVE_FEATURE(f) 0
-#  endif
-#endif
+// #if !defined(OPENTELEMETRY_HAVE_FEATURE)
+// #  ifdef __has_feature
+// #    define OPENTELEMETRY_HAVE_FEATURE(f) __has_feature(f)
+// #  else
+// #    define OPENTELEMETRY_HAVE_FEATURE(f) 0
+// #  endif
+// #endif
 
 /*
    has feature
@@ -44,13 +44,13 @@
    GCC: https://gcc.gnu.org/gcc-5/changes.html
    Clang: https://clang.llvm.org/docs/LanguageExtensions.html
 */
-#if !defined(OPENTELEMETRY_HAVE_ATTRIBUTE)
-#  ifdef __has_attribute
-#    define OPENTELEMETRY_HAVE_ATTRIBUTE(x) __has_attribute(x)
-#  else
-#    define OPENTELEMETRY_HAVE_ATTRIBUTE(x) 0
-#  endif
-#endif
+// #if !defined(OPENTELEMETRY_HAVE_ATTRIBUTE)
+// #  ifdef __has_attribute
+// #    define OPENTELEMETRY_HAVE_ATTRIBUTE(x) __has_attribute(x)
+// #  else
+// #    define OPENTELEMETRY_HAVE_ATTRIBUTE(x) 0
+// #  endif
+// #endif
 
 /*
    OPENTELEMETRY_HAVE_CPP_ATTRIBUTE
@@ -60,15 +60,15 @@
    (https://en.cppreference.com/w/cpp/experimental/feature_test). If we don't
    find `__has_cpp_attribute`, will evaluate to 0.
 */
-#if !defined(OPENTELEMETRY_HAVE_CPP_ATTRIBUTE)
-#  if defined(__cplusplus) && defined(__has_cpp_attribute)
-// NOTE: requiring __cplusplus above should not be necessary, but
-// works around https://bugs.llvm.org/show_bug.cgi?id=23435.
-#    define OPENTELEMETRY_HAVE_CPP_ATTRIBUTE(x) __has_cpp_attribute(x)
-#  else
-#    define OPENTELEMETRY_HAVE_CPP_ATTRIBUTE(x) 0
-#  endif
-#endif
+// #if !defined(OPENTELEMETRY_HAVE_CPP_ATTRIBUTE)
+// #  if defined(__cplusplus) && defined(__has_cpp_attribute)
+// // NOTE: requiring __cplusplus above should not be necessary, but
+// // works around https://bugs.llvm.org/show_bug.cgi?id=23435.
+// #    define OPENTELEMETRY_HAVE_CPP_ATTRIBUTE(x) __has_cpp_attribute(x)
+// #  else
+// #    define OPENTELEMETRY_HAVE_CPP_ATTRIBUTE(x) 0
+// #  endif
+// #endif
 
 /*
    Expected usage pattern:
@@ -401,24 +401,24 @@ point.
 // * The `noexcept` operator may still return `false`.
 //
 // For further details, consult the compiler's documentation.
-#ifndef OPENTELEMETRY_HAVE_EXCEPTIONS
-#  if defined(__clang__) && ((__clang_major__ * 100) + __clang_minor__) < 306
-// Clang < 3.6
-// http://releases.llvm.org/3.6.0/tools/clang/docs/ReleaseNotes.html#the-exceptions-macro
-#    if defined(__EXCEPTIONS) && OPENTELEMETRY_HAVE_FEATURE(cxx_exceptions)
-#      define OPENTELEMETRY_HAVE_EXCEPTIONS 1
-#    endif  // defined(__EXCEPTIONS) && OPENTELEMETRY_HAVE_FEATURE(cxx_exceptions)
-#  elif OPENTELEMETRY_HAVE_FEATURE(cxx_exceptions)
-#    define OPENTELEMETRY_HAVE_EXCEPTIONS 1
-// Handle remaining special cases and default to exceptions being supported.
-#  elif !(defined(__GNUC__) && !defined(__EXCEPTIONS) && !defined(__cpp_exceptions)) && \
-      !(defined(_MSC_VER) && !defined(_CPPUNWIND))
-#    define OPENTELEMETRY_HAVE_EXCEPTIONS 1
-#  endif
-#endif
-#ifndef OPENTELEMETRY_HAVE_EXCEPTIONS
-#  define OPENTELEMETRY_HAVE_EXCEPTIONS 0
-#endif
+// #ifndef OPENTELEMETRY_HAVE_EXCEPTIONS
+// #  if defined(__clang__) && ((__clang_major__ * 100) + __clang_minor__) < 306
+// // Clang < 3.6
+// // http://releases.llvm.org/3.6.0/tools/clang/docs/ReleaseNotes.html#the-exceptions-macro
+// #    if defined(__EXCEPTIONS) && OPENTELEMETRY_HAVE_FEATURE(cxx_exceptions)
+// #      define OPENTELEMETRY_HAVE_EXCEPTIONS 1
+// #    endif  // defined(__EXCEPTIONS) && OPENTELEMETRY_HAVE_FEATURE(cxx_exceptions)
+// #  elif OPENTELEMETRY_HAVE_FEATURE(cxx_exceptions)
+// #    define OPENTELEMETRY_HAVE_EXCEPTIONS 1
+// // Handle remaining special cases and default to exceptions being supported.
+// #  elif !(defined(__GNUC__) && !defined(__EXCEPTIONS) && !defined(__cpp_exceptions)) && \
+//       !(defined(_MSC_VER) && !defined(_CPPUNWIND))
+// #    define OPENTELEMETRY_HAVE_EXCEPTIONS 1
+// #  endif
+// #endif
+// #ifndef OPENTELEMETRY_HAVE_EXCEPTIONS
+// #  define OPENTELEMETRY_HAVE_EXCEPTIONS 0
+// #endif
 
 /*
    OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND indicates that a resource owned by a function
@@ -436,93 +436,95 @@ point.
    See also the upstream documentation:
    https://clang.llvm.org/docs/AttributeReference.html#lifetimebound
 */
-#ifndef OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND
-#  if OPENTELEMETRY_HAVE_CPP_ATTRIBUTE(clang::lifetimebound)
-#    define OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND [[clang::lifetimebound]]
-#  elif OPENTELEMETRY_HAVE_ATTRIBUTE(lifetimebound)
-#    define OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND __attribute__((lifetimebound))
-#  else
-#    define OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND
-#  endif
-#endif
+// #ifndef OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND
+// #  if OPENTELEMETRY_HAVE_CPP_ATTRIBUTE(clang::lifetimebound)
+// #    define OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND [[clang::lifetimebound]]
+// #  elif OPENTELEMETRY_HAVE_ATTRIBUTE(lifetimebound)
+// #    define OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND __attribute__((lifetimebound))
+// #  else
+// #    define OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND
+// #  endif
+// #endif
+
+#define OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND
 
 // OPENTELEMETRY_HAVE_MEMORY_SANITIZER
 //
 // MemorySanitizer (MSan) is a detector of uninitialized reads. It consists of
 // a compiler instrumentation module and a run-time library.
-#ifndef OPENTELEMETRY_HAVE_MEMORY_SANITIZER
-#  if !defined(__native_client__) && OPENTELEMETRY_HAVE_FEATURE(memory_sanitizer)
-#    define OPENTELEMETRY_HAVE_MEMORY_SANITIZER 1
-#  else
-#    define OPENTELEMETRY_HAVE_MEMORY_SANITIZER 0
-#  endif
-#endif
+// #ifndef OPENTELEMETRY_HAVE_MEMORY_SANITIZER
+// #  if !defined(__native_client__) && OPENTELEMETRY_HAVE_FEATURE(memory_sanitizer)
+// #    define OPENTELEMETRY_HAVE_MEMORY_SANITIZER 1
+// #  else
+// #    define OPENTELEMETRY_HAVE_MEMORY_SANITIZER 0
+// #  endif
+// #endif
 
-#if OPENTELEMETRY_HAVE_MEMORY_SANITIZER && OPENTELEMETRY_HAVE_ATTRIBUTE(no_sanitize_memory)
-#  define OPENTELEMETRY_SANITIZER_NO_MEMORY \
-    __attribute__((no_sanitize_memory))  // __attribute__((no_sanitize("memory")))
-#else
-#  define OPENTELEMETRY_SANITIZER_NO_MEMORY
-#endif
+// #if OPENTELEMETRY_HAVE_MEMORY_SANITIZER && OPENTELEMETRY_HAVE_ATTRIBUTE(no_sanitize_memory)
+// #  define OPENTELEMETRY_SANITIZER_NO_MEMORY \
+//     __attribute__((no_sanitize_memory))  // __attribute__((no_sanitize("memory")))
+// #else
+// #  define OPENTELEMETRY_SANITIZER_NO_MEMORY
+// #endif
 
 // OPENTELEMETRY_HAVE_THREAD_SANITIZER
 //
 // ThreadSanitizer (TSan) is a fast data race detector.
-#ifndef OPENTELEMETRY_HAVE_THREAD_SANITIZER
-#  if defined(__SANITIZE_THREAD__)
-#    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 1
-#  elif OPENTELEMETRY_HAVE_FEATURE(thread_sanitizer)
-#    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 1
-#  else
-#    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 0
-#  endif
-#endif
+// #ifndef OPENTELEMETRY_HAVE_THREAD_SANITIZER
+// #  if defined(__SANITIZE_THREAD__)
+// #    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 1
+// #  elif OPENTELEMETRY_HAVE_FEATURE(thread_sanitizer)
+// #    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 1
+// #  else
+// #    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 0
+// #  endif
+// #endif
 
-#if OPENTELEMETRY_HAVE_THREAD_SANITIZER && OPENTELEMETRY_HAVE_ATTRIBUTE(no_sanitize_thread)
-#  define OPENTELEMETRY_SANITIZER_NO_THREAD \
-    __attribute__((no_sanitize_thread))  // __attribute__((no_sanitize("thread")))
-#else
-#  define OPENTELEMETRY_SANITIZER_NO_THREAD
-#endif
+// #if OPENTELEMETRY_HAVE_THREAD_SANITIZER && OPENTELEMETRY_HAVE_ATTRIBUTE(no_sanitize_thread)
+// #  define OPENTELEMETRY_SANITIZER_NO_THREAD \
+//     __attribute__((no_sanitize_thread))  // __attribute__((no_sanitize("thread")))
+// #else
+// #  define OPENTELEMETRY_SANITIZER_NO_THREAD
+// #endif
 
 // OPENTELEMETRY_HAVE_ADDRESS_SANITIZER
 //
 // AddressSanitizer (ASan) is a fast memory error detector.
-#ifndef OPENTELEMETRY_HAVE_ADDRESS_SANITIZER
-#  if defined(__SANITIZE_ADDRESS__)
-#    define OPENTELEMETRY_HAVE_ADDRESS_SANITIZER 1
-#  elif OPENTELEMETRY_HAVE_FEATURE(address_sanitizer)
-#    define OPENTELEMETRY_HAVE_ADDRESS_SANITIZER 1
-#  else
-#    define OPENTELEMETRY_HAVE_ADDRESS_SANITIZER 0
-#  endif
-#endif
+// #ifndef OPENTELEMETRY_HAVE_ADDRESS_SANITIZER
+// #  if defined(__SANITIZE_ADDRESS__)
+// #    define OPENTELEMETRY_HAVE_ADDRESS_SANITIZER 1
+// #  elif OPENTELEMETRY_HAVE_FEATURE(address_sanitizer)
+// #    define OPENTELEMETRY_HAVE_ADDRESS_SANITIZER 1
+// #  else
+// #    define OPENTELEMETRY_HAVE_ADDRESS_SANITIZER 0
+// #  endif
+// #endif
 
 // OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER
 //
 // Hardware-Assisted AddressSanitizer (or HWASAN) is even faster than asan
 // memory error detector which can use CPU features like ARM TBI, Intel LAM or
 // AMD UAI.
-#ifndef OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER
-#  if defined(__SANITIZE_HWADDRESS__)
-#    define OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER 1
-#  elif OPENTELEMETRY_HAVE_FEATURE(hwaddress_sanitizer)
-#    define OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER 1
-#  else
-#    define OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER 0
-#  endif
-#endif
+// #ifndef OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER
+// #  if defined(__SANITIZE_HWADDRESS__)
+// #    define OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER 1
+// #  elif OPENTELEMETRY_HAVE_FEATURE(hwaddress_sanitizer)
+// #    define OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER 1
+// #  else
+// #    define OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER 0
+// #  endif
+// #endif
 
-#if OPENTELEMETRY_HAVE_ADDRESS_SANITIZER && OPENTELEMETRY_HAVE_ATTRIBUTE(no_sanitize_address)
-#  define OPENTELEMETRY_SANITIZER_NO_ADDRESS \
-    __attribute__((no_sanitize_address))  // __attribute__((no_sanitize("address")))
-#elif OPENTELEMETRY_HAVE_ADDRESS_SANITIZER && defined(_MSC_VER) && _MSC_VER >= 1928
-#  define OPENTELEMETRY_SANITIZER_NO_ADDRESS __declspec(no_sanitize_address)
-#elif OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER && OPENTELEMETRY_HAVE_ATTRIBUTE(no_sanitize)
-#  define OPENTELEMETRY_SANITIZER_NO_ADDRESS __attribute__((no_sanitize("hwaddress")))
-#else
-#  define OPENTELEMETRY_SANITIZER_NO_ADDRESS
-#endif
+// #if OPENTELEMETRY_HAVE_ADDRESS_SANITIZER && OPENTELEMETRY_HAVE_ATTRIBUTE(no_sanitize_address)
+// #  define OPENTELEMETRY_SANITIZER_NO_ADDRESS \
+//     __attribute__((no_sanitize_address))  // __attribute__((no_sanitize("address")))
+// #elif OPENTELEMETRY_HAVE_ADDRESS_SANITIZER && defined(_MSC_VER) && _MSC_VER >= 1928
+// #  define OPENTELEMETRY_SANITIZER_NO_ADDRESS __declspec(no_sanitize_address)
+// #elif OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER && OPENTELEMETRY_HAVE_ATTRIBUTE(no_sanitize)
+// #  define OPENTELEMETRY_SANITIZER_NO_ADDRESS __attribute__((no_sanitize("hwaddress")))
+// #else
+// #  define OPENTELEMETRY_SANITIZER_NO_ADDRESS
+// #endif
 
 // what foloows are overrides specific to github.com/malkia/opentelemetry-cpp's fork
 // where we force certain flags to be set, such that users of the library do not have to set them (through -Dxxx=yyy, etc.)
@@ -544,10 +546,10 @@ point.
 #endif
 #define OPENTELEMETRY_OPTION_USE_STD_SPAN 0 // Use the nostd version, std::span is in C++2020
 
-#ifdef OPENTELEMETRY_HAVE_EXCEPTIONS
-#undef OPENTELEMETRY_HAVE_EXCEPTIONS
-#endif
-#define OPENTELEMETRY_HAVE_EXCEPTIONS 1
+// #ifdef OPENTELEMETRY_HAVE_EXCEPTIONS
+// #undef OPENTELEMETRY_HAVE_EXCEPTIONS
+// #endif
+// #define OPENTELEMETRY_HAVE_EXCEPTIONS 1
 
 #ifdef OPENTELEMETRY_ABI_VERSION_NO
 #undef OPENTELEMETRY_ABI_VERSION_NO
@@ -619,6 +621,8 @@ point.
 #  define OPENTELEMETRY_API_SINGLETON OPENTELEMETRY_EXPORT
 #endif // if OPENTELEMETRY_DLL != 0
 
+// TODO: https://chatgpt.com/share/6840802f-2388-800a-a68a-928e76535c86
+
 // this check only works for static library build
 #if defined(_MSC_VER)
 #define OPENTELEMETRY_STRX(x) #x
@@ -628,7 +632,6 @@ point.
   "+stl:" OPENTELEMETRY_STR(OPENTELEMETRY_STL_VERSION) \
   "+rtti:" OPENTELEMETRY_STR(OPENTELEMETRY_RTTI_ENABLED) \
   "+std_span:" OPENTELEMETRY_STR(OPENTELEMETRY_OPTION_USE_STD_SPAN) \
-  "+have_excpts:" OPENTELEMETRY_STR(OPENTELEMETRY_HAVE_EXCEPTIONS) \
   "+abi:" OPENTELEMETRY_STR(OPENTELEMETRY_ABI_VERSION_NO) \
   "+exemplar:" OPENTELEMETRY_STR(ENABLE_METRICS_EXEMPLAR_PREVIEW) \
   "+async:" OPENTELEMETRY_STR(ENABLE_ASYNC_EXPORT) \
@@ -638,6 +641,9 @@ point.
   "+thrd_instr:" OPENTELEMETRY_STR(ENABLE_THREAD_INSTRUMENTATION_PREVIEW) \
   "+curl_log:"  OPENTELEMETRY_STR(ENABLE_CURL_LOGGING) \
 )
+
+//  "+have_excpts:" OPENTELEMETRY_STR(OPENTELEMETRY_HAVE_EXCEPTIONS)
+
 #undef OPENTELEMETRY_DLL_STRX
 #undef OPENTELEMETRY_DLL_STR
 #endif

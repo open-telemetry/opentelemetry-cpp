@@ -1005,10 +1005,10 @@ public:
     }
   }
 
-  // Written size is not required to be precise, we can just ignore tsan report here.
-  OPENTELEMETRY_SANITIZER_NO_THREAD void MaybeRotateLog(std::size_t data_size)
+  void MaybeRotateLog(std::size_t data_size)
   {
-    if (file_->written_size > 0 && file_->written_size + data_size > options_.file_size)
+    const auto written_size{ file_->written_size.load() };
+    if (written_size > 0 && written_size + data_size > options_.file_size)
     {
       RotateLog();
     }
@@ -1562,7 +1562,7 @@ private:
   {
     std::atomic<bool> is_shutdown;
     std::size_t rotate_index;
-    std::size_t written_size;
+    std::atomic<std::size_t> written_size;
     std::size_t left_flush_record_count;
     std::shared_ptr<FILE> current_file;
     std::mutex file_lock;
