@@ -51,10 +51,10 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
-  std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
+  std::shared_ptr<DefaultAttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
-      instr_desc, AggregationType::kHistogram, default_attributes_processor.get(),
+      instr_desc, AggregationType::kHistogram, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
@@ -192,10 +192,10 @@ TEST_P(WritableMetricStorageHistogramTestFixture, DoubleHistogram)
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
-  std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
+  std::shared_ptr<DefaultAttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
-      instr_desc, AggregationType::kHistogram, default_attributes_processor.get(),
+      instr_desc, AggregationType::kHistogram, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
@@ -340,10 +340,10 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
-  std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
+  std::shared_ptr<DefaultAttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
-      instr_desc, AggregationType::kBase2ExponentialHistogram, default_attributes_processor.get(),
+      instr_desc, AggregationType::kBase2ExponentialHistogram, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
