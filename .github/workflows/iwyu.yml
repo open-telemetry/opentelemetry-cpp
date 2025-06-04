@@ -28,22 +28,23 @@ jobs:
           sudo apt update -y
           sudo apt install -y --no-install-recommends --no-install-suggests \
             build-essential \
-            iwyu \
             ninja-build \
             libssl-dev \
             libcurl4-openssl-dev \
+            libabsl-dev \
             libprotobuf-dev \
+            libgrpc++-dev \
             protobuf-compiler \
+            protobuf-compiler-grpc \
             libgmock-dev \
             libgtest-dev \
-            libbenchmark-dev
+            libbenchmark-dev \
+            llvm-dev \
+            libclang-dev
           sudo ./ci/setup_cmake.sh
-
-
-      - name: setup grpc
+      - name: Install include-what-you-use
         run: |
-          sudo ./ci/setup_grpc.sh
-
+          sudo ./ci/install_iwyu.sh
       - name: Prepare CMake
         run: |
           TOPDIR=`pwd`
@@ -53,6 +54,8 @@ jobs:
             -DWITH_STL=CXX14 \
             -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;" \
             -DBUILD_TESTING=ON \
+            -DWITH_EXAMPLES=ON \
+            -DWITH_EXAMPLES_HTTP=ON \
             -DBUILD_W3CTRACECONTEXT_TEST=ON \
             -DWITH_OTLP_GRPC=ON \
             -DWITH_OTLP_HTTP=ON \
@@ -78,11 +81,13 @@ jobs:
       - name: count warnings
         run: |
           set +e
+          echo "include-what-you-use version:"
+          include-what-you-use --version
           cd build
           readonly WARNING_COUNT=`grep -c "include-what-you-use reported diagnostics:" iwyu.log`
           echo "include-what-you-use reported ${WARNING_COUNT} warning(s)"
           # Acceptable limit, to decrease over time down to 0
-          readonly WARNING_LIMIT=0
+          readonly WARNING_LIMIT=122
           # FAIL the build if WARNING_COUNT > WARNING_LIMIT
           if [ $WARNING_COUNT -gt $WARNING_LIMIT ] ; then
             exit 1

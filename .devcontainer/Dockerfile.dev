@@ -22,13 +22,16 @@ ENV GRPC_VERSION=${GRPC_VERSION}
 COPY ci /opt/ci
 
 RUN apt update && apt install -y wget \
-	ninja-build \
-	libcurl4-openssl-dev \
-	clang-tidy \
-	shellcheck
+    ninja-build \
+    llvm-dev \
+    libclang-dev \
+    libcurl4-openssl-dev \
+    clang-tidy \
+    shellcheck
 
 RUN cd /opt/ci && bash setup_cmake.sh
 RUN cd /opt/ci && bash setup_ci_environment.sh
+RUN cd /opt/ci && bash install_iwyu.sh
 RUN cd /opt && bash ci/setup_googletest.sh \
     && bash ci/install_abseil.sh \
     && bash ci/install_protobuf.sh \
