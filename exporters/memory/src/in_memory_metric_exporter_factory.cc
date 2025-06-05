@@ -35,7 +35,7 @@ namespace
 class InMemoryMetricExporter final : public sdk::metrics::PushMetricExporter
 {
 public:
-  /// @param buffer_size a required value that sets the size of the CircularBuffer
+  /// @param data The in-memory data to export to.
   /// @param temporality Output temporality as a function of instrument kind.
   InMemoryMetricExporter(const std::shared_ptr<InMemoryMetricData> &data,
                          const sdk::metrics::AggregationTemporalitySelector &temporality)
