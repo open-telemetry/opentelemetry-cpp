@@ -32,7 +32,7 @@ class Recordable : public opentelemetry::logs::LogRecord
 public:
   /**
    * Set Resource of this log
-   * @param Resource the resource to set
+   * @param resource the resource to set
    */
   virtual void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept = 0;
 
