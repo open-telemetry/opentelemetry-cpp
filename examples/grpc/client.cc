@@ -122,7 +122,7 @@ int main(int argc, char **argv)
   uint16_t port;
   if (argc > 1)
   {
-    port = atoi(argv[1]);
+    port = static_cast<uint16_t>(atoi(argv[1]));
   }
   else
   {

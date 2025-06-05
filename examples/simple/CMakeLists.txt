@@ -14,3 +14,7 @@ else()
     example_simple PRIVATE opentelemetry-cpp::trace
                            opentelemetry-cpp::ostream_span_exporter)
 endif()
+
+if(BUILD_TESTING)
+  add_test(NAME examples.simple COMMAND "$<TARGET_FILE:example_simple>")
+endif()
