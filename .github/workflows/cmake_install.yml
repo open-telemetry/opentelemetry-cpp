@@ -253,7 +253,7 @@ jobs:
         sudo -E ./ci/setup_cmake.sh
     - name: Install Dependencies
       run: |
-        sudo -E apt-get install -y libcurl4-openssl-dev zlib1g-dev nlohmann-json3-dev
+        sudo -E apt-get install -y libcurl4-openssl-dev nlohmann-json3-dev
         sudo -E ./ci/install_abseil.sh
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh

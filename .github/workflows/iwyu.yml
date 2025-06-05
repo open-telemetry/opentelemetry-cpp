@@ -30,6 +30,7 @@ jobs:
             build-essential \
             ninja-build \
             libssl-dev \
+            zlib1g-dev \
             libcurl4-openssl-dev \
             libabsl-dev \
             libprotobuf-dev \

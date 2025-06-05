@@ -128,6 +128,7 @@ option(OPENTELEMETRY_INSTALL "Whether to install opentelemetry targets"
        ${OPENTELEMETRY_INSTALL_default})
 
 include("${opentelemetry-cpp_SOURCE_DIR}/cmake/tools.cmake")
+include("${opentelemetry-cpp_SOURCE_DIR}/cmake/otel-install-functions.cmake")
 
 if(NOT WITH_STL STREQUAL "OFF")
   # These definitions are needed for test projects that do not link against
@@ -271,8 +272,6 @@ if(WITH_EXAMPLES_HTTP AND NOT WITH_EXAMPLES)
   message(FATAL_ERROR "WITH_EXAMPLES_HTTP=ON requires WITH_EXAMPLES=ON")
 endif()
 
-find_package(Threads)
-
 if(MSVC)
   # Options for Visual C++ compiler: /Zc:__cplusplus - report an updated value
   # for recent C++ language standards. Without this option MSVC returns the
@@ -283,8 +282,30 @@ if(MSVC)
   endif()
 endif()
 
+if(NOT WITH_API_ONLY)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/threads.cmake")
+endif()
+
 if(WITH_GSL)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/ms-gsl.cmake")
+endif()
+
+#
+# Do we need ZLIB ?
+#
+
+if((NOT WITH_API_ONLY)
+   AND WITH_HTTP_CLIENT_CURL
+   AND WITH_OTLP_HTTP_COMPRESSION)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/zlib.cmake")
+endif()
+
+#
+# Do we need CURL ?
+#
+
+if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/curl.cmake")
 endif()
 
 if(WITH_OTLP_GRPC
@@ -311,24 +332,6 @@ if(WITH_OTLP_HTTP
   set(WITH_HTTP_CLIENT_CURL ON)
 else()
   set(WITH_HTTP_CLIENT_CURL OFF)
-endif()
-
-#
-# Do we need CURL ?
-#
-
-if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
-  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/curl.cmake")
-endif()
-
-#
-# Do we need ZLIB ?
-#
-
-if((NOT WITH_API_ONLY)
-   AND WITH_HTTP_CLIENT_CURL
-   AND WITH_OTLP_HTTP_COMPRESSION)
-  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/zlib.cmake")
 endif()
 
 #
@@ -462,11 +465,7 @@ if(BUILD_TESTING)
   endif()
 endif()
 
-include("${opentelemetry-cpp_SOURCE_DIR}/cmake/otel-install-functions.cmake")
-
 otel_print_build_config()
-
-include(CMakePackageConfigHelpers)
 
 if(DEFINED OPENTELEMETRY_BUILD_DLL)
   if(NOT WIN32)

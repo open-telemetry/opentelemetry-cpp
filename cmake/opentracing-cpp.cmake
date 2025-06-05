@@ -1,8 +1,6 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-set(_SAVED_BUILD_TESTING ${BUILD_TESTING})
-
 otel_add_thirdparty_package(
   PACKAGE_NAME "OpenTracing"
   PACKAGE_SEARCH_MODES "CONFIG"
@@ -16,35 +14,30 @@ otel_add_thirdparty_package(
   VERSION_FILE "\${opentracing_BINARY_DIR}/include/opentracing/version.h"
 )
 
-set(BUILD_TESTING ${_SAVED_BUILD_TESTING} CACHE BOOL "" FORCE)
-unset(_SAVED_BUILD_TESTING)
+function(_patch_opentracing_targets)
+  get_property(_OpenTracing_SOURCE_DIR DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_OpenTracing_SOURCE_DIR)
+  get_property(_OpenTracing_BINARY_DIR DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_OpenTracing_BINARY_DIR)
+  foreach(_target opentracing opentracing-static)
+    if(TARGET ${_target})
+      # Add missing include directories
+      target_include_directories(${_target} PUBLIC
+        "$<BUILD_INTERFACE:${_OpenTracing_SOURCE_DIR}/include>"
+        "$<BUILD_INTERFACE:${_OpenTracing_SOURCE_DIR}/3rd_party/include>"
+        "$<BUILD_INTERFACE:${_OpenTracing_BINARY_DIR}/include>"
+        )
+      # Disable CXX_INCLUDE_WHAT_YOU_USE and CXX_CLANG_TIDY
+      set_target_properties(${_target}
+                          PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "" CXX_CLANG_TIDY "")
+      # Create alias targets
+      if(NOT TARGET OpenTracing::${_target})
+        add_library(OpenTracing::${_target} ALIAS ${_target})
+      endif()
+    endif()
+  endforeach()
+endfunction()
 
-if(NOT ${OpenTracing_PROVIDER} STREQUAL "package")
-  if(TARGET opentracing AND NOT TARGET OpenTracing::opentracing)
-    target_include_directories(opentracing PUBLIC
-      "$<BUILD_INTERFACE:${opentracing_SOURCE_DIR}/include>"
-      "$<BUILD_INTERFACE:${opentracing_SOURCE_DIR}/3rd_party/include>"
-      "$<BUILD_INTERFACE:${opentracing_BINARY_DIR}/include>"
-      )
-    set_target_properties(opentracing
-                        PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "" CXX_CLANG_TIDY "")
-    add_library(OpenTracing::opentracing ALIAS opentracing)
-  endif()
-
-  if(TARGET opentracing-static AND NOT TARGET OpenTracing::opentracing-static)
-    target_include_directories(opentracing-static PUBLIC
-      "$<BUILD_INTERFACE:${opentracing_SOURCE_DIR}/include>"
-      "$<BUILD_INTERFACE:${opentracing_SOURCE_DIR}/3rd_party/include>"
-      "$<BUILD_INTERFACE:${opentracing_BINARY_DIR}/include>"
-      )
-    set_target_properties(opentracing-static PROPERTIES
-                        POSITION_INDEPENDENT_CODE ON
-                        CXX_INCLUDE_WHAT_YOU_USE "" CXX_CLANG_TIDY "")
-
-    add_library(OpenTracing::opentracing-static ALIAS opentracing-static)
-  endif()
-endif()
+_patch_opentracing_targets()
 
 if(NOT TARGET OpenTracing::opentracing AND NOT TARGET OpenTracing::opentracing-static)
-  message(FATAL_ERROR "A required OpenTracing target (opentracing or opentracing-static) was not found")
+  message(FATAL_ERROR "No OpenTracing targets (OpenTracing::opentracing or OpenTracing::opentracing-static) were imported")
 endif()

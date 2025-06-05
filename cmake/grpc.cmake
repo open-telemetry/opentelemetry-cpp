@@ -24,7 +24,7 @@ otel_add_thirdparty_package(
     gRPC_BUILD_GRPC_RUBY_PLUGIN=OFF
     gRPC_BUILD_GRPCPP_OTEL_PLUGIN=OFF
     RE2_BUILD_TESTING=OFF
-    gRPC_ZLIB_PROVIDER=module
+    gRPC_ZLIB_PROVIDER=package
     gRPC_PROTOBUF_PROVIDER=module
 )
 

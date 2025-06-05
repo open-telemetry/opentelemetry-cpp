@@ -46,14 +46,7 @@ otel_add_thirdparty_package(
 )
 
 if(NOT DEFINED PROTO_PATH)
-  if(EXISTS ${opentelemetry-proto_SOURCE_DIR})
-    set(PROTO_PATH ${opentelemetry-proto_SOURCE_DIR})
-  else()
-    message(
-      FATAL_ERROR
-        "opentelemetry-proto src directory has not been fetched. Please set the OTELCPP_PROTO_PATH to the path of the opentelemetry-proto source code."
-    )
-  endif()
+  get_property(PROTO_PATH DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_opentelemetry-proto_SOURCE_DIR)
 endif()
 
 set(COMMON_PROTO "${PROTO_PATH}/opentelemetry/proto/common/v1/common.proto")
@@ -291,7 +284,7 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${GENERATED_PROTOBUF_PATH}>"
          "$<INSTALL_INTERFACE:include>")
 
-# Disable include-what-you-use on generated code.
+# Disable include-what-you-use and clang-tidy on generated code.
 set_target_properties(opentelemetry_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE ""
                                                           CXX_CLANG_TIDY "")
 if(NOT Protobuf_INCLUDE_DIRS AND TARGET protobuf::libprotobuf)
@@ -311,7 +304,7 @@ if(WITH_OTLP_GRPC)
     ${LOGS_SERVICE_GRPC_PB_CPP_FILE} ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
   set_target_version(opentelemetry_proto_grpc)
 
-  # Disable include-what-you-use on generated code.
+  # Disable include-what-you-use and clang-tidy on generated code.
   set_target_properties(opentelemetry_proto_grpc
                         PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "" CXX_CLANG_TIDY "")
 

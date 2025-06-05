@@ -7,8 +7,6 @@ else()
   set(_CURL_DISABLE_INSTALL ON)
 endif()
 
-set(_SAVED_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
-
 otel_add_thirdparty_package(
   PACKAGE_NAME "CURL"
   PACKAGE_SEARCH_MODES "MODULE" "CONFIG"
@@ -27,12 +25,8 @@ otel_add_thirdparty_package(
   VERSION_FILE "\${curl_SOURCE_DIR}/include/curl/curlver.h"
 )
 
-set(BUILD_SHARED_LIBS ${_SAVED_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
-unset(_SAVED_BUILD_SHARED_LIBS)
-unset(_CURL_DISABLE_INSTALL)
-
 if(NOT TARGET CURL::libcurl)
-  if(TARGET libcurl_shared)
+  if(TARGET libcurl_shared AND NOT CURL_USE_STATIC_LIBS)
     add_library(CURL::libcurl ALIAS libcurl_shared)
   elseif(TARGET libcurl_static)
     add_library(CURL::libcurl ALIAS libcurl_static)

@@ -16,16 +16,6 @@ target_link_libraries(
   PUBLIC opentelemetry_ext
   PRIVATE CURL::libcurl)
 
-# Some versions of libcurl do not export the link directories, which may cause
-# link errors
-project_build_tools_get_imported_location(CURL_LIB_FILE_PATH CURL::libcurl)
-get_filename_component(CURL_LIB_DIR_PATH "${CURL_LIB_FILE_PATH}" DIRECTORY)
-
-if(CURL_LIB_DIR_PATH)
-  target_link_directories(opentelemetry_http_client_curl PUBLIC
-                          "$<BUILD_INTERFACE:${CURL_LIB_DIR_PATH}>")
-endif()
-
 if(WITH_CURL_LOGGING)
   target_compile_definitions(opentelemetry_http_client_curl
                              PRIVATE ENABLE_CURL_LOGGING)

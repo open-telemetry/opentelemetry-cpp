@@ -13,4 +13,5 @@ apt-get install --no-install-recommends --no-install-suggests -y \
                 valgrind \
                 lcov \
                 pkg-config \
+                zlib1g-dev \
                 sudo
