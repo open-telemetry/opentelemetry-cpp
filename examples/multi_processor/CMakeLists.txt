@@ -7,3 +7,8 @@ target_link_libraries(
   PRIVATE common_foo_library opentelemetry-cpp::trace
           opentelemetry-cpp::ostream_span_exporter
           opentelemetry-cpp::in_memory_span_exporter)
+
+if(BUILD_TESTING)
+  add_test(NAME examples.multi_processor
+           COMMAND "$<TARGET_FILE:example_multi_processor>")
+endif()
