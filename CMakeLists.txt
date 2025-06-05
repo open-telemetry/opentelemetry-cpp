@@ -291,6 +291,20 @@ if(WITH_GSL)
 endif()
 
 #
+# Do we need HTTP CLIENT CURL ?
+#
+
+if(WITH_OTLP_HTTP
+   OR WITH_ELASTICSEARCH
+   OR WITH_ZIPKIN
+   OR BUILD_W3CTRACECONTEXT_TEST
+   OR WITH_EXAMPLES_HTTP)
+  set(WITH_HTTP_CLIENT_CURL ON)
+else()
+  set(WITH_HTTP_CLIENT_CURL OFF)
+endif()
+
+#
 # Do we need ZLIB ?
 #
 
@@ -318,20 +332,6 @@ if(WITH_OTLP_GRPC
 
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/protobuf.cmake")
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/opentelemetry-proto.cmake")
-endif()
-
-#
-# Do we need HTTP CLIENT CURL ?
-#
-
-if(WITH_OTLP_HTTP
-   OR WITH_ELASTICSEARCH
-   OR WITH_ZIPKIN
-   OR BUILD_W3CTRACECONTEXT_TEST
-   OR WITH_EXAMPLES_HTTP)
-  set(WITH_HTTP_CLIENT_CURL ON)
-else()
-  set(WITH_HTTP_CLIENT_CURL OFF)
 endif()
 
 #
