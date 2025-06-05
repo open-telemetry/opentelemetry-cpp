@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [TEST] Test examples in CI with CMake Part 1
+  [#3449](https://github.com/open-telemetry/opentelemetry-cpp/pull/3449)
+
 * [EXPORTER] Add `credentials` option to OTLP Exporter’s gRPC Client
   [#3403](https://github.com/open-telemetry/opentelemetry-cpp/pull/3403)
 

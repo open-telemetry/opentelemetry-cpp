@@ -77,23 +77,8 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    ctest -C Debug
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
     $env:PATH = "$BUILD_DIR\ext\src\dll\Debug;$env:PATH"
-    examples\simple\Debug\example_simple.exe
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
-    examples\metrics_simple\Debug\metrics_ostream_example.exe
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
-    examples\logs_simple\Debug\example_logs_simple.exe
+    ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -115,23 +100,8 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    ctest -C Debug
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
     $env:PATH = "$BUILD_DIR\ext\src\dll\Debug;$env:PATH"
-    examples\simple\Debug\example_simple.exe
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
-    examples\metrics_simple\Debug\metrics_ostream_example.exe
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
-    examples\logs_simple\Debug\example_logs_simple.exe
+    ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -277,6 +247,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
+    $env:PATH = "$BUILD_DIR\ext\src\dll\Debug;$env:PATH"
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -468,13 +439,13 @@ switch ($action) {
     $CMAKE_OPTIONS = @(
     "-DCMAKE_CXX_STANDARD=17",
     "-DVCPKG_TARGET_TRIPLET=x64-windows",
-    "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+    "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake",
+    "-DOPENTELEMETRY_BUILD_DLL=1"
     )
 
     cmake $SRC_DIR `
       $CMAKE_OPTIONS `
       "-DCMAKE_INSTALL_PREFIX=$INSTALL_TEST_DIR" `
-      -DOPENTELEMETRY_BUILD_DLL=1 `
       -DWITH_ABI_VERSION_1=ON `
       -DWITH_ABI_VERSION_2=OFF `
       -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON `
