@@ -19,6 +19,7 @@ jobs:
       CMAKE_VERSION: '3.31.6'
       # cxx17 is the default for windows-2022
       CXX_STANDARD: '17'
+      CMAKE_EXTRA_ARGS: "-DWITH_STL=CXX17 -DOTELCPP_REQUIRE_LOCAL_DEPENDENCIES=ON"
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -45,6 +46,7 @@ jobs:
       CMAKE_VERSION: '3.15.0'
       # cxx14 is the default for windows-2019
       CXX_STANDARD: '14'
+      CMAKE_EXTRA_ARGS: "-DWITH_GSL=ON -DOTELCPP_REQUIRE_LOCAL_DEPENDENCIES=ON"
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -70,6 +72,7 @@ jobs:
       CMAKE_VERSION: '3.28.3'
       # cxx17 is the default for Ubuntu 24.04
       CXX_STANDARD: '17'
+      CMAKE_EXTRA_ARGS: "-DOTELCPP_REQUIRE_LOCAL_DEPENDENCIES=ON"
       BUILD_TYPE: 'Debug'
     steps:
     - name: Harden the runner (Audit all outbound calls)
@@ -80,15 +83,14 @@ jobs:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
-    - name: Install libcurl, zlib, nlohmann-json with apt
+    - name: Setup CI Environment
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
-    - name: Install abseil, protobuf, and grpc with apt
+    - name: Install Dependencies
       run: |
         sudo -E apt-get update
-        sudo -E apt-get install -y libabsl-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
+        sudo -E apt-get install -y libabsl-dev libcurl4-openssl-dev zlib1g-dev nlohmann-json3-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
@@ -97,6 +99,41 @@ jobs:
       env:
         BUILD_SHARED_LIBS: 'ON'
       run: ./ci/do_ci.sh cmake.install.test
+
+  ubuntu_2404_all_fetch:
+    name: Ubuntu 24.04 fetch all dependencies (static libs - shared libs - opentracing shim)
+    runs-on: ubuntu-24.04
+    env:
+      INSTALL_TEST_DIR: '/home/runner/install_test'
+      # CMake 3.28 is apt package version for Ubuntu 24.04
+      CMAKE_VERSION: '3.28.3'
+      # The default cxx standard for Ubuntu 24.04
+      CXX_STANDARD: '17'
+      CMAKE_EXTRA_ARGS: "-DOTELCPP_FORCE_FETCH_DEPENDENCIES=ON"
+      BUILD_TYPE: 'Debug'
+    steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      with:
+        egress-policy: audit
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        # Don't checkout the submodules.
+        submodules: false
+    - name: Setup CI Environment
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+    - name: Run Tests (static libs)
+      env:
+        BUILD_SHARED_LIBS: 'OFF'
+      run: ./ci/do_ci.sh cmake.install.test
+    - name: Run Tests (shared libs)
+      env:
+        BUILD_SHARED_LIBS: 'ON'
+      run: ./ci/do_ci.sh cmake.install.test
+    - name: Run OpenTracing Shim Test
+      run: ./ci/do_ci.sh cmake.opentracing_shim.install.test
 
   ubuntu_2404_latest:
     name: Ubuntu 24.04 latest versions cxx20 (static libs)
@@ -107,6 +144,7 @@ jobs:
       CMAKE_VERSION: '3.31.6'
       # Set to the latest cxx standard supported by opentelemetry-cpp
       CXX_STANDARD: '20'
+      CMAKE_EXTRA_ARGS: "-DWITH_STL=CXX20"
       # Versions below set to the latest version available
       # The abseil and protobuf versions are taken from
       # the grpc submodules at the GRPC_VERSION tag
@@ -124,14 +162,14 @@ jobs:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
-    - name: Install gtest, libcurl, zlib, nlohmann-json with apt
+    - name: Setup CI Environment
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
-    - name: Build abseil, protobuf, and grpc with ci scripts
+    - name: Install Dependencies
       run: |
         sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
         sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
     - name: Run Tests (static libs)
@@ -147,6 +185,7 @@ jobs:
       # CMake 3.22 is the apt package version for Ubuntu 22.04
       CMAKE_VERSION: '3.22.0'
       CXX_STANDARD: '17'
+      CMAKE_EXTRA_ARGS: "-DWITH_STL=CXX17"
       # These are stable versions tested in the main ci workflow
       # and defaults in the devcontainer
       GOOGLETEST_VERSION: '1.14.0'
@@ -163,14 +202,14 @@ jobs:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
-    - name: Install gtest, libcurl, zlib, nlohmann-json with apt
+    - name: Setup CI Environment
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
-    - name: Build abseil, protobuf, and grpc with ci scripts
+    - name: Install Dependencies
       run: |
         sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
         sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
     - name: Run Tests (static libs)
@@ -191,6 +230,7 @@ jobs:
       CMAKE_VERSION: '3.14.0'
       # cxx14 is the default for Ubuntu 22.04
       CXX_STANDARD: '14'
+      CMAKE_EXTRA_ARGS: "-DWITH_GSL=ON"
       # This is the apt package version of googletest for Ubuntu 22.04
       GOOGLETEST_VERSION: '1.11.0'
       # These are minimum versions tested in the main ci workflow
@@ -207,14 +247,15 @@ jobs:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
-    - name: Install gtest, libcurl, zlib, nlohmann-json with apt
+    - name: Setup CI Environment
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
-    - name: Build abseil, protobuf, and grpc with ci scripts
+    - name: Install Dependencies
       run: |
+        sudo -E apt-get install -y libcurl4-openssl-dev nlohmann-json3-dev
         sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
         sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
     - name: Run Tests (static libs)
@@ -234,6 +275,7 @@ jobs:
        # CMake 3.28 is apt package version for Ubuntu 24.04
       CMAKE_VERSION: '3.28.3'
       CXX_STANDARD: '17'
+      CMAKE_EXTRA_ARGS: "-DOTELCPP_REQUIRE_LOCAL_DEPENDENCIES=ON"
       CMAKE_TOOLCHAIN_FILE: /home/runner/conan/build/Debug/generators/conan_toolchain.cmake
       BUILD_TYPE: 'Debug'
     steps:
@@ -244,7 +286,10 @@ jobs:
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          submodules: 'recursive'
+          submodules: false
+      - name: Get required submodules
+        run: |
+          git submodule update --init --depth 1 third_party/opentelemetry-proto
       - name: Install Conan
         run: |
           python3 -m pip install pip==25.0.1
@@ -271,13 +316,14 @@ jobs:
         run: ./ci/do_ci.sh cmake.opentracing_shim.install.test
 
   ubuntu_2404_conan_latest:
-    name: Ubuntu 24.04 conan latest versions cxx17 (static libs)
+    name: Ubuntu 24.04 conan latest versions cxx17 (static libs - opentracing shim)
     runs-on: ubuntu-24.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
       # Set to the latest version of cmake 3.x
       CMAKE_VERSION: '3.31.6'
       CXX_STANDARD: '17'
+      CMAKE_EXTRA_ARGS: "-DOTELCPP_REQUIRE_LOCAL_DEPENDENCIES=ON"
       CMAKE_TOOLCHAIN_FILE: /home/runner/conan/build/Debug/generators/conan_toolchain.cmake
       BUILD_TYPE: 'Debug'
     steps:
@@ -288,7 +334,10 @@ jobs:
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          submodules: 'recursive'
+          submodules: false
+      - name: Get required submodules
+        run: |
+          git submodule update --init --depth 1 third_party/opentelemetry-proto
       - name: Install Conan
         run: |
           python3 -m pip install pip==25.0.1
@@ -307,6 +356,8 @@ jobs:
         run: |
           export PKG_CONFIG_PATH=$INSTALL_TEST_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
           ./ci/verify_packages.sh
+      - name: Run OpenTracing Shim Test
+        run: ./ci/do_ci.sh cmake.opentracing_shim.install.test
 
   macos_14_conan_stable:
     name: macOS 14 conan stable versions cxx17 (static libs)
@@ -315,6 +366,7 @@ jobs:
       INSTALL_TEST_DIR: '/Users/runner/install_test'
       CMAKE_VERSION: '3.28.3'
       CXX_STANDARD: '17'
+      CMAKE_EXTRA_ARGS: "-DOTELCPP_REQUIRE_LOCAL_DEPENDENCIES=ON"
       CMAKE_TOOLCHAIN_FILE: '/Users/runner/conan/build/Debug/generators/conan_toolchain.cmake'
       BUILD_TYPE: 'Debug'
     steps:
@@ -325,7 +377,10 @@ jobs:
 
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
-        submodules: 'recursive'
+        submodules: false
+    - name: Get required submodules
+      run: |
+        git submodule update --init --depth 1 third_party/opentelemetry-proto
     - name: Install Conan and tools
       run: |
         brew install conan autoconf automake libtool coreutils
@@ -348,6 +403,7 @@ jobs:
       # Set to the latest version of cmake 3.x
       CMAKE_VERSION: '3.31.6'
       CXX_STANDARD: '17'
+      CMAKE_EXTRA_ARGS: "-DOTELCPP_REQUIRE_LOCAL_DEPENDENCIES=ON"
       BUILD_TYPE: 'Debug'
     steps:
     - name: Harden the runner (Audit all outbound calls)
@@ -357,7 +413,10 @@ jobs:
 
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
-        submodules: 'recursive'
+        submodules: false
+    - name: Get required submodules
+      run: |
+        git submodule update --init --depth 1 third_party/opentelemetry-proto
     - name: Install Dependencies with Homebrew
       run: |
         ./ci/setup_cmake_macos.sh

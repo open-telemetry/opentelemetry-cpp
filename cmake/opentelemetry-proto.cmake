@@ -20,7 +20,7 @@
 # 3 - Download opentelemetry-proto from github
 #
 # Code from the required version is used, unless a specific release tag is
-# provided in variable ${opentelemetry-proto}
+# provided in variable ${opentelemetry-proto_GIT_TAG}
 #
 
 if(OTELCPP_PROTO_PATH)
@@ -30,47 +30,23 @@ if(OTELCPP_PROTO_PATH)
       FATAL_ERROR
         "OTELCPP_PROTO_PATH does not point to a opentelemetry-proto repository")
   endif()
-  message(STATUS "opentelemetry-proto dependency satisfied by: external path")
   set(PROTO_PATH ${OTELCPP_PROTO_PATH})
-  set(needs_proto_download FALSE)
-else()
-  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto/.git)
-    message(STATUS "opentelemetry-proto dependency satisfied by: git submodule")
+  message(STATUS "opentelemetry-proto dependency satisfied by OTELCPP_PROTO_PATH: ${PROTO_PATH}")
+elseif(EXISTS ${PROJECT_SOURCE_DIR}/third_party/opentelemetry-proto/.git)
     set(PROTO_PATH
-        "${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto")
-    set(needs_proto_download FALSE)
-  else()
-    message(
-      STATUS "opentelemetry-proto dependency satisfied by: github download")
-    if("${opentelemetry-proto}" STREQUAL "")
-      file(READ "${CMAKE_CURRENT_LIST_DIR}/../third_party_release"
-           OTELCPP_THIRD_PARTY_RELEASE_CONTENT)
-      if(OTELCPP_THIRD_PARTY_RELEASE_CONTENT MATCHES
-         "opentelemetry-proto=[ \\t]*([A-Za-z0-9_\\.\\-]+)")
-        set(opentelemetry-proto "${CMAKE_MATCH_1}")
-      else()
-        set(opentelemetry-proto "v1.6.0")
-      endif()
-      unset(OTELCPP_THIRD_PARTY_RELEASE_CONTENT)
-    endif()
-    include(ExternalProject)
-    ExternalProject_Add(
-      opentelemetry-proto
-      GIT_REPOSITORY https://github.com/open-telemetry/opentelemetry-proto.git
-      GIT_TAG "${opentelemetry-proto}"
-      UPDATE_COMMAND ""
-      BUILD_COMMAND ""
-      INSTALL_COMMAND ""
-      CONFIGURE_COMMAND ""
-      TEST_AFTER_INSTALL 0
-      DOWNLOAD_NO_PROGRESS 1
-      LOG_CONFIGURE 1
-      LOG_BUILD 1
-      LOG_INSTALL 1)
-    ExternalProject_Get_Property(opentelemetry-proto INSTALL_DIR)
-    set(PROTO_PATH "${INSTALL_DIR}/src/opentelemetry-proto")
-    set(needs_proto_download TRUE)
-  endif()
+        "${PROJECT_SOURCE_DIR}/third_party/opentelemetry-proto")
+    message(STATUS "opentelemetry-proto dependency satisfied by git submodule: ${PROTO_PATH}")
+endif()
+
+otel_add_thirdparty_package(
+  PACKAGE_NAME "opentelemetry-proto"
+  FETCH_GIT_REPOSITORY "https://github.com/open-telemetry/opentelemetry-proto.git"
+  FETCH_GIT_TAG "${opentelemetry-proto_GIT_TAG}"
+  FETCH_SOURCE_DIR "${PROTO_PATH}"
+)
+
+if(NOT DEFINED PROTO_PATH)
+  get_property(PROTO_PATH DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_opentelemetry-proto_SOURCE_DIR)
 endif()
 
 set(COMMON_PROTO "${PROTO_PATH}/opentelemetry/proto/common/v1/common.proto")
@@ -197,20 +173,6 @@ foreach(IMPORT_DIR ${PROTOBUF_IMPORT_DIRS})
   list(APPEND PROTOBUF_INCLUDE_FLAGS "-I${IMPORT_DIR}")
 endforeach()
 
-if(WITH_OTLP_GRPC)
-  if(CMAKE_CROSSCOMPILING)
-    find_program(gRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin)
-  else()
-    if(TARGET gRPC::grpc_cpp_plugin)
-      project_build_tools_get_imported_location(gRPC_CPP_PLUGIN_EXECUTABLE
-                                                gRPC::grpc_cpp_plugin)
-    else()
-      find_program(gRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin)
-    endif()
-  endif()
-  message(STATUS "gRPC_CPP_PLUGIN_EXECUTABLE=${gRPC_CPP_PLUGIN_EXECUTABLE}")
-endif()
-
 set(PROTOBUF_COMMON_FLAGS "--proto_path=${PROTO_PATH}"
                           "--cpp_out=${GENERATED_PROTOBUF_PATH}")
 # --experimental_allow_proto3_optional is available from 3.13 and be stable and
@@ -243,7 +205,11 @@ set(PROTOBUF_GENERATED_FILES
     ${PROFILES_SERVICE_PB_H_FILE}
     ${PROFILES_SERVICE_PB_CPP_FILE})
 
+
+set(PROTOBUF_GENERATE_DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE})
+
 if(WITH_OTLP_GRPC)
+  list(APPEND PROTOBUF_GENERATE_DEPENDS ${gRPC_CPP_PLUGIN_EXECUTABLE})
   list(APPEND PROTOBUF_COMMON_FLAGS
        "--grpc_out=generate_mock_code=true:${GENERATED_PROTOBUF_PATH}"
        --plugin=protoc-gen-grpc="${gRPC_CPP_PLUGIN_EXECUTABLE}")
@@ -288,7 +254,7 @@ add_custom_command(
     ${LOGS_PROTO} ${METRICS_PROTO} ${TRACE_SERVICE_PROTO} ${LOGS_SERVICE_PROTO}
     ${METRICS_SERVICE_PROTO} ${PROFILES_PROTO} ${PROFILES_SERVICE_PROTO}
   COMMENT "[Run]: ${PROTOBUF_RUN_PROTOC_COMMAND}"
-  DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE})
+  DEPENDS ${PROTOBUF_GENERATE_DEPENDS})
 
 unset(OTELCPP_PROTO_TARGET_OPTIONS)
 if(CMAKE_SYSTEM_NAME MATCHES "Windows|MinGW|WindowsStore")
@@ -318,9 +284,9 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${GENERATED_PROTOBUF_PATH}>"
          "$<INSTALL_INTERFACE:include>")
 
-# Disable include-what-you-use on generated code.
-set_target_properties(opentelemetry_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE
-                                                     "")
+# Disable include-what-you-use and clang-tidy on generated code.
+set_target_properties(opentelemetry_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE ""
+                                                          CXX_CLANG_TIDY "")
 if(NOT Protobuf_INCLUDE_DIRS AND TARGET protobuf::libprotobuf)
   get_target_property(Protobuf_INCLUDE_DIRS protobuf::libprotobuf
                       INTERFACE_INCLUDE_DIRECTORIES)
@@ -338,9 +304,9 @@ if(WITH_OTLP_GRPC)
     ${LOGS_SERVICE_GRPC_PB_CPP_FILE} ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
   set_target_version(opentelemetry_proto_grpc)
 
-  # Disable include-what-you-use on generated code.
+  # Disable include-what-you-use and clang-tidy on generated code.
   set_target_properties(opentelemetry_proto_grpc
-                        PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "")
+                        PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "" CXX_CLANG_TIDY "")
 
   list(APPEND OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto_grpc)
   target_link_libraries(opentelemetry_proto_grpc PUBLIC opentelemetry_proto)
@@ -361,9 +327,6 @@ if(WITH_OTLP_GRPC)
   endif()
 endif()
 
-if(needs_proto_download)
-  add_dependencies(opentelemetry_proto opentelemetry-proto)
-endif()
 set_target_properties(opentelemetry_proto PROPERTIES EXPORT_NAME proto)
 patch_protobuf_targets(opentelemetry_proto)
 

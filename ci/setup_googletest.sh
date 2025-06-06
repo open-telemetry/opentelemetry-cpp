@@ -13,6 +13,26 @@ if [ -z "${GOOGLETEST_VERSION}" ]; then
   export GOOGLETEST_VERSION=1.14.0
 fi
 
+INSTALL_DIR=/usr/local/
+
+GOOGLETEST_BUILD_OPTIONS=(
+    "-DBUILD_SHARED_LIBS=ON"
+    "-DBUILD_GMOCK=ON"
+    "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+    "-DINSTALL_GTEST=ON"
+    "-DCMAKE_INSTALL_PREFIX=$INSTALL_DIR"
+)
+
+if [ ! -z "${CXX_STANDARD}" ]; then
+    GOOGLETEST_BUILD_OPTIONS+=("-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
+    GOOGLETEST_BUILD_OPTIONS+=("-DCMAKE_CXX_STANDARD_REQUIRED=ON")
+    GOOGLETEST_BUILD_OPTIONS+=("-DCMAKE_CXX_EXTENSIONS=OFF")
+fi
+
+if [ ! -z "${GTEST_HAS_ABSL}" ]; then
+    GOOGLETEST_BUILD_OPTIONS+=("-DGTEST_HAS_ABSL=${GTEST_HAS_ABSL}")
+fi
+
 OLD_GOOGLETEST_VERSION_REGEXP="^1\.([0-9]|10|11|12)(\..*)?$"
 
 if [[ ${GOOGLETEST_VERSION} =~ ${OLD_GOOGLETEST_VERSION_REGEXP} ]]; then
@@ -27,30 +47,21 @@ fi
 
 googletest_install()
 {
-  # Follows these instructions
-  # https://gist.github.com/dlime/313f74fd23e4267c4a915086b84c7d3d
   tmp_dir=$(mktemp -d)
   pushd $tmp_dir
   wget https://github.com/google/googletest/archive/${GOOGLETEST_VERSION_PATH}.tar.gz
   tar -xf ${GOOGLETEST_VERSION_PATH}.tar.gz
   cd ${GOOGLETEST_FOLDER_PATH}/
   mkdir build && cd build
-  cmake .. -DBUILD_SHARED_LIBS=ON -DINSTALL_GTEST=ON -DCMAKE_INSTALL_PREFIX:PATH=/usr
+
+  echo "Installing googletest version: ${GOOGLETEST_VERSION}..."
+  echo "Using build options:" "${GOOGLETEST_BUILD_OPTIONS[@]}"
+
+  cmake "${GOOGLETEST_BUILD_OPTIONS[@]}" ..
   make -j $(nproc)
   make install
   ldconfig
   popd
 }
-
-set +e
-echo	\
-      libbenchmark-dev \
-      zlib1g-dev \
-      sudo \
-      libcurl4-openssl-dev \
-      nlohmann-json-dev \
-      nlohmann-json3 \
-      nlohmann-json3-dev | xargs -n 1 apt-get install --ignore-missing --no-install-recommends --no-install-suggests -y
-set -e
 
 googletest_install
