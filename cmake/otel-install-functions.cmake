@@ -455,47 +455,6 @@ function(_otel_fetch_package)
   set("${_THIRDPARTY_FETCH_NAME}_BINARY_DIR" ${${_THIRDPARTY_FETCH_NAME}_BINARY_DIR} PARENT_SCOPE)
 endfunction()
 
-#-----------------------------------------------------------------------
-# otel_parse_version_from_file
-#   Parses the version from a file using a regex.
-function(otel_parse_version_from_file)
-  set(optionArgs )
-  set(oneValueArgs REGEX FILE OUT_VERSION)
-  set(multiValueArgs)
-  cmake_parse_arguments(_OTEL_PARSE "${optionArgs}" "${oneValueArgs}" "${multiValueArgs}" "${ARGN}")
-
-  # error if udefined args are detected
-  if(DEFINED _OTEL_PARSE_UNPARSED_ARGUMENTS)
-    message(FATAL_ERROR "Unparsed arguments detected: ${_OTEL_PARSE_UNPARSED_ARGUMENTS}")
-  endif()
-
-  if(NOT DEFINED _OTEL_PARSE_OUT_VERSION)
-    message(FATAL_ERROR "OUT_VERSION is required")
-  endif()
-  if(NOT DEFINED _OTEL_PARSE_REGEX)
-    message(FATAL_ERROR "REGEX is required")
-  endif()
-  if(NOT DEFINED _OTEL_PARSE_FILE)
-    message(FATAL_ERROR "FILE is required")
-  endif()
-
-  string(CONFIGURE "${_OTEL_PARSE_FILE}" _CONFIGURED_VERSION_FILEPATH)
-  if(NOT EXISTS "${_CONFIGURED_VERSION_FILEPATH}")
-    message(WARNING "Version file ${_CONFIGURED_VERSION_FILEPATH} does not exist")
-  else()
-    file(READ "${_CONFIGURED_VERSION_FILEPATH}" _VERSION_FILE_CONTENTS)
-    string(REGEX MATCH
-          "${_OTEL_PARSE_REGEX}"
-          _VERSION_MATCH
-          "${_VERSION_FILE_CONTENTS}")
-    if(_VERSION_MATCH)
-      set("${_OTEL_PARSE_OUT_VERSION}" "${CMAKE_MATCH_1}" PARENT_SCOPE)
-    else()
-      message(WARNING "Failed to parse version from ${_OTEL_PARSE_FILE} using regex ${_OTEL_PARSE_REGEX}")
-    endif()
-  endif()
-endfunction()
-
 ########################################################################
 # Main functions to support installing components
 # and the opentlemetry-cpp cmake package config files

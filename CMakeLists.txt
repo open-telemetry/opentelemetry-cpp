@@ -31,22 +31,20 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.20.0")
   cmake_policy(SET CMP0117 NEW)
 endif()
 
-project(opentelemetry-cpp)
+# Read the opentelemetry-cpp project version from the api version header file
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/otel-version-functions.cmake")
+otel_get_project_version("${CMAKE_CURRENT_LIST_DIR}" OPENTELEMETRY_VERSION)
+
+project(
+  opentelemetry-cpp
+  VERSION ${OPENTELEMETRY_VERSION}
+  LANGUAGES CXX)
 
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
 # Set the third-party dependency versions expected
-if(EXISTS "${opentelemetry-cpp_SOURCE_DIR}/third_party_release")
-  file(STRINGS "${opentelemetry-cpp_SOURCE_DIR}/third_party_release"
-       third_party_tags)
-  foreach(third_party ${third_party_tags})
-    string(REGEX REPLACE "^[ ]+" "" third_party ${third_party})
-    string(REGEX MATCH "^[^=]+" third_party_name ${third_party})
-    string(REPLACE "${third_party_name}=" "" third_party_tag ${third_party})
-    set(${third_party_name}_GIT_TAG "${third_party_tag}")
-  endforeach()
-endif()
+otel_get_thirdparty_version_tags("${opentelemetry-cpp_SOURCE_DIR}")
 
 # Autodetect vcpkg toolchain
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -57,9 +55,6 @@ endif()
 
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
 option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
-
-file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
-     OPENTELEMETRY_CPP_HEADER_VERSION_H)
 
 #
 # We do not want to have WITH_ABI_VERSION = "1" or "2", and instead prefer two
@@ -90,25 +85,8 @@ if(WITH_ABI_VERSION_2)
 elseif(WITH_ABI_VERSION_1)
   set(OPENTELEMETRY_ABI_VERSION_NO "1")
 else()
-  if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
-     "OPENTELEMETRY_ABI_VERSION_NO[ \t\r\n]+\"?([0-9]+)\"?")
-    math(EXPR OPENTELEMETRY_ABI_VERSION_NO ${CMAKE_MATCH_1})
-  else()
-    message(
-      FATAL_ERROR
-        "OPENTELEMETRY_ABI_VERSION_NO not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
-    )
-  endif()
-endif()
-
-if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
-   "OPENTELEMETRY_VERSION[ \t\r\n]+\"?([^\"]+)\"?")
-  set(OPENTELEMETRY_VERSION ${CMAKE_MATCH_1})
-else()
-  message(
-    FATAL_ERROR
-      "OPENTELEMETRY_VERSION not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
-  )
+  otel_get_abi_version_number("${opentelemetry-cpp_SOURCE_DIR}"
+                              OPENTELEMETRY_ABI_VERSION_NO)
 endif()
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
