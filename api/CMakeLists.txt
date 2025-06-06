@@ -69,7 +69,7 @@ elseif(WITH_STL STREQUAL "ON")
 else()
   message(
     FATAL_ERROR
-      "WITH_STL must be ON, OFF, CXX11, CXX14, CXX17, CXX20,CXX23 or CXX26")
+      "WITH_STL must be ON, OFF, CXX11, CXX14, CXX17, CXX20, CXX23 or CXX26")
 endif()
 
 if(WITH_GSL)
