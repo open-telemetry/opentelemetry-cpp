@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       CXX_STANDARD: '17'
-      BUILD_TYPE: 'Debug'
+      BUILD_TYPE: 'Release'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -69,11 +69,6 @@ jobs:
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
-    - name: Install abseil, protobuf, and grpc with apt
-      run: |
-        sudo -E apt-get update
-        sudo -E apt-get install -y libabsl-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
     - name: run fetch content cmake test
       run: |
         ./ci/do_ci.sh cmake.fetch_content.test
@@ -608,7 +603,6 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo -E ./ci/install_abseil.sh
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_protobuf.sh
         sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
     - name: run otlp exporter tests
