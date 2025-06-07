@@ -4,7 +4,6 @@
 #include <ctype.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <iostream>
@@ -15,6 +14,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/exporters/ostream/span_exporter.h"

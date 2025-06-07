@@ -4,13 +4,16 @@
 #include <benchmark/benchmark.h>
 #include <cstdint>
 
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/noop.h"
+#include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
