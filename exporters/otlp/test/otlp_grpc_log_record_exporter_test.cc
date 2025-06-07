@@ -4,7 +4,6 @@
 #include <grpc/support/port_platform.h>
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/support/status.h>
-#include <gtest/gtest.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <chrono>
@@ -40,7 +39,6 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/noop.h"
-#include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_id.h"
