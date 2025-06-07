@@ -18,6 +18,12 @@ Increment the:
 * [TEST] Test examples in CI with CMake Part 1
   [#3449](https://github.com/open-telemetry/opentelemetry-cpp/pull/3449)
 
+* [EXPORTER] Add `credentials` option to OTLP Exporter’s gRPC Client
+  [#3403](https://github.com/open-telemetry/opentelemetry-cpp/pull/3403)
+
+  * To enable with CMake: `-DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON`
+  * To enable with Bazel: `--@io_opentelemetry_cpp//exporters/otlp:with_otlp_grpc_credential_preview=true`
+
 ## [1.21 2025-05-28]
 
 * [BUILD] Remove WITH_ABSEIL

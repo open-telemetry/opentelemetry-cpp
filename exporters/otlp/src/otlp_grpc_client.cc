@@ -433,6 +433,19 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
         grpc::CreateCustomChannel(grpc_target, grpc::InsecureChannelCredentials(), grpc_arguments);
   }
 
+#ifdef ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
+  if (options.credentials)
+  {
+    if (options.use_ssl_credentials)
+    {
+      OTEL_INTERNAL_LOG_WARN(
+          "[OTLP GRPC Client] Both 'credentials' and 'use_ssl_credentials' options are set. "
+          "The former takes priority.");
+    }
+    channel = grpc::CreateCustomChannel(grpc_target, options.credentials, grpc_arguments);
+  }
+#endif  // ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
+
   return channel;
 }
 
