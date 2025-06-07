@@ -4,17 +4,18 @@
 #include <benchmark/benchmark.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <algorithm>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+#include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 using namespace opentelemetry::sdk::metrics;

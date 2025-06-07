@@ -16,6 +16,7 @@
 #include "opentracing/noop.h"
 #include "opentracing/propagation.h"
 #include "opentracing/span.h"
+#include "opentracing/string_view.h"
 #include "opentracing/tracer.h"
 #include "opentracing/util.h"
 #include "opentracing/value.h"

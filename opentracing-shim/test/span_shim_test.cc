@@ -5,7 +5,6 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
-#include <algorithm>
 #include <chrono>
 #include <functional>
 #include <initializer_list>

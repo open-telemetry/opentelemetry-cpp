@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <algorithm>
 #include <chrono>
 #include <map>
 #include <memory>
@@ -14,6 +13,7 @@
 #include "common.h"
 
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"

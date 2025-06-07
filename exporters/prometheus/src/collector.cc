@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <prometheus/metric_family.h>
-#include <algorithm>
 #include <mutex>
 #include <vector>
 

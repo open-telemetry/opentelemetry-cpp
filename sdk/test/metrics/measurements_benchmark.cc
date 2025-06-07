@@ -3,7 +3,6 @@
 
 #include <benchmark/benchmark.h>
 #include <stdlib.h>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cstdint>
@@ -18,7 +17,7 @@
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"

@@ -4,7 +4,6 @@
  */
 
 #include <gtest/gtest.h>
-#include <algorithm>
 #include <initializer_list>
 #include <string>
 #include <utility>
@@ -17,9 +16,11 @@
 
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/opentracingshim/span_context_shim.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentracing/string_view.h"
 
 namespace trace_api = opentelemetry::trace;
 namespace baggage   = opentelemetry::baggage;
