@@ -1,6 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 load("//:dll_deps.bzl", "dll_deps")
 load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_library", "otel_cc_test")
@@ -84,6 +85,10 @@ otel_cc_library(
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
+    # defines = select({
+    #     ":enable_otlp_grpc_credential_preview": ["ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW"],
+    #     "//conditions:default": [],
+    # }),
     strip_include_prefix = "include",
     tags = [
         "otlp",
@@ -99,6 +104,18 @@ otel_cc_library(
         "@opentelemetry-proto//:trace_service_grpc_cc",
     ],
 )
+
+# config_setting(
+#     name = "enable_otlp_grpc_credential_preview",
+#     flag_values = {
+#         ":with_otlp_grpc_credential_preview": "true",
+#     },
+# )
+
+# bool_flag(
+#     name = "with_otlp_grpc_credential_preview",
+#     build_setting_default = False,
+# )
 
 otel_cc_library(
     name = "otlp_grpc_exporter",

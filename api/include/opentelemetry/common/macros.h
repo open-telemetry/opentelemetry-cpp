@@ -564,6 +564,7 @@ point.
 #define ENABLE_OTLP_RETRY_PREVIEW 1
 #define ENABLE_THREAD_INSTRUMENTATION_PREVIEW 1
 #define ENABLE_CURL_LOGGING 1
+#define ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW 1
 
 // What follows is specific to the https://github.com/malkia/opentelemetry-cpp windows-dll branch.
 // Users should not predefine OPENTELEMETRY_DLL, and it would get set to 1 ("dllimport").
@@ -639,7 +640,8 @@ point.
   "+otlp_compr:" OPENTELEMETRY_STR(ENABLE_OTLP_COMPRESSION_PREVIEW) \
   "+otlp_retry:" OPENTELEMETRY_STR(ENABLE_OTLP_RETRY_PREVIEW) \
   "+thrd_instr:" OPENTELEMETRY_STR(ENABLE_THREAD_INSTRUMENTATION_PREVIEW) \
-  "+curl_log:"  OPENTELEMETRY_STR(ENABLE_CURL_LOGGING) \
+  "+curl_log:" OPENTELEMETRY_STR(ENABLE_CURL_LOGGING) \
+  "+grpc_cred:" OPENTELEMETRY_STR(ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW) \
 )
 
 //  "+have_excpts:" OPENTELEMETRY_STR(OPENTELEMETRY_HAVE_EXCEPTIONS)

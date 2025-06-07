@@ -7,7 +7,13 @@
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 #include <chrono>
+#include <memory>
 #include <string>
+
+namespace grpc
+{
+class ChannelCredentials;
+}
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -41,6 +47,11 @@ struct OtlpGrpcClientOptions
 
   /** CLIENT CERT, as a string. */
   std::string ssl_client_cert_string;
+#endif
+
+#ifdef ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
+  /** Use custom ChannelCredentials, instead of the SSL options above. */
+  std::shared_ptr<grpc::ChannelCredentials> credentials;
 #endif
 
   /** Export timeout. */
