@@ -11,6 +11,7 @@
 #include <string>
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/version.h"
 
 // clang-format off
