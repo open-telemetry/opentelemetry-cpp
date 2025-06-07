@@ -28,6 +28,18 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <condition_variable>
+#  include <cstdio>
+#  include <mutex>
+#  include <thread>
+#  include <unordered_set>
+
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/nostd/function_ref.h"
+#  include "opentelemetry/nostd/string_view.h"
+#endif /* ENABLE_ASYNC_EXPORT */
+
 namespace google
 {
 namespace protobuf
