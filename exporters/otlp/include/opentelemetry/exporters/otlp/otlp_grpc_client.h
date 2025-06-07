@@ -11,7 +11,6 @@
 #include <string>
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
-#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/version.h"
 
 // clang-format off
@@ -21,6 +20,10 @@
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
+
+#ifdef ENABLE_ASYNC_EXPORT
+#  include "opentelemetry/sdk/common/exporter_utils.h"
+#endif /* ENABLE_ASYNC_EXPORT */
 
 namespace google
 {
@@ -75,9 +78,8 @@ namespace exporter
 namespace otlp
 {
 
-class OtlpGrpcClient;
-struct OtlpGrpcClientOptions;
-struct OtlpGrpcClientAsyncData;
+struct OtlpGrpcClientOptions;    // IWYU pragma: keep
+struct OtlpGrpcClientAsyncData;  // IWYU pragma: keep
 
 class OtlpGrpcClientReferenceGuard
 {
