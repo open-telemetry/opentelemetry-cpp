@@ -37,10 +37,10 @@ TEST_P(WritableMetricStorageTestFixture, LongGaugeLastValueAggregation)
   std::map<std::string, std::string> attributes_roomA = {{"Room.id", "Rack A"}};
   std::map<std::string, std::string> attributes_roomB = {{"Room.id", "Rack B"}};
 
-  std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
+  std::shared_ptr<DefaultAttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
-      instr_desc, AggregationType::kLastValue, default_attributes_processor.get(),
+      instr_desc, AggregationType::kLastValue, default_attributes_processor,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
@@ -121,10 +121,10 @@ TEST_P(WritableMetricStorageTestFixture, DoubleGaugeLastValueAggregation)
   std::map<std::string, std::string> attributes_roomA = {{"Room.id", "Rack A"}};
   std::map<std::string, std::string> attributes_roomB = {{"Room.id", "Rack B"}};
 
-  std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
+  std::shared_ptr<DefaultAttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
-      instr_desc, AggregationType::kLastValue, default_attributes_processor.get(),
+      instr_desc, AggregationType::kLastValue, default_attributes_processor,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif

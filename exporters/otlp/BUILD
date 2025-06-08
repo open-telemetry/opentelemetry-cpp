@@ -1,9 +1,10 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-package(default_visibility = ["//visibility:public"])
-
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "otlp_recordable",
@@ -54,6 +55,10 @@ cc_library(
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
+    defines = select({
+        ":enable_otlp_grpc_credential_preview": ["ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW"],
+        "//conditions:default": [],
+    }),
     strip_include_prefix = "include",
     tags = [
         "otlp",
@@ -68,6 +73,18 @@ cc_library(
         "@com_github_opentelemetry_proto//:metrics_service_grpc_cc",
         "@com_github_opentelemetry_proto//:trace_service_grpc_cc",
     ],
+)
+
+config_setting(
+    name = "enable_otlp_grpc_credential_preview",
+    flag_values = {
+        ":with_otlp_grpc_credential_preview": "true",
+    },
+)
+
+bool_flag(
+    name = "with_otlp_grpc_credential_preview",
+    build_setting_default = False,
 )
 
 cc_library(
@@ -482,6 +499,20 @@ cc_test(
         ":otlp_grpc_exporter",
         "//api",
         "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "otlp_grpc_target_test",
+    srcs = ["test/otlp_grpc_target_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_grpc",
+        "test",
+    ],
+    deps = [
+        ":otlp_grpc_client",
         "@com_google_googletest//:gtest_main",
     ],
 )

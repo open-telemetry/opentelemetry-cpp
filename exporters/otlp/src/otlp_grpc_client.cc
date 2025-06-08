@@ -309,6 +309,32 @@ OtlpGrpcClient::~OtlpGrpcClient()
 #endif
 }
 
+std::string OtlpGrpcClient::GetGrpcTarget(const std::string &endpoint)
+{
+  //
+  // Scheme is allowed in OTLP endpoint definition, but is not allowed for creating gRPC
+  // channel. Passing URI with scheme to grpc::CreateChannel could resolve the endpoint to some
+  // unexpected address.
+  //
+  ext::http::common::UrlParser url(endpoint);
+  if (!url.success_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] invalid endpoint: " << endpoint);
+    return "";
+  }
+
+  std::string grpc_target;
+  if (url.scheme_ == "unix")
+  {
+    grpc_target = "unix:" + url.path_;
+  }
+  else
+  {
+    grpc_target = url.host_ + ":" + std::to_string(static_cast<int>(url.port_));
+  }
+  return grpc_target;
+}
+
 std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientOptions &options)
 {
 
@@ -318,22 +344,16 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
 
     return nullptr;
   }
-  //
-  // Scheme is allowed in OTLP endpoint definition, but is not allowed for creating gRPC
-  // channel. Passing URI with scheme to grpc::CreateChannel could resolve the endpoint to some
-  // unexpected address.
-  //
 
-  ext::http::common::UrlParser url(options.endpoint);
-  if (!url.success_)
+  std::shared_ptr<grpc::Channel> channel;
+  std::string grpc_target = GetGrpcTarget(options.endpoint);
+
+  if (grpc_target.empty())
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] invalid endpoint: " << options.endpoint);
-
     return nullptr;
   }
 
-  std::shared_ptr<grpc::Channel> channel;
-  std::string grpc_target = url.host_ + ":" + std::to_string(static_cast<int>(url.port_));
   grpc::ChannelArguments grpc_arguments;
   grpc_arguments.SetUserAgentPrefix(options.user_agent);
 
@@ -412,6 +432,19 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
     channel =
         grpc::CreateCustomChannel(grpc_target, grpc::InsecureChannelCredentials(), grpc_arguments);
   }
+
+#ifdef ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
+  if (options.credentials)
+  {
+    if (options.use_ssl_credentials)
+    {
+      OTEL_INTERNAL_LOG_WARN(
+          "[OTLP GRPC Client] Both 'credentials' and 'use_ssl_credentials' options are set. "
+          "The former takes priority.");
+    }
+    channel = grpc::CreateCustomChannel(grpc_target, options.credentials, grpc_arguments);
+  }
+#endif  // ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
 
   return channel;
 }

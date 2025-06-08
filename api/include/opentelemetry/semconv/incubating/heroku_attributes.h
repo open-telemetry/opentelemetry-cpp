@@ -20,17 +20,17 @@ namespace heroku
 {
 
 /**
- * Unique identifier for the application
+  Unique identifier for the application
  */
 static constexpr const char *kHerokuAppId = "heroku.app.id";
 
 /**
- * Commit hash for the current release
+  Commit hash for the current release
  */
 static constexpr const char *kHerokuReleaseCommit = "heroku.release.commit";
 
 /**
- * Time and date the release was created
+  Time and date the release was created
  */
 static constexpr const char *kHerokuReleaseCreationTimestamp = "heroku.release.creation_timestamp";
 

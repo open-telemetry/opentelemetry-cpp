@@ -21,13 +21,13 @@ namespace otel
 {
 
 /**
- * The number of log records for which the export has finished, either successful or failed
- * <p>
- * For successful exports, @code error.type @endcode MUST NOT be set. For failed exports, @code
- * error.type @endcode MUST contain the failure cause. For exporters with partial success semantics
- * (e.g. OTLP with @code rejected_log_records @endcode), rejected log records MUST count as failed
- * and only non-rejected log records count as success. If no rejection reason is available, @code
- * rejected @endcode SHOULD be used as value for @code error.type @endcode. <p> counter
+  The number of log records for which the export has finished, either successful or failed
+  <p>
+  For successful exports, @code error.type @endcode MUST NOT be set. For failed exports, @code
+  error.type @endcode MUST contain the failure cause. For exporters with partial success semantics
+  (e.g. OTLP with @code rejected_log_records @endcode), rejected log records MUST count as failed
+  and only non-rejected log records count as success. If no rejection reason is available, @code
+  rejected @endcode SHOULD be used as value for @code error.type @endcode. <p> counter
  */
 static constexpr const char *kMetricOtelSdkExporterLogExported = "otel.sdk.exporter.log.exported";
 static constexpr const char *descrMetricOtelSdkExporterLogExported =
@@ -67,10 +67,10 @@ CreateAsyncDoubleMetricOtelSdkExporterLogExported(metrics::Meter *meter)
 }
 
 /**
- * The number of log records which were passed to the exporter, but that have not been exported yet
- * (neither successful, nor failed) <p> For successful exports, @code error.type @endcode MUST NOT
- * be set. For failed exports, @code error.type @endcode MUST contain the failure cause. <p>
- * updowncounter
+  The number of log records which were passed to the exporter, but that have not been exported yet
+  (neither successful, nor failed) <p> For successful exports, @code error.type @endcode MUST NOT be
+  set. For failed exports, @code error.type @endcode MUST contain the failure cause. <p>
+  updowncounter
  */
 static constexpr const char *kMetricOtelSdkExporterLogInflight = "otel.sdk.exporter.log.inflight";
 static constexpr const char *descrMetricOtelSdkExporterLogInflight =
@@ -111,13 +111,13 @@ CreateAsyncDoubleMetricOtelSdkExporterLogInflight(metrics::Meter *meter)
 }
 
 /**
- * The number of metric data points for which the export has finished, either successful or failed
- * <p>
- * For successful exports, @code error.type @endcode MUST NOT be set. For failed exports, @code
- * error.type @endcode MUST contain the failure cause. For exporters with partial success semantics
- * (e.g. OTLP with @code rejected_data_points @endcode), rejected data points MUST count as failed
- * and only non-rejected data points count as success. If no rejection reason is available, @code
- * rejected @endcode SHOULD be used as value for @code error.type @endcode. <p> counter
+  The number of metric data points for which the export has finished, either successful or failed
+  <p>
+  For successful exports, @code error.type @endcode MUST NOT be set. For failed exports, @code
+  error.type @endcode MUST contain the failure cause. For exporters with partial success semantics
+  (e.g. OTLP with @code rejected_data_points @endcode), rejected data points MUST count as failed
+  and only non-rejected data points count as success. If no rejection reason is available, @code
+  rejected @endcode SHOULD be used as value for @code error.type @endcode. <p> counter
  */
 static constexpr const char *kMetricOtelSdkExporterMetricDataPointExported =
     "otel.sdk.exporter.metric_data_point.exported";
@@ -159,10 +159,10 @@ CreateAsyncDoubleMetricOtelSdkExporterMetricDataPointExported(metrics::Meter *me
 }
 
 /**
- * The number of metric data points which were passed to the exporter, but that have not been
- * exported yet (neither successful, nor failed) <p> For successful exports, @code error.type
- * @endcode MUST NOT be set. For failed exports, @code error.type @endcode MUST contain the failure
- * cause. <p> updowncounter
+  The number of metric data points which were passed to the exporter, but that have not been
+  exported yet (neither successful, nor failed) <p> For successful exports, @code error.type
+  @endcode MUST NOT be set. For failed exports, @code error.type @endcode MUST contain the failure
+  cause. <p> updowncounter
  */
 static constexpr const char *kMetricOtelSdkExporterMetricDataPointInflight =
     "otel.sdk.exporter.metric_data_point.inflight";
@@ -206,15 +206,15 @@ CreateAsyncDoubleMetricOtelSdkExporterMetricDataPointInflight(metrics::Meter *me
 }
 
 /**
- * The duration of exporting a batch of telemetry records.
- * <p>
- * This metric defines successful operations using the full success definitions for <a
- * href="https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/docs/specification.md#full-success-1">http</a>
- * and <a
- * href="https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/docs/specification.md#full-success">grpc</a>.
- * Anything else is defined as an unsuccessful operation. For successful operations, @code
- * error.type @endcode MUST NOT be set. For unsuccessful export operations, @code error.type
- * @endcode MUST contain a relevant failure cause. <p> histogram
+  The duration of exporting a batch of telemetry records.
+  <p>
+  This metric defines successful operations using the full success definitions for <a
+  href="https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/docs/specification.md#full-success-1">http</a>
+  and <a
+  href="https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/docs/specification.md#full-success">grpc</a>.
+  Anything else is defined as an unsuccessful operation. For successful operations, @code error.type
+  @endcode MUST NOT be set. For unsuccessful export operations, @code error.type @endcode MUST
+  contain a relevant failure cause. <p> histogram
  */
 static constexpr const char *kMetricOtelSdkExporterOperationDuration =
     "otel.sdk.exporter.operation.duration";
@@ -239,13 +239,13 @@ CreateSyncDoubleMetricOtelSdkExporterOperationDuration(metrics::Meter *meter)
 }
 
 /**
- * The number of spans for which the export has finished, either successful or failed
- * <p>
- * For successful exports, @code error.type @endcode MUST NOT be set. For failed exports, @code
- * error.type @endcode MUST contain the failure cause. For exporters with partial success semantics
- * (e.g. OTLP with @code rejected_spans @endcode), rejected spans MUST count as failed and only
- * non-rejected spans count as success. If no rejection reason is available, @code rejected @endcode
- * SHOULD be used as value for @code error.type @endcode. <p> counter
+  The number of spans for which the export has finished, either successful or failed
+  <p>
+  For successful exports, @code error.type @endcode MUST NOT be set. For failed exports, @code
+  error.type @endcode MUST contain the failure cause. For exporters with partial success semantics
+  (e.g. OTLP with @code rejected_spans @endcode), rejected spans MUST count as failed and only
+  non-rejected spans count as success. If no rejection reason is available, @code rejected @endcode
+  SHOULD be used as value for @code error.type @endcode. <p> counter
  */
 static constexpr const char *kMetricOtelSdkExporterSpanExported = "otel.sdk.exporter.span.exported";
 static constexpr const char *descrMetricOtelSdkExporterSpanExported =
@@ -285,11 +285,11 @@ CreateAsyncDoubleMetricOtelSdkExporterSpanExported(metrics::Meter *meter)
 }
 
 /**
- * Deprecated, use @code otel.sdk.exporter.span.exported @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code otel.sdk.exporter.span.exported @endcode.", "reason": "renamed",
- * "renamed_to": "otel.sdk.exporter.span.exported"} <p> updowncounter
+  Deprecated, use @code otel.sdk.exporter.span.exported @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code otel.sdk.exporter.span.exported @endcode.", "reason": "renamed",
+  "renamed_to": "otel.sdk.exporter.span.exported"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricOtelSdkExporterSpanExportedCount =
     "otel.sdk.exporter.span.exported.count";
@@ -331,10 +331,10 @@ CreateAsyncDoubleMetricOtelSdkExporterSpanExportedCount(metrics::Meter *meter)
 }
 
 /**
- * The number of spans which were passed to the exporter, but that have not been exported yet
- * (neither successful, nor failed) <p> For successful exports, @code error.type @endcode MUST NOT
- * be set. For failed exports, @code error.type @endcode MUST contain the failure cause. <p>
- * updowncounter
+  The number of spans which were passed to the exporter, but that have not been exported yet
+  (neither successful, nor failed) <p> For successful exports, @code error.type @endcode MUST NOT be
+  set. For failed exports, @code error.type @endcode MUST contain the failure cause. <p>
+  updowncounter
  */
 static constexpr const char *kMetricOtelSdkExporterSpanInflight = "otel.sdk.exporter.span.inflight";
 static constexpr const char *descrMetricOtelSdkExporterSpanInflight =
@@ -375,11 +375,11 @@ CreateAsyncDoubleMetricOtelSdkExporterSpanInflight(metrics::Meter *meter)
 }
 
 /**
- * Deprecated, use @code otel.sdk.exporter.span.inflight @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code otel.sdk.exporter.span.inflight @endcode.", "reason": "renamed",
- * "renamed_to": "otel.sdk.exporter.span.inflight"} <p> updowncounter
+  Deprecated, use @code otel.sdk.exporter.span.inflight @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code otel.sdk.exporter.span.inflight @endcode.", "reason": "renamed",
+  "renamed_to": "otel.sdk.exporter.span.inflight"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricOtelSdkExporterSpanInflightCount =
     "otel.sdk.exporter.span.inflight.count";
@@ -421,9 +421,9 @@ CreateAsyncDoubleMetricOtelSdkExporterSpanInflightCount(metrics::Meter *meter)
 }
 
 /**
- * The number of logs submitted to enabled SDK Loggers
- * <p>
- * counter
+  The number of logs submitted to enabled SDK Loggers
+  <p>
+  counter
  */
 static constexpr const char *kMetricOtelSdkLogCreated = "otel.sdk.log.created";
 static constexpr const char *descrMetricOtelSdkLogCreated =
@@ -459,12 +459,12 @@ CreateAsyncDoubleMetricOtelSdkLogCreated(metrics::Meter *meter)
 }
 
 /**
- * The duration of the collect operation of the metric reader.
- * <p>
- * For successful collections, @code error.type @endcode MUST NOT be set. For failed collections,
- * @code error.type @endcode SHOULD contain the failure cause. It can happen that metrics collection
- * is successful for some MetricProducers, while others fail. In that case @code error.type @endcode
- * SHOULD be set to any of the failure causes. <p> histogram
+  The duration of the collect operation of the metric reader.
+  <p>
+  For successful collections, @code error.type @endcode MUST NOT be set. For failed collections,
+  @code error.type @endcode SHOULD contain the failure cause. It can happen that metrics collection
+  is successful for some MetricProducers, while others fail. In that case @code error.type @endcode
+  SHOULD be set to any of the failure causes. <p> histogram
  */
 static constexpr const char *kMetricOtelSdkMetricReaderCollectionDuration =
     "otel.sdk.metric_reader.collection.duration";
@@ -489,12 +489,12 @@ CreateSyncDoubleMetricOtelSdkMetricReaderCollectionDuration(metrics::Meter *mete
 }
 
 /**
- * The number of log records for which the processing has finished, either successful or failed
- * <p>
- * For successful processing, @code error.type @endcode MUST NOT be set. For failed processing,
- * @code error.type @endcode MUST contain the failure cause. For the SDK Simple and Batching Log
- * Record Processor a log record is considered to be processed already when it has been submitted to
- * the exporter, not when the corresponding export call has finished. <p> counter
+  The number of log records for which the processing has finished, either successful or failed
+  <p>
+  For successful processing, @code error.type @endcode MUST NOT be set. For failed processing, @code
+  error.type @endcode MUST contain the failure cause. For the SDK Simple and Batching Log Record
+  Processor a log record is considered to be processed already when it has been submitted to the
+  exporter, not when the corresponding export call has finished. <p> counter
  */
 static constexpr const char *kMetricOtelSdkProcessorLogProcessed =
     "otel.sdk.processor.log.processed";
@@ -535,9 +535,9 @@ CreateAsyncDoubleMetricOtelSdkProcessorLogProcessed(metrics::Meter *meter)
 }
 
 /**
- * The maximum number of log records the queue of a given instance of an SDK Log Record processor
- * can hold <p> Only applies to Log Record processors which use a queue, e.g. the SDK Batching Log
- * Record Processor. <p> updowncounter
+  The maximum number of log records the queue of a given instance of an SDK Log Record processor can
+  hold <p> Only applies to Log Record processors which use a queue, e.g. the SDK Batching Log Record
+  Processor. <p> updowncounter
  */
 static constexpr const char *kMetricOtelSdkProcessorLogQueueCapacity =
     "otel.sdk.processor.log.queue.capacity";
@@ -579,10 +579,10 @@ CreateAsyncDoubleMetricOtelSdkProcessorLogQueueCapacity(metrics::Meter *meter)
 }
 
 /**
- * The number of log records in the queue of a given instance of an SDK log processor
- * <p>
- * Only applies to log record processors which use a queue, e.g. the SDK Batching Log Record
- * Processor. <p> updowncounter
+  The number of log records in the queue of a given instance of an SDK log processor
+  <p>
+  Only applies to log record processors which use a queue, e.g. the SDK Batching Log Record
+  Processor. <p> updowncounter
  */
 static constexpr const char *kMetricOtelSdkProcessorLogQueueSize =
     "otel.sdk.processor.log.queue.size";
@@ -623,12 +623,12 @@ CreateAsyncDoubleMetricOtelSdkProcessorLogQueueSize(metrics::Meter *meter)
 }
 
 /**
- * The number of spans for which the processing has finished, either successful or failed
- * <p>
- * For successful processing, @code error.type @endcode MUST NOT be set. For failed processing,
- * @code error.type @endcode MUST contain the failure cause. For the SDK Simple and Batching Span
- * Processor a span is considered to be processed already when it has been submitted to the
- * exporter, not when the corresponding export call has finished. <p> counter
+  The number of spans for which the processing has finished, either successful or failed
+  <p>
+  For successful processing, @code error.type @endcode MUST NOT be set. For failed processing, @code
+  error.type @endcode MUST contain the failure cause. For the SDK Simple and Batching Span Processor
+  a span is considered to be processed already when it has been submitted to the exporter, not when
+  the corresponding export call has finished. <p> counter
  */
 static constexpr const char *kMetricOtelSdkProcessorSpanProcessed =
     "otel.sdk.processor.span.processed";
@@ -669,11 +669,11 @@ CreateAsyncDoubleMetricOtelSdkProcessorSpanProcessed(metrics::Meter *meter)
 }
 
 /**
- * Deprecated, use @code otel.sdk.processor.span.processed @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code otel.sdk.processor.span.processed @endcode.", "reason": "renamed",
- * "renamed_to": "otel.sdk.processor.span.processed"} <p> updowncounter
+  Deprecated, use @code otel.sdk.processor.span.processed @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code otel.sdk.processor.span.processed @endcode.", "reason": "renamed",
+  "renamed_to": "otel.sdk.processor.span.processed"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricOtelSdkProcessorSpanProcessedCount =
     "otel.sdk.processor.span.processed.count";
@@ -716,11 +716,11 @@ CreateAsyncDoubleMetricOtelSdkProcessorSpanProcessedCount(metrics::Meter *meter)
 }
 
 /**
- * The maximum number of spans the queue of a given instance of an SDK span processor can hold
- * <p>
- * Only applies to span processors which use a queue, e.g. the SDK Batching Span Processor.
- * <p>
- * updowncounter
+  The maximum number of spans the queue of a given instance of an SDK span processor can hold
+  <p>
+  Only applies to span processors which use a queue, e.g. the SDK Batching Span Processor.
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricOtelSdkProcessorSpanQueueCapacity =
     "otel.sdk.processor.span.queue.capacity";
@@ -761,11 +761,11 @@ CreateAsyncDoubleMetricOtelSdkProcessorSpanQueueCapacity(metrics::Meter *meter)
 }
 
 /**
- * The number of spans in the queue of a given instance of an SDK span processor
- * <p>
- * Only applies to span processors which use a queue, e.g. the SDK Batching Span Processor.
- * <p>
- * updowncounter
+  The number of spans in the queue of a given instance of an SDK span processor
+  <p>
+  Only applies to span processors which use a queue, e.g. the SDK Batching Span Processor.
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricOtelSdkProcessorSpanQueueSize =
     "otel.sdk.processor.span.queue.size";
@@ -806,12 +806,12 @@ CreateAsyncDoubleMetricOtelSdkProcessorSpanQueueSize(metrics::Meter *meter)
 }
 
 /**
- * The number of created spans for which the end operation was called
- * <p>
- * For spans with @code recording=true @endcode: Implementations MUST record both @code
- * otel.sdk.span.live @endcode and @code otel.sdk.span.ended @endcode. For spans with @code
- * recording=false @endcode: If implementations decide to record this metric, they MUST also record
- * @code otel.sdk.span.live @endcode. <p> counter
+  The number of created spans for which the end operation was called
+  <p>
+  For spans with @code recording=true @endcode: Implementations MUST record both @code
+  otel.sdk.span.live @endcode and @code otel.sdk.span.ended @endcode. For spans with @code
+  recording=false @endcode: If implementations decide to record this metric, they MUST also record
+  @code otel.sdk.span.live @endcode. <p> counter
  */
 static constexpr const char *kMetricOtelSdkSpanEnded = "otel.sdk.span.ended";
 static constexpr const char *descrMetricOtelSdkSpanEnded =
@@ -847,11 +847,11 @@ CreateAsyncDoubleMetricOtelSdkSpanEnded(metrics::Meter *meter)
 }
 
 /**
- * Deprecated, use @code otel.sdk.span.ended @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code otel.sdk.span.ended @endcode.", "reason": "renamed", "renamed_to":
- * "otel.sdk.span.ended"} <p> counter
+  Deprecated, use @code otel.sdk.span.ended @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code otel.sdk.span.ended @endcode.", "reason": "renamed", "renamed_to":
+  "otel.sdk.span.ended"} <p> counter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricOtelSdkSpanEndedCount =
     "otel.sdk.span.ended.count";
@@ -890,12 +890,12 @@ CreateAsyncDoubleMetricOtelSdkSpanEndedCount(metrics::Meter *meter)
 }
 
 /**
- * The number of created spans for which the end operation has not been called yet
- * <p>
- * For spans with @code recording=true @endcode: Implementations MUST record both @code
- * otel.sdk.span.live @endcode and @code otel.sdk.span.ended @endcode. For spans with @code
- * recording=false @endcode: If implementations decide to record this metric, they MUST also record
- * @code otel.sdk.span.ended @endcode. <p> updowncounter
+  The number of created spans for which the end operation has not been called yet
+  <p>
+  For spans with @code recording=true @endcode: Implementations MUST record both @code
+  otel.sdk.span.live @endcode and @code otel.sdk.span.ended @endcode. For spans with @code
+  recording=false @endcode: If implementations decide to record this metric, they MUST also record
+  @code otel.sdk.span.ended @endcode. <p> updowncounter
  */
 static constexpr const char *kMetricOtelSdkSpanLive = "otel.sdk.span.live";
 static constexpr const char *descrMetricOtelSdkSpanLive =
@@ -931,11 +931,11 @@ CreateAsyncDoubleMetricOtelSdkSpanLive(metrics::Meter *meter)
 }
 
 /**
- * Deprecated, use @code otel.sdk.span.live @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code otel.sdk.span.live @endcode.", "reason": "renamed", "renamed_to":
- * "otel.sdk.span.live"} <p> updowncounter
+  Deprecated, use @code otel.sdk.span.live @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code otel.sdk.span.live @endcode.", "reason": "renamed", "renamed_to":
+  "otel.sdk.span.live"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricOtelSdkSpanLiveCount =
     "otel.sdk.span.live.count";

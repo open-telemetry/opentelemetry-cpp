@@ -224,7 +224,10 @@ option(WITH_OTLP_RETRY_PREVIEW
        "Whether to enable experimental retry functionality" OFF)
 
 option(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
-       "Whether to enable mTLS support fro gRPC" OFF)
+       "Whether to enable mTLS support for gRPC" OFF)
+
+option(WITH_OTLP_GRPC_CREDENTIAL_PREVIEW
+       "Whether to enable gRPC credentials option in OTLP gRPC Exporter" OFF)
 
 option(WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK"
        OFF)
@@ -807,6 +810,9 @@ message(
 message(STATUS "WITH_REMOVE_METER_PREVIEW: ${WITH_REMOVE_METER_PREVIEW}")
 message(
   STATUS "WITH_OTLP_GRPC_SSL_MTLS_PREVIEW: ${WITH_OTLP_GRPC_SSL_MTLS_PREVIEW}")
+message(
+  STATUS
+    "WITH_OTLP_GRPC_CREDENTIAL_PREVIEW: ${WITH_OTLP_GRPC_CREDENTIAL_PREVIEW}")
 message(STATUS "WITH_OTLP_RETRY_PREVIEW: ${WITH_OTLP_RETRY_PREVIEW}")
 message(STATUS "---------------------------------------------")
 message(STATUS "third-party options")

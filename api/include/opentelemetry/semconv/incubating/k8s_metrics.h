@@ -21,13 +21,13 @@ namespace k8s
 {
 
 /**
- * The number of actively running jobs for a cronjob
- * <p>
- * This metric aligns with the @code active @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#cronjobstatus-v1-batch">K8s
- * CronJobStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#cronjob">@code k8s.cronjob @endcode</a> resource. <p> updowncounter
+  The number of actively running jobs for a cronjob
+  <p>
+  This metric aligns with the @code active @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#cronjobstatus-v1-batch">K8s
+  CronJobStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#cronjob">@code k8s.cronjob @endcode</a> resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sCronjobActiveJobs = "k8s.cronjob.active_jobs";
 static constexpr const char *descrMetricK8sCronjobActiveJobs =
@@ -63,13 +63,13 @@ CreateAsyncDoubleMetricK8sCronjobActiveJobs(metrics::Meter *meter)
 }
 
 /**
- * Number of nodes that are running at least 1 daemon pod and are supposed to run the daemon pod
- * <p>
- * This metric aligns with the @code currentNumberScheduled @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
- * DaemonSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#daemonset">@code k8s.daemonset @endcode</a> resource. <p> updowncounter
+  Number of nodes that are running at least 1 daemon pod and are supposed to run the daemon pod
+  <p>
+  This metric aligns with the @code currentNumberScheduled @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
+  DaemonSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#daemonset">@code k8s.daemonset @endcode</a> resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sDaemonsetCurrentScheduledNodes =
     "k8s.daemonset.current_scheduled_nodes";
@@ -110,11 +110,11 @@ CreateAsyncDoubleMetricK8sDaemonsetCurrentScheduledNodes(metrics::Meter *meter)
 }
 
 /**
- * Number of nodes that should be running the daemon pod (including nodes currently running the
- * daemon pod) <p> This metric aligns with the @code desiredNumberScheduled @endcode field of the <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
- * DaemonSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#daemonset">@code k8s.daemonset @endcode</a> resource. <p> updowncounter
+  Number of nodes that should be running the daemon pod (including nodes currently running the
+  daemon pod) <p> This metric aligns with the @code desiredNumberScheduled @endcode field of the <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
+  DaemonSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#daemonset">@code k8s.daemonset @endcode</a> resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sDaemonsetDesiredScheduledNodes =
     "k8s.daemonset.desired_scheduled_nodes";
@@ -156,13 +156,13 @@ CreateAsyncDoubleMetricK8sDaemonsetDesiredScheduledNodes(metrics::Meter *meter)
 }
 
 /**
- * Number of nodes that are running the daemon pod, but are not supposed to run the daemon pod
- * <p>
- * This metric aligns with the @code numberMisscheduled @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
- * DaemonSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#daemonset">@code k8s.daemonset @endcode</a> resource. <p> updowncounter
+  Number of nodes that are running the daemon pod, but are not supposed to run the daemon pod
+  <p>
+  This metric aligns with the @code numberMisscheduled @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
+  DaemonSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#daemonset">@code k8s.daemonset @endcode</a> resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sDaemonsetMisscheduledNodes =
     "k8s.daemonset.misscheduled_nodes";
@@ -203,11 +203,11 @@ CreateAsyncDoubleMetricK8sDaemonsetMisscheduledNodes(metrics::Meter *meter)
 }
 
 /**
- * Number of nodes that should be running the daemon pod and have one or more of the daemon pod
- * running and ready <p> This metric aligns with the @code numberReady @endcode field of the <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
- * DaemonSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#daemonset">@code k8s.daemonset @endcode</a> resource. <p> updowncounter
+  Number of nodes that should be running the daemon pod and have one or more of the daemon pod
+  running and ready <p> This metric aligns with the @code numberReady @endcode field of the <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
+  DaemonSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#daemonset">@code k8s.daemonset @endcode</a> resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sDaemonsetReadyNodes = "k8s.daemonset.ready_nodes";
 static constexpr const char *descrMetricK8sDaemonsetReadyNodes =
@@ -248,12 +248,11 @@ CreateAsyncDoubleMetricK8sDaemonsetReadyNodes(metrics::Meter *meter)
 }
 
 /**
- * Total number of available replica pods (ready for at least minReadySeconds) targeted by this
- * deployment <p> This metric aligns with the @code availableReplicas @endcode field of the <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentstatus-v1-apps">K8s
- * DeploymentStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#deployment">@code k8s.deployment @endcode</a> resource. <p>
- * updowncounter
+  Total number of available replica pods (ready for at least minReadySeconds) targeted by this
+  deployment <p> This metric aligns with the @code availableReplicas @endcode field of the <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentstatus-v1-apps">K8s
+  DeploymentStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#deployment">@code k8s.deployment @endcode</a> resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sDeploymentAvailablePods = "k8s.deployment.available_pods";
 static constexpr const char *descrMetricK8sDeploymentAvailablePods =
@@ -294,14 +293,13 @@ CreateAsyncDoubleMetricK8sDeploymentAvailablePods(metrics::Meter *meter)
 }
 
 /**
- * Number of desired replica pods in this deployment
- * <p>
- * This metric aligns with the @code replicas @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentspec-v1-apps">K8s
- * DeploymentSpec</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#deployment">@code k8s.deployment @endcode</a> resource. <p>
- * updowncounter
+  Number of desired replica pods in this deployment
+  <p>
+  This metric aligns with the @code replicas @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentspec-v1-apps">K8s
+  DeploymentSpec</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#deployment">@code k8s.deployment @endcode</a> resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sDeploymentDesiredPods = "k8s.deployment.desired_pods";
 static constexpr const char *descrMetricK8sDeploymentDesiredPods =
@@ -341,12 +339,12 @@ CreateAsyncDoubleMetricK8sDeploymentDesiredPods(metrics::Meter *meter)
 }
 
 /**
- * Current number of replica pods managed by this horizontal pod autoscaler, as last seen by the
- * autoscaler <p> This metric aligns with the @code currentReplicas @endcode field of the <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling">K8s
- * HorizontalPodAutoscalerStatus</a> <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#horizontalpodautoscaler">@code k8s.hpa @endcode</a> resource. <p>
- * updowncounter
+  Current number of replica pods managed by this horizontal pod autoscaler, as last seen by the
+  autoscaler <p> This metric aligns with the @code currentReplicas @endcode field of the <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling">K8s
+  HorizontalPodAutoscalerStatus</a> <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#horizontalpodautoscaler">@code k8s.hpa @endcode</a> resource. <p>
+  updowncounter
  */
 static constexpr const char *kMetricK8sHpaCurrentPods = "k8s.hpa.current_pods";
 static constexpr const char *descrMetricK8sHpaCurrentPods =
@@ -383,12 +381,12 @@ CreateAsyncDoubleMetricK8sHpaCurrentPods(metrics::Meter *meter)
 }
 
 /**
- * Desired number of replica pods managed by this horizontal pod autoscaler, as last calculated by
- * the autoscaler <p> This metric aligns with the @code desiredReplicas @endcode field of the <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling">K8s
- * HorizontalPodAutoscalerStatus</a> <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#horizontalpodautoscaler">@code k8s.hpa @endcode</a> resource. <p>
- * updowncounter
+  Desired number of replica pods managed by this horizontal pod autoscaler, as last calculated by
+  the autoscaler <p> This metric aligns with the @code desiredReplicas @endcode field of the <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling">K8s
+  HorizontalPodAutoscalerStatus</a> <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#horizontalpodautoscaler">@code k8s.hpa @endcode</a> resource. <p>
+  updowncounter
  */
 static constexpr const char *kMetricK8sHpaDesiredPods = "k8s.hpa.desired_pods";
 static constexpr const char *descrMetricK8sHpaDesiredPods =
@@ -425,14 +423,14 @@ CreateAsyncDoubleMetricK8sHpaDesiredPods(metrics::Meter *meter)
 }
 
 /**
- * The upper limit for the number of replica pods to which the autoscaler can scale up
- * <p>
- * This metric aligns with the @code maxReplicas @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling">K8s
- * HorizontalPodAutoscalerSpec</a> <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#horizontalpodautoscaler">@code k8s.hpa @endcode</a> resource. <p>
- * updowncounter
+  The upper limit for the number of replica pods to which the autoscaler can scale up
+  <p>
+  This metric aligns with the @code maxReplicas @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling">K8s
+  HorizontalPodAutoscalerSpec</a> <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#horizontalpodautoscaler">@code k8s.hpa @endcode</a> resource. <p>
+  updowncounter
  */
 static constexpr const char *kMetricK8sHpaMaxPods = "k8s.hpa.max_pods";
 static constexpr const char *descrMetricK8sHpaMaxPods =
@@ -468,14 +466,14 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * The lower limit for the number of replica pods to which the autoscaler can scale down
- * <p>
- * This metric aligns with the @code minReplicas @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling">K8s
- * HorizontalPodAutoscalerSpec</a> <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#horizontalpodautoscaler">@code k8s.hpa @endcode</a> resource. <p>
- * updowncounter
+  The lower limit for the number of replica pods to which the autoscaler can scale down
+  <p>
+  This metric aligns with the @code minReplicas @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling">K8s
+  HorizontalPodAutoscalerSpec</a> <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#horizontalpodautoscaler">@code k8s.hpa @endcode</a> resource. <p>
+  updowncounter
  */
 static constexpr const char *kMetricK8sHpaMinPods = "k8s.hpa.min_pods";
 static constexpr const char *descrMetricK8sHpaMinPods =
@@ -511,13 +509,13 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * The number of pending and actively running pods for a job
- * <p>
- * This metric aligns with the @code active @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch">K8s
- * JobStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#job">@code k8s.job @endcode</a> resource. <p> updowncounter
+  The number of pending and actively running pods for a job
+  <p>
+  This metric aligns with the @code active @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch">K8s
+  JobStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#job">@code k8s.job @endcode</a> resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sJobActivePods = "k8s.job.active_pods";
 static constexpr const char *descrMetricK8sJobActivePods =
@@ -553,13 +551,13 @@ CreateAsyncDoubleMetricK8sJobActivePods(metrics::Meter *meter)
 }
 
 /**
- * The desired number of successfully finished pods the job should be run with
- * <p>
- * This metric aligns with the @code completions @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch">K8s
- * JobSpec</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#job">@code k8s.job @endcode</a> resource. <p> updowncounter
+  The desired number of successfully finished pods the job should be run with
+  <p>
+  This metric aligns with the @code completions @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch">K8s
+  JobSpec</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#job">@code k8s.job @endcode</a> resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sJobDesiredSuccessfulPods = "k8s.job.desired_successful_pods";
 static constexpr const char *descrMetricK8sJobDesiredSuccessfulPods =
@@ -599,13 +597,13 @@ CreateAsyncDoubleMetricK8sJobDesiredSuccessfulPods(metrics::Meter *meter)
 }
 
 /**
- * The number of pods which reached phase Failed for a job
- * <p>
- * This metric aligns with the @code failed @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch">K8s
- * JobStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#job">@code k8s.job @endcode</a> resource. <p> updowncounter
+  The number of pods which reached phase Failed for a job
+  <p>
+  This metric aligns with the @code failed @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch">K8s
+  JobStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#job">@code k8s.job @endcode</a> resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sJobFailedPods = "k8s.job.failed_pods";
 static constexpr const char *descrMetricK8sJobFailedPods =
@@ -641,13 +639,13 @@ CreateAsyncDoubleMetricK8sJobFailedPods(metrics::Meter *meter)
 }
 
 /**
- * The max desired number of pods the job should run at any given time
- * <p>
- * This metric aligns with the @code parallelism @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch">K8s
- * JobSpec</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#job">@code k8s.job @endcode</a> resource. <p> updowncounter
+  The max desired number of pods the job should run at any given time
+  <p>
+  This metric aligns with the @code parallelism @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch">K8s
+  JobSpec</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#job">@code k8s.job @endcode</a> resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sJobMaxParallelPods = "k8s.job.max_parallel_pods";
 static constexpr const char *descrMetricK8sJobMaxParallelPods =
@@ -687,13 +685,13 @@ CreateAsyncDoubleMetricK8sJobMaxParallelPods(metrics::Meter *meter)
 }
 
 /**
- * The number of pods which reached phase Succeeded for a job
- * <p>
- * This metric aligns with the @code succeeded @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch">K8s
- * JobStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#job">@code k8s.job @endcode</a> resource. <p> updowncounter
+  The number of pods which reached phase Succeeded for a job
+  <p>
+  This metric aligns with the @code succeeded @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch">K8s
+  JobStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#job">@code k8s.job @endcode</a> resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sJobSuccessfulPods = "k8s.job.successful_pods";
 static constexpr const char *descrMetricK8sJobSuccessfulPods =
@@ -729,12 +727,12 @@ CreateAsyncDoubleMetricK8sJobSuccessfulPods(metrics::Meter *meter)
 }
 
 /**
- * Describes number of K8s namespaces that are currently in a given phase.
- * <p>
- * This metric SHOULD, at a minimum, be reported against a
- * <a href="../resource/k8s.md#namespace">@code k8s.namespace @endcode</a> resource.
- * <p>
- * updowncounter
+  Describes number of K8s namespaces that are currently in a given phase.
+  <p>
+  This metric SHOULD, at a minimum, be reported against a
+  <a href="../resource/k8s.md#namespace">@code k8s.namespace @endcode</a> resource.
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricK8sNamespacePhase = "k8s.namespace.phase";
 static constexpr const char *descrMetricK8sNamespacePhase =
@@ -770,11 +768,11 @@ CreateAsyncDoubleMetricK8sNamespacePhase(metrics::Meter *meter)
 }
 
 /**
- * Total CPU time consumed
- * <p>
- * Total CPU time consumed by the specific Node on all available CPU cores
- * <p>
- * counter
+  Total CPU time consumed
+  <p>
+  Total CPU time consumed by the specific Node on all available CPU cores
+  <p>
+  counter
  */
 static constexpr const char *kMetricK8sNodeCpuTime     = "k8s.node.cpu.time";
 static constexpr const char *descrMetricK8sNodeCpuTime = "Total CPU time consumed";
@@ -809,11 +807,11 @@ CreateAsyncDoubleMetricK8sNodeCpuTime(metrics::Meter *meter)
 }
 
 /**
- * Node's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs
- * <p>
- * CPU usage of the specific Node on all available CPU cores, averaged over the sample window
- * <p>
- * gauge
+  Node's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs
+  <p>
+  CPU usage of the specific Node on all available CPU cores, averaged over the sample window
+  <p>
+  gauge
  */
 static constexpr const char *kMetricK8sNodeCpuUsage = "k8s.node.cpu.usage";
 static constexpr const char *descrMetricK8sNodeCpuUsage =
@@ -852,11 +850,11 @@ CreateAsyncDoubleMetricK8sNodeCpuUsage(metrics::Meter *meter)
 }
 
 /**
- * Memory usage of the Node
- * <p>
- * Total memory usage of the Node
- * <p>
- * gauge
+  Memory usage of the Node
+  <p>
+  Total memory usage of the Node
+  <p>
+  gauge
  */
 static constexpr const char *kMetricK8sNodeMemoryUsage     = "k8s.node.memory.usage";
 static constexpr const char *descrMetricK8sNodeMemoryUsage = "Memory usage of the Node";
@@ -894,9 +892,9 @@ CreateAsyncDoubleMetricK8sNodeMemoryUsage(metrics::Meter *meter)
 }
 
 /**
- * Node network errors
- * <p>
- * counter
+  Node network errors
+  <p>
+  counter
  */
 static constexpr const char *kMetricK8sNodeNetworkErrors     = "k8s.node.network.errors";
 static constexpr const char *descrMetricK8sNodeNetworkErrors = "Node network errors";
@@ -931,9 +929,9 @@ CreateAsyncDoubleMetricK8sNodeNetworkErrors(metrics::Meter *meter)
 }
 
 /**
- * Network bytes for the Node
- * <p>
- * counter
+  Network bytes for the Node
+  <p>
+  counter
  */
 static constexpr const char *kMetricK8sNodeNetworkIo     = "k8s.node.network.io";
 static constexpr const char *descrMetricK8sNodeNetworkIo = "Network bytes for the Node";
@@ -968,11 +966,11 @@ CreateAsyncDoubleMetricK8sNodeNetworkIo(metrics::Meter *meter)
 }
 
 /**
- * The time the Node has been running
- * <p>
- * Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
- * as a floating point number with the highest precision available. The actual accuracy would depend
- * on the instrumentation and operating system. <p> gauge
+  The time the Node has been running
+  <p>
+  Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
+  as a floating point number with the highest precision available. The actual accuracy would depend
+  on the instrumentation and operating system. <p> gauge
  */
 static constexpr const char *kMetricK8sNodeUptime     = "k8s.node.uptime";
 static constexpr const char *descrMetricK8sNodeUptime = "The time the Node has been running";
@@ -1010,11 +1008,11 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * Total CPU time consumed
- * <p>
- * Total CPU time consumed by the specific Pod on all available CPU cores
- * <p>
- * counter
+  Total CPU time consumed
+  <p>
+  Total CPU time consumed by the specific Pod on all available CPU cores
+  <p>
+  counter
  */
 static constexpr const char *kMetricK8sPodCpuTime     = "k8s.pod.cpu.time";
 static constexpr const char *descrMetricK8sPodCpuTime = "Total CPU time consumed";
@@ -1049,11 +1047,11 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * Pod's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs
- * <p>
- * CPU usage of the specific Pod on all available CPU cores, averaged over the sample window
- * <p>
- * gauge
+  Pod's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs
+  <p>
+  CPU usage of the specific Pod on all available CPU cores, averaged over the sample window
+  <p>
+  gauge
  */
 static constexpr const char *kMetricK8sPodCpuUsage = "k8s.pod.cpu.usage";
 static constexpr const char *descrMetricK8sPodCpuUsage =
@@ -1092,11 +1090,11 @@ CreateAsyncDoubleMetricK8sPodCpuUsage(metrics::Meter *meter)
 }
 
 /**
- * Memory usage of the Pod
- * <p>
- * Total memory usage of the Pod
- * <p>
- * gauge
+  Memory usage of the Pod
+  <p>
+  Total memory usage of the Pod
+  <p>
+  gauge
  */
 static constexpr const char *kMetricK8sPodMemoryUsage     = "k8s.pod.memory.usage";
 static constexpr const char *descrMetricK8sPodMemoryUsage = "Memory usage of the Pod";
@@ -1134,9 +1132,9 @@ CreateAsyncDoubleMetricK8sPodMemoryUsage(metrics::Meter *meter)
 }
 
 /**
- * Pod network errors
- * <p>
- * counter
+  Pod network errors
+  <p>
+  counter
  */
 static constexpr const char *kMetricK8sPodNetworkErrors     = "k8s.pod.network.errors";
 static constexpr const char *descrMetricK8sPodNetworkErrors = "Pod network errors";
@@ -1171,9 +1169,9 @@ CreateAsyncDoubleMetricK8sPodNetworkErrors(metrics::Meter *meter)
 }
 
 /**
- * Network bytes for the Pod
- * <p>
- * counter
+  Network bytes for the Pod
+  <p>
+  counter
  */
 static constexpr const char *kMetricK8sPodNetworkIo     = "k8s.pod.network.io";
 static constexpr const char *descrMetricK8sPodNetworkIo = "Network bytes for the Pod";
@@ -1208,11 +1206,11 @@ CreateAsyncDoubleMetricK8sPodNetworkIo(metrics::Meter *meter)
 }
 
 /**
- * The time the Pod has been running
- * <p>
- * Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
- * as a floating point number with the highest precision available. The actual accuracy would depend
- * on the instrumentation and operating system. <p> gauge
+  The time the Pod has been running
+  <p>
+  Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
+  as a floating point number with the highest precision available. The actual accuracy would depend
+  on the instrumentation and operating system. <p> gauge
  */
 static constexpr const char *kMetricK8sPodUptime     = "k8s.pod.uptime";
 static constexpr const char *descrMetricK8sPodUptime = "The time the Pod has been running";
@@ -1250,12 +1248,11 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * Total number of available replica pods (ready for at least minReadySeconds) targeted by this
- * replicaset <p> This metric aligns with the @code availableReplicas @endcode field of the <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetstatus-v1-apps">K8s
- * ReplicaSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#replicaset">@code k8s.replicaset @endcode</a> resource. <p>
- * updowncounter
+  Total number of available replica pods (ready for at least minReadySeconds) targeted by this
+  replicaset <p> This metric aligns with the @code availableReplicas @endcode field of the <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetstatus-v1-apps">K8s
+  ReplicaSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#replicaset">@code k8s.replicaset @endcode</a> resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sReplicasetAvailablePods = "k8s.replicaset.available_pods";
 static constexpr const char *descrMetricK8sReplicasetAvailablePods =
@@ -1296,14 +1293,13 @@ CreateAsyncDoubleMetricK8sReplicasetAvailablePods(metrics::Meter *meter)
 }
 
 /**
- * Number of desired replica pods in this replicaset
- * <p>
- * This metric aligns with the @code replicas @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetspec-v1-apps">K8s
- * ReplicaSetSpec</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#replicaset">@code k8s.replicaset @endcode</a> resource. <p>
- * updowncounter
+  Number of desired replica pods in this replicaset
+  <p>
+  This metric aligns with the @code replicas @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetspec-v1-apps">K8s
+  ReplicaSetSpec</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#replicaset">@code k8s.replicaset @endcode</a> resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sReplicasetDesiredPods = "k8s.replicaset.desired_pods";
 static constexpr const char *descrMetricK8sReplicasetDesiredPods =
@@ -1343,11 +1339,11 @@ CreateAsyncDoubleMetricK8sReplicasetDesiredPods(metrics::Meter *meter)
 }
 
 /**
- * Deprecated, use @code k8s.replicationcontroller.available_pods @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code k8s.replicationcontroller.available_pods @endcode.", "reason":
- * "renamed", "renamed_to": "k8s.replicationcontroller.available_pods"} <p> updowncounter
+  Deprecated, use @code k8s.replicationcontroller.available_pods @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code k8s.replicationcontroller.available_pods @endcode.", "reason":
+  "renamed", "renamed_to": "k8s.replicationcontroller.available_pods"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sReplicationControllerAvailablePods =
     "k8s.replication_controller.available_pods";
@@ -1391,11 +1387,11 @@ CreateAsyncDoubleMetricK8sReplicationControllerAvailablePods(metrics::Meter *met
 }
 
 /**
- * Deprecated, use @code k8s.replicationcontroller.desired_pods @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code k8s.replicationcontroller.desired_pods @endcode.", "reason":
- * "renamed", "renamed_to": "k8s.replicationcontroller.desired_pods"} <p> updowncounter
+  Deprecated, use @code k8s.replicationcontroller.desired_pods @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code k8s.replicationcontroller.desired_pods @endcode.", "reason":
+  "renamed", "renamed_to": "k8s.replicationcontroller.desired_pods"} <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sReplicationControllerDesiredPods =
     "k8s.replication_controller.desired_pods";
@@ -1438,13 +1434,13 @@ CreateAsyncDoubleMetricK8sReplicationControllerDesiredPods(metrics::Meter *meter
 }
 
 /**
- * Total number of available replica pods (ready for at least minReadySeconds) targeted by this
- * replication controller <p> This metric aligns with the @code availableReplicas @endcode field of
- * the <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerstatus-v1-core">K8s
- * ReplicationControllerStatus</a> <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#replicationcontroller">@code k8s.replicationcontroller @endcode</a>
- * resource. <p> updowncounter
+  Total number of available replica pods (ready for at least minReadySeconds) targeted by this
+  replication controller <p> This metric aligns with the @code availableReplicas @endcode field of
+  the <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerstatus-v1-core">K8s
+  ReplicationControllerStatus</a> <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#replicationcontroller">@code k8s.replicationcontroller @endcode</a>
+  resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sReplicationcontrollerAvailablePods =
     "k8s.replicationcontroller.available_pods";
@@ -1487,14 +1483,14 @@ CreateAsyncDoubleMetricK8sReplicationcontrollerAvailablePods(metrics::Meter *met
 }
 
 /**
- * Number of desired replica pods in this replication controller
- * <p>
- * This metric aligns with the @code replicas @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerspec-v1-core">K8s
- * ReplicationControllerSpec</a> <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#replicationcontroller">@code k8s.replicationcontroller @endcode</a>
- * resource. <p> updowncounter
+  Number of desired replica pods in this replication controller
+  <p>
+  This metric aligns with the @code replicas @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerspec-v1-core">K8s
+  ReplicationControllerSpec</a> <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#replicationcontroller">@code k8s.replicationcontroller @endcode</a>
+  resource. <p> updowncounter
  */
 static constexpr const char *kMetricK8sReplicationcontrollerDesiredPods =
     "k8s.replicationcontroller.desired_pods";
@@ -1535,13 +1531,13 @@ CreateAsyncDoubleMetricK8sReplicationcontrollerDesiredPods(metrics::Meter *meter
 }
 
 /**
- * The number of replica pods created by the statefulset controller from the statefulset version
- * indicated by currentRevision <p> This metric aligns with the @code currentReplicas @endcode field
- * of the <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps">K8s
- * StatefulSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#statefulset">@code k8s.statefulset @endcode</a> resource. <p>
- * updowncounter
+  The number of replica pods created by the statefulset controller from the statefulset version
+  indicated by currentRevision <p> This metric aligns with the @code currentReplicas @endcode field
+  of the <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps">K8s
+  StatefulSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#statefulset">@code k8s.statefulset @endcode</a> resource. <p>
+  updowncounter
  */
 static constexpr const char *kMetricK8sStatefulsetCurrentPods = "k8s.statefulset.current_pods";
 static constexpr const char *descrMetricK8sStatefulsetCurrentPods =
@@ -1582,14 +1578,14 @@ CreateAsyncDoubleMetricK8sStatefulsetCurrentPods(metrics::Meter *meter)
 }
 
 /**
- * Number of desired replica pods in this statefulset
- * <p>
- * This metric aligns with the @code replicas @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetspec-v1-apps">K8s
- * StatefulSetSpec</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#statefulset">@code k8s.statefulset @endcode</a> resource. <p>
- * updowncounter
+  Number of desired replica pods in this statefulset
+  <p>
+  This metric aligns with the @code replicas @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetspec-v1-apps">K8s
+  StatefulSetSpec</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#statefulset">@code k8s.statefulset @endcode</a> resource. <p>
+  updowncounter
  */
 static constexpr const char *kMetricK8sStatefulsetDesiredPods = "k8s.statefulset.desired_pods";
 static constexpr const char *descrMetricK8sStatefulsetDesiredPods =
@@ -1629,14 +1625,14 @@ CreateAsyncDoubleMetricK8sStatefulsetDesiredPods(metrics::Meter *meter)
 }
 
 /**
- * The number of replica pods created for this statefulset with a Ready Condition
- * <p>
- * This metric aligns with the @code readyReplicas @endcode field of the
- * <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps">K8s
- * StatefulSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#statefulset">@code k8s.statefulset @endcode</a> resource. <p>
- * updowncounter
+  The number of replica pods created for this statefulset with a Ready Condition
+  <p>
+  This metric aligns with the @code readyReplicas @endcode field of the
+  <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps">K8s
+  StatefulSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#statefulset">@code k8s.statefulset @endcode</a> resource. <p>
+  updowncounter
  */
 static constexpr const char *kMetricK8sStatefulsetReadyPods = "k8s.statefulset.ready_pods";
 static constexpr const char *descrMetricK8sStatefulsetReadyPods =
@@ -1676,13 +1672,13 @@ CreateAsyncDoubleMetricK8sStatefulsetReadyPods(metrics::Meter *meter)
 }
 
 /**
- * Number of replica pods created by the statefulset controller from the statefulset version
- * indicated by updateRevision <p> This metric aligns with the @code updatedReplicas @endcode field
- * of the <a
- * href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps">K8s
- * StatefulSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
- * href="../resource/k8s.md#statefulset">@code k8s.statefulset @endcode</a> resource. <p>
- * updowncounter
+  Number of replica pods created by the statefulset controller from the statefulset version
+  indicated by updateRevision <p> This metric aligns with the @code updatedReplicas @endcode field
+  of the <a
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps">K8s
+  StatefulSetStatus</a>. <p> This metric SHOULD, at a minimum, be reported against a <a
+  href="../resource/k8s.md#statefulset">@code k8s.statefulset @endcode</a> resource. <p>
+  updowncounter
  */
 static constexpr const char *kMetricK8sStatefulsetUpdatedPods = "k8s.statefulset.updated_pods";
 static constexpr const char *descrMetricK8sStatefulsetUpdatedPods =

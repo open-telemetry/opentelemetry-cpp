@@ -20,39 +20,39 @@ namespace message
 {
 
 /**
- * Deprecated, use @code rpc.message.compressed_size @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code rpc.message.compressed_size @endcode.", "reason": "renamed",
- * "renamed_to": "rpc.message.compressed_size"}
+  Deprecated, use @code rpc.message.compressed_size @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rpc.message.compressed_size @endcode.", "reason": "renamed",
+  "renamed_to": "rpc.message.compressed_size"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessageCompressedSize =
     "message.compressed_size";
 
 /**
- * Deprecated, use @code rpc.message.id @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code rpc.message.id @endcode.", "reason": "renamed", "renamed_to":
- * "rpc.message.id"}
+  Deprecated, use @code rpc.message.id @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rpc.message.id @endcode.", "reason": "renamed", "renamed_to":
+  "rpc.message.id"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessageId = "message.id";
 
 /**
- * Deprecated, use @code rpc.message.type @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code rpc.message.type @endcode.", "reason": "renamed", "renamed_to":
- * "rpc.message.type"}
+  Deprecated, use @code rpc.message.type @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rpc.message.type @endcode.", "reason": "renamed", "renamed_to":
+  "rpc.message.type"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessageType = "message.type";
 
 /**
- * Deprecated, use @code rpc.message.uncompressed_size @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code rpc.message.uncompressed_size @endcode.", "reason": "renamed",
- * "renamed_to": "rpc.message.uncompressed_size"}
+  Deprecated, use @code rpc.message.uncompressed_size @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code rpc.message.uncompressed_size @endcode.", "reason": "renamed",
+  "renamed_to": "rpc.message.uncompressed_size"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMessageUncompressedSize =
     "message.uncompressed_size";
@@ -60,12 +60,12 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kMessageUncompressedSize =
 namespace MessageTypeValues
 {
 /**
- * none
+  none
  */
 static constexpr const char *kSent = "SENT";
 
 /**
- * none
+  none
  */
 static constexpr const char *kReceived = "RECEIVED";
 

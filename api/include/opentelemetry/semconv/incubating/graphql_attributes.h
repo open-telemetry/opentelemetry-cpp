@@ -20,36 +20,36 @@ namespace graphql
 {
 
 /**
- * The GraphQL document being executed.
- * <p>
- * The value may be sanitized to exclude sensitive information.
+  The GraphQL document being executed.
+  <p>
+  The value may be sanitized to exclude sensitive information.
  */
 static constexpr const char *kGraphqlDocument = "graphql.document";
 
 /**
- * The name of the operation being executed.
+  The name of the operation being executed.
  */
 static constexpr const char *kGraphqlOperationName = "graphql.operation.name";
 
 /**
- * The type of the operation being executed.
+  The type of the operation being executed.
  */
 static constexpr const char *kGraphqlOperationType = "graphql.operation.type";
 
 namespace GraphqlOperationTypeValues
 {
 /**
- * GraphQL query
+  GraphQL query
  */
 static constexpr const char *kQuery = "query";
 
 /**
- * GraphQL mutation
+  GraphQL mutation
  */
 static constexpr const char *kMutation = "mutation";
 
 /**
- * GraphQL subscription
+  GraphQL subscription
  */
 static constexpr const char *kSubscription = "subscription";
 
