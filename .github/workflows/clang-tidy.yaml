@@ -97,4 +97,13 @@ jobs:
         run: |
           COUNT=$(grep -c "warning:" clang-tidy.log)
           echo "clang-tidy reported ${COUNT} warning(s)"
+          readonly WARNING_LIMIT=216
+          # FAIL the build if COUNT > WARNING_LIMIT
+          if [ $COUNT -gt $WARNING_LIMIT ] ; then
+            echo "clang-tidy reported ${COUNT} warning(s) exceeding the existing warning limit of ${WARNING_LIMIT}"
+            exit 1
+          # WARN in annotations if COUNT > 0
+          elif [ $COUNT -gt 0 ] ; then
+            echo "clang-tidy reported ${COUNT} warning(s)"
+          fi
 
