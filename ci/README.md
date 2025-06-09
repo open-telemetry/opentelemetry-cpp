@@ -24,7 +24,6 @@ by invoking the script
   checker.
 * `benchmark`: run all benchmarks.
 * `format`: use `tools/format.sh` to enforce text formatting.
-* `third_party.tags`: store third_party release tags.
 * `code.coverage`: build cmake targets with CXX option `--coverage` and run
   tests.
 

@@ -220,3 +220,13 @@ function(project_build_tools_patch_default_imported_config)
     endif()
   endforeach()
 endfunction()
+
+#-------------------------------------------------------------------------------
+# Set the target version for a given target
+function(set_target_version target_name)
+  if(OTELCPP_VERSIONED_LIBS)
+    set_target_properties(
+      ${target_name} PROPERTIES VERSION ${OPENTELEMETRY_VERSION}
+                                SOVERSION ${OPENTELEMETRY_ABI_VERSION_NO})
+  endif()
+endfunction()
