@@ -37,14 +37,13 @@ jobs:
       - name: Run DLL Tests
         run: ./ci/do_ci.ps1 cmake.dll.install.test
 
-  windows_2019_vcpkg_submodule_min_cmake:
-    name: Windows 2019 vcpkg submodule versions minimum cmake cxx14 (static libs)
-    runs-on: windows-2019
+  windows_2025_vcpkg_submodule:
+    name: Windows 2025 vcpkg submodule versions cxx20 (static libs)
+    runs-on: windows-2025
     env:
-      # cmake 3.15 is the minimum for windows builds (See https://github.com/open-telemetry/opentelemetry-cpp/pull/3349#discussion_r2030319430)
-      CMAKE_VERSION: '3.15.0'
-      # cxx14 is the default for windows-2019
-      CXX_STANDARD: '14'
+      # Set to the latest version of cmake 3.x
+      CMAKE_VERSION: '3.31.6'
+      CXX_STANDARD: '20'
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
