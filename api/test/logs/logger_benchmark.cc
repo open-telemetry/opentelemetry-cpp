@@ -3,7 +3,6 @@
 
 #include <benchmark/benchmark.h>
 #include <stdint.h>
-#include <algorithm>
 #include <condition_variable>
 #include <cstddef>
 #include <functional>

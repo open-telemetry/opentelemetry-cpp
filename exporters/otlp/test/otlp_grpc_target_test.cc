@@ -1,10 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <grpcpp/grpcpp.h>
 #include <gtest/gtest.h>
+#include <string>
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

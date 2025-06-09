@@ -4,7 +4,6 @@
  */
 
 #include <gtest/gtest.h>
-#include <algorithm>
 #include <string>
 #include <system_error>
 #include <unordered_map>

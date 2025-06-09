@@ -87,7 +87,7 @@ jobs:
           readonly WARNING_COUNT=`grep -c "include-what-you-use reported diagnostics:" iwyu.log`
           echo "include-what-you-use reported ${WARNING_COUNT} warning(s)"
           # Acceptable limit, to decrease over time down to 0
-          readonly WARNING_LIMIT=122
+          readonly WARNING_LIMIT=0
           # FAIL the build if WARNING_COUNT > WARNING_LIMIT
           if [ $WARNING_COUNT -gt $WARNING_LIMIT ] ; then
             exit 1

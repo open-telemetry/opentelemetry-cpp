@@ -10,7 +10,6 @@
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 #include <string.h>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>

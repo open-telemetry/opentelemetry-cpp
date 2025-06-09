@@ -3,28 +3,74 @@
 
 #pragma once
 
-#include <grpcpp/completion_queue.h>
 #include <grpcpp/grpcpp.h>
-
+#include <grpcpp/support/status.h>
 #include <atomic>
+#include <chrono>
 #include <memory>
-
-#include "opentelemetry/sdk/common/exporter_utils.h"
+#include <string>
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
+#include "opentelemetry/version.h"
 
 // clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-// clang-format on
-
-#include "google/protobuf/arena.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 #include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
 #include "opentelemetry/proto/collector/metrics/v1/metrics_service.grpc.pb.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
-
-// clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
+
+#ifdef ENABLE_ASYNC_EXPORT
+#  include "opentelemetry/sdk/common/exporter_utils.h"
+#endif /* ENABLE_ASYNC_EXPORT */
+
+namespace google
+{
+namespace protobuf
+{
+class Arena;
+}
+}  // namespace google
+
+namespace opentelemetry
+{
+namespace proto
+{
+namespace collector
+{
+
+namespace logs
+{
+namespace v1
+{
+class ExportLogsServiceRequest;
+class ExportLogsServiceResponse;
+}  // namespace v1
+}  // namespace logs
+
+namespace metrics
+{
+namespace v1
+{
+class ExportMetricsServiceRequest;
+class ExportMetricsServiceResponse;
+}  // namespace v1
+}  // namespace metrics
+
+namespace trace
+{
+namespace v1
+{
+class ExportTraceServiceRequest;
+class ExportTraceServiceResponse;
+}  // namespace v1
+
+}  // namespace trace
+
+}  // namespace collector
+}  // namespace proto
+}  // namespace opentelemetry
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -32,9 +78,8 @@ namespace exporter
 namespace otlp
 {
 
-class OtlpGrpcClient;
-struct OtlpGrpcClientOptions;
-struct OtlpGrpcClientAsyncData;
+struct OtlpGrpcClientOptions;    // IWYU pragma: keep
+struct OtlpGrpcClientAsyncData;  // IWYU pragma: keep
 
 class OtlpGrpcClientReferenceGuard
 {
