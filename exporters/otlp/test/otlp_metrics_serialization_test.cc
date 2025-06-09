@@ -3,7 +3,6 @@
 
 #include <gtest/gtest.h>
 #include <stddef.h>
-#include <algorithm>
 #include <chrono>
 #include <string>
 #include <utility>
@@ -11,6 +10,7 @@
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"

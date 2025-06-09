@@ -3,7 +3,6 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
-#include <algorithm>
 #include <array>
 #include <chrono>
 #include <functional>
