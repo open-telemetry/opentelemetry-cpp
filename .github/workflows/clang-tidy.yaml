@@ -24,8 +24,6 @@ jobs:
 
       - name: Setup Environment
         env:
-          PROTOBUF_VERSION: '23.3'
-          ABSEIL_CPP_VERSION: '20230125.3'
           CXX_STANDARD: '14'
         run: |
           sudo apt update -y
