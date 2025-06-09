@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <limits.h>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
