@@ -260,84 +260,94 @@ if(MSVC)
   endif()
 endif()
 
-if(NOT WITH_API_ONLY)
-  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/threads.cmake")
-endif()
+#
+# API ONLY Dependencies
+#
 
 if(WITH_GSL)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/ms-gsl.cmake")
 endif()
 
 #
-# Do we need HTTP CLIENT CURL ?
+# SDK and Exporter Dependencies
 #
 
-if(WITH_OTLP_HTTP
-   OR WITH_ELASTICSEARCH
-   OR WITH_ZIPKIN
-   OR BUILD_W3CTRACECONTEXT_TEST
-   OR WITH_EXAMPLES_HTTP)
-  set(WITH_HTTP_CLIENT_CURL ON)
-else()
-  set(WITH_HTTP_CLIENT_CURL OFF)
-endif()
+if(NOT WITH_API_ONLY)
 
-#
-# Do we need ZLIB ?
-#
-
-if((NOT WITH_API_ONLY)
-   AND WITH_HTTP_CLIENT_CURL
-   AND WITH_OTLP_HTTP_COMPRESSION)
-  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/zlib.cmake")
-endif()
-
-#
-# Do we need CURL ?
-#
-
-if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
-  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/curl.cmake")
-endif()
-
-if(WITH_OTLP_GRPC
-   OR WITH_OTLP_HTTP
-   OR WITH_OTLP_FILE)
-
-  if(WITH_OTLP_GRPC)
-    include("${opentelemetry-cpp_SOURCE_DIR}/cmake/grpc.cmake")
+  if(WITH_OPENTRACING)
+    include("${opentelemetry-cpp_SOURCE_DIR}/cmake/opentracing-cpp.cmake")
   endif()
 
-  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/protobuf.cmake")
-  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/opentelemetry-proto.cmake")
-endif()
+  # Always include Threads for the SDK
 
-#
-# Do we need NLOHMANN_JSON ?
-#
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/threads.cmake")
 
-if(WITH_ELASTICSEARCH
-   OR WITH_ZIPKIN
-   OR WITH_OTLP_HTTP
-   OR WITH_OTLP_FILE
-   OR BUILD_W3CTRACECONTEXT_TEST
-   OR WITH_ETW)
-  set(USE_NLOHMANN_JSON ON)
-else()
-  set(USE_NLOHMANN_JSON OFF)
-endif()
+  #
+  # Do we need HTTP CLIENT CURL ?
+  #
 
-if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
-  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/nlohmann-json.cmake")
-endif()
+  set(WITH_HTTP_CLIENT_CURL OFF)
+  if(WITH_OTLP_HTTP
+     OR WITH_ELASTICSEARCH
+     OR WITH_ZIPKIN
+     OR BUILD_W3CTRACECONTEXT_TEST
+     OR WITH_EXAMPLES_HTTP)
+    set(WITH_HTTP_CLIENT_CURL ON)
+  endif()
 
-if(WITH_PROMETHEUS)
-  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/prometheus-cpp.cmake")
-endif()
+  #
+  # Do we need ZLIB ?
+  #
 
-if(WITH_OPENTRACING)
-  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/opentracing-cpp.cmake")
-endif()
+  if(WITH_HTTP_CLIENT_CURL AND WITH_OTLP_HTTP_COMPRESSION)
+    include("${opentelemetry-cpp_SOURCE_DIR}/cmake/zlib.cmake")
+  endif()
+
+  #
+  # Do we need CURL ?
+  #
+
+  if(WITH_HTTP_CLIENT_CURL)
+    include("${opentelemetry-cpp_SOURCE_DIR}/cmake/curl.cmake")
+  endif()
+
+  #
+  # Do we need gRPC, Protobuf, and opentelemetry-proto ?
+  #
+
+  if(WITH_OTLP_GRPC
+     OR WITH_OTLP_HTTP
+     OR WITH_OTLP_FILE)
+
+    # Include gRPC before Protobuf We'll use the gRPC submodules for Protobuf
+    # and Abseil with FetchContent
+
+    if(WITH_OTLP_GRPC)
+      include("${opentelemetry-cpp_SOURCE_DIR}/cmake/grpc.cmake")
+    endif()
+
+    include("${opentelemetry-cpp_SOURCE_DIR}/cmake/protobuf.cmake")
+    include("${opentelemetry-cpp_SOURCE_DIR}/cmake/opentelemetry-proto.cmake")
+  endif()
+
+  #
+  # Do we need NLOHMANN_JSON ?
+  #
+
+  if(WITH_ELASTICSEARCH
+     OR WITH_ZIPKIN
+     OR WITH_OTLP_HTTP
+     OR WITH_OTLP_FILE
+     OR BUILD_W3CTRACECONTEXT_TEST
+     OR WITH_ETW)
+    include("${opentelemetry-cpp_SOURCE_DIR}/cmake/nlohmann-json.cmake")
+  endif()
+
+  if(WITH_PROMETHEUS)
+    include("${opentelemetry-cpp_SOURCE_DIR}/cmake/prometheus-cpp.cmake")
+  endif()
+
+endif(NOT WITH_API_ONLY)
 
 if(OTELCPP_MAINTAINER_MODE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -461,11 +471,12 @@ otel_print_build_config()
 
 add_subdirectory(api)
 
-if(WITH_OPENTRACING)
-  add_subdirectory(opentracing-shim)
-endif()
-
 if(NOT WITH_API_ONLY)
+
+  if(WITH_OPENTRACING)
+    add_subdirectory(opentracing-shim)
+  endif()
+
   add_subdirectory(sdk)
   add_subdirectory(ext)
   add_subdirectory(exporters)

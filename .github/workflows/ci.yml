@@ -68,9 +68,12 @@ jobs:
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
-    - name: run fetch content cmake test
+    - name: run fetch content test
       run: |
         ./ci/do_ci.sh cmake.fetch_content.test
+    - name: run api only test
+      run: |
+        ./ci/do_ci.sh cmake.api_only.test
 
   cmake_gcc_maintainer_sync_test:
     name: CMake gcc 14 (maintainer mode, sync)

@@ -543,6 +543,17 @@ elif [[ "$1" == "cmake.fetch_content.test" ]]; then
   make test
   exit 0
 
+elif [[ "$1" == "cmake.api_only.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -DOPENTELEMETRY_INSTALL=OFF \
+        -DOPENTELEMETRY_CPP_SRC_DIR="${SRC_DIR}" \
+        "${SRC_DIR}/install/test/cmake/api_only_test"
+  make -j $(nproc)
+  make test
+  exit 0
+
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
   cd "${BUILD_DIR}"
