@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

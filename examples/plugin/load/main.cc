@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/plugin/dynamic_load.h"
 #include "opentelemetry/plugin/factory.h"
 #include "opentelemetry/trace/tracer.h"

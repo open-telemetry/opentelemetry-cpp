@@ -8,8 +8,8 @@
 #include <mutex>
 #include <vector>
 
-#include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
 
 namespace prometheus_client = ::prometheus;
 

@@ -14,6 +14,7 @@
 #include "opentracing/span.h"
 #include "opentracing/tracer.h"
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/baggage/baggage_context.h"
 #include "opentelemetry/common/timestamp.h"
@@ -24,7 +25,6 @@
 #include "opentelemetry/opentracingshim/span_context_shim.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_startoptions.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim

@@ -20,6 +20,7 @@
 #include "opentracing/value.h"
 #include "opentracing/variant/recursive_wrapper.hpp"
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
@@ -32,7 +33,6 @@
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/span_startoptions.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim

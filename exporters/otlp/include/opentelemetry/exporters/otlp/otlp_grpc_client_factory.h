@@ -6,8 +6,8 @@
 #include <memory>
 
 // IWYU pragma: no_include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
-#include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

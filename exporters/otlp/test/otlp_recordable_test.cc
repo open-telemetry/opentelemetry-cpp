@@ -3,13 +3,13 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
-#include <algorithm>
 #include <chrono>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/common/timestamp.h"
@@ -28,7 +28,6 @@
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
-#include "opentelemetry/version.h"
 
 #if defined(__GNUC__)
 // GCC raises -Wsuggest-override warnings on GTest,

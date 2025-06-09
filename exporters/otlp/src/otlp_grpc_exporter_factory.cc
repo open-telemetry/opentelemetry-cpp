@@ -4,9 +4,14 @@
 // Make sure to include GRPC exporter first because otherwise Abseil may create
 // ambiguity with `nostd::variant`. See issue:
 // https://github.com/open-telemetry/opentelemetry-cpp/issues/880
+#include "opentelemetry/version.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 
+#include <memory>
+
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#include "opentelemetry/sdk/trace/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

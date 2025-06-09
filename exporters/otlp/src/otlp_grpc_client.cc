@@ -3,29 +3,50 @@
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
 
-#if defined(HAVE_GSL)
-#  include <gsl/gsl>
-#else
-#  include <assert.h>
-#endif
-
+#include <grpc/compression.h>
+#include <grpcpp/resource_quota.h>
+#include <grpcpp/security/credentials.h>
+#include <grpcpp/support/channel_arguments.h>
+#include <stdint.h>
 #include <atomic>
 #include <chrono>
-#include <condition_variable>
-#include <cstdio>
 #include <fstream>
 #include <iterator>
+#include <map>
 #include <memory>
-#include <mutex>
 #include <string>
-#include <thread>
-#include <unordered_set>
+#include <utility>
 
-#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
-#include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
+#include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
+#include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
+
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <condition_variable>
+#  include <cstdio>
+#  include <mutex>
+#  include <thread>
+#  include <unordered_set>
+
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/nostd/function_ref.h"
+#  include "opentelemetry/nostd/string_view.h"
+#endif /* ENABLE_ASYNC_EXPORT */
+
+namespace google
+{
+namespace protobuf
+{
+class Arena;
+}
+}  // namespace google
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

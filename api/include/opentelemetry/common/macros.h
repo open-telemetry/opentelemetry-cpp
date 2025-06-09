@@ -196,21 +196,21 @@
 #  define OPENTELEMETRY_MAYBE_UNUSED
 #endif
 
-#ifndef OPENTELEMETRY_RTTI_ENABLED
-#  if defined(__clang__)
-#    if __has_feature(cxx_rtti)
-#      define OPENTELEMETRY_RTTI_ENABLED
-#    endif
-#  elif defined(__GNUG__)
-#    if defined(__GXX_RTTI)
-#      define OPENTELEMETRY_RTTI_ENABLED
-#    endif
-#  elif defined(_MSC_VER)
-#    if defined(_CPPRTTI)
-#      define OPENTELEMETRY_RTTI_ENABLED
-#    endif
-#  endif
-#endif
+// #ifndef OPENTELEMETRY_RTTI_ENABLED
+// #  if defined(__clang__)
+// #    if __has_feature(cxx_rtti)
+// #      define OPENTELEMETRY_RTTI_ENABLED
+// #    endif
+// #  elif defined(__GNUG__)
+// #    if defined(__GXX_RTTI)
+// #      define OPENTELEMETRY_RTTI_ENABLED
+// #    endif
+// #  elif defined(_MSC_VER)
+// #    if defined(_CPPRTTI)
+// #      define OPENTELEMETRY_RTTI_ENABLED
+// #    endif
+// #  endif
+// #endif
 
 #if defined(__cplusplus) && __cplusplus >= 201402L
 #  define OPENTELEMETRY_DEPRECATED [[deprecated]]

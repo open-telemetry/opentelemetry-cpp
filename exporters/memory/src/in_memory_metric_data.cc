@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/exporters/memory/in_memory_data.h"
 #include "opentelemetry/exporters/memory/in_memory_metric_data.h"
 #include "opentelemetry/nostd/variant.h"
@@ -17,7 +18,6 @@
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

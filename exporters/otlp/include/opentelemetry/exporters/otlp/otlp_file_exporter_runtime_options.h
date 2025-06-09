@@ -4,7 +4,6 @@
 #pragma once
 
 #include "opentelemetry/version.h"
-
 #include "opentelemetry/exporters/otlp/otlp_file_client_runtime_options.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

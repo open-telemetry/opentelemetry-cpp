@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/exporters/otlp/otlp_file_client_runtime_options.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/exporters/otlp/otlp_file_client_runtime_options.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

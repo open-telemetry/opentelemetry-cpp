@@ -6,8 +6,8 @@
 #include <memory>
 #include <string>
 
-#include "logger_config.h"
 #include "opentelemetry/version.h"
+#include "logger_config.h"
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/noop.h"

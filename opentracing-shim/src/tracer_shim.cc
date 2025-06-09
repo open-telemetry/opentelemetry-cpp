@@ -19,7 +19,9 @@
 #include "opentracing/tracer.h"
 #include "opentracing/value.h"
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/baggage/baggage_context.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
@@ -34,8 +36,10 @@
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim

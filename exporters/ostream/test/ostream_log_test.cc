@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/common/timestamp.h"
@@ -36,7 +37,6 @@
 #include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/version/version.h"
-#include "opentelemetry/version.h"
 
 namespace sdklogs      = opentelemetry::sdk::logs;
 namespace logs_api     = opentelemetry::logs;

@@ -6,8 +6,8 @@
 #include <chrono>
 #include <cstddef>
 
-#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

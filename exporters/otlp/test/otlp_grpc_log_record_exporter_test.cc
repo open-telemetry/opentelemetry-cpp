@@ -1,39 +1,60 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <grpc/support/port_platform.h>
+#include <grpcpp/grpcpp.h>
+#include <grpcpp/support/status.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <chrono>
+#include <functional>
+#include <string>
 #include <unordered_map>
+#include <utility>
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
+#include "opentelemetry/version.h"
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
-
-// clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-// clang-format on
-
-#include "opentelemetry/proto/collector/logs/v1/logs_service_mock.grpc.pb.h"
-#include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
-
-// clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-// clang-format on
-
-#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
-#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#include "opentelemetry/trace/provider.h"
+#include "opentelemetry/trace/noop.h"
+#include "opentelemetry/trace/scope.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/trace/tracer_provider.h"
 
-#include <grpcpp/grpcpp.h>
-#include <gtest/gtest.h>
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/collector/logs/v1/logs_service_mock.grpc.pb.h"
+#include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
+#include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
+#include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
 
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
@@ -42,6 +63,40 @@ using opentelemetry::sdk::common::unsetenv;
 #endif
 
 using namespace testing;
+
+namespace grpc
+{
+class ClientUnaryReactor;
+}
+
+namespace opentelemetry
+{
+namespace proto
+{
+namespace collector
+{
+
+namespace logs
+{
+namespace v1
+{
+class ExportLogsServiceRequest;
+class ExportLogsServiceResponse;
+}  // namespace v1
+}  // namespace logs
+
+namespace trace
+{
+namespace v1
+{
+class ExportTraceServiceRequest;
+class ExportTraceServiceResponse;
+}  // namespace v1
+}  // namespace trace
+
+}  // namespace collector
+}  // namespace proto
+}  // namespace opentelemetry
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

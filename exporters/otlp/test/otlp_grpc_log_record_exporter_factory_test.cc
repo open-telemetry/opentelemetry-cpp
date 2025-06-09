@@ -2,9 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <memory>
+#include <string>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h"
+#include "opentelemetry/sdk/logs/exporter.h"
 
 /*
   Make sure OtlpGrpcLogRecordExporterFactory does not require,

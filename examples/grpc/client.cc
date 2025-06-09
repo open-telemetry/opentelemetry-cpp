@@ -13,22 +13,25 @@
 #include <iostream>
 #include <string>
 #include <utility>
+
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/semconv/incubating/rpc_attributes.h"
+#include "opentelemetry/semconv/network_attributes.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
+#include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/span_startoptions.h"
 #include "opentelemetry/trace/tracer.h"
+#include "tracer_common.h"
 
 #include "messages.grpc.pb.h"
 #include "messages.pb.h"
-
-#include "opentelemetry/semconv/incubating/rpc_attributes.h"
-#include "opentelemetry/semconv/network_attributes.h"
-#include "tracer_common.h"
 
 using grpc::Channel;
 using grpc::ClientContext;

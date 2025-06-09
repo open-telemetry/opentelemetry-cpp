@@ -10,11 +10,11 @@
 
 #include "opentracing/span.h"
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim

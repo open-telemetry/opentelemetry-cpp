@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

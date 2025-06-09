@@ -5,10 +5,10 @@
 #include <memory>
 #include <string>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/version.h"
 
 /*
   Make sure OtlpFileExporterFactory does not require,
