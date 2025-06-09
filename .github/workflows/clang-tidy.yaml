@@ -95,6 +95,7 @@ jobs:
 
       - name: Count warnings
         run: |
+          clang-tidy --version
           COUNT=$(grep -c "warning:" clang-tidy.log)
           echo "clang-tidy reported ${COUNT} warning(s)"
           readonly WARNING_LIMIT=216
@@ -104,6 +105,6 @@ jobs:
             exit 1
           # WARN in annotations if COUNT > 0
           elif [ $COUNT -gt 0 ] ; then
-            echo "clang-tidy reported ${COUNT} warning(s)"
+            echo "::warning::clang-tidy reported ${COUNT} warning(s)"
           fi
 
