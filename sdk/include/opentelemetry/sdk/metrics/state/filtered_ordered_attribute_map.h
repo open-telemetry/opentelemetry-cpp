@@ -4,7 +4,6 @@
 #pragma once
 
 #include <stddef.h>
-#include <algorithm>
 #include <functional>
 #include <initializer_list>
 #include <limits>

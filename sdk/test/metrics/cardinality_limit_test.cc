@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <algorithm>
 #include <chrono>
 #include <functional>
 #include <map>
@@ -15,6 +14,7 @@
 #include "common.h"
 
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
@@ -109,9 +109,9 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
   const size_t attributes_limit   = 10;
   InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kCounter,
                                      InstrumentValueType::kLong};
-  std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
+  std::shared_ptr<DefaultAttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
-  SyncMetricStorage storage(instr_desc, AggregationType::kSum, default_attributes_processor.get(),
+  SyncMetricStorage storage(instr_desc, AggregationType::kSum, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
                             ExemplarFilterType::kAlwaysOff,
                             ExemplarReservoir::GetNoExemplarReservoir(),
