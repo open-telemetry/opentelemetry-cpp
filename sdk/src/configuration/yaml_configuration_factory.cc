@@ -13,7 +13,6 @@
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_factory.h"
 #include "opentelemetry/sdk/configuration/document.h"
-#include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/ryml_document.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
 #include "opentelemetry/version.h"
