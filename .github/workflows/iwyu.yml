@@ -30,6 +30,7 @@ jobs:
             build-essential \
             ninja-build \
             libssl-dev \
+            zlib1g-dev \
             libcurl4-openssl-dev \
             libabsl-dev \
             libprotobuf-dev \
@@ -40,11 +41,13 @@ jobs:
             libgtest-dev \
             libbenchmark-dev \
             llvm-dev \
-            libclang-dev
+            libclang-dev \
+            zlib1g-dev \
           sudo ./ci/setup_cmake.sh
       - name: Install include-what-you-use
         run: |
           sudo ./ci/install_iwyu.sh
+
       - name: Prepare CMake
         run: |
           TOPDIR=`pwd`

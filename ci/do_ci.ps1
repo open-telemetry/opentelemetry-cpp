@@ -330,6 +330,17 @@ switch ($action) {
         $CXX_STANDARD = 14
     }
     Write-Host "Using CXX_STANDARD: $CXX_STANDARD"
+
+    if (Test-Path Env:\CMAKE_EXTRA_ARGS) {
+        # Split on any run of whitespace; filter out any empty tokens
+        $CMAKE_EXTRA_ARGS = $Env:CMAKE_EXTRA_ARGS -split '\s+' |
+                          Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+    }
+    else {
+        $CMAKE_EXTRA_ARGS = @()
+    }
+
+    Write-Host "CMAKE_EXTRA_ARGS is: $CMAKE_EXTRA_ARGS"
       
     $CMAKE_OPTIONS = @(
     "-DCMAKE_CXX_STANDARD=$CXX_STANDARD",
@@ -362,7 +373,8 @@ switch ($action) {
       -DWITH_EXAMPLES=ON `
       -DWITH_EXAMPLES_HTTP=ON `
       -DBUILD_W3CTRACECONTEXT_TEST=ON `
-      -DOPENTELEMETRY_INSTALL=ON
+      -DOPENTELEMETRY_INSTALL=ON `
+      @CMAKE_EXTRA_ARGS
 
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {

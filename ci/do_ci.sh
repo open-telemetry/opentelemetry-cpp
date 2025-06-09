@@ -367,9 +367,6 @@ elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
         -DWITH_OTLP_FILE=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
-  grpc_cpp_plugin=`which grpc_cpp_plugin`
-  proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
-  sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
   make -j $(nproc)
   cd exporters/otlp && make test
   exit 0
@@ -384,9 +381,6 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
         -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
         -DWITH_OTLP_RETRY_PREVIEW=ON \
         "${SRC_DIR}"
-  grpc_cpp_plugin=`which grpc_cpp_plugin`
-  proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
-  sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
   make -j $(nproc)
   cd exporters/otlp && make test
   exit 0
@@ -399,9 +393,6 @@ elif [[ "$1" == "cmake.exporter.otprotocol.shared_libs.with_static_grpc.test" ]]
         -DWITH_OTLP_FILE=ON \
         -DBUILD_SHARED_LIBS=ON \
         "${SRC_DIR}"
-  grpc_cpp_plugin=`which grpc_cpp_plugin`
-  proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
-  sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
   make -j $(nproc)
   cd exporters/otlp && make test
   exit 0
@@ -414,9 +405,6 @@ elif [[ "$1" == "cmake.exporter.otprotocol.with_async_export.test" ]]; then
         -DWITH_OTLP_FILE=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
-  grpc_cpp_plugin=`which grpc_cpp_plugin`
-  proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
-  sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
   make -j $(nproc)
   cd exporters/otlp && make test
   exit 0
@@ -440,9 +428,6 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOPENTELEMETRY_INSTALL=OFF \
         "${SRC_DIR}"
-  grpc_cpp_plugin=`which grpc_cpp_plugin`
-  proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
-  sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
   make -j $(nproc)
   cd exporters/otlp && make test
   exit 0
@@ -455,7 +440,8 @@ elif [[ "$1" == "cmake.install.test" ]]; then
     echo "BUILD_SHARED_LIBS is set to: OFF"
   fi
   CMAKE_OPTIONS+=("-DCMAKE_POSITION_INDEPENDENT_CODE=ON")
-
+  read -r -a CMAKE_EXTRA_ARGS <<< "$CMAKE_EXTRA_ARGS"
+  echo "CMAKE_EXTRA_ARGS is set to: ${CMAKE_EXTRA_ARGS[*]}"
   cd "${BUILD_DIR}"
   rm -rf *
   rm -rf ${INSTALL_TEST_DIR}/*
@@ -482,6 +468,7 @@ elif [[ "$1" == "cmake.install.test" ]]; then
         -DWITH_EXAMPLES_HTTP=ON \
         -DBUILD_W3CTRACECONTEXT_TEST=ON \
         -DOPENTELEMETRY_INSTALL=ON \
+        "${CMAKE_EXTRA_ARGS[@]}" \
         "${SRC_DIR}"
 
   make -j $(nproc)
@@ -679,11 +666,6 @@ elif [[ "$1" == "code.coverage" ]]; then
   # removing test http server coverage from the total coverage. We don't use this server completely.
   lcov --remove coverage.info '*/ext/http/server/*'> tmp_coverage.info 2>/dev/null
   cp tmp_coverage.info coverage.info
-  exit 0
-elif [[ "$1" == "third_party.tags" ]]; then
-  echo "gRPC=v1.49.2" > third_party_release
-  echo "abseil=20240116.1" >> third_party_release
-  git submodule foreach --quiet 'echo "$name=$(git describe --tags HEAD)"' | sed 's:.*/::' >> third_party_release
   exit 0
 fi
 
