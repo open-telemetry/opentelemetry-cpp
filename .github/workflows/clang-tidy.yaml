@@ -32,10 +32,15 @@ jobs:
           sudo apt install -y --no-install-recommends --no-install-suggests \
           build-essential \
           cmake \
+          zlib1g-dev \
           libssl-dev \
           libcurl4-openssl-dev \
+          nlohmann-json3-dev \
+          libabsl-dev \
           libprotobuf-dev \
+          libgrpc++-dev \
           protobuf-compiler \
+          protobuf-compiler-grpc \
           libgmock-dev \
           libgtest-dev \
           libbenchmark-dev
@@ -57,6 +62,14 @@ jobs:
           cmake -B build \
             -DCMAKE_CXX_STANDARD=14 \
             -DWITH_STL=CXX14 \
+            -DWITH_ABI_VERSION_1=OFF \
+            -DWITH_ABI_VERSION_2=ON \
+            -DWITH_HTTP_CLIENT_CURL=ON \
+            -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
+            -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
+            -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
+            -DWITH_OTLP_RETRY_PREVIEW=ON \
+            -DWITH_OTLP_GRPC=ON \
             -DWITH_OTLP_HTTP=ON \
             -DWITH_OTLP_FILE=ON \
             -DWITH_PROMETHEUS=ON \
@@ -85,4 +98,3 @@ jobs:
           COUNT=$(grep -c "warning:" clang-tidy.log)
           echo "clang-tidy reported ${COUNT} warning(s)"
 
-# TODO: include WITH_OTLP_GRPC flags.

@@ -62,9 +62,18 @@ jobs:
             -DWITH_OTLP_FILE=ON \
             -DWITH_OPENTRACING=ON \
             -DWITH_OTLP_HTTP_COMPRESSION=ON \
-            -DWITH_THREAD_INSTRUMENTATION=ON \
             -DWITH_ZIPKIN=ON \
             -DWITH_PROMETHEUS=ON \
+            -DWITH_ELASTICSEARCH=ON \
+            -DWITH_HTTP_CLIENT_CURL=ON \
+            -DWITH_ABI_VERSION_1=OFF \
+            -DWITH_ABI_VERSION_2=ON \
+            -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+            -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+            -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
+            -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
+            -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
+            -DWITH_OTLP_RETRY_PREVIEW=ON \
             ..
 
       - name: iwyu_tool
