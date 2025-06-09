@@ -41,8 +41,7 @@ jobs:
             libgtest-dev \
             libbenchmark-dev \
             llvm-dev \
-            libclang-dev \
-            zlib1g-dev \
+            libclang-dev
           sudo ./ci/setup_cmake.sh
       - name: Install include-what-you-use
         run: |
