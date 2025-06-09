@@ -1,14 +1,18 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
-
-# Git tags of third-party dependencies
-
-# This file is used to:
-# - Install third-party dependencies with the opentelemetry-cpp-thirdparty-install project (./install/cmake/CMakeLists.txt)
-# - Fetch third-party dependencies with FetchContent when using CMake to build opentelemetry-cpp
-
-# To update a dependency version, manually edit the release git tag below.
-# If the dependency is also a submodule, please manually update it to the new tag.
+#
+# MAINTAINER
+#
+# This file is used for the CMake build.
+# Format: <dependency_name>=<release_git_tag>
+#
+# When changing (add, upgrade, remove) dependencies
+# please update:
+#  - manually edit the release git tag below.
+#  - update the matching git submodule to the new tag.
+#  - update the Bazel build files
+#     - opentelemetry-cpp/MODULE.bazel
+#     - opentelemetry-cpp/bazel/repository.bzl
 
 abseil=20220623.2
 zlib=v1.3.1
