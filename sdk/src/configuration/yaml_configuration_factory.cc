@@ -71,7 +71,6 @@ std::unique_ptr<Configuration> YamlConfigurationFactory::ParseString(const std::
                                                                      const std::string &content)
 {
   std::unique_ptr<Document> doc;
-  std::unique_ptr<DocumentNode> root;
   std::unique_ptr<Configuration> config;
 
   doc = RymlParse(source, content);
