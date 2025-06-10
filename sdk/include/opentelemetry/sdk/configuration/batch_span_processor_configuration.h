@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration_visitor.h"

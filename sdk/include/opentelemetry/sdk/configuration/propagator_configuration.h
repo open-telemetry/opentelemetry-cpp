@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

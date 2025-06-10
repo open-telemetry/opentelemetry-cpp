@@ -4,6 +4,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "opentelemetry/sdk/configuration/metric_producer_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"

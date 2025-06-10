@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration_visitor.h"
 #include "opentelemetry/version.h"

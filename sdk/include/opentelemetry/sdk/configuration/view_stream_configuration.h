@@ -4,6 +4,8 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/version.h"

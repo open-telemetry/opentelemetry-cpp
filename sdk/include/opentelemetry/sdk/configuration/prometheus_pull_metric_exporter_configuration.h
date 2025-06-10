@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration_visitor.h"

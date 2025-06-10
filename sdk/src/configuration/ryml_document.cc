@@ -79,7 +79,7 @@ std::unique_ptr<Document> RymlDocument::Parse(const std::string &source, const s
 
 std::unique_ptr<DocumentNode> RymlDocument::GetRootNode()
 {
-  RymlDocumentNode *ryml_node = new RymlDocumentNode(m_tree.rootref(), 0);
+  RymlDocumentNode *ryml_node = new RymlDocumentNode(tree_.rootref(), 0);
   std::unique_ptr<DocumentNode> node(ryml_node);
   return node;
 }

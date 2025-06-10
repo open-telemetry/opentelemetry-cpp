@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_encoding.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"

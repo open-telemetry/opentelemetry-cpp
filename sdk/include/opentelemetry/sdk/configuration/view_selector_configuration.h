@@ -4,6 +4,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "opentelemetry/version.h"
 

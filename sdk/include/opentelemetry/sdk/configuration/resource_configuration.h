@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/detectors_configuration.h"
 #include "opentelemetry/version.h"

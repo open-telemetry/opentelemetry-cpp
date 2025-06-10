@@ -3,9 +3,7 @@
 
 #pragma once
 
-#include <fstream>
 #include <memory>
-#include <string>
 
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/document_node.h"

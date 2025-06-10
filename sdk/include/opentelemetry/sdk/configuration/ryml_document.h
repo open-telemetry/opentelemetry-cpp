@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <memory>
 #include <ryml.hpp>
 #include <string>
 
@@ -21,13 +22,13 @@ class RymlDocument : public Document
 public:
   static std::unique_ptr<Document> Parse(const std::string &source, const std::string &content);
 
-  RymlDocument(ryml::Tree tree) : m_tree(tree) {}
+  RymlDocument(ryml::Tree tree) : tree_(tree) {}
   ~RymlDocument() override = default;
 
   std::unique_ptr<DocumentNode> GetRootNode() override;
 
 private:
-  ryml::Tree m_tree;
+  ryml::Tree tree_;
 };
 
 }  // namespace configuration

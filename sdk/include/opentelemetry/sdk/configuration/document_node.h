@@ -94,58 +94,52 @@ public:
 class DocumentNodeConstIterator
 {
 public:
-  DocumentNodeConstIterator(DocumentNodeConstIteratorImpl *impl) : m_impl(impl) {}
-  ~DocumentNodeConstIterator() { delete m_impl; }
+  DocumentNodeConstIterator(DocumentNodeConstIteratorImpl *impl) : impl_(impl) {}
+  ~DocumentNodeConstIterator() { delete impl_; }
 
-  bool operator==(const DocumentNodeConstIterator &rhs) const
-  {
-    return (m_impl->Equal(rhs.m_impl));
-  }
+  bool operator==(const DocumentNodeConstIterator &rhs) const { return (impl_->Equal(rhs.impl_)); }
 
-  bool operator!=(const DocumentNodeConstIterator &rhs) const
-  {
-    return (!m_impl->Equal(rhs.m_impl));
-  }
+  bool operator!=(const DocumentNodeConstIterator &rhs) const { return (!impl_->Equal(rhs.impl_)); }
 
-  std::unique_ptr<DocumentNode> operator*() const { return m_impl->Item(); }
+  std::unique_ptr<DocumentNode> operator*() const { return impl_->Item(); }
 
   DocumentNodeConstIterator &operator++()
   {
-    m_impl->Next();
+    impl_->Next();
     return *this;
   }
 
 private:
-  DocumentNodeConstIteratorImpl *m_impl;
+  DocumentNodeConstIteratorImpl *impl_;
 };
 
 class PropertiesNodeConstIterator
 {
 public:
-  PropertiesNodeConstIterator(PropertiesNodeConstIteratorImpl *impl) : m_impl(impl) {}
-  ~PropertiesNodeConstIterator() { delete m_impl; }
+  PropertiesNodeConstIterator(PropertiesNodeConstIteratorImpl *impl) : impl_(impl) {}
+  ~PropertiesNodeConstIterator() { delete impl_; }
 
   bool operator==(const PropertiesNodeConstIterator &rhs) const
   {
-    return (m_impl->Equal(rhs.m_impl));
+    return (impl_->Equal(rhs.impl_));
   }
 
   bool operator!=(const PropertiesNodeConstIterator &rhs) const
   {
-    return (!m_impl->Equal(rhs.m_impl));
+    return (!impl_->Equal(rhs.impl_));
   }
 
-  std::string Name() const { return m_impl->Name(); }
-  std::unique_ptr<DocumentNode> Value() const { return m_impl->Value(); }
+  std::string Name() const { return impl_->Name(); }
+  std::unique_ptr<DocumentNode> Value() const { return impl_->Value(); }
 
   PropertiesNodeConstIterator &operator++()
   {
-    m_impl->Next();
+    impl_->Next();
     return *this;
   }
 
 private:
-  PropertiesNodeConstIteratorImpl *m_impl;
+  PropertiesNodeConstIteratorImpl *impl_;
 };
 
 }  // namespace configuration

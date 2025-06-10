@@ -3,11 +3,11 @@
 
 #pragma once
 
+#include <string>
+
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration_visitor.h"
 #include "opentelemetry/version.h"
-
-#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

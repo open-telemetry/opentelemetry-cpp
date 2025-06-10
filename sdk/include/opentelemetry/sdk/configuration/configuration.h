@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
@@ -46,7 +47,7 @@ namespace configuration
 class Configuration
 {
 public:
-  Configuration(std::unique_ptr<Document> doc) : m_doc(std::move(doc)) {}
+  Configuration(std::unique_ptr<Document> doc) : doc_(std::move(doc)) {}
   ~Configuration() = default;
 
   std::string file_format;
@@ -62,7 +63,7 @@ public:
   // Ignored: instrumentation
 
 private:
-  std::unique_ptr<Document> m_doc;
+  std::unique_ptr<Document> doc_;
 };
 
 }  // namespace configuration
