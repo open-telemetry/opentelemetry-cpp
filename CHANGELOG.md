@@ -24,6 +24,9 @@ Increment the:
   * To enable with CMake: `-DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON`
   * To enable with Bazel: `--@io_opentelemetry_cpp//exporters/otlp:with_otlp_grpc_credential_preview=true`
 
+* [BUILD] Upgrade opentelemetry-proto to 1.7.0
+  [#3443](https://github.com/open-telemetry/opentelemetry-cpp/pull/3443)
+
 ## [1.21 2025-05-28]
 
 * [BUILD] Remove WITH_ABSEIL
