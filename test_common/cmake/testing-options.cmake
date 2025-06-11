@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-# Enable all tests in the OpenTelemetry C++ SDK.
+# All testing options
 
 if(NOT DEFINED ENABLE_TESTS)
     set(ENABLE_TESTS ON)

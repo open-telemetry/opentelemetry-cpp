@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-# Enable all examples in the OpenTelemetry C++ SDK.
+# All examples options
 
 if(NOT DEFINED ENABLE_EXAMPLES)
     set(ENABLE_EXAMPLES ON)

@@ -14,7 +14,7 @@ jobs:
   iwyu:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - cmake_options: all-options-abiv1
@@ -57,26 +57,26 @@ jobs:
         run: |
           sudo ./ci/install_iwyu.sh
       - name: Prepare CMake
+        env:
+          CC: clang
+          CXX: clang++
         run: |
           TOPDIR=`pwd`
-          mkdir -p build-${{ matrix.cmake_options }} && cd build-${{ matrix.cmake_options }}
-          CC="clang" CXX="clang++" cmake \
-            -C ${TOPDIR}/test_common/cmake/${{ matrix.cmake_options }}.cmake \
+          cmake -B build-${{ matrix.cmake_options }} \
+            -C ./test_common/cmake/${{ matrix.cmake_options }}.cmake \
             -DCMAKE_CXX_STANDARD=14 \
             -DWITH_STL=CXX14 \
-            -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;" \
-            ..
+            -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;"
 
       - name: iwyu_tool
         run: |
-          cd build-${{ matrix.cmake_options }}
-          make -k 2>&1 | tee -a iwyu-${{ matrix.cmake_options }}.log
+          cmake --build build-${{ matrix.cmake_options }} -- -j$(nproc) -k 2>&1 | tee -a iwyu-${{ matrix.cmake_options }}.log
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: success() || failure()
         with:
           name: Logs-iwyu-${{ matrix.cmake_options }}
-          path: ./build-${{ matrix.cmake_options }}/*.log
+          path: ./iwyu-${{ matrix.cmake_options }}.log
 
       - name: count warnings
         run: |

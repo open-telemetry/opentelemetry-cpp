@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-# Enable all components in the OpenTelemetry C++ SDK.
+# All components options
 
 if(NOT DEFINED ENABLE_COMPONENTS)
     set(ENABLE_COMPONENTS ON)

@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-# Enable all preview features in the OpenTelemetry C++ SDK.
+# All preview feature options
 
 if(NOT DEFINED ENABLE_PREVIEW)
     set(ENABLE_PREVIEW ON)
