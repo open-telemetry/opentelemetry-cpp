@@ -13,11 +13,12 @@ jobs:
   clang-tidy:
     runs-on: ubuntu-24.04
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - options_preset: all-options-abiv1-preview
+          - cmake_options: all-options-abiv1-preview
             warning_limit: 0
-          - options_preset: all-options-abiv2-preview
+          - cmake_options: all-options-abiv2-preview
             warning_limit: 216
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -66,36 +67,36 @@ jobs:
           CXX: clang++
         run: |
           echo "Running cmake..."
-          cmake -B build-${{ matrix.options_preset }} \
-            -C ./test_common/cmake/${{ matrix.options_preset }}.cmake \
+          cmake -B build-${{ matrix.cmake_options }} \
+            -C ./test_common/cmake/${{ matrix.cmake_options }}.cmake \
             -DCMAKE_CXX_STANDARD=14 \
             -DWITH_STL=CXX14 \
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       - name: Run clang-tidy
         run: |
-          cmake --build build-${{ matrix.options_preset }} --target opentelemetry_proto
-          jq -r .[].file build-${{ matrix.options_preset }}/compile_commands.json | grep -vE '/(generated|third_party)/' | xargs -P $(nproc) -n 1 clang-tidy --quiet -p build-${{ matrix.options_preset }} 2>&1 | tee -a clang-tidy-${{ matrix.options_preset }}.log
+          cmake --build build-${{ matrix.cmake_options }}
+          jq -r .[].file build-${{ matrix.cmake_options }}/compile_commands.json | grep -vE '/(generated|third_party)/' | xargs -P $(nproc) -n 1 clang-tidy --quiet -p build-${{ matrix.cmake_options }} 2>&1 | tee -a clang-tidy-${{ matrix.cmake_options }}.log
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: Logs (clang-tidy)
-          path: ./clang-tidy-${{ matrix.options_preset }}.log
+          name: Logs-clang-tidy-${{ matrix.cmake_options }}
+          path: ./clang-tidy-${{ matrix.cmake_options }}.log
 
       - name: Count warnings
         run: |
           clang-tidy --version
-          COUNT=$(grep -c "warning:" clang-tidy-${{ matrix.options_preset }}.log)
-          echo "clang-tidy reported ${COUNT} warning(s) with cmake options preset '${{ matrix.options_preset }}'"
+          COUNT=$(grep -c "warning:" clang-tidy-${{ matrix.cmake_options }}.log)
+          echo "clang-tidy reported ${COUNT} warning(s) with cmake options preset '${{ matrix.cmake_options }}'"
 
           readonly WARNING_LIMIT=${{ matrix.warning_limit }}
 
           # FAIL the build if COUNT > WARNING_LIMIT
           if [ $COUNT -gt $WARNING_LIMIT ] ; then
-            echo "clang-tidy reported ${COUNT} warning(s) exceeding the existing warning limit of ${WARNING_LIMIT} with cmake options preset '${{ matrix.options_preset }}'"
+            echo "clang-tidy reported ${COUNT} warning(s) exceeding the existing warning limit of ${WARNING_LIMIT} with cmake options preset '${{ matrix.cmake_options }}'"
             exit 1
           # WARN in annotations if COUNT > 0
           elif [ $COUNT -gt 0 ] ; then
-            echo "::warning::clang-tidy reported ${COUNT} warning(s) with cmake options preset '${{ matrix.options_preset }}'"
+            echo "::warning::clang-tidy reported ${COUNT} warning(s) with cmake options preset '${{ matrix.cmake_options }}'"
           fi
 

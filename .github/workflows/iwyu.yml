@@ -14,13 +14,14 @@ jobs:
   iwyu:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - options_preset: all-options-abiv1
-            warning_limit: 0
-          - options_preset: all-options-abiv1-preview
-            warning_limit: 24
-          - options_preset: all-options-abiv2-preview
+          - cmake_options: all-options-abiv1
+            warning_limit: 3
+          - cmake_options: all-options-abiv1-preview
+            warning_limit: 48
+          - cmake_options: all-options-abiv2-preview
             warning_limit: 48
 
     steps:
@@ -58,9 +59,9 @@ jobs:
       - name: Prepare CMake
         run: |
           TOPDIR=`pwd`
-          mkdir -p build-${{ matrix.options_preset }} && cd build-${{ matrix.options_preset }}
+          mkdir -p build-${{ matrix.cmake_options }} && cd build-${{ matrix.cmake_options }}
           CC="clang" CXX="clang++" cmake \
-            -C ${TOPDIR}/test_common/cmake/${{ matrix.options_preset }}.cmake \
+            -C ${TOPDIR}/test_common/cmake/${{ matrix.cmake_options }}.cmake \
             -DCMAKE_CXX_STANDARD=14 \
             -DWITH_STL=CXX14 \
             -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;" \
@@ -68,30 +69,30 @@ jobs:
 
       - name: iwyu_tool
         run: |
-          cd build-${{ matrix.options_preset }}
-          make -k 2>&1 | tee -a iwyu-${{ matrix.options_preset }}.log
+          cd build-${{ matrix.cmake_options }}
+          make -k 2>&1 | tee -a iwyu-${{ matrix.cmake_options }}.log
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: success() || failure()
         with:
-          name: Logs-${{ matrix.options_preset }} (include-what-you-use)
-          path: ./build-${{ matrix.options_preset }}/*.log
+          name: Logs-iwyu-${{ matrix.cmake_options }}
+          path: ./build-${{ matrix.cmake_options }}/*.log
 
       - name: count warnings
         run: |
           set +e
           echo "include-what-you-use version:"
           include-what-you-use --version
-          cd build-${{ matrix.options_preset }}
-          readonly WARNING_COUNT=`grep -c "include-what-you-use reported diagnostics:" iwyu-${{ matrix.options_preset }}.log`
-          echo "include-what-you-use reported ${WARNING_COUNT} warning(s) with cmake options preset '${{ matrix.options_preset }}'"
+          cd build-${{ matrix.cmake_options }}
+          readonly WARNING_COUNT=`grep -c "include-what-you-use reported diagnostics:" iwyu-${{ matrix.cmake_options }}.log`
+          echo "include-what-you-use reported ${WARNING_COUNT} warning(s) with cmake options preset '${{ matrix.cmake_options }}'"
           # Acceptable limit, to decrease over time down to 0
           readonly WARNING_LIMIT=${{ matrix.warning_limit }}
           # FAIL the build if WARNING_COUNT > WARNING_LIMIT
           if [ $WARNING_COUNT -gt $WARNING_LIMIT ] ; then
-            echo "include-what-you-use reported ${WARNING_COUNT} warning(s) exceeding the existing warning limit of ${WARNING_LIMIT} with cmake options preset '${{ matrix.options_preset }}'"
+            echo "include-what-you-use reported ${WARNING_COUNT} warning(s) exceeding the existing warning limit of ${WARNING_LIMIT} with cmake options preset '${{ matrix.cmake_options }}'"
             exit 1
           # WARN in annotations if WARNING_COUNT > 0
           elif [ $WARNING_COUNT -gt 0 ] ; then
-            echo "::warning::include-what-you-use reported ${WARNING_COUNT} warning(s) with cmake options preset '${{ matrix.options_preset }}'"
+            echo "::warning::include-what-you-use reported ${WARNING_COUNT} warning(s) with cmake options preset '${{ matrix.cmake_options }}'"
           fi

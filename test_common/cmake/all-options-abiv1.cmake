@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-# This script enables ABI V1 with all options except preview features
+# Enable all options with ABI V1 except preview features
 
 set(WITH_ABI_VERSION_1 ON CACHE BOOL "" FORCE)
 set(WITH_ABI_VERSION_2 OFF CACHE BOOL "" FORCE)
