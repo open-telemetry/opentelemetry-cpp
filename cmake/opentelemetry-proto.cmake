@@ -231,7 +231,7 @@ if(TARGET protobuf::libprotobuf)
   # protobuf_lib_type may be "INTERFACE_LIBRARY" in some build systems, such as
   # conan.
   if(protobuf_lib_type STREQUAL "INTERFACE_LIBRARY")
-    project_build_tools_recursive_scan_imported_locations(
+    project_build_tools_unwrap_interface_link_libraries(
       protobuf_lib_files TARGET_NAME protobuf::libprotobuf TARGET_MATCH
       ".*(protobuf).*")
     foreach(protobuf_lib_file ${protobuf_lib_files})
@@ -393,7 +393,7 @@ if(WITH_OTLP_GRPC)
   # grpc_lib_type may be "INTERFACE_LIBRARY" in some build systems, such as
   # conan.
   if(grpc_lib_type STREQUAL "INTERFACE_LIBRARY")
-    project_build_tools_recursive_scan_imported_locations(
+    project_build_tools_unwrap_interface_link_libraries(
       grpc_lib_files TARGET_NAME gRPC::grpc++ TARGET_MATCH ".*(grpc|gRPC).*")
     foreach(grpc_lib_file ${grpc_lib_files})
       if(grpc_lib_file MATCHES
