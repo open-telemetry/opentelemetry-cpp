@@ -248,7 +248,7 @@ function(__project_build_tools_recursive_scan_unwrap OUTPUT_VAR INPUT_VAR)
   endif()
 endfunction()
 
-function(project_build_tools_unwrap_interface_link_libraries OUTPUT_VAR)
+function(__project_build_tools_unwrap_interface_link_libraries OUTPUT_VAR)
   set(optionArgs)
   set(oneValueArgs)
   set(multiValueArgs TARGET_NAME TARGET_MATCH)
@@ -265,20 +265,23 @@ function(project_build_tools_unwrap_interface_link_libraries OUTPUT_VAR)
       set(TARGET_NAME "${TARGET_NAME_ORIGIN}")
     endif()
 
-    if(TARGET ${TARGET_NAME})
+    if(TARGET "${TARGET_NAME}")
       # Get the imported location of the target
       project_build_tools_get_imported_location(__TARGET_IMPORTED_LOCATION
-                                                ${TARGET_NAME})
+                                                "${TARGET_NAME}")
       if(__TARGET_IMPORTED_LOCATION)
         list(APPEND __TARGET_CHECK_NAMES ${__TARGET_IMPORTED_LOCATION})
       endif()
 
       # Get the interface link libraries of the target
       set(__TARGET_LINK_LIBRARIES)
-      get_target_property(__TARGET_LINK_LIBRARIES ${TARGET_NAME}
+      get_target_property(__TARGET_LINK_LIBRARIES "${TARGET_NAME}"
                           INTERFACE_LINK_LIBRARIES)
       list(APPEND __TARGET_CHECK_NAMES ${__TARGET_LINK_LIBRARIES})
-
+    else()
+      # If the name is not a target, it should be a link name. We can directly
+      # append it to the checking list.
+      list(APPEND __TARGET_CHECK_NAMES "${TARGET_NAME}")
     endif()
   endforeach()
 
@@ -303,5 +306,25 @@ function(project_build_tools_unwrap_interface_link_libraries OUTPUT_VAR)
 
   set(${OUTPUT_VAR}
       ${__OUTPUT_VAR}
+      PARENT_SCOPE)
+endfunction()
+
+function(project_build_tools_unwrap_interface_link_libraries OUTPUT_VAR)
+  set(optionArgs)
+  set(oneValueArgs)
+  set(multiValueArgs TARGET_NAME TARGET_MATCH)
+  cmake_parse_arguments(__SCAN_OPTION "${optionArgs}" "${oneValueArgs}"
+                        "${multiValueArgs}" "${ARGN}")
+
+  set(__OUTPUT_VAR_LEVEL_1)
+  set(__OUTPUT_VAR_LEVEL_2)
+  __project_build_tools_unwrap_interface_link_libraries(__OUTPUT_VAR_LEVEL_1
+                                                        "${ARGN}")
+  __project_build_tools_unwrap_interface_link_libraries(
+    __OUTPUT_VAR_LEVEL_2 TARGET_NAME ${__OUTPUT_VAR_LEVEL_1} TARGET_MATCH
+    ${__SCAN_OPTION_TARGET_MATCH})
+
+  set(${OUTPUT_VAR}
+      ${__OUTPUT_VAR_LEVEL_2}
       PARENT_SCOPE)
 endfunction()
