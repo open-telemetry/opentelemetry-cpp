@@ -97,7 +97,7 @@ otel_cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "logger_config_test",
     srcs = [
         "logger_config_test.cc",

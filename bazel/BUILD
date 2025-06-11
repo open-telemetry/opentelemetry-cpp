@@ -7,3 +7,7 @@ config_setting(
     name = "windows",
     constraint_values = ["@platforms//os:windows"],
 )
+
+exports_files([
+    "llvm_windows_install.BUILD",
+])

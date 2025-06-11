@@ -26,6 +26,18 @@ config_setting(
     },
 )
 
+bool_flag(
+    name = "asanwin",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "asanwin_enabled",
+    flag_values = {
+        "asanwin": "true",
+    },
+)
+
 otel_cc_library(
     name = "windows_only",
     target_compatible_with = select({

@@ -26,9 +26,11 @@ test --test_tag_filters=-jaeger,-opentracing,-opentracing_shim,-etw,-es,-prometh
 build --experimental_convenience_symlinks=clean
 
 build:windows      --copt="/Brepro"      --copt="/guard:cf"      --copt="/guard:ehcont"      --copt="/Z7"      --copt="/JMC-"      --copt="/sdl" 
+build:windows --host_copt="/Brepro"      --copt="/guard:cf"      --copt="/guard:ehcont"      --copt="/Z7"      --copt="/JMC-"      --copt="/sdl"
 build:windows      --linkopt="/Brepro"      --linkopt="/guard:cf"      --linkopt="/guard:ehcont" --linkopt="/DEBUG:FULL" --linkopt="/CETCOMPAT" --linkopt="/SWAPRUN:NET,CD" --linkopt="/OPT:REF,NOICF" --linkopt="/RELEASE" --linkopt="/DEBUGTYPE:CV,PDATA,FIXUP" 
-build:windows --copt="/Zc:strictStrings"
-build:windows --copt="/Gy"
+build:windows --host_linkopt="/Brepro"      --linkopt="/guard:cf"      --linkopt="/guard:ehcont" --linkopt="/DEBUG:FULL" --linkopt="/CETCOMPAT" --linkopt="/SWAPRUN:NET,CD" --linkopt="/OPT:REF,NOICF" --linkopt="/RELEASE" --linkopt="/DEBUGTYPE:CV,PDATA,FIXUP" 
+build:windows      --copt="/Zc:strictStrings" --copt="/Gy"
+build:windows --host_copt="/Zc:strictStrings" --copt="/Gy"
 build:windows --host_linkopt="shell32.lib" 
 # Requires Visual Studio 2019 Build Tools installed in default location with the latest compiler (14.29.30133) for x64
 build:windows      --action_env=BAZEL_VC_FULL_VERSION=14.42.34433      --action_env=BAZEL_WINSDK_FULL_VERSION=10.0.22621.0
@@ -55,6 +57,16 @@ build:macos --strip=never --copt=-g --cxxopt=-g
 build:macos --action_env=CC=/opt/homebrew/opt/llvm/bin/clang
 build:macos --host_action_env=CC=/opt/homebrew/opt/llvm/bin/clang
 #build:macos --apple_generate_dsym --output_groups=+dsyms
+
+# Windows specific asan setup
+# common:asanwin --copt -fsanitize=address,bool,float-cast-overflow,integer-divide-by-zero,null,return,returns-nonnull-attribute,shift-exponent,signed-integer-overflow,unreachable,vla-bound
+common:asanwin --copt -fsanitize=address,bool,float-cast-overflow,integer-divide-by-zero,null,return,returns-nonnull-attribute,shift-exponent,unreachable,vla-bound
+common:asanwin --copt -fsanitize-address-use-after-scope
+common:asanwin --copt -fno-sanitize-recover=all
+common:asanwin --copt -fno-sanitize-ignorelist --copt -MD
+common:asanwin --test_env=ASAN_OPTIONS=report_globals=0:detect_odr_violation=0
+common:asanwin --cc_output_directory_tag=asanwin
+common:asanwin --@otel_sdk//:asanwin=true
 
 # --config=asan : Address Sanitizer.
 common:asan --copt -DADDRESS_SANITIZER
@@ -157,7 +169,6 @@ build --host_copt="-DGRPC_NO_ABSL_SYNC"
 
 # disable all GRPC experiments
 # build --define=grpc_experiments_are_final=true
-
 
 ## This is what my ../top.bazelrc contains (not in the repo as local to my machine)
 # build --disk_cache=f:/b/d
