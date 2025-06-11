@@ -248,69 +248,7 @@ function(__project_build_tools_recursive_scan_unwrap OUTPUT_VAR INPUT_VAR)
   endif()
 endfunction()
 
-macro(__project_build_tools_recursive_scan_imported_locations)
-  if(NOT DEFINED __project_build_tools_recursive_call_level)
-    set(__project_build_tools_recursive_call_level 1)
-  else()
-    math(EXPR __project_build_tools_recursive_call_level
-         "${__project_build_tools_recursive_call_level} + 1")
-  endif()
-  foreach(TARGET_NAME_ORIGIN_${__project_build_tools_recursive_call_level}
-          ${ARGN})
-    if(TARGET_NAME_ORIGIN_${__project_build_tools_recursive_call_level} MATCHES
-       "^\\\$<.*>?$")
-      __project_build_tools_recursive_scan_unwrap(
-        TARGET_NAME
-        "${TARGET_NAME_ORIGIN_${__project_build_tools_recursive_call_level}}")
-    else()
-      set(TARGET_NAME
-          "${TARGET_NAME_ORIGIN_${__project_build_tools_recursive_call_level}}")
-    endif()
-    if(NOT DEFINED
-       __project_build_tools_recursive_scan_imported_locations_${TARGET_NAME}
-       AND TARGET ${TARGET_NAME})
-      set(__project_build_tools_recursive_scan_imported_locations_${TARGET_NAME}
-          TRUE)
-      set(__lib_path)
-      project_build_tools_get_imported_location(__lib_path ${TARGET_NAME})
-      if(__lib_path)
-        list(APPEND __OUTPUT_VAR ${__lib_path})
-      endif()
-
-      set(__TARGET_LINK_LIBRARIES)
-      get_target_property(__TARGET_LINK_LIBRARIES ${TARGET_NAME}
-                          INTERFACE_LINK_LIBRARIES)
-      if(__SCAN_OPTION_TARGET_MATCH)
-        set(__TARGET_LINK_LIBRARIES_SELECTED)
-        foreach(__TARGET_LINK_LIBRARIES_ITEM IN LISTS __TARGET_LINK_LIBRARIES)
-          set(__TARGET_MATCHED FALSE)
-          foreach(__MATCH_RULE ${__SCAN_OPTION_TARGET_MATCH})
-            if(__TARGET_LINK_LIBRARIES_ITEM MATCHES "${__MATCH_RULE}")
-              set(__TARGET_MATCHED TRUE)
-              break()
-            endif()
-          endforeach()
-          if(__TARGET_MATCHED)
-            list(APPEND __TARGET_LINK_LIBRARIES_SELECTED
-                 ${__TARGET_LINK_LIBRARIES_ITEM})
-          endif()
-        endforeach(__TARGET_LINK_LIBRARIES_ITEM IN LISTS
-                   __TARGET_LINK_LIBRARIES)
-      else()
-        set(__TARGET_LINK_LIBRARIES_SELECTED ${__TARGET_LINK_LIBRARIES})
-      endif()
-
-      if(__TARGET_LINK_LIBRARIES_SELECTED)
-        __project_build_tools_recursive_scan_imported_locations(
-          ${__TARGET_LINK_LIBRARIES_SELECTED})
-      endif()
-    endif()
-  endforeach()
-  math(EXPR __project_build_tools_recursive_call_level
-       "${__project_build_tools_recursive_call_level} - 1")
-endmacro()
-
-function(project_build_tools_recursive_scan_imported_locations OUTPUT_VAR)
+function(project_build_tools_unwrap_interface_link_libraries OUTPUT_VAR)
   set(optionArgs)
   set(oneValueArgs)
   set(multiValueArgs TARGET_NAME TARGET_MATCH)
@@ -318,8 +256,50 @@ function(project_build_tools_recursive_scan_imported_locations OUTPUT_VAR)
                         "${multiValueArgs}" "${ARGN}")
   set(__OUTPUT_VAR)
 
-  __project_build_tools_recursive_scan_imported_locations(
-    ${__SCAN_OPTION_TARGET_NAME})
+  set(__TARGET_CHECK_NAMES)
+  foreach(TARGET_NAME_ORIGIN ${__SCAN_OPTION_TARGET_NAME})
+    if(TARGET_NAME_ORIGIN MATCHES "^\\\$<.*>?$")
+      __project_build_tools_recursive_scan_unwrap(TARGET_NAME
+                                                  "${TARGET_NAME_ORIGIN}")
+    else()
+      set(TARGET_NAME "${TARGET_NAME_ORIGIN}")
+    endif()
+
+    if(TARGET ${TARGET_NAME})
+      # Get the imported location of the target
+      project_build_tools_get_imported_location(__TARGET_IMPORTED_LOCATION
+                                                ${TARGET_NAME})
+      if(__TARGET_IMPORTED_LOCATION)
+        list(APPEND __TARGET_CHECK_NAMES ${__TARGET_IMPORTED_LOCATION})
+      endif()
+
+      # Get the interface link libraries of the target
+      set(__TARGET_LINK_LIBRARIES)
+      get_target_property(__TARGET_LINK_LIBRARIES ${TARGET_NAME}
+                          INTERFACE_LINK_LIBRARIES)
+      list(APPEND __TARGET_CHECK_NAMES ${__TARGET_LINK_LIBRARIES})
+
+    endif()
+  endforeach()
+
+  list(REMOVE_DUPLICATES __TARGET_CHECK_NAMES)
+  # If the target match option is set, filter the link names
+  if(__SCAN_OPTION_TARGET_MATCH)
+    foreach(__LINK_NAME IN LISTS __TARGET_CHECK_NAMES)
+      set(__TARGET_MATCHED FALSE)
+      foreach(__MATCH_RULE ${__SCAN_OPTION_TARGET_MATCH})
+        if(__LINK_NAME MATCHES "${__MATCH_RULE}")
+          set(__TARGET_MATCHED TRUE)
+          break()
+        endif()
+      endforeach()
+      if(__TARGET_MATCHED)
+        list(APPEND __OUTPUT_VAR ${__LINK_NAME})
+      endif()
+    endforeach()
+  else()
+    set(__OUTPUT_VAR ${__TARGET_CHECK_NAMES})
+  endif()
 
   set(${OUTPUT_VAR}
       ${__OUTPUT_VAR}
