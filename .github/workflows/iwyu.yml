@@ -13,6 +13,16 @@ permissions:
 jobs:
   iwyu:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - options_preset: all-options-abiv1
+            warning_limit: 0
+          - options_preset: all-options-abiv1-preview
+            warning_limit: 24
+          - options_preset: all-options-abiv2-preview
+            warning_limit: 48
+
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -48,59 +58,40 @@ jobs:
       - name: Prepare CMake
         run: |
           TOPDIR=`pwd`
-          mkdir build && cd build
+          mkdir -p build-${{ matrix.options_preset }} && cd build-${{ matrix.options_preset }}
           CC="clang" CXX="clang++" cmake \
+            -C ${TOPDIR}/test_common/cmake/${{ matrix.options_preset }}.cmake \
             -DCMAKE_CXX_STANDARD=14 \
             -DWITH_STL=CXX14 \
             -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;" \
-            -DBUILD_TESTING=ON \
-            -DWITH_EXAMPLES=ON \
-            -DWITH_EXAMPLES_HTTP=ON \
-            -DBUILD_W3CTRACECONTEXT_TEST=ON \
-            -DWITH_OTLP_GRPC=ON \
-            -DWITH_OTLP_HTTP=ON \
-            -DWITH_OTLP_FILE=ON \
-            -DWITH_OPENTRACING=ON \
-            -DWITH_OTLP_HTTP_COMPRESSION=ON \
-            -DWITH_ZIPKIN=ON \
-            -DWITH_PROMETHEUS=ON \
-            -DWITH_ELASTICSEARCH=ON \
-            -DWITH_HTTP_CLIENT_CURL=ON \
-            -DWITH_ABI_VERSION_1=OFF \
-            -DWITH_ABI_VERSION_2=ON \
-            -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-            -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-            -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
-            -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
-            -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
-            -DWITH_OTLP_RETRY_PREVIEW=ON \
             ..
 
       - name: iwyu_tool
         run: |
-          cd build
-          make -k 2>&1 | tee -a iwyu.log
+          cd build-${{ matrix.options_preset }}
+          make -k 2>&1 | tee -a iwyu-${{ matrix.options_preset }}.log
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: success() || failure()
         with:
-          name: Logs (include-what-you-use)
-          path: ./build/*.log
+          name: Logs-${{ matrix.options_preset }} (include-what-you-use)
+          path: ./build-${{ matrix.options_preset }}/*.log
 
       - name: count warnings
         run: |
           set +e
           echo "include-what-you-use version:"
           include-what-you-use --version
-          cd build
-          readonly WARNING_COUNT=`grep -c "include-what-you-use reported diagnostics:" iwyu.log`
-          echo "include-what-you-use reported ${WARNING_COUNT} warning(s)"
+          cd build-${{ matrix.options_preset }}
+          readonly WARNING_COUNT=`grep -c "include-what-you-use reported diagnostics:" iwyu-${{ matrix.options_preset }}.log`
+          echo "include-what-you-use reported ${WARNING_COUNT} warning(s) with cmake options preset '${{ matrix.options_preset }}'"
           # Acceptable limit, to decrease over time down to 0
-          readonly WARNING_LIMIT=48
+          readonly WARNING_LIMIT=${{ matrix.warning_limit }}
           # FAIL the build if WARNING_COUNT > WARNING_LIMIT
           if [ $WARNING_COUNT -gt $WARNING_LIMIT ] ; then
+            echo "include-what-you-use reported ${WARNING_COUNT} warning(s) exceeding the existing warning limit of ${WARNING_LIMIT} with cmake options preset '${{ matrix.options_preset }}'"
             exit 1
           # WARN in annotations if WARNING_COUNT > 0
           elif [ $WARNING_COUNT -gt 0 ] ; then
-            echo "::warning::include-what-you-use reported ${WARNING_COUNT} warning(s)"
+            echo "::warning::include-what-you-use reported ${WARNING_COUNT} warning(s) with cmake options preset '${{ matrix.options_preset }}'"
           fi

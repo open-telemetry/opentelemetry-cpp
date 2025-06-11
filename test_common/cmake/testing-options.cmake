@@ -1,0 +1,13 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+# Enable all examples in the OpenTelemetry C++ SDK.
+
+if(NOT DEFINED ENABLE_TESTS)
+    set(ENABLE_TESTS ON)
+endif()
+
+set(BUILD_TESTING ${ENABLE_TESTS} CACHE BOOL "" FORCE)
+set(BUILD_W3CTRACECONTEXT_TEST ${ENABLE_TESTS} CACHE BOOL "" FORCE)
+set(WITH_BENCHMARK ${ENABLE_TESTS} CACHE BOOL "" FORCE)
+set(WITH_FUNC_TESTS ${ENABLE_TESTS} CACHE BOOL "" FORCE)
