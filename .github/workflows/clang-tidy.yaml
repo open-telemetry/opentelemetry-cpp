@@ -11,15 +11,15 @@ permissions:
 
 jobs:
   clang-tidy:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 236
+            warning_limit: 215
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 236
+            warning_limit: 216
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
