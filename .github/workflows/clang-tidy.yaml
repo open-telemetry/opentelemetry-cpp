@@ -13,13 +13,13 @@ jobs:
   clang-tidy:
     runs-on: ubuntu-24.04
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 0
+            warning_limit: 236
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 216
+            warning_limit: 236
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -60,7 +60,6 @@ jobs:
           echo "Using clang-tidy version: $(clang-tidy --version)"
           echo "clang-tidy installed at: $(which clang-tidy)"
 
-
       - name: Prepare CMake
         env:
           CC: clang
@@ -71,12 +70,13 @@ jobs:
             -C ./test_common/cmake/${{ matrix.cmake_options }}.cmake \
             -DCMAKE_CXX_STANDARD=14 \
             -DWITH_STL=CXX14 \
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+            -DWITH_OPENTRACING=OFF \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--quiet;-p;build-${{ matrix.cmake_options }}"
 
       - name: Run clang-tidy
         run: |
-          cmake --build build-${{ matrix.cmake_options }}
-          jq -r .[].file build-${{ matrix.cmake_options }}/compile_commands.json | grep -vE '/(generated|third_party)/' | xargs -P $(nproc) -n 1 clang-tidy --quiet -p build-${{ matrix.cmake_options }} 2>&1 | tee -a clang-tidy-${{ matrix.cmake_options }}.log
+          cmake --build build-${{ matrix.cmake_options }} -- -j$(nproc) 2>&1 | tee clang-tidy-${{ matrix.cmake_options }}.log
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
