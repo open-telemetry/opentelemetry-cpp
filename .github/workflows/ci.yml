@@ -334,6 +334,27 @@ jobs:
         CXX_STANDARD: '20'
       run: ./ci/do_ci.ps1 cmake.maintainer.cxx20.stl.test
 
+  cmake_msvc_maintainer_test_stl_cxx20_dll:
+    name: CMake msvc (maintainer mode) with C++20 (Build as DLL)
+    runs-on: windows-latest
+    steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      with:
+        egress-policy: audit
+
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        ./ci/setup_cmake.ps1
+        ./ci/setup_windows_ci_environment.ps1
+    - name: run tests (Build as DLL)
+      env:
+        CXX_STANDARD: '20'
+      run: ./ci/do_ci.ps1 cmake.maintainer.cxx20.stl.dll.test
+
   cmake_msvc_maintainer_abiv2_test:
     name: CMake msvc (maintainer mode, abiv2)
     runs-on: windows-latest
