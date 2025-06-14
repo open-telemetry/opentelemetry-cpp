@@ -42,9 +42,12 @@ jobs:
             llvm-dev \
             libclang-dev
           sudo ./ci/setup_cmake.sh
+          sudo ./ci/install_ryml.sh
+
       - name: Install include-what-you-use
         run: |
           sudo ./ci/install_iwyu.sh
+
       - name: Prepare CMake
         run: |
           TOPDIR=`pwd`
@@ -53,6 +56,7 @@ jobs:
             -DCMAKE_CXX_STANDARD=14 \
             -DWITH_STL=CXX14 \
             -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;" \
+            -DWITH_CONFIGURATION=ON \
             -DBUILD_TESTING=ON \
             -DWITH_EXAMPLES=ON \
             -DWITH_EXAMPLES_HTTP=ON \

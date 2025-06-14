@@ -39,6 +39,7 @@ jobs:
           libgmock-dev \
           libgtest-dev \
           libbenchmark-dev
+          sudo ./ci/install_ryml.sh
 
           if ! command -v clang-tidy &> /dev/null; then
             echo "clang-tidy could not be found"
@@ -68,6 +69,7 @@ jobs:
             -DBUILD_W3CTRACECONTEXT_TEST=ON \
             -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
             -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+            -DWITH_CONFIGURATION=ON \
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       - name: Run clang-tidy
