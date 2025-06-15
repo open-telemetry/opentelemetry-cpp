@@ -135,6 +135,8 @@ bool BatchLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noex
     if (synchronization_data_->force_flush_pending_sequence.load(std::memory_order_acquire) >
         synchronization_data_->force_flush_notified_sequence.load(std::memory_order_acquire))
     {
+      synchronization_data_->is_force_wakeup_background_worker.store(true,
+                                                                     std::memory_order_release);
       synchronization_data_->cv.notify_all();
     }
 
