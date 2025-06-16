@@ -51,8 +51,8 @@ jobs:
             libgtest-dev \
             libbenchmark-dev \
             llvm-dev \
-            libclang-dev
-          sudo ./ci/setup_cmake.sh
+            libclang-dev \
+            cmake
       - name: Install include-what-you-use
         run: |
           sudo ./ci/install_iwyu.sh
