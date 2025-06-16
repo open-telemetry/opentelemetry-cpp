@@ -8,10 +8,8 @@ ARG USER_GID=1000
 ARG INSTALL_PACKAGES=
 
 ARG CXX_STANDARD=17
-ARG CMAKE_VERSION=3.31.6
 
 ENV CXX_STANDARD=${CXX_STANDARD}
-ENV CMAKE_VERSION=${CMAKE_VERSION}
 
 COPY ci /opt/ci
 
@@ -20,9 +18,9 @@ RUN apt update && apt install -y wget \
     llvm-dev \
     libclang-dev \
     clang-tidy \
-    shellcheck
+    shellcheck \
+    cmake
 
-RUN cd /opt/ci && bash setup_cmake.sh
 RUN cd /opt/ci && bash setup_ci_environment.sh
 RUN cd /opt/ci && bash install_iwyu.sh
 

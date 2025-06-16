@@ -41,8 +41,9 @@ add_custom_command(
 add_library(example_grpc_proto ${example_grpc_srcs} ${example_grpc_hdrs}
                                ${example_proto_srcs} ${example_proto_hdrs})
 
-# Disable include-what-you-use on generated code.
-set_target_properties(example_grpc_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "")
+# Disable include-what-you-use and clang-tidy on generated code.
+set_target_properties(example_grpc_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE ""
+                                                    CXX_CLANG_TIDY "")
 
 target_include_directories(
   example_grpc_proto PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>")

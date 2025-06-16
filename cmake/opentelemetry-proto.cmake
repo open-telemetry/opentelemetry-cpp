@@ -315,8 +315,8 @@ target_include_directories(
          "$<INSTALL_INTERFACE:include>")
 
 # Disable include-what-you-use and clang-tidy on generated code.
-set_target_properties(opentelemetry_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE ""
-                                                          CXX_CLANG_TIDY "")
+set_target_properties(opentelemetry_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE
+                                                     "" CXX_CLANG_TIDY "")
 if(NOT Protobuf_INCLUDE_DIRS AND TARGET protobuf::libprotobuf)
   get_target_property(Protobuf_INCLUDE_DIRS protobuf::libprotobuf
                       INTERFACE_INCLUDE_DIRECTORIES)

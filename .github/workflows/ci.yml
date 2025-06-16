@@ -27,7 +27,6 @@ jobs:
 #      run: |
 #        sudo -E ./ci/setup_gcc10.sh
 #        sudo -E ./ci/setup_ci_environment.sh
-#        sudo -E ./ci/setup_cmake.sh
 
   cmake_test:
     name: CMake test (prometheus, elasticsearch, zipkin)
@@ -36,7 +35,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -46,7 +45,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run cmake tests
       run: |
         ./ci/do_ci.sh cmake.test
@@ -58,7 +56,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -67,7 +65,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run fetch content test
       run: |
         ./ci/do_ci.sh cmake.fetch_content.test
@@ -84,7 +81,7 @@ jobs:
       CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -93,7 +90,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: install dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh /usr/local third_party_release
@@ -119,7 +115,7 @@ jobs:
       CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -128,7 +124,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: install dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh /usr/local third_party_release
@@ -154,7 +149,7 @@ jobs:
       CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -163,7 +158,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: install dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh /usr/local third_party_release
@@ -189,7 +183,7 @@ jobs:
       CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -198,7 +192,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: install dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh /usr/local third_party_release
@@ -224,7 +217,7 @@ jobs:
       CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -233,7 +226,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: install dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh /usr/local third_party_release
@@ -255,7 +247,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -264,7 +256,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.maintainer.test
@@ -274,7 +265,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -283,7 +274,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       env:
@@ -295,7 +285,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -304,7 +294,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       env:
@@ -316,7 +305,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -329,7 +318,6 @@ jobs:
         CXX: /usr/bin/g++-12
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run cmake tests (without otlp-exporter)
       env:
         CC: /usr/bin/gcc-12
@@ -342,7 +330,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -352,7 +340,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run cmake tests (enable opentracing-shim)
       run: ./ci/do_ci.sh cmake.opentracing_shim.test
 
@@ -361,7 +348,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -371,7 +358,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run tests (enable stl)
       env:
         CXX_STANDARD: '14'
@@ -382,7 +368,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -392,7 +378,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run tests (enable stl)
       env:
         CXX_STANDARD: '17'
@@ -403,7 +388,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -413,7 +398,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run tests
       env:
         CXX_STANDARD: '20'
@@ -428,7 +412,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -442,7 +426,6 @@ jobs:
         CXXFLAGS: "-stdlib=libc++"
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run tests
       env:
         CC: /usr/bin/clang
@@ -463,7 +446,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -473,7 +456,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run tests
       env:
         CXX_STANDARD: '23'
@@ -488,7 +470,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -502,7 +484,6 @@ jobs:
         CXXFLAGS: "-stdlib=libc++"
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run tests
       env:
         CC: /usr/bin/clang
@@ -523,7 +504,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -533,7 +514,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run otlp exporter tests
       run: |
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
@@ -554,7 +534,7 @@ jobs:
       CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -563,7 +543,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: install dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh /usr/local install/cmake/third_party_stable
@@ -576,7 +555,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -586,7 +565,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run otlp exporter tests
       run: |
         ./ci/do_ci.sh cmake.do_not_install.test
@@ -596,7 +574,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -606,7 +584,6 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run otlp exporter tests
       run: |
         ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
@@ -616,7 +593,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -629,7 +606,6 @@ jobs:
         CXX: /usr/bin/g++-12
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run tests
       env:
         CC: /usr/bin/gcc-12
@@ -641,7 +617,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -658,7 +634,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
@@ -668,7 +643,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -685,7 +660,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.no_bzlmod.test
@@ -695,7 +669,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -712,7 +686,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.with_async_export.test
@@ -722,7 +695,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -739,7 +712,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.valgrind
@@ -749,7 +721,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -766,7 +738,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.noexcept
@@ -776,7 +747,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -793,7 +764,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.nortti
@@ -803,7 +773,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -820,7 +790,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.asan
@@ -830,7 +799,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -847,7 +816,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.tsan
@@ -857,7 +825,7 @@ jobs:
     runs-on: macos-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -879,7 +847,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -912,7 +880,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -926,7 +894,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -939,7 +907,7 @@ jobs:
     runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -948,7 +916,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test
@@ -961,7 +928,7 @@ jobs:
     runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -970,7 +937,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test (DLL build)
@@ -985,7 +951,7 @@ jobs:
     runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -994,7 +960,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test
@@ -1007,7 +972,7 @@ jobs:
     runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -1025,7 +990,7 @@ jobs:
     runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -1034,7 +999,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.test_example_plugin
@@ -1044,7 +1008,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -1057,7 +1021,6 @@ jobs:
         CXX: /usr/bin/g++-10
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
     - name: run tests and generate report
       env:
         CC: /usr/bin/gcc-10
@@ -1073,7 +1036,7 @@ jobs:
 
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -1090,7 +1053,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -1105,7 +1068,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -1123,7 +1086,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
 
@@ -1139,7 +1102,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
         with:
           egress-policy: audit
 
@@ -1153,7 +1116,6 @@ jobs:
           CXX: /usr/bin/g++-12
         run: |
           sudo -E ./ci/setup_ci_environment.sh
-          sudo -E ./ci/setup_cmake.sh
       - name: run w3c trace-context test server (background)
         env:
           CXX_STANDARD: '14'
