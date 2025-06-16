@@ -13,9 +13,20 @@ permissions:
 jobs:
   iwyu:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - cmake_options: all-options-abiv1
+            warning_limit: 5
+          - cmake_options: all-options-abiv1-preview
+            warning_limit: 28
+          - cmake_options: all-options-abiv2-preview
+            warning_limit: 48
+
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
         with:
           egress-policy: audit
 
@@ -40,58 +51,48 @@ jobs:
             libgtest-dev \
             libbenchmark-dev \
             llvm-dev \
-            libclang-dev
-          sudo ./ci/setup_cmake.sh
+            libclang-dev \
+            cmake
       - name: Install include-what-you-use
         run: |
           sudo ./ci/install_iwyu.sh
       - name: Prepare CMake
+        env:
+          CC: clang
+          CXX: clang++
         run: |
           TOPDIR=`pwd`
-          mkdir build && cd build
-          CC="clang" CXX="clang++" cmake \
+          cmake -B build-${{ matrix.cmake_options }} \
+            -C ./test_common/cmake/${{ matrix.cmake_options }}.cmake \
             -DCMAKE_CXX_STANDARD=14 \
             -DWITH_STL=CXX14 \
-            -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;" \
-            -DBUILD_TESTING=ON \
-            -DWITH_EXAMPLES=ON \
-            -DWITH_EXAMPLES_HTTP=ON \
-            -DBUILD_W3CTRACECONTEXT_TEST=ON \
-            -DWITH_OTLP_GRPC=ON \
-            -DWITH_OTLP_HTTP=ON \
-            -DWITH_OTLP_FILE=ON \
-            -DWITH_OPENTRACING=ON \
-            -DWITH_OTLP_HTTP_COMPRESSION=ON \
-            -DWITH_THREAD_INSTRUMENTATION=ON \
-            -DWITH_ZIPKIN=ON \
-            -DWITH_PROMETHEUS=ON \
-            ..
+            -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
+            -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;"
 
       - name: iwyu_tool
         run: |
-          cd build
-          make -k 2>&1 | tee -a iwyu.log
+          cmake --build build-${{ matrix.cmake_options }} -- -j$(nproc) -k 2>&1 | tee -a iwyu-${{ matrix.cmake_options }}.log
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: success() || failure()
         with:
-          name: Logs (include-what-you-use)
-          path: ./build/*.log
+          name: Logs-iwyu-${{ matrix.cmake_options }}
+          path: ./iwyu-${{ matrix.cmake_options }}.log
 
       - name: count warnings
         run: |
           set +e
           echo "include-what-you-use version:"
           include-what-you-use --version
-          cd build
-          readonly WARNING_COUNT=`grep -c "include-what-you-use reported diagnostics:" iwyu.log`
-          echo "include-what-you-use reported ${WARNING_COUNT} warning(s)"
+          readonly WARNING_COUNT=`grep -c "include-what-you-use reported diagnostics:" iwyu-${{ matrix.cmake_options }}.log`
+          echo "include-what-you-use reported ${WARNING_COUNT} warning(s) with cmake options preset '${{ matrix.cmake_options }}'"
           # Acceptable limit, to decrease over time down to 0
-          readonly WARNING_LIMIT=0
+          readonly WARNING_LIMIT=${{ matrix.warning_limit }}
           # FAIL the build if WARNING_COUNT > WARNING_LIMIT
           if [ $WARNING_COUNT -gt $WARNING_LIMIT ] ; then
+            echo "include-what-you-use reported ${WARNING_COUNT} warning(s) exceeding the existing warning limit of ${WARNING_LIMIT} with cmake options preset '${{ matrix.cmake_options }}'"
             exit 1
           # WARN in annotations if WARNING_COUNT > 0
           elif [ $WARNING_COUNT -gt 0 ] ; then
-            echo "::warning::include-what-you-use reported ${WARNING_COUNT} warning(s)"
+            echo "::warning::include-what-you-use reported ${WARNING_COUNT} warning(s) with cmake options preset '${{ matrix.cmake_options }}'"
           fi
