@@ -361,6 +361,7 @@ jobs:
         CXX: /usr/bin/g++-12
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E apt-get install -y zlib1g-dev libcurl4-openssl-dev
     - name: run cmake tests (without otlp-exporter)
       env:
         CC: /usr/bin/gcc-12
@@ -1172,6 +1173,7 @@ jobs:
           CXX: /usr/bin/g++-12
         run: |
           sudo -E ./ci/setup_ci_environment.sh
+          sudo -E apt-get install -y zlib1g-dev libcurl4-openssl-dev
       - name: run w3c trace-context test server (background)
         env:
           CXX_STANDARD: '14'
