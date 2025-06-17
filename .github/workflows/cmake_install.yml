@@ -73,10 +73,11 @@ jobs:
     - name: Setup CI Environment
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: Install Dependencies
       run: |
         sudo -E apt-get update
-        sudo -E apt-get install -y libgmock-dev libgtest-dev libbenchmark-dev libabsl-dev libcurl4-openssl-dev zlib1g-dev nlohmann-json3-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
+        sudo -E apt-get install -y libbenchmark-dev libabsl-dev libcurl4-openssl-dev zlib1g-dev nlohmann-json3-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
