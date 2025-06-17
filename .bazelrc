@@ -60,15 +60,34 @@ build:macos --host_action_env=CC=/opt/homebrew/opt/llvm/bin/clang
 
 # Windows specific asan setup
 # common:asanwin --copt -fsanitize=address,bool,float-cast-overflow,integer-divide-by-zero,null,return,returns-nonnull-attribute,shift-exponent,signed-integer-overflow,unreachable,vla-bound
-common:asanwin --copt -fsanitize=address,bool,float-cast-overflow,integer-divide-by-zero,null,return,returns-nonnull-attribute,shift-exponent,unreachable,vla-bound
-common:asanwin --copt -fsanitize-address-use-after-scope
-common:asanwin --copt -fno-sanitize-recover=all
+#common:asanwin --copt -fsanitize=address,bool,float-cast-overflow,integer-divide-by-zero,null,return,returns-nonnull-attribute,shift-exponent,unreachable,vla-bound
+common:asanwin --copt -fsanitize=address,undefined
 common:asanwin --copt -fno-sanitize-ignorelist --copt -MD
-common:asanwin --test_env=ASAN_OPTIONS=report_globals=0:detect_odr_violation=0
+#alignment,bool,builtin,bounds,array-bounds,enum,float-cast-overflow,integer-divide-by-zero,function,implicit-unsigned-integer-truncation,implicit-signed-integer-truncation,implicit-integer-sign-change,null,return,returns-nonnull-attribute,shift-exponent,unreachable,vla-bound
+common:asanwin --copt -fsanitize-address-use-after-scope
+common:asanwin --copt -fsanitize-address-globals-dead-stripping
+common:asanwin --copt -fsanitize-address-outline-instrumentation
+common:asanwin --copt -fsanitize-address-use-after-return=always
+common:asanwin --copt -fsanitize-stable-abi
+common:asanwin --copt -fsanitize-merge
+# common:asanwin --copt -fsanitize-address-use-odr-indicator
+# common:asanwin --test_env="ASAN_OPTIONS=report_globals=0:detect_odr_violation=0:verbosity=1:debug=1:strict_init_order=1:check_initialization_order=1:detect_stack_use_after_return=1:print_stats=1:verbosity=2:atexit=1:alloc_dealloc_mismatch=1:strict_string_checks=1:use_odr_indicator=1:halt_on_error=0:malloc_context_size=0"
+# common:asanwin --test_env=ASAN_OPTIONS="help"
 common:asanwin --cc_output_directory_tag=asanwin
 common:asanwin --@otel_sdk//:asanwin=true
-
-# --config=asan : Address Sanitizer.
+# common:asanwin --copt -fno-sanitize-cfi-canonical-jump-tables
+# common:asanwin --copt -fno-sanitize-cfi-cross-dso
+# common:asanwin -fno-sanitize-coverage=<value>
+# common:asanwin --copt -fno-sanitize-hwaddress-experimental-aliasing
+# common:asanwin --copt -fno-sanitize-memory-param-retval
+# common:asanwin --copt -fno-sanitize-memory-track-origins
+# common:asanwin --copt -fno-sanitize-memory-use-after-dtor
+# common:asanwin -fno-sanitize-recover=<value>
+# common:asanwin -fno-sanitize-stats
+# common:asanwin --copt -fno-sanitize-thread-atomics
+# common:asanwin --copt -fno-sanitize-thread-func-entry-exit
+# common:asanwin --copt -fno-sanitize-thread-memory-access
+ 
 common:asan --copt -DADDRESS_SANITIZER
 common:asan --copt -fsanitize=address,bool,float-cast-overflow,integer-divide-by-zero,null,return,returns-nonnull-attribute,shift-exponent,signed-integer-overflow,unreachable,vla-bound
 common:asan --copt -fsanitize-address-use-after-scope
@@ -169,6 +188,8 @@ build --host_copt="-DGRPC_NO_ABSL_SYNC"
 
 # disable all GRPC experiments
 # build --define=grpc_experiments_are_final=true
+
+common:devenv --run_under='"c:/windows/system32/cmd.exe" /C start "bazel debug exe" /wait devenv /debugexe '
 
 ## This is what my ../top.bazelrc contains (not in the repo as local to my machine)
 # build --disk_cache=f:/b/d
