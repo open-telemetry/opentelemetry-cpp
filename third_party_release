@@ -16,8 +16,8 @@
 gRPC=v1.49.2
 abseil=20240116.1
 benchmark=v1.8.3
-googletest=1.14.0
-ms-gsl=v3.1.0-67-g6f45293
+googletest=v1.14.0
+ms-gsl=v3.1.0
 nlohmann-json=v3.12.0
 opentelemetry-proto=v1.7.0
 opentracing-cpp=v1.6.0

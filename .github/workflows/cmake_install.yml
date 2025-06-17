@@ -71,14 +71,13 @@ jobs:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
-    - name: Install libcurl, zlib, nlohmann-json with apt
+    - name: Setup Environment
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
-    - name: Install abseil, protobuf, and grpc with apt
+    - name: Install Dependencies
       run: |
         sudo -E apt-get update
-        sudo -E apt-get install -y libabsl-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
+        sudo -E apt-get install -y zlib1g-dev libcurl4-openssl-dev nlohmann-json3-dev libabsl-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
@@ -98,7 +97,6 @@ jobs:
       # Versions below set to the latest version available
       # The abseil and protobuf versions are taken from
       # the grpc submodules at the GRPC_VERSION tag
-      GOOGLETEST_VERSION: '1.16.0'
       ABSEIL_CPP_VERSION: '20240722.1'
       PROTOBUF_VERSION: '29.0'
       GRPC_VERSION: 'v1.71.0'
@@ -112,12 +110,12 @@ jobs:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
-    - name: Install gtest, libcurl, zlib, nlohmann-json with apt
+    - name: Setup Environment
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
-    - name: Build abseil, protobuf, and grpc with ci scripts
+    - name: Install Dependencies
       run: |
+        sudo -E apt-get install -y zlib1g-dev libcurl4-openssl-dev
         sudo -E ./ci/install_abseil.sh
         sudo -E ./ci/install_protobuf.sh
         sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
@@ -134,7 +132,6 @@ jobs:
       CXX_STANDARD: '17'
       # These are stable versions tested in the main ci workflow
       # and defaults in the devcontainer
-      GOOGLETEST_VERSION: '1.14.0'
       ABSEIL_CPP_VERSION: '20230125.3'
       PROTOBUF_VERSION: '23.3'
       GRPC_VERSION: 'v1.55.0'
@@ -148,12 +145,12 @@ jobs:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
-    - name: Install gtest, libcurl, zlib, nlohmann-json with apt
+    - name: Setup Environment
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
-    - name: Build abseil, protobuf, and grpc with ci scripts
+    - name: Install Dependencies
       run: |
+        sudo -E apt-get install -y zlib1g-dev libcurl4-openssl-dev
         sudo -E ./ci/install_abseil.sh
         sudo -E ./ci/install_protobuf.sh
         sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
@@ -175,8 +172,6 @@ jobs:
       CMAKE_VERSION: '3.14.0'
       # cxx14 is the default for Ubuntu 22.04
       CXX_STANDARD: '14'
-      # This is the apt package version of googletest for Ubuntu 22.04
-      GOOGLETEST_VERSION: '1.11.0'
       # These are minimum versions tested in the main ci workflow
       ABSEIL_CPP_VERSION: '20220623.2'
       PROTOBUF_VERSION: '21.12'
@@ -191,13 +186,13 @@ jobs:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
-    - name: Install gtest, libcurl, zlib, nlohmann-json with apt
+    - name: Setup Environment
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
-    - name: Build abseil, protobuf, and grpc with ci scripts
+    - name: Install Dependencies
       run: |
+        sudo -E apt-get install -y zlib1g-dev libcurl4-openssl-dev
         sudo -E ./ci/install_abseil.sh
         sudo -E ./ci/install_protobuf.sh
         sudo -E ./ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
