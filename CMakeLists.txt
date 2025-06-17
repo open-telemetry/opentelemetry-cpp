@@ -267,14 +267,6 @@ option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
 option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
        OFF)
 
-#
-# This option is experimental, subject to change in the spec:
-#
-# * https://github.com/open-telemetry/opentelemetry-specification/issues/2232
-#
-option(WITH_REMOVE_METER_PREVIEW
-       "EXPERIMENTAL, ABI BREAKING: Allow to remove a meter" OFF)
-
 if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
 endif()
@@ -793,7 +785,6 @@ message(
 )
 message(
   STATUS "WITH_METRICS_EXEMPLAR_PREVIEW: ${WITH_METRICS_EXEMPLAR_PREVIEW}")
-message(STATUS "WITH_REMOVE_METER_PREVIEW: ${WITH_REMOVE_METER_PREVIEW}")
 message(
   STATUS "WITH_OTLP_GRPC_SSL_MTLS_PREVIEW: ${WITH_OTLP_GRPC_SSL_MTLS_PREVIEW}")
 message(
