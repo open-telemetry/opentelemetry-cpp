@@ -27,6 +27,46 @@ Increment the:
 * [BUILD] Upgrade opentelemetry-proto to 1.7.0
   [#3443](https://github.com/open-telemetry/opentelemetry-cpp/pull/3443)
 
+* [REMOVAL] Removed deprecated semantic convention header files
+  [#3475](https://github.com/open-telemetry/opentelemetry-cpp/pull/3475)
+
+Important changes:
+
+* [REMOVAL] Removed deprecated semantic convention header files
+  [#3475](https://github.com/open-telemetry/opentelemetry-cpp/pull/3475)
+
+  * Old semantic conventions header files have been removed,
+    per announcement from Nov 9, 2024, see
+   [#3105](https://github.com/open-telemetry/opentelemetry-cpp/pull/3105)
+
+  * Mitigation steps are repeated below, for convenience.
+
+  * Two things have changed:
+
+    * the header file to use
+    * the symbol name to use.
+
+    Before, the semantic convention for `url.full` was:
+
+    * declared in file `semantic_conventions.h`
+    * declared as symbol `SemanticConventions::kUrlFull`
+
+    Now, the `url.full` convention, which is part or the `url` group, is:
+
+    * declared in file `semconv/url_attributes.h`
+    * declared as symbol `semconv::url::kUrlFull`
+
+    Application code that uses semantic conventions must be adjusted
+    accordingly.
+
+    In addition, semantic conventions that are not marked as stable
+    are generated in a different header file, placed under directory
+    `incubating`, to better separate stable and non stable code.
+
+    For example, file `semconv/incubating/url_attributes.h`
+    defines `semconv::url::kUrlDomain`,
+    which is not marked as stable in semconv v1.27.0
+
 ## [1.21 2025-05-28]
 
 * [BUILD] Remove WITH_ABSEIL
