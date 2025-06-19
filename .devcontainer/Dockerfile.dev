@@ -8,14 +8,8 @@ ARG USER_GID=1000
 ARG INSTALL_PACKAGES=
 
 ARG CXX_STANDARD=17
-ARG ABSEIL_CPP_VERSION=20230125.3
-ARG PROTOBUF_VERSION=23.3
-ARG GRPC_VERSION=v1.55.0
 
 ENV CXX_STANDARD=${CXX_STANDARD}
-ENV ABSEIL_CPP_VERSION=${ABSEIL_CPP_VERSION}
-ENV PROTOBUF_VERSION=${PROTOBUF_VERSION}
-ENV GRPC_VERSION=${GRPC_VERSION}
 
 COPY ci /opt/ci
 
@@ -23,17 +17,12 @@ RUN apt update && apt install -y wget \
     ninja-build \
     llvm-dev \
     libclang-dev \
-    libcurl4-openssl-dev \
     clang-tidy \
     shellcheck \
     cmake
 
 RUN cd /opt/ci && bash setup_ci_environment.sh
 RUN cd /opt/ci && bash install_iwyu.sh
-RUN cd /opt && bash ci/setup_googletest.sh \
-    && bash ci/install_abseil.sh \
-    && bash ci/install_protobuf.sh \
-    && bash ci/setup_grpc.sh -r $GRPC_VERSION -s $CXX_STANDARD -p protobuf -p abseil-cpp
 
 ADD https://github.com/bazelbuild/bazelisk/releases/download/v1.22.1/bazelisk-linux-amd64 /usr/local/bin
 	
@@ -46,6 +35,7 @@ ENV USER_UID=${USER_UID}
 ENV USER_GID=${USER_GID}
 ENV IS_CONTAINER_BUILD=true
 
+COPY install /opt/install
 COPY ./.devcontainer/customize_container.sh /tmp/opentelemetry_cpp/devcontainer/customize_container.sh
 RUN /tmp/opentelemetry_cpp/devcontainer/customize_container.sh
 RUN apt install -y npm && npm install -g markdownlint-cli@0.44.0
@@ -53,6 +43,8 @@ RUN apt install -y npm && npm install -g markdownlint-cli@0.44.0
 USER devuser
 
 WORKDIR  /workspaces/opentelemetry-cpp
+RUN cd /opt && bash ci/install_thirdparty.sh /home/devuser/third-party/install-stable install/cmake/third_party_stable
+ENV CMAKE_PREFIX_PATH=/home/devuser/third-party/install-stable
 
 ENTRYPOINT []
 
