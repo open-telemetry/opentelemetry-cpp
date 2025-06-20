@@ -72,7 +72,7 @@ TEST(StringViewTest, SubstrPortion)
   EXPECT_EQ("12", s.substr(3, 2));
 }
 
-TEST(StringViewTest, SubstrOutOfRange)
+static void __attribute__((no_sanitize("address"))) StringViewTest_SubstrOutOfRange_NoSanatize()
 {
   string_view s = "abc123";
 #if __EXCEPTIONS || (defined(OPENTELEMETRY_STL_VERSION) && (OPENTELEMETRY_STL_VERSION >= 2017))
@@ -80,6 +80,11 @@ TEST(StringViewTest, SubstrOutOfRange)
 #else
   EXPECT_DEATH({ s.substr(10); }, "");
 #endif
+}
+
+TEST(StringViewTest, SubstrOutOfRange)
+{
+  StringViewTest_SubstrOutOfRange_NoSanatize();
 }
 
 TEST(StringViewTest, FindSingleCharacter)
