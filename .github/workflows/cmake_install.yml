@@ -252,7 +252,7 @@ jobs:
         run: ./ci/do_ci.sh cmake.opentracing_shim.install.test
 
   ubuntu_2404_conan_latest:
-    name: Ubuntu 24.04 conan latest versions cxx17 (static libs - shared libs)
+    name: Ubuntu 24.04 conan latest versions cxx17 (static libs)
     runs-on: ubuntu-24.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
@@ -285,44 +285,6 @@ jobs:
         run: |
           export PKG_CONFIG_PATH=$INSTALL_TEST_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
           ./ci/verify_packages.sh
-      - name: Run Tests (shared libs)
-        env:
-          BUILD_SHARED_LIBS: 'ON'
-        run: ./ci/do_ci.sh cmake.install.test
-
-  ubuntu_2404_conan_latest_shared_deps:
-    name: Ubuntu 24.04 conan latest w/shared protobuf and grpc (shared libs)
-    runs-on: ubuntu-24.04
-    env:
-      INSTALL_TEST_DIR: '/home/runner/install_test'
-      # Set to the latest version of cmake 3.x
-      CMAKE_VERSION: '3.31.6'
-      CXX_STANDARD: '17'
-      CMAKE_TOOLCHAIN_FILE: /home/runner/conan/build/Debug/generators/conan_toolchain.cmake
-      BUILD_TYPE: 'Debug'
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
-        with:
-          egress-policy: audit
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          submodules: 'recursive'
-      - name: Install Conan
-        run: |
-          python3 -m pip install pip==25.0.1
-          pip install "conan==2.15.1"
-          conan profile detect --force
-      - name: Install or build all dependencies with Conan
-        run: |
-          sudo -E ./ci/setup_cmake.sh
-          conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD} -o protobuf/*:shared=True -o grpc/*:shared=True
-      - name: Run Tests (shared libs)
-        env:
-          BUILD_SHARED_LIBS: 'ON'
-        run: |
-          source /home/runner/conan/build/Debug/generators/conanrun.sh
-          ./ci/do_ci.sh cmake.install.test
 
   macos_14_conan_stable:
     name: macOS 14 conan stable versions cxx17 (static libs)

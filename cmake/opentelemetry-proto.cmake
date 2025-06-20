@@ -228,24 +228,6 @@ endif()
 # opentelemetry_exporter_otlp_grpc_client as a static library.
 if(TARGET protobuf::libprotobuf)
   get_target_property(protobuf_lib_type protobuf::libprotobuf TYPE)
-  # protobuf_lib_type may be "INTERFACE_LIBRARY" in some build systems, such as
-  # conan.
-  if(protobuf_lib_type STREQUAL "INTERFACE_LIBRARY")
-    project_build_tools_unwrap_interface_link_libraries(
-      protobuf_lib_files TARGET_NAME protobuf::libprotobuf TARGET_MATCH
-      ".*(protobuf).*")
-    foreach(protobuf_lib_file ${protobuf_lib_files})
-      if(protobuf_lib_file MATCHES
-         "(^|[\\\\\\/])[^\\\\\\/]*protobuf[^\\\\\\/]*\\.(a|lib)$")
-        set(protobuf_lib_type "STATIC_LIBRARY")
-        break()
-      elseif(protobuf_lib_file MATCHES
-             "(^|[\\\\\\/])[^\\\\\\/]*protobuf[^\\\\\\/]*\\.(so|dll|dylib)$")
-        set(protobuf_lib_type "SHARED_LIBRARY")
-        break()
-      endif()
-    endforeach()
-  endif()
 else()
   set(protobuf_lib_type "SHARED_LIBRARY")
   target_link_libraries(opentelemetry_proto PUBLIC ${Protobuf_LIBRARIES})
@@ -357,8 +339,8 @@ target_include_directories(
                              "$<INSTALL_INTERFACE:include>")
 
 # Disable include-what-you-use and clang-tidy on generated code.
-set_target_properties(opentelemetry_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE
-                                                     "" CXX_CLANG_TIDY "")
+set_target_properties(opentelemetry_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE ""
+                                                     CXX_CLANG_TIDY "")
 if(NOT Protobuf_INCLUDE_DIRS AND TARGET protobuf::libprotobuf)
   get_target_property(Protobuf_INCLUDE_DIRS protobuf::libprotobuf
                       INTERFACE_INCLUDE_DIRECTORIES)
@@ -378,8 +360,9 @@ if(WITH_OTLP_GRPC)
   set_target_version(opentelemetry_proto_grpc)
 
   # Disable include-what-you-use and clang-tidy on generated code.
-  set_target_properties(opentelemetry_proto_grpc
-                        PROPERTIES CXX_INCLUDE_WHAT_YOU_USE "" CXX_CLANG_TIDY "")
+  set_target_properties(
+    opentelemetry_proto_grpc PROPERTIES CXX_INCLUDE_WHAT_YOU_USE ""
+                                        CXX_CLANG_TIDY "")
 
   list(APPEND OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto_grpc)
   target_link_libraries(opentelemetry_proto_grpc PUBLIC opentelemetry_proto)
@@ -390,23 +373,6 @@ if(WITH_OTLP_GRPC)
   # result in crashes. To prevent such conflicts, we also need to build
   # opentelemetry_exporter_otlp_grpc_client as a static library.
   get_target_property(grpc_lib_type gRPC::grpc++ TYPE)
-  # grpc_lib_type may be "INTERFACE_LIBRARY" in some build systems, such as
-  # conan.
-  if(grpc_lib_type STREQUAL "INTERFACE_LIBRARY")
-    project_build_tools_unwrap_interface_link_libraries(
-      grpc_lib_files TARGET_NAME gRPC::grpc++ TARGET_MATCH ".*(grpc|gRPC).*")
-    foreach(grpc_lib_file ${grpc_lib_files})
-      if(grpc_lib_file MATCHES
-         "(^|[\\\\\\/])[^\\\\\\/]*grpc[^\\\\\\/]*\\.(a|lib)$")
-        set(grpc_lib_type "STATIC_LIBRARY")
-        break()
-      elseif(grpc_lib_file MATCHES
-             "(^|[\\\\\\/])[^\\\\\\/]*grpc[^\\\\\\/]*\\.(so|dll|dylib)$")
-        set(grpc_lib_type "SHARED_LIBRARY")
-        break()
-      endif()
-    endforeach()
-  endif()
 
   if(grpc_lib_type STREQUAL "SHARED_LIBRARY")
     target_link_libraries(opentelemetry_proto_grpc PUBLIC gRPC::grpc++)
