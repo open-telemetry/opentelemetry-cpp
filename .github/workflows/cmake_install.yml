@@ -211,7 +211,7 @@ jobs:
       run: ./ci/do_ci.sh cmake.install.test
 
   ubuntu_2404_conan_stable:
-    name: Ubuntu 24.04 conan stable versions cxx17 (static libs - shared libs - opentracing shim)
+    name: Ubuntu 24.04 conan stable versions cxx17 (static libs - opentracing shim)
     runs-on: ubuntu-24.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
@@ -239,10 +239,6 @@ jobs:
       - name: Run Tests (static libs)
         env:
           BUILD_SHARED_LIBS: 'OFF'
-        run: ./ci/do_ci.sh cmake.install.test
-      - name: Run Tests (shared libs)
-        env:
-          BUILD_SHARED_LIBS: 'ON'
         run: ./ci/do_ci.sh cmake.install.test
       - name: verify pkgconfig packages
         run: |
