@@ -73,11 +73,11 @@ jobs:
     - name: Setup CI Environment
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
     - name: Install Dependencies
       run: |
         sudo -E apt-get update
-        sudo -E apt-get install -y libbenchmark-dev libabsl-dev libcurl4-openssl-dev zlib1g-dev nlohmann-json3-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
+        sudo -E apt-get install -y libabsl-dev libcurl4-openssl-dev zlib1g-dev nlohmann-json3-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "googletest;benchmark"
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
@@ -107,7 +107,7 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
     - name: Install Dependencies
       run: |
-        sudo -E ./ci/install_thirdparty.sh /usr/local install/cmake/third_party_latest
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_latest
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
@@ -133,7 +133,7 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
     - name: Install Dependencies
       run: |
-        sudo -E ./ci/install_thirdparty.sh /usr/local install/cmake/third_party_stable
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_stable
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
@@ -167,7 +167,7 @@ jobs:
         sudo -E ./ci/setup_cmake.sh
     - name: Install Dependencies
       run: |
-        sudo -E ./ci/install_thirdparty.sh /usr/local install/cmake/third_party_minimum
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_minimum
     - name: Run Tests (static libs)
       env:
           BUILD_SHARED_LIBS: 'OFF'

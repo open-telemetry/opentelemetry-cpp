@@ -19,6 +19,7 @@ RUN apt update && apt install -y wget \
     libclang-dev \
     clang-tidy \
     shellcheck \
+    sudo \
     cmake
 
 RUN cd /opt/ci && bash setup_ci_environment.sh
@@ -43,7 +44,7 @@ RUN apt install -y npm && npm install -g markdownlint-cli@0.44.0
 USER devuser
 
 WORKDIR  /workspaces/opentelemetry-cpp
-RUN cd /opt && bash ci/install_thirdparty.sh /home/devuser/third-party/install-stable install/cmake/third_party_stable
+RUN cd /opt && bash ci/install_thirdparty.sh --install-dir /home/devuser/third-party/install-stable --tags-file install/cmake/third_party_stable
 ENV CMAKE_PREFIX_PATH=/home/devuser/third-party/install-stable
 
 ENTRYPOINT []

@@ -29,7 +29,7 @@ jobs:
 #        sudo -E ./ci/setup_ci_environment.sh
 #    - name: install dependencies
 #      run: |
-#        sudo -E ./ci/install_thirdparty.sh /usr/local third_party_release
+#        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
 
   cmake_test:
     name: CMake test (prometheus, elasticsearch, zipkin)
@@ -99,7 +99,7 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
     - name: install dependencies
       run: |
-        sudo -E ./ci/install_thirdparty.sh /usr/local third_party_release
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake gcc (maintainer mode, sync)
       run: |
         ./ci/do_ci.sh cmake.maintainer.sync.test
@@ -133,7 +133,7 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
     - name: install dependencies
       run: |
-        sudo -E ./ci/install_thirdparty.sh /usr/local third_party_release
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake gcc (maintainer mode, async)
       run: |
         ./ci/do_ci.sh cmake.maintainer.async.test
@@ -167,7 +167,7 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
     - name: install dependencies
       run: |
-        sudo -E ./ci/install_thirdparty.sh /usr/local third_party_release
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake clang (maintainer mode, sync)
       run: |
         ./ci/do_ci.sh cmake.maintainer.sync.test
@@ -201,7 +201,7 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
     - name: install dependencies
       run: |
-        sudo -E ./ci/install_thirdparty.sh /usr/local third_party_release
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake clang (maintainer mode, async)
       run: |
         ./ci/do_ci.sh cmake.maintainer.async.test
@@ -235,7 +235,7 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
     - name: install dependencies
       run: |
-        sudo -E ./ci/install_thirdparty.sh /usr/local third_party_release
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake clang (maintainer mode, abiv2)
       run: |
         ./ci/do_ci.sh cmake.maintainer.abiv2.test
@@ -531,7 +531,7 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
     - name: install dependencies
       run: |
-        sudo -E ./ci/install_thirdparty.sh /usr/local third_party_release
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run otlp exporter tests
       run: |
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
@@ -563,7 +563,7 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
     - name: install dependencies
       run: |
-        sudo -E ./ci/install_thirdparty.sh /usr/local install/cmake/third_party_stable
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_stable
     - name: run otlp exporter tests
       run: |
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
@@ -585,7 +585,7 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
     - name: install dependencies
       run: |
-        sudo -E ./ci/install_thirdparty.sh /usr/local third_party_release
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run otlp exporter tests
       run: |
         ./ci/do_ci.sh cmake.do_not_install.test
@@ -607,7 +607,7 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
     - name: install dependencies
       run: |
-        sudo -E ./ci/install_thirdparty.sh /usr/local third_party_release
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run otlp exporter tests
       run: |
         ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test

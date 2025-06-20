@@ -25,16 +25,29 @@ include(ExternalProject)
 set(OTELCPP_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../..")
 get_filename_component(OTELCPP_SOURCE_DIR "${OTELCPP_SOURCE_DIR}" ABSOLUTE)
 
-if(NOT OTELCPP_THIRDPARTY_FILE)
-  set(OTELCPP_THIRDPARTY_FILE "${OTELCPP_SOURCE_DIR}/third_party_release")
-elseif(NOT IS_ABSOLUTE OTELCPP_THIRDPARTY_FILE)
-  string(PREPEND OTELCPP_THIRDPARTY_FILE "${OTELCPP_SOURCE_DIR}/")
+if(NOT OTELCPP_THIRDPARTY_TAGS_FILE)
+  set(OTELCPP_THIRDPARTY_TAGS_FILE "${OTELCPP_SOURCE_DIR}/third_party_release")
+elseif(NOT IS_ABSOLUTE OTELCPP_THIRDPARTY_TAGS_FILE)
+  string(PREPEND OTELCPP_THIRDPARTY_TAGS_FILE "${OTELCPP_SOURCE_DIR}/")
 endif()
 
-message(
-  STATUS "Reading third-party version tags from ${OTELCPP_THIRDPARTY_FILE} ...")
+if(NOT OTELCPP_THIRDPARTY_INSTALL_LIST)
+  set(OTELCPP_THIRDPARTY_INSTALL_LIST
+      "zlib"
+      "curl"
+      "abseil"
+      "protobuf"
+      "grpc"
+      "benchmark"
+      "googletest"
+      "ms-gsl"
+      "nlohmann-json"
+      "opentelemetry-proto"
+      "opentracing-cpp"
+      "prometheus-cpp")
+endif()
 
-file(STRINGS "${OTELCPP_THIRDPARTY_FILE}" _THIRDPARTY_FILE_CONTENT)
+file(STRINGS "${OTELCPP_THIRDPARTY_TAGS_FILE}" _THIRDPARTY_FILE_CONTENT)
 set(_THIRDPARTY_PACKAGE_LIST "")
 
 # Parse the third-party tags file
@@ -48,20 +61,27 @@ foreach(_raw_line IN LISTS _THIRDPARTY_FILE_CONTENT)
   if(_line MATCHES "^([^=]+)=(.+)$")
     set(_package "${CMAKE_MATCH_1}")
     set(_git_tag "${CMAKE_MATCH_2}")
+
+    # Check if the package is in the install list
+    if(NOT _package IN_LIST OTELCPP_THIRDPARTY_INSTALL_LIST)
+      continue()
+    endif()
+
     set("${_package}_GIT_TAG" "${_git_tag}")
     list(APPEND _THIRDPARTY_PACKAGE_LIST "${_package}")
     message(STATUS " - ${_package}: ${${_package}_GIT_TAG}")
   else()
     message(
       FATAL_ERROR
-        "Could not parse third-party tag. Invalid line in ${OTELCPP_THIRDPARTY_FILE}. Line:\n  ${_raw_line}"
+        "Could not parse third-party tag. Invalid line in ${OTELCPP_THIRDPARTY_TAGS_FILE}. Line:\n  ${_raw_line}"
     )
   endif()
 endforeach()
 
 # Use submodules if the third-party tags file is the default
 # `third_party_release` file.
-if(OTELCPP_THIRDPARTY_FILE STREQUAL "${OTELCPP_SOURCE_DIR}/third_party_release")
+if(OTELCPP_THIRDPARTY_TAGS_FILE STREQUAL
+   "${OTELCPP_SOURCE_DIR}/third_party_release")
   set(USE_SUBMODULES ON)
 else()
   set(USE_SUBMODULES OFF)
@@ -83,7 +103,7 @@ set(CMAKE_OPTIONS
 message(STATUS "Installing third-party packages....")
 message(STATUS "  opentelemetry-cpp_SOURCE_DIR = ${OTELCPP_SOURCE_DIR}")
 message(STATUS "  third-party packages = ${_THIRDPARTY_PACKAGE_LIST}")
-message(STATUS "  third-party tags file = ${OTELCPP_THIRDPARTY_FILE}")
+message(STATUS "  third-party tags file = ${OTELCPP_THIRDPARTY_TAGS_FILE}")
 message(STATUS "  opentelemetry-proto path = ${OTELCPP_PROTO_PATH}")
 message(STATUS "  CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 message(STATUS "  CMAKE_OPTIONS=${CMAKE_OPTIONS}")
@@ -91,218 +111,239 @@ message(STATUS "  USE_SUBMODULES=${USE_SUBMODULES}")
 
 # ------------------------------------------------------------------------
 # ---- zlib ----
-ExternalProject_Add(
-  zlib
-  STEP_TARGETS install
-  GIT_REPOSITORY "https://github.com/madler/zlib.git"
-  GIT_TAG ${zlib_GIT_TAG}
-  GIT_SHALLOW ON
-  PREFIX ${CMAKE_BINARY_DIR}/external/zlib
-  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-  CMAKE_ARGS "${CMAKE_OPTIONS}" "-DZLIB_BUILD_EXAMPLES=OFF")
+if(zlib_GIT_TAG AND zlib IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  ExternalProject_Add(
+    zlib
+    STEP_TARGETS install
+    GIT_REPOSITORY "https://github.com/madler/zlib.git"
+    GIT_TAG ${zlib_GIT_TAG}
+    GIT_SHALLOW ON
+    PREFIX ${CMAKE_BINARY_DIR}/external/zlib
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    CMAKE_ARGS "${CMAKE_OPTIONS}" "-DZLIB_BUILD_EXAMPLES=OFF")
+endif()
 
 # ------------------------------------------------------------------------
 # ---- curl ----
-ExternalProject_Add(
-  curl
-  DEPENDS zlib
-  STEP_TARGETS build install
-  GIT_REPOSITORY "https://github.com/curl/curl.git"
-  GIT_TAG ${curl_GIT_TAG}
-  GIT_SHALLOW ON
-  PREFIX ${CMAKE_BINARY_DIR}/external/curl
-  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-  CMAKE_ARGS "${CMAKE_OPTIONS}"
-             "-DCURL_USE_LIBPSL=OFF"
-             "-DBUILD_CURL_EXE=OFF"
-             "-DBUILD_LIBCURL_DOCS=OFF"
-             "-DBUILD_MISC_DOCS=OFF"
-             "-DENABLE_CURL_MANUAL=OFF"
-             "-DBUILD_SHARED_LIBS=ON")
+if(curl_GIT_TAG AND curl IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  ExternalProject_Add(
+    curl
+    DEPENDS zlib
+    STEP_TARGETS build install
+    GIT_REPOSITORY "https://github.com/curl/curl.git"
+    GIT_TAG ${curl_GIT_TAG}
+    GIT_SHALLOW ON
+    PREFIX ${CMAKE_BINARY_DIR}/external/curl
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    CMAKE_ARGS "${CMAKE_OPTIONS}"
+               "-DCURL_USE_LIBPSL=OFF"
+               "-DBUILD_CURL_EXE=OFF"
+               "-DBUILD_LIBCURL_DOCS=OFF"
+               "-DBUILD_MISC_DOCS=OFF"
+               "-DENABLE_CURL_MANUAL=OFF"
+               "-DBUILD_SHARED_LIBS=ON")
 
-add_dependencies(curl-build zlib-install)
-# ------------------------------------------------------------------------
-# ---- abseil-cpp ----
-ExternalProject_Add(
-  abseil
-  STEP_TARGETS install
-  GIT_REPOSITORY "https://github.com/abseil/abseil-cpp.git"
-  GIT_TAG ${abseil_GIT_TAG}
-  GIT_SHALLOW ON
-  PREFIX ${CMAKE_BINARY_DIR}/external/abseil
-  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-  CMAKE_ARGS "${CMAKE_OPTIONS}" "-DABSL_BUILD_TESTING=OFF"
-             "-DABSL_ENABLE_INSTALL=ON")
-
-# ------------------------------------------------------------------------
-# ---- protobuf ----
-ExternalProject_Add(
-  protobuf
-  STEP_TARGETS build install
-  DEPENDS zlib abseil
-  GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
-  GIT_TAG ${protobuf_GIT_TAG}
-  GIT_SHALLOW ON
-  GIT_SUBMODULES ""
-  PREFIX ${CMAKE_BINARY_DIR}/external/protobuf
-  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-  CMAKE_ARGS "${CMAKE_OPTIONS}"
-             "-Dprotobuf_WITH_ZLIB=ON"
-             "-Dprotobuf_ZLIB_PROVIDER=package"
-             "-Dprotobuf_ABSL_PROVIDER=package"
-             "-Dprotobuf_INSTALL=ON"
-             "-Dprotobuf_BUILD_TESTS=OFF"
-             "-Dprotobuf_BUILD_EXAMPLES=OFF")
-
-add_dependencies(protobuf-build zlib-install abseil-install)
-
-# ------------------------------------------------------------------------
-# ---- grpc ----
-ExternalProject_Add(
-  grpc
-  DEPENDS zlib abseil protobuf
-  STEP_TARGETS build
-  GIT_REPOSITORY "https://github.com/grpc/grpc.git"
-  GIT_TAG ${grpc_GIT_TAG}
-  GIT_SHALLOW ON
-  GIT_SUBMODULES "third_party/re2" "third_party/cares/cares"
-                 "third_party/boringssl-with-bazel"
-  PREFIX ${CMAKE_BINARY_DIR}/external/grpc
-  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-  CMAKE_ARGS "${CMAKE_OPTIONS}"
-             "-DgRPC_INSTALL=ON"
-             "-DgRPC_BUILD_TESTS=OFF"
-             "-DgRPC_BUILD_GRPC_CPP_PLUGIN=ON"
-             "-DgRPC_BUILD_GRPC_CSHARP_PLUGIN=OFF"
-             "-DgRPC_BUILD_GRPC_OBJECTIVE_C_PLUGIN=OFF"
-             "-DgRPC_BUILD_GRPC_PHP_PLUGIN=OFF"
-             "-DgRPC_BUILD_GRPC_NODE_PLUGIN=OFF"
-             "-DgRPC_BUILD_GRPC_PYTHON_PLUGIN=OFF"
-             "-DgRPC_BUILD_GRPC_RUBY_PLUGIN=OFF"
-             "-DgRPC_BUILD_GRPCPP_OTEL_PLUGIN=OFF"
-             "-DRE2_BUILD_TESTING=OFF"
-             "-DgRPC_ZLIB_PROVIDER=package"
-             "-DgRPC_PROTOBUF_PROVIDER=package"
-             "-DgRPC_ABSL_PROVIDER=package")
-
-add_dependencies(grpc-build zlib-install abseil-install protobuf-install)
-
-# ------------------------------------------------------------------------
-# ---- benchmark ----
-
-set(benchmark_ARGS "")
-if(USE_SUBMODULES AND EXISTS "${OTELCPP_SOURCE_DIR}/third_party/benchmark/.git")
-  message(STATUS "Using submodule for benchmark")
-  list(APPEND benchmark_ARGS SOURCE_DIR
-       "${OTELCPP_SOURCE_DIR}/third_party/benchmark")
-else()
-  list(
-    APPEND
-    benchmark_ARGS
-    SOURCE_DIR
-    GIT_REPOSITORY
-    "https://github.com/google/benchmark.git"
-    GIT_TAG
-    ${benchmark_GIT_TAG}
-    GIT_SHALLOW
-    ON)
+  add_dependencies(curl-build zlib-install)
 endif()
 
-ExternalProject_Add(
-  benchmark
-  ${benchmark_ARGS}
-  PREFIX ${CMAKE_BINARY_DIR}/external/benchmark
-  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-  CMAKE_ARGS "${CMAKE_OPTIONS}" "-DBENCHMARK_ENABLE_TESTING=OFF"
-             "-DBENCHMARK_ENABLE_INSTALL=ON" "-DBUILD_SHARED_LIBS=ON")
+# ------------------------------------------------------------------------
+# ---- abseil-cpp ----
+if(abseil_GIT_TAG AND abseil IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  ExternalProject_Add(
+    abseil
+    STEP_TARGETS install
+    GIT_REPOSITORY "https://github.com/abseil/abseil-cpp.git"
+    GIT_TAG ${abseil_GIT_TAG}
+    GIT_SHALLOW ON
+    PREFIX ${CMAKE_BINARY_DIR}/external/abseil
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    CMAKE_ARGS "${CMAKE_OPTIONS}" "-DABSL_BUILD_TESTING=OFF"
+               "-DABSL_ENABLE_INSTALL=ON")
+endif()
+# ------------------------------------------------------------------------
+# ---- protobuf ----
+if(protobuf_GIT_TAG AND protobuf IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  ExternalProject_Add(
+    protobuf
+    STEP_TARGETS build install
+    DEPENDS zlib abseil
+    GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
+    GIT_TAG ${protobuf_GIT_TAG}
+    GIT_SHALLOW ON
+    GIT_SUBMODULES ""
+    PREFIX ${CMAKE_BINARY_DIR}/external/protobuf
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    CMAKE_ARGS "${CMAKE_OPTIONS}"
+               "-Dprotobuf_WITH_ZLIB=ON"
+               "-Dprotobuf_ZLIB_PROVIDER=package"
+               "-Dprotobuf_ABSL_PROVIDER=package"
+               "-Dprotobuf_INSTALL=ON"
+               "-Dprotobuf_BUILD_TESTS=OFF"
+               "-Dprotobuf_BUILD_EXAMPLES=OFF")
+
+  add_dependencies(protobuf-build zlib-install abseil-install)
+endif()
+# ------------------------------------------------------------------------
+# ---- grpc ----
+if(grpc_GIT_TAG AND grpc IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  ExternalProject_Add(
+    grpc
+    DEPENDS zlib abseil protobuf
+    STEP_TARGETS build
+    GIT_REPOSITORY "https://github.com/grpc/grpc.git"
+    GIT_TAG ${grpc_GIT_TAG}
+    GIT_SHALLOW ON
+    GIT_SUBMODULES "third_party/re2" "third_party/cares/cares"
+                   "third_party/boringssl-with-bazel"
+    PREFIX ${CMAKE_BINARY_DIR}/external/grpc
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    CMAKE_ARGS "${CMAKE_OPTIONS}"
+               "-DgRPC_INSTALL=ON"
+               "-DgRPC_BUILD_TESTS=OFF"
+               "-DgRPC_BUILD_GRPC_CPP_PLUGIN=ON"
+               "-DgRPC_BUILD_GRPC_CSHARP_PLUGIN=OFF"
+               "-DgRPC_BUILD_GRPC_OBJECTIVE_C_PLUGIN=OFF"
+               "-DgRPC_BUILD_GRPC_PHP_PLUGIN=OFF"
+               "-DgRPC_BUILD_GRPC_NODE_PLUGIN=OFF"
+               "-DgRPC_BUILD_GRPC_PYTHON_PLUGIN=OFF"
+               "-DgRPC_BUILD_GRPC_RUBY_PLUGIN=OFF"
+               "-DgRPC_BUILD_GRPCPP_OTEL_PLUGIN=OFF"
+               "-DRE2_BUILD_TESTING=OFF"
+               "-DgRPC_ZLIB_PROVIDER=package"
+               "-DgRPC_PROTOBUF_PROVIDER=package"
+               "-DgRPC_ABSL_PROVIDER=package")
+
+  add_dependencies(grpc-build zlib-install abseil-install protobuf-install)
+endif()
+# ------------------------------------------------------------------------
+# ---- benchmark ----
+if(benchmark_GIT_TAG AND benchmark IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  set(benchmark_ARGS "")
+  if(USE_SUBMODULES AND EXISTS
+                        "${OTELCPP_SOURCE_DIR}/third_party/benchmark/.git")
+    message(STATUS "Using submodule for benchmark")
+    list(APPEND benchmark_ARGS SOURCE_DIR
+         "${OTELCPP_SOURCE_DIR}/third_party/benchmark")
+  else()
+    list(
+      APPEND
+      benchmark_ARGS
+      SOURCE_DIR
+      GIT_REPOSITORY
+      "https://github.com/google/benchmark.git"
+      GIT_TAG
+      ${benchmark_GIT_TAG}
+      GIT_SHALLOW
+      ON)
+  endif()
+
+  ExternalProject_Add(
+    benchmark
+    ${benchmark_ARGS}
+    PREFIX ${CMAKE_BINARY_DIR}/external/benchmark
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    CMAKE_ARGS "${CMAKE_OPTIONS}" "-DBENCHMARK_ENABLE_TESTING=OFF"
+               "-DBENCHMARK_ENABLE_INSTALL=ON" "-DBUILD_SHARED_LIBS=ON"
+               "-DBENCHMARK_INSTALL_DOCS=OFF")
+endif()
 
 # -----------------------------------------------------------------------
 # ---- googletest ----
 
-set(googletest_ARGS "")
-if(USE_SUBMODULES AND EXISTS
-                      "${OTELCPP_SOURCE_DIR}/third_party/googletest/.git")
-  message(STATUS "Using submodule for googletest")
-  list(APPEND googletest_ARGS SOURCE_DIR
-       "${OTELCPP_SOURCE_DIR}/third_party/googletest")
-else()
-  list(
-    APPEND
-    googletest_ARGS
-    GIT_REPOSITORY
-    "https://github.com/google/googletest.git"
-    GIT_TAG
-    ${googletest_GIT_TAG}
-    GIT_SHALLOW
-    ON)
-endif()
+if(googletest_GIT_TAG AND googletest IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  set(googletest_ARGS "")
+  if(USE_SUBMODULES AND EXISTS
+                        "${OTELCPP_SOURCE_DIR}/third_party/googletest/.git")
+    message(STATUS "Using submodule for googletest")
+    list(APPEND googletest_ARGS SOURCE_DIR
+         "${OTELCPP_SOURCE_DIR}/third_party/googletest")
+  else()
+    list(
+      APPEND
+      googletest_ARGS
+      GIT_REPOSITORY
+      "https://github.com/google/googletest.git"
+      GIT_TAG
+      ${googletest_GIT_TAG}
+      GIT_SHALLOW
+      ON)
+  endif()
 
-ExternalProject_Add(
-  googletest
-  ${googletest_ARGS}
-  PREFIX ${CMAKE_BINARY_DIR}/external/googletest
-  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-  CMAKE_ARGS "${CMAKE_OPTIONS}" "-DINSTALL_GTEST=ON" "-DBUILD_GMOCK=ON"
-             "-DBUILD_SHARED_LIBS=ON")
+  ExternalProject_Add(
+    googletest
+    ${googletest_ARGS}
+    PREFIX ${CMAKE_BINARY_DIR}/external/googletest
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    CMAKE_ARGS "${CMAKE_OPTIONS}" "-DINSTALL_GTEST=ON" "-DBUILD_GMOCK=ON"
+               "-DBUILD_SHARED_LIBS=ON")
+endif()
 
 # ----------------------------------------------------------------------
 # ---- Microsoft.GSL ----
 
-set(ms-gsl_ARGS "")
-if(USE_SUBMODULES AND EXISTS "${OTELCPP_SOURCE_DIR}/third_party/ms-gsl/.git")
-  message(STATUS "Using submodule for ms-gsl")
-  list(APPEND ms-gsl_ARGS SOURCE_DIR "${OTELCPP_SOURCE_DIR}/third_party/ms-gsl")
-else()
-  list(
-    APPEND
-    ms-gsl_ARGS
-    GIT_REPOSITORY
-    "https://github.com/microsoft/GSL.git"
-    GIT_TAG
-    ${ms-gsl_GIT_TAG}
-    GIT_SHALLOW
-    ON)
-endif()
+if(ms-gsl_GIT_TAG AND ms-gsl IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  set(ms-gsl_ARGS "")
+  if(USE_SUBMODULES AND EXISTS "${OTELCPP_SOURCE_DIR}/third_party/ms-gsl/.git")
+    message(STATUS "Using submodule for ms-gsl")
+    list(APPEND ms-gsl_ARGS SOURCE_DIR
+         "${OTELCPP_SOURCE_DIR}/third_party/ms-gsl")
+  else()
+    list(
+      APPEND
+      ms-gsl_ARGS
+      GIT_REPOSITORY
+      "https://github.com/microsoft/GSL.git"
+      GIT_TAG
+      ${ms-gsl_GIT_TAG}
+      GIT_SHALLOW
+      ON)
+  endif()
 
-ExternalProject_Add(
-  ms-gsl
-  ${ms-gsl_ARGS}
-  PREFIX ${CMAKE_BINARY_DIR}/external/ms-gsl
-  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-  CMAKE_ARGS "${CMAKE_OPTIONS}" "-DGSL_TEST=OFF" "-DGSL_INSTALL=ON")
+  ExternalProject_Add(
+    ms-gsl
+    ${ms-gsl_ARGS}
+    PREFIX ${CMAKE_BINARY_DIR}/external/ms-gsl
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    CMAKE_ARGS "${CMAKE_OPTIONS}" "-DGSL_TEST=OFF" "-DGSL_INSTALL=ON")
+endif()
 
 # ----------------------------------------------------------------------
 # ---- nlohmann-json ----
 
-set(nhlohmann-json_ARGS "")
-if(USE_SUBMODULES AND EXISTS
-                      "${OTELCPP_SOURCE_DIR}/third_party/nlohmann-json/.git")
-  message(STATUS "Using submodule for nlohmann-json")
-  list(APPEND nhlohmann-json_ARGS SOURCE_DIR
-       "${OTELCPP_SOURCE_DIR}/third_party/nlohmann-json")
-else()
-  list(
-    APPEND
-    nhlohmann-json_ARGS
-    GIT_REPOSITORY
-    "https://github.com/nlohmann/json.git"
-    GIT_TAG
-    ${nhlohmann-json_GIT_TAG}
-    GIT_SHALLOW
-    ON)
-endif()
+if(nlohmann-json_GIT_TAG AND nlohmann-json IN_LIST _THIRDPARTY_PACKAGE_LIST)
 
-ExternalProject_Add(
-  nlohmann-json
-  ${nhlohmann-json_ARGS}
-  PREFIX ${CMAKE_BINARY_DIR}/external/nlohmann-json
-  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-  CMAKE_ARGS "${CMAKE_OPTIONS}" "-DJSON_BuildTests=OFF" "-DJSON_Install=ON"
-             "-DJSON_MultipleHeaders=OFF")
+  set(nlohmann-json_ARGS "")
+  if(USE_SUBMODULES AND EXISTS
+                        "${OTELCPP_SOURCE_DIR}/third_party/nlohmann-json/.git")
+    message(STATUS "Using submodule for nlohmann-json")
+    list(APPEND nlohmann-json_ARGS SOURCE_DIR
+         "${OTELCPP_SOURCE_DIR}/third_party/nlohmann-json")
+  else()
+    list(
+      APPEND
+      nlohmann-json_ARGS
+      GIT_REPOSITORY
+      "https://github.com/nlohmann/json.git"
+      GIT_TAG
+      ${nlohmann-json_GIT_TAG}
+      GIT_SHALLOW
+      ON)
+  endif()
+
+  ExternalProject_Add(
+    nlohmann-json
+    ${nlohmann-json_ARGS}
+    PREFIX ${CMAKE_BINARY_DIR}/external/nlohmann-json
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    CMAKE_ARGS "${CMAKE_OPTIONS}" "-DJSON_BuildTests=OFF" "-DJSON_Install=ON"
+               "-DJSON_MultipleHeaders=OFF")
+endif()
 
 # ----------------------------------------------------------------------
 # ---- opentelemetry-proto ----
-if(OTELCPP_PROTO_PATH)
+if(opentelemetry-proto_GIT_TAG
+   AND OTELCPP_PROTO_PATH
+   AND opentelemetry-proto IN_LIST _THIRDPARTY_PACKAGE_LIST)
   message(
     STATUS
       "Adding opentelemetry-proto: OTELCPP_PROTO_PATH: ${OTELCPP_PROTO_PATH}")
@@ -320,64 +361,69 @@ endif()
 # ----------------------------------------------------------------------
 # ---- opentracing-cpp ----
 
-set(opentracing-cpp_ARGS "")
-if(USE_SUBMODULES AND EXISTS
-                      "${OTELCPP_SOURCE_DIR}/third_party/opentracing-cpp/.git")
-  message(STATUS "Using submodule for opentracing-cpp")
-  list(APPEND opentracing-cpp_ARGS SOURCE_DIR
-       "${OTELCPP_SOURCE_DIR}/third_party/opentracing-cpp"
-       ${opentracing-cpp_ARGS})
-else()
-  list(
-    APPEND
-    opentracing-cpp_ARGS
-    GIT_REPOSITORY
-    "https://github.com/opentracing/opentracing-cpp.git"
-    GIT_TAG
-    ${opentracing-cpp_GIT_TAG}
-    GIT_SHALLOW
-    ON)
-endif()
+if(opentracing-cpp_GIT_TAG AND opentracing-cpp IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  set(opentracing-cpp_ARGS "")
+  if(USE_SUBMODULES
+     AND EXISTS "${OTELCPP_SOURCE_DIR}/third_party/opentracing-cpp/.git")
+    message(STATUS "Using submodule for opentracing-cpp")
+    list(APPEND opentracing-cpp_ARGS SOURCE_DIR
+         "${OTELCPP_SOURCE_DIR}/third_party/opentracing-cpp"
+         ${opentracing-cpp_ARGS})
+  else()
+    list(
+      APPEND
+      opentracing-cpp_ARGS
+      GIT_REPOSITORY
+      "https://github.com/opentracing/opentracing-cpp.git"
+      GIT_TAG
+      ${opentracing-cpp_GIT_TAG}
+      GIT_SHALLOW
+      ON)
+  endif()
 
-ExternalProject_Add(
-  opentracing-cpp
-  ${opentracing-cpp_ARGS}
-  PREFIX ${CMAKE_BINARY_DIR}/external/opentracing-cpp
-  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-  CMAKE_ARGS "${CMAKE_OPTIONS}" "-DBUILD_TESTING=OFF")
+  ExternalProject_Add(
+    opentracing-cpp
+    ${opentracing-cpp_ARGS}
+    PREFIX ${CMAKE_BINARY_DIR}/external/opentracing-cpp
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    CMAKE_ARGS "${CMAKE_OPTIONS}" "-DBUILD_TESTING=OFF")
+endif()
 
 # ----------------------------------------------------------------------
 # ---- prometheus-cpp ----
 
-set(prometheus-cpp_ARGS "")
-if(USE_SUBMODULES AND EXISTS
-                      "${OTELCPP_SOURCE_DIR}/third_party/prometheus-cpp/.git")
-  message(STATUS "Using submodule for prometheus-cpp")
-  list(APPEND prometheus-cpp_ARGS SOURCE_DIR
-       "${OTELCPP_SOURCE_DIR}/third_party/prometheus-cpp")
-else()
+if(prometheus-cpp_GIT_TAG AND prometheus-cpp IN_LIST _THIRDPARTY_PACKAGE_LIST)
 
-  list(
-    APPEND
-    prometheus-cpp_ARGS
-    GIT_REPOSITORY
-    "https://github.com/jupp0r/prometheus-cpp.git"
-    GIT_TAG
-    "${prometheus-cpp_GIT_TAG}"
-    GIT_SHALLOW
-    ON
-    GIT_SUBMODULES
-    "3rdparty/civetweb")
+  set(prometheus-cpp_ARGS "")
+  if(USE_SUBMODULES AND EXISTS
+                        "${OTELCPP_SOURCE_DIR}/third_party/prometheus-cpp/.git")
+    message(STATUS "Using submodule for prometheus-cpp")
+    list(APPEND prometheus-cpp_ARGS SOURCE_DIR
+         "${OTELCPP_SOURCE_DIR}/third_party/prometheus-cpp")
+  else()
+
+    list(
+      APPEND
+      prometheus-cpp_ARGS
+      GIT_REPOSITORY
+      "https://github.com/jupp0r/prometheus-cpp.git"
+      GIT_TAG
+      "${prometheus-cpp_GIT_TAG}"
+      GIT_SHALLOW
+      ON
+      GIT_SUBMODULES
+      "3rdparty/civetweb")
+  endif()
+
+  ExternalProject_Add(
+    prometheus-cpp
+    ${prometheus-cpp_ARGS}
+    PREFIX ${CMAKE_BINARY_DIR}/external/prometheus-cpp
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    STEP_TARGETS build
+    DEPENDS zlib curl
+    CMAKE_ARGS "${CMAKE_OPTIONS}" "-DENABLE_TESTING=OFF" "-DENABLE_PUSH=ON"
+               "-DENABLE_PULL=ON")
+
+  add_dependencies(prometheus-cpp-build zlib-install curl-install)
 endif()
-
-ExternalProject_Add(
-  prometheus-cpp
-  ${prometheus-cpp_ARGS}
-  PREFIX ${CMAKE_BINARY_DIR}/external/prometheus-cpp
-  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-  STEP_TARGETS build
-  DEPENDS zlib curl
-  CMAKE_ARGS "${CMAKE_OPTIONS}" "-DENABLE_TESTING=OFF" "-DENABLE_PUSH=ON"
-             "-DENABLE_PULL=ON")
-
-add_dependencies(prometheus-cpp-build zlib-install curl-install)
