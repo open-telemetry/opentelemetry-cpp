@@ -99,7 +99,9 @@ function(project_build_tools_get_imported_location OUTPUT_VAR_NAME TARGET_NAME)
   get_target_property(TARGET_TYPE ${TARGET_NAME} TYPE)
   if(TARGET_TYPE STREQUAL "INTERFACE_LIBRARY")
     # For interface libraries, do not attempt to retrieve imported location.
-    set(${OUTPUT_VAR_NAME} "" PARENT_SCOPE)
+    set(${OUTPUT_VAR_NAME}
+        ""
+        PARENT_SCOPE)
     return()
   endif()
 
