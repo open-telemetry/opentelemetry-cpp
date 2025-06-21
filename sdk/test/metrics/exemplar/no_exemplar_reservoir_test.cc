@@ -4,10 +4,16 @@
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 #  include <gtest/gtest.h>
+#  include <stdint.h>
 #  include <chrono>
+#  include <memory>
 #  include <string>
+#  include <vector>
 
-#  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/context/context.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 
 using namespace opentelemetry::sdk::metrics;
 

@@ -3,20 +3,17 @@
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
 
-#include <google/protobuf/arena.h>
 #include <grpc/compression.h>
 #include <grpcpp/resource_quota.h>
 #include <grpcpp/security/credentials.h>
 #include <grpcpp/support/channel_arguments.h>
 #include <stdint.h>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <fstream>
 #include <iterator>
 #include <map>
 #include <memory>
-#include <ratio>
 #include <string>
 #include <utility>
 
@@ -32,9 +29,12 @@
 // clang-format on
 
 #ifdef ENABLE_ASYNC_EXPORT
+#  include <google/protobuf/arena.h>
+#  include <algorithm>
 #  include <condition_variable>
 #  include <cstdio>
 #  include <mutex>
+#  include <ratio>
 #  include <unordered_set>
 
 #  include "opentelemetry/common/timestamp.h"

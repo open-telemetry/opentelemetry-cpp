@@ -2,15 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
-#include "opentelemetry/ext/http/client/http_client.h"
-#include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/logs/severity.h"
-#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/common/exporter_utils.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -20,15 +15,15 @@
 #include "opentelemetry/version.h"
 
 #include <stdint.h>
-#include <atomic>
 #include <chrono>
+#include <cstdint>
+#include <cstdio>
 #include <ctime>
-#include <map>
-#include <memory>
 #include <nlohmann/json.hpp>
 #include <string>
+#include <type_traits>
+#include <unordered_map>
 #include <utility>
-#include <vector>
 
 #if defined(__cpp_lib_format)
 #  include <format>
