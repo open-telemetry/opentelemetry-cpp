@@ -16,7 +16,6 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include <numeric>
 #include <ratio>
 #include <sstream>
 #include <string>
