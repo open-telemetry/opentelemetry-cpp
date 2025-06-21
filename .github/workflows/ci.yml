@@ -21,17 +21,15 @@ jobs:
 #        submodules: 'recursive'
 #    - name: setup
 #      env:
-#        PROTOBUF_VERSION: '23.3'
-#        ABSEIL_CPP_VERSION: '20230125.3'
 #        CXX_STANDARD: '14'
 #        CC: /usr/bin/gcc-10
 #        CXX: /usr/bin/g++-10
 #      run: |
 #        sudo -E ./ci/setup_gcc10.sh
 #        sudo -E ./ci/setup_ci_environment.sh
-#        sudo -E ./ci/setup_googletest.sh
-#        sudo -E ./ci/install_abseil.sh
-#        sudo -E ./ci/install_protobuf.sh
+#    - name: install dependencies
+#      run: |
+#        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
 
   cmake_test:
     name: CMake test (prometheus, elasticsearch, zipkin)
@@ -84,32 +82,25 @@ jobs:
   cmake_gcc_maintainer_sync_test:
     name: CMake gcc 14 (maintainer mode, sync)
     runs-on: ubuntu-24.04
+    env:
+      CC: /usr/bin/gcc-14
+      CXX: /usr/bin/g++-14
+      CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
-
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CC: /usr/bin/gcc-14
-        CXX: /usr/bin/g++-14
-        PROTOBUF_VERSION: 21.12
       run: |
-        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/install_protobuf.sh
-    - name: setup grpc
+    - name: install dependencies
       run: |
-        sudo ./ci/setup_grpc.sh
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake gcc (maintainer mode, sync)
-      env:
-        CC: /usr/bin/gcc-14
-        CXX: /usr/bin/g++-14
       run: |
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
@@ -125,32 +116,25 @@ jobs:
   cmake_gcc_maintainer_async_test:
     name: CMake gcc 14 (maintainer mode, async)
     runs-on: ubuntu-24.04
+    env:
+      CC: /usr/bin/gcc-14
+      CXX: /usr/bin/g++-14
+      CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
-
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CC: /usr/bin/gcc-14
-        CXX: /usr/bin/g++-14
-        PROTOBUF_VERSION: 21.12
       run: |
-        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/install_protobuf.sh
-    - name: setup grpc
+    - name: install dependencies
       run: |
-        sudo ./ci/setup_grpc.sh
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake gcc (maintainer mode, async)
-      env:
-        CC: /usr/bin/gcc-14
-        CXX: /usr/bin/g++-14
       run: |
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
@@ -166,32 +150,25 @@ jobs:
   cmake_clang_maintainer_sync_test:
     name: CMake clang 18 (maintainer mode, sync)
     runs-on: ubuntu-24.04
+    env:
+      CC: /usr/bin/clang-18
+      CXX: /usr/bin/clang++-18
+      CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
-
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CC: /usr/bin/clang-18
-        CXX: /usr/bin/clang++-18
-        PROTOBUF_VERSION: 21.12
       run: |
-        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/install_protobuf.sh
-    - name: setup grpc
+    - name: install dependencies
       run: |
-        sudo ./ci/setup_grpc.sh
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake clang (maintainer mode, sync)
-      env:
-        CC: /usr/bin/clang-18
-        CXX: /usr/bin/clang++-18
       run: |
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
@@ -207,32 +184,25 @@ jobs:
   cmake_clang_maintainer_async_test:
     name: CMake clang 18 (maintainer mode, async)
     runs-on: ubuntu-24.04
+    env:
+      CC: /usr/bin/clang-18
+      CXX: /usr/bin/clang++-18
+      CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
-
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CC: /usr/bin/clang-18
-        CXX: /usr/bin/clang++-18
-        PROTOBUF_VERSION: 21.12
       run: |
-        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/install_protobuf.sh
-    - name: setup grpc
+    - name: install dependencies
       run: |
-        sudo ./ci/setup_grpc.sh
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake clang (maintainer mode, async)
-      env:
-        CC: /usr/bin/clang-18
-        CXX: /usr/bin/clang++-18
       run: |
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
@@ -248,32 +218,25 @@ jobs:
   cmake_clang_maintainer_abiv2_test:
     name: CMake clang 18 (maintainer mode, abiv2)
     runs-on: ubuntu-24.04
+    env:
+      CC: /usr/bin/clang-18
+      CXX: /usr/bin/clang++-18
+      CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
-
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CC: /usr/bin/clang-18
-        CXX: /usr/bin/clang++-18
-        PROTOBUF_VERSION: 21.12
       run: |
-        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/install_protobuf.sh
-    - name: setup grpc
+    - name: install dependencies
       run: |
-        sudo ./ci/setup_grpc.sh
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake clang (maintainer mode, abiv2)
-      env:
-        CC: /usr/bin/clang-18
-        CXX: /usr/bin/clang++-18
       run: |
         ./ci/do_ci.sh cmake.maintainer.abiv2.test
     - name: generate test cert
@@ -566,10 +529,11 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
+    - name: install dependencies
+      run: |
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run otlp exporter tests
       run: |
-        sudo ./ci/setup_grpc.sh
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
     - name: generate test cert
       env:
@@ -584,30 +548,24 @@ jobs:
   cmake_modern_protobuf_grpc_with_abseil_test:
     name: CMake test (with modern protobuf,grpc and abseil)
     runs-on: ubuntu-latest
+    env:
+      CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
       with:
         egress-policy: audit
-
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        PROTOBUF_VERSION: '23.3'
-        ABSEIL_CPP_VERSION: '20230125.3'
-        CXX_STANDARD: '14'
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/install_abseil.sh
-        sudo -E ./ci/install_protobuf.sh
-    - name: run otlp exporter tests
-      env:
-        CXX_STANDARD: '14'
+    - name: install dependencies
       run: |
-        sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_stable
+    - name: run otlp exporter tests
+      run: |
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   cmake_do_not_install_test:
@@ -625,10 +583,11 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
+    - name: install dependencies
+      run: |
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run otlp exporter tests
       run: |
-        sudo ./ci/setup_grpc.sh
         ./ci/do_ci.sh cmake.do_not_install.test
 
   cmake_otprotocol_shared_libs_with_static_grpc_test:
@@ -646,10 +605,11 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_googletest.sh
+    - name: install dependencies
+      run: |
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run otlp exporter tests
       run: |
-        sudo ./ci/setup_grpc.sh -T
         ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
 
   plugin_test:
@@ -951,7 +911,7 @@ jobs:
 
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: setup
-      run: sudo apt remove needrestart && sudo ./ci/install_format_tools.sh #refer: https://github.com/actions/runner-images/issues/9937
+      run: sudo ./ci/install_format_tools.sh
     - name: run tests
       run: ./ci/do_ci.sh format
 
