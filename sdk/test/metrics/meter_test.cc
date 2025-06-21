@@ -17,7 +17,7 @@
 
 #include <functional>
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context.h"  // IWYU pragma: keep
 #include "opentelemetry/metrics/async_instruments.h"
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/meter_provider.h"
@@ -31,6 +31,7 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/data/exemplar_data.h"  // IWYU pragma: keep
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"

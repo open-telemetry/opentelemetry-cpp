@@ -4,8 +4,8 @@
 #include <gtest/gtest.h>
 #include <string>
 
-#include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/common/attribute_value.h"  // IWYU pragma: keep
+#include "opentelemetry/nostd/utility.h"           // IWYU pragma: keep
 #include "opentelemetry/sdk/metrics/instruments.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -22,7 +22,6 @@
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/nostd/function_ref.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/nostd/variant.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
