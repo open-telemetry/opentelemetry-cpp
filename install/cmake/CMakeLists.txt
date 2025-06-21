@@ -1,6 +1,27 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+# This file uses CMake's ExternalProject module to populate, build, and install
+# all opentelemetry-cpp dependencies
+
+# Input variables:
+#
+# OTELCPP_THIRDPARTY_TAGS_FILE: Relative path to the file containing third-party
+# release git tags.
+#
+# OTELCPP_THIRDPARTY_INSTALL_LIST: List of third-party packages to install. If
+# not set, all supported packages from the tags file will be installed.
+#
+# OTELCPP_PROTO_PATH: Path to the opentelemetry-proto source directory. If not
+# set, the opentelemetry-proto package will not be installed.
+#
+# CMAKE_BUILD_TYPE: The build type to use for all third-party packages
+#
+# CMAKE_INSTALL_PREFIX: The installation prefix for all third-party packages.
+#
+# CMAKE_CXX_STANDARD: The C++ standard to use for all third-party packages.
+# Defaults to 14 if not set.
+
 cmake_minimum_required(VERSION 3.14)
 project(opentelemetry-cpp-thirdparty-install LANGUAGES CXX)
 
@@ -16,9 +37,6 @@ if(POLICY CMP0114)
   cmake_policy(SET CMP0114 NEW)
 endif()
 
-# This file uses CMake's ExternalProject module to fetch, build, and install all
-# opentelemetry-cpp dependencies
-
 include(ExternalProject)
 
 # Set the third-party version tags file to read.
@@ -29,22 +47,6 @@ if(NOT OTELCPP_THIRDPARTY_TAGS_FILE)
   set(OTELCPP_THIRDPARTY_TAGS_FILE "${OTELCPP_SOURCE_DIR}/third_party_release")
 elseif(NOT IS_ABSOLUTE OTELCPP_THIRDPARTY_TAGS_FILE)
   string(PREPEND OTELCPP_THIRDPARTY_TAGS_FILE "${OTELCPP_SOURCE_DIR}/")
-endif()
-
-if(NOT OTELCPP_THIRDPARTY_INSTALL_LIST)
-  set(OTELCPP_THIRDPARTY_INSTALL_LIST
-      "zlib"
-      "curl"
-      "abseil"
-      "protobuf"
-      "grpc"
-      "benchmark"
-      "googletest"
-      "ms-gsl"
-      "nlohmann-json"
-      "opentelemetry-proto"
-      "opentracing-cpp"
-      "prometheus-cpp")
 endif()
 
 file(STRINGS "${OTELCPP_THIRDPARTY_TAGS_FILE}" _THIRDPARTY_FILE_CONTENT)
@@ -62,8 +64,10 @@ foreach(_raw_line IN LISTS _THIRDPARTY_FILE_CONTENT)
     set(_package "${CMAKE_MATCH_1}")
     set(_git_tag "${CMAKE_MATCH_2}")
 
-    # Check if the package is in the install list
-    if(NOT _package IN_LIST OTELCPP_THIRDPARTY_INSTALL_LIST)
+    # If a list of packages is not specified, install all packages.
+    if(OTELCPP_THIRDPARTY_INSTALL_LIST
+       AND
+       AND NOT _package IN_LIST OTELCPP_THIRDPARTY_INSTALL_LIST)
       continue()
     endif()
 
@@ -111,7 +115,11 @@ message(STATUS "  USE_SUBMODULES=${USE_SUBMODULES}")
 
 # ------------------------------------------------------------------------
 # ---- zlib ----
-if(zlib_GIT_TAG AND zlib IN_LIST _THIRDPARTY_PACKAGE_LIST)
+if(zlib IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  if(NOT zlib_GIT_TAG)
+    message(FATAL_ERROR "zlib_GIT_TAG is not set")
+  endif()
+
   ExternalProject_Add(
     zlib
     STEP_TARGETS install
@@ -125,7 +133,10 @@ endif()
 
 # ------------------------------------------------------------------------
 # ---- curl ----
-if(curl_GIT_TAG AND curl IN_LIST _THIRDPARTY_PACKAGE_LIST)
+if(curl IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  if(NOT curl_GIT_TAG)
+    message(FATAL_ERROR "curl_GIT_TAG is not set")
+  endif()
   ExternalProject_Add(
     curl
     DEPENDS zlib
@@ -148,7 +159,10 @@ endif()
 
 # ------------------------------------------------------------------------
 # ---- abseil-cpp ----
-if(abseil_GIT_TAG AND abseil IN_LIST _THIRDPARTY_PACKAGE_LIST)
+if(abseil IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  if(NOT abseil_GIT_TAG)
+    message(FATAL_ERROR "abseil_GIT_TAG is not set")
+  endif()
   ExternalProject_Add(
     abseil
     STEP_TARGETS install
@@ -160,9 +174,14 @@ if(abseil_GIT_TAG AND abseil IN_LIST _THIRDPARTY_PACKAGE_LIST)
     CMAKE_ARGS "${CMAKE_OPTIONS}" "-DABSL_BUILD_TESTING=OFF"
                "-DABSL_ENABLE_INSTALL=ON")
 endif()
+
 # ------------------------------------------------------------------------
 # ---- protobuf ----
-if(protobuf_GIT_TAG AND protobuf IN_LIST _THIRDPARTY_PACKAGE_LIST)
+
+if(protobuf IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  if(NOT protobuf_GIT_TAG)
+    message(FATAL_ERROR "protobuf_GIT_TAG is not set")
+  endif()
   ExternalProject_Add(
     protobuf
     STEP_TARGETS build install
@@ -185,7 +204,10 @@ if(protobuf_GIT_TAG AND protobuf IN_LIST _THIRDPARTY_PACKAGE_LIST)
 endif()
 # ------------------------------------------------------------------------
 # ---- grpc ----
-if(grpc_GIT_TAG AND grpc IN_LIST _THIRDPARTY_PACKAGE_LIST)
+if(grpc IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  if(NOT grpc_GIT_TAG)
+    message(FATAL_ERROR "grpc_GIT_TAG is not set")
+  endif()
   ExternalProject_Add(
     grpc
     DEPENDS zlib abseil protobuf
@@ -217,7 +239,7 @@ if(grpc_GIT_TAG AND grpc IN_LIST _THIRDPARTY_PACKAGE_LIST)
 endif()
 # ------------------------------------------------------------------------
 # ---- benchmark ----
-if(benchmark_GIT_TAG AND benchmark IN_LIST _THIRDPARTY_PACKAGE_LIST)
+if(benchmark IN_LIST _THIRDPARTY_PACKAGE_LIST)
   set(benchmark_ARGS "")
   if(USE_SUBMODULES AND EXISTS
                         "${OTELCPP_SOURCE_DIR}/third_party/benchmark/.git")
@@ -225,6 +247,9 @@ if(benchmark_GIT_TAG AND benchmark IN_LIST _THIRDPARTY_PACKAGE_LIST)
     list(APPEND benchmark_ARGS SOURCE_DIR
          "${OTELCPP_SOURCE_DIR}/third_party/benchmark")
   else()
+    if(NOT benchmark_GIT_TAG)
+      message(FATAL_ERROR "benchmark_GIT_TAG is not set")
+    endif()
     list(
       APPEND
       benchmark_ARGS
@@ -250,7 +275,7 @@ endif()
 # -----------------------------------------------------------------------
 # ---- googletest ----
 
-if(googletest_GIT_TAG AND googletest IN_LIST _THIRDPARTY_PACKAGE_LIST)
+if(googletest IN_LIST _THIRDPARTY_PACKAGE_LIST)
   set(googletest_ARGS "")
   if(USE_SUBMODULES AND EXISTS
                         "${OTELCPP_SOURCE_DIR}/third_party/googletest/.git")
@@ -258,6 +283,9 @@ if(googletest_GIT_TAG AND googletest IN_LIST _THIRDPARTY_PACKAGE_LIST)
     list(APPEND googletest_ARGS SOURCE_DIR
          "${OTELCPP_SOURCE_DIR}/third_party/googletest")
   else()
+    if(NOT googletest_GIT_TAG)
+      message(FATAL_ERROR "googletest_GIT_TAG is not set")
+    endif()
     list(
       APPEND
       googletest_ARGS
@@ -281,13 +309,16 @@ endif()
 # ----------------------------------------------------------------------
 # ---- Microsoft.GSL ----
 
-if(ms-gsl_GIT_TAG AND ms-gsl IN_LIST _THIRDPARTY_PACKAGE_LIST)
+if(ms-gsl IN_LIST _THIRDPARTY_PACKAGE_LIST)
   set(ms-gsl_ARGS "")
   if(USE_SUBMODULES AND EXISTS "${OTELCPP_SOURCE_DIR}/third_party/ms-gsl/.git")
     message(STATUS "Using submodule for ms-gsl")
     list(APPEND ms-gsl_ARGS SOURCE_DIR
          "${OTELCPP_SOURCE_DIR}/third_party/ms-gsl")
   else()
+    if(NOT ms-gsl_GIT_TAG)
+      message(FATAL_ERROR "ms-gsl_GIT_TAG is not set")
+    endif()
     list(
       APPEND
       ms-gsl_ARGS
@@ -310,7 +341,7 @@ endif()
 # ----------------------------------------------------------------------
 # ---- nlohmann-json ----
 
-if(nlohmann-json_GIT_TAG AND nlohmann-json IN_LIST _THIRDPARTY_PACKAGE_LIST)
+if(nlohmann-json IN_LIST _THIRDPARTY_PACKAGE_LIST)
 
   set(nlohmann-json_ARGS "")
   if(USE_SUBMODULES AND EXISTS
@@ -319,6 +350,9 @@ if(nlohmann-json_GIT_TAG AND nlohmann-json IN_LIST _THIRDPARTY_PACKAGE_LIST)
     list(APPEND nlohmann-json_ARGS SOURCE_DIR
          "${OTELCPP_SOURCE_DIR}/third_party/nlohmann-json")
   else()
+    if(NOT nlohmann-json_GIT_TAG)
+      message(FATAL_ERROR "nlohmann-json_GIT_TAG is not set")
+    endif()
     list(
       APPEND
       nlohmann-json_ARGS
@@ -341,12 +375,10 @@ endif()
 
 # ----------------------------------------------------------------------
 # ---- opentelemetry-proto ----
-if(opentelemetry-proto_GIT_TAG
-   AND OTELCPP_PROTO_PATH
-   AND opentelemetry-proto IN_LIST _THIRDPARTY_PACKAGE_LIST)
-  message(
-    STATUS
-      "Adding opentelemetry-proto: OTELCPP_PROTO_PATH: ${OTELCPP_PROTO_PATH}")
+if(OTELCPP_PROTO_PATH AND opentelemetry-proto IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  if(NOT opentelemetry-proto_GIT_TAG)
+    message(FATAL_ERROR "opentelemetry-proto_GIT_TAG is not set")
+  endif()
   ExternalProject_Add(
     opentelemetry-proto
     GIT_REPOSITORY "https://github.com/open-telemetry/opentelemetry-proto.git"
@@ -361,7 +393,7 @@ endif()
 # ----------------------------------------------------------------------
 # ---- opentracing-cpp ----
 
-if(opentracing-cpp_GIT_TAG AND opentracing-cpp IN_LIST _THIRDPARTY_PACKAGE_LIST)
+if(opentracing-cpp IN_LIST _THIRDPARTY_PACKAGE_LIST)
   set(opentracing-cpp_ARGS "")
   if(USE_SUBMODULES
      AND EXISTS "${OTELCPP_SOURCE_DIR}/third_party/opentracing-cpp/.git")
@@ -370,6 +402,9 @@ if(opentracing-cpp_GIT_TAG AND opentracing-cpp IN_LIST _THIRDPARTY_PACKAGE_LIST)
          "${OTELCPP_SOURCE_DIR}/third_party/opentracing-cpp"
          ${opentracing-cpp_ARGS})
   else()
+    if(NOT opentracing-cpp_GIT_TAG)
+      message(FATAL_ERROR "opentracing-cpp_GIT_TAG is not set")
+    endif()
     list(
       APPEND
       opentracing-cpp_ARGS
@@ -392,7 +427,7 @@ endif()
 # ----------------------------------------------------------------------
 # ---- prometheus-cpp ----
 
-if(prometheus-cpp_GIT_TAG AND prometheus-cpp IN_LIST _THIRDPARTY_PACKAGE_LIST)
+if(prometheus-cpp IN_LIST _THIRDPARTY_PACKAGE_LIST)
 
   set(prometheus-cpp_ARGS "")
   if(USE_SUBMODULES AND EXISTS
@@ -401,7 +436,9 @@ if(prometheus-cpp_GIT_TAG AND prometheus-cpp IN_LIST _THIRDPARTY_PACKAGE_LIST)
     list(APPEND prometheus-cpp_ARGS SOURCE_DIR
          "${OTELCPP_SOURCE_DIR}/third_party/prometheus-cpp")
   else()
-
+    if(NOT prometheus-cpp_GIT_TAG)
+      message(FATAL_ERROR "prometheus-cpp_GIT_TAG is not set")
+    endif()
     list(
       APPEND
       prometheus-cpp_ARGS
