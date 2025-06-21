@@ -12,7 +12,7 @@
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/nostd/variant.h"
-#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
 #  include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 #  include "opentelemetry/version.h"

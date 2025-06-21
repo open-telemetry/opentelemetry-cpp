@@ -29,6 +29,10 @@
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 #  include <zconf.h>
 #  include <zlib.h>
+#  include <algorithm>
+#  include <array>
+
+#  include "opentelemetry/nostd/type_traits.h"
 #else
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 #endif
