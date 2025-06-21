@@ -9,6 +9,10 @@
 #  include "gmock/gmock.h"
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
+#ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
+#  include <numeric>
+#endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
+
 #include <string.h>
 #include <atomic>
 #include <chrono>

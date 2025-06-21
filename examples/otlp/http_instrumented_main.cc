@@ -55,6 +55,11 @@
 #  include "metrics_foo_library/foo_library.h"
 #endif
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+#  include <thread>
+#  include "opentelemetry/sdk/common/thread_instrumentation.h"
+#endif
+
 namespace
 {
 

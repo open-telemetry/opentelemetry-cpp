@@ -5,7 +5,9 @@
 #include <stdlib.h>
 
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/logs/logger.h"  // IWYU pragma: keep
+#include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
+#include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
+#include "opentelemetry/logs/logger.h"                 // IWYU pragma: keep
 #include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -18,6 +20,10 @@ using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
 #endif
 
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+using opentelemetry::logs::EventLogger;
+using opentelemetry::logs::EventLoggerProvider;
+#endif
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
 using opentelemetry::logs::Provider;

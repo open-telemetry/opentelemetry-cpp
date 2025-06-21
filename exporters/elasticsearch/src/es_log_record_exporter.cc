@@ -6,7 +6,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <map>
-#include <memory>
+#include <memory>  // IWYU pragma: keep
 #include <mutex>
 #include <sstream>
 #include <string>
@@ -24,6 +24,14 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
+
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <cstddef>
+#  include <functional>
+#  include <ratio>
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#endif
 
 namespace nostd       = opentelemetry::nostd;
 namespace sdklogs     = opentelemetry::sdk::logs;

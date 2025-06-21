@@ -16,6 +16,11 @@
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
 
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <condition_variable>
+#  include <mutex>
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
