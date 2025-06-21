@@ -65,9 +65,8 @@ foreach(_raw_line IN LISTS _THIRDPARTY_FILE_CONTENT)
     set(_git_tag "${CMAKE_MATCH_2}")
 
     # If a list of packages is not specified, install all packages.
-    if(OTELCPP_THIRDPARTY_INSTALL_LIST
-       AND
-       AND NOT _package IN_LIST OTELCPP_THIRDPARTY_INSTALL_LIST)
+    if(OTELCPP_THIRDPARTY_INSTALL_LIST AND NOT _package IN_LIST
+                                           OTELCPP_THIRDPARTY_INSTALL_LIST)
       continue()
     endif()
 
