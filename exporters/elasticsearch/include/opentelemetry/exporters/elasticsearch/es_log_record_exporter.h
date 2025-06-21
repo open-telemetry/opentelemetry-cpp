@@ -18,6 +18,7 @@
 
 #ifdef ENABLE_ASYNC_EXPORT
 #  include <condition_variable>
+#  include <cstddef>
 #  include <mutex>
 #endif
 
