@@ -26,6 +26,10 @@
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {

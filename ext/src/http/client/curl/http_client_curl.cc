@@ -3,8 +3,6 @@
 
 #include <curl/curl.h>
 #include <curl/curlver.h>
-#include <algorithm>
-#include <array>
 #include <atomic>
 #include <chrono>
 #include <cstdint>
@@ -25,7 +23,6 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
