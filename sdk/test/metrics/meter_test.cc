@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <initializer_list>  // IWYU pragma: keep
 #include <iostream>
 #include <string>
 #include <thread>
