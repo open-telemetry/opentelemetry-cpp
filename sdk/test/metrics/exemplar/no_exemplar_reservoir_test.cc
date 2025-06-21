@@ -3,8 +3,11 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 #  include <gtest/gtest.h>
+#  include <chrono>
+#  include <string>
+
+#  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 
 using namespace opentelemetry::sdk::metrics;
 

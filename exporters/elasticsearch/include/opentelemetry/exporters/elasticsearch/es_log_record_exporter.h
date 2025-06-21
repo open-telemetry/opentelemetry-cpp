@@ -7,7 +7,6 @@
 #include <chrono>
 #include <map>
 #include <string>
-#include "nlohmann/json.hpp"
 
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/nostd/shared_ptr.h"

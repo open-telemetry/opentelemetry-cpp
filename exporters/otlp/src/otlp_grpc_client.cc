@@ -3,17 +3,20 @@
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
 
+#include <google/protobuf/arena.h>
 #include <grpc/compression.h>
 #include <grpcpp/resource_quota.h>
 #include <grpcpp/security/credentials.h>
 #include <grpcpp/support/channel_arguments.h>
 #include <stdint.h>
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <fstream>
 #include <iterator>
 #include <map>
 #include <memory>
+#include <ratio>
 #include <string>
 #include <utility>
 
@@ -32,21 +35,11 @@
 #  include <condition_variable>
 #  include <cstdio>
 #  include <mutex>
-#  include <thread>
 #  include <unordered_set>
 
 #  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/nostd/function_ref.h"
 #  include "opentelemetry/nostd/string_view.h"
 #endif /* ENABLE_ASYNC_EXPORT */
-
-namespace google
-{
-namespace protobuf
-{
-class Arena;
-}
-}  // namespace google
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

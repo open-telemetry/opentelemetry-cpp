@@ -3,8 +3,11 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
 #  include <gtest/gtest.h>
+#  include <string>
+
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
+#  include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

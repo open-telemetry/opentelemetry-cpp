@@ -7,7 +7,6 @@
 #include <grpcpp/support/status.h>
 #include <atomic>
 #include <chrono>
-#include <functional>
 #include <memory>
 #include <string>
 
