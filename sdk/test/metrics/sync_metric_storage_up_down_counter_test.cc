@@ -27,6 +27,7 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
 using namespace opentelemetry::sdk::metrics;
