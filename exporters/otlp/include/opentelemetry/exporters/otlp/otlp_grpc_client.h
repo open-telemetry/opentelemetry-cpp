@@ -22,6 +22,8 @@
 // clang-format on
 
 #ifdef ENABLE_ASYNC_EXPORT
+#  include <functional>
+
 #  include "opentelemetry/sdk/common/exporter_utils.h"
 #endif /* ENABLE_ASYNC_EXPORT */
 
