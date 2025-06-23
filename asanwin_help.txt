@@ -1,0 +1,270 @@
+Available flags for AddressSanitizer:
+	quarantine_size
+		- Deprecated, please use quarantine_size_mb. (Current Value: -1)
+	quarantine_size_mb
+		- Size (in Mb) of quarantine used to detect use-after-free errors. Lower value may reduce memory usage but increase the chance of false negatives. (Current Value: -1)
+	thread_local_quarantine_size_kb
+		- Size (in Kb) of thread local quarantine used to detect use-after-free errors. Lower value may reduce memory usage but increase the chance of false negatives. It is not advised to go lower than 64Kb, otherwise frequent transfers to global quarantine might affect performance. (Current Value: -1)
+	redzone
+		- Minimal size (in bytes) of redzones around heap objects. Requirement: redzone >= 16, is a power of two. (Current Value: 16)
+	max_redzone
+		- Maximal size (in bytes) of redzones around heap objects. (Current Value: 2048)
+	debug
+		- If set, prints some debugging information and does additional checks. (Current Value: false)
+	report_globals
+		- Controls the way to handle globals (0 - don't detect buffer overflow on globals, 1 - detect buffer overflow, 2 - print data about registered globals). (Current Value: 1)
+	check_initialization_order
+		- If set, attempts to catch initialization order issues. (Current Value: false)
+	replace_str
+		- If set, uses custom wrappers and replacements for libc string functions to find more errors. (Current Value: true)
+	replace_intrin
+		- If set, uses custom wrappers for memset/memcpy/memmove intrinsics. (Current Value: true)
+	detect_stack_use_after_return
+		- Enables stack-use-after-return checking at run-time. (Current Value: false)
+	min_uar_stack_size_log
+		- Minimum fake stack size log. (Current Value: 16)
+	max_uar_stack_size_log
+		- Maximum fake stack size log. (Current Value: 20)
+	uar_noreserve
+		- Use mmap with 'noreserve' flag to allocate fake stack. (Current Value: false)
+	max_malloc_fill_size
+		- ASan allocator flag. max_malloc_fill_size is the maximal amount of bytes that will be filled with malloc_fill_byte on malloc. (Current Value: 4096)
+	max_free_fill_size
+		- ASan allocator flag. max_free_fill_size is the maximal amount of bytes that will be filled with free_fill_byte during free. (Current Value: 0)
+	malloc_fill_byte
+		- Value used to fill the newly allocated memory. (Current Value: 190)
+	free_fill_byte
+		- Value used to fill deallocated memory. (Current Value: 85)
+	allow_user_poisoning
+		- If set, user may manually mark memory regions as poisoned or unpoisoned. (Current Value: true)
+	sleep_before_dying
+		- Number of seconds to sleep between printing an error report and terminating the program. Useful for debugging purposes (e.g. when one needs to attach gdb). (Current Value: 0)
+	sleep_after_init
+		- Number of seconds to sleep after AddressSanitizer is initialized. Useful for debugging purposes (e.g. when one needs to attach gdb). (Current Value: 0)
+	sleep_before_init
+		- Number of seconds to sleep before AddressSanitizer starts initializing. Useful for debugging purposes (e.g. when one needs to attach gdb). (Current Value: 0)
+	check_malloc_usable_size
+		- Allows the users to work around the bug in Nvidia drivers prior to 295.*. (Current Value: true)
+	unmap_shadow_on_exit
+		- If set, explicitly unmaps the (huge) shadow at exit. (Current Value: false)
+	protect_shadow_gap
+		- If set, mprotect the shadow gap (Current Value: true)
+	print_stats
+		- Print various statistics after printing an error message or if atexit=1. (Current Value: false)
+	print_legend
+		- Print the legend for the shadow bytes. (Current Value: true)
+	print_scariness
+		- Print the scariness score. Experimental. (Current Value: false)
+	atexit
+		- If set, prints ASan exit stats even after program terminates successfully. (Current Value: false)
+	print_full_thread_history
+		- If set, prints thread creation stacks for the threads involved in the report and their ancestors up to the main thread. (Current Value: true)
+	poison_heap
+		- Poison (or not) the heap memory on [de]allocation. Zero value is useful for benchmarking the allocator or instrumentator. (Current Value: true)
+	poison_partial
+		- If true, poison partially addressable 8-byte aligned words (default=true). This flag affects heap and global buffers, but not stack buffers. (Current Value: true)
+	poison_array_cookie
+		- Poison (or not) the array cookie after operator new[]. (Current Value: true)
+	alloc_dealloc_mismatch
+		- Report errors on malloc/delete, new/free, new/delete[], etc. (Current Value: false)
+	new_delete_type_mismatch
+		- Report errors on mismatch between size of new and delete. (Current Value: true)
+	strict_init_order
+		- If true, assume that dynamic initializers can never access globals from other modules, even if the latter are already initialized. (Current Value: false)
+	start_deactivated
+		- If true, ASan tweaks a bunch of other flags (quarantine, redzone, heap poisoning) to reduce memory consumption as much as possible, and restores them to original values when the first instrumented module is loaded into the process. This is mainly intended to be used on Android.  (Current Value: false)
+	detect_invalid_pointer_pairs
+		- If >= 2, detect operations like <, <=, >, >= and - on invalid pointer pairs (e.g. when pointers belong to different objects); If == 1, detect invalid operations only when both pointers are non-null. (Current Value: 0)
+	detect_container_overflow
+		- If true, honor the container overflow annotations. See https://github.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow (Current Value: true)
+	detect_odr_violation
+		- If >=2, detect violation of One-Definition-Rule (ODR); If ==1, detect ODR-violation only if the two variables have different sizes (Current Value: 2)
+	suppressions
+		- Suppressions file name. (Current Value: )
+	halt_on_error
+		- Crash the program after printing the first error report (WARNING: USE AT YOUR OWN RISK!) (Current Value: true)
+	allocator_frees_and_returns_null_on_realloc_zero
+		- realloc(p, 0) is equivalent to free(p) by default (Same as the POSIX standard). If set to false, realloc(p, 0) will return a pointer to an allocated space which can not be used. (Current Value: true)
+	verify_asan_link_order
+		- Check position of ASan runtime in library list (needs to be disabled when other library has to be preloaded system-wide) (Current Value: true)
+	windows_hook_rtl_allocators
+		- (Windows only) enable hooking of Rtl(Allocate|Free|Size|ReAllocate)Heap. (Current Value: false)
+	symbolize
+		- If set, use the online symbolizer from common sanitizer runtime to turn virtual addresses to file/line locations. (Current Value: true)
+	external_symbolizer_path
+		- Path to external symbolizer. If empty, the tool will search $PATH for the symbolizer. (Current Value: <null>)
+	allow_addr2line
+		- If set, allows online symbolizer to run addr2line binary to symbolize stack traces (addr2line will only be used if llvm-symbolizer binary is unavailable. (Current Value: false)
+	strip_path_prefix
+		- Strips this prefix from file paths in error reports. (Current Value: )
+	fast_unwind_on_check
+		- If available, use the fast frame-pointer-based unwinder on internal CHECK failures. (Current Value: false)
+	fast_unwind_on_fatal
+		- If available, use the fast frame-pointer-based unwinder on fatal errors. (Current Value: false)
+	fast_unwind_on_malloc
+		- If available, use the fast frame-pointer-based unwinder on malloc/free. (Current Value: true)
+	handle_ioctl
+		- Intercept and handle ioctl requests. (Current Value: false)
+	malloc_context_size
+		- Max number of stack frames kept for each allocation/deallocation. (Current Value: 30)
+	log_path
+		- Write logs to "log_path.pid". The special values are "stdout" and "stderr". If unspecified, defaults to "stderr". (Current Value: <null>)
+	log_exe_name
+		- Mention name of executable when reporting error and append executable name to logs (as in "log_path.exe_name.pid"). (Current Value: false)
+	log_suffix
+		- String to append to log file name, e.g. ".txt". (Current Value: <null>)
+	log_to_syslog
+		- Write all sanitizer output to syslog in addition to other means of logging. (Current Value: false)
+	verbosity
+		- Verbosity level (0 - silent, 1 - a bit of output, 2+ - more output). (Current Value: 0)
+	strip_env
+		- Whether to remove the sanitizer from DYLD_INSERT_LIBRARIES to avoid passing it to children on Apple platforms. Default is true. (Current Value: true)
+	verify_interceptors
+		- Verify that interceptors are working on Apple platforms. Default is true. (Current Value: true)
+	detect_leaks
+		- Enable memory leak detection. (Current Value: false)
+	leak_check_at_exit
+		- Invoke leak checking in an atexit handler. Has no effect if detect_leaks=false, or if __lsan_do_leak_check() is called before the handler has a chance to run. (Current Value: true)
+	allocator_may_return_null
+		- If false, the allocator will crash instead of returning 0 on out-of-memory. (Current Value: false)
+	print_summary
+		- If false, disable printing error summaries in addition to error reports. (Current Value: true)
+	print_module_map
+		- Print the process module map where supported (0 - don't print, 1 - print only once before process exits, 2 - print after each report). (Current Value: 0)
+	check_printf
+		- Check printf arguments. (Current Value: true)
+	handle_segv
+		- Controls custom tool's SIGSEGV handler (0 - do not registers the handler, 1 - register the handler and allow user to set own, 2 - registers the handler and block user from changing it).  (Current Value: 1)
+	handle_sigbus
+		- Controls custom tool's SIGBUS handler (0 - do not registers the handler, 1 - register the handler and allow user to set own, 2 - registers the handler and block user from changing it).  (Current Value: 1)
+	handle_abort
+		- Controls custom tool's SIGABRT handler (0 - do not registers the handler, 1 - register the handler and allow user to set own, 2 - registers the handler and block user from changing it).  (Current Value: 0)
+	handle_sigill
+		- Controls custom tool's SIGILL handler (0 - do not registers the handler, 1 - register the handler and allow user to set own, 2 - registers the handler and block user from changing it).  (Current Value: 0)
+	handle_sigtrap
+		- Controls custom tool's SIGTRAP handler (0 - do not registers the handler, 1 - register the handler and allow user to set own, 2 - registers the handler and block user from changing it).  (Current Value: 0)
+	handle_sigfpe
+		- Controls custom tool's SIGFPE handler (0 - do not registers the handler, 1 - register the handler and allow user to set own, 2 - registers the handler and block user from changing it).  (Current Value: 1)
+	allow_user_segv_handler
+		- Deprecated. True has no effect, use handle_sigbus=1. If false, handle_*=1 will be upgraded to handle_*=2. (Current Value: true)
+	use_sigaltstack
+		- If set, uses alternate stack for signal handling. (Current Value: true)
+	detect_deadlocks
+		- If set, deadlock detection is enabled. (Current Value: true)
+	clear_shadow_mmap_threshold
+		- Large shadow regions are zero-filled using mmap(NORESERVE) instead of memset(). This is the threshold size in bytes. (Current Value: 0x10000)
+	color
+		- Colorize reports: (always|never|auto). (Current Value: auto)
+	legacy_pthread_cond
+		- Enables support for dynamic libraries linked with libpthread 2.2.5. (Current Value: false)
+	intercept_tls_get_addr
+		- Intercept __tls_get_addr. (Current Value: true)
+	help
+		- Print the flag descriptions. (Current Value: true)
+	mmap_limit_mb
+		- Limit the amount of mmap-ed memory (excluding shadow) in Mb; not a user-facing flag, used mosly for testing the tools (Current Value: 0x0)
+	hard_rss_limit_mb
+		- Hard RSS limit in Mb. If non-zero, a background thread is spawned at startup which periodically reads RSS and aborts the process if the limit is reached (Current Value: 0x0)
+	soft_rss_limit_mb
+		- Soft RSS limit in Mb. If non-zero, a background thread is spawned at startup which periodically reads RSS. If the limit is reached all subsequent malloc/new calls will fail or return NULL (depending on the value of allocator_may_return_null) until the RSS goes below the soft limit. This limit does not affect memory allocations other than malloc/new. (Current Value: 0x0)
+	max_allocation_size_mb
+		- If non-zero, malloc/new calls larger than this size will return nullptr (or crash if allocator_may_return_null=false). (Current Value: 0x0)
+	heap_profile
+		- Experimental heap profiler, asan-only (Current Value: false)
+	allocator_release_to_os_interval_ms
+		- Only affects a 64-bit allocator. If set, tries to release unused memory to the OS, but not more often than this interval (in milliseconds). Negative values mean do not attempt to release memory to the OS.
+ (Current Value: -1)
+	can_use_proc_maps_statm
+		- If false, do not attempt to read /proc/maps/statm. Mostly useful for testing sanitizers. (Current Value: true)
+	coverage
+		- If set, coverage information will be dumped at program shutdown (if the coverage instrumentation was enabled at compile time). (Current Value: false)
+	coverage_dir
+		- Target directory for coverage dumps. Defaults to the current directory. (Current Value: .)
+	cov_8bit_counters_out
+		- If non-empty, write 8bit counters to this file.  (Current Value: )
+	cov_pcs_out
+		- If non-empty, write the coverage pc table to this file.  (Current Value: )
+	full_address_space
+		- Sanitize complete address space; by default kernel area on 32-bit platforms will not be sanitized (Current Value: false)
+	print_suppressions
+		- Print matched suppressions at exit. (Current Value: true)
+	disable_coredump
+		- Disable core dumping. By default, disable_coredump=1 on 64-bit to avoid dumping a 16T+ core file. Ignored on OSes that don't dump core by default and for sanitizers that don't reserve lots of virtual memory. (Current Value: true)
+	use_madv_dontdump
+		- If set, instructs kernel to not store the (huge) shadow in core file. (Current Value: true)
+	symbolize_inline_frames
+		- Print inlined frames in stacktraces. Defaults to true. (Current Value: true)
+	demangle
+		- Print demangled symbols. (Current Value: true)
+	symbolize_vs_style
+		- Print file locations in Visual Studio style (e.g:  file(10,42): ... (Current Value: false)
+	dedup_token_length
+		- If positive, after printing a stack trace also print a short string token based on this number of frames that will simplify deduplication of the reports. Example: 'DEDUP_TOKEN: foo-bar-main'. Default is 0. (Current Value: 0)
+	stack_trace_format
+		- Format string used to render stack frames. See sanitizer_stacktrace_printer.h for the format description. Use DEFAULT to get default format. (Current Value: DEFAULT)
+	compress_stack_depot
+		- Compress stack depot to save memory. (Current Value: 0)
+	no_huge_pages_for_shadow
+		- If true, the shadow is not allowed to use huge pages.  (Current Value: true)
+	strict_string_checks
+		- If set check that string arguments are properly null-terminated (Current Value: false)
+	intercept_strstr
+		- If set, uses custom wrappers for strstr and strcasestr functions to find more errors. (Current Value: true)
+	intercept_strspn
+		- If set, uses custom wrappers for strspn and strcspn function to find more errors. (Current Value: true)
+	intercept_strtok
+		- If set, uses a custom wrapper for the strtok function to find more errors. (Current Value: true)
+	intercept_strpbrk
+		- If set, uses custom wrappers for strpbrk function to find more errors. (Current Value: true)
+	intercept_strcmp
+		- If set, uses custom wrappers for strcmp functions to find more errors. (Current Value: true)
+	intercept_strlen
+		- If set, uses custom wrappers for strlen and strnlen functions to find more errors. (Current Value: true)
+	intercept_strndup
+		- If set, uses custom wrappers for strndup functions to find more errors. (Current Value: true)
+	intercept_strchr
+		- If set, uses custom wrappers for strchr, strchrnul, and strrchr functions to find more errors. (Current Value: true)
+	intercept_memcmp
+		- If set, uses custom wrappers for memcmp function to find more errors. (Current Value: true)
+	strict_memcmp
+		- If true, assume that memcmp(p1, p2, n) always reads n bytes before comparing p1 and p2. (Current Value: true)
+	intercept_memmem
+		- If set, uses a wrapper for memmem() to find more errors. (Current Value: true)
+	intercept_intrin
+		- If set, uses custom wrappers for memset/memcpy/memmove intrinsics to find more errors. (Current Value: true)
+	intercept_stat
+		- If set, uses custom wrappers for *stat functions to find more errors. (Current Value: true)
+	intercept_send
+		- If set, uses custom wrappers for send* functions to find more errors. (Current Value: true)
+	decorate_proc_maps
+		- If set, decorate sanitizer mappings in /proc/self/maps with user-readable names (Current Value: false)
+	exitcode
+		- Override the program exit status if the tool found an error (Current Value: 1)
+	abort_on_error
+		- If set, the tool calls abort() instead of _exit() after printing the error report. (Current Value: false)
+	suppress_equal_pcs
+		- Deduplicate multiple reports for single source location in halt_on_error=false mode (asan only). (Current Value: true)
+	print_cmdline
+		- Print command line on crash (asan only). (Current Value: false)
+	html_cov_report
+		- Generate html coverage report. (Current Value: false)
+	sancov_path
+		- Sancov tool location. (Current Value: sancov)
+	dump_instruction_bytes
+		- If true, dump 16 bytes starting at the instruction that caused SEGV (Current Value: false)
+	dump_registers
+		- If true, dump values of CPU registers when SEGV happens. Only available on OS X for now. (Current Value: true)
+	detect_write_exec
+		- If true, triggers warning when writable-executable pages requests are being made (Current Value: false)
+	test_only_emulate_no_memorymap
+		- TEST ONLY fail to read memory mappings to emulate sanitized "init" (Current Value: false)
+	test_only_replace_dlopen_main_program
+		- TEST ONLY replace dlopen(<main program>,...) with dlopen(NULL) (Current Value: false)
+	enable_symbolizer_markup
+		- Use sanitizer symbolizer markup, available on Linux and always set true for Fuchsia. (Current Value: false)
+	detect_invalid_join
+		- If set, check invalid joins of threads. (Current Value: true)
+	include
+		- read more options from the given file (Current Value: )
+	include_if_exists
+		- read more options from the given file (if it exists) (Current Value: )
