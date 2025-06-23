@@ -3,10 +3,20 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
+#  include <gtest/gtest.h>
+#  include <stdint.h>
+#  include <chrono>
+#  include <memory>
+#  include <string>
 #  include <vector>
 
-#  include <gtest/gtest.h>
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/context/context.h"
+#  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #  include "opentelemetry/sdk/metrics/exemplar/aligned_histogram_bucket_exemplar_reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -3,13 +3,14 @@
 
 #pragma once
 
+#include "opentelemetry/version.h"
+
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 #  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #  include "opentelemetry/sdk/metrics/exemplar/aligned_histogram_bucket_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/exemplar/simple_fixed_size_exemplar_reservoir.h"
-#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

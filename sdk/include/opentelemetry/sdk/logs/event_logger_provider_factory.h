@@ -3,10 +3,12 @@
 
 #pragma once
 
-#include <memory>
-
 #include "opentelemetry/version.h"
-#include "opentelemetry/sdk/logs/event_logger_provider.h"
+
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+#  include <memory>
+#  include "opentelemetry/sdk/logs/event_logger_provider.h"
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -3,12 +3,13 @@
 
 #pragma once
 
+#include "opentelemetry/version.h"
+
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 #  include <memory>
 #  include <vector>
 
-#  include "opentelemetry/version.h"
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
 

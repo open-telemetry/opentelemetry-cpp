@@ -1,16 +1,19 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <string>
-#include <utility>
-
 #include "opentelemetry/version.h"
-#include "opentelemetry/logs/log_record.h"
-#include "opentelemetry/logs/logger.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/sdk/logs/event_logger.h"
+
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+#  include <string>
+#  include <utility>
+
+#  include "opentelemetry/logs/log_record.h"
+#  include "opentelemetry/logs/logger.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/nostd/unique_ptr.h"
+#  include "opentelemetry/sdk/logs/event_logger.h"
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

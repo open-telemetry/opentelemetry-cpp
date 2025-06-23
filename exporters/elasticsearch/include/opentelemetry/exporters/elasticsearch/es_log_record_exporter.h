@@ -3,18 +3,24 @@
 
 #pragma once
 
-#include "nlohmann/json.hpp"
-#include "opentelemetry/ext/http/client/http_client_factory.h"
+#include <atomic>
+#include <chrono>
+#include <map>
+#include <string>
+
+#include "opentelemetry/version.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 
-#include <time.h>
-#include <atomic>
-#include <condition_variable>
-#include <cstddef>
-#include <iostream>
-#include <mutex>
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <condition_variable>
+#  include <cstddef>
+#  include <mutex>
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

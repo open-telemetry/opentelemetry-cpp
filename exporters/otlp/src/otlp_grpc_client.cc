@@ -29,24 +29,17 @@
 // clang-format on
 
 #ifdef ENABLE_ASYNC_EXPORT
+#  include <google/protobuf/arena.h>
+#  include <algorithm>
 #  include <condition_variable>
 #  include <cstdio>
 #  include <mutex>
-#  include <thread>
+#  include <ratio>
 #  include <unordered_set>
 
 #  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/nostd/function_ref.h"
 #  include "opentelemetry/nostd/string_view.h"
 #endif /* ENABLE_ASYNC_EXPORT */
-
-namespace google
-{
-namespace protobuf
-{
-class Arena;
-}
-}  // namespace google
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

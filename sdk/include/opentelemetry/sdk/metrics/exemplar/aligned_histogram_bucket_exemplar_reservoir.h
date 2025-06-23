@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "opentelemetry/version.h"
+
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 #  include <memory>
@@ -14,7 +16,6 @@
 #  include "opentelemetry/sdk/metrics/exemplar/fixed_size_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
-#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common

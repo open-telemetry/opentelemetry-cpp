@@ -3,16 +3,22 @@
 
 #pragma once
 
-#include <map>
-#include <sstream>
-#include <type_traits>
-#include <unordered_map>
-
+#include <stdint.h>
+#include <string>
 #include "nlohmann/json.hpp"
+
 #include "opentelemetry/version.h"
-#include "opentelemetry/common/macros.h"
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
