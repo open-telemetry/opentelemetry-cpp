@@ -30,6 +30,9 @@ Increment the:
 * [REMOVAL] Removed deprecated semantic convention header files
   [#3475](https://github.com/open-telemetry/opentelemetry-cpp/pull/3475)
 
+* [CMAKE] Clean up googletest and benchmark dependency management
+  [#3485](https://github.com/open-telemetry/opentelemetry-cpp/pull/3485)
+
 Important changes:
 
 * [REMOVAL] Removed deprecated semantic convention header files
