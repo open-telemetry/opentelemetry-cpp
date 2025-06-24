@@ -7,6 +7,7 @@
 #include <chrono>
 #include <cstddef>
 #include <memory>
+#include <ratio>
 #include <string>
 #include <thread>
 #include <utility>
