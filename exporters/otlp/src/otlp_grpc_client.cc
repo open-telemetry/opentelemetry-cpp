@@ -173,10 +173,12 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
     OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
                             << export_data_count << " " << export_data_name
                             << " failed, exporter queue is full");
-    if (result_callback)
+
+    auto result_callback_fn = std::move(result_callback);
+    if (result_callback_fn)
     {
-      result_callback(opentelemetry::sdk::common::ExportResult::kFailureFull, std::move(arena),
-                      request, nullptr);
+      result_callback_fn(opentelemetry::sdk::common::ExportResult::kFailureFull, std::move(arena),
+                         request, nullptr);
     }
     return opentelemetry::sdk::common::ExportResult::kFailureFull;
   }
@@ -205,7 +207,8 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
 
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
-  call_data->grpc_context.swap(context);
+  auto context_ptr = std::move(context);
+  call_data->grpc_context.swap(context_ptr);
 
   call_data->grpc_async_callback = [](OtlpGrpcAsyncCallDataBase *base_call_data) {
     OtlpGrpcAsyncCallData<RequestType, ResponseType> *real_call_data =
@@ -519,31 +522,40 @@ OtlpGrpcClient::MakeLogsServiceStub()
 grpc::Status OtlpGrpcClient::DelegateExport(
     proto::collector::trace::v1::TraceService::StubInterface *stub,
     std::unique_ptr<grpc::ClientContext> &&context,
-    std::unique_ptr<google::protobuf::Arena> && /*arena*/,
+    std::unique_ptr<google::protobuf::Arena> &&arena,
     proto::collector::trace::v1::ExportTraceServiceRequest &&request,
     proto::collector::trace::v1::ExportTraceServiceResponse *response)
 {
-  return stub->Export(context.get(), request, response);
+  auto context_ptr = std::move(context);
+  auto arena_ptr   = std::move(arena);
+  auto request_ptr = std::move(request);
+  return stub->Export(context_ptr.get(), request_ptr, response);
 }
 
 grpc::Status OtlpGrpcClient::DelegateExport(
     proto::collector::metrics::v1::MetricsService::StubInterface *stub,
     std::unique_ptr<grpc::ClientContext> &&context,
-    std::unique_ptr<google::protobuf::Arena> && /*arena*/,
+    std::unique_ptr<google::protobuf::Arena> &&arena,
     proto::collector::metrics::v1::ExportMetricsServiceRequest &&request,
     proto::collector::metrics::v1::ExportMetricsServiceResponse *response)
 {
-  return stub->Export(context.get(), request, response);
+  auto context_ptr = std::move(context);
+  auto arena_ptr   = std::move(arena);
+  auto request_ptr = std::move(request);
+  return stub->Export(context_ptr.get(), request_ptr, response);
 }
 
 grpc::Status OtlpGrpcClient::DelegateExport(
     proto::collector::logs::v1::LogsService::StubInterface *stub,
     std::unique_ptr<grpc::ClientContext> &&context,
-    std::unique_ptr<google::protobuf::Arena> && /*arena*/,
+    std::unique_ptr<google::protobuf::Arena> &&arena,
     proto::collector::logs::v1::ExportLogsServiceRequest &&request,
     proto::collector::logs::v1::ExportLogsServiceResponse *response)
 {
-  return stub->Export(context.get(), request, response);
+  auto context_ptr = std::move(context);
+  auto arena_ptr   = std::move(arena);
+  auto request_ptr = std::move(request);
+  return stub->Export(context_ptr.get(), request_ptr, response);
 }
 
 void OtlpGrpcClient::AddReference(OtlpGrpcClientReferenceGuard &guard,

@@ -224,6 +224,7 @@ class DummyProcessor : public LogRecordProcessor
     return std::unique_ptr<Recordable>(new DummyLogRecordable());
   }
 
+  // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
   void OnEmit(std::unique_ptr<Recordable> && /* record */) noexcept override {}
   bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }

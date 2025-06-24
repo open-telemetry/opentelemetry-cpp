@@ -151,9 +151,10 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
         // called.
         [trace_service_stub = trace_service_stub_](
             opentelemetry::sdk::common::ExportResult result,
-            std::unique_ptr<google::protobuf::Arena> &&,
+            std::unique_ptr<google::protobuf::Arena> &&arena,
             const proto::collector::trace::v1::ExportTraceServiceRequest &request,
             proto::collector::trace::v1::ExportTraceServiceResponse *) {
+          auto arena_ptr = std::move(arena);
           if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
           {
             OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE GRPC Exporter] ERROR: Export "
