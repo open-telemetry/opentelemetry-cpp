@@ -46,39 +46,42 @@ namespace
 
 MetricFilter::TestMetricFn AcceptAllTestMetricFn()
 {
-  return [](const InstrumentationScope &scope, nostd::string_view name, const InstrumentType &type,
-            nostd::string_view unit) -> MetricFilter::MetricFilterResult {
+  return [](const InstrumentationScope & /*scope*/, nostd::string_view /*name*/,
+            const InstrumentType & /*type*/,
+            nostd::string_view /*unit*/) -> MetricFilter::MetricFilterResult {
     return MetricFilter::MetricFilterResult::kAccept;
   };
 }
 MetricFilter::TestMetricFn DropAllTestMetricFn()
 {
-  return [](const InstrumentationScope &scope, nostd::string_view name, const InstrumentType &type,
-            nostd::string_view unit) -> MetricFilter::MetricFilterResult {
+  return [](const InstrumentationScope & /*scope*/, nostd::string_view /*name*/,
+            const InstrumentType & /*type*/,
+            nostd::string_view /*unit*/) -> MetricFilter::MetricFilterResult {
     return MetricFilter::MetricFilterResult::kDrop;
   };
 }
 MetricFilter::TestMetricFn AcceptPartialAllTestMetricFn()
 {
-  return [](const InstrumentationScope &scope, nostd::string_view name, const InstrumentType &type,
-            nostd::string_view unit) -> MetricFilter::MetricFilterResult {
+  return [](const InstrumentationScope & /*scope*/, nostd::string_view /*name*/,
+            const InstrumentType & /*type*/,
+            nostd::string_view /*unit*/) -> MetricFilter::MetricFilterResult {
     return MetricFilter::MetricFilterResult::kAcceptPartial;
   };
 }
 
 MetricFilter::TestAttributesFn AcceptAllTestAttributesFn()
 {
-  return [](const InstrumentationScope &scope, nostd::string_view name, const InstrumentType &type,
-            nostd::string_view unit,
-            const PointAttributes &attributes) -> MetricFilter::AttributesFilterResult {
+  return [](const InstrumentationScope & /*scope*/, nostd::string_view /*name*/,
+            const InstrumentType & /*type*/, nostd::string_view /*unit*/,
+            const PointAttributes & /*attributes*/) -> MetricFilter::AttributesFilterResult {
     return MetricFilter::AttributesFilterResult::kAccept;
   };
 }
 MetricFilter::TestAttributesFn DropAllTestAttributesFn()
 {
-  return [](const InstrumentationScope &scope, nostd::string_view name, const InstrumentType &type,
-            nostd::string_view unit,
-            const PointAttributes &attributes) -> MetricFilter::AttributesFilterResult {
+  return [](const InstrumentationScope & /*scope*/, nostd::string_view /*name*/,
+            const InstrumentType & /*type*/, nostd::string_view /*unit*/,
+            const PointAttributes & /*attributes*/) -> MetricFilter::AttributesFilterResult {
     return MetricFilter::AttributesFilterResult::kDrop;
   };
 }
@@ -194,9 +197,9 @@ TEST_F(MetricCollectorTest, CollectWithMetricFilterTestMetricTest3)
   auto meter   = std::shared_ptr<Meter>(new Meter(context, std::move(scope)));
   context->AddMeter(meter);
 
-  auto test_metric_fn = [](const InstrumentationScope &scope, nostd::string_view name,
-                           const InstrumentType &type,
-                           nostd::string_view unit) -> MetricFilter::MetricFilterResult {
+  auto test_metric_fn = [](const InstrumentationScope & /*scope*/, nostd::string_view name,
+                           const InstrumentType & /*type*/,
+                           nostd::string_view /*unit*/) -> MetricFilter::MetricFilterResult {
     std::string name_copy = {name.begin(), name.end()};
     if (name_copy.find("_accept") != std::string::npos)
     {
@@ -249,8 +252,8 @@ TEST_F(MetricCollectorTest, CollectWithMetricFilterTestAttributesTest1)
   context->AddMeter(meter);
 
   auto test_attributes_fn =
-      [](const InstrumentationScope &scope, nostd::string_view name, const InstrumentType &type,
-         nostd::string_view unit,
+      [](const InstrumentationScope & /*scope*/, nostd::string_view /*name*/,
+         const InstrumentType & /*type*/, nostd::string_view /*unit*/,
          const PointAttributes &attributes) -> MetricFilter::AttributesFilterResult {
     if (attributes.GetAttributes().find("stream") != attributes.GetAttributes().end())
     {
@@ -332,8 +335,8 @@ TEST_F(MetricCollectorTest, CollectWithMetricFilterTestAttributesTest2)
   context->AddMeter(meter);
 
   auto test_attributes_fn =
-      [](const InstrumentationScope &scope, nostd::string_view name, const InstrumentType &type,
-         nostd::string_view unit,
+      [](const InstrumentationScope & /*scope*/, nostd::string_view /*name*/,
+         const InstrumentType & /*type*/, nostd::string_view /*unit*/,
          const PointAttributes &attributes) -> MetricFilter::AttributesFilterResult {
     if (attributes.GetAttributes().find("stream") != attributes.GetAttributes().end())
     {
