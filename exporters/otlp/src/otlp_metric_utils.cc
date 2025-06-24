@@ -108,7 +108,7 @@ void OtlpMetricUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data
     for (auto &kv_attr : point_data_with_attributes.attributes)
     {
       OtlpPopulateAttributeUtils::PopulateAttribute(proto_sum_point_data->add_attributes(),
-                                                    kv_attr.first, kv_attr.second);
+                                                    kv_attr.first, kv_attr.second, false);
     }
   }
 }
@@ -180,7 +180,7 @@ void OtlpMetricUtils::ConvertHistogramMetric(
     for (auto &kv_attr : point_data_with_attributes.attributes)
     {
       OtlpPopulateAttributeUtils::PopulateAttribute(proto_histogram_point_data->add_attributes(),
-                                                    kv_attr.first, kv_attr.second);
+                                                    kv_attr.first, kv_attr.second, false);
     }
   }
 }
@@ -244,7 +244,7 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
     for (auto &kv_attr : point_data_with_attributes.attributes)
     {
       OtlpPopulateAttributeUtils::PopulateAttribute(proto_histogram_point_data->add_attributes(),
-                                                    kv_attr.first, kv_attr.second);
+                                                    kv_attr.first, kv_attr.second, false);
     }
   }
 }
@@ -274,7 +274,7 @@ void OtlpMetricUtils::ConvertGaugeMetric(const opentelemetry::sdk::metrics::Metr
     for (auto &kv_attr : point_data_with_attributes.attributes)
     {
       OtlpPopulateAttributeUtils::PopulateAttribute(proto_gauge_point_data->add_attributes(),
-                                                    kv_attr.first, kv_attr.second);
+                                                    kv_attr.first, kv_attr.second, false);
     }
   }
 }
