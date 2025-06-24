@@ -91,7 +91,7 @@ public:
       result_callback;
 
   OtlpGrpcAsyncCallData() {}
-  virtual ~OtlpGrpcAsyncCallData() {}
+  ~OtlpGrpcAsyncCallData() override {}
 };
 }  // namespace
 #endif
