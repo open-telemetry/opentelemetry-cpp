@@ -18,8 +18,8 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/logs/event_logger_provider.h"
-#include "opentelemetry/sdk/logs/event_logger_provider_factory.h"
+#include "opentelemetry/sdk/logs/event_logger_provider.h"          // IWYU pragma: keep
+#include "opentelemetry/sdk/logs/event_logger_provider_factory.h"  // IWYU pragma: keep
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/logger_context.h"

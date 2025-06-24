@@ -43,6 +43,10 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include "opentelemetry/common/attribute_value.h"
+#endif
+
 using namespace testing;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
