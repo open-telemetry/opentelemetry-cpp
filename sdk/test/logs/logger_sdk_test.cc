@@ -208,9 +208,10 @@ public:
   // constructor
   void OnEmit(std::unique_ptr<opentelemetry::sdk::logs::Recordable> &&record) noexcept override
   {
+    auto log_record = std::move(record);
     // Cast the recordable received into a concrete MockLogRecordable type
     auto copy =
-        std::shared_ptr<MockLogRecordable>(static_cast<MockLogRecordable *>(record.release()));
+        std::shared_ptr<MockLogRecordable>(static_cast<MockLogRecordable *>(log_record.release()));
 
     // Copy over the received log record's severity, name, and body fields over to the recordable
     // passed in the constructor

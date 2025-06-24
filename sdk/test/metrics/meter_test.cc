@@ -111,7 +111,7 @@ public:
   {
     if (LogLevel::Warning == level)
     {
-      std::cout << msg << std::endl;
+      std::cout << msg << "\n";
       warnings.push_back(msg);
     }
   }

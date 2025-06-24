@@ -26,7 +26,6 @@ using opentelemetry::logs::EventLoggerProvider;
 #endif
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
-using opentelemetry::logs::Provider;
 using opentelemetry::nostd::shared_ptr;
 
 namespace nostd    = opentelemetry::nostd;
