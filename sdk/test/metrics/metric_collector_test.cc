@@ -89,7 +89,7 @@ class testing::MetricCollectorTest : public Test
 {
 public:
   std::weak_ptr<MetricCollector> AddMetricReaderToMeterContext(
-      std::shared_ptr<MeterContext> context,
+      const std::shared_ptr<MeterContext> &context,
       std::shared_ptr<MetricReader> reader,
       std::unique_ptr<MetricFilter> metric_filter = nullptr) noexcept
   {
