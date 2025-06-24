@@ -719,11 +719,11 @@ static inline char HexEncode(unsigned char byte)
 #endif
   if (byte >= 10)
   {
-    return byte - 10 + 'a';
+    return static_cast<char>(byte - 10 + 'a');
   }
   else
   {
-    return byte + '0';
+    return static_cast<char>(byte + '0');
   }
 }
 
@@ -1003,6 +1003,11 @@ public:
       }
     }
   }
+
+  OtlpFileSystemBackend(const OtlpFileSystemBackend &)            = delete;
+  OtlpFileSystemBackend &operator=(const OtlpFileSystemBackend &) = delete;
+  OtlpFileSystemBackend(OtlpFileSystemBackend &&)                 = delete;
+  OtlpFileSystemBackend &operator=(OtlpFileSystemBackend &&)      = delete;
 
   // Written size is not required to be precise, we can just ignore tsan report here.
   OPENTELEMETRY_SANITIZER_NO_THREAD void MaybeRotateLog(std::size_t data_size)
@@ -1588,11 +1593,9 @@ class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileOstreamBackend : public OtlpFileAppende
 public:
   explicit OtlpFileOstreamBackend(const std::reference_wrapper<std::ostream> &os) : os_(os) {}
 
-  ~OtlpFileOstreamBackend() override {}
-
   void Export(nostd::string_view data, std::size_t /*record_count*/) override
   {
-    os_.get().write(data.data(), data.size());
+    os_.get().write(data.data(), static_cast<std::streamsize>(data.size()));
   }
 
   bool ForceFlush(std::chrono::microseconds /*timeout*/) noexcept override
@@ -1611,8 +1614,8 @@ private:
 OtlpFileClient::OtlpFileClient(OtlpFileClientOptions &&options,
                                OtlpFileClientRuntimeOptions &&runtime_options)
     : is_shutdown_(false),
-      options_(std::move(options)),
-      runtime_options_(std::move(runtime_options))
+      options_{std::move(options)},
+      runtime_options_{std::move(runtime_options)}
 {
   if (nostd::holds_alternative<OtlpFileClientFileSystemOptions>(options_.backend_options))
   {
