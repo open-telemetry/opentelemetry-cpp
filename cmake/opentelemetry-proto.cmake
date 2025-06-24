@@ -322,7 +322,6 @@ endif()
 set(OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto)
 add_library(
   opentelemetry_proto
-  ${OPENTELEMETRY_OTLP_PROTO_LIB_TYPE}
   ${OTELCPP_PROTO_TARGET_OPTIONS}
   ${COMMON_PB_CPP_FILE}
   ${RESOURCE_PB_CPP_FILE}
@@ -354,9 +353,8 @@ endif()
 if(WITH_OTLP_GRPC)
   add_library(
     opentelemetry_proto_grpc
-    ${OPENTELEMETRY_OTLP_PROTO_LIB_TYPE} ${OTELCPP_PROTO_TARGET_OPTIONS}
-    ${TRACE_SERVICE_GRPC_PB_CPP_FILE} ${LOGS_SERVICE_GRPC_PB_CPP_FILE}
-    ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
+    ${OTELCPP_PROTO_TARGET_OPTIONS} ${TRACE_SERVICE_GRPC_PB_CPP_FILE}
+    ${LOGS_SERVICE_GRPC_PB_CPP_FILE} ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
   set_target_version(opentelemetry_proto_grpc)
 
   # Disable include-what-you-use and clang-tidy on generated code.
