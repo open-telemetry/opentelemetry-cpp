@@ -18,7 +18,6 @@ using opentelemetry::sdk::common::unsetenv;
 
 using opentelemetry::metrics::MeterProvider;
 using opentelemetry::metrics::NoopMeterProvider;
-using opentelemetry::metrics::Provider;
 
 namespace metrics_api = opentelemetry::metrics;
 namespace metrics_sdk = opentelemetry::sdk::metrics;

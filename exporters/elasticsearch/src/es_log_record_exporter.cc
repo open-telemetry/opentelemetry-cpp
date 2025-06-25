@@ -1,13 +1,37 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <sstream>  // std::stringstream
-
+#include <stdint.h>
+#include <atomic>
+#include <chrono>
 #include <condition_variable>
+#include <map>
+#include <memory>  // IWYU pragma: keep
 #include <mutex>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "opentelemetry/exporters/elasticsearch/es_log_record_exporter.h"
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
-#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/ext/http/client/http_client_factory.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/version.h"
+
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <cstddef>
+#  include <functional>
+#  include <ratio>
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#endif
 
 namespace nostd       = opentelemetry::nostd;
 namespace sdklogs     = opentelemetry::sdk::logs;

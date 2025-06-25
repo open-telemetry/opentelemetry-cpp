@@ -2,7 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/logs/event_logger_provider_factory.h"
-#include "opentelemetry/sdk/logs/event_logger_provider.h"
+
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+#  include "opentelemetry/sdk/logs/event_logger_provider.h"
+#endif
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
