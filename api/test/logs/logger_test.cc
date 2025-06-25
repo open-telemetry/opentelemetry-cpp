@@ -206,11 +206,11 @@ class TestLogger : public Logger
 
   using Logger::EmitLogRecord;
 
-  // NOLINTBEGIN(cppcoreguidelines-rvalue-reference-param-not-moved)
   void EmitLogRecord(
-      nostd::unique_ptr<opentelemetry::logs::LogRecord> && /*log_record*/) noexcept override
-  {}
-  // NOLINTEND(cppcoreguidelines-rvalue-reference-param-not-moved)
+      nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept override
+  {
+    auto log_record_ptr = std::move(log_record);
+  }
 };
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
