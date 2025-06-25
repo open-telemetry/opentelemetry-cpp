@@ -165,10 +165,9 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
         // called.
         [metrics_service_stub = metrics_service_stub_](
             opentelemetry::sdk::common::ExportResult result,
-            std::unique_ptr<google::protobuf::Arena> &&arena,
+            std::unique_ptr<google::protobuf::Arena> &&,
             const proto::collector::metrics::v1::ExportMetricsServiceRequest &request,
             proto::collector::metrics::v1::ExportMetricsServiceResponse *) {
-          auto arena_ptr = std::move(arena);
           if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
           {
             OTEL_INTERNAL_LOG_ERROR("[OTLP METRIC GRPC Exporter] ERROR: Export "
