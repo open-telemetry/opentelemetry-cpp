@@ -186,8 +186,6 @@ public:
   public:
     async_interface(OtlpMockLogsServiceStub *owner) : stub_(owner) {}
 
-    virtual ~async_interface() override = default;
-
     void Export(
         ::grpc::ClientContext *context,
         const ::opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest *request,
