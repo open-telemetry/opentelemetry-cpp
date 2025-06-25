@@ -69,6 +69,10 @@ public:
 
   OtlpGrpcAsyncCallDataBase() {}
   virtual ~OtlpGrpcAsyncCallDataBase() {}
+  OtlpGrpcAsyncCallDataBase(const OtlpGrpcAsyncCallDataBase &)            = delete;
+  OtlpGrpcAsyncCallDataBase &operator=(const OtlpGrpcAsyncCallDataBase &) = delete;
+  OtlpGrpcAsyncCallDataBase(OtlpGrpcAsyncCallDataBase &&)                 = delete;
+  OtlpGrpcAsyncCallDataBase &operator=(OtlpGrpcAsyncCallDataBase &&)      = delete;
 };
 
 // When building with -fvisibility=default, we hide the symbols and vtable to ensure we always use
@@ -91,7 +95,11 @@ public:
       result_callback;
 
   OtlpGrpcAsyncCallData() {}
-  virtual ~OtlpGrpcAsyncCallData() {}
+  ~OtlpGrpcAsyncCallData() override {}
+  OtlpGrpcAsyncCallData(const OtlpGrpcAsyncCallData &)            = delete;
+  OtlpGrpcAsyncCallData &operator=(const OtlpGrpcAsyncCallData &) = delete;
+  OtlpGrpcAsyncCallData(OtlpGrpcAsyncCallData &&)                 = delete;
+  OtlpGrpcAsyncCallData &operator=(OtlpGrpcAsyncCallData &&)      = delete;
 };
 }  // namespace
 #endif

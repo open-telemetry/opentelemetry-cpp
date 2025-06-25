@@ -73,13 +73,11 @@ public:
     propogator_list.push_back(std::move(b3_propogator));
 
     composite_propagator_ =
-        new context::propagation::CompositePropagator(std::move(propogator_list));
+        std::make_shared<context::propagation::CompositePropagator>(std::move(propogator_list));
   }
 
-  ~CompositePropagatorTest() override { delete composite_propagator_; }
-
 protected:
-  context::propagation::CompositePropagator *composite_propagator_;
+  std::shared_ptr<context::propagation::CompositePropagator> composite_propagator_;
 };
 
 TEST_F(CompositePropagatorTest, Extract)
