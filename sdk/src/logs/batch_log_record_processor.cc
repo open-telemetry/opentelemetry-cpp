@@ -25,6 +25,10 @@
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+#  include "opentelemetry/sdk/common/thread_instrumentation.h"
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBufferRange;
 
@@ -95,7 +99,7 @@ void BatchLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexc
     return;
   }
 
-  if (buffer_.Add(std::unique_ptr<Recordable>(record.release())) == false)
+  if (buffer_.Add(std::move(record)) == false)
   {
     return;
   }

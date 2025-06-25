@@ -20,7 +20,6 @@
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
-#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -28,7 +27,6 @@ namespace sdk
 {
 namespace metrics
 {
-using opentelemetry::sdk::resource::Resource;
 
 MetricCollector::MetricCollector(opentelemetry::sdk::metrics::MeterContext *context,
                                  std::shared_ptr<MetricReader> metric_reader,

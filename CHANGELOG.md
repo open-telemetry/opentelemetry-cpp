@@ -30,6 +30,9 @@ Increment the:
 * [REMOVAL] Removed deprecated semantic convention header files
   [#3475](https://github.com/open-telemetry/opentelemetry-cpp/pull/3475)
 
+* [CodeHealth] Fix clang-tidy warnings part 1
+  [#3493](https://github.com/open-telemetry/opentelemetry-cpp/pull/3493)
+
 Important changes:
 
 * [REMOVAL] Removed deprecated semantic convention header files

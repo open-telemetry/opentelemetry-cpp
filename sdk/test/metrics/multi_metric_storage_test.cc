@@ -11,10 +11,6 @@
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
-#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
-
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::metrics;
 

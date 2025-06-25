@@ -17,6 +17,10 @@ using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
 #endif
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include "opentelemetry/common/key_value_iterable.h"
+#endif
+
 using opentelemetry::trace::Tracer;
 using opentelemetry::trace::TracerProvider;
 
