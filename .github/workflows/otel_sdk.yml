@@ -26,15 +26,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
         with:
-          path: d:/d.vhdx
+          path: c:/d.vhdx
           enableCrossOsArchive: true
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
           restore-keys: ${{ runner.os }}-bazel-
       - name: mount cache disk
         run: |
-          New-Item -Path d:/d -ItemType "directory" -Force -Verbose
-          If (-not(Test-Path d:/d.vhdx)) {
-            $vhd = New-VHD -Path d:/d.vhdx -SizeBytes 137438953472 -Dynamic -LogicalSectorSizeBytes 4096 -PhysicalSectorSizeBytes 4096 -Verbose
+          New-Item -Path c:/d -ItemType "directory" -Force -Verbose
+          If (-not(Test-Path c:/d.vhdx)) {
+            $vhd = New-VHD -Path c:/d.vhdx -SizeBytes 137438953472 -Dynamic -LogicalSectorSizeBytes 4096 -PhysicalSectorSizeBytes 4096 -Verbose
             $vhd
             $mnt = Mount-VHD -Path $vhd.path -NoDriveLetter -Verbose -PassThru | Out-Host
             $mnt
@@ -45,42 +45,42 @@ jobs:
             $part
             $vol = Format-Volume -FileSystem ReFS -Partition $part -Verbose
             $vol
-            Dismount-VHD -Path d:/d.vhdx -Verbose
+            Dismount-VHD -Path c:/d.vhdx -Verbose
           }
-          $part = Mount-VHD -Path d:/d.vhdx -NoDriveLetter -Verbose -PassThru | Get-Disk | Get-Partition | Where-Object -Not IsHidden
+          $part = Mount-VHD -Path c:/d.vhdx -NoDriveLetter -Verbose -PassThru | Get-Disk | Get-Partition | Where-Object -Not IsHidden
           $part
-          $part | Add-PartitionAccessPath -AccessPath d:/d -Verbose
-          ls d:/d.vhdx
-          echo empty > d:\d\empty.txt
-          cmd /c dir d:\d || echo "swallowing errors"
-          refsutil dedup d:\d /s
+          $part | Add-PartitionAccessPath -AccessPath c:/d -Verbose
+          ls c:/d.vhdx
+          echo empty > c:\d\empty.txt
+          cmd /c dir c:\d || echo "swallowing errors"
+          refsutil dedup c:\d /s
       - name: build minimal otel_sdk
         # On the CI, the github runner does not have constant vs2022 msvc release, but has the same vs2019 (14.29.30133)
         run: |
           echo "build:windows --action_env=BAZEL_VC_FULL_VERSION=14.29.30133" >> ../top.bazelrc
           echo "build:windows --host_action_env=BAZEL_VC_FULL_VERSION=14.42.34438" >> ../top.bazelrc
           echo "common --remote_download_minimal" >> ../top.bazelrc
-          echo "build --disk_cache=d:/d" >> ../top.bazelrc
-          echo "common --repository_cache=d:/r" >> ../top.bazelrc
-          echo "startup --output_user_root=d:/b" >> ../top.bazelrc
+          echo "build --disk_cache=c:/d" >> ../top.bazelrc
+          echo "common --repository_cache=c:/r" >> ../top.bazelrc
+          echo "startup --output_user_root=c:/b" >> ../top.bazelrc
           ./otel_sdk_build.cmd minimal
           ./otel_sdk_build.cmd shutdown
       - run: |
-          cmd /c dir d:\d || echo "swallowing errors"
-          Dismount-VHD -Path "d:/d.vhdx" -Verbose
-          ls d:/d.vhdx
-          Resize-VHD -Path "d:/d.vhdx" -ToMinimumSize -Verbose -ErrorAction SilentlyContinue
-          ls d:/d.vhdx
+          cmd /c dir c:\d || echo "swallowing errors"
+          Dismount-VHD -Path "c:/d.vhdx" -Verbose
+          ls c:/d.vhdx
+          Resize-VHD -Path "c:/d.vhdx" -ToMinimumSize -Verbose -ErrorAction SilentlyContinue
+          ls c:/d.vhdx
       - uses: actions/cache/save@v4
         # Don't update cache on releases
         if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
         env:
           ZSTD_CLEVEL: 1 # 1 (fastest) .. 19 (slowest)
         with:
-          path: d:/d.vhdx
+          path: c:/d.vhdx
           enableCrossOsArchive: true
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
-      - run: Mount-VHD -Path "d:/d.vhdx" -NoDriveLetter -Verbose -PassThru | Out-Host
+      - run: Mount-VHD -Path "c:/d.vhdx" -NoDriveLetter -Verbose -PassThru | Out-Host
       - uses: actions/upload-artifact@v4
         with:
           name: tracing-profiles
@@ -89,7 +89,7 @@ jobs:
       - run: ./otel_sdk_build.cmd test
       - run: ./otel_sdk_build.cmd zip
       - run: ./otel_sdk_build.cmd shutdown
-      - run: ls d:/d.vhdx
+      - run: ls c:/d.vhdx
       - uses: actions/upload-artifact@v4
         if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
         with:
