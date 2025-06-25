@@ -21,11 +21,13 @@ namespace logs
 MultiLogRecordProcessor::MultiLogRecordProcessor(
     std::vector<std::unique_ptr<LogRecordProcessor>> &&processors)
 {
-  for (auto &processor : processors)
+  auto log_record_processors = std::move(processors);
+  for (auto &processor : log_record_processors)
   {
     AddProcessor(std::move(processor));
   }
 }
+
 MultiLogRecordProcessor::~MultiLogRecordProcessor()
 {
   ForceFlush();
@@ -54,11 +56,12 @@ std::unique_ptr<Recordable> MultiLogRecordProcessor::MakeRecordable() noexcept
 
 void MultiLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 {
-  if (!record)
+  auto log_record = std::move(record);
+  if (!log_record)
   {
     return;
   }
-  auto multi_recordable = static_cast<MultiRecordable *>(record.get());
+  auto multi_recordable = static_cast<MultiRecordable *>(log_record.get());
 
   for (auto &processor : processors_)
   {

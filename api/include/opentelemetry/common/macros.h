@@ -22,13 +22,13 @@
 // #  endif
 // #endif
 
-// #if !defined(OPENTELEMETRY_HAVE_FEATURE)
-// #  ifdef __has_feature
-// #    define OPENTELEMETRY_HAVE_FEATURE(f) __has_feature(f)
-// #  else
-// #    define OPENTELEMETRY_HAVE_FEATURE(f) 0
-// #  endif
-// #endif
+#if !defined(OPENTELEMETRY_HAVE_FEATURE)
+#  ifdef __has_feature
+#    define OPENTELEMETRY_HAVE_FEATURE(f) __has_feature(f)
+#  else
+#    define OPENTELEMETRY_HAVE_FEATURE(f) 0
+#  endif
+#endif
 
 /*
    has feature
@@ -44,13 +44,13 @@
    GCC: https://gcc.gnu.org/gcc-5/changes.html
    Clang: https://clang.llvm.org/docs/LanguageExtensions.html
 */
-// #if !defined(OPENTELEMETRY_HAVE_ATTRIBUTE)
-// #  ifdef __has_attribute
-// #    define OPENTELEMETRY_HAVE_ATTRIBUTE(x) __has_attribute(x)
-// #  else
-// #    define OPENTELEMETRY_HAVE_ATTRIBUTE(x) 0
-// #  endif
-// #endif
+#if !defined(OPENTELEMETRY_HAVE_ATTRIBUTE)
+#  ifdef __has_attribute
+#    define OPENTELEMETRY_HAVE_ATTRIBUTE(x) __has_attribute(x)
+#  else
+#    define OPENTELEMETRY_HAVE_ATTRIBUTE(x) 0
+#  endif
+#endif
 
 /*
    OPENTELEMETRY_HAVE_CPP_ATTRIBUTE
@@ -470,22 +470,22 @@ point.
 // OPENTELEMETRY_HAVE_THREAD_SANITIZER
 //
 // ThreadSanitizer (TSan) is a fast data race detector.
-// #ifndef OPENTELEMETRY_HAVE_THREAD_SANITIZER
-// #  if defined(__SANITIZE_THREAD__)
-// #    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 1
-// #  elif OPENTELEMETRY_HAVE_FEATURE(thread_sanitizer)
-// #    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 1
-// #  else
-// #    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 0
-// #  endif
-// #endif
+#ifndef OPENTELEMETRY_HAVE_THREAD_SANITIZER
+#  if defined(__SANITIZE_THREAD__)
+#    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 1
+#  elif OPENTELEMETRY_HAVE_FEATURE(thread_sanitizer)
+#    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 1
+#  else
+#    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 0
+#  endif
+#endif
 
-// #if OPENTELEMETRY_HAVE_THREAD_SANITIZER && OPENTELEMETRY_HAVE_ATTRIBUTE(no_sanitize_thread)
-// #  define OPENTELEMETRY_SANITIZER_NO_THREAD \
-//     __attribute__((no_sanitize_thread))  // __attribute__((no_sanitize("thread")))
-// #else
-// #  define OPENTELEMETRY_SANITIZER_NO_THREAD
-// #endif
+#if OPENTELEMETRY_HAVE_THREAD_SANITIZER && OPENTELEMETRY_HAVE_ATTRIBUTE(no_sanitize_thread)
+#  define OPENTELEMETRY_SANITIZER_NO_THREAD \
+    __attribute__((no_sanitize_thread))  // __attribute__((no_sanitize("thread")))
+#else
+#  define OPENTELEMETRY_SANITIZER_NO_THREAD
+#endif
 
 // OPENTELEMETRY_HAVE_ADDRESS_SANITIZER
 //

@@ -100,8 +100,8 @@ private:
    * @return The number of bytes actually taken care of. If this differs from size * nmemb, it
    * signals an error to libcurl.
    */
-  static size_t WriteVectorHeaderCallback(void *ptr, size_t size, size_t nmemb, void *userp);
-  static size_t WriteVectorBodyCallback(void *ptr, size_t size, size_t nmemb, void *userp);
+  static size_t WriteVectorHeaderCallback(char *ptr, size_t size, size_t nmemb, void *userp);
+  static size_t WriteVectorBodyCallback(char *ptr, size_t size, size_t nmemb, void *userp);
 
   static size_t ReadMemoryCallback(char *buffer, size_t size, size_t nitems, void *userp);
 

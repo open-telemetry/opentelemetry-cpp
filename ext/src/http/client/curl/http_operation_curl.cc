@@ -76,7 +76,7 @@ size_t HttpOperation::WriteMemoryCallback(void *contents, size_t size, size_t nm
   return size * nmemb;
 }
 
-size_t HttpOperation::WriteVectorHeaderCallback(void *ptr, size_t size, size_t nmemb, void *userp)
+size_t HttpOperation::WriteVectorHeaderCallback(char *ptr, size_t size, size_t nmemb, void *userp)
 {
   HttpOperation *self = reinterpret_cast<HttpOperation *>(userp);
   if (nullptr == self)
@@ -84,8 +84,8 @@ size_t HttpOperation::WriteVectorHeaderCallback(void *ptr, size_t size, size_t n
     return 0;
   }
 
-  const unsigned char *begin = static_cast<unsigned char *>(ptr);
-  const unsigned char *end   = begin + size * nmemb;
+  const char *begin = ptr;
+  const char *end   = begin + size * nmemb;
   self->response_headers_.insert(self->response_headers_.end(), begin, end);
 
   if (self->WasAborted())
@@ -106,7 +106,7 @@ size_t HttpOperation::WriteVectorHeaderCallback(void *ptr, size_t size, size_t n
   return size * nmemb;
 }
 
-size_t HttpOperation::WriteVectorBodyCallback(void *ptr, size_t size, size_t nmemb, void *userp)
+size_t HttpOperation::WriteVectorBodyCallback(char *ptr, size_t size, size_t nmemb, void *userp)
 {
   HttpOperation *self = reinterpret_cast<HttpOperation *>(userp);
   if (nullptr == self)
@@ -114,8 +114,8 @@ size_t HttpOperation::WriteVectorBodyCallback(void *ptr, size_t size, size_t nme
     return 0;
   }
 
-  const unsigned char *begin = static_cast<unsigned char *>(ptr);
-  const unsigned char *end   = begin + size * nmemb;
+  const char *begin = ptr;
+  const char *end   = begin + size * nmemb;
   self->response_body_.insert(self->response_body_.end(), begin, end);
 
   if (self->WasAborted())
@@ -1113,8 +1113,7 @@ CURLcode HttpOperation::Setup()
   }
   else
   {
-    rc = SetCurlPtrOption(CURLOPT_WRITEFUNCTION,
-                          reinterpret_cast<void *>(&HttpOperation::WriteVectorBodyCallback));
+    rc = SetCurlPtrOption(CURLOPT_WRITEFUNCTION, HttpOperation::WriteVectorBodyCallback);
     if (rc != CURLE_OK)
     {
       return rc;
@@ -1126,8 +1125,7 @@ CURLcode HttpOperation::Setup()
       return rc;
     }
 
-    rc = SetCurlPtrOption(CURLOPT_HEADERFUNCTION,
-                          reinterpret_cast<void *>(&HttpOperation::WriteVectorHeaderCallback));
+    rc = SetCurlPtrOption(CURLOPT_HEADERFUNCTION, HttpOperation::WriteVectorHeaderCallback);
     if (rc != CURLE_OK)
     {
       return rc;

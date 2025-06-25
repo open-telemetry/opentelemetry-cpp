@@ -22,7 +22,6 @@ class OPENTELEMETRY_EXPORT_TYPE LongSumAggregation : public Aggregation
 {
 public:
   LongSumAggregation(bool is_monotonic);
-  LongSumAggregation(SumPointData &&);
   LongSumAggregation(const SumPointData &);
 
   void Aggregate(int64_t value, const PointAttributes &attributes = {}) noexcept override;
@@ -44,7 +43,6 @@ class OPENTELEMETRY_EXPORT_TYPE DoubleSumAggregation : public Aggregation
 {
 public:
   DoubleSumAggregation(bool is_monotonic);
-  DoubleSumAggregation(SumPointData &&);
   DoubleSumAggregation(const SumPointData &);
 
   void Aggregate(int64_t /* value */, const PointAttributes & /* attributes */) noexcept override {}

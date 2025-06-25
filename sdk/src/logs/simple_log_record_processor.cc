@@ -41,7 +41,8 @@ std::unique_ptr<Recordable> SimpleLogRecordProcessor::MakeRecordable() noexcept
  */
 void SimpleLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 {
-  nostd::span<std::unique_ptr<Recordable>> batch(&record, 1);
+  auto log_record = std::move(record);
+  nostd::span<std::unique_ptr<Recordable>> batch(&log_record, 1);
   // Get lock to ensure Export() is never called concurrently
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
 

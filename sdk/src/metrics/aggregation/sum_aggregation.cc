@@ -27,8 +27,6 @@ LongSumAggregation::LongSumAggregation(bool is_monotonic)
   point_data_.is_monotonic_ = is_monotonic;
 }
 
-LongSumAggregation::LongSumAggregation(SumPointData &&data) : point_data_{data} {}
-
 LongSumAggregation::LongSumAggregation(const SumPointData &data) : point_data_{data} {}
 
 void LongSumAggregation::Aggregate(int64_t value, const PointAttributes & /* attributes */) noexcept
@@ -80,8 +78,6 @@ DoubleSumAggregation::DoubleSumAggregation(bool is_monotonic)
   point_data_.value_        = 0.0;
   point_data_.is_monotonic_ = is_monotonic;
 }
-
-DoubleSumAggregation::DoubleSumAggregation(SumPointData &&data) : point_data_(data) {}
 
 DoubleSumAggregation::DoubleSumAggregation(const SumPointData &data) : point_data_(data) {}
 

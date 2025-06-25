@@ -4,6 +4,23 @@
 # Track changes in folders referenced by copy_directory
 startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
 
+# Disable ANDROID detection, as it breaks with github actions on the Windows image
+# ERROR: D:/a/opentelemetry-cpp/opentelemetry-cpp/BUILD:141:24: While resolving toolchains for target 
+#        //:otel_sdk_r (1512d13): invalid registered toolchain '@androidsdk//:sdk-toolchain': 
+#                                 error loading package '@@rules_android++android_sdk_repository_extension+androidsdk//': 
+#        at D:/b/cefevaif/external/rules_android++android_sdk_repository_extension+androidsdk/helper.bzl:16:6: 
+#                                 Unable to find package for @@[unknown repo 'local_config_platform' 
+#        requested from @@rules_android++android_sdk_repository_extension+androidsdk]//:constraints.bzl: 
+#                                 The repository '@@[unknown repo 'local_config_platform' requested from @@rules_android++android_sdk_repository_extension+androidsdk]' 
+#                                 could not be resolved: 
+#         No repository visible as '@local_config_platform' from repository '@@rules_android++android_sdk_repository_extension+androidsdk'. 
+#         The local_config_platform built-in module is disabled by --incompatible_disable_native_repo_rules. 
+#         Either remove that flag, or replace @local_config_platform with @platforms//host.
+common --repo_env=ANDROID_HOME=
+common --action_env=ANDROID_HOME=
+common --host_action_env=ANDROID_HOME=
+common --test_env=ANDROID_HOME=
+
 #build --features=parse_headers
 #build --features=layering_check
 

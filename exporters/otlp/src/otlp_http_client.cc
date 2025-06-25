@@ -176,7 +176,7 @@ public:
         error_message << "[OTLP HTTP Client] Session state: session create failed.";
         if (!reason.empty())
         {
-          error_message.write(reason.data(), reason.size());
+          error_message.write(reason.data(), static_cast<std::streamsize>(reason.size()));
         }
         OTEL_INTERNAL_LOG_ERROR(error_message.str());
       }
@@ -208,7 +208,7 @@ public:
         error_message << "[OTLP HTTP Client] Session state: connection failed.";
         if (!reason.empty())
         {
-          error_message.write(reason.data(), reason.size());
+          error_message.write(reason.data(), static_cast<std::streamsize>(reason.size()));
         }
         OTEL_INTERNAL_LOG_ERROR(error_message.str());
       }
@@ -233,7 +233,7 @@ public:
         error_message << "[OTLP HTTP Client] Session state: request send failed.";
         if (!reason.empty())
         {
-          error_message.write(reason.data(), reason.size());
+          error_message.write(reason.data(), static_cast<std::streamsize>(reason.size()));
         }
         OTEL_INTERNAL_LOG_ERROR(error_message.str());
       }
@@ -251,7 +251,7 @@ public:
         error_message << "[OTLP HTTP Client] Session state: SSL handshake failed.";
         if (!reason.empty())
         {
-          error_message.write(reason.data(), reason.size());
+          error_message.write(reason.data(), static_cast<std::streamsize>(reason.size()));
         }
         OTEL_INTERNAL_LOG_ERROR(error_message.str());
       }
@@ -262,7 +262,7 @@ public:
         error_message << "[OTLP HTTP Client] Session state: request time out.";
         if (!reason.empty())
         {
-          error_message.write(reason.data(), reason.size());
+          error_message.write(reason.data(), static_cast<std::streamsize>(reason.size()));
         }
         OTEL_INTERNAL_LOG_ERROR(error_message.str());
       }
@@ -273,7 +273,7 @@ public:
         error_message << "[OTLP HTTP Client] Session state: network error.";
         if (!reason.empty())
         {
-          error_message.write(reason.data(), reason.size());
+          error_message.write(reason.data(), static_cast<std::streamsize>(reason.size()));
         }
         OTEL_INTERNAL_LOG_ERROR(error_message.str());
       }
@@ -298,7 +298,7 @@ public:
         error_message << "[OTLP HTTP Client] Session state: (manually) cancelled.";
         if (!reason.empty())
         {
-          error_message.write(reason.data(), reason.size());
+          error_message.write(reason.data(), static_cast<std::streamsize>(reason.size()));
         }
         OTEL_INTERNAL_LOG_ERROR(error_message.str());
       }
@@ -377,11 +377,11 @@ static inline char HexEncode(unsigned char byte)
 #endif
   if (byte >= 10)
   {
-    return byte - 10 + 'a';
+    return static_cast<char>(byte - 10 + 'a');
   }
   else
   {
-    return byte + '0';
+    return static_cast<char>(byte + '0');
   }
 }
 
@@ -665,7 +665,7 @@ void ConvertListFieldToJson(nlohmann::json &value,
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
     : is_shutdown_(false),
-      options_(options),
+      options_(std::move(options)),
       http_client_(http_client::HttpClientFactory::Create(options.thread_instrumentation)),
       start_session_counter_(0),
       finished_session_counter_(0)

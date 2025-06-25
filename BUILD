@@ -513,6 +513,8 @@ native_binary(
     src = "@multitool//tools/multitool",
 )
 
+exports_files(["asan_ignorelist.txt"])
+
 #exports_files("multitool.lock.json")
 
 # copy_file(

@@ -289,7 +289,11 @@ struct Socket
     assert(m_sock != Invalid);
 #ifdef _WIN32
     u_long value = 1;
-    ::ioctlsocket(m_sock, FIONBIO, &value);
+    // ioctlsocket expects cmd to be `long`, not `u_long`, and FIONBIO is a 32-bit negative value: 0x8004667E (2147772030 (usigned), and -2147195266 (signed))
+    // this trips ASAN (UBSAN) with: UndefinedBehaviorSanitizer: unsigned-integer-overflow runtime error:
+    //   implicit conversion from type 'unsigned long' of value 2147772030 (32-bit, unsigned) to type 'long' changed the value to -2147195266 (32-bit, signed) 
+    // hence force convert it to long before the call.
+    ::ioctlsocket(m_sock, static_cast<long>(FIONBIO), &value);
 #else
     int flags = ::fcntl(m_sock, F_GETFL, 0);
     ::fcntl(m_sock, F_SETFL, flags | O_NONBLOCK);

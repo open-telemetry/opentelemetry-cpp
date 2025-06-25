@@ -94,7 +94,7 @@ private:
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
   // Meant exclusively to test force flush timeout
-  const std::chrono::milliseconds export_delay_;
+  std::chrono::milliseconds export_delay_;
 };
 
 /**
