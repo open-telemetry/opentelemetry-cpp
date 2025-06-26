@@ -67,8 +67,12 @@ public:
       opentelemetry::sdk::common::ExportResult::kFailure;
   GrpcAsyncCallback grpc_async_callback = nullptr;
 
-  OtlpGrpcAsyncCallDataBase() {}
-  virtual ~OtlpGrpcAsyncCallDataBase() {}
+  OtlpGrpcAsyncCallDataBase()                                             = default;
+  virtual ~OtlpGrpcAsyncCallDataBase()                                    = default;
+  OtlpGrpcAsyncCallDataBase(const OtlpGrpcAsyncCallDataBase &)            = delete;
+  OtlpGrpcAsyncCallDataBase &operator=(const OtlpGrpcAsyncCallDataBase &) = delete;
+  OtlpGrpcAsyncCallDataBase(OtlpGrpcAsyncCallDataBase &&)                 = delete;
+  OtlpGrpcAsyncCallDataBase &operator=(OtlpGrpcAsyncCallDataBase &&)      = delete;
 };
 
 // When building with -fvisibility=default, we hide the symbols and vtable to ensure we always use
@@ -90,8 +94,7 @@ public:
                      ResponseType *)>
       result_callback;
 
-  OtlpGrpcAsyncCallData() {}
-  virtual ~OtlpGrpcAsyncCallData() {}
+  OtlpGrpcAsyncCallData() = default;
 };
 }  // namespace
 #endif
