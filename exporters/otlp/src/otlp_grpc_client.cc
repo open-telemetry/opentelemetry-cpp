@@ -67,8 +67,8 @@ public:
       opentelemetry::sdk::common::ExportResult::kFailure;
   GrpcAsyncCallback grpc_async_callback = nullptr;
 
-  OtlpGrpcAsyncCallDataBase() = default;
-  virtual ~OtlpGrpcAsyncCallDataBase() = default;
+  OtlpGrpcAsyncCallDataBase()                                             = default;
+  virtual ~OtlpGrpcAsyncCallDataBase()                                    = default;
   OtlpGrpcAsyncCallDataBase(const OtlpGrpcAsyncCallDataBase &)            = delete;
   OtlpGrpcAsyncCallDataBase &operator=(const OtlpGrpcAsyncCallDataBase &) = delete;
   OtlpGrpcAsyncCallDataBase(OtlpGrpcAsyncCallDataBase &&)                 = delete;
