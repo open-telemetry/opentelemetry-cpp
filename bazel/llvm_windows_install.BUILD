@@ -1,6 +1,6 @@
 LIBCLANG_DIR = "lib/clang/20/"
-SHARE_DIR = LIBCLANG_DIR + "share/"
 WIN_DIR = LIBCLANG_DIR + "lib/windows/"
+# SHARE_DIR = LIBCLANG_DIR + "share/"
 
 cc_import(
     name = "asan1",
@@ -17,9 +17,9 @@ cc_import(
     visibility = ["//visibility:public"],
 )
 
-exports_files(
-    SHARE_DIR + "asan_ignorelist.txt"
-)
+# exports_files([
+#     SHARE_DIR + "asan_ignorelist.txt"
+# ])
 
 cc_library(
     name = "asan",
