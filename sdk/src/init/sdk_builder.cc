@@ -145,10 +145,10 @@ class SamplerBuilder : public opentelemetry::sdk::configuration::SamplerConfigur
 {
 public:
   SamplerBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  SamplerBuilder(SamplerBuilder &&)                      = default;
-  SamplerBuilder(const SamplerBuilder &)                 = default;
-  SamplerBuilder &operator=(SamplerBuilder &&)           = default;
-  SamplerBuilder &operator=(const SamplerBuilder &other) = default;
+  SamplerBuilder(SamplerBuilder &&)                      = delete;
+  SamplerBuilder(const SamplerBuilder &)                 = delete;
+  SamplerBuilder &operator=(SamplerBuilder &&)           = delete;
+  SamplerBuilder &operator=(const SamplerBuilder &other) = delete;
   ~SamplerBuilder() override                             = default;
 
   void VisitAlwaysOff(
@@ -199,10 +199,10 @@ class SpanProcessorBuilder
 {
 public:
   SpanProcessorBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  SpanProcessorBuilder(SpanProcessorBuilder &&)                      = default;
-  SpanProcessorBuilder(const SpanProcessorBuilder &)                 = default;
-  SpanProcessorBuilder &operator=(SpanProcessorBuilder &&)           = default;
-  SpanProcessorBuilder &operator=(const SpanProcessorBuilder &other) = default;
+  SpanProcessorBuilder(SpanProcessorBuilder &&)                      = delete;
+  SpanProcessorBuilder(const SpanProcessorBuilder &)                 = delete;
+  SpanProcessorBuilder &operator=(SpanProcessorBuilder &&)           = delete;
+  SpanProcessorBuilder &operator=(const SpanProcessorBuilder &other) = delete;
   ~SpanProcessorBuilder() override                                   = default;
 
   void VisitBatch(
@@ -234,10 +234,10 @@ class SpanExporterBuilder
 {
 public:
   SpanExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  SpanExporterBuilder(SpanExporterBuilder &&)                      = default;
-  SpanExporterBuilder(const SpanExporterBuilder &)                 = default;
-  SpanExporterBuilder &operator=(SpanExporterBuilder &&)           = default;
-  SpanExporterBuilder &operator=(const SpanExporterBuilder &other) = default;
+  SpanExporterBuilder(SpanExporterBuilder &&)                      = delete;
+  SpanExporterBuilder(const SpanExporterBuilder &)                 = delete;
+  SpanExporterBuilder &operator=(SpanExporterBuilder &&)           = delete;
+  SpanExporterBuilder &operator=(const SpanExporterBuilder &other) = delete;
   ~SpanExporterBuilder() override                                  = default;
 
   void VisitOtlpHttp(
@@ -287,10 +287,10 @@ class MetricReaderBuilder
 {
 public:
   MetricReaderBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  MetricReaderBuilder(MetricReaderBuilder &&)                      = default;
-  MetricReaderBuilder(const MetricReaderBuilder &)                 = default;
-  MetricReaderBuilder &operator=(MetricReaderBuilder &&)           = default;
-  MetricReaderBuilder &operator=(const MetricReaderBuilder &other) = default;
+  MetricReaderBuilder(MetricReaderBuilder &&)                      = delete;
+  MetricReaderBuilder(const MetricReaderBuilder &)                 = delete;
+  MetricReaderBuilder &operator=(MetricReaderBuilder &&)           = delete;
+  MetricReaderBuilder &operator=(const MetricReaderBuilder &other) = delete;
   ~MetricReaderBuilder() override                                  = default;
 
   void VisitPeriodic(
@@ -316,10 +316,10 @@ class PushMetricExporterBuilder
 {
 public:
   PushMetricExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  PushMetricExporterBuilder(PushMetricExporterBuilder &&)                      = default;
-  PushMetricExporterBuilder(const PushMetricExporterBuilder &)                 = default;
-  PushMetricExporterBuilder &operator=(PushMetricExporterBuilder &&)           = default;
-  PushMetricExporterBuilder &operator=(const PushMetricExporterBuilder &other) = default;
+  PushMetricExporterBuilder(PushMetricExporterBuilder &&)                      = delete;
+  PushMetricExporterBuilder(const PushMetricExporterBuilder &)                 = delete;
+  PushMetricExporterBuilder &operator=(PushMetricExporterBuilder &&)           = delete;
+  PushMetricExporterBuilder &operator=(const PushMetricExporterBuilder &other) = delete;
   ~PushMetricExporterBuilder() override                                        = default;
 
   void VisitOtlpHttp(
@@ -367,10 +367,10 @@ class PullMetricExporterBuilder
 {
 public:
   PullMetricExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  PullMetricExporterBuilder(PullMetricExporterBuilder &&)                      = default;
-  PullMetricExporterBuilder(const PullMetricExporterBuilder &)                 = default;
-  PullMetricExporterBuilder &operator=(PullMetricExporterBuilder &&)           = default;
-  PullMetricExporterBuilder &operator=(const PullMetricExporterBuilder &other) = default;
+  PullMetricExporterBuilder(PullMetricExporterBuilder &&)                      = delete;
+  PullMetricExporterBuilder(const PullMetricExporterBuilder &)                 = delete;
+  PullMetricExporterBuilder &operator=(PullMetricExporterBuilder &&)           = delete;
+  PullMetricExporterBuilder &operator=(const PullMetricExporterBuilder &other) = delete;
   ~PullMetricExporterBuilder() override                                        = default;
 
   void VisitPrometheus(
@@ -398,10 +398,10 @@ class LogRecordProcessorBuilder
 {
 public:
   LogRecordProcessorBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  LogRecordProcessorBuilder(LogRecordProcessorBuilder &&)                      = default;
-  LogRecordProcessorBuilder(const LogRecordProcessorBuilder &)                 = default;
-  LogRecordProcessorBuilder &operator=(LogRecordProcessorBuilder &&)           = default;
-  LogRecordProcessorBuilder &operator=(const LogRecordProcessorBuilder &other) = default;
+  LogRecordProcessorBuilder(LogRecordProcessorBuilder &&)                      = delete;
+  LogRecordProcessorBuilder(const LogRecordProcessorBuilder &)                 = delete;
+  LogRecordProcessorBuilder &operator=(LogRecordProcessorBuilder &&)           = delete;
+  LogRecordProcessorBuilder &operator=(const LogRecordProcessorBuilder &other) = delete;
   ~LogRecordProcessorBuilder() override                                        = default;
 
   void VisitBatch(
@@ -434,10 +434,10 @@ class LogRecordExporterBuilder
 {
 public:
   LogRecordExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  LogRecordExporterBuilder(LogRecordExporterBuilder &&)                      = default;
-  LogRecordExporterBuilder(const LogRecordExporterBuilder &)                 = default;
-  LogRecordExporterBuilder &operator=(LogRecordExporterBuilder &&)           = default;
-  LogRecordExporterBuilder &operator=(const LogRecordExporterBuilder &other) = default;
+  LogRecordExporterBuilder(LogRecordExporterBuilder &&)                      = delete;
+  LogRecordExporterBuilder(const LogRecordExporterBuilder &)                 = delete;
+  LogRecordExporterBuilder &operator=(LogRecordExporterBuilder &&)           = delete;
+  LogRecordExporterBuilder &operator=(const LogRecordExporterBuilder &other) = delete;
   ~LogRecordExporterBuilder() override                                       = default;
 
   void VisitOtlpHttp(const opentelemetry::sdk::configuration::OtlpHttpLogRecordExporterConfiguration
