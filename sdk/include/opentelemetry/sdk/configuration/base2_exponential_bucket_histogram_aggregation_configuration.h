@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include <memory>
-
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/aggregation_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -19,11 +18,13 @@ namespace configuration
 class Base2ExponentialBucketHistogramAggregationConfiguration : public AggregationConfiguration
 {
 public:
-  Base2ExponentialBucketHistogramAggregationConfiguration()           = default;
-  ~Base2ExponentialBucketHistogramAggregationConfiguration() override = default;
+  void Accept(AggregationConfigurationVisitor *visitor) const override
+  {
+    visitor->VisitBase2ExponentialBucketHistogram(this);
+  }
 
-  size_t max_scale{0};
-  size_t max_size{0};
+  std::size_t max_scale{0};
+  std::size_t max_size{0};
   bool record_min_max{false};
 };
 

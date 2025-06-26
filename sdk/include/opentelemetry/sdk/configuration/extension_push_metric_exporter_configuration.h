@@ -22,9 +22,6 @@ namespace configuration
 class ExtensionPushMetricExporterConfiguration : public PushMetricExporterConfiguration
 {
 public:
-  ExtensionPushMetricExporterConfiguration()           = default;
-  ~ExtensionPushMetricExporterConfiguration() override = default;
-
   void Accept(PushMetricExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitExtension(this);

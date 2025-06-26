@@ -15,7 +15,12 @@ class PullMetricExporterConfigurationVisitor;
 class PullMetricExporterConfiguration
 {
 public:
-  PullMetricExporterConfiguration()          = default;
+  PullMetricExporterConfiguration()                                              = default;
+  PullMetricExporterConfiguration(PullMetricExporterConfiguration &&)            = default;
+  PullMetricExporterConfiguration(const PullMetricExporterConfiguration &)       = default;
+  PullMetricExporterConfiguration &operator=(PullMetricExporterConfiguration &&) = default;
+  PullMetricExporterConfiguration &operator=(const PullMetricExporterConfiguration &other) =
+      default;
   virtual ~PullMetricExporterConfiguration() = default;
 
   virtual void Accept(PullMetricExporterConfigurationVisitor *visitor) const = 0;

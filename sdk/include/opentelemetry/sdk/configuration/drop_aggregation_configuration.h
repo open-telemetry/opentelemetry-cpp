@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include <memory>
-
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/aggregation_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -19,8 +18,7 @@ namespace configuration
 class DropAggregationConfiguration : public AggregationConfiguration
 {
 public:
-  DropAggregationConfiguration()           = default;
-  ~DropAggregationConfiguration() override = default;
+  void Accept(AggregationConfigurationVisitor *visitor) const override { visitor->VisitDrop(this); }
 };
 
 }  // namespace configuration

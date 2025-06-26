@@ -20,9 +20,6 @@ namespace configuration
 class ViewConfiguration
 {
 public:
-  ViewConfiguration()  = default;
-  ~ViewConfiguration() = default;
-
   std::unique_ptr<ViewSelectorConfiguration> selector;
   std::unique_ptr<ViewStreamConfiguration> stream;
 };

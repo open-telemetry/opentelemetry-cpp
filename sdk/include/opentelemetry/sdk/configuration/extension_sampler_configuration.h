@@ -20,9 +20,6 @@ namespace configuration
 class ExtensionSamplerConfiguration : public SamplerConfiguration
 {
 public:
-  ExtensionSamplerConfiguration()           = default;
-  ~ExtensionSamplerConfiguration() override = default;
-
   void Accept(SamplerConfigurationVisitor *visitor) const override
   {
     visitor->VisitExtension(this);
@@ -30,7 +27,7 @@ public:
 
   std::string name;
   std::unique_ptr<DocumentNode> node;
-  size_t depth{0};
+  std::size_t depth{0};
 };
 
 }  // namespace configuration

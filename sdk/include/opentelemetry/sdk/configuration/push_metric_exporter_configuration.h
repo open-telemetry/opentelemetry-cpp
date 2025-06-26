@@ -17,7 +17,12 @@ class PushMetricExporterConfigurationVisitor;
 class PushMetricExporterConfiguration
 {
 public:
-  PushMetricExporterConfiguration()          = default;
+  PushMetricExporterConfiguration()                                              = default;
+  PushMetricExporterConfiguration(PushMetricExporterConfiguration &&)            = default;
+  PushMetricExporterConfiguration(const PushMetricExporterConfiguration &)       = default;
+  PushMetricExporterConfiguration &operator=(PushMetricExporterConfiguration &&) = default;
+  PushMetricExporterConfiguration &operator=(const PushMetricExporterConfiguration &other) =
+      default;
   virtual ~PushMetricExporterConfiguration() = default;
 
   virtual void Accept(PushMetricExporterConfigurationVisitor *visitor) const = 0;

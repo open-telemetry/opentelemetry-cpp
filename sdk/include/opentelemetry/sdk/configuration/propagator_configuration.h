@@ -19,9 +19,6 @@ namespace configuration
 class PropagatorConfiguration
 {
 public:
-  PropagatorConfiguration()          = default;
-  virtual ~PropagatorConfiguration() = default;
-
   std::vector<std::string> composite;
 };
 

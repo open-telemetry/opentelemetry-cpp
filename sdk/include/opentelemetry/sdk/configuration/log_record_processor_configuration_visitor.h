@@ -18,8 +18,14 @@ class ExtensionLogRecordProcessorConfiguration;
 class LogRecordProcessorConfigurationVisitor
 {
 public:
-  LogRecordProcessorConfigurationVisitor()          = default;
-  virtual ~LogRecordProcessorConfigurationVisitor() = default;
+  LogRecordProcessorConfigurationVisitor()                                               = default;
+  LogRecordProcessorConfigurationVisitor(LogRecordProcessorConfigurationVisitor &&)      = default;
+  LogRecordProcessorConfigurationVisitor(const LogRecordProcessorConfigurationVisitor &) = default;
+  LogRecordProcessorConfigurationVisitor &operator=(LogRecordProcessorConfigurationVisitor &&) =
+      default;
+  LogRecordProcessorConfigurationVisitor &operator=(
+      const LogRecordProcessorConfigurationVisitor &other) = default;
+  virtual ~LogRecordProcessorConfigurationVisitor()        = default;
 
   virtual void VisitBatch(const BatchLogRecordProcessorConfiguration *model)         = 0;
   virtual void VisitSimple(const SimpleLogRecordProcessorConfiguration *model)       = 0;

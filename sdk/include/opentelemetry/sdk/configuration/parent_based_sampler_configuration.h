@@ -20,9 +20,6 @@ namespace configuration
 class ParentBasedSamplerConfiguration : public SamplerConfiguration
 {
 public:
-  ParentBasedSamplerConfiguration()           = default;
-  ~ParentBasedSamplerConfiguration() override = default;
-
   void Accept(SamplerConfigurationVisitor *visitor) const override
   {
     visitor->VisitParentBased(this);

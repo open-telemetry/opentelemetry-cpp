@@ -20,9 +20,6 @@ namespace configuration
 class ExtensionLogRecordProcessorConfiguration : public LogRecordProcessorConfiguration
 {
 public:
-  ExtensionLogRecordProcessorConfiguration()           = default;
-  ~ExtensionLogRecordProcessorConfiguration() override = default;
-
   void Accept(LogRecordProcessorConfigurationVisitor *visitor) const override
   {
     visitor->VisitExtension(this);

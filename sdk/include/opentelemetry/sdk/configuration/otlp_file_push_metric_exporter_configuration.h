@@ -5,7 +5,7 @@
 
 #include <string>
 
-#include "opentelemetry/sdk/configuration/exporter_default_histogram_aggregation.h"
+#include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration_visitor.h"
@@ -22,9 +22,6 @@ namespace configuration
 class OtlpFilePushMetricExporterConfiguration : public PushMetricExporterConfiguration
 {
 public:
-  OtlpFilePushMetricExporterConfiguration()           = default;
-  ~OtlpFilePushMetricExporterConfiguration() override = default;
-
   void Accept(PushMetricExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitOtlpFile(this);

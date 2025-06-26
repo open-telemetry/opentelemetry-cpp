@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -11,7 +13,7 @@ namespace sdk
 namespace configuration
 {
 
-enum enum_otlp_http_encoding
+enum enum_otlp_http_encoding : std::uint8_t
 {
   protobuf,
   json

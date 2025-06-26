@@ -22,9 +22,6 @@ namespace configuration
 class OtlpGrpcLogRecordExporterConfiguration : public LogRecordExporterConfiguration
 {
 public:
-  OtlpGrpcLogRecordExporterConfiguration()           = default;
-  ~OtlpGrpcLogRecordExporterConfiguration() override = default;
-
   void Accept(LogRecordExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitOtlpGrpc(this);
@@ -37,7 +34,7 @@ public:
   std::unique_ptr<HeadersConfiguration> headers;
   std::string headers_list;
   std::string compression;
-  size_t timeout{0};
+  std::size_t timeout{0};
   bool insecure{false};
 };
 

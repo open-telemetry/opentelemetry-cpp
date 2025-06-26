@@ -21,8 +21,12 @@ class ExtensionSamplerConfiguration;
 class SamplerConfigurationVisitor
 {
 public:
-  SamplerConfigurationVisitor()          = default;
-  virtual ~SamplerConfigurationVisitor() = default;
+  SamplerConfigurationVisitor()                                                    = default;
+  SamplerConfigurationVisitor(SamplerConfigurationVisitor &&)                      = default;
+  SamplerConfigurationVisitor(const SamplerConfigurationVisitor &)                 = default;
+  SamplerConfigurationVisitor &operator=(SamplerConfigurationVisitor &&)           = default;
+  SamplerConfigurationVisitor &operator=(const SamplerConfigurationVisitor &other) = default;
+  virtual ~SamplerConfigurationVisitor()                                           = default;
 
   virtual void VisitAlwaysOff(const AlwaysOffSamplerConfiguration *model)                 = 0;
   virtual void VisitAlwaysOn(const AlwaysOnSamplerConfiguration *model)                   = 0;

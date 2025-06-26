@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -11,7 +13,7 @@ namespace sdk
 namespace configuration
 {
 
-enum enum_default_histogram_aggregation
+enum enum_default_histogram_aggregation : std::uint8_t
 {
   explicit_bucket_histogram,
   base2_exponential_bucket_histogram

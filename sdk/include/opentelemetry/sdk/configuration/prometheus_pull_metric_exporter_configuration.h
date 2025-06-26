@@ -21,16 +21,13 @@ namespace configuration
 class PrometheusPullMetricExporterConfiguration : public PullMetricExporterConfiguration
 {
 public:
-  PrometheusPullMetricExporterConfiguration()           = default;
-  ~PrometheusPullMetricExporterConfiguration() override = default;
-
   void Accept(PullMetricExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitPrometheus(this);
   }
 
   std::string host;
-  size_t port{0};
+  std::size_t port{0};
   bool without_units{false};
   bool without_type_suffix{false};
   bool without_scope_info{false};

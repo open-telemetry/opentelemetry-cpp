@@ -17,8 +17,12 @@ class SpanProcessorConfigurationVisitor;
 class SpanProcessorConfiguration
 {
 public:
-  SpanProcessorConfiguration()          = default;
-  virtual ~SpanProcessorConfiguration() = default;
+  SpanProcessorConfiguration()                                                   = default;
+  SpanProcessorConfiguration(SpanProcessorConfiguration &&)                      = default;
+  SpanProcessorConfiguration(const SpanProcessorConfiguration &)                 = default;
+  SpanProcessorConfiguration &operator=(SpanProcessorConfiguration &&)           = default;
+  SpanProcessorConfiguration &operator=(const SpanProcessorConfiguration &other) = default;
+  virtual ~SpanProcessorConfiguration()                                          = default;
 
   virtual void Accept(SpanProcessorConfigurationVisitor *visitor) const = 0;
 };

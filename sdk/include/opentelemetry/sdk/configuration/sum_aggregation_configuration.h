@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include <memory>
-
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/aggregation_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -19,8 +18,7 @@ namespace configuration
 class SumAggregationConfiguration : public AggregationConfiguration
 {
 public:
-  SumAggregationConfiguration()           = default;
-  ~SumAggregationConfiguration() override = default;
+  void Accept(AggregationConfigurationVisitor *visitor) const override { visitor->VisitSum(this); }
 };
 
 }  // namespace configuration

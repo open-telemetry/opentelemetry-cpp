@@ -20,13 +20,17 @@ namespace configuration
 class RymlDocumentNode : public DocumentNode
 {
 public:
-  RymlDocumentNode(ryml::ConstNodeRef node, size_t depth) : node_(node), depth_(depth) {}
-  ~RymlDocumentNode() override = default;
+  RymlDocumentNode(ryml::ConstNodeRef node, std::size_t depth) : node_(node), depth_(depth) {}
+  RymlDocumentNode(RymlDocumentNode &&)                      = delete;
+  RymlDocumentNode(const RymlDocumentNode &)                 = delete;
+  RymlDocumentNode &operator=(RymlDocumentNode &&)           = delete;
+  RymlDocumentNode &operator=(const RymlDocumentNode &other) = delete;
+  ~RymlDocumentNode() override                               = default;
 
   std::string Key() const override;
 
   bool AsBoolean() override;
-  size_t AsInteger() override;
+  std::size_t AsInteger() override;
   double AsDouble() override;
   std::string AsString() override;
 
@@ -36,8 +40,8 @@ public:
   bool GetRequiredBoolean(const std::string &name) override;
   bool GetBoolean(const std::string &name, bool default_value) override;
 
-  size_t GetRequiredInteger(const std::string &name) override;
-  size_t GetInteger(const std::string &name, size_t default_value) override;
+  std::size_t GetRequiredInteger(const std::string &name) override;
+  std::size_t GetInteger(const std::string &name, std::size_t default_value) override;
 
   double GetRequiredDouble(const std::string &name) override;
   double GetDouble(const std::string &name, double default_value) override;
@@ -48,8 +52,8 @@ public:
   DocumentNodeConstIterator begin() const override;
   DocumentNodeConstIterator end() const override;
 
-  size_t num_children() const override;
-  std::unique_ptr<DocumentNode> GetChild(size_t index) const override;
+  std::size_t num_children() const override;
+  std::unique_ptr<DocumentNode> GetChild(std::size_t index) const override;
 
   PropertiesNodeConstIterator begin_properties() const override;
   PropertiesNodeConstIterator end_properties() const override;
@@ -61,13 +65,20 @@ private:
   ryml::ConstNodeRef GetRymlChildNode(const std::string &name);
 
   ryml::ConstNodeRef node_;
-  size_t depth_;
+  std::size_t depth_;
 };
 
 class RymlDocumentNodeConstIteratorImpl : public DocumentNodeConstIteratorImpl
 {
 public:
-  RymlDocumentNodeConstIteratorImpl(ryml::ConstNodeRef parent, size_t index, size_t depth);
+  RymlDocumentNodeConstIteratorImpl(ryml::ConstNodeRef parent,
+                                    std::size_t index,
+                                    std::size_t depth);
+  RymlDocumentNodeConstIteratorImpl(RymlDocumentNodeConstIteratorImpl &&)            = delete;
+  RymlDocumentNodeConstIteratorImpl(const RymlDocumentNodeConstIteratorImpl &)       = delete;
+  RymlDocumentNodeConstIteratorImpl &operator=(RymlDocumentNodeConstIteratorImpl &&) = delete;
+  RymlDocumentNodeConstIteratorImpl &operator=(const RymlDocumentNodeConstIteratorImpl &other) =
+      delete;
   ~RymlDocumentNodeConstIteratorImpl() override;
 
   void Next() override;
@@ -76,14 +87,21 @@ public:
 
 private:
   ryml::ConstNodeRef parent_;
-  size_t index_;
-  size_t depth_;
+  std::size_t index_;
+  std::size_t depth_;
 };
 
 class RymlPropertiesNodeConstIteratorImpl : public PropertiesNodeConstIteratorImpl
 {
 public:
-  RymlPropertiesNodeConstIteratorImpl(ryml::ConstNodeRef parent, size_t index, size_t depth);
+  RymlPropertiesNodeConstIteratorImpl(ryml::ConstNodeRef parent,
+                                      std::size_t index,
+                                      std::size_t depth);
+  RymlPropertiesNodeConstIteratorImpl(RymlPropertiesNodeConstIteratorImpl &&)            = delete;
+  RymlPropertiesNodeConstIteratorImpl(const RymlPropertiesNodeConstIteratorImpl &)       = delete;
+  RymlPropertiesNodeConstIteratorImpl &operator=(RymlPropertiesNodeConstIteratorImpl &&) = delete;
+  RymlPropertiesNodeConstIteratorImpl &operator=(const RymlPropertiesNodeConstIteratorImpl &other) =
+      delete;
   ~RymlPropertiesNodeConstIteratorImpl() override;
 
   void Next() override;
@@ -93,8 +111,8 @@ public:
 
 private:
   ryml::ConstNodeRef parent_;
-  size_t index_;
-  size_t depth_;
+  std::size_t index_;
+  std::size_t depth_;
 };
 
 }  // namespace configuration

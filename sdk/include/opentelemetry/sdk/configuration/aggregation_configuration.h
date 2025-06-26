@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -12,14 +10,21 @@ namespace sdk
 {
 namespace configuration
 {
+class AggregationConfigurationVisitor;
 
 // YAML-SCHEMA: schema/meter_provider.json
 // YAML-NODE: aggregation
 class AggregationConfiguration
 {
 public:
-  AggregationConfiguration()          = default;
-  virtual ~AggregationConfiguration() = default;
+  AggregationConfiguration()                                                 = default;
+  AggregationConfiguration(AggregationConfiguration &&)                      = default;
+  AggregationConfiguration(const AggregationConfiguration &)                 = default;
+  AggregationConfiguration &operator=(AggregationConfiguration &&)           = default;
+  AggregationConfiguration &operator=(const AggregationConfiguration &other) = default;
+  virtual ~AggregationConfiguration()                                        = default;
+
+  virtual void Accept(AggregationConfigurationVisitor *visitor) const = 0;
 };
 
 }  // namespace configuration

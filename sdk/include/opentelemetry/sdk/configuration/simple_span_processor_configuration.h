@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration_visitor.h"
 #include "opentelemetry/version.h"
@@ -20,9 +21,6 @@ namespace configuration
 class SimpleSpanProcessorConfiguration : public SpanProcessorConfiguration
 {
 public:
-  SimpleSpanProcessorConfiguration()           = default;
-  ~SimpleSpanProcessorConfiguration() override = default;
-
   void Accept(SpanProcessorConfigurationVisitor *visitor) const override
   {
     visitor->VisitSimple(this);

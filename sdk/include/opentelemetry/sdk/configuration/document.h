@@ -18,8 +18,12 @@ namespace configuration
 class Document
 {
 public:
-  Document()          = default;
-  virtual ~Document() = default;
+  Document()                                 = default;
+  Document(Document &&)                      = default;
+  Document(const Document &)                 = default;
+  Document &operator=(Document &&)           = default;
+  Document &operator=(const Document &other) = default;
+  virtual ~Document()                        = default;
 
   virtual std::unique_ptr<DocumentNode> GetRootNode() = 0;
 };

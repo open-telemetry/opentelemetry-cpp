@@ -21,18 +21,15 @@ namespace configuration
 class BatchSpanProcessorConfiguration : public SpanProcessorConfiguration
 {
 public:
-  BatchSpanProcessorConfiguration()           = default;
-  ~BatchSpanProcessorConfiguration() override = default;
-
   void Accept(SpanProcessorConfigurationVisitor *visitor) const override
   {
     visitor->VisitBatch(this);
   }
 
-  size_t schedule_delay{0};
-  size_t export_timeout{0};
-  size_t max_queue_size{0};
-  size_t max_export_batch_size{0};
+  std::size_t schedule_delay{0};
+  std::size_t export_timeout{0};
+  std::size_t max_queue_size{0};
+  std::size_t max_export_batch_size{0};
   std::unique_ptr<SpanExporterConfiguration> exporter;
 };
 

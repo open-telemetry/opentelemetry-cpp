@@ -19,9 +19,6 @@ namespace configuration
 class ConsolePushMetricExporterConfiguration : public PushMetricExporterConfiguration
 {
 public:
-  ConsolePushMetricExporterConfiguration()           = default;
-  ~ConsolePushMetricExporterConfiguration() override = default;
-
   void Accept(PushMetricExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitConsole(this);

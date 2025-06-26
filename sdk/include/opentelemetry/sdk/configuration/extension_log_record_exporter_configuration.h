@@ -22,9 +22,6 @@ namespace configuration
 class ExtensionLogRecordExporterConfiguration : public LogRecordExporterConfiguration
 {
 public:
-  ExtensionLogRecordExporterConfiguration()           = default;
-  ~ExtensionLogRecordExporterConfiguration() override = default;
-
   void Accept(LogRecordExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitExtension(this);

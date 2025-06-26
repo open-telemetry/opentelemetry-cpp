@@ -22,9 +22,6 @@ namespace configuration
 class ExtensionPullMetricExporterConfiguration : public PullMetricExporterConfiguration
 {
 public:
-  ExtensionPullMetricExporterConfiguration()           = default;
-  ~ExtensionPullMetricExporterConfiguration() override = default;
-
   void Accept(PullMetricExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitExtension(this);

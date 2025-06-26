@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -14,7 +15,7 @@ namespace sdk
 namespace configuration
 {
 
-enum enum_instrument_type
+enum enum_instrument_type : std::uint8_t
 {
   counter,
   histogram,
@@ -29,8 +30,12 @@ enum enum_instrument_type
 class ViewSelectorConfiguration
 {
 public:
-  ViewSelectorConfiguration()  = default;
-  ~ViewSelectorConfiguration() = default;
+  ViewSelectorConfiguration()                                                  = default;
+  ViewSelectorConfiguration(ViewSelectorConfiguration &&)                      = default;
+  ViewSelectorConfiguration(const ViewSelectorConfiguration &)                 = default;
+  ViewSelectorConfiguration &operator=(ViewSelectorConfiguration &&)           = default;
+  ViewSelectorConfiguration &operator=(const ViewSelectorConfiguration &other) = default;
+  ~ViewSelectorConfiguration()                                                 = default;
 
   std::string instrument_name;
   enum_instrument_type instrument_type{counter};

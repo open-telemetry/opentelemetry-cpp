@@ -23,9 +23,6 @@ namespace configuration
 class PullMetricReaderConfiguration : public MetricReaderConfiguration
 {
 public:
-  PullMetricReaderConfiguration()           = default;
-  ~PullMetricReaderConfiguration() override = default;
-
   void Accept(MetricReaderConfigurationVisitor *visitor) const override
   {
     visitor->VisitPull(this);

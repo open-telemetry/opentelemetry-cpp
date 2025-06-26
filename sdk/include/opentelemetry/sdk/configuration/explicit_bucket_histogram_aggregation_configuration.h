@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <memory>
 #include <vector>
 
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/aggregation_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -20,8 +20,10 @@ namespace configuration
 class ExplicitBucketHistogramAggregationConfiguration : public AggregationConfiguration
 {
 public:
-  ExplicitBucketHistogramAggregationConfiguration()           = default;
-  ~ExplicitBucketHistogramAggregationConfiguration() override = default;
+  void Accept(AggregationConfigurationVisitor *visitor) const override
+  {
+    visitor->VisitExplicitBucketHistogram(this);
+  }
 
   std::vector<double> boundaries;
   bool record_min_max{false};

@@ -21,13 +21,10 @@ namespace configuration
 class ViewStreamConfiguration
 {
 public:
-  ViewStreamConfiguration()  = default;
-  ~ViewStreamConfiguration() = default;
-
   std::string name;
   std::string description;
   std::unique_ptr<AggregationConfiguration> aggregation;
-  size_t aggregation_cardinality_limit;
+  std::size_t aggregation_cardinality_limit;
   std::vector<std::string> attribute_keys;
 };
 

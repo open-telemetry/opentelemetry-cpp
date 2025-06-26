@@ -20,8 +20,14 @@ class ExtensionPushMetricExporterConfiguration;
 class PushMetricExporterConfigurationVisitor
 {
 public:
-  PushMetricExporterConfigurationVisitor()          = default;
-  virtual ~PushMetricExporterConfigurationVisitor() = default;
+  PushMetricExporterConfigurationVisitor()                                               = default;
+  PushMetricExporterConfigurationVisitor(PushMetricExporterConfigurationVisitor &&)      = default;
+  PushMetricExporterConfigurationVisitor(const PushMetricExporterConfigurationVisitor &) = default;
+  PushMetricExporterConfigurationVisitor &operator=(PushMetricExporterConfigurationVisitor &&) =
+      default;
+  PushMetricExporterConfigurationVisitor &operator=(
+      const PushMetricExporterConfigurationVisitor &other) = default;
+  virtual ~PushMetricExporterConfigurationVisitor()        = default;
 
   virtual void VisitOtlpHttp(const OtlpHttpPushMetricExporterConfiguration *model)   = 0;
   virtual void VisitOtlpGrpc(const OtlpGrpcPushMetricExporterConfiguration *model)   = 0;
