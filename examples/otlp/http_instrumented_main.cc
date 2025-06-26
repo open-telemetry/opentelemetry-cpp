@@ -89,7 +89,6 @@ public:
                           const std::string &priority)
       : thread_name_(thread_name), network_name_(network_name), priority_(priority)
   {}
-  ~MyThreadInstrumentation() override = default;
 
   void OnStart() override
   {
