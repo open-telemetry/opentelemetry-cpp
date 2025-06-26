@@ -50,7 +50,7 @@ std::shared_ptr<InMemorySpanData> InitTracer()
       trace_sdk::TracerProviderFactory::Create(std::move(processors));
 
   // Set the global trace provider
-  trace_sdk::Provider::SetTracerProvider(std::move(provider));
+  trace_sdk::Provider::SetTracerProvider(provider);
 
   return data;
 }

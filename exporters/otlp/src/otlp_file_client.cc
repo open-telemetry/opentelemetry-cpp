@@ -1201,7 +1201,7 @@ private:
       {
         if (file_pattern[i] == '%')
         {
-          int checked = static_cast<int>(file_pattern[i + 1]);
+          int checked = static_cast<unsigned char>(file_pattern[i + 1]);
           if (checked > 0 && checked < 128 && check_interval[checked] > 0)
           {
             if (0 == check_file_path_interval_ ||
