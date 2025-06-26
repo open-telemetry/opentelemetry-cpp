@@ -16,8 +16,12 @@ namespace init
 class ConsoleSpanExporterBuilder
 {
 public:
-  ConsoleSpanExporterBuilder()          = default;
-  virtual ~ConsoleSpanExporterBuilder() = default;
+  ConsoleSpanExporterBuilder()                                                   = default;
+  ConsoleSpanExporterBuilder(ConsoleSpanExporterBuilder &&)                      = default;
+  ConsoleSpanExporterBuilder(const ConsoleSpanExporterBuilder &)                 = default;
+  ConsoleSpanExporterBuilder &operator=(ConsoleSpanExporterBuilder &&)           = default;
+  ConsoleSpanExporterBuilder &operator=(const ConsoleSpanExporterBuilder &other) = default;
+  virtual ~ConsoleSpanExporterBuilder()                                          = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
       const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) const = 0;

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/version.h"
 
@@ -16,7 +16,12 @@ namespace init
 class ExtensionPushMetricExporterBuilder
 {
 public:
-  ExtensionPushMetricExporterBuilder()          = default;
+  ExtensionPushMetricExporterBuilder()                                                 = default;
+  ExtensionPushMetricExporterBuilder(ExtensionPushMetricExporterBuilder &&)            = default;
+  ExtensionPushMetricExporterBuilder(const ExtensionPushMetricExporterBuilder &)       = default;
+  ExtensionPushMetricExporterBuilder &operator=(ExtensionPushMetricExporterBuilder &&) = default;
+  ExtensionPushMetricExporterBuilder &operator=(const ExtensionPushMetricExporterBuilder &other) =
+      default;
   virtual ~ExtensionPushMetricExporterBuilder() = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Build(

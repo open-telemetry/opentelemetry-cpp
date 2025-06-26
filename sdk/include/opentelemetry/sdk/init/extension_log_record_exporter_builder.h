@@ -16,7 +16,12 @@ namespace init
 class ExtensionLogRecordExporterBuilder
 {
 public:
-  ExtensionLogRecordExporterBuilder()          = default;
+  ExtensionLogRecordExporterBuilder()                                                = default;
+  ExtensionLogRecordExporterBuilder(ExtensionLogRecordExporterBuilder &&)            = default;
+  ExtensionLogRecordExporterBuilder(const ExtensionLogRecordExporterBuilder &)       = default;
+  ExtensionLogRecordExporterBuilder &operator=(ExtensionLogRecordExporterBuilder &&) = default;
+  ExtensionLogRecordExporterBuilder &operator=(const ExtensionLogRecordExporterBuilder &other) =
+      default;
   virtual ~ExtensionLogRecordExporterBuilder() = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Build(

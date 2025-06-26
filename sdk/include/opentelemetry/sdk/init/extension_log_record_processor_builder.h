@@ -16,7 +16,12 @@ namespace init
 class ExtensionLogRecordProcessorBuilder
 {
 public:
-  ExtensionLogRecordProcessorBuilder()          = default;
+  ExtensionLogRecordProcessorBuilder()                                                 = default;
+  ExtensionLogRecordProcessorBuilder(ExtensionLogRecordProcessorBuilder &&)            = default;
+  ExtensionLogRecordProcessorBuilder(const ExtensionLogRecordProcessorBuilder &)       = default;
+  ExtensionLogRecordProcessorBuilder &operator=(ExtensionLogRecordProcessorBuilder &&) = default;
+  ExtensionLogRecordProcessorBuilder &operator=(const ExtensionLogRecordProcessorBuilder &other) =
+      default;
   virtual ~ExtensionLogRecordProcessorBuilder() = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> Build(

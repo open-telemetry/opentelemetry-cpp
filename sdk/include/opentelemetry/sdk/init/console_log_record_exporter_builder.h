@@ -16,7 +16,12 @@ namespace init
 class ConsoleLogRecordExporterBuilder
 {
 public:
-  ConsoleLogRecordExporterBuilder()          = default;
+  ConsoleLogRecordExporterBuilder()                                              = default;
+  ConsoleLogRecordExporterBuilder(ConsoleLogRecordExporterBuilder &&)            = default;
+  ConsoleLogRecordExporterBuilder(const ConsoleLogRecordExporterBuilder &)       = default;
+  ConsoleLogRecordExporterBuilder &operator=(ConsoleLogRecordExporterBuilder &&) = default;
+  ConsoleLogRecordExporterBuilder &operator=(const ConsoleLogRecordExporterBuilder &other) =
+      default;
   virtual ~ConsoleLogRecordExporterBuilder() = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Build(

@@ -16,7 +16,12 @@ namespace init
 class OtlpHttpLogRecordExporterBuilder
 {
 public:
-  OtlpHttpLogRecordExporterBuilder()          = default;
+  OtlpHttpLogRecordExporterBuilder()                                               = default;
+  OtlpHttpLogRecordExporterBuilder(OtlpHttpLogRecordExporterBuilder &&)            = default;
+  OtlpHttpLogRecordExporterBuilder(const OtlpHttpLogRecordExporterBuilder &)       = default;
+  OtlpHttpLogRecordExporterBuilder &operator=(OtlpHttpLogRecordExporterBuilder &&) = default;
+  OtlpHttpLogRecordExporterBuilder &operator=(const OtlpHttpLogRecordExporterBuilder &other) =
+      default;
   virtual ~OtlpHttpLogRecordExporterBuilder() = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Build(

@@ -16,8 +16,12 @@ namespace init
 class ExtensionSpanProcessorBuilder
 {
 public:
-  ExtensionSpanProcessorBuilder()          = default;
-  virtual ~ExtensionSpanProcessorBuilder() = default;
+  ExtensionSpanProcessorBuilder()                                                      = default;
+  ExtensionSpanProcessorBuilder(ExtensionSpanProcessorBuilder &&)                      = default;
+  ExtensionSpanProcessorBuilder(const ExtensionSpanProcessorBuilder &)                 = default;
+  ExtensionSpanProcessorBuilder &operator=(ExtensionSpanProcessorBuilder &&)           = default;
+  ExtensionSpanProcessorBuilder &operator=(const ExtensionSpanProcessorBuilder &other) = default;
+  virtual ~ExtensionSpanProcessorBuilder()                                             = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> Build(
       const opentelemetry::sdk::configuration::ExtensionSpanProcessorConfiguration *model)

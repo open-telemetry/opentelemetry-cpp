@@ -16,7 +16,12 @@ namespace init
 class PrometheusPullMetricExporterBuilder
 {
 public:
-  PrometheusPullMetricExporterBuilder()          = default;
+  PrometheusPullMetricExporterBuilder()                                                  = default;
+  PrometheusPullMetricExporterBuilder(PrometheusPullMetricExporterBuilder &&)            = default;
+  PrometheusPullMetricExporterBuilder(const PrometheusPullMetricExporterBuilder &)       = default;
+  PrometheusPullMetricExporterBuilder &operator=(PrometheusPullMetricExporterBuilder &&) = default;
+  PrometheusPullMetricExporterBuilder &operator=(const PrometheusPullMetricExporterBuilder &other) =
+      default;
   virtual ~PrometheusPullMetricExporterBuilder() = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> Build(

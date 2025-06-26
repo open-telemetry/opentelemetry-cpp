@@ -16,7 +16,12 @@ namespace init
 class ConsolePushMetricExporterBuilder
 {
 public:
-  ConsolePushMetricExporterBuilder()          = default;
+  ConsolePushMetricExporterBuilder()                                               = default;
+  ConsolePushMetricExporterBuilder(ConsolePushMetricExporterBuilder &&)            = default;
+  ConsolePushMetricExporterBuilder(const ConsolePushMetricExporterBuilder &)       = default;
+  ConsolePushMetricExporterBuilder &operator=(ConsolePushMetricExporterBuilder &&) = default;
+  ConsolePushMetricExporterBuilder &operator=(const ConsolePushMetricExporterBuilder &other) =
+      default;
   virtual ~ConsolePushMetricExporterBuilder() = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Build(

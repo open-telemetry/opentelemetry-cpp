@@ -31,6 +31,7 @@
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
+#include "opentelemetry/sdk/init/configured_sdk.h"
 #include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
@@ -40,6 +41,7 @@
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
 #include "opentelemetry/version.h"
@@ -53,8 +55,12 @@ namespace init
 class SdkBuilder
 {
 public:
-  SdkBuilder(std::shared_ptr<Registry> registry) : m_registry(registry) {}
-  ~SdkBuilder() = default;
+  SdkBuilder(std::shared_ptr<Registry> registry) : m_registry(std::move(registry)) {}
+  SdkBuilder(SdkBuilder &&)                      = default;
+  SdkBuilder(const SdkBuilder &)                 = default;
+  SdkBuilder &operator=(SdkBuilder &&)           = default;
+  SdkBuilder &operator=(const SdkBuilder &other) = default;
+  ~SdkBuilder()                                  = default;
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateAlwaysOffSampler(
       const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration *model) const;

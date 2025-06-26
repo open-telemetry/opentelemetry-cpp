@@ -16,8 +16,12 @@ namespace init
 class ZipkinSpanExporterBuilder
 {
 public:
-  ZipkinSpanExporterBuilder()          = default;
-  virtual ~ZipkinSpanExporterBuilder() = default;
+  ZipkinSpanExporterBuilder()                                                  = default;
+  ZipkinSpanExporterBuilder(ZipkinSpanExporterBuilder &&)                      = default;
+  ZipkinSpanExporterBuilder(const ZipkinSpanExporterBuilder &)                 = default;
+  ZipkinSpanExporterBuilder &operator=(ZipkinSpanExporterBuilder &&)           = default;
+  ZipkinSpanExporterBuilder &operator=(const ZipkinSpanExporterBuilder &other) = default;
+  virtual ~ZipkinSpanExporterBuilder()                                         = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
       const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) const = 0;

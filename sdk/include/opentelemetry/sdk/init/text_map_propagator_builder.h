@@ -15,8 +15,12 @@ namespace init
 class TextMapPropagatorBuilder
 {
 public:
-  TextMapPropagatorBuilder()          = default;
-  virtual ~TextMapPropagatorBuilder() = default;
+  TextMapPropagatorBuilder()                                                 = default;
+  TextMapPropagatorBuilder(TextMapPropagatorBuilder &&)                      = default;
+  TextMapPropagatorBuilder(const TextMapPropagatorBuilder &)                 = default;
+  TextMapPropagatorBuilder &operator=(TextMapPropagatorBuilder &&)           = default;
+  TextMapPropagatorBuilder &operator=(const TextMapPropagatorBuilder &other) = default;
+  virtual ~TextMapPropagatorBuilder()                                        = default;
 
   virtual std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> Build() const = 0;
 };

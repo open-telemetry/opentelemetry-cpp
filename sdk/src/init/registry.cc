@@ -27,9 +27,6 @@ namespace init
 class TraceContextBuilder : public TextMapPropagatorBuilder
 {
 public:
-  TraceContextBuilder()                   = default;
-  virtual ~TraceContextBuilder() override = default;
-
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> Build() const override
   {
     return std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(
@@ -40,9 +37,6 @@ public:
 class BaggageBuilder : public TextMapPropagatorBuilder
 {
 public:
-  BaggageBuilder()                   = default;
-  virtual ~BaggageBuilder() override = default;
-
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> Build() const override
   {
     return std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(
@@ -53,9 +47,6 @@ public:
 class B3Builder : public TextMapPropagatorBuilder
 {
 public:
-  B3Builder()                   = default;
-  virtual ~B3Builder() override = default;
-
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> Build() const override
   {
     return std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(
@@ -66,9 +57,6 @@ public:
 class B3MultiBuilder : public TextMapPropagatorBuilder
 {
 public:
-  B3MultiBuilder()                   = default;
-  virtual ~B3MultiBuilder() override = default;
-
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> Build() const override
   {
     return std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(
@@ -80,9 +68,6 @@ public:
 class JaegerBuilder : public TextMapPropagatorBuilder
 {
 public:
-  JaegerBuilder()                   = default;
-  virtual ~JaegerBuilder() override = default;
-
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> Build() const override
   {
     return std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(

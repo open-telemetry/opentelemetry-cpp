@@ -37,7 +37,7 @@ std::unique_ptr<ConfiguredSdk> ConfiguredSdk::Create(
   {
     try
     {
-      SdkBuilder builder(registry);
+      SdkBuilder builder(std::move(registry));
       sdk = builder.CreateConfiguredSdk(model);
     }
     catch (const std::exception &e)

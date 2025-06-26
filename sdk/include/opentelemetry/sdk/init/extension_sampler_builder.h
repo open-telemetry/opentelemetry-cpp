@@ -16,8 +16,12 @@ namespace init
 class ExtensionSamplerBuilder
 {
 public:
-  ExtensionSamplerBuilder()          = default;
-  virtual ~ExtensionSamplerBuilder() = default;
+  ExtensionSamplerBuilder()                                                = default;
+  ExtensionSamplerBuilder(ExtensionSamplerBuilder &&)                      = default;
+  ExtensionSamplerBuilder(const ExtensionSamplerBuilder &)                 = default;
+  ExtensionSamplerBuilder &operator=(ExtensionSamplerBuilder &&)           = default;
+  ExtensionSamplerBuilder &operator=(const ExtensionSamplerBuilder &other) = default;
+  virtual ~ExtensionSamplerBuilder()                                       = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::trace::Sampler> Build(
       const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *model) const = 0;

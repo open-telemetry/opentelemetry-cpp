@@ -16,7 +16,12 @@ namespace init
 class ExtensionPullMetricExporterBuilder
 {
 public:
-  ExtensionPullMetricExporterBuilder()          = default;
+  ExtensionPullMetricExporterBuilder()                                                 = default;
+  ExtensionPullMetricExporterBuilder(ExtensionPullMetricExporterBuilder &&)            = default;
+  ExtensionPullMetricExporterBuilder(const ExtensionPullMetricExporterBuilder &)       = default;
+  ExtensionPullMetricExporterBuilder &operator=(ExtensionPullMetricExporterBuilder &&) = default;
+  ExtensionPullMetricExporterBuilder &operator=(const ExtensionPullMetricExporterBuilder &other) =
+      default;
   virtual ~ExtensionPullMetricExporterBuilder() = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> Build(

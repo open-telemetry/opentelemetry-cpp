@@ -145,7 +145,11 @@ class SamplerBuilder : public opentelemetry::sdk::configuration::SamplerConfigur
 {
 public:
   SamplerBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  ~SamplerBuilder() override = default;
+  SamplerBuilder(SamplerBuilder &&)                      = default;
+  SamplerBuilder(const SamplerBuilder &)                 = default;
+  SamplerBuilder &operator=(SamplerBuilder &&)           = default;
+  SamplerBuilder &operator=(const SamplerBuilder &other) = default;
+  ~SamplerBuilder() override                             = default;
 
   void VisitAlwaysOff(
       const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration *model) override
@@ -195,7 +199,11 @@ class SpanProcessorBuilder
 {
 public:
   SpanProcessorBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  ~SpanProcessorBuilder() override = default;
+  SpanProcessorBuilder(SpanProcessorBuilder &&)                      = default;
+  SpanProcessorBuilder(const SpanProcessorBuilder &)                 = default;
+  SpanProcessorBuilder &operator=(SpanProcessorBuilder &&)           = default;
+  SpanProcessorBuilder &operator=(const SpanProcessorBuilder &other) = default;
+  ~SpanProcessorBuilder() override                                   = default;
 
   void VisitBatch(
       const opentelemetry::sdk::configuration::BatchSpanProcessorConfiguration *model) override
@@ -226,7 +234,11 @@ class SpanExporterBuilder
 {
 public:
   SpanExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  ~SpanExporterBuilder() override = default;
+  SpanExporterBuilder(SpanExporterBuilder &&)                      = default;
+  SpanExporterBuilder(const SpanExporterBuilder &)                 = default;
+  SpanExporterBuilder &operator=(SpanExporterBuilder &&)           = default;
+  SpanExporterBuilder &operator=(const SpanExporterBuilder &other) = default;
+  ~SpanExporterBuilder() override                                  = default;
 
   void VisitOtlpHttp(
       const opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *model) override
@@ -275,7 +287,11 @@ class MetricReaderBuilder
 {
 public:
   MetricReaderBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  ~MetricReaderBuilder() override = default;
+  MetricReaderBuilder(MetricReaderBuilder &&)                      = default;
+  MetricReaderBuilder(const MetricReaderBuilder &)                 = default;
+  MetricReaderBuilder &operator=(MetricReaderBuilder &&)           = default;
+  MetricReaderBuilder &operator=(const MetricReaderBuilder &other) = default;
+  ~MetricReaderBuilder() override                                  = default;
 
   void VisitPeriodic(
       const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *model) override
@@ -300,7 +316,11 @@ class PushMetricExporterBuilder
 {
 public:
   PushMetricExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  ~PushMetricExporterBuilder() override = default;
+  PushMetricExporterBuilder(PushMetricExporterBuilder &&)                      = default;
+  PushMetricExporterBuilder(const PushMetricExporterBuilder &)                 = default;
+  PushMetricExporterBuilder &operator=(PushMetricExporterBuilder &&)           = default;
+  PushMetricExporterBuilder &operator=(const PushMetricExporterBuilder &other) = default;
+  ~PushMetricExporterBuilder() override                                        = default;
 
   void VisitOtlpHttp(
       const opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *model)
@@ -347,7 +367,11 @@ class PullMetricExporterBuilder
 {
 public:
   PullMetricExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  ~PullMetricExporterBuilder() override = default;
+  PullMetricExporterBuilder(PullMetricExporterBuilder &&)                      = default;
+  PullMetricExporterBuilder(const PullMetricExporterBuilder &)                 = default;
+  PullMetricExporterBuilder &operator=(PullMetricExporterBuilder &&)           = default;
+  PullMetricExporterBuilder &operator=(const PullMetricExporterBuilder &other) = default;
+  ~PullMetricExporterBuilder() override                                        = default;
 
   void VisitPrometheus(
       const opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *model)
@@ -374,7 +398,11 @@ class LogRecordProcessorBuilder
 {
 public:
   LogRecordProcessorBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  ~LogRecordProcessorBuilder() override = default;
+  LogRecordProcessorBuilder(LogRecordProcessorBuilder &&)                      = default;
+  LogRecordProcessorBuilder(const LogRecordProcessorBuilder &)                 = default;
+  LogRecordProcessorBuilder &operator=(LogRecordProcessorBuilder &&)           = default;
+  LogRecordProcessorBuilder &operator=(const LogRecordProcessorBuilder &other) = default;
+  ~LogRecordProcessorBuilder() override                                        = default;
 
   void VisitBatch(
       const opentelemetry::sdk::configuration::BatchLogRecordProcessorConfiguration *model) override
@@ -406,7 +434,11 @@ class LogRecordExporterBuilder
 {
 public:
   LogRecordExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  ~LogRecordExporterBuilder() override = default;
+  LogRecordExporterBuilder(LogRecordExporterBuilder &&)                      = default;
+  LogRecordExporterBuilder(const LogRecordExporterBuilder &)                 = default;
+  LogRecordExporterBuilder &operator=(LogRecordExporterBuilder &&)           = default;
+  LogRecordExporterBuilder &operator=(const LogRecordExporterBuilder &other) = default;
+  ~LogRecordExporterBuilder() override                                       = default;
 
   void VisitOtlpHttp(const opentelemetry::sdk::configuration::OtlpHttpLogRecordExporterConfiguration
                          *model) override

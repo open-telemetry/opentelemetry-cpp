@@ -16,8 +16,12 @@ namespace init
 class OtlpFileSpanExporterBuilder
 {
 public:
-  OtlpFileSpanExporterBuilder()          = default;
-  virtual ~OtlpFileSpanExporterBuilder() = default;
+  OtlpFileSpanExporterBuilder()                                                    = default;
+  OtlpFileSpanExporterBuilder(OtlpFileSpanExporterBuilder &&)                      = default;
+  OtlpFileSpanExporterBuilder(const OtlpFileSpanExporterBuilder &)                 = default;
+  OtlpFileSpanExporterBuilder &operator=(OtlpFileSpanExporterBuilder &&)           = default;
+  OtlpFileSpanExporterBuilder &operator=(const OtlpFileSpanExporterBuilder &other) = default;
+  virtual ~OtlpFileSpanExporterBuilder()                                           = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
       const opentelemetry::sdk::configuration::OtlpFileSpanExporterConfiguration *model) const = 0;

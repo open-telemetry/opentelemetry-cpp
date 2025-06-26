@@ -42,6 +42,11 @@ class Registry
 {
 public:
   Registry();
+  Registry(Registry &&)                      = default;
+  Registry(const Registry &)                 = default;
+  Registry &operator=(Registry &&)           = default;
+  Registry &operator=(const Registry &other) = default;
+
   ~Registry() = default;
 
   /* Core optional components. */

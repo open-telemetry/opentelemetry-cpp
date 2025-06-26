@@ -16,8 +16,12 @@ namespace init
 class ExtensionSpanExporterBuilder
 {
 public:
-  ExtensionSpanExporterBuilder()          = default;
-  virtual ~ExtensionSpanExporterBuilder() = default;
+  ExtensionSpanExporterBuilder()                                                     = default;
+  ExtensionSpanExporterBuilder(ExtensionSpanExporterBuilder &&)                      = default;
+  ExtensionSpanExporterBuilder(const ExtensionSpanExporterBuilder &)                 = default;
+  ExtensionSpanExporterBuilder &operator=(ExtensionSpanExporterBuilder &&)           = default;
+  ExtensionSpanExporterBuilder &operator=(const ExtensionSpanExporterBuilder &other) = default;
+  virtual ~ExtensionSpanExporterBuilder()                                            = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
       const opentelemetry::sdk::configuration::ExtensionSpanExporterConfiguration *model) const = 0;

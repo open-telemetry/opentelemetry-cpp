@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <stdexcept>
 #include <string>
 
 #include "opentelemetry/version.h"
@@ -17,8 +18,11 @@ class UnsupportedException : public std::runtime_error
 {
 public:
   UnsupportedException(const std::string &msg) : std::runtime_error(msg) {}
-
-  ~UnsupportedException() override = default;
+  UnsupportedException(UnsupportedException &&)                      = default;
+  UnsupportedException(const UnsupportedException &)                 = default;
+  UnsupportedException &operator=(UnsupportedException &&)           = default;
+  UnsupportedException &operator=(const UnsupportedException &other) = default;
+  ~UnsupportedException() override                                   = default;
 };
 
 }  // namespace init
