@@ -18,11 +18,9 @@ namespace
 struct GlobalLogHandlerData
 {
   nostd::shared_ptr<LogHandler> handler;
-  LogLevel log_level;
+  LogLevel log_level{LogLevel::Warning};
 
-  GlobalLogHandlerData()
-      : handler(nostd::shared_ptr<LogHandler>(new DefaultLogHandler)), log_level(LogLevel::Warning)
-  {}
+  GlobalLogHandlerData() : handler(nostd::shared_ptr<LogHandler>(new DefaultLogHandler)) {}
   ~GlobalLogHandlerData() { is_singleton_destroyed = true; }
 
   GlobalLogHandlerData(const GlobalLogHandlerData &) = delete;

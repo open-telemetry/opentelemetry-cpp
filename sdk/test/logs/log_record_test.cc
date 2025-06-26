@@ -100,9 +100,10 @@ public:
 
   void EmitLogRecord(nostd::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept override
   {
-    if (record)
+    auto log_record = std::move(record);
+    if (log_record)
     {
-      last_body_ = static_cast<ReadWriteLogRecord *>(record.get())->GetBody();
+      last_body_ = static_cast<ReadWriteLogRecord *>(log_record.get())->GetBody();
     }
   }
 

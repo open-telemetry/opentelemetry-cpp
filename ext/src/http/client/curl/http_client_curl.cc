@@ -3,8 +3,6 @@
 
 #include <curl/curl.h>
 #include <curl/curlver.h>
-#include <algorithm>
-#include <array>
 #include <atomic>
 #include <chrono>
 #include <cstdint>
@@ -25,13 +23,16 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 #  include <zconf.h>
 #  include <zlib.h>
+#  include <algorithm>
+#  include <array>
+
+#  include "opentelemetry/nostd/type_traits.h"
 #else
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 #endif

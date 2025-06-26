@@ -12,8 +12,8 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/logs/event_logger.h"
-#include "opentelemetry/logs/event_logger_provider.h"
+#include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
+#include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
@@ -25,7 +25,7 @@
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
-#include "opentelemetry/sdk/logs/event_logger_provider.h"
+#include "opentelemetry/sdk/logs/event_logger_provider.h"  // IWYU pragma: keep
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
@@ -208,9 +208,10 @@ public:
   // constructor
   void OnEmit(std::unique_ptr<opentelemetry::sdk::logs::Recordable> &&record) noexcept override
   {
+    auto log_record = std::move(record);
     // Cast the recordable received into a concrete MockLogRecordable type
     auto copy =
-        std::shared_ptr<MockLogRecordable>(static_cast<MockLogRecordable *>(record.release()));
+        std::shared_ptr<MockLogRecordable>(static_cast<MockLogRecordable *>(log_record.release()));
 
     // Copy over the received log record's severity, name, and body fields over to the recordable
     // passed in the constructor
