@@ -20,9 +20,6 @@ namespace configuration
 class OtlpFileSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:
-  OtlpFileSpanExporterConfiguration()           = default;
-  ~OtlpFileSpanExporterConfiguration() override = default;
-
   void Accept(SpanExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitOtlpFile(this);

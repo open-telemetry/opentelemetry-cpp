@@ -17,8 +17,12 @@ class SpanExporterConfigurationVisitor;
 class SpanExporterConfiguration
 {
 public:
-  SpanExporterConfiguration()          = default;
-  virtual ~SpanExporterConfiguration() = default;
+  SpanExporterConfiguration()                                                  = default;
+  SpanExporterConfiguration(SpanExporterConfiguration &&)                      = default;
+  SpanExporterConfiguration(const SpanExporterConfiguration &)                 = default;
+  SpanExporterConfiguration &operator=(SpanExporterConfiguration &&)           = default;
+  SpanExporterConfiguration &operator=(const SpanExporterConfiguration &other) = default;
+  virtual ~SpanExporterConfiguration()                                         = default;
 
   virtual void Accept(SpanExporterConfigurationVisitor *visitor) const = 0;
 };

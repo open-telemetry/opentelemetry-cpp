@@ -21,7 +21,12 @@ class ExtensionSpanExporterConfiguration;
 class SpanExporterConfigurationVisitor
 {
 public:
-  SpanExporterConfigurationVisitor()          = default;
+  SpanExporterConfigurationVisitor()                                               = default;
+  SpanExporterConfigurationVisitor(SpanExporterConfigurationVisitor &&)            = default;
+  SpanExporterConfigurationVisitor(const SpanExporterConfigurationVisitor &)       = default;
+  SpanExporterConfigurationVisitor &operator=(SpanExporterConfigurationVisitor &&) = default;
+  SpanExporterConfigurationVisitor &operator=(const SpanExporterConfigurationVisitor &other) =
+      default;
   virtual ~SpanExporterConfigurationVisitor() = default;
 
   virtual void VisitOtlpHttp(const OtlpHttpSpanExporterConfiguration *model)   = 0;

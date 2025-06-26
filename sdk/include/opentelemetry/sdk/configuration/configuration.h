@@ -48,7 +48,11 @@ class Configuration
 {
 public:
   Configuration(std::unique_ptr<Document> doc) : doc_(std::move(doc)) {}
-  ~Configuration() = default;
+  Configuration(Configuration &&)                      = delete;
+  Configuration(const Configuration &)                 = delete;
+  Configuration &operator=(Configuration &&)           = delete;
+  Configuration &operator=(const Configuration &other) = delete;
+  ~Configuration()                                     = default;
 
   std::string file_format;
   bool disabled{false};

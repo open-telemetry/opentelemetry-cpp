@@ -20,16 +20,13 @@ namespace configuration
 class ZipkinSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:
-  ZipkinSpanExporterConfiguration()           = default;
-  ~ZipkinSpanExporterConfiguration() override = default;
-
   void Accept(SpanExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitZipkin(this);
   }
 
   std::string endpoint;
-  size_t timeout{0};
+  std::size_t timeout{0};
 };
 
 }  // namespace configuration
