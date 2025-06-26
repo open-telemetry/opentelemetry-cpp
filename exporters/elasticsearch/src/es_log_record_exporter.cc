@@ -223,6 +223,11 @@ public:
         console_debug_{console_debug}
   {}
 
+  AsyncResponseHandler(const AsyncResponseHandler &)            = delete;
+  AsyncResponseHandler &operator=(const AsyncResponseHandler &) = delete;
+  AsyncResponseHandler(AsyncResponseHandler &&)                 = delete;
+  AsyncResponseHandler &operator=(AsyncResponseHandler &&)      = delete;
+
   /**
    * Cleans up the session in the destructor.
    */

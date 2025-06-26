@@ -50,6 +50,12 @@ static GlobalLogHandlerChecker &ConstructChecker()
 class CustomLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
 {
 public:
+  CustomLogHandler()                                    = default;
+  CustomLogHandler(const CustomLogHandler &)            = default;
+  CustomLogHandler(CustomLogHandler &&)                 = default;
+  CustomLogHandler &operator=(const CustomLogHandler &) = default;
+  CustomLogHandler &operator=(CustomLogHandler &&)      = default;
+
   ~CustomLogHandler() override
   {
     GlobalLogHandlerChecker::custom_handler_destroyed = true;

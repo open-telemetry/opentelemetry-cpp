@@ -25,10 +25,12 @@ class SumPointData
 {
 public:
   // TODO: remove ctors and initializers when GCC<5 stops shipping on Ubuntu
-  SumPointData(SumPointData &&)            = default;
-  SumPointData(const SumPointData &)       = default;
-  SumPointData &operator=(SumPointData &&) = default;
-  SumPointData()                           = default;
+  SumPointData(SumPointData &&)                      = default;
+  SumPointData(const SumPointData &)                 = default;
+  SumPointData &operator=(SumPointData &&)           = default;
+  SumPointData()                                     = default;
+  SumPointData &operator=(const SumPointData &other) = default;
+  ~SumPointData()                                    = default;
 
   ValueType value_   = {};
   bool is_monotonic_ = true;
@@ -38,10 +40,12 @@ class LastValuePointData
 {
 public:
   // TODO: remove ctors and initializers when GCC<5 stops shipping on Ubuntu
-  LastValuePointData(LastValuePointData &&)            = default;
-  LastValuePointData(const LastValuePointData &)       = default;
-  LastValuePointData &operator=(LastValuePointData &&) = default;
-  LastValuePointData()                                 = default;
+  LastValuePointData(LastValuePointData &&)                      = default;
+  LastValuePointData(const LastValuePointData &)                 = default;
+  LastValuePointData &operator=(LastValuePointData &&)           = default;
+  LastValuePointData()                                           = default;
+  LastValuePointData &operator=(const LastValuePointData &other) = default;
+  ~LastValuePointData()                                          = default;
 
   ValueType value_                                  = {};
   bool is_lastvalue_valid_                          = {};
@@ -57,6 +61,9 @@ public:
   HistogramPointData(const HistogramPointData &)       = default;
   HistogramPointData()                                 = default;
   HistogramPointData(const std::vector<double> &boundaries) : boundaries_(boundaries) {}
+  HistogramPointData &operator=(const HistogramPointData &other) = default;
+  ~HistogramPointData()                                          = default;
+
   std::vector<double> boundaries_ = {};
   ValueType sum_                  = {};
   ValueType min_                  = {};
