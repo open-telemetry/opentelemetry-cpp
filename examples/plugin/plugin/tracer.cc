@@ -35,6 +35,11 @@ public:
 
   ~Span() override { std::cout << "~Span\n"; }
 
+  Span(const Span &)            = delete;
+  Span &operator=(const Span &) = delete;
+  Span(Span &&)                 = delete;
+  Span &operator=(Span &&)      = delete;
+
   // opentelemetry::trace::Span
   void SetAttribute(nostd::string_view /*name*/,
                     const common::AttributeValue & /*value*/) noexcept override

@@ -61,8 +61,12 @@ namespace resource  = opentelemetry::sdk::resource;
 class ProtobufGlobalSymbolGuard
 {
 public:
-  ProtobufGlobalSymbolGuard() {}
+  ProtobufGlobalSymbolGuard() = default;
   ~ProtobufGlobalSymbolGuard() { google::protobuf::ShutdownProtobufLibrary(); }
+  ProtobufGlobalSymbolGuard(const ProtobufGlobalSymbolGuard &)            = delete;
+  ProtobufGlobalSymbolGuard &operator=(const ProtobufGlobalSymbolGuard &) = delete;
+  ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
+  ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
 };
 
 template <class T, size_t N>
