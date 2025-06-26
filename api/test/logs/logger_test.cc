@@ -206,7 +206,11 @@ class TestLogger : public Logger
 
   using Logger::EmitLogRecord;
 
-  void EmitLogRecord(nostd::unique_ptr<opentelemetry::logs::LogRecord> &&) noexcept override {}
+  void EmitLogRecord(
+      nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept override
+  {
+    auto log_record_ptr = std::move(log_record);
+  }
 };
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above

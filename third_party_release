@@ -4,20 +4,24 @@
 # MAINTAINER
 #
 # This file is used for the CMake build.
+# Format: <dependency_name>=<release_git_tag>
 #
 # When changing (add, upgrade, remove) dependencies
 # please update:
-# - the Bazel build, see file
-#   <root>/bazel/repository.bzl
-# - git submodule, see command
-#   git submodule status
-#
+#  - manually edit the release git tag below.
+#  - update the matching git submodule to the new tag.
+#  - update the Bazel build files
+#     - opentelemetry-cpp/MODULE.bazel
+#     - opentelemetry-cpp/bazel/repository.bzl
 
-gRPC=v1.49.2
-abseil=20240116.1
+abseil=20220623.2
+zlib=v1.3.1
+curl=curl-8_12_0
+protobuf=v3.21.6
+grpc=v1.49.2
 benchmark=v1.8.3
-googletest=1.14.0
-ms-gsl=v3.1.0-67-g6f45293
+googletest=v1.14.0
+ms-gsl=v3.1.0
 nlohmann-json=v3.12.0
 opentelemetry-proto=v1.7.0
 opentracing-cpp=v1.6.0
