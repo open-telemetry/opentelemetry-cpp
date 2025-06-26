@@ -117,10 +117,10 @@ int main(int argc, char *argv[])
       }
     }
   }
-  std::cout << "Using endpoint: " << exporter_options.endpoint << std::endl;
-  std::cout << "Using example type: " << example_type << std::endl;
-  std::cout << "Using cacert path: " << exporter_options.ssl_credentials_cacert_path << std::endl;
-  std::cout << "Using ssl credentials: " << exporter_options.use_ssl_credentials << std::endl;
+  std::cout << "Using endpoint: " << exporter_options.endpoint << "\n";
+  std::cout << "Using example type: " << example_type << "\n";
+  std::cout << "Using cacert path: " << exporter_options.ssl_credentials_cacert_path << "\n";
+  std::cout << "Using ssl credentials: " << exporter_options.use_ssl_credentials << "\n";
 
   // Removing this line will leave the default noop MetricProvider in place.
 
