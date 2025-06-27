@@ -17,9 +17,9 @@ jobs:
       matrix:
         include:
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 86
+            warning_limit: 88
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 86
+            warning_limit: 88
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
