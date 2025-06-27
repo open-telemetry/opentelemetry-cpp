@@ -4,6 +4,7 @@
 #include <exception>
 #include <memory>
 #include <ostream>
+#include <utility>
 
 #include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/provider.h"

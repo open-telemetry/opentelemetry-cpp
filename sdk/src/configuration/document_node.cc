@@ -91,6 +91,8 @@ std::string DocumentNode::DoSubstitution(const std::string &text)
 */
 std::string DocumentNode::DoOneSubstitution(const std::string &text)
 {
+  static std::string illegal_msg{"Illegal substitution expression"};
+
   static std::string env_token{"env:"};
   static std::string env_with_replacement{"env:-"};
   static std::string replacement_token{":-"};
@@ -108,25 +110,29 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text)
 
   if (len < 4)
   {
-    goto illegal;
+    OTEL_INTERNAL_LOG_ERROR(illegal_msg << ": " << text);
+    throw InvalidSchemaException(illegal_msg);
   }
 
   c = text[0];
   if (c != '$')
   {
-    goto illegal;
+    OTEL_INTERNAL_LOG_ERROR(illegal_msg << ": " << text);
+    throw InvalidSchemaException(illegal_msg);
   }
 
   c = text[1];
   if (c != '{')
   {
-    goto illegal;
+    OTEL_INTERNAL_LOG_ERROR(illegal_msg << ": " << text);
+    throw InvalidSchemaException(illegal_msg);
   }
 
   c = text[len - 1];
   if (c != '}')
   {
-    goto illegal;
+    OTEL_INTERNAL_LOG_ERROR(illegal_msg << ": " << text);
+    throw InvalidSchemaException(illegal_msg);
   }
 
   begin_name = 2;
@@ -148,7 +154,8 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text)
   c = text[begin_name];
   if (!std::isalpha(c) && c != '_')
   {
-    goto illegal;
+    OTEL_INTERNAL_LOG_ERROR(illegal_msg << ": " << text);
+    throw InvalidSchemaException(illegal_msg);
   }
 
   end_name = begin_name + 1;
@@ -181,7 +188,8 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text)
     pos = text.find(replacement_token, end_name);
     if (pos != end_name)
     {
-      goto illegal;
+      OTEL_INTERNAL_LOG_ERROR(illegal_msg << ": " << text);
+      throw InvalidSchemaException(illegal_msg);
     }
     // text is of the form ${ENV_NAME:-fallback}
     begin_fallback = pos + replacement_token.length();
@@ -203,10 +211,6 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text)
     fallback = "";
   }
   return fallback;
-
-illegal:
-  OTEL_INTERNAL_LOG_ERROR("Illegal substitution expression: " << text);
-  throw InvalidSchemaException("Illegal substitution expression");
 }
 
 bool DocumentNode::BooleanFromString(const std::string &value)

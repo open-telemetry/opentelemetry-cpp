@@ -974,6 +974,7 @@ static std::unique_ptr<AlwaysOnSamplerConfiguration> ParseAlwaysOnSamplerConfigu
   return model;
 }
 
+// NOLINTBEGIN(misc-no-recursion)
 static std::unique_ptr<JaegerRemoteSamplerConfiguration> ParseJaegerRemoteSamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node,
     size_t depth)
@@ -995,7 +996,9 @@ static std::unique_ptr<JaegerRemoteSamplerConfiguration> ParseJaegerRemoteSample
 
   return model;
 }
+// NOLINTEND(misc-no-recursion)
 
+// NOLINTBEGIN(misc-no-recursion)
 static std::unique_ptr<ParentBasedSamplerConfiguration> ParseParentBasedSamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node,
     size_t depth)
@@ -1035,6 +1038,7 @@ static std::unique_ptr<ParentBasedSamplerConfiguration> ParseParentBasedSamplerC
 
   return model;
 }
+// NOLINTEND(misc-no-recursion)
 
 static std::unique_ptr<TraceIdRatioBasedSamplerConfiguration>
 ParseTraceIdRatioBasedSamplerConfiguration(const std::unique_ptr<DocumentNode> &node,
@@ -1061,6 +1065,7 @@ static std::unique_ptr<ExtensionSamplerConfiguration> ParseSamplerExtensionConfi
   return model;
 }
 
+// NOLINTBEGIN(misc-no-recursion)
 static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node,
     size_t depth)
@@ -1121,6 +1126,7 @@ static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
 
   return model;
 }
+// NOLINTEND(misc-no-recursion)
 
 static std::unique_ptr<OtlpHttpSpanExporterConfiguration> ParseOtlpHttpSpanExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node)
