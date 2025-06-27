@@ -17,8 +17,12 @@ class LogRecordExporterConfigurationVisitor;
 class LogRecordExporterConfiguration
 {
 public:
-  LogRecordExporterConfiguration()          = default;
-  virtual ~LogRecordExporterConfiguration() = default;
+  LogRecordExporterConfiguration()                                                       = default;
+  LogRecordExporterConfiguration(LogRecordExporterConfiguration &&)                      = default;
+  LogRecordExporterConfiguration(const LogRecordExporterConfiguration &)                 = default;
+  LogRecordExporterConfiguration &operator=(LogRecordExporterConfiguration &&)           = default;
+  LogRecordExporterConfiguration &operator=(const LogRecordExporterConfiguration &other) = default;
+  virtual ~LogRecordExporterConfiguration()                                              = default;
 
   virtual void Accept(LogRecordExporterConfigurationVisitor *visitor) const = 0;
 };

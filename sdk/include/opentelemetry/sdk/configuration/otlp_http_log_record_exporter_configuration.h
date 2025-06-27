@@ -23,9 +23,6 @@ namespace configuration
 class OtlpHttpLogRecordExporterConfiguration : public LogRecordExporterConfiguration
 {
 public:
-  OtlpHttpLogRecordExporterConfiguration()           = default;
-  ~OtlpHttpLogRecordExporterConfiguration() override = default;
-
   void Accept(LogRecordExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitOtlpHttp(this);
@@ -38,7 +35,7 @@ public:
   std::unique_ptr<HeadersConfiguration> headers;
   std::string headers_list;
   std::string compression;
-  size_t timeout{0};
+  std::size_t timeout{0};
   enum_otlp_http_encoding encoding{protobuf};
 };
 

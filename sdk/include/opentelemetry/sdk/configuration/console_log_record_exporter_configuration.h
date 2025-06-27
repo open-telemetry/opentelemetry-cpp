@@ -18,9 +18,6 @@ namespace configuration
 class ConsoleLogRecordExporterConfiguration : public LogRecordExporterConfiguration
 {
 public:
-  ConsoleLogRecordExporterConfiguration()           = default;
-  ~ConsoleLogRecordExporterConfiguration() override = default;
-
   void Accept(LogRecordExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitConsole(this);

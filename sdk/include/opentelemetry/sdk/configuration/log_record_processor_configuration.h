@@ -17,7 +17,12 @@ class LogRecordProcessorConfigurationVisitor;
 class LogRecordProcessorConfiguration
 {
 public:
-  LogRecordProcessorConfiguration()          = default;
+  LogRecordProcessorConfiguration()                                              = default;
+  LogRecordProcessorConfiguration(LogRecordProcessorConfiguration &&)            = default;
+  LogRecordProcessorConfiguration(const LogRecordProcessorConfiguration &)       = default;
+  LogRecordProcessorConfiguration &operator=(LogRecordProcessorConfiguration &&) = default;
+  LogRecordProcessorConfiguration &operator=(const LogRecordProcessorConfiguration &other) =
+      default;
   virtual ~LogRecordProcessorConfiguration() = default;
 
   virtual void Accept(LogRecordProcessorConfigurationVisitor *visitor) const = 0;

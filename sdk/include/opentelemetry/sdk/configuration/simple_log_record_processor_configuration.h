@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "opentelemetry/sdk/configuration/log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration_visitor.h"
 #include "opentelemetry/version.h"
@@ -20,9 +21,6 @@ namespace configuration
 class SimpleLogRecordProcessorConfiguration : public LogRecordProcessorConfiguration
 {
 public:
-  SimpleLogRecordProcessorConfiguration()           = default;
-  ~SimpleLogRecordProcessorConfiguration() override = default;
-
   void Accept(LogRecordProcessorConfigurationVisitor *visitor) const override
   {
     visitor->VisitSimple(this);

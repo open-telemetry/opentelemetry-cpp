@@ -20,9 +20,6 @@ namespace configuration
 class OtlpFileLogRecordExporterConfiguration : public LogRecordExporterConfiguration
 {
 public:
-  OtlpFileLogRecordExporterConfiguration()           = default;
-  ~OtlpFileLogRecordExporterConfiguration() override = default;
-
   void Accept(LogRecordExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitOtlpFile(this);

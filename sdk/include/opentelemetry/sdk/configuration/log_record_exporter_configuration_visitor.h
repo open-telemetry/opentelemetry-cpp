@@ -20,8 +20,14 @@ class ExtensionLogRecordExporterConfiguration;
 class LogRecordExporterConfigurationVisitor
 {
 public:
-  LogRecordExporterConfigurationVisitor()          = default;
-  virtual ~LogRecordExporterConfigurationVisitor() = default;
+  LogRecordExporterConfigurationVisitor()                                              = default;
+  LogRecordExporterConfigurationVisitor(LogRecordExporterConfigurationVisitor &&)      = default;
+  LogRecordExporterConfigurationVisitor(const LogRecordExporterConfigurationVisitor &) = default;
+  LogRecordExporterConfigurationVisitor &operator=(LogRecordExporterConfigurationVisitor &&) =
+      default;
+  LogRecordExporterConfigurationVisitor &operator=(
+      const LogRecordExporterConfigurationVisitor &other) = default;
+  virtual ~LogRecordExporterConfigurationVisitor()        = default;
 
   virtual void VisitOtlpHttp(const OtlpHttpLogRecordExporterConfiguration *model)   = 0;
   virtual void VisitOtlpGrpc(const OtlpGrpcLogRecordExporterConfiguration *model)   = 0;
