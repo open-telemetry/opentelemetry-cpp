@@ -19,7 +19,7 @@
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
-#include "opentelemetry/sdk/configuration/configuration_factory.h"
+#include "opentelemetry/sdk/configuration/configuration_parser.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
@@ -394,6 +394,27 @@ static enum_default_histogram_aggregation ParseDefaultHistogramAggregation(const
   throw InvalidSchemaException("Illegal default_histogram_aggregation");
 }
 
+static enum_temporality_preference ParseTemporalityPreference(const std::string &name)
+{
+  if (name == "cumulative")
+  {
+    return cumulative;
+  }
+
+  if (name == "delta")
+  {
+    return delta;
+  }
+
+  if (name == "low_memory")
+  {
+    return low_memory;
+  }
+
+  OTEL_INTERNAL_LOG_ERROR("ParseTemporalityPreference: name = " << name);
+  throw InvalidSchemaException("Illegal temporality preference");
+}
+
 static std::unique_ptr<OtlpHttpPushMetricExporterConfiguration>
 ParseOtlpHttpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
@@ -412,10 +433,12 @@ ParseOtlpHttpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
     model->headers = ParseHeadersConfiguration(child);
   }
 
-  model->headers_list           = node->GetString("headers_list", "");
-  model->compression            = node->GetString("compression", "");
-  model->timeout                = node->GetInteger("timeout", 10000);
-  model->temporality_preference = node->GetString("temporality_preference", "");
+  model->headers_list = node->GetString("headers_list", "");
+  model->compression  = node->GetString("compression", "");
+  model->timeout      = node->GetInteger("timeout", 10000);
+
+  std::string temporality_preference = node->GetString("temporality_preference", "");
+  model->temporality_preference      = ParseTemporalityPreference(temporality_preference);
 
   std::string default_histogram_aggregation = node->GetString("default_histogram_aggregation", "");
   model->default_histogram_aggregation =
@@ -442,10 +465,12 @@ ParseOtlpGrpcPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
     model->headers = ParseHeadersConfiguration(child);
   }
 
-  model->headers_list           = node->GetString("headers_list", "");
-  model->compression            = node->GetString("compression", "");
-  model->timeout                = node->GetInteger("timeout", 10000);
-  model->temporality_preference = node->GetString("temporality_preference", "");
+  model->headers_list = node->GetString("headers_list", "");
+  model->compression  = node->GetString("compression", "");
+  model->timeout      = node->GetInteger("timeout", 10000);
+
+  std::string temporality_preference = node->GetString("temporality_preference", "");
+  model->temporality_preference      = ParseTemporalityPreference(temporality_preference);
 
   std::string default_histogram_aggregation = node->GetString("default_histogram_aggregation", "");
   model->default_histogram_aggregation =
@@ -465,7 +490,8 @@ ParseOtlpFilePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
 
   model->output_stream = node->GetString("output_stream", "");
 
-  model->temporality_preference = node->GetString("temporality_preference", "");
+  std::string temporality_preference = node->GetString("temporality_preference", "");
+  model->temporality_preference      = ParseTemporalityPreference(temporality_preference);
 
   std::string default_histogram_aggregation = node->GetString("default_histogram_aggregation", "");
   model->default_histogram_aggregation =
@@ -1522,8 +1548,7 @@ static std::unique_ptr<ResourceConfiguration> ParseResourceConfiguration(
   return model;
 }
 
-std::unique_ptr<Configuration> ConfigurationFactory::ParseConfiguration(
-    std::unique_ptr<Document> doc)
+std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Document> doc)
 {
   std::unique_ptr<DocumentNode> node = doc->GetRootNode();
   std::unique_ptr<Configuration> model(new Configuration(std::move(doc)));

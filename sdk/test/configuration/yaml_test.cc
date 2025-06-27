@@ -10,13 +10,13 @@
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
-#include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
+#include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
 
 static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(
     const std::string &yaml)
 {
   static const std::string source("test");
-  return opentelemetry::sdk::configuration::YamlConfigurationFactory::ParseString(source, yaml);
+  return opentelemetry::sdk::configuration::YamlConfigurationParser::ParseString(source, yaml);
 }
 
 TEST(Yaml, empty)

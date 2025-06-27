@@ -3,10 +3,8 @@
 
 #pragma once
 
-#include <memory>
+#include <cstdint>
 
-#include "opentelemetry/sdk/configuration/configuration.h"
-#include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -15,10 +13,11 @@ namespace sdk
 namespace configuration
 {
 
-class ConfigurationFactory
+enum enum_temporality_preference : std::uint8_t
 {
-public:
-  static std::unique_ptr<Configuration> ParseConfiguration(std::unique_ptr<Document> doc);
+  cumulative,
+  delta,
+  low_memory
 };
 
 }  // namespace configuration

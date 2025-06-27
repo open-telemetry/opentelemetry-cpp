@@ -11,7 +11,7 @@
 #include "opentelemetry/exporters/ostream/console_span_builder.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
-#include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
+#include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
 #include "opentelemetry/sdk/init/configured_sdk.h"
 #include "opentelemetry/sdk/init/registry.h"
 
@@ -114,7 +114,7 @@ void InitOtel(const std::string &config_file)
 
   // See
   // https://github.com/open-telemetry/opentelemetry-configuration/blob/main/examples/kitchen-sink.yaml
-  auto model = opentelemetry::sdk::configuration::YamlConfigurationFactory::ParseFile(config_file);
+  auto model = opentelemetry::sdk::configuration::YamlConfigurationParser::ParseFile(config_file);
 
   /* 5 - Build the SDK from the parsed config.yaml */
 
