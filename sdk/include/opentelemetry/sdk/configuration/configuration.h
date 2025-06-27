@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
@@ -13,7 +14,6 @@
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
-#include "opentelemetry/version.h"
 
 /*
  * General notes about configuration classes.
