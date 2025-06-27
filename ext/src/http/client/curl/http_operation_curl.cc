@@ -1113,7 +1113,8 @@ CURLcode HttpOperation::Setup()
   }
   else
   {
-    rc = SetCurlPtrOption(CURLOPT_WRITEFUNCTION, HttpOperation::WriteVectorBodyCallback);
+    rc = SetCurlPtrOption(CURLOPT_WRITEFUNCTION,
+                          reinterpret_cast<void *>(&HttpOperation::WriteVectorBodyCallback));
     if (rc != CURLE_OK)
     {
       return rc;
@@ -1125,7 +1126,8 @@ CURLcode HttpOperation::Setup()
       return rc;
     }
 
-    rc = SetCurlPtrOption(CURLOPT_HEADERFUNCTION, HttpOperation::WriteVectorHeaderCallback);
+    rc = SetCurlPtrOption(CURLOPT_HEADERFUNCTION, 
+                          reinterpret_cast<void *>(&HttpOperation::WriteVectorHeaderCallback));
     if (rc != CURLE_OK)
     {
       return rc;
