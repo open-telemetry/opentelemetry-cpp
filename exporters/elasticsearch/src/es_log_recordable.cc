@@ -1,25 +1,33 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <opentelemetry/version.h>
-
-#include <chrono>
-#include <ctime>
-#include <nlohmann/json.hpp>
-#include <string>
-
-#if defined(__cpp_lib_format)
-#  include <format>
-#endif
-
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
 #include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/version.h"
+
+#include <stdint.h>
+#include <chrono>
+#include <cstdint>
+#include <cstdio>
+#include <ctime>
+#include <nlohmann/json.hpp>
+#include <string>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+
+#if defined(__cpp_lib_format)
+#  include <format>
+#endif
 
 namespace nlohmann
 {

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <initializer_list>  // IWYU pragma: keep
 #include <iostream>
 #include <string>
 #include <thread>
@@ -17,19 +18,9 @@
 
 #include <functional>
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context.h"  // IWYU pragma: keep
 #include "opentelemetry/metrics/async_instruments.h"
 #include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/sdk/metrics/meter_config.h"
-#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
-#include "opentelemetry/sdk/metrics/view/view_registry.h"
-#include "opentelemetry/sdk/resource/resource.h"
-
-#include <opentelemetry/sdk/metrics/view/view_registry_factory.h>
-
 #include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/metrics/sync_instruments.h"  // IWYU pragma: keep
@@ -39,14 +30,23 @@
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/data/exemplar_data.h"  // IWYU pragma: keep
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
+#include "opentelemetry/sdk/metrics/view/view_registry_factory.h"
+#include "opentelemetry/sdk/resource/resource.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
@@ -111,7 +111,7 @@ public:
   {
     if (LogLevel::Warning == level)
     {
-      std::cout << msg << std::endl;
+      std::cout << msg << "\n";
       warnings.push_back(msg);
     }
   }
@@ -192,8 +192,7 @@ protected:
 class TestProcessor : public sdk::metrics::AttributesProcessor
 {
 public:
-  explicit TestProcessor()  = default;
-  ~TestProcessor() override = default;
+  explicit TestProcessor() = default;
 
   sdk::metrics::MetricAttributes process(
       const opentelemetry::common::KeyValueIterable &attributes) const noexcept override

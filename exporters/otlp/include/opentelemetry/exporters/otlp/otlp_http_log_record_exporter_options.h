@@ -11,6 +11,10 @@
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/version.h"
 
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <cstddef>
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {

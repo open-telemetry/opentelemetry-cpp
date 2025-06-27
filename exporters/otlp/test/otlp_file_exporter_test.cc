@@ -43,6 +43,10 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include "opentelemetry/common/attribute_value.h"
+#endif
+
 using namespace testing;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -57,8 +61,12 @@ namespace resource  = opentelemetry::sdk::resource;
 class ProtobufGlobalSymbolGuard
 {
 public:
-  ProtobufGlobalSymbolGuard() {}
+  ProtobufGlobalSymbolGuard() = default;
   ~ProtobufGlobalSymbolGuard() { google::protobuf::ShutdownProtobufLibrary(); }
+  ProtobufGlobalSymbolGuard(const ProtobufGlobalSymbolGuard &)            = delete;
+  ProtobufGlobalSymbolGuard &operator=(const ProtobufGlobalSymbolGuard &) = delete;
+  ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
+  ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
 };
 
 template <class T, size_t N>

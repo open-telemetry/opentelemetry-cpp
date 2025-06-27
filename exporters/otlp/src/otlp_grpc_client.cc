@@ -29,24 +29,17 @@
 // clang-format on
 
 #ifdef ENABLE_ASYNC_EXPORT
+#  include <google/protobuf/arena.h>
+#  include <algorithm>
 #  include <condition_variable>
 #  include <cstdio>
 #  include <mutex>
-#  include <thread>
+#  include <ratio>
 #  include <unordered_set>
 
 #  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/nostd/function_ref.h"
 #  include "opentelemetry/nostd/string_view.h"
 #endif /* ENABLE_ASYNC_EXPORT */
-
-namespace google
-{
-namespace protobuf
-{
-class Arena;
-}
-}  // namespace google
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -74,8 +67,12 @@ public:
       opentelemetry::sdk::common::ExportResult::kFailure;
   GrpcAsyncCallback grpc_async_callback = nullptr;
 
-  OtlpGrpcAsyncCallDataBase() {}
-  virtual ~OtlpGrpcAsyncCallDataBase() {}
+  OtlpGrpcAsyncCallDataBase()                                             = default;
+  virtual ~OtlpGrpcAsyncCallDataBase()                                    = default;
+  OtlpGrpcAsyncCallDataBase(const OtlpGrpcAsyncCallDataBase &)            = delete;
+  OtlpGrpcAsyncCallDataBase &operator=(const OtlpGrpcAsyncCallDataBase &) = delete;
+  OtlpGrpcAsyncCallDataBase(OtlpGrpcAsyncCallDataBase &&)                 = delete;
+  OtlpGrpcAsyncCallDataBase &operator=(OtlpGrpcAsyncCallDataBase &&)      = delete;
 };
 
 // When building with -fvisibility=default, we hide the symbols and vtable to ensure we always use
@@ -97,8 +94,7 @@ public:
                      ResponseType *)>
       result_callback;
 
-  OtlpGrpcAsyncCallData() {}
-  virtual ~OtlpGrpcAsyncCallData() {}
+  OtlpGrpcAsyncCallData() = default;
 };
 }  // namespace
 #endif

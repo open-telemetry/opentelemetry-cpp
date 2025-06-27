@@ -9,7 +9,7 @@
 #include "common.h"
 
 #include "opentelemetry/common/macros.h"
-#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context.h"  // IWYU pragma: keep
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"

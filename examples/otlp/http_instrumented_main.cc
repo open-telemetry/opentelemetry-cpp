@@ -55,6 +55,11 @@
 #  include "metrics_foo_library/foo_library.h"
 #endif
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+#  include <thread>
+#  include "opentelemetry/sdk/common/thread_instrumentation.h"
+#endif
+
 namespace
 {
 
@@ -84,7 +89,6 @@ public:
                           const std::string &priority)
       : thread_name_(thread_name), network_name_(network_name), priority_(priority)
   {}
-  ~MyThreadInstrumentation() override = default;
 
   void OnStart() override
   {
@@ -98,14 +102,13 @@ public:
     {
       std::cout << ", priority " << priority_;
     }
-    std::cout << std::endl << std::flush;
+    std::cout << "\n" << std::flush;
   }
 
   void OnEnd() override
   {
     std::lock_guard<std::mutex> lock_guard(serialize);
-    std::cout << "OnEnd() thread " << thread_name_ << ", id " << std::this_thread::get_id()
-              << std::endl
+    std::cout << "OnEnd() thread " << thread_name_ << ", id " << std::this_thread::get_id() << "\n"
               << std::flush;
   }
 
@@ -113,7 +116,7 @@ public:
   {
     std::lock_guard<std::mutex> lock_guard(serialize);
     std::cout << "BeforeWait() thread " << thread_name_ << ", id " << std::this_thread::get_id()
-              << ", waiting" << std::endl
+              << ", waiting\n"
               << std::flush;
   }
 
@@ -121,7 +124,7 @@ public:
   {
     std::lock_guard<std::mutex> lock_guard(serialize);
     std::cout << "AfterWait() thread " << thread_name_ << ", id " << std::this_thread::get_id()
-              << ", done waiting" << std::endl
+              << ", done waiting\n"
               << std::flush;
   }
 
@@ -129,7 +132,7 @@ public:
   {
     std::lock_guard<std::mutex> lock_guard(serialize);
     std::cout << "BeforeLoad() thread " << thread_name_ << ", id " << std::this_thread::get_id()
-              << ", about to work" << std::endl
+              << ", about to work\n"
               << std::flush;
   }
 
@@ -137,7 +140,7 @@ public:
   {
     std::lock_guard<std::mutex> lock_guard(serialize);
     std::cout << "AfterLoad() thread " << thread_name_ << ", id " << std::this_thread::get_id()
-              << ", done working" << std::endl
+              << ", done working\n"
               << std::flush;
   }
 
@@ -336,25 +339,25 @@ int main(int argc, char *argv[])
     logger_opts.url = "http://localhost:4318/v1/logs";
   }
 
-  std::cout << "Initializing opentelemetry-cpp" << std::endl << std::flush;
+  std::cout << "Initializing opentelemetry-cpp\n" << std::flush;
 
   InitTracer();
   InitMetrics();
   InitLogger();
 
-  std::cout << "Application payload" << std::endl << std::flush;
+  std::cout << "Application payload\n" << std::flush;
 
   foo_library();
 
   std::string name{"otlp_http_metric_example"};
   foo_library::observable_counter_example(name);
 
-  std::cout << "Shutting down opentelemetry-cpp" << std::endl << std::flush;
+  std::cout << "Shutting down opentelemetry-cpp\n" << std::flush;
 
   CleanupLogger();
   CleanupMetrics();
   CleanupTracer();
 
-  std::cout << "Done" << std::endl << std::flush;
+  std::cout << "Done\n" << std::flush;
   return 0;
 }
