@@ -17,8 +17,14 @@ class ExtensionPullMetricExporterConfiguration;
 class PullMetricExporterConfigurationVisitor
 {
 public:
-  PullMetricExporterConfigurationVisitor()          = default;
-  virtual ~PullMetricExporterConfigurationVisitor() = default;
+  PullMetricExporterConfigurationVisitor()                                               = default;
+  PullMetricExporterConfigurationVisitor(PullMetricExporterConfigurationVisitor &&)      = default;
+  PullMetricExporterConfigurationVisitor(const PullMetricExporterConfigurationVisitor &) = default;
+  PullMetricExporterConfigurationVisitor &operator=(PullMetricExporterConfigurationVisitor &&) =
+      default;
+  PullMetricExporterConfigurationVisitor &operator=(
+      const PullMetricExporterConfigurationVisitor &other) = default;
+  virtual ~PullMetricExporterConfigurationVisitor()        = default;
 
   virtual void VisitPrometheus(const PrometheusPullMetricExporterConfiguration *model) = 0;
   virtual void VisitExtension(const ExtensionPullMetricExporterConfiguration *model)   = 0;

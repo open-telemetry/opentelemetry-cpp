@@ -23,16 +23,13 @@ namespace configuration
 class PeriodicMetricReaderConfiguration : public MetricReaderConfiguration
 {
 public:
-  PeriodicMetricReaderConfiguration()           = default;
-  ~PeriodicMetricReaderConfiguration() override = default;
-
   void Accept(MetricReaderConfigurationVisitor *visitor) const override
   {
     visitor->VisitPeriodic(this);
   }
 
-  size_t interval{0};
-  size_t timeout{0};
+  std::size_t interval{0};
+  std::size_t timeout{0};
   std::unique_ptr<PushMetricExporterConfiguration> exporter;
   std::vector<std::unique_ptr<MetricProducerConfiguration>> producers;
 };

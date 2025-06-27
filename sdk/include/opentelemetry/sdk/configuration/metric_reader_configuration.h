@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -19,8 +17,12 @@ class MetricReaderConfigurationVisitor;
 class MetricReaderConfiguration
 {
 public:
-  MetricReaderConfiguration()          = default;
-  virtual ~MetricReaderConfiguration() = default;
+  MetricReaderConfiguration()                                                  = default;
+  MetricReaderConfiguration(MetricReaderConfiguration &&)                      = default;
+  MetricReaderConfiguration(const MetricReaderConfiguration &)                 = default;
+  MetricReaderConfiguration &operator=(MetricReaderConfiguration &&)           = default;
+  MetricReaderConfiguration &operator=(const MetricReaderConfiguration &other) = default;
+  virtual ~MetricReaderConfiguration()                                         = default;
 
   virtual void Accept(MetricReaderConfigurationVisitor *visitor) const = 0;
 };

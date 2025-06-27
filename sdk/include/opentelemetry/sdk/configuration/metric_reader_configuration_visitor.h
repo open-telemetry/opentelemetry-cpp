@@ -17,7 +17,12 @@ class PullMetricReaderConfiguration;
 class MetricReaderConfigurationVisitor
 {
 public:
-  MetricReaderConfigurationVisitor()          = default;
+  MetricReaderConfigurationVisitor()                                               = default;
+  MetricReaderConfigurationVisitor(MetricReaderConfigurationVisitor &&)            = default;
+  MetricReaderConfigurationVisitor(const MetricReaderConfigurationVisitor &)       = default;
+  MetricReaderConfigurationVisitor &operator=(MetricReaderConfigurationVisitor &&) = default;
+  MetricReaderConfigurationVisitor &operator=(const MetricReaderConfigurationVisitor &other) =
+      default;
   virtual ~MetricReaderConfigurationVisitor() = default;
 
   virtual void VisitPeriodic(const PeriodicMetricReaderConfiguration *model) = 0;
