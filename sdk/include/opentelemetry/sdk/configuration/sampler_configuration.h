@@ -18,8 +18,12 @@ class SamplerConfigurationVisitor;
 class SamplerConfiguration
 {
 public:
-  SamplerConfiguration()          = default;
-  virtual ~SamplerConfiguration() = default;
+  SamplerConfiguration()                                             = default;
+  SamplerConfiguration(SamplerConfiguration &&)                      = default;
+  SamplerConfiguration(const SamplerConfiguration &)                 = default;
+  SamplerConfiguration &operator=(SamplerConfiguration &&)           = default;
+  SamplerConfiguration &operator=(const SamplerConfiguration &other) = default;
+  virtual ~SamplerConfiguration()                                    = default;
 
   virtual void Accept(SamplerConfigurationVisitor *visitor) const = 0;
 };

@@ -18,9 +18,6 @@ namespace configuration
 class AlwaysOnSamplerConfiguration : public SamplerConfiguration
 {
 public:
-  AlwaysOnSamplerConfiguration()           = default;
-  ~AlwaysOnSamplerConfiguration() override = default;
-
   void Accept(SamplerConfigurationVisitor *visitor) const override { visitor->VisitAlwaysOn(this); }
 };
 

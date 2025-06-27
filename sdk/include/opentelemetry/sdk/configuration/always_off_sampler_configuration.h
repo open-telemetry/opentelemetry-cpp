@@ -18,9 +18,6 @@ namespace configuration
 class AlwaysOffSamplerConfiguration : public SamplerConfiguration
 {
 public:
-  AlwaysOffSamplerConfiguration()           = default;
-  ~AlwaysOffSamplerConfiguration() override = default;
-
   void Accept(SamplerConfigurationVisitor *visitor) const override
   {
     visitor->VisitAlwaysOff(this);

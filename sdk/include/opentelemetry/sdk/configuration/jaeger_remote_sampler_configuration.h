@@ -21,16 +21,13 @@ namespace configuration
 class JaegerRemoteSamplerConfiguration : public SamplerConfiguration
 {
 public:
-  JaegerRemoteSamplerConfiguration()           = default;
-  ~JaegerRemoteSamplerConfiguration() override = default;
-
   void Accept(SamplerConfigurationVisitor *visitor) const override
   {
     visitor->VisitJaegerRemote(this);
   }
 
   std::string endpoint;
-  size_t interval{0};
+  std::size_t interval{0};
   std::unique_ptr<SamplerConfiguration> initial_sampler;
 };
 
