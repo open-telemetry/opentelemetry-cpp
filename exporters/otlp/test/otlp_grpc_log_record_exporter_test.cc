@@ -125,8 +125,6 @@ public:
   public:
     async_interface(OtlpMockTraceServiceStub *owner) : stub_(owner) {}
 
-    virtual ~async_interface() override = default;
-
     void Export(
         ::grpc::ClientContext *context,
         const ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest *request,
@@ -187,8 +185,6 @@ public:
   {
   public:
     async_interface(OtlpMockLogsServiceStub *owner) : stub_(owner) {}
-
-    virtual ~async_interface() override = default;
 
     void Export(
         ::grpc::ClientContext *context,
@@ -255,7 +251,7 @@ public:
       const std::shared_ptr<OtlpGrpcClient> &client)
   {
     return std::unique_ptr<sdk::logs::LogRecordExporter>(
-        new OtlpGrpcLogRecordExporter(std::move(stub_interface), std::move(client)));
+        new OtlpGrpcLogRecordExporter(std::move(stub_interface), client));
   }
 
   std::unique_ptr<sdk::trace::SpanExporter> GetExporter(
@@ -263,7 +259,7 @@ public:
       const std::shared_ptr<OtlpGrpcClient> &client)
   {
     return std::unique_ptr<sdk::trace::SpanExporter>(
-        new OtlpGrpcExporter(std::move(stub_interface), std::move(client)));
+        new OtlpGrpcExporter(std::move(stub_interface), client));
   }
 
   // Get the options associated with the given exporter.
