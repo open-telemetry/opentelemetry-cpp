@@ -58,7 +58,12 @@ inline std::string LevelToString(LogLevel level)
 class LogHandler
 {
 public:
+  LogHandler() = default;
   virtual ~LogHandler();
+  LogHandler(const LogHandler &)            = default;
+  LogHandler(LogHandler &&)                 = default;
+  LogHandler &operator=(const LogHandler &) = default;
+  LogHandler &operator=(LogHandler &&)      = default;
 
   virtual void Handle(LogLevel level,
                       const char *file,

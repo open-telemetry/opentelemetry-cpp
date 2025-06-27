@@ -111,7 +111,7 @@ public:
   {
     if (LogLevel::Warning == level)
     {
-      std::cout << msg << std::endl;
+      std::cout << msg << "\n";
       warnings.push_back(msg);
     }
   }
@@ -192,8 +192,7 @@ protected:
 class TestProcessor : public sdk::metrics::AttributesProcessor
 {
 public:
-  explicit TestProcessor()  = default;
-  ~TestProcessor() override = default;
+  explicit TestProcessor() = default;
 
   sdk::metrics::MetricAttributes process(
       const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
