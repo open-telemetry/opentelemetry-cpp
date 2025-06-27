@@ -15,9 +15,6 @@ class CustomSamplerBuilder : public opentelemetry::sdk::init::ExtensionSamplerBu
 public:
   static void Register(opentelemetry::sdk::init::Registry *registry);
 
-  CustomSamplerBuilder()           = default;
-  ~CustomSamplerBuilder() override = default;
-
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> Build(
       const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *model) const override;
 };

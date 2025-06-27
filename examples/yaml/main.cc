@@ -56,7 +56,7 @@
 static bool opt_help              = false;
 static std::string yaml_file_path = "";
 
-std::unique_ptr<opentelemetry::sdk::init::ConfiguredSdk> sdk;
+static std::unique_ptr<opentelemetry::sdk::init::ConfiguredSdk> sdk;
 
 namespace
 {
@@ -138,7 +138,7 @@ void CleanupOtel()
 }
 }  // namespace
 
-void usage(FILE *out)
+static void usage(FILE *out)
 {
   static const char *msg =
       "Usage: example_yaml [options]\n"
@@ -154,7 +154,7 @@ void usage(FILE *out)
   fprintf(out, "%s", msg);
 }
 
-int parse_args(int argc, char *argv[])
+static int parse_args(int argc, char *argv[])
 {
   int remaining_argc    = argc;
   char **remaining_argv = argv;

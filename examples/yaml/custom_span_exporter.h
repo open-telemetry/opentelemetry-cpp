@@ -16,7 +16,11 @@ class CustomSpanExporter : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
   CustomSpanExporter(const std::string & /* comment */) {}
-  ~CustomSpanExporter() override = default;
+  CustomSpanExporter(CustomSpanExporter &&)                      = delete;
+  CustomSpanExporter(const CustomSpanExporter &)                 = delete;
+  CustomSpanExporter &operator=(CustomSpanExporter &&)           = delete;
+  CustomSpanExporter &operator=(const CustomSpanExporter &other) = delete;
+  ~CustomSpanExporter() override                                 = default;
 
   std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable() noexcept override;
 

@@ -23,9 +23,10 @@ void CustomSpanProcessor::OnStart(
 }
 
 void CustomSpanProcessor::OnEnd(
-    std::unique_ptr<opentelemetry::sdk::trace::Recordable> && /* span */) noexcept
+    std::unique_ptr<opentelemetry::sdk::trace::Recordable> &&span) noexcept
 {
   OTEL_INTERNAL_LOG_ERROR("CustomSpanProcessor::OnEnd(): FIXME");
+  auto unused = std::move(span);
 }
 
 bool CustomSpanProcessor::ForceFlush(std::chrono::microseconds /* timeout */) noexcept

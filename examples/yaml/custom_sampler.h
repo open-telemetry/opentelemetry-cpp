@@ -17,7 +17,11 @@ class CustomSampler : public opentelemetry::sdk::trace::Sampler
 {
 public:
   CustomSampler(const std::string & /* comment */) {}
-  ~CustomSampler() override = default;
+  CustomSampler(CustomSampler &&)                      = delete;
+  CustomSampler(const CustomSampler &)                 = delete;
+  CustomSampler &operator=(CustomSampler &&)           = delete;
+  CustomSampler &operator=(const CustomSampler &other) = delete;
+  ~CustomSampler() override                            = default;
 
   opentelemetry::sdk::trace::SamplingResult ShouldSample(
       const opentelemetry::trace::SpanContext &parent_context,

@@ -15,7 +15,11 @@ class CustomSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor
 {
 public:
   CustomSpanProcessor(const std::string &comment) : m_comment(comment) {}
-  ~CustomSpanProcessor() override = default;
+  CustomSpanProcessor(CustomSpanProcessor &&)                      = delete;
+  CustomSpanProcessor(const CustomSpanProcessor &)                 = delete;
+  CustomSpanProcessor &operator=(CustomSpanProcessor &&)           = delete;
+  CustomSpanProcessor &operator=(const CustomSpanProcessor &other) = delete;
+  ~CustomSpanProcessor() override                                  = default;
 
   std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable() noexcept override;
 

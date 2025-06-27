@@ -8,7 +8,8 @@
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
 
-std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(const std::string &yaml)
+static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(
+    const std::string &yaml)
 {
   static const std::string source("test");
   return opentelemetry::sdk::configuration::YamlConfigurationFactory::ParseString(source, yaml);
