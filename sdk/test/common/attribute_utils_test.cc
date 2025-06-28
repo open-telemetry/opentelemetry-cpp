@@ -175,7 +175,8 @@ TEST(AttributeMapTest, EqualTo)
   Attributes attributes_different_size = {{"key0", "some value"}};
 
   // check for the case where the number of attributes is the same but all keys are different
-  Attributes attributes_different_all = {{"a", "b"}, {"c", "d"}, {"e", 4.0}, {"f", uint8_t(5)}};
+  Attributes attributes_different_all = {
+      {"a", "b"}, {"c", "d"}, {"e", 4.0}, {"f", static_cast<uint8_t>(5)}};
 
   auto kv_iterable_different_value =
       opentelemetry::common::MakeKeyValueIterableView<Attributes>(attributes_different_value);

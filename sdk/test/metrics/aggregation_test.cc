@@ -254,7 +254,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
 
   // Create a new aggreagte based in point data
   {
-    auto point_data = histo_point;
+    const auto &point_data = histo_point;
     Base2ExponentialHistogramAggregation scale0_aggr2(point_data);
     scale0_aggr2.Aggregate(0.0, {});
 

@@ -283,10 +283,10 @@ TEST(ResourceTest, DerivedResourceDetector)
 {
   TestResourceDetector detector;
 
-  detector.attributes            = {{"key", "value"}};
-  detector.schema_url            = "https://opentelemetry.io/schemas/v3.1.4";
-  const auto resource            = detector.Detect();
-  const auto received_attributes = resource.GetAttributes();
+  detector.attributes             = {{"key", "value"}};
+  detector.schema_url             = "https://opentelemetry.io/schemas/v3.1.4";
+  const auto resource             = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   EXPECT_EQ(received_attributes.size(), 1);
   EXPECT_EQ(resource.GetSchemaURL(), detector.schema_url);

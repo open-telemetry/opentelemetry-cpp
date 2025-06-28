@@ -60,7 +60,7 @@ public:
   HistogramPointData &operator=(HistogramPointData &&) = default;
   HistogramPointData(const HistogramPointData &)       = default;
   HistogramPointData()                                 = default;
-  HistogramPointData(std::vector<double> &boundaries) : boundaries_(boundaries) {}
+  HistogramPointData(const std::vector<double> &boundaries) : boundaries_(boundaries) {}
   HistogramPointData &operator=(const HistogramPointData &other) = default;
   ~HistogramPointData()                                          = default;
 

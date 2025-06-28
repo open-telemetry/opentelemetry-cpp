@@ -131,7 +131,7 @@ void Base2ExponentialHistogramAggregation::Aggregate(
     int64_t value,
     const PointAttributes & /* attributes */) noexcept
 {
-  Aggregate(double(value));
+  Aggregate(static_cast<double>(value));
 }
 
 void Base2ExponentialHistogramAggregation::Aggregate(

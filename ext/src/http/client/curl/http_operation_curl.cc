@@ -515,6 +515,7 @@ std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
 #  define HAVE_TLS_VERSION
 #endif
 
+// NOLINTNEXTLINE(google-runtime-int)
 static long parse_min_ssl_version(const std::string &version)
 {
 #ifdef HAVE_TLS_VERSION
@@ -532,6 +533,7 @@ static long parse_min_ssl_version(const std::string &version)
   return 0;
 }
 
+// NOLINTNEXTLINE(google-runtime-int)
 static long parse_max_ssl_version(const std::string &version)
 {
 #ifdef HAVE_TLS_VERSION
@@ -591,6 +593,7 @@ CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, void *value)
   return rc;
 }
 
+// NOLINTNEXTLINE(google-runtime-int)
 CURLcode HttpOperation::SetCurlLongOption(CURLoption option, long value)
 {
   CURLcode rc;
@@ -877,8 +880,10 @@ CURLcode HttpOperation::Setup()
 
 #ifdef HAVE_TLS_VERSION
     /* By default, TLSv1.2 or better is required (if we have TLS). */
+    // NOLINTNEXTLINE(google-runtime-int)
     long min_ssl_version = CURL_SSLVERSION_TLSv1_2;
 #else
+    // NOLINTNEXTLINE(google-runtime-int)
     long min_ssl_version = 0;
 #endif
 
@@ -903,6 +908,7 @@ CURLcode HttpOperation::Setup()
      * The CURL + openssl library may be more recent than this code,
      * and support a version we do not know about.
      */
+    // NOLINTNEXTLINE(google-runtime-int)
     long max_ssl_version = 0;
 
     if (!ssl_options_.ssl_max_tls.empty())
@@ -921,6 +927,7 @@ CURLcode HttpOperation::Setup()
 #endif
     }
 
+    // NOLINTNEXTLINE(google-runtime-int)
     long version_range = min_ssl_version | max_ssl_version;
     if (version_range != 0)
     {
@@ -967,6 +974,7 @@ CURLcode HttpOperation::Setup()
     if (ssl_options_.ssl_insecure_skip_verify)
     {
       /* 6 - DO NOT ENFORCE VERIFICATION, This is not secure. */
+      // NOLINTNEXTLINE(google-runtime-int)
       rc = SetCurlLongOption(CURLOPT_USE_SSL, static_cast<long>(CURLUSESSL_NONE));
       if (rc != CURLE_OK)
       {
@@ -988,6 +996,7 @@ CURLcode HttpOperation::Setup()
     else
     {
       /* 6 - ENFORCE VERIFICATION */
+      // NOLINTNEXTLINE(google-runtime-int)
       rc = SetCurlLongOption(CURLOPT_USE_SSL, static_cast<long>(CURLUSESSL_ALL));
       if (rc != CURLE_OK)
       {
@@ -1042,7 +1051,7 @@ CURLcode HttpOperation::Setup()
 
   // TODO: control local port to use
   // curl_easy_setopt(curl, CURLOPT_LOCALPORT, dcf_port);
-
+  // NOLINTNEXTLINE(google-runtime-int)
   rc = SetCurlLongOption(CURLOPT_TIMEOUT_MS, static_cast<long>(http_conn_timeout_.count()));
   if (rc != CURLE_OK)
   {
