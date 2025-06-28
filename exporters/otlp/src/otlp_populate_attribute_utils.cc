@@ -40,7 +40,8 @@ const int kOwnedAttributeValueSize = 15;
 
 void OtlpPopulateAttributeUtils::PopulateAnyValue(
     opentelemetry::proto::common::v1::AnyValue *proto_value,
-    const opentelemetry::common::AttributeValue &value) noexcept
+    const opentelemetry::common::AttributeValue &value,
+    bool allow_bytes) noexcept
 {
   if (nullptr == proto_value)
   {
@@ -89,10 +90,19 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   }
   else if (nostd::holds_alternative<nostd::span<const uint8_t>>(value))
   {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const uint8_t>>(value))
+    if (allow_bytes)
     {
-      array_value->add_values()->set_int_value(val);
+      proto_value->set_bytes_value(
+          reinterpret_cast<const void *>(nostd::get<nostd::span<const uint8_t>>(value).data()),
+          nostd::get<nostd::span<const uint8_t>>(value).size());
+    }
+    else
+    {
+      auto array_value = proto_value->mutable_array_value();
+      for (const auto &val : nostd::get<nostd::span<const uint8_t>>(value))
+      {
+        array_value->add_values()->set_int_value(val);
+      }
     }
   }
   else if (nostd::holds_alternative<nostd::span<const bool>>(value))
@@ -156,7 +166,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
 
 void OtlpPopulateAttributeUtils::PopulateAnyValue(
     opentelemetry::proto::common::v1::AnyValue *proto_value,
-    const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept
+    const opentelemetry::sdk::common::OwnedAttributeValue &value,
+    bool allow_bytes) noexcept
 {
   if (nullptr == proto_value)
   {
@@ -193,6 +204,23 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   else if (nostd::holds_alternative<double>(value))
   {
     proto_value->set_double_value(nostd::get<double>(value));
+  }
+  else if (nostd::holds_alternative<std::vector<uint8_t>>(value))
+  {
+    if (allow_bytes)
+    {
+      const std::vector<uint8_t> &byte_array = nostd::get<std::vector<uint8_t>>(value);
+      proto_value->set_bytes_value(reinterpret_cast<const void *>(byte_array.data()),
+                                   byte_array.size());
+    }
+    else
+    {
+      auto array_value = proto_value->mutable_array_value();
+      for (const auto &val : nostd::get<std::vector<uint8_t>>(value))
+      {
+        array_value->add_values()->set_int_value(val);
+      }
+    }
   }
   else if (nostd::holds_alternative<std::string>(value))
   {
@@ -261,7 +289,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
 void OtlpPopulateAttributeUtils::PopulateAttribute(
     opentelemetry::proto::common::v1::KeyValue *attribute,
     nostd::string_view key,
-    const opentelemetry::common::AttributeValue &value) noexcept
+    const opentelemetry::common::AttributeValue &value,
+    bool allow_bytes) noexcept
 {
   if (nullptr == attribute)
   {
@@ -275,14 +304,15 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
       "AttributeValue contains unknown type");
 
   attribute->set_key(key.data(), key.size());
-  PopulateAnyValue(attribute->mutable_value(), value);
+  PopulateAnyValue(attribute->mutable_value(), value, allow_bytes);
 }
 
 /** Maps from C++ attribute into OTLP proto attribute. */
 void OtlpPopulateAttributeUtils::PopulateAttribute(
     opentelemetry::proto::common::v1::KeyValue *attribute,
     nostd::string_view key,
-    const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept
+    const opentelemetry::sdk::common::OwnedAttributeValue &value,
+    bool allow_bytes) noexcept
 {
   if (nullptr == attribute)
   {
@@ -296,7 +326,7 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
                 "OwnedAttributeValue contains unknown type");
 
   attribute->set_key(key.data(), key.size());
-  PopulateAnyValue(attribute->mutable_value(), value);
+  PopulateAnyValue(attribute->mutable_value(), value, allow_bytes);
 }
 
 void OtlpPopulateAttributeUtils::PopulateAttribute(
@@ -310,7 +340,8 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
 
   for (const auto &kv : resource.GetAttributes())
   {
-    OtlpPopulateAttributeUtils::PopulateAttribute(proto->add_attributes(), kv.first, kv.second);
+    OtlpPopulateAttributeUtils::PopulateAttribute(proto->add_attributes(), kv.first, kv.second,
+                                                  false);
   }
 }
 
@@ -321,7 +352,8 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
 {
   for (const auto &kv : instrumentation_scope.GetAttributes())
   {
-    OtlpPopulateAttributeUtils::PopulateAttribute(proto->add_attributes(), kv.first, kv.second);
+    OtlpPopulateAttributeUtils::PopulateAttribute(proto->add_attributes(), kv.first, kv.second,
+                                                  false);
   }
 }
 

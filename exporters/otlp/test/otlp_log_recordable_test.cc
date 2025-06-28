@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include <stdint.h>
 #include <chrono>
+#include <cstring>
 #include <string>
 #include <utility>
 
@@ -73,6 +74,16 @@ TEST(OtlpLogRecordable, Basic)
   EXPECT_EQ(rec.log_record().body().string_value(), name);
   EXPECT_EQ(rec.log_record().trace_id(), expected_trace_id_bytes);
   EXPECT_EQ(rec.log_record().span_id(), expected_span_id_bytes);
+
+  // Test bytes body
+  uint8_t byte_arr[] = {'T', 'e', '\0', 's', 't'};
+  common::AttributeValue byte_val(
+      nostd::span<const uint8_t>{reinterpret_cast<const uint8_t *>(byte_arr), 5});
+  rec.SetBody(byte_val);
+  EXPECT_TRUE(0 ==
+              memcmp(reinterpret_cast<const void *>(rec.log_record().body().bytes_value().data()),
+                     reinterpret_cast<const void *>(byte_arr), 5));
+  EXPECT_EQ(rec.log_record().body().bytes_value().size(), 5);
 }
 
 TEST(OtlpLogRecordable, GetResource)
@@ -111,6 +122,12 @@ TEST(OtlpLogRecordable, SetSingleAttribute)
   common::AttributeValue str_val(nostd::string_view("Test"));
   rec.SetAttribute(str_key, str_val);
 
+  nostd::string_view byte_key = "byte_attr";
+  uint8_t byte_arr[]          = {'T', 'e', 's', 't'};
+  common::AttributeValue byte_val(
+      nostd::span<const uint8_t>{reinterpret_cast<const uint8_t *>(byte_arr), 4});
+  rec.SetAttribute(byte_key, byte_val);
+
   int checked_attributes = 0;
   for (auto &attribute : rec.log_record().attributes())
   {
@@ -129,8 +146,16 @@ TEST(OtlpLogRecordable, SetSingleAttribute)
       ++checked_attributes;
       EXPECT_EQ(attribute.value().string_value(), nostd::get<nostd::string_view>(str_val).data());
     }
+    else if (attribute.key() == byte_key)
+    {
+      ++checked_attributes;
+      EXPECT_TRUE(0 ==
+                  memcmp(reinterpret_cast<const void *>(attribute.value().bytes_value().data()),
+                         reinterpret_cast<const void *>(byte_arr), 4));
+      EXPECT_EQ(attribute.value().bytes_value().size(), 4);
+    }
   }
-  EXPECT_EQ(3, checked_attributes);
+  EXPECT_EQ(4, checked_attributes);
 }
 
 // Test non-int array types. Int array types are tested using templates (see IntAttributeTest)
