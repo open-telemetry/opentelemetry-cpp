@@ -37,12 +37,7 @@ OtlpHttpLogRecordExporterOptions::OtlpHttpLogRecordExporterOptions()
       retry_policy_initial_backoff(GetOtlpDefaultLogsRetryInitialBackoff()),
       retry_policy_max_backoff(GetOtlpDefaultLogsRetryMaxBackoff()),
       retry_policy_backoff_multiplier(GetOtlpDefaultLogsRetryBackoffMultiplier())
-{
-#ifdef ENABLE_ASYNC_EXPORT
-  max_concurrent_requests     = 64;
-  max_requests_per_connection = 8;
-#endif
-}
+{}
 
 OtlpHttpLogRecordExporterOptions::~OtlpHttpLogRecordExporterOptions() {}
 

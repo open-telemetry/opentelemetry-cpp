@@ -65,10 +65,10 @@ struct OPENTELEMETRY_EXPORT OtlpHttpExporterOptions
 
 #ifdef ENABLE_ASYNC_EXPORT
   /** Max number of concurrent requests. */
-  std::size_t max_concurrent_requests;
+  std::size_t max_concurrent_requests{64};
 
   /** Max number of requests per connection. */
-  std::size_t max_requests_per_connection;
+  std::size_t max_requests_per_connection{8};
 #endif
 
   /** True do disable SSL. */
