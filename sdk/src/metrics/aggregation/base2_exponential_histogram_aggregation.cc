@@ -32,7 +32,7 @@ namespace
 uint32_t GetScaleReduction(int32_t start_index, int32_t end_index, size_t max_buckets) noexcept
 {
   uint32_t scale_reduction = 0;
-  while (static_cast<size_t>(end_index - start_index + 1) > max_buckets)
+  while ((end_index - start_index + 1) > max_buckets)
   {
     start_index >>= 1;
     end_index >>= 1;
