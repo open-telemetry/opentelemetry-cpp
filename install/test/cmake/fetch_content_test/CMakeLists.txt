@@ -8,8 +8,6 @@ cmake_minimum_required(VERSION 3.14)
 
 project(opentelemetry-cpp-fetch-content-test LANGUAGES CXX)
 
-find_package(GTest CONFIG REQUIRED)
-
 set(BUILD_TESTING
     ON
     CACHE BOOL "Build tests" FORCE)
@@ -27,8 +25,10 @@ message(
 )
 
 include(FetchContent)
+FetchContent_Declare(
+  googletest SOURCE_DIR "${OPENTELEMETRY_CPP_SRC_DIR}/third_party/googletest")
 FetchContent_Declare(opentelemetry-cpp SOURCE_DIR ${OPENTELEMETRY_CPP_SRC_DIR})
-FetchContent_MakeAvailable(opentelemetry-cpp)
+FetchContent_MakeAvailable(googletest opentelemetry-cpp)
 
 add_executable(
   fetch_content_src_test
