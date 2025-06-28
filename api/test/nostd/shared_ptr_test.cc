@@ -19,6 +19,11 @@ public:
 
   ~A() { destructed_ = true; }
 
+  A(const A &)            = delete;
+  A(A &&)                 = delete;
+  A &operator=(const A &) = delete;
+  A &operator=(A &&)      = delete;
+
 private:
   bool &destructed_;
 };
@@ -33,13 +38,16 @@ class C
 {
 public:
   virtual ~C() {}
+  C() = default;
+
+  C(const C &)            = delete;
+  C(C &&)                 = delete;
+  C &operator=(const C &) = delete;
+  C &operator=(C &&)      = delete;
 };
 
 class D : public C
-{
-public:
-  ~D() override {}
-};
+{};
 
 TEST(SharedPtrTest, DefaultConstruction)
 {

@@ -64,8 +64,6 @@ public:
 
   CustomEventHandler() : is_called_(false), got_response_(false) {}
 
-  ~CustomEventHandler() override = default;
-
   std::atomic<bool> is_called_;
   std::atomic<bool> got_response_;
 };
@@ -700,8 +698,6 @@ TEST_F(BasicCurlHttpTests, BackgroundThreadWaitMore)
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 struct GzipEventHandler : public CustomEventHandler
 {
-  ~GzipEventHandler() override = default;
-
   void OnResponse(http_client::Response & /* response */) noexcept override {}
 
   void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
