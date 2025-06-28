@@ -21,6 +21,10 @@ OtlpHttpLogRecordExporterOptions::OtlpHttpLogRecordExporterOptions()
       console_debug(false),
       timeout(GetOtlpDefaultLogsTimeout()),
       http_headers(GetOtlpDefaultLogsHeaders()),
+#ifdef ENABLE_ASYNC_EXPORT
+      max_concurrent_requests{64},
+      max_requests_per_connection{8},
+#endif
       ssl_insecure_skip_verify(false),
       ssl_ca_cert_path(GetOtlpDefaultLogsSslCertificatePath()),
       ssl_ca_cert_string(GetOtlpDefaultLogsSslCertificateString()),

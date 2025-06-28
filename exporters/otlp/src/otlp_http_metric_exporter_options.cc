@@ -23,6 +23,10 @@ OtlpHttpMetricExporterOptions::OtlpHttpMetricExporterOptions()
       timeout(GetOtlpDefaultMetricsTimeout()),
       http_headers(GetOtlpDefaultMetricsHeaders()),
       aggregation_temporality(PreferredAggregationTemporality::kCumulative),
+#ifdef ENABLE_ASYNC_EXPORT
+      max_concurrent_requests{64},
+      max_requests_per_connection{8},
+#endif
       ssl_insecure_skip_verify(false),
       ssl_ca_cert_path(GetOtlpDefaultMetricsSslCertificatePath()),
       ssl_ca_cert_string(GetOtlpDefaultMetricsSslCertificateString()),
