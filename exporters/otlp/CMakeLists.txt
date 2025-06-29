@@ -133,6 +133,7 @@ if(WITH_OTLP_GRPC)
 
   add_library(
     opentelemetry_otlp_grpc_builder
+    ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE}
     src/otlp_grpc_span_builder.cc src/otlp_grpc_push_metric_builder.cc
     src/otlp_grpc_log_record_builder.cc)
   set_target_properties(opentelemetry_otlp_grpc_builder
@@ -244,6 +245,7 @@ if(WITH_OTLP_HTTP)
 
   add_library(
     opentelemetry_otlp_http_builder
+    ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE}
     src/otlp_http_span_builder.cc src/otlp_http_push_metric_builder.cc
     src/otlp_http_log_record_builder.cc)
   set_target_properties(opentelemetry_otlp_http_builder
@@ -347,6 +349,7 @@ if(WITH_OTLP_FILE)
 
   add_library(
     opentelemetry_otlp_file_builder
+    ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE}
     src/otlp_file_span_builder.cc src/otlp_file_push_metric_builder.cc
     src/otlp_file_log_record_builder.cc)
 
