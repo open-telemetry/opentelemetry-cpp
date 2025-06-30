@@ -46,8 +46,8 @@ build:windows      --copt="/Brepro"      --copt="/guard:cf"      --copt="/guard:
 build:windows --host_copt="/Brepro"      --copt="/guard:cf"      --copt="/guard:ehcont"      --copt="/Z7"      --copt="/JMC-"      --copt="/sdl"
 build:windows      --linkopt="/Brepro"      --linkopt="/guard:cf"      --linkopt="/guard:ehcont" --linkopt="/DEBUG:FULL" --linkopt="/CETCOMPAT" --linkopt="/SWAPRUN:NET,CD" --linkopt="/OPT:REF,NOICF" --linkopt="/RELEASE" --linkopt="/DEBUGTYPE:CV,PDATA,FIXUP" 
 build:windows --host_linkopt="/Brepro"      --linkopt="/guard:cf"      --linkopt="/guard:ehcont" --linkopt="/DEBUG:FULL" --linkopt="/CETCOMPAT" --linkopt="/SWAPRUN:NET,CD" --linkopt="/OPT:REF,NOICF" --linkopt="/RELEASE" --linkopt="/DEBUGTYPE:CV,PDATA,FIXUP" 
-build:windows      --copt="/Zc:strictStrings" --copt="/Gy"
-build:windows --host_copt="/Zc:strictStrings" --copt="/Gy"
+build:windows      --copt="/Zc:strictStrings"      --copt="/Gy"      --copt="-DGPR_DISABLE_ABSEIL_SYNC"
+build:windows --host_copt="/Zc:strictStrings" --host_copt="/Gy" --host_copt="-DGPR_DISABLE_ABSEIL_SYNC"
 build:windows --host_linkopt="shell32.lib" 
 # Requires Visual Studio 2019 Build Tools installed in default location with the latest compiler (14.29.30133) for x64
 build:windows      --action_env=BAZEL_VC_FULL_VERSION=14.42.34433      --action_env=BAZEL_WINSDK_FULL_VERSION=10.0.26100.0
