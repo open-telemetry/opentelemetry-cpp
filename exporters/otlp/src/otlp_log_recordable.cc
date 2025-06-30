@@ -196,7 +196,7 @@ void OtlpLogRecordable::SetSeverity(opentelemetry::logs::Severity severity) noex
 
 void OtlpLogRecordable::SetBody(const opentelemetry::common::AttributeValue &message) noexcept
 {
-  OtlpPopulateAttributeUtils::PopulateAnyValue(proto_record_.mutable_body(), message);
+  OtlpPopulateAttributeUtils::PopulateAnyValue(proto_record_.mutable_body(), message, true);
 }
 
 void OtlpLogRecordable::SetEventId(int64_t /* id */, nostd::string_view event_name) noexcept
@@ -238,7 +238,7 @@ void OtlpLogRecordable::SetTraceFlags(const opentelemetry::trace::TraceFlags &tr
 void OtlpLogRecordable::SetAttribute(opentelemetry::nostd::string_view key,
                                      const opentelemetry::common::AttributeValue &value) noexcept
 {
-  OtlpPopulateAttributeUtils::PopulateAttribute(proto_record_.add_attributes(), key, value);
+  OtlpPopulateAttributeUtils::PopulateAttribute(proto_record_.add_attributes(), key, value, true);
 }
 
 void OtlpLogRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
