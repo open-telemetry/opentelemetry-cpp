@@ -75,8 +75,6 @@ public:
   public:
     async_interface(OtlpMockTraceServiceStub *owner) : stub_(owner) {}
 
-    virtual ~async_interface() override = default;
-
     void Export(
         ::grpc::ClientContext *context,
         const ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest *request,
