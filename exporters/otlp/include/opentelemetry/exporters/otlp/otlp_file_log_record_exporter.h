@@ -77,9 +77,9 @@ public:
 
 private:
   // Configuration options for the exporter
-  const OtlpFileLogRecordExporterOptions options_;
+  OtlpFileLogRecordExporterOptions options_;
   // Runtime options for the exporter
-  const OtlpFileLogRecordExporterRuntimeOptions runtime_options_;
+  OtlpFileLogRecordExporterRuntimeOptions runtime_options_;
 
   // Object that stores the file context.
   std::unique_ptr<OtlpFileClient> file_client_;
