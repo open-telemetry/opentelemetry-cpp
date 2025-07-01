@@ -4,6 +4,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
 
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"

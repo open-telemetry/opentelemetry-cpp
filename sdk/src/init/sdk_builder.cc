@@ -11,10 +11,10 @@
 
 #include "opentelemetry/context/propagation/composite_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stddef.h>
+#include <cstddef>
 #include <fstream>
 #include <map>
 #include <memory>
@@ -14,6 +15,7 @@
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"

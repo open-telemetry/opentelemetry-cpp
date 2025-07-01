@@ -17,6 +17,13 @@ class AttributeValueConfigurationVisitor;
 class AttributeValueConfiguration
 {
 public:
+  AttributeValueConfiguration()                                                    = default;
+  AttributeValueConfiguration(AttributeValueConfiguration &&)                      = default;
+  AttributeValueConfiguration(const AttributeValueConfiguration &)                 = default;
+  AttributeValueConfiguration &operator=(AttributeValueConfiguration &&)           = default;
+  AttributeValueConfiguration &operator=(const AttributeValueConfiguration &other) = default;
+  virtual ~AttributeValueConfiguration()                                           = default;
+
   virtual void Accept(AttributeValueConfigurationVisitor *visitor) const = 0;
 };
 

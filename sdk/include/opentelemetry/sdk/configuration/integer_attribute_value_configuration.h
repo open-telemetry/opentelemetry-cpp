@@ -5,6 +5,7 @@
 
 #include <cstddef>
 
+#include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
