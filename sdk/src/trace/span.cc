@@ -5,6 +5,8 @@
 #include <utility>
 
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/sdk/common/attribute_validity.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/span_id.h"
@@ -106,6 +108,13 @@ void Span::SetAttribute(nostd::string_view key, const common::AttributeValue &va
     return;
   }
 
+  if (!sdk::common::AttributeValidator::IsValid(value))
+  {
+    OTEL_INTERNAL_LOG_WARN("[Trace Span] Invalid span attribute value for: "
+                           << key << ". This attribute will be ignored.");
+    return;
+  }
+
   recordable_->SetAttribute(key, value);
 }
 
@@ -161,7 +170,7 @@ void Span::AddLink(const opentelemetry::trace::SpanContext &target,
     return;
   }
 
-  recordable_->AddLink(target, attrs);
+  recordable_->AddLink(target, common::KeyValueFilterIterable(attrs, "[Trace Span Link] "));
 }
 
 void Span::AddLinks(const opentelemetry::trace::SpanContextKeyValueIterable &links) noexcept
