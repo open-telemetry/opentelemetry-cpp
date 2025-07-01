@@ -18,8 +18,7 @@ namespace otlp
 struct OPENTELEMETRY_EXPORT OtlpFileLogRecordExporterRuntimeOptions
     : public OtlpFileClientRuntimeOptions
 {
-  OtlpFileLogRecordExporterRuntimeOptions()  = default;
-  ~OtlpFileLogRecordExporterRuntimeOptions() = default;
+  OtlpFileLogRecordExporterRuntimeOptions() = default;
 };
 
 }  // namespace otlp

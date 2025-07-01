@@ -69,12 +69,12 @@ private:
   friend class OtlpFileMetricExporterTestPeer;
 
   // Configuration options for the exporter
-  const OtlpFileMetricExporterOptions options_;
+  OtlpFileMetricExporterOptions options_;
   // Runtime options for the exporter
-  const OtlpFileMetricExporterRuntimeOptions runtime_options_;
+  OtlpFileMetricExporterRuntimeOptions runtime_options_;
 
   // Aggregation Temporality Selector
-  const sdk::metrics::AggregationTemporalitySelector aggregation_temporality_selector_;
+  sdk::metrics::AggregationTemporalitySelector aggregation_temporality_selector_;
 
   // Object that stores the file context.
   std::unique_ptr<OtlpFileClient> file_client_;

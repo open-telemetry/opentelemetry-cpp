@@ -21,7 +21,6 @@ namespace otlp
 struct OPENTELEMETRY_EXPORT OtlpFileLogRecordExporterOptions : public OtlpFileClientOptions
 {
   OtlpFileLogRecordExporterOptions();
-  ~OtlpFileLogRecordExporterOptions();
 };
 
 }  // namespace otlp

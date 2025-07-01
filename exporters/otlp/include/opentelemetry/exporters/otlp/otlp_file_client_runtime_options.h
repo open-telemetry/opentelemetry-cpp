@@ -19,6 +19,13 @@ namespace otlp
  */
 struct OtlpFileClientRuntimeOptions
 {
+  OtlpFileClientRuntimeOptions()                                                = default;
+  virtual ~OtlpFileClientRuntimeOptions()                                       = default;
+  OtlpFileClientRuntimeOptions(const OtlpFileClientRuntimeOptions &)            = default;
+  OtlpFileClientRuntimeOptions &operator=(const OtlpFileClientRuntimeOptions &) = default;
+  OtlpFileClientRuntimeOptions(OtlpFileClientRuntimeOptions &&)                 = default;
+  OtlpFileClientRuntimeOptions &operator=(OtlpFileClientRuntimeOptions &&)      = default;
+
   std::shared_ptr<sdk::common::ThreadInstrumentation> thread_instrumentation =
       std::shared_ptr<sdk::common::ThreadInstrumentation>(nullptr);
 };

@@ -38,7 +38,7 @@
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
 
-#define HTTP_PORT 19000
+constexpr int HTTP_PORT{19000};
 
 namespace curl        = opentelemetry::ext::http::client::curl;
 namespace http_client = opentelemetry::ext::http::client;
