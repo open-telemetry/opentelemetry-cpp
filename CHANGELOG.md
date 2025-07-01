@@ -37,7 +37,10 @@ Increment the:
   [#3496](https://github.com/open-telemetry/opentelemetry-cpp/pull/3496)
 
 * [CodeHealth] Fix clang-tidy warnings part 3
-  [#3496](https://github.com/open-telemetry/opentelemetry-cpp/pull/3498)
+  [#3498](https://github.com/open-telemetry/opentelemetry-cpp/pull/3498)
+
+* [CodeHealth] Fix clang-tidy warnings part 4
+  [#3501](https://github.com/open-telemetry/opentelemetry-cpp/pull/3501)
 
 Important changes:
 
