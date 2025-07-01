@@ -234,6 +234,8 @@ private:
     std::shared_ptr<opentelemetry::ext::http::client::Session> session;
     std::shared_ptr<opentelemetry::ext::http::client::EventHandler> event_handle;
 
+    HttpSessionData() = default;
+
     explicit HttpSessionData(
         std::shared_ptr<opentelemetry::ext::http::client::Session> input_session,
         std::shared_ptr<opentelemetry::ext::http::client::EventHandler> input_handle)

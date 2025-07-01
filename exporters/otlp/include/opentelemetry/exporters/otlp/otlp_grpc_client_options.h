@@ -34,7 +34,7 @@ struct OtlpGrpcClientOptions
   std::string endpoint;
 
   /** Use SSL. */
-  bool use_ssl_credentials;
+  bool use_ssl_credentials{};
 
   /** CA CERT, path to a file. */
   std::string ssl_credentials_cacert_path;
@@ -71,14 +71,14 @@ struct OtlpGrpcClientOptions
   std::string user_agent;
 
   /** max number of threads that can be allocated from this */
-  std::size_t max_threads;
+  std::size_t max_threads{};
 
   /** Compression type. */
   std::string compression;
 
 #ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests
-  std::size_t max_concurrent_requests;
+  std::size_t max_concurrent_requests{};
 #endif
 
   /** The maximum number of call attempts, including the original attempt. */
