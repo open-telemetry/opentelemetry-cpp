@@ -24,7 +24,6 @@ namespace otlp
 struct OPENTELEMETRY_EXPORT OtlpGrpcLogRecordExporterOptions : public OtlpGrpcClientOptions
 {
   OtlpGrpcLogRecordExporterOptions();
-  ~OtlpGrpcLogRecordExporterOptions();
 };
 
 }  // namespace otlp

@@ -47,8 +47,6 @@ OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions()
   retry_policy_backoff_multiplier = GetOtlpDefaultMetricsRetryBackoffMultiplier();
 }
 
-OtlpGrpcMetricExporterOptions::~OtlpGrpcMetricExporterOptions() {}
-
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

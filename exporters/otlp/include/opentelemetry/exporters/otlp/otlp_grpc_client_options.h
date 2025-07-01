@@ -23,6 +23,13 @@ namespace otlp
 
 struct OtlpGrpcClientOptions
 {
+  virtual ~OtlpGrpcClientOptions()                                = default;
+  OtlpGrpcClientOptions()                                         = default;
+  OtlpGrpcClientOptions(const OtlpGrpcClientOptions &)            = default;
+  OtlpGrpcClientOptions(OtlpGrpcClientOptions &&)                 = default;
+  OtlpGrpcClientOptions &operator=(const OtlpGrpcClientOptions &) = default;
+  OtlpGrpcClientOptions &operator=(OtlpGrpcClientOptions &&)      = default;
+
   /** The endpoint to export to. */
   std::string endpoint;
 

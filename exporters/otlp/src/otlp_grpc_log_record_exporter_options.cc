@@ -45,8 +45,6 @@ OtlpGrpcLogRecordExporterOptions::OtlpGrpcLogRecordExporterOptions()
   retry_policy_backoff_multiplier = GetOtlpDefaultLogsRetryBackoffMultiplier();
 }
 
-OtlpGrpcLogRecordExporterOptions::~OtlpGrpcLogRecordExporterOptions() {}
-
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
