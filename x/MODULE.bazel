@@ -10,7 +10,7 @@ local_path_override(
 )
 bazel_dep(name = "abseil-cpp", version = "20250512.1")
 bazel_dep(name = "aspect_bazel_lib", version = "2.19.4")
-bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "bazel_skylib", version = "1.8.0")
 bazel_dep(name = "boringssl", version = "0.20250514.0")
 bazel_dep(name = "curl", version = "8.8.0.bcr.3")
 bazel_dep(name = "depend_on_what_you_use", version = "0.9.0")
