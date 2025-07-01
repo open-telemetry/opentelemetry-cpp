@@ -221,6 +221,11 @@ public:
       const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,
       const opentelemetry::sdk::resource::Resource &resource) const;
 
+  void SetResourceAttribute(
+      opentelemetry::sdk::resource::ResourceAttributes &resource_attributes,
+      const std::string &name,
+      const opentelemetry::sdk::configuration::AttributeValueConfiguration *model) const;
+
   void SetResource(opentelemetry::sdk::resource::Resource &resource,
                    const std::unique_ptr<opentelemetry::sdk::configuration::ResourceConfiguration>
                        &opt_model) const;

@@ -61,8 +61,6 @@ public:
   virtual PropertiesNodeConstIterator begin_properties() const = 0;
   virtual PropertiesNodeConstIterator end_properties() const   = 0;
 
-  virtual std::string Dump() const = 0;
-
 protected:
   std::string DoSubstitution(const std::string &text);
   std::string DoOneSubstitution(const std::string &text);

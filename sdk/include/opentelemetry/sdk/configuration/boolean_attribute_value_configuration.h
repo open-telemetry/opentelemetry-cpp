@@ -3,10 +3,7 @@
 
 #pragma once
 
-#include <map>
-#include <memory>
-
-#include "opentelemetry/sdk/configuration/string_array_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_value_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -16,12 +13,16 @@ namespace configuration
 {
 
 // YAML-SCHEMA: schema/resource.json
-// YAML-NODE: Detectors
-class DetectorsConfiguration
+// YAML-NODE: AttributeNameValue
+class BooleanAttributeValueConfiguration : public AttributeValueConfiguration
 {
 public:
-  std::unique_ptr<StringArrayConfiguration> included;
-  std::unique_ptr<StringArrayConfiguration> excluded;
+  void Accept(AttributeValueConfigurationVisitor *visitor) const override
+  {
+    visitor->VisitBoolean(this);
+  }
+
+  bool value;
 };
 
 }  // namespace configuration

@@ -4,9 +4,9 @@
 #pragma once
 
 #include <map>
-#include <string>
+#include <memory>
 
-#include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/string_array_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -15,12 +15,13 @@ namespace sdk
 namespace configuration
 {
 
-// YAML-SCHEMA: schema/resource.json
-// YAML-NODE: AttributeNameValue
-class AttributesConfiguration
+// YAML-SCHEMA: schema/common.json
+// YAML-NODE: IncludeExclude
+class IncludeExcludeConfiguration
 {
 public:
-  std::map<std::string, std::unique_ptr<AttributeValueConfiguration>> kv_map;
+  std::unique_ptr<StringArrayConfiguration> included;
+  std::unique_ptr<StringArrayConfiguration> excluded;
 };
 
 }  // namespace configuration

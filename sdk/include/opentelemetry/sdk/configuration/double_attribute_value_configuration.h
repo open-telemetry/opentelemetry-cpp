@@ -3,10 +3,7 @@
 
 #pragma once
 
-#include <map>
-#include <string>
-
-#include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_value_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -17,10 +14,15 @@ namespace configuration
 
 // YAML-SCHEMA: schema/resource.json
 // YAML-NODE: AttributeNameValue
-class AttributesConfiguration
+class DoubleAttributeValueConfiguration : public AttributeValueConfiguration
 {
 public:
-  std::map<std::string, std::unique_ptr<AttributeValueConfiguration>> kv_map;
+  void Accept(AttributeValueConfigurationVisitor *visitor) const override
+  {
+    visitor->VisitDouble(this);
+  }
+
+  double value;
 };
 
 }  // namespace configuration

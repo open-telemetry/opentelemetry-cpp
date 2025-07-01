@@ -58,8 +58,6 @@ public:
   PropertiesNodeConstIterator begin_properties() const override;
   PropertiesNodeConstIterator end_properties() const override;
 
-  std::string Dump() const override;
-
 private:
   ryml::ConstNodeRef GetRequiredRymlChildNode(const std::string &name);
   ryml::ConstNodeRef GetRymlChildNode(const std::string &name);

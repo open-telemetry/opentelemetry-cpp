@@ -1045,8 +1045,6 @@ SdkBuilder::CreatePushMetricExporter(
 {
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
 
-  OTEL_INTERNAL_LOG_ERROR("SdkBuilder::CreatePushMetricExporter: FIXME");
-
   PushMetricExporterBuilder builder(this);
   model->Accept(&builder);
   sdk = std::move(builder.exporter);
@@ -1059,8 +1057,6 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePul
         &model) const
 {
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
-
-  OTEL_INTERNAL_LOG_ERROR("SdkBuilder::CreatePullMetricExporter: FIXME");
 
   PullMetricExporterBuilder builder(this);
   model->Accept(&builder);
@@ -1092,7 +1088,6 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePul
 {
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
 
-  OTEL_INTERNAL_LOG_ERROR("SdkBuilder::CreatePullMetricReader: FIXME");
   sdk = CreatePullMetricExporter(model->exporter);
 
   return sdk;
@@ -1165,8 +1160,6 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMe
 
   auto meter_context =
       opentelemetry::sdk::metrics::MeterContextFactory::Create(std::move(view_registry), resource);
-
-  OTEL_INTERNAL_LOG_ERROR("CreateMeterProvider() FIXME");
 
   for (const auto &reader_configuration : model->readers)
   {
@@ -1391,6 +1384,16 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
   return sdk;
 }
 
+void SdkBuilder::SetResourceAttribute(
+    opentelemetry::sdk::resource::ResourceAttributes &resource_attributes,
+    const std::string &name,
+    const opentelemetry::sdk::configuration::AttributeValueConfiguration *model) const
+{
+  OTEL_INTERNAL_LOG_ERROR("SdkBuilder::SetResourceAttribute: FIXME");
+
+  // sdk_attributes.SetAttribute(kv.first, kv.second);
+}
+
 void SdkBuilder::SetResource(
     opentelemetry::sdk::resource::Resource &resource,
     const std::unique_ptr<opentelemetry::sdk::configuration::ResourceConfiguration> &opt_model)
@@ -1404,7 +1407,7 @@ void SdkBuilder::SetResource(
     {
       for (const auto &kv : opt_model->attributes->kv_map)
       {
-        sdk_attributes.SetAttribute(kv.first, kv.second);
+        SetResourceAttribute(sdk_attributes, kv.first, kv.second.get());
       }
     }
 

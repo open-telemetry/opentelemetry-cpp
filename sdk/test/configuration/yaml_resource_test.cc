@@ -9,9 +9,10 @@
 
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
-#include "opentelemetry/sdk/configuration/detectors_configuration.h"
+#include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/string_array_configuration.h"
+#include "opentelemetry/sdk/configuration/string_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
 
 static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(
@@ -84,8 +85,26 @@ resource:
   ASSERT_NE(config->resource, nullptr);
   ASSERT_NE(config->resource->attributes, nullptr);
   ASSERT_EQ(config->resource->attributes->kv_map.size(), 2);
-  ASSERT_EQ(config->resource->attributes->kv_map["foo"], "1234");
-  ASSERT_EQ(config->resource->attributes->kv_map["bar"], "5678");
+
+  {
+    const auto &value = config->resource->attributes->kv_map["foo"];
+    ASSERT_NE(value, nullptr);
+    auto *value_ptr = value.get();
+    auto *string_value =
+        reinterpret_cast<opentelemetry::sdk::configuration::StringAttributeValueConfiguration *>(
+            value_ptr);
+    ASSERT_EQ(string_value->value, "1234");
+  }
+
+  {
+    const auto &value = config->resource->attributes->kv_map["bar"];
+    ASSERT_NE(value, nullptr);
+    auto *value_ptr = value.get();
+    auto *string_value =
+        reinterpret_cast<opentelemetry::sdk::configuration::StringAttributeValueConfiguration *>(
+            value_ptr);
+    ASSERT_EQ(string_value->value, "5678");
+  }
 }
 
 TEST(YamlResource, empty_attributes_list)
@@ -151,8 +170,27 @@ resource:
   ASSERT_NE(config->resource, nullptr);
   ASSERT_NE(config->resource->attributes, nullptr);
   ASSERT_EQ(config->resource->attributes->kv_map.size(), 2);
-  ASSERT_EQ(config->resource->attributes->kv_map["foo"], "1234");
-  ASSERT_EQ(config->resource->attributes->kv_map["bar"], "5678");
+
+  {
+    const auto &value = config->resource->attributes->kv_map["foo"];
+    ASSERT_NE(value, nullptr);
+    auto *value_ptr = value.get();
+    auto *string_value =
+        reinterpret_cast<opentelemetry::sdk::configuration::StringAttributeValueConfiguration *>(
+            value_ptr);
+    ASSERT_EQ(string_value->value, "1234");
+  }
+
+  {
+    const auto &value = config->resource->attributes->kv_map["bar"];
+    ASSERT_NE(value, nullptr);
+    auto *value_ptr = value.get();
+    auto *string_value =
+        reinterpret_cast<opentelemetry::sdk::configuration::StringAttributeValueConfiguration *>(
+            value_ptr);
+    ASSERT_EQ(string_value->value, "5678");
+  }
+
   ASSERT_EQ(config->resource->attributes_list, "foo=aaaa,bar=bbbb");
 }
 

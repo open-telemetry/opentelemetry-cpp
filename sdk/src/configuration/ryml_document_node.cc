@@ -411,11 +411,6 @@ PropertiesNodeConstIterator RymlDocumentNode::end_properties() const
       new RymlPropertiesNodeConstIteratorImpl(node_, node_.num_children(), depth_));
 }
 
-std::string RymlDocumentNode::Dump() const
-{
-  return "FIXME: Dump";
-}
-
 RymlDocumentNodeConstIteratorImpl::RymlDocumentNodeConstIteratorImpl(ryml::ConstNodeRef parent,
                                                                      size_t index,
                                                                      size_t depth)

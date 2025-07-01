@@ -3,10 +3,6 @@
 
 #pragma once
 
-#include <map>
-#include <string>
-
-#include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -14,13 +10,14 @@ namespace sdk
 {
 namespace configuration
 {
+class AttributeValueConfigurationVisitor;
 
 // YAML-SCHEMA: schema/resource.json
 // YAML-NODE: AttributeNameValue
-class AttributesConfiguration
+class AttributeValueConfiguration
 {
 public:
-  std::map<std::string, std::unique_ptr<AttributeValueConfiguration>> kv_map;
+  virtual void Accept(AttributeValueConfigurationVisitor *visitor) const = 0;
 };
 
 }  // namespace configuration

@@ -18,6 +18,8 @@
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_parser.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
@@ -25,9 +27,10 @@
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/default_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
-#include "opentelemetry/sdk/configuration/detectors_configuration.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
+#include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/drop_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
@@ -38,6 +41,9 @@
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
+#include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
+#include "opentelemetry/sdk/configuration/integer_array_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/integer_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/last_value_aggregation_configuration.h"
@@ -70,7 +76,9 @@
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/string_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/string_array_configuration.h"
+#include "opentelemetry/sdk/configuration/string_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/sum_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/temporality_preference.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
@@ -89,6 +97,44 @@ namespace configuration
 
 // FIXME: proper sizing
 constexpr size_t MAX_SAMPLER_DEPTH = 10;
+
+static std::unique_ptr<StringArrayConfiguration> ParseStringArrayConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<StringArrayConfiguration> model(new StringArrayConfiguration);
+
+  for (auto it = node->begin(); it != node->end(); ++it)
+  {
+    std::unique_ptr<DocumentNode> child(*it);
+
+    std::string name = child->AsString();
+
+    model->string_array.push_back(name);
+  }
+
+  return model;
+}
+
+static std::unique_ptr<IncludeExcludeConfiguration> ParseIncludeExcludeConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<IncludeExcludeConfiguration> model(new IncludeExcludeConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  child = node->GetChildNode("included");
+  if (child)
+  {
+    model->included = ParseStringArrayConfiguration(child);
+  }
+
+  child = node->GetChildNode("excluded");
+  if (child)
+  {
+    model->excluded = ParseStringArrayConfiguration(child);
+  }
+
+  return model;
+}
 
 static std::unique_ptr<HeadersConfiguration> ParseHeadersConfiguration(
     const std::unique_ptr<DocumentNode> &node)
@@ -875,8 +921,9 @@ static std::unique_ptr<ViewStreamConfiguration> ParseViewStreamConfiguration(
   std::unique_ptr<ViewStreamConfiguration> model(new ViewStreamConfiguration);
   std::unique_ptr<DocumentNode> child;
 
-  model->name        = node->GetString("name", "");
-  model->description = node->GetString("description", "");
+  model->name                          = node->GetString("name", "");
+  model->description                   = node->GetString("description", "");
+  model->aggregation_cardinality_limit = node->GetInteger("aggregation_cardinality_limit", 0);
 
   child = node->GetChildNode("aggregation");
   if (child)
@@ -885,22 +932,9 @@ static std::unique_ptr<ViewStreamConfiguration> ParseViewStreamConfiguration(
   }
 
   child = node->GetChildNode("attribute_keys");
-
   if (child)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseViewStreamConfiguration: FIXME");
-
-    // Schema has changed
-#ifdef NEVER
-    for (auto it = child->begin(); it != child->end(); ++it)
-    {
-      std::unique_ptr<DocumentNode> attribute_key(*it);
-
-      std::string name = attribute_key->AsString();
-
-      model->attribute_keys.push_back(name);
-    }
-#endif
+    model->attribute_keys = ParseIncludeExcludeConfiguration(child);
   }
 
   return model;
@@ -1407,13 +1441,123 @@ static std::unique_ptr<TracerProviderConfiguration> ParseTracerProviderConfigura
   return model;
 }
 
+static std::unique_ptr<StringAttributeValueConfiguration> ParseStringAttributeValueConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<StringAttributeValueConfiguration> model(new StringAttributeValueConfiguration);
+
+  model->value = node->AsString();
+
+  return model;
+}
+
+static std::unique_ptr<IntegerAttributeValueConfiguration> ParseIntegerAttributeValueConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<IntegerAttributeValueConfiguration> model(new IntegerAttributeValueConfiguration);
+
+  model->value = node->AsInteger();
+
+  return model;
+}
+
+static std::unique_ptr<DoubleAttributeValueConfiguration> ParseDoubleAttributeValueConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<DoubleAttributeValueConfiguration> model(new DoubleAttributeValueConfiguration);
+
+  model->value = node->AsDouble();
+
+  return model;
+}
+
+static std::unique_ptr<BooleanAttributeValueConfiguration> ParseBooleanAttributeValueConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<BooleanAttributeValueConfiguration> model(new BooleanAttributeValueConfiguration);
+
+  model->value = node->AsBoolean();
+
+  return model;
+}
+
+static std::unique_ptr<StringArrayAttributeValueConfiguration>
+ParseStringArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<StringArrayAttributeValueConfiguration> model(
+      new StringArrayAttributeValueConfiguration);
+
+  for (auto it = node->begin(); it != node->end(); ++it)
+  {
+    std::unique_ptr<DocumentNode> child(*it);
+
+    std::string value = child->AsString();
+
+    model->value.push_back(value);
+  }
+
+  return model;
+}
+
+static std::unique_ptr<IntegerArrayAttributeValueConfiguration>
+ParseIntegerArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<IntegerArrayAttributeValueConfiguration> model(
+      new IntegerArrayAttributeValueConfiguration);
+
+  for (auto it = node->begin(); it != node->end(); ++it)
+  {
+    std::unique_ptr<DocumentNode> child(*it);
+
+    std::size_t value = child->AsInteger();
+
+    model->value.push_back(value);
+  }
+
+  return model;
+}
+
+static std::unique_ptr<DoubleArrayAttributeValueConfiguration>
+ParseDoubleArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<DoubleArrayAttributeValueConfiguration> model(
+      new DoubleArrayAttributeValueConfiguration);
+
+  for (auto it = node->begin(); it != node->end(); ++it)
+  {
+    std::unique_ptr<DocumentNode> child(*it);
+
+    double value = child->AsDouble();
+
+    model->value.push_back(value);
+  }
+
+  return model;
+}
+
+static std::unique_ptr<BooleanArrayAttributeValueConfiguration>
+ParseBooleanArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<BooleanArrayAttributeValueConfiguration> model(
+      new BooleanArrayAttributeValueConfiguration);
+
+  for (auto it = node->begin(); it != node->end(); ++it)
+  {
+    std::unique_ptr<DocumentNode> child(*it);
+
+    bool value = child->AsBoolean();
+
+    model->value.push_back(value);
+  }
+
+  return model;
+}
+
 static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
   std::unique_ptr<AttributesConfiguration> model(new AttributesConfiguration);
   std::unique_ptr<DocumentNode> child;
-
-  OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME");
 
   std::unique_ptr<DocumentNode> attribute_name_value;
   std::unique_ptr<DocumentNode> name_child;
@@ -1430,6 +1574,8 @@ static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
     value_child = attribute_name_value->GetRequiredChildNode("value");
     type_child  = attribute_name_value->GetChildNode("type");
 
+    std::unique_ptr<AttributeValueConfiguration> value_model;
+
     name = name_child->AsString();
     if (type_child)
     {
@@ -1442,84 +1588,53 @@ static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
 
     if (type == "string")
     {
-      std::string value;
-      value = value_child->AsString();
-      OTEL_INTERNAL_LOG_DEBUG("ParseAttributesConfiguration() name = " << name
-                                                                       << ", value = " << value);
-      std::pair<std::string, std::string> entry(name, value);
-      model->kv_map.insert(entry);
+      auto model_detail = ParseStringAttributeValueConfiguration(value_child);
+      value_model       = std::move(model_detail);
     }
     else if (type == "bool")
     {
-      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME: bool");
+      auto model_detail = ParseBooleanAttributeValueConfiguration(value_child);
+      value_model       = std::move(model_detail);
     }
     else if (type == "int")
     {
-      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME: int");
+      auto model_detail = ParseIntegerAttributeValueConfiguration(value_child);
+      value_model       = std::move(model_detail);
     }
     else if (type == "double")
     {
-      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME: double");
+      auto model_detail = ParseDoubleAttributeValueConfiguration(value_child);
+      value_model       = std::move(model_detail);
     }
     else if (type == "string_array")
     {
-      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME: string_array");
+      auto model_detail = ParseStringArrayAttributeValueConfiguration(value_child);
+      value_model       = std::move(model_detail);
     }
     else if (type == "bool_array")
     {
-      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME: bool_array");
+      auto model_detail = ParseBooleanArrayAttributeValueConfiguration(value_child);
+      value_model       = std::move(model_detail);
     }
     else if (type == "int_array")
     {
-      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME: int_array");
+      auto model_detail = ParseIntegerArrayAttributeValueConfiguration(value_child);
+      value_model       = std::move(model_detail);
     }
     else if (type == "double_array")
     {
-      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: FIXME: double_array");
+      auto model_detail = ParseDoubleArrayAttributeValueConfiguration(value_child);
+      value_model       = std::move(model_detail);
     }
     else
     {
       OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: unknown type " << type);
       throw InvalidSchemaException("Illegal attribute type");
     }
-  }
 
-  return model;
-}
-
-static std::unique_ptr<StringArrayConfiguration> ParseStringArrayConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
-{
-  std::unique_ptr<StringArrayConfiguration> model(new StringArrayConfiguration);
-
-  for (auto it = node->begin(); it != node->end(); ++it)
-  {
-    std::unique_ptr<DocumentNode> child(*it);
-
-    std::string name = child->AsString();
-
-    model->string_array.push_back(name);
-  }
-
-  return model;
-}
-
-static std::unique_ptr<DetectorsConfiguration> ParseDetectorsConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
-{
-  std::unique_ptr<DetectorsConfiguration> model(new DetectorsConfiguration);
-  std::unique_ptr<DocumentNode> child;
-
-  child = node->GetChildNode("included");
-  if (child)
-  {
-    model->included = ParseStringArrayConfiguration(child);
-  }
-
-  child = node->GetChildNode("excluded");
-  if (child)
-  {
-    model->excluded = ParseStringArrayConfiguration(child);
+    std::pair<std::string, std::unique_ptr<AttributeValueConfiguration>> entry(
+        name, std::move(value_model));
+    model->kv_map.insert(std::move(entry));
   }
 
   return model;
@@ -1543,7 +1658,7 @@ static std::unique_ptr<ResourceConfiguration> ParseResourceConfiguration(
   child = node->GetChildNode("detectors");
   if (child)
   {
-    model->detectors = ParseDetectorsConfiguration(child);
+    model->detectors = ParseIncludeExcludeConfiguration(child);
   }
 
   return model;
