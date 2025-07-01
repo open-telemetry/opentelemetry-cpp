@@ -1000,9 +1000,8 @@ OtlpHttpClient::createSession(
 
   // Returns the created session data
   return HttpSessionData{
-      std::move(session),
-      std::shared_ptr<opentelemetry::ext::http::client::EventHandler>{
-          new ResponseHandler(std::move(result_callback), options_.console_debug)}};
+      session, std::shared_ptr<opentelemetry::ext::http::client::EventHandler>{
+                   new ResponseHandler(std::move(result_callback), options_.console_debug)}};
 }
 
 void OtlpHttpClient::addSession(HttpSessionData &&session_data) noexcept
