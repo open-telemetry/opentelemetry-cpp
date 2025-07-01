@@ -5,8 +5,7 @@ on:
       - main
 
 permissions:
-  contents: write
-  deployments: write
+  contents: read
 
 jobs:
   benchmark:
@@ -46,6 +45,9 @@ jobs:
           path: benchmarks
   store_benchmark:
     needs: benchmark
+    permissions:
+      contents: write
+      deployments: write
     strategy:
       matrix:
         components: ["api", "sdk", "exporters"]
