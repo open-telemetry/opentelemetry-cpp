@@ -6,13 +6,19 @@
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/integer_array_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/integer_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_configuration.h"
@@ -30,6 +36,8 @@
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/string_array_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/string_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/sdk/init/configured_sdk.h"
 #include "opentelemetry/sdk/init/registry.h"
@@ -43,7 +51,6 @@
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/tracer_provider.h"
-
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -220,6 +227,32 @@ public:
   std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> CreateLoggerProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,
       const opentelemetry::sdk::resource::Resource &resource) const;
+
+  opentelemetry::common::AttributeValue CreateStringAttribute(
+      const opentelemetry::sdk::configuration::StringAttributeValueConfiguration *model) const;
+
+  opentelemetry::common::AttributeValue CreateIntegerAttribute(
+      const opentelemetry::sdk::configuration::IntegerAttributeValueConfiguration *model) const;
+
+  opentelemetry::common::AttributeValue CreateDoubleAttribute(
+      const opentelemetry::sdk::configuration::DoubleAttributeValueConfiguration *model) const;
+
+  opentelemetry::common::AttributeValue CreateBooleanAttribute(
+      const opentelemetry::sdk::configuration::BooleanAttributeValueConfiguration *model) const;
+
+  opentelemetry::common::AttributeValue CreateStringArrayAttribute(
+      const opentelemetry::sdk::configuration::StringArrayAttributeValueConfiguration *model) const;
+
+  opentelemetry::common::AttributeValue CreateIntegerArrayAttribute(
+      const opentelemetry::sdk::configuration::IntegerArrayAttributeValueConfiguration *model)
+      const;
+
+  opentelemetry::common::AttributeValue CreateDoubleArrayAttribute(
+      const opentelemetry::sdk::configuration::DoubleArrayAttributeValueConfiguration *model) const;
+
+  opentelemetry::common::AttributeValue CreateBooleanArrayAttribute(
+      const opentelemetry::sdk::configuration::BooleanArrayAttributeValueConfiguration *model)
+      const;
 
   void SetResourceAttribute(
       opentelemetry::sdk::resource::ResourceAttributes &resource_attributes,

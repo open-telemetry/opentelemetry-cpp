@@ -141,6 +141,75 @@ namespace sdk
 namespace init
 {
 
+class AttributeValueBuilder
+    : public opentelemetry::sdk::configuration::AttributeValueConfigurationVisitor
+{
+public:
+  AttributeValueBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  AttributeValueBuilder(AttributeValueBuilder &&)                      = delete;
+  AttributeValueBuilder(const AttributeValueBuilder &)                 = delete;
+  AttributeValueBuilder &operator=(AttributeValueBuilder &&)           = delete;
+  AttributeValueBuilder &operator=(const AttributeValueBuilder &other) = delete;
+  ~AttributeValueBuilder() override                                    = default;
+
+  void VisitString(
+      const opentelemetry::sdk::configuration::StringAttributeValueConfiguration *model) override
+  {
+    attribute_value = m_sdk_builder->CreateStringAttribute(model);
+  }
+
+  void VisitInteger(
+      const opentelemetry::sdk::configuration::IntegerAttributeValueConfiguration *model) override
+  {
+    attribute_value = m_sdk_builder->CreateIntegerAttribute(model);
+  }
+
+  void VisitDouble(
+      const opentelemetry::sdk::configuration::DoubleAttributeValueConfiguration *model) override
+  {
+    attribute_value = m_sdk_builder->CreateDoubleAttribute(model);
+  }
+
+  void VisitBoolean(
+      const opentelemetry::sdk::configuration::BooleanAttributeValueConfiguration *model) override
+  {
+    attribute_value = m_sdk_builder->CreateBooleanAttribute(model);
+  }
+
+  void VisitStringArray(
+      const opentelemetry::sdk::configuration::StringArrayAttributeValueConfiguration *model)
+      override
+  {
+    attribute_value = m_sdk_builder->CreateStringArrayAttribute(model);
+  }
+
+  void VisitIntegerArray(
+      const opentelemetry::sdk::configuration::IntegerArrayAttributeValueConfiguration *model)
+      override
+  {
+    attribute_value = m_sdk_builder->CreateIntegerArrayAttribute(model);
+  }
+
+  void VisitDoubleArray(
+      const opentelemetry::sdk::configuration::DoubleArrayAttributeValueConfiguration *model)
+      override
+  {
+    attribute_value = m_sdk_builder->CreateDoubleArrayAttribute(model);
+  }
+
+  void VisitBooleanArray(
+      const opentelemetry::sdk::configuration::BooleanArrayAttributeValueConfiguration *model)
+      override
+  {
+    attribute_value = m_sdk_builder->CreateBooleanArrayAttribute(model);
+  }
+
+  opentelemetry::common::AttributeValue attribute_value;
+
+private:
+  const SdkBuilder *m_sdk_builder;
+};
+
 class SamplerBuilder : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
 {
 public:
@@ -1384,14 +1453,83 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
   return sdk;
 }
 
+opentelemetry::common::AttributeValue SdkBuilder::CreateStringAttribute(
+    const opentelemetry::sdk::configuration::StringAttributeValueConfiguration *model) const
+{
+  opentelemetry::common::AttributeValue result(model->value);
+
+  return result;
+}
+
+opentelemetry::common::AttributeValue SdkBuilder::CreateIntegerAttribute(
+    const opentelemetry::sdk::configuration::IntegerAttributeValueConfiguration *model) const
+{
+  opentelemetry::common::AttributeValue result(model->value);
+
+  return result;
+}
+
+opentelemetry::common::AttributeValue SdkBuilder::CreateDoubleAttribute(
+    const opentelemetry::sdk::configuration::DoubleAttributeValueConfiguration *model) const
+{
+  opentelemetry::common::AttributeValue result(model->value);
+
+  return result;
+}
+
+opentelemetry::common::AttributeValue SdkBuilder::CreateBooleanAttribute(
+    const opentelemetry::sdk::configuration::BooleanAttributeValueConfiguration *model) const
+{
+  bool value = model->value;
+  opentelemetry::common::AttributeValue result(value);
+
+  return result;
+}
+
+opentelemetry::common::AttributeValue SdkBuilder::CreateStringArrayAttribute(
+    const opentelemetry::sdk::configuration::StringArrayAttributeValueConfiguration * /*model*/)
+    const
+{
+  opentelemetry::common::AttributeValue result("FIXME");
+
+  return result;
+}
+
+opentelemetry::common::AttributeValue SdkBuilder::CreateIntegerArrayAttribute(
+    const opentelemetry::sdk::configuration::IntegerArrayAttributeValueConfiguration * /*model*/)
+    const
+{
+  opentelemetry::common::AttributeValue result("FIXME");
+
+  return result;
+}
+
+opentelemetry::common::AttributeValue SdkBuilder::CreateDoubleArrayAttribute(
+    const opentelemetry::sdk::configuration::DoubleArrayAttributeValueConfiguration *model) const
+{
+  nostd::span<const double> data{model->value.data(), model->value.size()};
+  opentelemetry::common::AttributeValue result(data);
+
+  return result;
+}
+
+opentelemetry::common::AttributeValue SdkBuilder::CreateBooleanArrayAttribute(
+    const opentelemetry::sdk::configuration::BooleanArrayAttributeValueConfiguration * /*model*/)
+    const
+{
+  opentelemetry::common::AttributeValue result("FIXME");
+
+  return result;
+}
+
 void SdkBuilder::SetResourceAttribute(
     opentelemetry::sdk::resource::ResourceAttributes &resource_attributes,
     const std::string &name,
     const opentelemetry::sdk::configuration::AttributeValueConfiguration *model) const
 {
-  OTEL_INTERNAL_LOG_ERROR("SdkBuilder::SetResourceAttribute: FIXME");
-
-  // sdk_attributes.SetAttribute(kv.first, kv.second);
+  AttributeValueBuilder builder(this);
+  model->Accept(&builder);
+  resource_attributes.SetAttribute(name, builder.attribute_value);
 }
 
 void SdkBuilder::SetResource(
