@@ -538,6 +538,12 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
         else
         {
           WarnOnDuplicateInstrument(GetInstrumentationScope(), storage_registry_, view_instr_desc);
+          // Calculate cardinality limit based on specification priority:
+          // 1. View-specific cardinality limit (if set)
+          // 2. Default value of 2000
+          size_t cardinality_limit = view.HasAggregationCardinalityLimit()
+                                         ? view.GetAggregationCardinalityLimit()
+                                         : kAggregationCardinalityLimit;
           sync_storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
               view_instr_desc, view.GetAggregationType(), view.GetAttributesProcessor(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -545,7 +551,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
               GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
                                    view_instr_desc),
 #endif
-              view.GetAggregationConfig()));
+              view.GetAggregationConfig(), cardinality_limit));
           storage_registry_.insert({view_instr_desc, sync_storage});
         }
         auto sync_multi_storage = static_cast<SyncMultiMetricStorage *>(storages.get());

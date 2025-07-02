@@ -42,6 +42,19 @@ public:
       InstrumentType instrument_type) const noexcept = 0;
 
   /**
+   * Get the default cardinality limit for given Instrument Type for this reader.
+   * 
+   * @param instrument_type The instrument type to get the cardinality limit for
+   * @return The cardinality limit, or 0 if no limit is set
+   */
+  virtual size_t GetDefaultCardinalityLimit(InstrumentType instrument_type) const noexcept
+  {
+    // Default implementation returns no limit
+    (void)instrument_type;
+    return 0;
+  }
+
+  /**
    * Shutdown the metric reader.
    */
   bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
