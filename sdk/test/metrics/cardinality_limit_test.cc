@@ -205,6 +205,7 @@ TEST(CardinalityLimit, SyncMetricStorageWithViewCardinalityLimit)
 
   int64_t record_value = 100;
   // Add 5 unique metric points (should all fit within limit)
+  // With cardinality limit 5: first 4 get individual metric points
   for (auto i = 0; i < 5; i++)
   {
     std::map<std::string, std::string> attributes = {{"key", std::to_string(i)}};
@@ -214,6 +215,7 @@ TEST(CardinalityLimit, SyncMetricStorageWithViewCardinalityLimit)
   }
 
   // Add 3 more unique metric points (should trigger overflow behavior)
+  // These will be aggregated with the 5th metric point into overflow bucket
   for (auto i = 5; i < 8; i++)
   {
     std::map<std::string, std::string> attributes = {{"key", std::to_string(i)}};
@@ -237,9 +239,10 @@ TEST(CardinalityLimit, SyncMetricStorageWithViewCardinalityLimit)
           count_attributes++;
           if (data_attr.attributes.begin()->first == kAttributesLimitOverflowKey)
           {
-            // The overflow attribute should contain the aggregated values from the 3 excess metrics
+            // The overflow attribute should contain the aggregated values from the 4 excess metrics
+            // With cardinality limit 5: first 4 get individual points, remaining 4 go to overflow
             const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
-            EXPECT_EQ(nostd::get<int64_t>(data.value_), record_value * 3);
+            EXPECT_EQ(nostd::get<int64_t>(data.value_), record_value * 4);
             overflow_present = true;
           }
         }
