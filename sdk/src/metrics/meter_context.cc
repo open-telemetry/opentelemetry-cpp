@@ -163,6 +163,7 @@ bool MeterContext::Shutdown(std::chrono::microseconds timeout) noexcept
   // Shutdown only once.
   if (!shutdown_latch_.test_and_set(std::memory_order_acquire))
   {
+    is_shutdown_.store(true, std::memory_order_release);
     for (auto &collector : collectors_)
     {
       bool status = std::static_pointer_cast<MetricCollector>(collector)->Shutdown(timeout);
@@ -178,6 +179,11 @@ bool MeterContext::Shutdown(std::chrono::microseconds timeout) noexcept
     OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Shutdown can be invoked only once.");
   }
   return result;
+}
+
+bool MeterContext::IsShutdown() const noexcept
+{
+  return is_shutdown_.load(std::memory_order_acquire);
 }
 
 bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
