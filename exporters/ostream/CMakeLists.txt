@@ -15,20 +15,7 @@ target_include_directories(
 target_link_libraries(opentelemetry_exporter_ostream_span
                       PUBLIC opentelemetry_trace)
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_exporter_ostream_span
-    EXPORT "${PROJECT_NAME}-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-  install(
-    DIRECTORY include/opentelemetry/exporters/ostream
-    DESTINATION include/opentelemetry/exporters
-    PATTERN "*.h"
-    PATTERN "log_record_exporter.h" EXCLUDE)
-endif()
+list(APPEND OPENTELEMETRY_OSTREAM_TARGETS opentelemetry_exporter_ostream_span)
 
 if(BUILD_TESTING)
   add_executable(ostream_span_test test/ostream_span_test.cc)
@@ -52,18 +39,8 @@ target_include_directories(
 target_link_libraries(opentelemetry_exporter_ostream_metrics
                       PUBLIC opentelemetry_metrics)
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_exporter_ostream_metrics
-    EXPORT "${PROJECT_NAME}-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-  install(
-    DIRECTORY include/opentelemetry/exporters/ostream
-    DESTINATION include/opentelemetry/exporters
-    PATTERN "metric_exporter.h")
-endif()
+list(APPEND OPENTELEMETRY_OSTREAM_TARGETS
+     opentelemetry_exporter_ostream_metrics)
 
 if(BUILD_TESTING)
   add_executable(ostream_metric_test test/ostream_metric_test.cc)
@@ -87,20 +64,20 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
 target_link_libraries(opentelemetry_exporter_ostream_logs
                       PUBLIC opentelemetry_logs)
+list(APPEND OPENTELEMETRY_OSTREAM_TARGETS opentelemetry_exporter_ostream_logs)
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_exporter_ostream_logs
-    EXPORT "${PROJECT_NAME}-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-  install(
-    FILES
-      "include/opentelemetry/exporters/ostream/log_record_exporter.h"
-      "include/opentelemetry/exporters/ostream/log_record_exporter_factory.h"
-    DESTINATION include/opentelemetry/exporters/ostream)
-endif()
+otel_add_component(
+  COMPONENT
+  exporters_ostream
+  TARGETS
+  ${OPENTELEMETRY_OSTREAM_TARGETS}
+  FILES_DIRECTORY
+  "include/opentelemetry/exporters/ostream"
+  FILES_DESTINATION
+  "include/opentelemetry/exporters"
+  FILES_MATCHING
+  PATTERN
+  "*.h")
 
 if(BUILD_TESTING)
   add_executable(ostream_log_test test/ostream_log_test.cc)

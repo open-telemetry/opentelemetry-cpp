@@ -1,7 +1,6 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-include_directories(include)
 if(NOT TARGET prometheus-cpp::core)
   find_package(prometheus-cpp CONFIG REQUIRED)
 endif()
@@ -37,20 +36,18 @@ endif()
 target_link_libraries(opentelemetry_exporter_prometheus
                       PUBLIC opentelemetry_metrics ${PROMETHEUS_CPP_TARGETS})
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS ${PROMETHEUS_EXPORTER_TARGETS}
-    EXPORT "${PROJECT_NAME}-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-  install(
-    DIRECTORY include/opentelemetry/exporters/prometheus
-    DESTINATION include/opentelemetry/exporters/
-    FILES_MATCHING
-    PATTERN "*.h")
-endif()
+otel_add_component(
+  COMPONENT
+  exporters_prometheus
+  TARGETS
+  opentelemetry_exporter_prometheus
+  FILES_DIRECTORY
+  "include/opentelemetry/exporters/prometheus"
+  FILES_DESTINATION
+  "include/opentelemetry/exporters"
+  FILES_MATCHING
+  PATTERN
+  "*.h")
 
 if(BUILD_TESTING)
   add_subdirectory(test)

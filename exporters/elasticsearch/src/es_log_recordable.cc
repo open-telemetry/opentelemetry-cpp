@@ -1,34 +1,65 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <opentelemetry/version.h>
+#include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/version.h"
 
+#include <stdint.h>
 #include <chrono>
+#include <cstdint>
+#include <cstdio>
 #include <ctime>
 #include <nlohmann/json.hpp>
 #include <string>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
 
 #if defined(__cpp_lib_format)
 #  include <format>
 #endif
 
-#include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
-#include "opentelemetry/logs/severity.h"
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/trace/span_id.h"
-#include "opentelemetry/trace/trace_flags.h"
-#include "opentelemetry/trace/trace_id.h"
-
 namespace nlohmann
 {
+template <class T>
+struct json_assign_visitor
+{
+  T *j_;
+  json_assign_visitor(T &j) : j_(&j) {}
+
+  template <class U>
+  void operator()(const U &u)
+  {
+    *j_ = u;
+  }
+
+  template <class U>
+  void operator()(const opentelemetry::nostd::span<U> &span)
+  {
+    *j_ = nlohmann::json::array();
+    for (const auto &elem : span)
+    {
+      j_->push_back(elem);
+    }
+  }
+};
+
 template <>
 struct adl_serializer<opentelemetry::sdk::common::OwnedAttributeValue>
 {
   static void to_json(json &j, const opentelemetry::sdk::common::OwnedAttributeValue &v)
   {
-    opentelemetry::nostd::visit([&j](const auto &value) { j = value; }, v);
+    opentelemetry::nostd::visit(json_assign_visitor<json>(j), v);
   }
 };
 
@@ -37,7 +68,7 @@ struct adl_serializer<opentelemetry::common::AttributeValue>
 {
   static void to_json(json &j, const opentelemetry::common::AttributeValue &v)
   {
-    opentelemetry::nostd::visit([&j](const auto &value) { j = value; }, v);
+    opentelemetry::nostd::visit(json_assign_visitor<json>(j), v);
   }
 };
 }  // namespace nlohmann
@@ -75,12 +106,6 @@ void ElasticSearchRecordable::SetTimestamp(
 {
   const std::chrono::system_clock::time_point timePoint{timestamp};
 
-  // If built with with at least cpp 20 then use std::format
-  // Otherwise use the old style to format the timestamp in UTC
-  // @see https://en.cppreference.com/w/cpp/feature_test#cpp_lib_format
-#if defined(__cpp_lib_format) && __cpp_lib_format >= 201907
-  const std::string dateStr = std::format("{:%FT%T%Ez}", timePoint);
-#else
   std::time_t time = std::chrono::system_clock::to_time_t(timePoint);
   std::tm tm       = *std::gmtime(&time);
   auto microseconds =
@@ -95,7 +120,6 @@ void ElasticSearchRecordable::SetTimestamp(
                 static_cast<long>(microseconds.count()));
 
   const std::string dateStr(bufferDate);
-#endif
 
   json_["@timestamp"] = dateStr;
 }

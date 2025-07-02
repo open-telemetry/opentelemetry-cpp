@@ -32,21 +32,19 @@ set_target_version(opentelemetry_exporter_in_memory_metric)
 target_link_libraries(opentelemetry_exporter_in_memory_metric
                       PUBLIC opentelemetry_metrics)
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_exporter_in_memory
-            opentelemetry_exporter_in_memory_metric
-    EXPORT "${PROJECT_NAME}-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-  install(
-    DIRECTORY include/opentelemetry/exporters/memory
-    DESTINATION include/opentelemetry/exporters
-    FILES_MATCHING
-    PATTERN "*.h")
-endif()
+otel_add_component(
+  COMPONENT
+  exporters_in_memory
+  TARGETS
+  opentelemetry_exporter_in_memory
+  opentelemetry_exporter_in_memory_metric
+  FILES_DIRECTORY
+  "include/opentelemetry/exporters/memory"
+  FILES_DESTINATION
+  "include/opentelemetry/exporters"
+  FILES_MATCHING
+  PATTERN
+  "*.h")
 
 if(BUILD_TESTING)
   add_executable(in_memory_span_data_test test/in_memory_span_data_test.cc)

@@ -8,6 +8,10 @@
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include "opentelemetry/common/key_value_iterable.h"
+#endif
+
 using opentelemetry::trace::Provider;
 using opentelemetry::trace::Tracer;
 using opentelemetry::trace::TracerProvider;

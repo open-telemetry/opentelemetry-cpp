@@ -1,19 +1,40 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <google/protobuf/arena.h>
+#include <grpcpp/client_context.h>
+#include <grpcpp/support/status.h>
+#include <atomic>
+#include <chrono>
 #include <memory>
-#include <mutex>
-
-#include "opentelemetry/common/macros.h"
-#include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+#include <new>
+#include <ostream>
+#include <string>
+#include <utility>
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
-#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/version.h"
 
-#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
-#include "opentelemetry/exporters/otlp/otlp_grpc_utils.h"
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
+#include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
+
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <functional>
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -105,7 +126,7 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   google::protobuf::ArenaOptions arena_options;
   // It's easy to allocate datas larger than 1024 when we populate basic resource and attributes
   arena_options.initial_block_size = 1024;
-  // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
+  // When in batch mode, it's easy to export a large number of spans at once, we can alloc a larger
   // block to reduce memory fragments.
   arena_options.max_block_size = 65536;
   std::unique_ptr<google::protobuf::Arena> arena{new google::protobuf::Arena{arena_options}};

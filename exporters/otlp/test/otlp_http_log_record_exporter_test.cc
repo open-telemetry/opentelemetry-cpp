@@ -59,18 +59,26 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
   options.content_type  = content_type;
   options.console_debug = true;
   options.http_headers.insert(std::make_pair("Custom-Header-Key", "Custom-Header-Value"));
+  options.retry_policy_max_attempts       = 0U;
+  options.retry_policy_initial_backoff    = std::chrono::duration<float>::zero();
+  options.retry_policy_max_backoff        = std::chrono::duration<float>::zero();
+  options.retry_policy_backoff_multiplier = 0.0f;
   OtlpHttpClientOptions otlp_http_client_options(
-      options.url, false,                 /* ssl_insecure_skip_verify */
-      "", /* ssl_ca_cert_path */ "",      /* ssl_ca_cert_string */
-      "",                                 /* ssl_client_key_path */
-      "", /* ssl_client_key_string */ "", /* ssl_client_cert_path */
-      "",                                 /* ssl_client_cert_string */
-      "",                                 /* ssl_min_tls */
-      "",                                 /* ssl_max_tls */
-      "",                                 /* ssl_cipher */
-      "",                                 /* ssl_cipher_suite */
+      options.url, false, /* ssl_insecure_skip_verify */
+      "",                 /* ssl_ca_cert_path */
+      "",                 /* ssl_ca_cert_string */
+      "",                 /* ssl_client_key_path */
+      "",                 /* ssl_client_key_string */
+      "",                 /* ssl_client_cert_path */
+      "",                 /* ssl_client_cert_string */
+      "",                 /* ssl_min_tls */
+      "",                 /* ssl_max_tls */
+      "",                 /* ssl_cipher */
+      "",                 /* ssl_cipher_suite */
       options.content_type, options.json_bytes_mapping, options.compression, options.use_json_name,
-      options.console_debug, options.timeout, options.http_headers, not_instrumented);
+      options.console_debug, options.timeout, options.http_headers,
+      options.retry_policy_max_attempts, options.retry_policy_initial_backoff,
+      options.retry_policy_max_backoff, options.retry_policy_backoff_multiplier, not_instrumented);
   if (!async_mode)
   {
     otlp_http_client_options.max_concurrent_requests = 0;
@@ -749,7 +757,56 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, DefaultEndpoint)
   EXPECT_EQ("http://localhost:4317", GetOtlpDefaultGrpcEndpoint());
 }
 
-#  endif
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigRetryDefaultValues)
+{
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 5);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5.0f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 1.5f);
+}
+
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigRetryValuesFromEnv)
+{
+  setenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_ATTEMPTS", "123", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_INITIAL_BACKOFF", "4.5", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_BACKOFF", "6.7", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
+
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 123);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 8.9f);
+
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_BACKOFF_MULTIPLIER");
+}
+
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigRetryGenericValuesFromEnv)
+{
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS", "321", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF", "5.4", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
+
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 321);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 9.8f);
+
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
+}
+#  endif  // NO_GETENV
 
 }  // namespace otlp
 }  // namespace exporter

@@ -24,5 +24,8 @@
   # We prefer to include <gmock/gmock.h> for simplicity
   { "include": ["<gmock/gmock-function-mocker.h>", "private", "<gmock/gmock.h>", "public"] },
   { "include": ["<gmock/gmock-spec-builders.h>", "private", "<gmock/gmock.h>", "public"] },
+
+  # We prefer to include <curl/curl.h> for simplicity
+  { "include": ["<curl/system.h>", "private", "<curl/curl.h>", "public"] },
 ]
 

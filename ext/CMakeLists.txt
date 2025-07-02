@@ -10,20 +10,18 @@ target_include_directories(
 set_target_properties(opentelemetry_ext PROPERTIES EXPORT_NAME "ext")
 target_link_libraries(opentelemetry_ext INTERFACE opentelemetry_api)
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_ext
-    EXPORT "${PROJECT_NAME}-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-  install(
-    DIRECTORY include/opentelemetry/ext
-    DESTINATION include/opentelemetry/
-    FILES_MATCHING
-    PATTERN "*.h")
-endif()
+otel_add_component(
+  COMPONENT
+  ext_common
+  TARGETS
+  opentelemetry_ext
+  FILES_DIRECTORY
+  "include/opentelemetry/ext"
+  FILES_DESTINATION
+  "include/opentelemetry/"
+  FILES_MATCHING
+  PATTERN
+  "*.h")
 
 add_subdirectory(src)
 

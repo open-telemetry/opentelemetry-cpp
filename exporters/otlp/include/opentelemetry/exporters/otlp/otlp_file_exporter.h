@@ -76,9 +76,9 @@ public:
 
 private:
   // The configuration options associated with this exporter.
-  const OtlpFileExporterOptions options_;
+  OtlpFileExporterOptions options_;
   // The runtime options associated with this exporter.
-  const OtlpFileExporterRuntimeOptions runtime_options_;
+  OtlpFileExporterRuntimeOptions runtime_options_;
 
   // Object that stores the file context.
   std::unique_ptr<OtlpFileClient> file_client_;

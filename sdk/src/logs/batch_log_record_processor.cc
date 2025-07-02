@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stddef.h>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -19,13 +18,16 @@
 #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 #include "opentelemetry/sdk/common/circular_buffer.h"
 #include "opentelemetry/sdk/common/circular_buffer_range.h"
-#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_runtime_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
+
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+#  include "opentelemetry/sdk/common/thread_instrumentation.h"
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBufferRange;
@@ -97,7 +99,7 @@ void BatchLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexc
     return;
   }
 
-  if (buffer_.Add(std::unique_ptr<Recordable>(record.release())) == false)
+  if (buffer_.Add(std::move(record)) == false)
   {
     return;
   }
@@ -137,6 +139,8 @@ bool BatchLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noex
     if (synchronization_data_->force_flush_pending_sequence.load(std::memory_order_acquire) >
         synchronization_data_->force_flush_notified_sequence.load(std::memory_order_acquire))
     {
+      synchronization_data_->is_force_wakeup_background_worker.store(true,
+                                                                     std::memory_order_release);
       synchronization_data_->cv.notify_all();
     }
 
@@ -219,7 +223,7 @@ void BatchLogRecordProcessor::DoBackgroundWork()
     if (synchronization_data_->is_shutdown.load() == true)
     {
       DrainQueue();
-      return;
+      break;
     }
 
     auto start = std::chrono::steady_clock::now();

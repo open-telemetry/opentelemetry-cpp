@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
@@ -25,6 +24,16 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/tracer.h"
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include <stdint.h>
+#  include <initializer_list>
+#  include <map>
+#  include <unordered_map>
+
+#  include "opentelemetry/common/attribute_value.h"
+#  include "opentelemetry/nostd/variant.h"
+#endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;

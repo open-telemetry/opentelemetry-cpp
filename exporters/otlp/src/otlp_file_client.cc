@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <limits.h>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -19,6 +18,8 @@
 #include <thread>
 #include <utility>
 #include <vector>
+
+// IWYU pragma: no_include <features.h>
 
 #if defined(HAVE_GSL)
 #  include <gsl/gsl>
@@ -60,6 +61,7 @@
 
 #  include <fcntl.h>
 #  include <sys/stat.h>
+#  include <sys/types.h>
 #  include <unistd.h>
 
 #  define FS_ACCESS(x) access(x, F_OK)
@@ -111,6 +113,7 @@
 #include "opentelemetry/sdk/common/base64.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
 // clang-format off
@@ -716,11 +719,11 @@ static inline char HexEncode(unsigned char byte)
 #endif
   if (byte >= 10)
   {
-    return byte - 10 + 'a';
+    return static_cast<char>(byte - 10 + 'a');
   }
   else
   {
-    return byte + '0';
+    return static_cast<char>(byte + '0');
   }
 }
 
@@ -1001,6 +1004,11 @@ public:
     }
   }
 
+  OtlpFileSystemBackend(const OtlpFileSystemBackend &)            = delete;
+  OtlpFileSystemBackend &operator=(const OtlpFileSystemBackend &) = delete;
+  OtlpFileSystemBackend(OtlpFileSystemBackend &&)                 = delete;
+  OtlpFileSystemBackend &operator=(OtlpFileSystemBackend &&)      = delete;
+
   // Written size is not required to be precise, we can just ignore tsan report here.
   OPENTELEMETRY_SANITIZER_NO_THREAD void MaybeRotateLog(std::size_t data_size)
   {
@@ -1192,7 +1200,7 @@ private:
       {
         if (file_pattern[i] == '%')
         {
-          int checked = static_cast<int>(file_pattern[i + 1]);
+          int checked = static_cast<unsigned char>(file_pattern[i + 1]);
           if (checked > 0 && checked < 128 && check_interval[checked] > 0)
           {
             if (0 == check_file_path_interval_ ||
@@ -1585,11 +1593,9 @@ class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileOstreamBackend : public OtlpFileAppende
 public:
   explicit OtlpFileOstreamBackend(const std::reference_wrapper<std::ostream> &os) : os_(os) {}
 
-  ~OtlpFileOstreamBackend() override {}
-
   void Export(nostd::string_view data, std::size_t /*record_count*/) override
   {
-    os_.get().write(data.data(), data.size());
+    os_.get().write(data.data(), static_cast<std::streamsize>(data.size()));
   }
 
   bool ForceFlush(std::chrono::microseconds /*timeout*/) noexcept override
@@ -1608,8 +1614,8 @@ private:
 OtlpFileClient::OtlpFileClient(OtlpFileClientOptions &&options,
                                OtlpFileClientRuntimeOptions &&runtime_options)
     : is_shutdown_(false),
-      options_(std::move(options)),
-      runtime_options_(std::move(runtime_options))
+      options_{std::move(options)},
+      runtime_options_{std::move(runtime_options)}
 {
   if (nostd::holds_alternative<OtlpFileClientFileSystemOptions>(options_.backend_options))
   {

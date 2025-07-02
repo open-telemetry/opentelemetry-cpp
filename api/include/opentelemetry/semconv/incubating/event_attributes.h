@@ -20,14 +20,12 @@ namespace event
 {
 
 /**
- * Identifies the class / type of event.
- * <p>
- * Event names are subject to the same rules as <a
- * href="/docs/general/attribute-naming.md">attribute names</a>. Notably, event names are namespaced
- * to avoid collisions and provide a clean separation of semantics for events in separate domains
- * like browser, mobile, and kubernetes.
+  Identifies the class / type of event.
+
+  @deprecated
+  {"note": "Replaced by EventName top-level field on the LogRecord.\n", "reason": "uncategorized"}
  */
-static constexpr const char *kEventName = "event.name";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kEventName = "event.name";
 
 }  // namespace event
 }  // namespace semconv

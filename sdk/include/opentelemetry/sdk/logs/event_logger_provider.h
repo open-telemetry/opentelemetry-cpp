@@ -3,11 +3,14 @@
 
 #pragma once
 
-#include "opentelemetry/logs/event_logger.h"
-#include "opentelemetry/logs/event_logger_provider.h"
-#include "opentelemetry/logs/logger.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/string_view.h"
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+#  include "opentelemetry/logs/event_logger.h"
+#  include "opentelemetry/logs/event_logger_provider.h"
+#  include "opentelemetry/logs/logger.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/nostd/string_view.h"
+#endif
+
 #include "opentelemetry/version.h"
 
 // Define the maximum number of loggers that are allowed to be registered to the loggerprovider.
@@ -19,7 +22,8 @@ namespace sdk
 {
 namespace logs
 {
-class OPENTELEMETRY_EXPORT EventLoggerProvider final
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+class OPENTELEMETRY_EXPORT OPENTELEMETRY_DEPRECATED EventLoggerProvider final
     : public opentelemetry::logs::EventLoggerProvider
 {
 public:
@@ -31,6 +35,7 @@ public:
       nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
       nostd::string_view event_domain) noexcept override;
 };
+#endif
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

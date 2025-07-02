@@ -1,38 +1,60 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <grpc/support/port_platform.h>
+#include <grpcpp/grpcpp.h>
+#include <grpcpp/support/status.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <chrono>
+#include <functional>
+#include <string>
 #include <unordered_map>
+#include <utility>
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
-
-// clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-// clang-format on
-
-#include "opentelemetry/proto/collector/logs/v1/logs_service_mock.grpc.pb.h"
-#include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
-
-// clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-// clang-format on
-
-#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
-#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#include "opentelemetry/trace/provider.h"
+#include "opentelemetry/trace/noop.h"
+#include "opentelemetry/trace/scope.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/trace/tracer_provider.h"
+#include "opentelemetry/version.h"
 
-#include <grpcpp/grpcpp.h>
-#include <gtest/gtest.h>
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/collector/logs/v1/logs_service_mock.grpc.pb.h"
+#include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
+#include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
+#include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
 
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
@@ -41,6 +63,40 @@ using opentelemetry::sdk::common::unsetenv;
 #endif
 
 using namespace testing;
+
+namespace grpc
+{
+class ClientUnaryReactor;
+}
+
+namespace opentelemetry
+{
+namespace proto
+{
+namespace collector
+{
+
+namespace logs
+{
+namespace v1
+{
+class ExportLogsServiceRequest;
+class ExportLogsServiceResponse;
+}  // namespace v1
+}  // namespace logs
+
+namespace trace
+{
+namespace v1
+{
+class ExportTraceServiceRequest;
+class ExportTraceServiceResponse;
+}  // namespace v1
+}  // namespace trace
+
+}  // namespace collector
+}  // namespace proto
+}  // namespace opentelemetry
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -68,8 +124,6 @@ public:
   {
   public:
     async_interface(OtlpMockTraceServiceStub *owner) : stub_(owner) {}
-
-    virtual ~async_interface() {}
 
     void Export(
         ::grpc::ClientContext *context,
@@ -103,7 +157,7 @@ public:
     OtlpMockTraceServiceStub *stub_;
   };
 
-  async_interface_base *async() { return &async_interface_; }
+  async_interface_base *async() override { return &async_interface_; }
   async_interface_base *experimental_async() { return &async_interface_; }
 
   ::grpc::Status GetLastAsyncStatus() const noexcept { return last_async_status_; }
@@ -131,8 +185,6 @@ public:
   {
   public:
     async_interface(OtlpMockLogsServiceStub *owner) : stub_(owner) {}
-
-    virtual ~async_interface() {}
 
     void Export(
         ::grpc::ClientContext *context,
@@ -166,7 +218,7 @@ public:
     OtlpMockLogsServiceStub *stub_;
   };
 
-  async_interface_base *async() { return &async_interface_; }
+  async_interface_base *async() override { return &async_interface_; }
   async_interface_base *experimental_async() { return &async_interface_; }
 
   ::grpc::Status GetLastAsyncStatus() const noexcept { return last_async_status_; }
@@ -199,7 +251,7 @@ public:
       const std::shared_ptr<OtlpGrpcClient> &client)
   {
     return std::unique_ptr<sdk::logs::LogRecordExporter>(
-        new OtlpGrpcLogRecordExporter(std::move(stub_interface), std::move(client)));
+        new OtlpGrpcLogRecordExporter(std::move(stub_interface), client));
   }
 
   std::unique_ptr<sdk::trace::SpanExporter> GetExporter(
@@ -207,7 +259,7 @@ public:
       const std::shared_ptr<OtlpGrpcClient> &client)
   {
     return std::unique_ptr<sdk::trace::SpanExporter>(
-        new OtlpGrpcExporter(std::move(stub_interface), std::move(client)));
+        new OtlpGrpcExporter(std::move(stub_interface), client));
   }
 
   // Get the options associated with the given exporter.
@@ -324,7 +376,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
     const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
 
     auto tracer = trace_provider->GetTracer("opentelelemtry_library", "", schema_url);
-    opentelemetry::trace::Provider::SetTracerProvider(std::move(trace_provider));
+    opentelemetry::sdk::trace::Provider::SetTracerProvider(std::move(trace_provider));
     auto trace_span = tracer->StartSpan("test_log");
     opentelemetry::trace::Scope trace_scope{trace_span};
 
@@ -350,7 +402,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
                           trace_span->GetContext(), std::chrono::system_clock::now());
   }
 
-  opentelemetry::trace::Provider::SetTracerProvider(
+  opentelemetry::sdk::trace::Provider::SetTracerProvider(
       opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
           new opentelemetry::trace::NoopTracerProvider()));
   trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::sdk::trace::TracerProvider>();
@@ -410,7 +462,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ShareClientTest)
 
     auto tracer              = trace_provider->GetTracer("opentelelemtry_library", "", schema_url);
     auto copy_trace_provider = trace_provider;
-    opentelemetry::trace::Provider::SetTracerProvider(std::move(copy_trace_provider));
+    opentelemetry::sdk::trace::Provider::SetTracerProvider(std::move(copy_trace_provider));
     auto trace_span = tracer->StartSpan("test_log");
     opentelemetry::trace::Scope trace_scope{trace_span};
 
@@ -460,11 +512,63 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ShareClientTest)
   trace_provider->Shutdown();
   EXPECT_TRUE(shared_client->IsShutdown());
 
-  opentelemetry::trace::Provider::SetTracerProvider(
+  opentelemetry::sdk::trace::Provider::SetTracerProvider(
       opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
           new opentelemetry::trace::NoopTracerProvider()));
   trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::sdk::trace::TracerProvider>();
 }
+
+#ifndef NO_GETENV
+TEST_F(OtlpGrpcLogRecordExporterTestPeer, ConfigRetryDefaultValues)
+{
+  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter(new OtlpGrpcLogRecordExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 5);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5.0f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 1.5f);
+}
+
+TEST_F(OtlpGrpcLogRecordExporterTestPeer, ConfigRetryValuesFromEnv)
+{
+  setenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_ATTEMPTS", "123", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_INITIAL_BACKOFF", "4.5", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_BACKOFF", "6.7", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
+
+  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter(new OtlpGrpcLogRecordExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 123);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 8.9f);
+
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_BACKOFF_MULTIPLIER");
+}
+
+TEST_F(OtlpGrpcLogRecordExporterTestPeer, ConfigRetryGenericValuesFromEnv)
+{
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS", "321", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF", "5.4", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
+
+  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter(new OtlpGrpcLogRecordExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 321);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 9.8f);
+
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
+}
+#endif  // NO_GETENV
 
 }  // namespace otlp
 }  // namespace exporter

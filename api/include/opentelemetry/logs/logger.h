@@ -42,7 +42,7 @@ public:
   /**
    * Emit a Log Record object
    *
-   * @param log_record
+   * @param log_record Log record
    */
   virtual void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record) noexcept = 0;
 
@@ -50,7 +50,7 @@ public:
    * Emit a Log Record object with arguments
    *
    * @param log_record Log record
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  Severity                                -> severity, severity_text
    *  string_view                             -> body
    *  AttributeValue                          -> body
@@ -72,8 +72,23 @@ public:
       return;
     }
 
-    IgnoreTraitResult(detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
-        log_record.get(), std::forward<ArgumentType>(args))...);
+    //
+    // Keep the parameter pack unpacking order from left to right because left
+    // ones are usually more important like severity and event_id than the
+    // attributes. The left to right unpack order could pass the more important
+    // data to processors to avoid caching and memory allocating.
+    //
+#if __cplusplus <= 201402L
+    // C++14 does not support fold expressions for parameter pack expansion.
+    int dummy[] = {(detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
+                        log_record.get(), std::forward<ArgumentType>(args)),
+                    0)...};
+    IgnoreTraitResult(dummy);
+#else
+    IgnoreTraitResult((detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
+                           log_record.get(), std::forward<ArgumentType>(args)),
+                       ...));
+#endif
 
     EmitLogRecord(std::move(log_record));
   }
@@ -81,7 +96,7 @@ public:
   /**
    * Emit a Log Record object with arguments
    *
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  Severity                                -> severity, severity_text
    *  string_view                             -> body
    *  AttributeValue                          -> body
@@ -105,7 +120,7 @@ public:
 
   /**
    * Writes a log with a severity of trace.
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,trace_id and trace_flags
@@ -129,7 +144,7 @@ public:
 
   /**
    * Writes a log with a severity of debug.
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,trace_id and trace_flags
@@ -153,7 +168,7 @@ public:
 
   /**
    * Writes a log with a severity of info.
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,trace_id and trace_flags
@@ -177,7 +192,7 @@ public:
 
   /**
    * Writes a log with a severity of warn.
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,trace_id and trace_flags
@@ -201,7 +216,7 @@ public:
 
   /**
    * Writes a log with a severity of error.
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,trace_id and trace_flags
@@ -225,7 +240,7 @@ public:
 
   /**
    * Writes a log with a severity of fatal.
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,trace_id and trace_flags

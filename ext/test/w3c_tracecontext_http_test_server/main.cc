@@ -4,7 +4,6 @@
 #include <ctype.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <iostream>
@@ -15,6 +14,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/exporters/ostream/span_exporter.h"
@@ -25,6 +25,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
@@ -97,7 +98,7 @@ void initTracer()
   auto provider = nostd::shared_ptr<trace_api::TracerProvider>(
       new trace_sdk::TracerProvider(std::move(context)));
   // Set the global trace provider
-  trace_api::Provider::SetTracerProvider(provider);
+  trace_sdk::Provider::SetTracerProvider(provider);
 }
 
 nostd::shared_ptr<trace_api::Tracer> get_tracer()

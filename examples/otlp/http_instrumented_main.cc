@@ -1,13 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <chrono>
 #include <iostream>
 #include <memory>
+#include <mutex>  // IWYU pragma: keep
 #include <string>
 #include <utility>
 
-#include "opentelemetry/exporters/otlp/otlp_environment.h"
-#include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_runtime_options.h"
@@ -17,32 +17,34 @@
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_runtime_options.h"
-#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger_provider.h"
-#include "opentelemetry/logs/provider.h"
 #include "opentelemetry/metrics/meter_provider.h"
-#include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_factory.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_runtime_options.h"
+#include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
-#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/provider.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_runtime_options.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/meter_context_factory.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/provider.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_runtime_options.h"
+#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#include "opentelemetry/trace/provider.h"
-#include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
 #ifdef BAZEL_BUILD
@@ -53,12 +55,17 @@
 #  include "metrics_foo_library/foo_library.h"
 #endif
 
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+#  include <thread>
+#  include "opentelemetry/sdk/common/thread_instrumentation.h"
+#endif
+
 namespace
 {
 
-std::mutex serialize;
-
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+
+std::mutex serialize;
 
 /**
  The purpose of MyThreadInstrumentation is to demonstrate
@@ -82,7 +89,6 @@ public:
                           const std::string &priority)
       : thread_name_(thread_name), network_name_(network_name), priority_(priority)
   {}
-  ~MyThreadInstrumentation() override = default;
 
   void OnStart() override
   {
@@ -96,14 +102,13 @@ public:
     {
       std::cout << ", priority " << priority_;
     }
-    std::cout << std::endl << std::flush;
+    std::cout << "\n" << std::flush;
   }
 
   void OnEnd() override
   {
     std::lock_guard<std::mutex> lock_guard(serialize);
-    std::cout << "OnEnd() thread " << thread_name_ << ", id " << std::this_thread::get_id()
-              << std::endl
+    std::cout << "OnEnd() thread " << thread_name_ << ", id " << std::this_thread::get_id() << "\n"
               << std::flush;
   }
 
@@ -111,7 +116,7 @@ public:
   {
     std::lock_guard<std::mutex> lock_guard(serialize);
     std::cout << "BeforeWait() thread " << thread_name_ << ", id " << std::this_thread::get_id()
-              << ", waiting" << std::endl
+              << ", waiting\n"
               << std::flush;
   }
 
@@ -119,7 +124,7 @@ public:
   {
     std::lock_guard<std::mutex> lock_guard(serialize);
     std::cout << "AfterWait() thread " << thread_name_ << ", id " << std::this_thread::get_id()
-              << ", done waiting" << std::endl
+              << ", done waiting\n"
               << std::flush;
   }
 
@@ -127,7 +132,7 @@ public:
   {
     std::lock_guard<std::mutex> lock_guard(serialize);
     std::cout << "BeforeLoad() thread " << thread_name_ << ", id " << std::this_thread::get_id()
-              << ", about to work" << std::endl
+              << ", about to work\n"
               << std::flush;
   }
 
@@ -135,7 +140,7 @@ public:
   {
     std::lock_guard<std::mutex> lock_guard(serialize);
     std::cout << "AfterLoad() thread " << thread_name_ << ", id " << std::this_thread::get_id()
-              << ", done working" << std::endl
+              << ", done working\n"
               << std::flush;
   }
 
@@ -183,7 +188,7 @@ void InitTracer()
 
   // Set the global trace provider
   std::shared_ptr<opentelemetry::trace::TracerProvider> api_provider = tracer_provider;
-  opentelemetry::trace::Provider::SetTracerProvider(api_provider);
+  opentelemetry::sdk::trace::Provider::SetTracerProvider(api_provider);
 }
 
 void CleanupTracer()
@@ -197,7 +202,7 @@ void CleanupTracer()
 
   tracer_provider.reset();
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
-  opentelemetry::trace::Provider::SetTracerProvider(none);
+  opentelemetry::sdk::trace::Provider::SetTracerProvider(none);
 }
 
 void InitMetrics()
@@ -238,7 +243,7 @@ void InitMetrics()
   meter_provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create(std::move(context));
   std::shared_ptr<opentelemetry::metrics::MeterProvider> api_provider = meter_provider;
 
-  opentelemetry::metrics::Provider::SetMeterProvider(api_provider);
+  opentelemetry::sdk::metrics::Provider::SetMeterProvider(api_provider);
 }
 
 void CleanupMetrics()
@@ -252,7 +257,7 @@ void CleanupMetrics()
 
   meter_provider.reset();
   std::shared_ptr<opentelemetry::metrics::MeterProvider> none;
-  opentelemetry::metrics::Provider::SetMeterProvider(none);
+  opentelemetry::sdk::metrics::Provider::SetMeterProvider(none);
 }
 
 void InitLogger()
@@ -281,7 +286,7 @@ void InitLogger()
   logger_provider = opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(processor));
 
   std::shared_ptr<opentelemetry::logs::LoggerProvider> api_provider = logger_provider;
-  opentelemetry::logs::Provider::SetLoggerProvider(api_provider);
+  opentelemetry::sdk::logs::Provider::SetLoggerProvider(api_provider);
 }
 
 void CleanupLogger()
@@ -295,7 +300,7 @@ void CleanupLogger()
 
   logger_provider.reset();
   std::shared_ptr<opentelemetry::logs::LoggerProvider> none;
-  opentelemetry::logs::Provider::SetLoggerProvider(none);
+  opentelemetry::sdk::logs::Provider::SetLoggerProvider(none);
 }
 
 }  // namespace
@@ -334,25 +339,25 @@ int main(int argc, char *argv[])
     logger_opts.url = "http://localhost:4318/v1/logs";
   }
 
-  std::cout << "Initializing opentelemetry-cpp" << std::endl << std::flush;
+  std::cout << "Initializing opentelemetry-cpp\n" << std::flush;
 
   InitTracer();
   InitMetrics();
   InitLogger();
 
-  std::cout << "Application payload" << std::endl << std::flush;
+  std::cout << "Application payload\n" << std::flush;
 
   foo_library();
 
   std::string name{"otlp_http_metric_example"};
   foo_library::observable_counter_example(name);
 
-  std::cout << "Shutting down opentelemetry-cpp" << std::endl << std::flush;
+  std::cout << "Shutting down opentelemetry-cpp\n" << std::flush;
 
   CleanupLogger();
   CleanupMetrics();
   CleanupTracer();
 
-  std::cout << "Done" << std::endl << std::flush;
+  std::cout << "Done\n" << std::flush;
   return 0;
 }

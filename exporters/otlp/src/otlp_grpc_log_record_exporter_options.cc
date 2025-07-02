@@ -1,6 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <chrono>
+#include <string>
+
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h"
 #include "opentelemetry/version.h"
 
@@ -34,6 +38,11 @@ OtlpGrpcLogRecordExporterOptions::OtlpGrpcLogRecordExporterOptions()
 #ifdef ENABLE_ASYNC_EXPORT
   max_concurrent_requests = 64;
 #endif
+
+  retry_policy_max_attempts       = GetOtlpDefaultLogsRetryMaxAttempts();
+  retry_policy_initial_backoff    = GetOtlpDefaultLogsRetryInitialBackoff();
+  retry_policy_max_backoff        = GetOtlpDefaultLogsRetryMaxBackoff();
+  retry_policy_backoff_multiplier = GetOtlpDefaultLogsRetryBackoffMultiplier();
 }
 
 OtlpGrpcLogRecordExporterOptions::~OtlpGrpcLogRecordExporterOptions() {}

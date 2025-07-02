@@ -3,25 +3,31 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
+#include <array>
 #include <chrono>
+#include <functional>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/logs/event_logger.h"
-#include "opentelemetry/logs/event_logger_provider.h"
+#include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
+#include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
+#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/logs/noop.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/logs/event_logger_provider.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/logs/event_logger_provider.h"  // IWYU pragma: keep
 #include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
@@ -38,6 +44,7 @@
 #include "opentelemetry/trace/tracer.h"
 
 using namespace opentelemetry::sdk::logs;
+using namespace opentelemetry::sdk::instrumentationscope;
 namespace logs_api = opentelemetry::logs;
 namespace nostd    = opentelemetry::nostd;
 
@@ -201,9 +208,10 @@ public:
   // constructor
   void OnEmit(std::unique_ptr<opentelemetry::sdk::logs::Recordable> &&record) noexcept override
   {
+    auto log_record = std::move(record);
     // Cast the recordable received into a concrete MockLogRecordable type
     auto copy =
-        std::shared_ptr<MockLogRecordable>(static_cast<MockLogRecordable *>(record.release()));
+        std::shared_ptr<MockLogRecordable>(static_cast<MockLogRecordable *>(log_record.release()));
 
     // Copy over the received log record's severity, name, and body fields over to the recordable
     // passed in the constructor
@@ -275,6 +283,238 @@ TEST(LoggerSDK, LogToAProcessor)
       now);
 }
 
+TEST(LoggerSDK, LoggerWithDisabledConfig)
+{
+  ScopeConfigurator<LoggerConfig> disabled_all_scopes =
+      ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Disabled()).Build();
+  // Set a processor for the LoggerProvider
+  auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
+  auto log_processor = std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable));
+
+  // Create an API LoggerProvider and logger
+  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(
+      new LoggerProvider(std::move(log_processor), resource,
+                         std::make_unique<ScopeConfigurator<LoggerConfig>>(disabled_all_scopes)));
+  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url);
+
+  auto noop_logger = logs_api::NoopLogger();
+
+  // Test Logger functions for the constructed logger
+  // This logger should behave like a noop logger
+  ASSERT_EQ(logger->GetName(), noop_logger.GetName());
+
+  // Since the logger is disabled, when creating a LogRecord, the observed timestamp will not be
+  // set in the underlying LogRecordable
+  auto log_record = logger->CreateLogRecord();
+  logger->EmitLogRecord(std::move(log_record));
+  ASSERT_EQ(shared_recordable->GetObservedTimestamp(), std::chrono::system_clock::from_time_t(0));
+
+  // Since this logger should behave like a noop logger, no values within the recordable would be
+  // set.
+  logger->EmitLogRecord(logs_api::Severity::kWarn, "Log Message");
+  ASSERT_EQ(shared_recordable->GetBody(), "");
+  ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kInvalid);
+  ASSERT_EQ(shared_recordable->GetObservedTimestamp(), std::chrono::system_clock::from_time_t(0));
+}
+
+TEST(LoggerSDK, LoggerWithEnabledConfig)
+{
+  ScopeConfigurator<LoggerConfig> enabled_all_scopes =
+      ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Enabled()).Build();
+  // Set a processor for the LoggerProvider
+  auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
+  auto log_processor = std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable));
+
+  // Create an API LoggerProvider and logger
+  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(
+      new LoggerProvider(std::move(log_processor), resource,
+                         std::make_unique<ScopeConfigurator<LoggerConfig>>(enabled_all_scopes)));
+  auto logger = api_lp->GetLogger("test-logger", "opentelemetry_library", "", schema_url);
+
+  // Test Logger functions for the constructed logger
+  ASSERT_EQ(logger->GetName(), "test-logger");
+
+  // Since the logger is enabled, when creating a LogRecord, the observed timestamp will be set
+  // in the underlying LogRecordable.
+  auto reference_ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
+      std::chrono::system_clock::now().time_since_epoch());
+  auto log_record = logger->CreateLogRecord();
+  logger->EmitLogRecord(std::move(log_record));
+  // Since log_record was created after recording reference timestamp, expect that observed
+  // timestamp is greater
+  ASSERT_GE(shared_recordable->GetObservedTimestamp().time_since_epoch().count(),
+            reference_ts.count());
+
+  // Since this logger should behave like a valid logger, values within the recordable would be set.
+  logger->EmitLogRecord(logs_api::Severity::kWarn, "Log Message");
+  ASSERT_EQ(shared_recordable->GetBody(), "Log Message");
+  ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kWarn);
+  ASSERT_GE(shared_recordable->GetObservedTimestamp().time_since_epoch().count(),
+            reference_ts.count());
+}
+
+static std::unique_ptr<MockLogRecordable> create_mock_log_recordable(
+    const std::string &body,
+    opentelemetry::logs::Severity severity)
+{
+  auto mock_log_recordable = std::make_unique<MockLogRecordable>();
+  mock_log_recordable->SetBody(body);
+  mock_log_recordable->SetSeverity(severity);
+  return mock_log_recordable;
+}
+
+class CustomLogConfiguratorTestData
+{
+public:
+  InstrumentationScope instrumentation_scope_;
+  MockLogRecordable test_log_recordable_;
+  MockLogRecordable expected_log_recordable_;
+  bool expected_disabled_for_scope_;
+
+  CustomLogConfiguratorTestData(const InstrumentationScope &instrumentation_scope,
+                                const MockLogRecordable &test_log_recordable,
+                                const MockLogRecordable &expected_log_recordable,
+                                const bool expected_disabled_for_scope)
+      : instrumentation_scope_(instrumentation_scope),
+        test_log_recordable_(test_log_recordable),
+        expected_log_recordable_(expected_log_recordable),
+        expected_disabled_for_scope_(expected_disabled_for_scope)
+  {}
+};
+
+// constants used in VerifyCustomConfiguratorBehavior test
+static auto noop_logger = logs_api::NoopLogger();
+const std::string schema{"https://opentelemetry.io/schemas/1.11.0"};
+
+// Generate test case data
+// Test Case 1
+static auto instrumentation_scope_1 =
+    *InstrumentationScope::Create("opentelemetry_library", "1.0.0", schema);
+static auto test_log_recordable_1 =
+    create_mock_log_recordable("Log Message", opentelemetry::logs::Severity::kWarn);
+static auto expected_log_recordable_1 =
+    create_mock_log_recordable("Log Message", opentelemetry::logs::Severity::kWarn);
+static auto custom_log_configurator_test_data_1 =
+    CustomLogConfiguratorTestData(instrumentation_scope_1,
+                                  *test_log_recordable_1,
+                                  *expected_log_recordable_1,
+                                  false);
+// Test Case 2
+static auto instrumentation_scope_2 = *InstrumentationScope::Create("bar_library", "1.0.0", schema);
+static auto test_log_recordable_2 =
+    create_mock_log_recordable("", opentelemetry::logs::Severity::kDebug);
+static auto expected_log_recordable_2 =
+    create_mock_log_recordable("", opentelemetry::logs::Severity::kDebug);
+static auto custom_log_configurator_test_data_2 =
+    CustomLogConfiguratorTestData(instrumentation_scope_2,
+                                  *test_log_recordable_2,
+                                  *expected_log_recordable_2,
+                                  false);
+// Test Case 3
+static auto instrumentation_scope_3 = *InstrumentationScope::Create("foo_library", "", schema);
+static auto test_log_recordable_3 =
+    create_mock_log_recordable("Info message", opentelemetry::logs::Severity::kInfo);
+static auto expected_log_recordable_3 =
+    create_mock_log_recordable("", opentelemetry::logs::Severity::kInvalid);
+static auto custom_log_configurator_test_data_3 =
+    CustomLogConfiguratorTestData(instrumentation_scope_3,
+                                  *test_log_recordable_3,
+                                  *expected_log_recordable_3,
+                                  true);
+// Test Case 4
+static auto instrumentation_scope_4 = *InstrumentationScope::Create("allowed_library", "", schema);
+static auto test_log_recordable_4 =
+    create_mock_log_recordable("Scope version missing", opentelemetry::logs::Severity::kInfo);
+static auto expected_log_recordable_4 =
+    create_mock_log_recordable("", opentelemetry::logs::Severity::kInvalid);
+static auto custom_log_configurator_test_data_4 =
+    CustomLogConfiguratorTestData(instrumentation_scope_4,
+                                  *test_log_recordable_4,
+                                  *expected_log_recordable_4,
+                                  true);
+
+// This array could also directly contain the reference types, but that  leads to 'uninitialized
+// value was created by heap allocation' errors in Valgrind memcheck. This is a bug in Googletest
+// library, see https://github.com/google/googletest/issues/3805#issuecomment-1397301790 for more
+// details. Using pointers is a workaround to prevent the Valgrind warnings.
+constexpr std::array<CustomLogConfiguratorTestData *, 4> log_configurator_test_cases = {
+    &custom_log_configurator_test_data_1, &custom_log_configurator_test_data_2,
+    &custom_log_configurator_test_data_3, &custom_log_configurator_test_data_4};
+
+// Test fixture for VerifyCustomConfiguratorBehavior
+class CustomLoggerConfiguratorTestFixture
+    : public ::testing::TestWithParam<CustomLogConfiguratorTestData *>
+{};
+
+TEST_P(CustomLoggerConfiguratorTestFixture, VerifyCustomConfiguratorBehavior)
+{
+  // lambda checks if version is present in scope information
+  auto check_if_version_present = [](const InstrumentationScope &scope_info) {
+    return !scope_info.GetVersion().empty();
+  };
+  // custom scope configurator that only disables loggers for library name "foo_library" or do not
+  // have version information
+  auto test_scope_configurator = ScopeConfigurator<LoggerConfig>(
+      ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Disabled())
+          .AddConditionNameEquals("foo_library", LoggerConfig::Disabled())
+          .AddCondition(check_if_version_present, LoggerConfig::Enabled())
+          .Build());
+
+  // Get the test case data from fixture
+  CustomLogConfiguratorTestData *test_case = GetParam();
+  auto test_instrumentation_scope          = test_case->instrumentation_scope_;
+  auto test_log_recordable                 = test_case->test_log_recordable_;
+
+  // Set a processor for the LoggerProvider
+  auto shared_recordable_under_test = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
+  auto log_processor_test =
+      std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable_under_test));
+
+  // Create an API LoggerProvider and logger
+  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto api_lp         = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider(
+      std::move(log_processor_test), resource,
+      std::make_unique<ScopeConfigurator<LoggerConfig>>(test_scope_configurator)));
+
+  // Create logger and make assertions
+  auto logger_under_test = api_lp->GetLogger("test-logger", test_instrumentation_scope.GetName(),
+                                             test_instrumentation_scope.GetVersion(),
+                                             test_instrumentation_scope.GetSchemaURL());
+  auto reference_ts      = std::chrono::duration_cast<std::chrono::nanoseconds>(
+      std::chrono::system_clock::now().time_since_epoch());
+  auto log_record = logger_under_test->CreateLogRecord();
+  logger_under_test->EmitLogRecord(std::move(log_record));
+
+  // Test Logger functions for the constructed logger
+  if (test_case->expected_disabled_for_scope_)
+  {
+    ASSERT_EQ(logger_under_test->GetName(), noop_logger.GetName());
+    ASSERT_EQ(shared_recordable_under_test->GetObservedTimestamp(),
+              std::chrono::system_clock::from_time_t(0));
+  }
+  else
+  {
+    ASSERT_EQ(logger_under_test->GetName(), "test-logger");
+    ASSERT_GE(shared_recordable_under_test->GetObservedTimestamp().time_since_epoch().count(),
+              reference_ts.count());
+  }
+
+  logger_under_test->EmitLogRecord(test_log_recordable.GetBody(),
+                                   test_log_recordable.GetSeverity());
+  ASSERT_EQ(shared_recordable_under_test->GetBody(), test_case->expected_log_recordable_.GetBody());
+  ASSERT_EQ(shared_recordable_under_test->GetSeverity(),
+            test_case->expected_log_recordable_.GetSeverity());
+}
+
+INSTANTIATE_TEST_SUITE_P(CustomLogConfiguratorTestData,
+                         CustomLoggerConfiguratorTestFixture,
+                         ::testing::ValuesIn(log_configurator_test_cases));
+
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
 TEST(LoggerSDK, EventLog)
 {
   // Create an API LoggerProvider and logger
@@ -303,3 +543,4 @@ TEST(LoggerSDK, EventLog)
   ASSERT_EQ(shared_recordable->GetEventName(), "otel-cpp.event_name");
   ASSERT_EQ(shared_recordable->GetEventDomain(), "otel-cpp.event_domain");
 }
+#endif

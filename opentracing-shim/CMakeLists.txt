@@ -27,20 +27,18 @@ else()
                         OpenTracing::opentracing)
 endif()
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS ${this_target}
-    EXPORT "${PROJECT_NAME}-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-  install(
-    DIRECTORY include/opentelemetry/opentracingshim
-    DESTINATION include/opentelemetry
-    FILES_MATCHING
-    PATTERN "*.h")
-endif()
+otel_add_component(
+  COMPONENT
+  shims_opentracing
+  TARGETS
+  ${this_target}
+  FILES_DIRECTORY
+  "include/opentelemetry/opentracingshim"
+  FILES_DESTINATION
+  "include/opentelemetry/"
+  FILES_MATCHING
+  PATTERN
+  "*.h")
 
 if(BUILD_TESTING)
   foreach(testname propagation_test shim_utils_test span_shim_test

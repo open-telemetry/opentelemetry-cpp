@@ -20,49 +20,54 @@ namespace cpu
 {
 
 /**
- * The mode of the CPU
+  The logical CPU number [0..n-1]
+ */
+static constexpr const char *kCpuLogicalNumber = "cpu.logical_number";
+
+/**
+  The mode of the CPU
  */
 static constexpr const char *kCpuMode = "cpu.mode";
 
 namespace CpuModeValues
 {
 /**
- * none
+  none
  */
 static constexpr const char *kUser = "user";
 
 /**
- * none
+  none
  */
 static constexpr const char *kSystem = "system";
 
 /**
- * none
+  none
  */
 static constexpr const char *kNice = "nice";
 
 /**
- * none
+  none
  */
 static constexpr const char *kIdle = "idle";
 
 /**
- * none
+  none
  */
 static constexpr const char *kIowait = "iowait";
 
 /**
- * none
+  none
  */
 static constexpr const char *kInterrupt = "interrupt";
 
 /**
- * none
+  none
  */
 static constexpr const char *kSteal = "steal";
 
 /**
- * none
+  none
  */
 static constexpr const char *kKernel = "kernel";
 

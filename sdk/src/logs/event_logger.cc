@@ -1,15 +1,18 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <string>
-#include <utility>
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+#  include <string>
+#  include <utility>
 
-#include "opentelemetry/logs/log_record.h"
-#include "opentelemetry/logs/logger.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/sdk/logs/event_logger.h"
+#  include "opentelemetry/logs/log_record.h"
+#  include "opentelemetry/logs/logger.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/nostd/unique_ptr.h"
+#  include "opentelemetry/sdk/logs/event_logger.h"
+#endif
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -17,7 +20,7 @@ namespace sdk
 {
 namespace logs
 {
-
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
 EventLogger::EventLogger(
     opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
     opentelemetry::nostd::string_view event_domain) noexcept
@@ -57,7 +60,7 @@ void EventLogger::EmitEvent(
 
   delegate_logger_->EmitLogRecord(std::move(log_record));
 }
-
+#endif
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

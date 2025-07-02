@@ -1,24 +1,29 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <string>
+#include <utility>
+
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h"
-#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
 #include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/provider.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#include "opentelemetry/trace/provider.h"
-
-#include <string>
+#include "opentelemetry/trace/tracer_provider.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/logs_foo_library/foo_library.h"
@@ -41,16 +46,16 @@ opentelemetry::exporter::otlp::OtlpGrpcLogRecordExporterOptions log_opts;
 std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> tracer_provider;
 std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> logger_provider;
 
-void InitTracer()
+void InitTracer(const std::shared_ptr<otlp::OtlpGrpcClient> &shared_client)
 {
   // Create OTLP exporter instance
-  auto exporter   = otlp::OtlpGrpcExporterFactory::Create(opts);
+  auto exporter   = otlp::OtlpGrpcExporterFactory::Create(opts, shared_client);
   auto processor  = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
   tracer_provider = trace_sdk::TracerProviderFactory::Create(std::move(processor));
 
   // Set the global trace provider
   std::shared_ptr<opentelemetry::trace::TracerProvider> api_provider = tracer_provider;
-  trace::Provider::SetTracerProvider(api_provider);
+  trace_sdk::Provider::SetTracerProvider(api_provider);
 }
 
 void CleanupTracer()
@@ -63,19 +68,19 @@ void CleanupTracer()
 
   tracer_provider.reset();
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
-  trace::Provider::SetTracerProvider(none);
+  trace_sdk::Provider::SetTracerProvider(none);
 }
 
-void InitLogger()
+void InitLogger(const std::shared_ptr<otlp::OtlpGrpcClient> &shared_client)
 {
   // Create OTLP exporter instance
-  auto exporter   = otlp::OtlpGrpcLogRecordExporterFactory::Create(log_opts);
+  auto exporter   = otlp::OtlpGrpcLogRecordExporterFactory::Create(log_opts, shared_client);
   auto processor  = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
   logger_provider = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
 
   // Set the global logger provider
   std::shared_ptr<opentelemetry::logs::LoggerProvider> api_provider = logger_provider;
-  opentelemetry::logs::Provider::SetLoggerProvider(api_provider);
+  logs_sdk::Provider::SetLoggerProvider(api_provider);
 }
 
 void CleanupLogger()
@@ -88,7 +93,7 @@ void CleanupLogger()
 
   logger_provider.reset();
   nostd::shared_ptr<logs::LoggerProvider> none;
-  opentelemetry::logs::Provider::SetLoggerProvider(none);
+  logs_sdk::Provider::SetLoggerProvider(none);
 }
 }  // namespace
 
@@ -106,8 +111,11 @@ int main(int argc, char *argv[])
       log_opts.ssl_credentials_cacert_path = argv[2];
     }
   }
-  InitLogger();
-  InitTracer();
+
+  std::shared_ptr<otlp::OtlpGrpcClient> shared_client = otlp::OtlpGrpcClientFactory::Create(opts);
+
+  InitLogger(shared_client);
+  InitTracer(shared_client);
   foo_library();
   CleanupTracer();
   CleanupLogger();

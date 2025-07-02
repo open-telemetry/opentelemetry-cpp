@@ -3,14 +3,13 @@
 
 #pragma once
 
-#include <memory>
+#include <prometheus/collectable.h>
+#include <prometheus/metric_family.h>
 #include <mutex>
 #include <vector>
 
-#include <prometheus/collectable.h>
-#include <prometheus/metric_family.h>
-#include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/version.h"
 
 namespace prometheus_client = ::prometheus;
 

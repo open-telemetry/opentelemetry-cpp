@@ -4,6 +4,9 @@ on:
   issues:
     types:
       - labeled
+permissions:
+  contents: read
+
 jobs:
   add-comment:
     if: github.event.label.name == 'help wanted'
@@ -11,6 +14,11 @@ jobs:
     permissions:
       issues: write
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+        with:
+          egress-policy: audit
+
       - name: Add comment
         uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043
         with:

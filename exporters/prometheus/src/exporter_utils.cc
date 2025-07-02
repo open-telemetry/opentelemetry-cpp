@@ -1,24 +1,36 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <prometheus/client_metric.h>
+#include <prometheus/metric_family.h>
+#include <prometheus/metric_type.h>
 #include <algorithm>
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <limits>
+#include <map>
 #include <regex>
 #include <sstream>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
-#include "prometheus/metric_family.h"
-#include "prometheus/metric_type.h"
-
-#include "opentelemetry/common/macros.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 namespace prometheus_client = ::prometheus;
 namespace metric_sdk        = opentelemetry::sdk::metrics;
@@ -549,6 +561,10 @@ metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
   else if (nostd::holds_alternative<sdk::metrics::HistogramPointData>(point_type))
   {
     return metric_sdk::AggregationType::kHistogram;
+  }
+  else if (nostd::holds_alternative<sdk::metrics::Base2ExponentialHistogramPointData>(point_type))
+  {
+    return metric_sdk::AggregationType::kBase2ExponentialHistogram;
   }
   else if (nostd::holds_alternative<sdk::metrics::LastValuePointData>(point_type))
   {

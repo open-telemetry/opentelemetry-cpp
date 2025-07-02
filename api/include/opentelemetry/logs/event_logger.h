@@ -14,10 +14,11 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs
 {
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
 /**
  * Handles event log record creation.
  **/
-class EventLogger
+class OPENTELEMETRY_DEPRECATED EventLogger
 {
 public:
   virtual ~EventLogger() = default;
@@ -41,7 +42,7 @@ public:
    * Emit a event Log Record object with arguments
    *
    * @param event_name Event name
-   * @tparam args Arguments which can be used to set data of log record by type.
+   * @param args Arguments which can be used to set data of log record by type.
    *  Severity                                -> severity, severity_text
    *  string_view                             -> body
    *  AttributeValue                          -> body
@@ -76,5 +77,6 @@ private:
   void IgnoreTraitResult(ValueType &&...)
   {}
 };
+#endif
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE

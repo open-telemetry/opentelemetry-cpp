@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <memory>
+#include <string>
 
-#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h"
+#include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/version.h"
 
 /*
   Make sure OtlpGrpcLogRecordExporterFactory does not require,
@@ -13,6 +16,19 @@
 */
 #ifdef GOOGLE_PROTOBUF_VERSION
 #  error "protobuf should not be included"
+#endif
+
+/*
+  Implementation, this requires protobuf.
+*/
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
+
+/*
+  Make sure OtlpGrpcClientFactory does not require,
+  even indirectly, gRPC headers.
+*/
+#if defined(GRPC_CPP_VERSION_MAJOR) || defined(GRPC_CPP_VERSION_STRING)
+#  error "gRPC should not be included"
 #endif
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"

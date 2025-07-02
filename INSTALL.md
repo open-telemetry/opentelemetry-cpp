@@ -23,7 +23,9 @@ You can link OpenTelemetry C++ SDK with libraries provided in
   repository. To install Git, consult the [Set up
   Git](https://help.github.com/articles/set-up-git/) guide on GitHub.
 - [CMake](https://cmake.org/) for building opentelemetry-cpp API, SDK with their
-  unittests. We use CMake version 3.15.2 in our build system. To install CMake,
+  unittests. The minimum CMake version is 3.14.
+  CMake 3.15+ is recommended on Windows due to known CI test failures with 3.14.
+  To install CMake,
   consult the [Installing CMake](https://cmake.org/install/) guide.
 - [GoogleTest](https://github.com/google/googletest) framework to build and run
   the unittests. Refer to
@@ -38,10 +40,30 @@ You can link OpenTelemetry C++ SDK with libraries provided in
   [GoogleBenchmark Build
   Instructions](https://github.com/google/benchmark#installation).
 - Apart from above core requirements, the Exporters and Propagators have their
-  build dependencies which are not covered here. E.g, the OTLP Exporter needs
-  grpc/protobuf library, the Zipkin exporter needs nlohmann-json and libcurl,
-  the ETW exporter needs nlohmann-json to build. This is covered in the build
-  instructions for each of these components.
+  build dependencies.
+
+### Building dependencies for the OTLP exporters
+
+The opentelemetry-cpp OTLP exporters depend on Protobuf and gRPC
+ (in the case of the otlp grpc exporters).
+Protobuf (since version 3.22.0) and gRPC depend on Abseil.
+For cmake builds, it is best practice to build and install Abseil
+, Protobuf, and gPRC as independent packages -
+configuring cmake for Protobuf and gRPC to build against
+ the installed packages instead of using their submodule option.
+
+If building and installing Protobuf and gRPC manually with cmake the
+ recommended approach is:
+
+1. Choose the desired tag version of grpc. Find the compatible versions of abseil
+ and protobuf by inspecting the submodules of grpc at that tag.
+2. Build and install the required version of abseil
+3. Build and install the required version of protobuf
+    - Set the cmake option of Protobuf to build against the installed
+     package of Abseil (`protobuf_ABSL_PROVIDER=package`)
+4. Build and install the required version of grpc
+    - Set the cmake option of grpc to build against the installed packages
+     of Abseil and Protobuf (cmake options - `gRPC_ABSL_PROVIDER=package` and `gRPC_PROTOBUF_PROVIDER=package`)
 
 ### Building as standalone CMake Project
 
@@ -129,21 +151,125 @@ You can link OpenTelemetry C++ SDK with libraries provided in
    $
    ```
 
-### Incorporating into an existing CMake Project
+### Incorporating into an external CMake Project
 
-To use the library from a CMake project, you can locate it directly with
- `find_package` and use the imported targets from generated package
- configurations. As of now, this will import targets for both API and SDK. In
- future, there may be separate packages for API and SDK which can be installed
- and imported separately according to need.
+There are two approaches to incoporate `opentelemetry-cpp` into
+ an external CMake project:
+
+1. Build and install `opentelemetry-cpp` then use `find_package`
+ to import its targets
+
+   ```cmake
+   # Find all installed components and link all imported targets
+   find_package(opentelemetry-cpp CONFIG REQUIRED)
+   ...
+   target_include_directories(foo PRIVATE ${OPENTELEMETRY_CPP_INCLUDE_DIRS})
+   target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
+   ```
+
+   ```cmake
+   # Find a specific component and link its imported target(s)
+   find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS api)
+   ...
+   target_link_libraries(foo PRIVATE opentelemetry-cpp::api)
+   ```
+
+2. Use CMake's [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html)
+ module to fetch and build `opentelemetry-cpp` then make its targets available
+
+   ```cmake
+   # Fetch from an existing clone and build
+   include(FetchContent)
+   FetchContent_Declare(opentelemetry-cpp SOURCE_DIR "<path/to/opentelemetry-cpp>")
+   FetchContent_MakeAvailable(opentelemetry-cpp)
+   ...
+   target_link_libraries(foo PRIVATE opentelemetry-cpp::api)
+   ```
+
+   ```cmake
+   # Clone and build opentelemetry-cpp from a git tag
+   include(FetchContent)
+   FetchContent_Declare(
+   opentelemetry-cpp
+   GIT_REPOSITORY https://github.com/open-telemetry/opentelemetry-cpp.git
+   GIT_TAG        v1.20.0)
+   FetchContent_MakeAvailable(opentelemetry-cpp)
+   ...
+   target_link_libraries(foo PRIVATE opentelemetry-cpp::api)
+   ```
+
+In both cases the project's built or imported CMake targets will be
+ available in the `opentelemetry-cpp` namespace (ie: `opentelemetry-cpp::api`)
+
+#### Using opentelemetry-cpp package components
+
+> **Note:** `opentelemetry-cpp` CMake package components were introduced in `v1.21.0`
+
+The `opentelemetry-cpp` package supports using the `COMPONENTS` argument to
+`find_package`. The following example illustrates using this feature to include
+and link the `api` header only target to an instrumented `foo_lib` while only including
+and linking the `sdk` and `otlp_grpc_exporter` targets to the `foo_app`.
 
 ```cmake
-# CMakeLists.txt
-find_package(opentelemetry-cpp CONFIG REQUIRED)
-...
-target_include_directories(foo PRIVATE ${OPENTELEMETRY_CPP_INCLUDE_DIRS})
-target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
+# foo_lib/CMakeLists.txt
+find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS api)
+add_library(foo_lib foo.cpp)
+target_link_libraries(foo_lib PRIVATE opentelemetry-cpp::api)
 ```
+
+```cmake
+# foo_app/CMakeLists.txt
+find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS api sdk exporters_otlp_grpc)
+add_executable(foo_app main.cpp)
+target_link_libraries(foo_app PRIVATE foo_lib opentelemetry-cpp::api opentelemetry-cpp::trace opentelemetry-cpp::otlp_grpc_exporter )
+```
+
+The following table provides the mapping between components and targets. Components
+and targets available in the installation depends on the opentelemetry-cpp package
+build configuration.
+
+> **Note:** components `exporters_elasticsearch` and `exporters_etw`
+ may be moved out of the core package and to `opentelemetry-cpp-contrib`
+  in a future release
+
+| Component                  | Targets                                                                                          |
+|----------------------------|--------------------------------------------------------------------------------------------------|
+| **api**                    | opentelemetry-cpp::api                                                                           |
+| **sdk**                    | opentelemetry-cpp::sdk                                                                           |
+|                            | opentelemetry-cpp::version                                                                       |
+|                            | opentelemetry-cpp::common                                                                        |
+|                            | opentelemetry-cpp::resources                                                                     |
+|                            | opentelemetry-cpp::trace                                                                         |
+|                            | opentelemetry-cpp::metrics                                                                       |
+|                            | opentelemetry-cpp::logs                                                                          |
+| **ext_common**             | opentelemetry-cpp::ext                                                                           |
+| **ext_http_curl**          | opentelemetry-cpp::http_client_curl                                                              |
+| **ext_dll**                | opentelemetry-cpp::opentelemetry_cpp                                                             |
+| **exporters_in_memory**    | opentelemetry-cpp::in_memory_span_exporter                                                       |
+|                            | opentelemetry-cpp::in_memory_metric_exporter                                                     |
+| **exporters_ostream**      | opentelemetry-cpp::ostream_log_record_exporter                                                   |
+|                            | opentelemetry-cpp::ostream_metrics_exporter                                                      |
+|                            | opentelemetry-cpp::ostream_span_exporter                                                         |
+| **exporters_otlp_common**  | opentelemetry-cpp::proto                                                                         |
+|                            | opentelemetry-cpp::otlp_recordable                                                               |
+| **exporters_otlp_file**    | opentelemetry-cpp::otlp_file_client                                                              |
+|                            | opentelemetry-cpp::otlp_file_exporter                                                            |
+|                            | opentelemetry-cpp::otlp_file_log_record_exporter                                                 |
+|                            | opentelemetry-cpp::otlp_file_metric_exporter                                                     |
+| **exporters_otlp_grpc**    | opentelemetry-cpp::proto_grpc                                                                    |
+|                            | opentelemetry-cpp::otlp_grpc_client                                                              |
+|                            | opentelemetry-cpp::otlp_grpc_exporter                                                            |
+|                            | opentelemetry-cpp::otlp_grpc_log_record_exporter                                                 |
+|                            | opentelemetry-cpp::otlp_grpc_metrics_exporter                                                    |
+| **exporters_otlp_http**    | opentelemetry-cpp::otlp_http_client                                                              |
+|                            | opentelemetry-cpp::otlp_http_exporter                                                            |
+|                            | opentelemetry-cpp::otlp_http_log_record_exporter                                                 |
+|                            | opentelemetry-cpp::otlp_http_metric_exporter                                                     |
+| **exporters_prometheus**   | opentelemetry-cpp::prometheus_exporter                                                           |
+| **exporters_elasticsearch**| opentelemetry-cpp::elasticsearch_log_record_exporter                                             |
+| **exporters_etw**          | opentelemetry-cpp::etw_exporter                                                                  |
+| **exporters_zipkin**       | opentelemetry-cpp::zipkin_trace_exporter                                                         |
+| **shims_opentracing**      | opentelemetry-cpp::opentracing_shim                                                              |
 
 ## Build instructions using Bazel
 

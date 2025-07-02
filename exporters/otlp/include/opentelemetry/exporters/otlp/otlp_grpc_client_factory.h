@@ -5,8 +5,9 @@
 
 #include <memory>
 
+// IWYU pragma: no_include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
-#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -14,8 +15,8 @@ namespace exporter
 namespace otlp
 {
 
-class OtlpGrpcClientReferenceGuard;
-class OtlpGrpcClient;
+class OtlpGrpcClient;                // IWYU pragma: keep
+class OtlpGrpcClientReferenceGuard;  // IWYU pragma: keep
 
 /**
  * Factory class for OtlpGrpcClient.

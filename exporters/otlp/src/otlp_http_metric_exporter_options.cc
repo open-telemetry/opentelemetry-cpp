@@ -5,6 +5,7 @@
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -22,6 +23,10 @@ OtlpHttpMetricExporterOptions::OtlpHttpMetricExporterOptions()
       timeout(GetOtlpDefaultMetricsTimeout()),
       http_headers(GetOtlpDefaultMetricsHeaders()),
       aggregation_temporality(PreferredAggregationTemporality::kCumulative),
+#ifdef ENABLE_ASYNC_EXPORT
+      max_concurrent_requests{64},
+      max_requests_per_connection{8},
+#endif
       ssl_insecure_skip_verify(false),
       ssl_ca_cert_path(GetOtlpDefaultMetricsSslCertificatePath()),
       ssl_ca_cert_string(GetOtlpDefaultMetricsSslCertificateString()),
@@ -33,13 +38,12 @@ OtlpHttpMetricExporterOptions::OtlpHttpMetricExporterOptions()
       ssl_max_tls(GetOtlpDefaultMetricsSslTlsMaxVersion()),
       ssl_cipher(GetOtlpDefaultMetricsSslTlsCipher()),
       ssl_cipher_suite(GetOtlpDefaultMetricsSslTlsCipherSuite()),
-      compression(GetOtlpDefaultMetricsCompression())
-{
-#ifdef ENABLE_ASYNC_EXPORT
-  max_concurrent_requests     = 64;
-  max_requests_per_connection = 8;
-#endif
-}
+      compression(GetOtlpDefaultMetricsCompression()),
+      retry_policy_max_attempts(GetOtlpDefaultMetricsRetryMaxAttempts()),
+      retry_policy_initial_backoff(GetOtlpDefaultMetricsRetryInitialBackoff()),
+      retry_policy_max_backoff(GetOtlpDefaultMetricsRetryMaxBackoff()),
+      retry_policy_backoff_multiplier(GetOtlpDefaultMetricsRetryBackoffMultiplier())
+{}
 
 OtlpHttpMetricExporterOptions::~OtlpHttpMetricExporterOptions() {}
 

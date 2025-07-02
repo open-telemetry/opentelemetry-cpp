@@ -9,20 +9,20 @@ target_include_directories(
 
 set_target_properties(opentelemetry_api PROPERTIES EXPORT_NAME api)
 
+otel_add_component(
+  COMPONENT
+  api
+  TARGETS
+  opentelemetry_api
+  FILES_DIRECTORY
+  "include/opentelemetry"
+  FILES_DESTINATION
+  "include"
+  FILES_MATCHING
+  PATTERN
+  "*.h")
+
 if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_api
-    EXPORT "${PROJECT_NAME}-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-  install(
-    DIRECTORY include/opentelemetry
-    DESTINATION include
-    FILES_MATCHING
-    PATTERN "*.h")
-
   unset(TARGET_DEPS)
 endif()
 
@@ -33,21 +33,6 @@ endif()
 if(WITH_NO_DEPRECATED_CODE)
   target_compile_definitions(opentelemetry_api
                              INTERFACE OPENTELEMETRY_NO_DEPRECATED_CODE)
-endif()
-
-if(WITH_ABSEIL)
-  target_compile_definitions(opentelemetry_api INTERFACE HAVE_ABSEIL)
-  target_link_libraries(
-    opentelemetry_api INTERFACE absl::bad_variant_access absl::any absl::base
-                                absl::bits absl::city)
-  list(
-    APPEND
-    TARGET_DEPS
-    "absl_bad_variant_access"
-    "absl_any"
-    "absl_base"
-    "absl_bits"
-    "absl_city")
 endif()
 
 if(WITH_STL STREQUAL "OFF")
@@ -72,6 +57,10 @@ elseif(WITH_STL STREQUAL "CXX23")
   message(STATUS "Building WITH_STL=CXX23")
   target_compile_definitions(opentelemetry_api
                              INTERFACE OPENTELEMETRY_STL_VERSION=2023)
+elseif(WITH_STL STREQUAL "CXX26")
+  message(STATUS "Building WITH_STL=CXX26")
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_STL_VERSION=2026)
 elseif(WITH_STL STREQUAL "ON")
   message(STATUS "Building WITH_STL=ON")
   # "ON" corresponds to "CXX23" at this time.
@@ -79,7 +68,8 @@ elseif(WITH_STL STREQUAL "ON")
                              INTERFACE OPENTELEMETRY_STL_VERSION=2023)
 else()
   message(
-    FATAL_ERROR "WITH_STL must be ON, OFF, CXX11, CXX14, CXX17, CXX20 or CXX23")
+    FATAL_ERROR
+      "WITH_STL must be ON, OFF, CXX11, CXX14, CXX17, CXX20, CXX23 or CXX26")
 endif()
 
 if(WITH_GSL)
@@ -116,9 +106,19 @@ target_compile_definitions(
   opentelemetry_api
   INTERFACE OPENTELEMETRY_ABI_VERSION_NO=${OPENTELEMETRY_ABI_VERSION_NO})
 
+if(WITH_OTLP_RETRY_PREVIEW)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_OTLP_RETRY_PREVIEW)
+endif()
+
 if(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW)
+endif()
+
+if(WITH_OTLP_GRPC_CREDENTIAL_PREVIEW)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW)
 endif()
 
 if(WITH_METRICS_EXEMPLAR_PREVIEW)

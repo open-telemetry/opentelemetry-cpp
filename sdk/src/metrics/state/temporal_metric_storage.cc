@@ -1,7 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <algorithm>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -13,7 +12,6 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
@@ -51,6 +49,35 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   AggregationTemporality aggregation_temporarily =
       collector->GetAggregationTemporality(instrument_descriptor_.type_);
 
+  // Fast path for single collector with delta temporality and counter, updown-counter, histogram
+  // This path doesn't need to aggregated-with/contribute-to the unreported_metric_, as there is
+  // no other reader configured to collect those data.
+  if (collectors.size() == 1 && aggregation_temporarily == AggregationTemporality::kDelta)
+  {
+    // If no metrics, early return
+    if (delta_metrics->Size() == 0)
+    {
+      return true;
+    }
+    // Create MetricData directly
+    MetricData metric_data;
+    metric_data.instrument_descriptor   = instrument_descriptor_;
+    metric_data.aggregation_temporality = AggregationTemporality::kDelta;
+    metric_data.start_ts                = sdk_start_ts;
+    metric_data.end_ts                  = collection_ts;
+
+    // Direct conversion of delta metrics to point data
+    delta_metrics->GetAllEnteries(
+        [&metric_data](const MetricAttributes &attributes, Aggregation &aggregation) {
+          PointDataAttributes point_data_attr;
+          point_data_attr.point_data = aggregation.ToPoint();
+          point_data_attr.attributes = attributes;
+          metric_data.point_data_attr_.emplace_back(std::move(point_data_attr));
+          return true;
+        });
+    return callback(metric_data);
+  }
+
   if (delta_metrics->Size())
   {
     for (auto &col : collectors)
@@ -75,19 +102,17 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   {
     agg_hashmap->GetAllEnteries(
         [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
-          auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-          auto agg  = merged_metrics->Get(hash);
+          auto agg = merged_metrics->Get(attributes);
           if (agg)
           {
-            merged_metrics->Set(attributes, agg->Merge(aggregation), hash);
+            merged_metrics->Set(attributes, agg->Merge(aggregation));
           }
           else
           {
             merged_metrics->Set(attributes,
                                 DefaultAggregation::CreateAggregation(
                                     aggregation_type_, instrument_descriptor_, aggregation_config_)
-                                    ->Merge(aggregation),
-                                hash);
+                                    ->Merge(aggregation));
           }
           return true;
         });
@@ -110,17 +135,16 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
       // merge current delta to previous cumulative
       last_aggr_hashmap->GetAllEnteries(
           [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
-            auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-            auto agg  = merged_metrics->Get(hash);
+            auto agg = merged_metrics->Get(attributes);
             if (agg)
             {
-              merged_metrics->Set(attributes, agg->Merge(aggregation), hash);
+              merged_metrics->Set(attributes, agg->Merge(aggregation));
             }
             else
             {
               auto def_agg = DefaultAggregation::CreateAggregation(
                   aggregation_type_, instrument_descriptor_, aggregation_config_);
-              merged_metrics->Set(attributes, def_agg->Merge(aggregation), hash);
+              merged_metrics->Set(attributes, def_agg->Merge(aggregation));
             }
             return true;
           });

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdint.h>
+#include <stdint.h>  // IWYU pragma: keep
 
 #ifdef _WIN32
 #  include <windows.h>
@@ -56,6 +56,8 @@ void do_something()
 
 #  ifdef _WIN32
   HMODULE component_g = LoadLibraryA("component_g.dll");
+#  elif defined(__APPLE__)
+  void *component_g = dlopen("libcomponent_g.dylib", RTLD_NOW);
 #  else
   void *component_g = dlopen("libcomponent_g.so", RTLD_NOW);
 #  endif
@@ -82,6 +84,8 @@ void do_something()
 
 #  ifdef _WIN32
   HMODULE component_h = LoadLibraryA("component_h.dll");
+#  elif defined(__APPLE__)
+  void *component_h = dlopen("libcomponent_h.dylib", RTLD_NOW);
 #  else
   void *component_h = dlopen("libcomponent_h.so", RTLD_NOW);
 #  endif
@@ -165,6 +169,13 @@ void reset_counts()
 class MyTracer : public trace::Tracer
 {
 public:
+  MyTracer()
+  {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    UpdateEnabled(true);
+#endif
+  }
+
   nostd::shared_ptr<trace::Span> StartSpan(
       nostd::string_view name,
       const common::KeyValueIterable & /* attributes */,

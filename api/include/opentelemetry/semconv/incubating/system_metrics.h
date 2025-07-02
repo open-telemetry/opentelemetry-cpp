@@ -21,40 +21,43 @@ namespace system
 {
 
 /**
- * Reports the current frequency of the CPU in Hz
- * <p>
- * gauge
+  Deprecated. Use @code cpu.frequency @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code cpu.frequency @endcode.", "reason": "renamed", "renamed_to":
+  "cpu.frequency"} <p> gauge
  */
-static constexpr const char *kMetricSystemCpuFrequency = "system.cpu.frequency";
-static constexpr const char *descrMetricSystemCpuFrequency =
-    "Reports the current frequency of the CPU in Hz";
-static constexpr const char *unitMetricSystemCpuFrequency = "{Hz}";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricSystemCpuFrequency =
+    "system.cpu.frequency";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricSystemCpuFrequency =
+    "Deprecated. Use `cpu.frequency` instead.";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricSystemCpuFrequency = "{Hz}";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-static inline nostd::unique_ptr<metrics::Gauge<int64_t>> CreateSyncInt64MetricSystemCpuFrequency(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
+CreateSyncInt64MetricSystemCpuFrequency(metrics::Meter *meter)
 {
   return meter->CreateInt64Gauge(kMetricSystemCpuFrequency, descrMetricSystemCpuFrequency,
                                  unitMetricSystemCpuFrequency);
 }
 
-static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricSystemCpuFrequency(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<double>>
+CreateSyncDoubleMetricSystemCpuFrequency(metrics::Meter *meter)
 {
   return meter->CreateDoubleGauge(kMetricSystemCpuFrequency, descrMetricSystemCpuFrequency,
                                   unitMetricSystemCpuFrequency);
 }
 #endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricSystemCpuFrequency(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableGauge(kMetricSystemCpuFrequency, descrMetricSystemCpuFrequency,
                                            unitMetricSystemCpuFrequency);
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricSystemCpuFrequency(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableGauge(
@@ -62,8 +65,9 @@ CreateAsyncDoubleMetricSystemCpuFrequency(metrics::Meter *meter)
 }
 
 /**
- * Reports the number of logical (virtual) processor cores created by the operating system to manage
- * multitasking <p> updowncounter
+  Reports the number of logical (virtual) processor cores created by the operating system to manage
+  multitasking <p> Calculated by multiplying the number of sockets by the number of cores per
+  socket, and then by the number of threads per core <p> updowncounter
  */
 static constexpr const char *kMetricSystemCpuLogicalCount = "system.cpu.logical.count";
 static constexpr const char *descrMetricSystemCpuLogicalCount =
@@ -104,9 +108,11 @@ CreateAsyncDoubleMetricSystemCpuLogicalCount(metrics::Meter *meter)
 }
 
 /**
- * Reports the number of actual physical processor cores on the hardware
- * <p>
- * updowncounter
+  Reports the number of actual physical processor cores on the hardware
+  <p>
+  Calculated by multiplying the number of sockets by the number of cores per socket
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricSystemCpuPhysicalCount = "system.cpu.physical.count";
 static constexpr const char *descrMetricSystemCpuPhysicalCount =
@@ -146,78 +152,84 @@ CreateAsyncDoubleMetricSystemCpuPhysicalCount(metrics::Meter *meter)
 }
 
 /**
- * Seconds each logical CPU spent on each mode
- * <p>
- * counter
- */
-static constexpr const char *kMetricSystemCpuTime = "system.cpu.time";
-static constexpr const char *descrMetricSystemCpuTime =
-    "Seconds each logical CPU spent on each mode";
-static constexpr const char *unitMetricSystemCpuTime = "s";
+  Deprecated. Use @code cpu.time @endcode instead.
 
-static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricSystemCpuTime(
-    metrics::Meter *meter)
+  @deprecated
+  {"note": "Replaced by @code cpu.time @endcode.", "reason": "renamed", "renamed_to": "cpu.time"}
+  <p>
+  counter
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricSystemCpuTime = "system.cpu.time";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricSystemCpuTime =
+    "Deprecated. Use `cpu.time` instead.";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricSystemCpuTime = "s";
+
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricSystemCpuTime(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemCpuTime, descrMetricSystemCpuTime,
                                     unitMetricSystemCpuTime);
 }
 
-static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricSystemCpuTime(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricSystemCpuTime(metrics::Meter *meter)
 {
   return meter->CreateDoubleCounter(kMetricSystemCpuTime, descrMetricSystemCpuTime,
                                     unitMetricSystemCpuTime);
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncInt64MetricSystemCpuTime(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemCpuTime(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricSystemCpuTime, descrMetricSystemCpuTime,
                                              unitMetricSystemCpuTime);
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDoubleMetricSystemCpuTime(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemCpuTime(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableCounter(kMetricSystemCpuTime, descrMetricSystemCpuTime,
                                               unitMetricSystemCpuTime);
 }
 
 /**
- * Difference in system.cpu.time since the last measurement, divided by the elapsed time and number
- * of logical CPUs <p> gauge
+  Deprecated. Use @code cpu.utilization @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code cpu.utilization @endcode.", "reason": "renamed", "renamed_to":
+  "cpu.utilization"} <p> gauge
  */
-static constexpr const char *kMetricSystemCpuUtilization = "system.cpu.utilization";
-static constexpr const char *descrMetricSystemCpuUtilization =
-    "Difference in system.cpu.time since the last measurement, divided by the elapsed time and "
-    "number of logical CPUs";
-static constexpr const char *unitMetricSystemCpuUtilization = "1";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricSystemCpuUtilization =
+    "system.cpu.utilization";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricSystemCpuUtilization =
+    "Deprecated. Use `cpu.utilization` instead.";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricSystemCpuUtilization = "1";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-static inline nostd::unique_ptr<metrics::Gauge<int64_t>> CreateSyncInt64MetricSystemCpuUtilization(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
+CreateSyncInt64MetricSystemCpuUtilization(metrics::Meter *meter)
 {
   return meter->CreateInt64Gauge(kMetricSystemCpuUtilization, descrMetricSystemCpuUtilization,
                                  unitMetricSystemCpuUtilization);
 }
 
-static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricSystemCpuUtilization(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<double>>
+CreateSyncDoubleMetricSystemCpuUtilization(metrics::Meter *meter)
 {
   return meter->CreateDoubleGauge(kMetricSystemCpuUtilization, descrMetricSystemCpuUtilization,
                                   unitMetricSystemCpuUtilization);
 }
 #endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricSystemCpuUtilization(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableGauge(
       kMetricSystemCpuUtilization, descrMetricSystemCpuUtilization, unitMetricSystemCpuUtilization);
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricSystemCpuUtilization(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableGauge(
@@ -225,7 +237,7 @@ CreateAsyncDoubleMetricSystemCpuUtilization(metrics::Meter *meter)
 }
 
 /**
- * counter
+  counter
  */
 static constexpr const char *kMetricSystemDiskIo     = "system.disk.io";
 static constexpr const char *descrMetricSystemDiskIo = "";
@@ -260,17 +272,18 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
- * Time disk spent activated
- * <p>
- * The real elapsed time ("wall clock") used in the I/O path (time from operations running in
- * parallel are not counted). Measured as: <ul> <li>Linux: Field 13 from <a
- * href="https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats">procfs-diskstats</a></li>
- *   <li>Windows: The complement of
- * <a
- * href="https://learn.microsoft.com/archive/blogs/askcore/windows-performance-monitor-disk-counters-explained#windows-performance-monitor-disk-counters-explained">"Disk%
- * Idle Time"</a> performance counter: @code uptime * (100 - "Disk\% Idle Time") / 100 @endcode</li>
- * </ul>
- * counter
+  Time disk spent activated
+  <p>
+  The real elapsed time ("wall clock") used in the I/O path (time from operations running in
+  parallel are not counted). Measured as: <ul> <li>Linux: Field 13 from <a
+  href="https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats">procfs-diskstats</a></li>
+    <li>Windows: The complement of
+  <a
+  href="https://learn.microsoft.com/archive/blogs/askcore/windows-performance-monitor-disk-counters-explained#windows-performance-monitor-disk-counters-explained">"Disk%
+  Idle Time"</a> performance counter: @code uptime * (100 - "Disk\% Idle Time") / 100 @endcode</li>
+  </ul>
+  <p>
+  counter
  */
 static constexpr const char *kMetricSystemDiskIoTime     = "system.disk.io_time";
 static constexpr const char *descrMetricSystemDiskIoTime = "Time disk spent activated";
@@ -305,9 +318,9 @@ CreateAsyncDoubleMetricSystemDiskIoTime(metrics::Meter *meter)
 }
 
 /**
- * The total storage capacity of the disk
- * <p>
- * updowncounter
+  The total storage capacity of the disk
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricSystemDiskLimit     = "system.disk.limit";
 static constexpr const char *descrMetricSystemDiskLimit = "The total storage capacity of the disk";
@@ -342,7 +355,7 @@ CreateAsyncDoubleMetricSystemDiskLimit(metrics::Meter *meter)
 }
 
 /**
- * counter
+  counter
  */
 static constexpr const char *kMetricSystemDiskMerged     = "system.disk.merged";
 static constexpr const char *descrMetricSystemDiskMerged = "";
@@ -377,15 +390,16 @@ CreateAsyncDoubleMetricSystemDiskMerged(metrics::Meter *meter)
 }
 
 /**
- * Sum of the time each operation took to complete
- * <p>
- * Because it is the sum of time each request took, parallel-issued requests each contribute to make
- * the count grow. Measured as: <ul> <li>Linux: Fields 7 & 11 from <a
- * href="https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats">procfs-diskstats</a></li>
- *   <li>Windows: "Avg. Disk sec/Read" perf counter multiplied by "Disk Reads/sec" perf counter
- * (similar for Writes)</li>
- * </ul>
- * counter
+  Sum of the time each operation took to complete
+  <p>
+  Because it is the sum of time each request took, parallel-issued requests each contribute to make
+  the count grow. Measured as: <ul> <li>Linux: Fields 7 & 11 from <a
+  href="https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats">procfs-diskstats</a></li>
+    <li>Windows: "Avg. Disk sec/Read" perf counter multiplied by "Disk Reads/sec" perf counter
+  (similar for Writes)</li>
+  </ul>
+  <p>
+  counter
  */
 static constexpr const char *kMetricSystemDiskOperationTime = "system.disk.operation_time";
 static constexpr const char *descrMetricSystemDiskOperationTime =
@@ -425,7 +439,7 @@ CreateAsyncDoubleMetricSystemDiskOperationTime(metrics::Meter *meter)
 }
 
 /**
- * counter
+  counter
  */
 static constexpr const char *kMetricSystemDiskOperations     = "system.disk.operations";
 static constexpr const char *descrMetricSystemDiskOperations = "";
@@ -460,9 +474,9 @@ CreateAsyncDoubleMetricSystemDiskOperations(metrics::Meter *meter)
 }
 
 /**
- * The total storage capacity of the filesystem
- * <p>
- * updowncounter
+  The total storage capacity of the filesystem
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricSystemFilesystemLimit = "system.filesystem.limit";
 static constexpr const char *descrMetricSystemFilesystemLimit =
@@ -502,11 +516,11 @@ CreateAsyncDoubleMetricSystemFilesystemLimit(metrics::Meter *meter)
 }
 
 /**
- * Reports a filesystem's space usage across different states.
- * <p>
- * The sum of all @code system.filesystem.usage @endcode values over the different @code
- * system.filesystem.state @endcode attributes SHOULD equal the total storage capacity of the
- * filesystem, that is @code system.filesystem.limit @endcode. <p> updowncounter
+  Reports a filesystem's space usage across different states.
+  <p>
+  The sum of all @code system.filesystem.usage @endcode values over the different @code
+  system.filesystem.state @endcode attributes SHOULD equal the total storage capacity of the
+  filesystem, that is @code system.filesystem.limit @endcode. <p> updowncounter
  */
 static constexpr const char *kMetricSystemFilesystemUsage = "system.filesystem.usage";
 static constexpr const char *descrMetricSystemFilesystemUsage =
@@ -546,7 +560,7 @@ CreateAsyncDoubleMetricSystemFilesystemUsage(metrics::Meter *meter)
 }
 
 /**
- * gauge
+  gauge
  */
 static constexpr const char *kMetricSystemFilesystemUtilization = "system.filesystem.utilization";
 static constexpr const char *descrMetricSystemFilesystemUtilization = "";
@@ -588,13 +602,13 @@ CreateAsyncDoubleMetricSystemFilesystemUtilization(metrics::Meter *meter)
 }
 
 /**
- * An estimate of how much memory is available for starting new applications, without causing
- * swapping <p> This is an alternative to @code system.memory.usage @endcode metric with @code
- * state=free @endcode. Linux starting from 3.14 exports "available" memory. It takes "free" memory
- * as a baseline, and then factors in kernel-specific values. This is supposed to be more accurate
- * than just "free" memory. For reference, see the calculations <a
- * href="https://superuser.com/a/980821">here</a>. See also @code MemAvailable @endcode in <a
- * href="https://man7.org/linux/man-pages/man5/proc.5.html">/proc/meminfo</a>. <p> updowncounter
+  An estimate of how much memory is available for starting new applications, without causing
+  swapping <p> This is an alternative to @code system.memory.usage @endcode metric with @code
+  state=free @endcode. Linux starting from 3.14 exports "available" memory. It takes "free" memory
+  as a baseline, and then factors in kernel-specific values. This is supposed to be more accurate
+  than just "free" memory. For reference, see the calculations <a
+  href="https://superuser.com/a/980821">here</a>. See also @code MemAvailable @endcode in <a
+  href="https://man7.org/linux/man-pages/man5/proc.5.html">/proc/meminfo</a>. <p> updowncounter
  */
 static constexpr const char *kMetricSystemLinuxMemoryAvailable = "system.linux.memory.available";
 static constexpr const char *descrMetricSystemLinuxMemoryAvailable =
@@ -635,14 +649,15 @@ CreateAsyncDoubleMetricSystemLinuxMemoryAvailable(metrics::Meter *meter)
 }
 
 /**
- * Reports the memory used by the Linux kernel for managing caches of frequently used objects.
- * <p>
- * The sum over the @code reclaimable @endcode and @code unreclaimable @endcode state values in
- * @code linux.memory.slab.usage @endcode SHOULD be equal to the total slab memory available on the
- * system. Note that the total slab memory is not constant and may vary over time. See also the <a
- * href="https://blogs.oracle.com/linux/post/understanding-linux-kernel-memory-statistics">Slab
- * allocator</a> and @code Slab @endcode in <a
- * href="https://man7.org/linux/man-pages/man5/proc.5.html">/proc/meminfo</a>. <p> updowncounter
+  Reports the memory used by the Linux kernel for managing caches of frequently used objects.
+  <p>
+  The sum over the @code reclaimable @endcode and @code unreclaimable @endcode state values in @code
+  linux.memory.slab.usage @endcode SHOULD be equal to the total slab memory available on the system.
+  Note that the total slab memory is not constant and may vary over time.
+  See also the <a
+  href="https://blogs.oracle.com/linux/post/understanding-linux-kernel-memory-statistics">Slab
+  allocator</a> and @code Slab @endcode in <a
+  href="https://man7.org/linux/man-pages/man5/proc.5.html">/proc/meminfo</a>. <p> updowncounter
  */
 static constexpr const char *kMetricSystemLinuxMemorySlabUsage = "system.linux.memory.slab.usage";
 static constexpr const char *descrMetricSystemLinuxMemorySlabUsage =
@@ -682,11 +697,11 @@ CreateAsyncDoubleMetricSystemLinuxMemorySlabUsage(metrics::Meter *meter)
 }
 
 /**
- * Total memory available in the system.
- * <p>
- * Its value SHOULD equal the sum of @code system.memory.state @endcode over all states.
- * <p>
- * updowncounter
+  Total memory available in the system.
+  <p>
+  Its value SHOULD equal the sum of @code system.memory.state @endcode over all states.
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricSystemMemoryLimit     = "system.memory.limit";
 static constexpr const char *descrMetricSystemMemoryLimit = "Total memory available in the system.";
@@ -721,12 +736,12 @@ CreateAsyncDoubleMetricSystemMemoryLimit(metrics::Meter *meter)
 }
 
 /**
- * Shared memory used (mostly by tmpfs).
- * <p>
- * Equivalent of @code shared @endcode from <a
- * href="https://man7.org/linux/man-pages/man1/free.1.html">@code free @endcode command</a> or
- * @code Shmem @endcode from <a href="https://man7.org/linux/man-pages/man5/proc.5.html">@code
- * /proc/meminfo @endcode</a>" <p> updowncounter
+  Shared memory used (mostly by tmpfs).
+  <p>
+  Equivalent of @code shared @endcode from <a
+  href="https://man7.org/linux/man-pages/man1/free.1.html">@code free @endcode command</a> or
+  @code Shmem @endcode from <a href="https://man7.org/linux/man-pages/man5/proc.5.html">@code
+  /proc/meminfo @endcode</a>" <p> updowncounter
  */
 static constexpr const char *kMetricSystemMemoryShared = "system.memory.shared";
 static constexpr const char *descrMetricSystemMemoryShared =
@@ -762,12 +777,12 @@ CreateAsyncDoubleMetricSystemMemoryShared(metrics::Meter *meter)
 }
 
 /**
- * Reports memory in use by state.
- * <p>
- * The sum over all @code system.memory.state @endcode values SHOULD equal the total memory
- * available on the system, that is @code system.memory.limit @endcode.
- * <p>
- * updowncounter
+  Reports memory in use by state.
+  <p>
+  The sum over all @code system.memory.state @endcode values SHOULD equal the total memory
+  available on the system, that is @code system.memory.limit @endcode.
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricSystemMemoryUsage     = "system.memory.usage";
 static constexpr const char *descrMetricSystemMemoryUsage = "Reports memory in use by state.";
@@ -802,7 +817,7 @@ CreateAsyncDoubleMetricSystemMemoryUsage(metrics::Meter *meter)
 }
 
 /**
- * gauge
+  gauge
  */
 static constexpr const char *kMetricSystemMemoryUtilization     = "system.memory.utilization";
 static constexpr const char *descrMetricSystemMemoryUtilization = "";
@@ -843,7 +858,7 @@ CreateAsyncDoubleMetricSystemMemoryUtilization(metrics::Meter *meter)
 }
 
 /**
- * updowncounter
+  updowncounter
  */
 static constexpr const char *kMetricSystemNetworkConnections     = "system.network.connections";
 static constexpr const char *descrMetricSystemNetworkConnections = "";
@@ -882,19 +897,20 @@ CreateAsyncDoubleMetricSystemNetworkConnections(metrics::Meter *meter)
 }
 
 /**
- * Count of packets that are dropped or discarded even though there was no error
- * <p>
- * Measured as:
- * <ul>
- *   <li>Linux: the @code drop @endcode column in @code /proc/dev/net @endcode (<a
- * href="https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html">source</a>)</li>
- *   <li>Windows: <a
- * href="https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2">@code
- * InDiscards @endcode/@code OutDiscards @endcode</a> from <a
- * href="https://docs.microsoft.com/windows/win32/api/netioapi/nf-netioapi-getifentry2">@code
- * GetIfEntry2 @endcode</a></li>
- * </ul>
- * counter
+  Count of packets that are dropped or discarded even though there was no error
+  <p>
+  Measured as:
+  <ul>
+    <li>Linux: the @code drop @endcode column in @code /proc/dev/net @endcode (<a
+  href="https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html">source</a>)</li>
+    <li>Windows: <a
+  href="https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2">@code
+  InDiscards @endcode/@code OutDiscards @endcode</a> from <a
+  href="https://docs.microsoft.com/windows/win32/api/netioapi/nf-netioapi-getifentry2">@code
+  GetIfEntry2 @endcode</a></li>
+  </ul>
+  <p>
+  counter
  */
 static constexpr const char *kMetricSystemNetworkDropped = "system.network.dropped";
 static constexpr const char *descrMetricSystemNetworkDropped =
@@ -930,19 +946,20 @@ CreateAsyncDoubleMetricSystemNetworkDropped(metrics::Meter *meter)
 }
 
 /**
- * Count of network errors detected
- * <p>
- * Measured as:
- * <ul>
- *   <li>Linux: the @code errs @endcode column in @code /proc/dev/net @endcode (<a
- * href="https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html">source</a>).</li>
- *   <li>Windows: <a
- * href="https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2">@code
- * InErrors @endcode/@code OutErrors @endcode</a> from <a
- * href="https://docs.microsoft.com/windows/win32/api/netioapi/nf-netioapi-getifentry2">@code
- * GetIfEntry2 @endcode</a>.</li>
- * </ul>
- * counter
+  Count of network errors detected
+  <p>
+  Measured as:
+  <ul>
+    <li>Linux: the @code errs @endcode column in @code /proc/dev/net @endcode (<a
+  href="https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html">source</a>).</li>
+    <li>Windows: <a
+  href="https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2">@code
+  InErrors @endcode/@code OutErrors @endcode</a> from <a
+  href="https://docs.microsoft.com/windows/win32/api/netioapi/nf-netioapi-getifentry2">@code
+  GetIfEntry2 @endcode</a>.</li>
+  </ul>
+  <p>
+  counter
  */
 static constexpr const char *kMetricSystemNetworkErrors     = "system.network.errors";
 static constexpr const char *descrMetricSystemNetworkErrors = "Count of network errors detected";
@@ -977,7 +994,7 @@ CreateAsyncDoubleMetricSystemNetworkErrors(metrics::Meter *meter)
 }
 
 /**
- * counter
+  counter
  */
 static constexpr const char *kMetricSystemNetworkIo     = "system.network.io";
 static constexpr const char *descrMetricSystemNetworkIo = "";
@@ -1012,7 +1029,7 @@ CreateAsyncDoubleMetricSystemNetworkIo(metrics::Meter *meter)
 }
 
 /**
- * counter
+  counter
  */
 static constexpr const char *kMetricSystemNetworkPackets     = "system.network.packets";
 static constexpr const char *descrMetricSystemNetworkPackets = "";
@@ -1047,7 +1064,7 @@ CreateAsyncDoubleMetricSystemNetworkPackets(metrics::Meter *meter)
 }
 
 /**
- * counter
+  counter
  */
 static constexpr const char *kMetricSystemPagingFaults     = "system.paging.faults";
 static constexpr const char *descrMetricSystemPagingFaults = "";
@@ -1082,7 +1099,7 @@ CreateAsyncDoubleMetricSystemPagingFaults(metrics::Meter *meter)
 }
 
 /**
- * counter
+  counter
  */
 static constexpr const char *kMetricSystemPagingOperations     = "system.paging.operations";
 static constexpr const char *descrMetricSystemPagingOperations = "";
@@ -1121,9 +1138,9 @@ CreateAsyncDoubleMetricSystemPagingOperations(metrics::Meter *meter)
 }
 
 /**
- * Unix swap or windows pagefile usage
- * <p>
- * updowncounter
+  Unix swap or windows pagefile usage
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricSystemPagingUsage     = "system.paging.usage";
 static constexpr const char *descrMetricSystemPagingUsage = "Unix swap or windows pagefile usage";
@@ -1158,7 +1175,7 @@ CreateAsyncDoubleMetricSystemPagingUsage(metrics::Meter *meter)
 }
 
 /**
- * gauge
+  gauge
  */
 static constexpr const char *kMetricSystemPagingUtilization     = "system.paging.utilization";
 static constexpr const char *descrMetricSystemPagingUtilization = "";
@@ -1199,9 +1216,9 @@ CreateAsyncDoubleMetricSystemPagingUtilization(metrics::Meter *meter)
 }
 
 /**
- * Total number of processes in each state
- * <p>
- * updowncounter
+  Total number of processes in each state
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricSystemProcessCount = "system.process.count";
 static constexpr const char *descrMetricSystemProcessCount =
@@ -1237,9 +1254,9 @@ CreateAsyncDoubleMetricSystemProcessCount(metrics::Meter *meter)
 }
 
 /**
- * Total number of processes created over uptime of the host
- * <p>
- * counter
+  Total number of processes created over uptime of the host
+  <p>
+  counter
  */
 static constexpr const char *kMetricSystemProcessCreated = "system.process.created";
 static constexpr const char *descrMetricSystemProcessCreated =
@@ -1275,11 +1292,11 @@ CreateAsyncDoubleMetricSystemProcessCreated(metrics::Meter *meter)
 }
 
 /**
- * The time the system has been running
- * <p>
- * Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
- * as a floating point number with the highest precision available. The actual accuracy would depend
- * on the instrumentation and operating system. <p> gauge
+  The time the system has been running
+  <p>
+  Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
+  as a floating point number with the highest precision available. The actual accuracy would depend
+  on the instrumentation and operating system. <p> gauge
  */
 static constexpr const char *kMetricSystemUptime     = "system.uptime";
 static constexpr const char *descrMetricSystemUptime = "The time the system has been running";

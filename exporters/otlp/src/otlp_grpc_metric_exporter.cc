@@ -1,16 +1,39 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <google/protobuf/arena.h>
+#include <grpcpp/client_context.h>
+#include <grpcpp/support/status.h>
+#include <atomic>
+#include <chrono>
 #include <memory>
-#include <mutex>
+#include <new>
+#include <ostream>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/version.h"
 
-#include "opentelemetry/sdk_config.h"
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/collector/metrics/v1/metrics_service.grpc.pb.h"
+#include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
+
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <functional>
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -50,10 +73,10 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
 OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptions &options,
                                                const std::shared_ptr<OtlpGrpcClient> &client)
     : options_(options),
-      aggregation_temporality_selector_{
-          OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
       client_(client),
-      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard())
+      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
+      aggregation_temporality_selector_{
+          OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)}
 {
   client_->AddReference(*client_reference_guard_, options_);
 
@@ -64,10 +87,10 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
     std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub,
     const std::shared_ptr<OtlpGrpcClient> &client)
     : options_(OtlpGrpcMetricExporterOptions()),
-      aggregation_temporality_selector_{
-          OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
       client_(client),
       client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
+      aggregation_temporality_selector_{
+          OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
       metrics_service_stub_(std::move(stub))
 {
   client_->AddReference(*client_reference_guard_, options_);

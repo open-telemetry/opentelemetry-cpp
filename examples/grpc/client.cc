@@ -5,19 +5,38 @@
 // ambiguity with `nostd::variant` if compiled with Visual Studio 2015. Other
 // modern compilers are unaffected.
 #include <grpcpp/grpcpp.h>
-#ifdef BAZEL_BUILD
-#  include "examples/grpc/protos/messages.grpc.pb.h"
-#else
-#  include "messages.grpc.pb.h"
-#endif
+#include <grpcpp/security/credentials.h>
+#include <grpcpp/support/status.h>
 
+#include <stdint.h>
+#include <stdlib.h>
 #include <iostream>
-#include <memory>
 #include <string>
+#include <utility>
 
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/propagation/global_propagator.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/semconv/incubating/rpc_attributes.h"
 #include "opentelemetry/semconv/network_attributes.h"
+#include "opentelemetry/trace/propagation/http_trace_context.h"
+#include "opentelemetry/trace/scope.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/span_startoptions.h"
+#include "opentelemetry/trace/tracer.h"
 #include "tracer_common.h"
+
+#ifdef BAZEL_BUILD
+#  include "examples/grpc/protos/messages.grpc.pb.h"
+#  include "examples/grpc/protos/messages.pb.h"
+#else
+#  include "messages.grpc.pb.h"
+#  include "messages.pb.h"
+#endif
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -111,7 +130,7 @@ int main(int argc, char **argv)
   uint16_t port;
   if (argc > 1)
   {
-    port = atoi(argv[1]);
+    port = static_cast<uint16_t>(atoi(argv[1]));
   }
   else
   {

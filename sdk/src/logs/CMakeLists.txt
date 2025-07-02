@@ -3,6 +3,7 @@
 
 add_library(
   opentelemetry_logs
+  provider.cc
   logger_provider.cc
   logger_provider_factory.cc
   logger.cc
@@ -14,6 +15,7 @@ add_library(
   simple_log_record_processor_factory.cc
   batch_log_record_processor.cc
   batch_log_record_processor_factory.cc
+  logger_config.cc
   logger_context.cc
   logger_context_factory.cc
   multi_log_record_processor.cc
@@ -33,13 +35,6 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
 if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_logs
-    EXPORT "${PROJECT_NAME}-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
   opentelemetry_add_pkgconfig(
     logs "OpenTelemetry SDK - Logs"
     "Components for exporting logs in the OpenTelemetry SDK."

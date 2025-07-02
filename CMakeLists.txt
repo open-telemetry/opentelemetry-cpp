@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 
 # See https://cmake.org/cmake/help/latest/policy/CMP0074.html required by
 # certain version of zlib which CURL depends on.
@@ -19,6 +19,12 @@ if(POLICY CMP0091)
   cmake_policy(SET CMP0091 NEW)
 endif()
 
+if(POLICY CMP0092)
+  # https://cmake.org/cmake/help/latest/policy/CMP0092.html#policy:CMP0092 Make
+  # sure the /W3 is not removed from CMAKE_CXX_FLAGS since CMake 3.15
+  cmake_policy(SET CMP0092 OLD)
+endif()
+
 # MSVC RTTI flag /GR should not be not added to CMAKE_CXX_FLAGS by default. @see
 # https://cmake.org/cmake/help/latest/policy/CMP0117.html
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.20.0")
@@ -30,7 +36,9 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
-# Prefer cmake CONFIG to auto resolve dependencies.
+# Note: CMAKE_FIND_PACKAGE_PREFER_CONFIG requires cmake 3.15. Prefer cmake
+# CONFIG search mode to find dependencies. This is important to properly find
+# protobuf versions 3.22.0 and above due to the abseil-cpp dependency.
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 # Don't use customized cmake modules if vcpkg is used to resolve dependence.
@@ -182,8 +190,6 @@ set(WITH_STL
 option(WITH_GSL
        "Whether to use Guidelines Support Library for C++ latest features" OFF)
 
-option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
-
 set(OPENTELEMETRY_INSTALL_default ON)
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   set(OPENTELEMETRY_INSTALL_default OFF)
@@ -212,8 +218,14 @@ if(NOT WITH_STL STREQUAL "OFF")
   endif()
 endif()
 
+option(WITH_OTLP_RETRY_PREVIEW
+       "Whether to enable experimental retry functionality" OFF)
+
 option(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
-       "Whether to enable mTLS support fro gRPC" OFF)
+       "Whether to enable mTLS support for gRPC" OFF)
+
+option(WITH_OTLP_GRPC_CREDENTIAL_PREVIEW
+       "Whether to enable gRPC credentials option in OTLP gRPC Exporter" OFF)
 
 option(WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK"
        OFF)
@@ -254,14 +266,6 @@ option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
 
 option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
        OFF)
-
-#
-# This option is experimental, subject to change in the spec:
-#
-# * https://github.com/open-telemetry/opentelemetry-specification/issues/2232
-#
-option(WITH_REMOVE_METER_PREVIEW
-       "EXPERIMENTAL, ABI BREAKING: Allow to remove a meter" OFF)
 
 if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
@@ -369,11 +373,33 @@ if(WITH_PROMETHEUS)
     if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/prometheus-cpp/.git)
       set(SAVED_ENABLE_TESTING ${ENABLE_TESTING})
       set(SAVED_CMAKE_CXX_CLANG_TIDY ${CMAKE_CXX_CLANG_TIDY})
+      set(SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE
+          ${CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
       set(ENABLE_TESTING OFF)
       set(CMAKE_CXX_CLANG_TIDY "")
+      set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "")
       add_subdirectory(third_party/prometheus-cpp)
       set(ENABLE_TESTING ${SAVED_ENABLE_TESTING})
       set(CMAKE_CXX_CLANG_TIDY ${SAVED_CMAKE_CXX_CLANG_TIDY})
+      set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE
+          ${SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
+
+      # Get the version of the prometheus-cpp submodule
+      find_package(Git QUIET)
+      if(Git_FOUND)
+        execute_process(
+          COMMAND ${GIT_EXECUTABLE} describe --tags --always
+          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/third_party/prometheus-cpp
+          OUTPUT_VARIABLE prometheus-cpp_VERSION
+          OUTPUT_STRIP_TRAILING_WHITESPACE)
+        string(REGEX REPLACE "^v" "" prometheus-cpp_VERSION
+                             "${prometheus-cpp_VERSION}")
+      endif()
+
+      message(
+        STATUS
+          "Using local prometheus-cpp from submodule. Version = ${prometheus-cpp_VERSION}"
+      )
     else()
       message(
         FATAL_ERROR
@@ -386,24 +412,36 @@ if(WITH_PROMETHEUS)
   endif()
 endif()
 
-if(WITH_ABSEIL)
-  if(NOT TARGET absl::strings)
-    find_package(absl CONFIG REQUIRED)
-  endif()
-endif()
-
 if(WITH_OTLP_GRPC
    OR WITH_OTLP_HTTP
    OR WITH_OTLP_FILE)
-  find_package(Protobuf)
-  # Protobuf 3.22 or upper require abseil-cpp, we can find it in
-  # opentelemetry-cpp-config.cmake
+
+  # Including the CMakeFindDependencyMacro resolves an error from
+  # gRPCConfig.cmake on some grpc versions. See
+  # https://github.com/grpc/grpc/pull/33361 for more details.
+  include(CMakeFindDependencyMacro)
+
+  # Protobuf 3.22+ depends on abseil-cpp and must be found using the cmake
+  # find_package CONFIG search mode. The following attempts to find Protobuf
+  # using the CONFIG mode first, and if not found, falls back to the MODULE
+  # mode. See https://gitlab.kitware.com/cmake/cmake/-/issues/24321 for more
+  # details.
+  find_package(Protobuf CONFIG)
+  if(NOT Protobuf_FOUND)
+    find_package(Protobuf MODULE)
+    if(Protobuf_FOUND AND Protobuf_VERSION VERSION_GREATER_EQUAL "3.22.0")
+      message(
+        WARNING
+          "Found Protobuf version ${Protobuf_VERSION} using MODULE mode. "
+          "Linking errors may occur. Protobuf 3.22+ depends on abseil-cpp "
+          "and should be found using the CONFIG mode.")
+    endif()
+  endif()
 
   if(WITH_OTLP_GRPC)
-    find_package(gRPC)
+    find_package(gRPC CONFIG)
   endif()
-  if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (WITH_OTLP_GRPC
-                                                     AND NOT gRPC_FOUND))
+  if((NOT Protobuf_FOUND) OR (WITH_OTLP_GRPC AND NOT gRPC_FOUND))
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
       install_windows_deps()
     endif()
@@ -415,11 +453,11 @@ if(WITH_OTLP_GRPC
       include(${CMAKE_TOOLCHAIN_FILE})
     endif()
 
-    if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
-      find_package(Protobuf REQUIRED)
+    if(NOT Protobuf_FOUND)
+      find_package(Protobuf CONFIG REQUIRED)
     endif()
     if(NOT gRPC_FOUND AND WITH_OTLP_GRPC)
-      find_package(gRPC)
+      find_package(gRPC CONFIG)
     endif()
     if(WIN32)
       # Always use x64 protoc.exe
@@ -477,7 +515,11 @@ endif()
 if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
   # No specific version required.
   find_package(CURL REQUIRED)
-  message(STATUS "Found CURL: ${CURL_LIBRARIES}, version ${CURL_VERSION}")
+  # Set the CURL_VERSION from the legacy CURL_VERSION_STRING Required for CMake
+  # versions below 4.0
+  if(NOT DEFINED CURL_VERSION AND DEFINED CURL_VERSION_STRING)
+    set(CURL_VERSION ${CURL_VERSION_STRING})
+  endif()
 endif()
 
 #
@@ -489,7 +531,11 @@ if((NOT WITH_API_ONLY)
    AND WITH_OTLP_HTTP_COMPRESSION)
   # No specific version required.
   find_package(ZLIB REQUIRED)
-  message(STATUS "Found ZLIB: ${ZLIB_LIBRARIES}, version ${ZLIB_VERSION}")
+  # Set the ZLIB_VERSION from the legacy ZLIB_VERSION_STRING Required for CMake
+  # versions below 3.26
+  if(NOT DEFINED ZLIB_VERSION AND DEFINED ZLIB_VERSION_STRING)
+    set(ZLIB_VERSION ${ZLIB_VERSION_STRING})
+  endif()
 endif()
 
 #
@@ -589,6 +635,7 @@ if(OTELCPP_MAINTAINER_MODE)
     add_compile_options(/wd4127)
     add_compile_options(/wd4512)
     add_compile_options(/wd4267)
+    add_compile_options(/wd4996)
 
     # Enforced warnings
     add_compile_options(/we4265) # 'class': class has virtual functions, but
@@ -687,6 +734,112 @@ if(BUILD_TESTING)
   endif()
 endif()
 
+# Record build config and versions
+message(STATUS "---------------------------------------------")
+message(STATUS "build settings")
+message(STATUS "---------------------------------------------")
+message(STATUS "OpenTelemetry: ${OPENTELEMETRY_VERSION}")
+message(STATUS "OpenTelemetry ABI: ${OPENTELEMETRY_ABI_VERSION_NO}")
+message(STATUS "ARCH: ${ARCH}")
+message(STATUS "CXX: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+message(STATUS "CXXFLAGS: ${CMAKE_CXX_FLAGS}")
+message(STATUS "CMAKE_CXX_STANDARD: ${CMAKE_CXX_STANDARD}")
+message(STATUS "CMAKE_TOOLCHAIN_FILE: ${CMAKE_TOOLCHAIN_FILE}")
+message(STATUS "BUILD_SHARED_LIBS: ${BUILD_SHARED_LIBS}")
+
+message(STATUS "---------------------------------------------")
+message(STATUS "opentelemetry-cpp build options")
+message(STATUS "---------------------------------------------")
+message(STATUS "WITH_API_ONLY: ${WITH_API_ONLY}")
+message(STATUS "WITH_NO_DEPRECATED_CODE: ${WITH_NO_DEPRECATED_CODE}")
+message(STATUS "WITH_ABI_VERSION_1: ${WITH_ABI_VERSION_1}")
+message(STATUS "WITH_ABI_VERSION_2: ${WITH_ABI_VERSION_2}")
+message(STATUS "OTELCPP_VERSIONED_LIBS: ${OTELCPP_VERSIONED_LIBS}")
+message(STATUS "OTELCPP_MAINTAINER_MODE: ${OTELCPP_MAINTAINER_MODE}")
+message(STATUS "WITH_STL: ${WITH_STL}")
+message(STATUS "WITH_GSL: ${WITH_GSL}")
+message(STATUS "WITH_NO_GETENV: ${WITH_NO_GETENV}")
+
+message(STATUS "---------------------------------------------")
+message(STATUS "opentelemetry-cpp cmake component options")
+message(STATUS "---------------------------------------------")
+message(STATUS "WITH_OTLP_GRPC: ${WITH_OTLP_GRPC}")
+message(STATUS "WITH_OTLP_HTTP: ${WITH_OTLP_HTTP}")
+message(STATUS "WITH_OTLP_FILE: ${WITH_OTLP_FILE}")
+message(STATUS "WITH_HTTP_CLIENT_CURL: ${WITH_HTTP_CLIENT_CURL}")
+message(STATUS "WITH_ZIPKIN: ${WITH_ZIPKIN}")
+message(STATUS "WITH_PROMETHEUS: ${WITH_PROMETHEUS}")
+message(STATUS "WITH_ELASTICSEARCH: ${WITH_ELASTICSEARCH}")
+message(STATUS "WITH_OPENTRACING: ${WITH_OPENTRACING}")
+message(STATUS "WITH_ETW: ${WITH_ETW}")
+message(STATUS "OPENTELEMETRY_BUILD_DLL: ${OPENTELEMETRY_BUILD_DLL}")
+
+message(STATUS "---------------------------------------------")
+message(STATUS "feature preview options")
+message(STATUS "---------------------------------------------")
+message(STATUS "WITH_ASYNC_EXPORT_PREVIEW: ${WITH_ASYNC_EXPORT_PREVIEW}")
+message(
+  STATUS
+    "WITH_THREAD_INSTRUMENTATION_PREVIEW: ${WITH_THREAD_INSTRUMENTATION_PREVIEW}"
+)
+message(
+  STATUS "WITH_METRICS_EXEMPLAR_PREVIEW: ${WITH_METRICS_EXEMPLAR_PREVIEW}")
+message(
+  STATUS "WITH_OTLP_GRPC_SSL_MTLS_PREVIEW: ${WITH_OTLP_GRPC_SSL_MTLS_PREVIEW}")
+message(
+  STATUS
+    "WITH_OTLP_GRPC_CREDENTIAL_PREVIEW: ${WITH_OTLP_GRPC_CREDENTIAL_PREVIEW}")
+message(STATUS "WITH_OTLP_RETRY_PREVIEW: ${WITH_OTLP_RETRY_PREVIEW}")
+message(STATUS "---------------------------------------------")
+message(STATUS "third-party options")
+message(STATUS "---------------------------------------------")
+message(STATUS "WITH_NLOHMANN_JSON: ${USE_NLOHMANN_JSON}")
+message(STATUS "WITH_CURL_LOGGING: ${WITH_CURL_LOGGING}")
+message(STATUS "WITH_OTLP_HTTP_COMPRESSION: ${WITH_OTLP_HTTP_COMPRESSION}")
+message(STATUS "---------------------------------------------")
+message(STATUS "examples and test options")
+message(STATUS "---------------------------------------------")
+message(STATUS "WITH_BENCHMARK: ${WITH_BENCHMARK}")
+message(STATUS "WITH_EXAMPLES: ${WITH_EXAMPLES}")
+message(STATUS "WITH_EXAMPLES_HTTP: ${WITH_EXAMPLES_HTTP}")
+message(STATUS "WITH_FUNC_TESTS: ${WITH_FUNC_TESTS}")
+message(STATUS "BUILD_W3CTRACECONTEXT_TEST: ${BUILD_W3CTRACECONTEXT_TEST}")
+message(STATUS "BUILD_TESTING: ${BUILD_TESTING}")
+message(STATUS "---------------------------------------------")
+message(STATUS "versions")
+message(STATUS "---------------------------------------------")
+message(STATUS "CMake: ${CMAKE_VERSION}")
+message(STATUS "GTest: ${GTest_VERSION}")
+message(STATUS "benchmark: ${benchmark_VERSION}")
+if(WITH_GSL)
+  message(STATUS "GSL: ${GSL_VERSION}")
+endif()
+if(absl_FOUND)
+  message(STATUS "Abseil: ${absl_VERSION}")
+endif()
+if(Protobuf_FOUND)
+  message(STATUS "Protobuf: ${Protobuf_VERSION}")
+endif()
+if(gRPC_FOUND)
+  message(STATUS "gRPC: ${gRPC_VERSION}")
+endif()
+if(CURL_FOUND)
+  message(STATUS "CURL: ${CURL_VERSION}")
+endif()
+if(ZLIB_FOUND)
+  message(STATUS "ZLIB: ${ZLIB_VERSION}")
+endif()
+if(USE_NLOHMANN_JSON)
+  message(STATUS "nlohmann-json: ${nlohmann_json_VERSION}")
+endif()
+if(prometheus-cpp_FOUND)
+  message(STATUS "prometheus-cpp: ${prometheus-cpp_VERSION}")
+endif()
+message(STATUS "---------------------------------------------")
+
+include("${PROJECT_SOURCE_DIR}/cmake/otel-install-functions.cmake")
+
 include(CMakePackageConfigHelpers)
 
 if(DEFINED OPENTELEMETRY_BUILD_DLL)
@@ -703,8 +856,6 @@ if(DEFINED OPENTELEMETRY_BUILD_DLL)
   add_definitions(-DOPENTELEMETRY_BUILD_EXPORT_DLL)
 endif()
 
-include_directories(api/include)
-
 add_subdirectory(api)
 
 if(WITH_OPENTRACING)
@@ -715,8 +866,13 @@ if(WITH_OPENTRACING)
     if(EXISTS "${PROJECT_SOURCE_DIR}/${OPENTRACING_DIR}/.git")
       set(SAVED_BUILD_TESTING ${BUILD_TESTING})
       set(BUILD_TESTING OFF)
+      set(SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE
+          ${CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
+      set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "")
       add_subdirectory(${OPENTRACING_DIR})
       set(BUILD_TESTING ${SAVED_BUILD_TESTING})
+      set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE
+          ${SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
     else()
       message(
         FATAL_ERROR
@@ -732,9 +888,6 @@ endif()
 
 if(NOT WITH_API_ONLY)
   set(BUILD_TESTING ${BUILD_TESTING})
-  include_directories(sdk/include)
-  include_directories(sdk)
-  include_directories(ext/include)
 
   add_subdirectory(sdk)
   add_subdirectory(ext)
@@ -756,39 +909,14 @@ include(cmake/opentelemetry-build-external-component.cmake)
 include(cmake/patch-imported-config.cmake)
 
 if(OPENTELEMETRY_INSTALL)
-  # Export cmake config and support find_packages(opentelemetry-cpp CONFIG)
-  # Write config file for find_packages(opentelemetry-cpp CONFIG)
-  set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
-  configure_package_config_file(
-    "${CMAKE_CURRENT_LIST_DIR}/cmake/opentelemetry-cpp-config.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config.cmake"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-    PATH_VARS OPENTELEMETRY_ABI_VERSION_NO OPENTELEMETRY_VERSION PROJECT_NAME
-              INCLUDE_INSTALL_DIR CMAKE_INSTALL_LIBDIR
-    NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+  # Install the cmake config and version files
+  otel_install_cmake_config()
 
-  # Write version file for find_packages(opentelemetry-cpp CONFIG)
-  write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config-version.cmake"
-    VERSION ${OPENTELEMETRY_VERSION}
-    COMPATIBILITY ExactVersion)
+  # Install the components and associated files
+  otel_install_components()
 
-  install(
-    FILES
-      "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config.cmake"
-      "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config-version.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
-
-  # Export all components
-  export(
-    EXPORT "${PROJECT_NAME}-target"
-    NAMESPACE "${PROJECT_NAME}::"
-    FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-target.cmake"
-  )
-  install(
-    EXPORT "${PROJECT_NAME}-target"
-    NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+  # Install the thirdparty dependency definition file
+  otel_install_thirdparty_definitions()
 
   if(BUILD_PACKAGE)
     include(cmake/package.cmake)

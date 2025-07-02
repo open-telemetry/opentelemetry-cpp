@@ -12,7 +12,10 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/export/metric_filter.h"
 #include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
@@ -22,6 +25,10 @@
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
+
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -36,8 +43,11 @@ MeterProvider::MeterProvider(std::unique_ptr<MeterContext> context) noexcept
 {}
 
 MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
-                             const sdk::resource::Resource &resource) noexcept
-    : context_(std::make_shared<MeterContext>(std::move(views), resource))
+                             const sdk::resource::Resource &resource,
+                             std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>>
+                                 meter_configurator) noexcept
+    : context_(
+          std::make_shared<MeterContext>(std::move(views), resource, std::move(meter_configurator)))
 {
   OTEL_INTERNAL_LOG_DEBUG("[MeterProvider] MeterProvider created.");
 }
@@ -107,9 +117,10 @@ const resource::Resource &MeterProvider::GetResource() const noexcept
   return context_->GetResource();
 }
 
-void MeterProvider::AddMetricReader(std::shared_ptr<MetricReader> reader) noexcept
+void MeterProvider::AddMetricReader(std::shared_ptr<MetricReader> reader,
+                                    std::unique_ptr<MetricFilter> metric_filter) noexcept
 {
-  context_->AddMetricReader(std::move(reader));
+  context_->AddMetricReader(std::move(reader), std::move(metric_filter));
 }
 
 void MeterProvider::AddView(std::unique_ptr<InstrumentSelector> instrument_selector,

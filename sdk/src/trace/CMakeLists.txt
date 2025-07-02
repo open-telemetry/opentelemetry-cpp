@@ -10,6 +10,7 @@ add_library(
   tracer.cc
   span.cc
   exporter.cc
+  provider.cc
   batch_span_processor.cc
   batch_span_processor_factory.cc
   simple_processor_factory.cc
@@ -20,7 +21,8 @@ add_library(
   samplers/trace_id_ratio.cc
   samplers/trace_id_ratio_factory.cc
   random_id_generator.cc
-  random_id_generator_factory.cc)
+  random_id_generator_factory.cc
+  tracer_config.cc)
 
 set_target_properties(opentelemetry_trace PROPERTIES EXPORT_NAME trace)
 set_target_version(opentelemetry_trace)
@@ -33,13 +35,6 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
 if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_trace
-    EXPORT "${PROJECT_NAME}-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
   opentelemetry_add_pkgconfig(
     trace "OpenTelemetry SDK - Trace"
     "Components for exporting traces in the OpenTelemetry SDK."

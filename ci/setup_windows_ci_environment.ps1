@@ -19,4 +19,13 @@ $VCPKG_DIR = (Get-Item -Path ".\").FullName
 # nlohmann-json
 ./vcpkg "--vcpkg-root=$VCPKG_DIR" install nlohmann-json:x64-windows
 
+# grpc
+./vcpkg "--vcpkg-root=$VCPKG_DIR" install grpc:x64-windows
+
+# curl
+./vcpkg "--vcpkg-root=$VCPKG_DIR" install curl:x64-windows
+
+# prometheus-cpp
+./vcpkg "--vcpkg-root=$VCPKG_DIR" install prometheus-cpp:x64-windows
+
 Pop-Location

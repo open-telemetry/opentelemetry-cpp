@@ -19,20 +19,18 @@ if(nlohmann_json_clone)
   add_dependencies(opentelemetry_exporter_etw nlohmann_json::nlohmann_json)
 endif()
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_exporter_etw
-    EXPORT "${PROJECT_NAME}-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-  install(
-    DIRECTORY include/opentelemetry/exporters/etw
-    DESTINATION include/opentelemetry/exporters
-    FILES_MATCHING
-    PATTERN "*.h")
-endif()
+otel_add_component(
+  COMPONENT
+  exporters_etw
+  TARGETS
+  opentelemetry_exporter_etw
+  FILES_DIRECTORY
+  "include/opentelemetry/exporters/etw"
+  FILES_DESTINATION
+  "include/opentelemetry/exporters"
+  FILES_MATCHING
+  PATTERN
+  "*.h")
 
 if(BUILD_TESTING)
   add_executable(etw_provider_test test/etw_provider_test.cc)

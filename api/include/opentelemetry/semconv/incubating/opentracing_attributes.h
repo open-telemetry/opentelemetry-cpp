@@ -20,21 +20,21 @@ namespace opentracing
 {
 
 /**
- * Parent-child Reference type
- * <p>
- * The causal relationship between a child Span and a parent Span.
+  Parent-child Reference type
+  <p>
+  The causal relationship between a child Span and a parent Span.
  */
 static constexpr const char *kOpentracingRefType = "opentracing.ref_type";
 
 namespace OpentracingRefTypeValues
 {
 /**
- * The parent Span depends on the child Span in some capacity
+  The parent Span depends on the child Span in some capacity
  */
 static constexpr const char *kChildOf = "child_of";
 
 /**
- * The parent Span doesn't depend in any way on the result of the child Span
+  The parent Span doesn't depend in any way on the result of the child Span
  */
 static constexpr const char *kFollowsFrom = "follows_from";
 

@@ -157,9 +157,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_METRICS_HEADERS");
 }
-#  endif
 
-#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigHttpsSecureFromEnv)
 {
@@ -175,9 +173,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigHttpsSecureFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE");
 }
-#  endif
 
-#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigHttpInsecureFromEnv)
 {
@@ -193,9 +189,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigHttpInsecureFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE");
 }
-#  endif
 
-#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigUnknownSecureFromEnv)
 {
@@ -210,9 +204,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigUnknownSecureFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE");
 }
-#  endif
 
-#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigUnknownInsecureFromEnv)
 {
@@ -227,7 +219,57 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigUnknownInsecureFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE");
 }
-#  endif
+
+TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryDefaultValues)
+{
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 5);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5.0f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 1.5f);
+}
+
+TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryValuesFromEnv)
+{
+  setenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_MAX_ATTEMPTS", "123", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_INITIAL_BACKOFF", "4.5", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_MAX_BACKOFF", "6.7", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
+
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 123);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 8.9f);
+
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_BACKOFF_MULTIPLIER");
+}
+
+TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryGenericValuesFromEnv)
+{
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS", "321", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF", "5.4", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
+  setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
+
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter());
+  const auto options = GetOptions(exporter);
+  ASSERT_EQ(options.retry_policy_max_attempts, 321);
+  ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4f);
+  ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6f);
+  ASSERT_FLOAT_EQ(options.retry_policy_backoff_multiplier, 9.8f);
+
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF");
+  unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
+}
+#  endif  // NO_GETENV
 
 TEST_F(OtlpGrpcMetricExporterTestPeer, CheckGetAggregationTemporality)
 {

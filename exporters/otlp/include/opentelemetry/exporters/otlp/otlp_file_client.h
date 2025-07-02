@@ -40,6 +40,10 @@ public:
                           OtlpFileClientRuntimeOptions &&runtime_options);
 
   ~OtlpFileClient();
+  OtlpFileClient(const OtlpFileClient &)            = delete;
+  OtlpFileClient &operator=(const OtlpFileClient &) = delete;
+  OtlpFileClient(OtlpFileClient &&)                 = delete;
+  OtlpFileClient &operator=(OtlpFileClient &&)      = delete;
 
   /**
    * Sync export
@@ -81,9 +85,9 @@ private:
   bool is_shutdown_;
 
   // The configuration options associated with this file client.
-  const OtlpFileClientOptions options_;
+  OtlpFileClientOptions options_;
   // The runtime options associated with this file client.
-  const OtlpFileClientRuntimeOptions runtime_options_;
+  OtlpFileClientRuntimeOptions runtime_options_;
 
   opentelemetry::nostd::shared_ptr<OtlpFileAppender> backend_;
 };

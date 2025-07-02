@@ -20,12 +20,12 @@ namespace thread
 {
 
 /**
- * Current "managed" thread ID (as opposed to OS thread ID).
+  Current "managed" thread ID (as opposed to OS thread ID).
  */
 static constexpr const char *kThreadId = "thread.id";
 
 /**
- * Current thread name.
+  Current thread name.
  */
 static constexpr const char *kThreadName = "thread.name";
 

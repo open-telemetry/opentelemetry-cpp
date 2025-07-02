@@ -4,14 +4,14 @@
 #include <benchmark/benchmark.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <algorithm>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <utility>
 #include <vector>
 
-#include "opentelemetry/sdk/common/attributemap_hash.h"
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
@@ -39,10 +39,9 @@ void BM_AttributseHashMap(benchmark::State &state)
       return std::unique_ptr<Aggregation>(new DropAggregation);
     };
     m.lock();
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes[i % 2]);
-    hash_map.GetOrSetDefault(attributes[i % 2], create_default_aggregation, hash)
+    hash_map.GetOrSetDefault(attributes[i % 2], create_default_aggregation)
         ->Aggregate(static_cast<int64_t>(1));
-    benchmark::DoNotOptimize(hash_map.Has(hash));
+    benchmark::DoNotOptimize(hash_map.Has(attributes[i % 2]));
     m.unlock();
   };
   while (state.KeepRunning())
