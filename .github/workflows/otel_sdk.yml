@@ -22,7 +22,14 @@ jobs:
       # - uses: Cyberboss/install-winget@6f566e9e227561d5d31e45d65f9b777b3fa8f56f
       - run: winget list --accept-source-agreements --disable-interactivity
       - run: winget install bazelisk -r bazel --accept-package-agreements --disable-interactivity --silent
-      - run: winget install -e LLVM.LLVM -v 20.1.7 --accept-package-agreements --disable-interactivity --silent || echo swalloing errors
+      - name: Install LLVM with winget (ignore if already installed)
+        shell: pwsh
+        run: |
+          winget install -e LLVM.LLVM -v 20.1.7 --accept-package-agreements --disable-interactivity --silent
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "Winget install failed or not needed (already installed)"
+            exit 0
+          }
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
         with:
