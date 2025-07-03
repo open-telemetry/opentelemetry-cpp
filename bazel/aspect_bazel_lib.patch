@@ -1,0 +1,20 @@
+--- a/lib/private/write_source_file.bzl
++++ b/lib/private/write_source_file.bzl
+@@ -323,7 +323,7 @@ def _write_source_file_bat(ctx, paths):
+ @echo off
+ set runfiles_dir=%cd%
+ if defined BUILD_WORKSPACE_DIRECTORY (
+-    cd %BUILD_WORKSPACE_DIRECTORY%
++    cd /d %BUILD_WORKSPACE_DIRECTORY%
+ )"""]
+
+     progress_message = ""
+@@ -360,7 +360,7 @@ if exist "%in%\\*" (
+         ))
+
+     contents.extend([
+-        "cd %runfiles_dir%",
++        "cd /d %runfiles_dir%",
+         "@rem Run the update scripts for all write_source_file deps",
+     ])
+     for update_script in additional_update_scripts:
