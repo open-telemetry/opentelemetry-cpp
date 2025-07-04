@@ -13,7 +13,9 @@ namespace sdk
 namespace configuration
 {
 
-enum enum_temporality_preference : std::uint8_t
+// YAML-SCHEMA: schema/meter_provider.json
+// YAML-NODE: ExporterTemporalityPreference
+enum class TemporalityPreference : std::uint8_t
 {
   cumulative,
   delta,
