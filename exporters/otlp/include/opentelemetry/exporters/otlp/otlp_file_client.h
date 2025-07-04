@@ -40,6 +40,10 @@ public:
                           OtlpFileClientRuntimeOptions &&runtime_options);
 
   ~OtlpFileClient();
+  OtlpFileClient(const OtlpFileClient &)            = delete;
+  OtlpFileClient &operator=(const OtlpFileClient &) = delete;
+  OtlpFileClient(OtlpFileClient &&)                 = delete;
+  OtlpFileClient &operator=(OtlpFileClient &&)      = delete;
 
   /**
    * Sync export
