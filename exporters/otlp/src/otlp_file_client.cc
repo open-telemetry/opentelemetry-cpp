@@ -1029,13 +1029,13 @@ public:
 
     MaybeRotateLog(data.size());
 
-    std::shared_ptr<FILE> out = OpenLogFile(true);
+    std::shared_ptr<std::FILE> out = OpenLogFile(true);
     if (!out)
     {
       return;
     }
 
-    fwrite(data.data(), 1, data.size(), out.get());
+    std::fwrite(data.data(), 1, data.size(), out.get());
 
     {
       std::lock_guard<std::mutex> lock_guard{file_->file_lock};
@@ -1043,7 +1043,7 @@ public:
       file_->record_count += record_count;
 
       // Pipe file size always returns 0, we ignore the size limit of it.
-      auto written_size = ftell(out.get());
+      auto written_size = std::ftell(out.get());
       if (written_size >= 0)
       {
         file_->written_size = static_cast<std::size_t>(written_size);
@@ -1055,7 +1055,7 @@ public:
         {
           file_->left_flush_record_count = options_.flush_count;
 
-          fflush(out.get());
+          std::fflush(out.get());
 
           file_->flushed_record_count.store(file_->record_count.load(std::memory_order_acquire),
                                             std::memory_order_release);
@@ -1217,7 +1217,7 @@ private:
     OpenLogFile(false);
   }
 
-  std::shared_ptr<FILE> OpenLogFile(bool destroy_content)
+  std::shared_ptr<std::FILE> OpenLogFile(bool destroy_content)
   {
     std::lock_guard<std::mutex> lock_guard{file_->file_lock};
 
@@ -1293,10 +1293,10 @@ private:
                               << " failed with pattern: " << options_.file_pattern << hint);
       return nullptr;
     }
-    std::shared_ptr<FILE> of = std::shared_ptr<std::FILE>(new_file, fclose);
+    std::shared_ptr<std::FILE> of = std::shared_ptr<std::FILE>(new_file, fclose);
 
-    fseek(of.get(), 0, SEEK_END);
-    file_->written_size = static_cast<size_t>(ftell(of.get()));
+    std::fseek(of.get(), 0, SEEK_END);
+    file_->written_size = static_cast<size_t>(std::ftell(of.get()));
 
     file_->current_file    = of;
     file_->last_checkpoint = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -1512,7 +1512,7 @@ private:
 
             if (concurrency_file->current_file)
             {
-              fflush(concurrency_file->current_file.get());
+              std::fflush(concurrency_file->current_file.get());
             }
 
             concurrency_file->flushed_record_count.store(current_record_count,
@@ -1567,7 +1567,7 @@ private:
     std::size_t rotate_index;
     std::size_t written_size;
     std::size_t left_flush_record_count;
-    std::shared_ptr<FILE> current_file;
+    std::shared_ptr<std::FILE> current_file;
     std::mutex file_lock;
     std::time_t last_checkpoint;
     std::string file_path;
