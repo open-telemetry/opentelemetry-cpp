@@ -42,6 +42,9 @@ Increment the:
 * [CodeHealth] Fix clang-tidy warnings part 4
   [#3501](https://github.com/open-telemetry/opentelemetry-cpp/pull/3501)
 
+* [CMAKE] Clean up googletest and benchmark dependency management
+  [#3485](https://github.com/open-telemetry/opentelemetry-cpp/pull/3485)
+
 Important changes:
 
 * [REMOVAL] Removed deprecated semantic convention header files
