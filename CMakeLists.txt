@@ -385,9 +385,6 @@ if(WITH_OTLP_GRPC
     find_package(gRPC CONFIG)
   endif()
   if((NOT Protobuf_FOUND) OR (WITH_OTLP_GRPC AND NOT gRPC_FOUND))
-    if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
-      install_windows_deps()
-    endif()
 
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
       message(FATAL_ERROR "Windows dependency installation failed!")
