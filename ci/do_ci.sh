@@ -262,6 +262,7 @@ elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}" \
         -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
         -DWITH_OPENTRACING=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         "${SRC_DIR}"
   make -j $(nproc)
   make test
@@ -273,6 +274,7 @@ elif [[ "$1" == "cmake.opentracing_shim.install.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}" \
         -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
         -DWITH_OPENTRACING=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
         "${SRC_DIR}"
   make -j $(nproc)
