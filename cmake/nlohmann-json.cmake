@@ -61,7 +61,7 @@ else()
     nlohmann_json_download
     PREFIX third_party
     GIT_REPOSITORY https://github.com/nlohmann/json.git
-    GIT_TAG "${nlohmann-json}"
+    GIT_TAG "${nlohmann-json_GIT_TAG}"
     UPDATE_COMMAND ""
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                -DJSON_BuildTests=OFF -DJSON_Install=ON

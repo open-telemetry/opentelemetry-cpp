@@ -27,8 +27,6 @@ OtlpFileExporterOptions::OtlpFileExporterOptions()
   backend_options = fs_options;
 }
 
-OtlpFileExporterOptions::~OtlpFileExporterOptions() {}
-
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
