@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <nlohmann/json.hpp>
+
 #include <limits.h>
 #include <atomic>
 #include <chrono>
@@ -12,7 +14,6 @@
 #include <fstream>
 #include <functional>
 #include <mutex>
-#include <nlohmann/json.hpp>
 #include <ratio>
 #include <string>
 #include <thread>
@@ -1238,8 +1239,6 @@ private:
     }
     file_path[file_path_size] = 0;
 
-    std::shared_ptr<FILE> of = std::make_shared<FILE>();
-
     std::string directory_name = FileSystemUtil::DirName(file_path);
     if (!directory_name.empty())
     {
@@ -1294,7 +1293,7 @@ private:
                               << " failed with pattern: " << options_.file_pattern << hint);
       return nullptr;
     }
-    of = std::shared_ptr<std::FILE>(new_file, fclose);
+    std::shared_ptr<FILE> of = std::shared_ptr<std::FILE>(new_file, fclose);
 
     fseek(of.get(), 0, SEEK_END);
     file_->written_size = static_cast<size_t>(ftell(of.get()));
