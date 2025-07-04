@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 
+#include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -14,16 +15,6 @@ namespace sdk
 {
 namespace configuration
 {
-
-enum enum_instrument_type : std::uint8_t
-{
-  counter,
-  histogram,
-  observable_counter,
-  observable_gauge,
-  observable_up_down_counter,
-  up_down_counter
-};
 
 // YAML-SCHEMA: schema/meter_provider.json
 // YAML-NODE: ViewSelector
@@ -38,7 +29,7 @@ public:
   ~ViewSelectorConfiguration()                                                 = default;
 
   std::string instrument_name;
-  enum_instrument_type instrument_type{counter};
+  InstrumentType instrument_type{InstrumentType::counter};
   std::string unit;
   std::string meter_name;
   std::string meter_version;
