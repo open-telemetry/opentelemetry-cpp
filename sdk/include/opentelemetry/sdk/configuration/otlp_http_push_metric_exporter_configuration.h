@@ -38,9 +38,10 @@ public:
   std::string headers_list;
   std::string compression;
   std::size_t timeout{0};
-  enum_otlp_http_encoding encoding{protobuf};
-  enum_temporality_preference temporality_preference{cumulative};
-  enum_default_histogram_aggregation default_histogram_aggregation{explicit_bucket_histogram};
+  OtlpHttpEncoding encoding{OtlpHttpEncoding::protobuf};
+  TemporalityPreference temporality_preference{TemporalityPreference::cumulative};
+  DefaultHistogramAggregation default_histogram_aggregation{
+      DefaultHistogramAggregation::explicit_bucket_histogram};
 };
 
 }  // namespace configuration
