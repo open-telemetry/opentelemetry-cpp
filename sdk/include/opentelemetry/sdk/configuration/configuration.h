@@ -34,6 +34,15 @@
  *   Yaml node OpenTelemetryConfiguration,
  * in file
  * https://github.com/open-telemetry/opentelemetry-configuration/blob/main/schema/opentelemetry_configuration.json
+ *
+ * Every property in the yaml schema is already documented in the
+ * opentelemetry-configuration repository,
+ * in file schema/type_descriptions.yaml, see
+ * https://github.com/open-telemetry/opentelemetry-configuration/blob/main/schema/type_descriptions.yaml
+ *
+ * As a result, C++ class members representing yaml properties are not
+ * commented with details, refer to the source of truth in
+ * type_descriptions.yaml directly.
  */
 
 OPENTELEMETRY_BEGIN_NAMESPACE

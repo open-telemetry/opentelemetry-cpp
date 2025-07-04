@@ -180,6 +180,40 @@ jobs:
       run: |
         (cd ./functional/otlp; ./run_test.sh)
 
+  cmake_clang_yaml_config:
+    name: CMake clang 18 (maintainer mode, yaml config)
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/clang-18
+        CXX: /usr/bin/clang++-18
+        PROTOBUF_VERSION: 21.12
+      run: |
+        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
+        sudo -E ./ci/setup_googletest.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/install_protobuf.sh
+        sudo -E ./ci/install_ryml.sh
+    - name: run cmake clang (maintainer mode, sync)
+      env:
+        CC: /usr/bin/clang-18
+        CXX: /usr/bin/clang++-18
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.yaml.test
+    - name: generate test cert
+      env:
+        CFSSL_VERSION: 1.6.3
+      run: |
+        sudo -E ./tools/setup-cfssl.sh
+        (cd ./functional/cert; ./generate_cert.sh)
+    - name: run func test
+      run: |
+        (cd ./functional/otlp; ./run_test.sh)
+
   cmake_clang_maintainer_async_test:
     name: CMake clang 18 (maintainer mode, async)
     runs-on: ubuntu-24.04

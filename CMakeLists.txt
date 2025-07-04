@@ -86,6 +86,8 @@ endif()
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
 option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
 
+option(WITH_CONFIGURATION "EXPERIMENTAL: YAML configuration file" OFF)
+
 file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
      OPENTELEMETRY_CPP_HEADER_VERSION_H)
 
@@ -495,6 +497,18 @@ endif()
 
 if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/nlohmann-json.cmake")
+endif()
+
+#
+# Do we need RapidYaml ?
+#
+
+if((NOT WITH_API_ONLY) AND WITH_CONFIGURATION)
+  find_package(ryml 0.7.2 REQUIRED)
+  message(
+    STATUS
+      "Found ryml: include ${RYML_INCLUDE_DIR}, lib ${RYML_LIB_DIR}, version ${ryml_VERSION}"
+  )
 endif()
 
 if(OTELCPP_MAINTAINER_MODE)
