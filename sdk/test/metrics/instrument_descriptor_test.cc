@@ -49,7 +49,7 @@ TEST(InstrumentDescriptorUtilTest, IsDuplicate)
       InstrumentDescriptorUtil::IsDuplicate(instrument_existing, instrument_different_name));
 
   // not a duplicate - identical instrument
-  auto instrument_identical = instrument_existing;
+  const auto &instrument_identical = instrument_existing;
   EXPECT_FALSE(InstrumentDescriptorUtil::IsDuplicate(instrument_existing, instrument_identical));
 
   // not a duplicate - instrument with same case-insensitive name
@@ -87,8 +87,8 @@ TEST(InstrumentDescriptorTest, EqualNameCaseInsensitiveOperator)
 {
   // equal by name, description, unit, type and value type
   InstrumentEqualNameCaseInsensitive equal_operator{};
-  auto instrument_existing  = CreateInstrumentDescriptor("counter");
-  auto instrument_identical = instrument_existing;
+  auto instrument_existing         = CreateInstrumentDescriptor("counter");
+  const auto &instrument_identical = instrument_existing;
   EXPECT_TRUE(equal_operator(instrument_existing, instrument_identical));
 
   // equal by name with different case
@@ -127,8 +127,8 @@ TEST(InstrumentDescriptorTest, HashOperator)
   InstrumentDescriptorHash hash_operator{};
 
   // identical instrument - hash must match
-  auto instrument_existing  = CreateInstrumentDescriptor("counter");
-  auto instrument_identical = instrument_existing;
+  auto instrument_existing         = CreateInstrumentDescriptor("counter");
+  const auto &instrument_identical = instrument_existing;
   EXPECT_EQ(hash_operator(instrument_existing), hash_operator(instrument_identical));
 
   // name case conflict - hash must match
