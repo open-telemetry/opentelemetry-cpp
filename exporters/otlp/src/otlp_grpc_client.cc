@@ -238,7 +238,7 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
   stub->experimental_async()
 #  endif
       ->Export(call_data->grpc_context.get(), call_data->request, call_data->response,
-               [call_data, async_data, export_data_name](::grpc::Status grpc_status) {
+               [call_data, async_data, export_data_name](const ::grpc::Status &grpc_status) {
                  {
                    std::lock_guard<std::mutex> lock{async_data->running_calls_lock};
                    async_data->running_calls.erase(

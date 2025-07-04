@@ -25,7 +25,6 @@ namespace otlp
 struct OPENTELEMETRY_EXPORT OtlpGrpcMetricExporterOptions : public OtlpGrpcClientOptions
 {
   OtlpGrpcMetricExporterOptions();
-  ~OtlpGrpcMetricExporterOptions();
 
   /** Preferred Aggregation Temporality. */
   PreferredAggregationTemporality aggregation_temporality;

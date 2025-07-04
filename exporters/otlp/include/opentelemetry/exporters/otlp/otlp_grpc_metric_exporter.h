@@ -55,6 +55,10 @@ public:
   explicit OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptions &options);
 
   ~OtlpGrpcMetricExporter() override;
+  OtlpGrpcMetricExporter(const OtlpGrpcMetricExporter &)            = delete;
+  OtlpGrpcMetricExporter(OtlpGrpcMetricExporter &&)                 = delete;
+  OtlpGrpcMetricExporter &operator=(const OtlpGrpcMetricExporter &) = delete;
+  OtlpGrpcMetricExporter &operator=(OtlpGrpcMetricExporter &&)      = delete;
 
   /**
    * Get the AggregationTemporality for exporter

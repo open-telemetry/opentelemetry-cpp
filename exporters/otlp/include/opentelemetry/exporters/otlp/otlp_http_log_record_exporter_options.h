@@ -33,7 +33,6 @@ namespace otlp
 struct OPENTELEMETRY_EXPORT OtlpHttpLogRecordExporterOptions
 {
   OtlpHttpLogRecordExporterOptions();
-  ~OtlpHttpLogRecordExporterOptions();
 
   /** The endpoint to export to. */
   std::string url;
