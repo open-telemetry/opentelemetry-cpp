@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <map>
 #include <memory>
 
 #include "opentelemetry/sdk/configuration/string_array_configuration.h"
@@ -15,9 +14,9 @@ namespace sdk
 namespace configuration
 {
 
-// YAML-SCHEMA: schema/resource.json
-// YAML-NODE: Detectors
-class DetectorsConfiguration
+// YAML-SCHEMA: schema/common.json
+// YAML-NODE: IncludeExclude
+class IncludeExcludeConfiguration
 {
 public:
   std::unique_ptr<StringArrayConfiguration> included;
