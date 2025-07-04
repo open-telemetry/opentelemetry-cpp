@@ -36,6 +36,7 @@
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/integer_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/integer_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
@@ -929,28 +930,28 @@ SdkBuilder::CreatePropagator(
 }
 
 static opentelemetry::sdk::metrics::InstrumentType ConvertInstrumentType(
-    enum opentelemetry::sdk::configuration::enum_instrument_type config)
+    enum opentelemetry::sdk::configuration::InstrumentType config)
 {
   opentelemetry::sdk::metrics::InstrumentType sdk;
 
   switch (config)
   {
-    case opentelemetry::sdk::configuration::counter:
+    case opentelemetry::sdk::configuration::InstrumentType::counter:
       sdk = opentelemetry::sdk::metrics::InstrumentType::kCounter;
       break;
-    case opentelemetry::sdk::configuration::histogram:
+    case opentelemetry::sdk::configuration::InstrumentType::histogram:
       sdk = opentelemetry::sdk::metrics::InstrumentType::kHistogram;
       break;
-    case opentelemetry::sdk::configuration::observable_counter:
+    case opentelemetry::sdk::configuration::InstrumentType::observable_counter:
       sdk = opentelemetry::sdk::metrics::InstrumentType::kObservableCounter;
       break;
-    case opentelemetry::sdk::configuration::observable_gauge:
+    case opentelemetry::sdk::configuration::InstrumentType::observable_gauge:
       sdk = opentelemetry::sdk::metrics::InstrumentType::kObservableGauge;
       break;
-    case opentelemetry::sdk::configuration::observable_up_down_counter:
+    case opentelemetry::sdk::configuration::InstrumentType::observable_up_down_counter:
       sdk = opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter;
       break;
-    case opentelemetry::sdk::configuration::up_down_counter:
+    case opentelemetry::sdk::configuration::InstrumentType::up_down_counter:
       sdk = opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter;
       break;
   }

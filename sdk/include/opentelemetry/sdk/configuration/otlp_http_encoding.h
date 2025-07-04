@@ -13,7 +13,9 @@ namespace sdk
 namespace configuration
 {
 
-enum enum_otlp_http_encoding : std::uint8_t
+// YAML-SCHEMA: schema/common.json
+// YAML-NODE: OtlpHttpEncoding
+enum class OtlpHttpEncoding : std::uint8_t
 {
   protobuf,
   json

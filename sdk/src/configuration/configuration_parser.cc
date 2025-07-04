@@ -44,6 +44,7 @@
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
+#include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/integer_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/integer_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
@@ -427,37 +428,37 @@ static std::unique_ptr<LoggerProviderConfiguration> ParseLoggerProviderConfigura
   return model;
 }
 
-static enum_default_histogram_aggregation ParseDefaultHistogramAggregation(const std::string &name)
+static DefaultHistogramAggregation ParseDefaultHistogramAggregation(const std::string &name)
 {
   if (name == "explicit_bucket_histogram")
   {
-    return explicit_bucket_histogram;
+    return DefaultHistogramAggregation::explicit_bucket_histogram;
   }
 
   if (name == "base2_exponential_bucket_histogram")
   {
-    return base2_exponential_bucket_histogram;
+    return DefaultHistogramAggregation::base2_exponential_bucket_histogram;
   }
 
   OTEL_INTERNAL_LOG_ERROR("ParseDefaultHistogramAggregation: name = " << name);
   throw InvalidSchemaException("Illegal default_histogram_aggregation");
 }
 
-static enum_temporality_preference ParseTemporalityPreference(const std::string &name)
+static TemporalityPreference ParseTemporalityPreference(const std::string &name)
 {
   if (name == "cumulative")
   {
-    return cumulative;
+    return TemporalityPreference::cumulative;
   }
 
   if (name == "delta")
   {
-    return delta;
+    return TemporalityPreference::delta;
   }
 
   if (name == "low_memory")
   {
-    return low_memory;
+    return TemporalityPreference::low_memory;
   }
 
   OTEL_INTERNAL_LOG_ERROR("ParseTemporalityPreference: name = " << name);
@@ -741,36 +742,36 @@ static std::unique_ptr<MetricReaderConfiguration> ParseMetricReaderConfiguration
   return model;
 }
 
-static enum_instrument_type ParseInstrumentType(const std::string &name)
+static InstrumentType ParseInstrumentType(const std::string &name)
 {
   if (name == "counter")
   {
-    return counter;
+    return InstrumentType::counter;
   }
 
   if (name == "histogram")
   {
-    return histogram;
+    return InstrumentType::histogram;
   }
 
   if (name == "observable_counter")
   {
-    return observable_counter;
+    return InstrumentType::observable_counter;
   }
 
   if (name == "observable_gauge")
   {
-    return observable_gauge;
+    return InstrumentType::observable_gauge;
   }
 
   if (name == "observable_up_down_counter")
   {
-    return observable_up_down_counter;
+    return InstrumentType::observable_up_down_counter;
   }
 
   if (name == "up_down_counter")
   {
-    return up_down_counter;
+    return InstrumentType::up_down_counter;
   }
 
   OTEL_INTERNAL_LOG_ERROR("ParseInstrumentType: name = " << name);

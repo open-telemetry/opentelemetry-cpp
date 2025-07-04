@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <map>
 #include <memory>
 
 #include "opentelemetry/sdk/configuration/string_array_configuration.h"

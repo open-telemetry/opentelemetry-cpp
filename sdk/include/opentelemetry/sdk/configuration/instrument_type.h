@@ -14,11 +14,15 @@ namespace configuration
 {
 
 // YAML-SCHEMA: schema/meter_provider.json
-// YAML-NODE: ExporterDefaultHistogramAggregation
-enum class DefaultHistogramAggregation : std::uint8_t
+// YAML-NODE: InstrumentType
+enum class InstrumentType : std::uint8_t
 {
-  explicit_bucket_histogram,
-  base2_exponential_bucket_histogram
+  counter,
+  histogram,
+  observable_counter,
+  observable_gauge,
+  observable_up_down_counter,
+  up_down_counter
 };
 
 }  // namespace configuration
