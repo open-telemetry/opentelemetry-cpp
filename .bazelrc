@@ -73,7 +73,8 @@ build:macos --strip=never --copt=-g --cxxopt=-g
 #build:macos --host_action_env=/Library/Developer/CommandLineTools/usr/bin/clang
 build:macos --action_env=CC=/opt/homebrew/opt/llvm/bin/clang
 build:macos --host_action_env=CC=/opt/homebrew/opt/llvm/bin/clang
-#build:macos --apple_generate_dsym --output_groups=+dsyms
+build:macos --apple_generate_dsym --output_groups=+dsyms
+build:macos --objc_generate_linkmap --output_groups=+linkmaps
 
 # Windows specific asan setup
 # common:asanwin --copt -fsanitize=address,bool,float-cast-overflow,integer-divide-by-zero,null,return,returns-nonnull-attribute,shift-exponent,signed-integer-overflow,unreachable,vla-bound
