@@ -27,7 +27,10 @@ if(NOT OpenTracing_FOUND)
     set(_SAVED_BUILD_TESTING ${BUILD_TESTING})
   endif()
 
+  # Set the cache variables for the opentracing build
   set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+  set(BUILD_MOCKTRACER OFF CACHE BOOL "" FORCE)
+
   FetchContent_MakeAvailable(opentracing)
 
   # Restore the saved state of BUILD_TESTING
