@@ -34,7 +34,7 @@ if(NOT OpenTracing_FOUND)
   if(DEFINED _SAVED_BUILD_TESTING)
     set(BUILD_TESTING ${_SAVED_BUILD_TESTING} CACHE BOOL "" FORCE)
   else()
-    unset(BUILD_TESTING)
+    unset(BUILD_TESTING CACHE)
   endif()
 
   # Patch the opentracing targets to set missing includes, add namespaced alias targets, disable iwyu and clang-tidy.
