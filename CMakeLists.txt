@@ -36,11 +36,6 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
-# Note: CMAKE_FIND_PACKAGE_PREFER_CONFIG requires cmake 3.15. Prefer cmake
-# CONFIG search mode to find dependencies. This is important to properly find
-# protobuf versions 3.22.0 and above due to the abseil-cpp dependency.
-set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
-
 # Don't use customized cmake modules if vcpkg is used to resolve dependence.
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/")
@@ -77,10 +72,6 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE
       "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       CACHE STRING "")
-endif()
-
-if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
-  include("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
 endif()
 
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
