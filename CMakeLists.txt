@@ -497,6 +497,14 @@ if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/nlohmann-json.cmake")
 endif()
 
+#
+# Do we need OpenTracing ?
+#
+
+if(WITH_OPENTRACING)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/opentracing-cpp.cmake")
+endif()
+
 if(OTELCPP_MAINTAINER_MODE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     message(STATUS "Building with gcc in maintainer mode.")
@@ -701,6 +709,10 @@ endif()
 if(prometheus-cpp_FOUND)
   message(STATUS "prometheus-cpp: ${prometheus-cpp_VERSION}")
 endif()
+if(WITH_OPENTRACING)
+  message(
+    STATUS "opentracing-cpp: ${OpenTracing_VERSION} (${OpenTracing_PROVIDER})")
+endif()
 message(STATUS "---------------------------------------------")
 
 include("${opentelemetry-cpp_SOURCE_DIR}/cmake/otel-install-functions.cmake")
@@ -724,30 +736,6 @@ endif()
 add_subdirectory(api)
 
 if(WITH_OPENTRACING)
-  find_package(OpenTracing CONFIG QUIET)
-  if(NOT OpenTracing_FOUND)
-    set(OPENTRACING_DIR "third_party/opentracing-cpp")
-    message(STATUS "Trying to use local ${OPENTRACING_DIR} from submodule")
-    if(EXISTS "${PROJECT_SOURCE_DIR}/${OPENTRACING_DIR}/.git")
-      set(SAVED_BUILD_TESTING ${BUILD_TESTING})
-      set(BUILD_TESTING OFF)
-      set(SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE
-          ${CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
-      set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "")
-      add_subdirectory(${OPENTRACING_DIR})
-      set(BUILD_TESTING ${SAVED_BUILD_TESTING})
-      set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE
-          ${SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
-    else()
-      message(
-        FATAL_ERROR
-          "\nopentracing-cpp package was not found. Please either provide it manually or clone with submodules. "
-          "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
-          "git submodule update --init --recursive")
-    endif()
-  else()
-    message(STATUS "Using external opentracing-cpp")
-  endif()
   add_subdirectory(opentracing-shim)
 endif()
 
