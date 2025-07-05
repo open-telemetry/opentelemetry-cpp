@@ -25,7 +25,7 @@ protobuf/*:shared=False
 abseil/*:fPIC=True
 abseil/*:shared=False
 opentracing-cpp/*:fPIC=True
-opentracing-cpp/*:shared=True
+opentracing-cpp/*:shared=False
 pcre2/*:with_bzip2=False
 
 [test_requires]
