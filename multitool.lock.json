@@ -48,33 +48,33 @@
     "binaries": [
       {
         "kind": "archive",
-        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.128.0/otelcol-contrib_0.128.0_linux_amd64.tar.gz",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.129.1/otelcol-contrib_0.129.1_linux_amd64.tar.gz",
         "file": "otelcol-contrib",
-        "sha256": "09b1332e29968bacdb7ce564073302ef9567c71919842544b4382f0f15456fd6",
+        "sha256": "6fe3531656660a8f145872cc1502371cb20e6d7da70fdc9a64bf6ebdaba20403",
         "os": "linux",
         "cpu": "x86_64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.128.0/otelcol-contrib_0.128.0_darwin_arm64.tar.gz",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.129.1/otelcol-contrib_0.129.1_darwin_arm64.tar.gz",
         "file": "otelcol-contrib",
-        "sha256": "6a5e030ccd6152facb1570a5bb5f794473fac39c6afaa48492f426276c291376",
+        "sha256": "bd5c2acb501d525da72a55136894a619e3539026640368ff8249d5829cd51f21",
         "os": "macos",
         "cpu": "arm64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.128.0/otelcol-contrib_0.128.0_darwin_amd64.tar.gz",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.129.1/otelcol-contrib_0.129.1_darwin_amd64.tar.gz",
         "file": "otelcol-contrib",
-        "sha256": "a1e8cef1a5770b9c7f5a41cff24945faa53bfccbae38512b62a1af119887d7d4",
+        "sha256": "ebacdb322c1a9adab9b1bc9d118f1a25278df30419a45ce345bbf05c77c680ba",
         "os": "macos",
         "cpu": "x86_64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.128.0/otelcol-contrib_0.128.0_windows_amd64.tar.gz",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.129.1/otelcol-contrib_0.129.1_windows_amd64.tar.gz",
         "file": "otelcol-contrib.exe",
-        "sha256": "9652536817f64539d162b85497e2de039b49c631018318072305e12c31d2f211",
+        "sha256": "f970e1898ecd870f24e552fa6a3322805ab0c4f186d3fe6537b26a792f696f18",
         "os": "windows",
         "cpu": "x86_64"
       }
@@ -84,33 +84,33 @@
     "binaries": [
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.51.0/perses_0.51.0_linux_amd64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.51.1/perses_0.51.1_linux_amd64.tar.gz",
         "file": "percli",
-        "sha256": "317a59ce306bfcc46241f24ef488cd2030d45c743cf3351d5dbd15980b7a3797",
+        "sha256": "48a1909193e60114482b244c916694a5c5e55aa5fde4f5c224a2cecc502c3205",
         "os": "linux",
         "cpu": "x86_64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.51.0/perses_0.51.0_darwin_arm64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.51.1/perses_0.51.1_darwin_arm64.tar.gz",
         "file": "percli",
-        "sha256": "b2dc88a9c0addfaba6c746e1eb48afe768c40078c18acac8ee058d9e1a8806f5",
+        "sha256": "abac4d5ec09ac01186c0614dbef9566936464fca20f6f25529086f8c1b659536",
         "os": "macos",
         "cpu": "arm64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.51.0/perses_0.51.0_darwin_amd64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.51.1/perses_0.51.1_darwin_amd64.tar.gz",
         "file": "percli",
-        "sha256": "18205d29f394abb76454e679554f748c03f9b80a901e895d6113c533b9d4ee67",
+        "sha256": "05bb9060f02345d32075b8cfc778eb8e7b54bf08754a12fd89669ed0ed847a3d",
         "os": "macos",
         "cpu": "x86_64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.51.0/perses_0.51.0_windows_amd64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.51.1/perses_0.51.1_windows_amd64.tar.gz",
         "file": "percli.exe",
-        "sha256": "fb603d96335737076efa391660fb56a014126dc6da647ba72fed3c553e45eb77",
+        "sha256": "cde2764669f72c2c5737adba87afcdf12d5a08cec969fba0f6b73e190cc70dac",
         "os": "windows",
         "cpu": "x86_64"
       }
@@ -120,33 +120,33 @@
     "binaries": [
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.51.0/perses_0.51.0_linux_amd64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.51.1/perses_0.51.1_linux_amd64.tar.gz",
         "file": "perses",
-        "sha256": "317a59ce306bfcc46241f24ef488cd2030d45c743cf3351d5dbd15980b7a3797",
+        "sha256": "48a1909193e60114482b244c916694a5c5e55aa5fde4f5c224a2cecc502c3205",
         "os": "linux",
         "cpu": "x86_64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.51.0/perses_0.51.0_darwin_arm64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.51.1/perses_0.51.1_darwin_arm64.tar.gz",
         "file": "perses",
-        "sha256": "b2dc88a9c0addfaba6c746e1eb48afe768c40078c18acac8ee058d9e1a8806f5",
+        "sha256": "abac4d5ec09ac01186c0614dbef9566936464fca20f6f25529086f8c1b659536",
         "os": "macos",
         "cpu": "arm64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.51.0/perses_0.51.0_darwin_amd64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.51.1/perses_0.51.1_darwin_amd64.tar.gz",
         "file": "perses",
-        "sha256": "18205d29f394abb76454e679554f748c03f9b80a901e895d6113c533b9d4ee67",
+        "sha256": "05bb9060f02345d32075b8cfc778eb8e7b54bf08754a12fd89669ed0ed847a3d",
         "os": "macos",
         "cpu": "x86_64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/perses/perses/releases/download/v0.51.0/perses_0.51.0_windows_amd64.tar.gz",
+        "url": "https://github.com/perses/perses/releases/download/v0.51.1/perses_0.51.1_windows_amd64.tar.gz",
         "file": "perses.exe",
-        "sha256": "fb603d96335737076efa391660fb56a014126dc6da647ba72fed3c553e45eb77",
+        "sha256": "cde2764669f72c2c5737adba87afcdf12d5a08cec969fba0f6b73e190cc70dac",
         "os": "windows",
         "cpu": "x86_64"
       }
