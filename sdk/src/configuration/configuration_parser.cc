@@ -101,6 +101,22 @@ namespace configuration
 // FIXME: proper sizing
 constexpr size_t MAX_SAMPLER_DEPTH = 10;
 
+static OtlpHttpEncoding ParseOtlpHttpEncoding(const std::string &name)
+{
+  if (name == "protobuf")
+  {
+    return OtlpHttpEncoding::protobuf;
+  }
+
+  if (name == "json")
+  {
+    return OtlpHttpEncoding::json;
+  }
+
+  OTEL_INTERNAL_LOG_ERROR("OtlpHttpEncoding: name = " << name);
+  throw InvalidSchemaException("Illegal OtlpHttpEncoding");
+}
+
 static std::unique_ptr<StringArrayConfiguration> ParseStringArrayConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
@@ -199,7 +215,9 @@ ParseOtlpHttpLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
-  // FIXME: encoding
+
+  std::string encoding = node->GetString("encoding", "protobuf");
+  model->encoding      = ParseOtlpHttpEncoding(encoding);
 
   return model;
 }
@@ -493,6 +511,9 @@ ParseOtlpHttpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
   std::string default_histogram_aggregation = node->GetString("default_histogram_aggregation", "");
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(default_histogram_aggregation);
+
+  std::string encoding = node->GetString("encoding", "protobuf");
+  model->encoding      = ParseOtlpHttpEncoding(encoding);
 
   return model;
 }
@@ -1212,6 +1233,9 @@ static std::unique_ptr<OtlpHttpSpanExporterConfiguration> ParseOtlpHttpSpanExpor
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
+
+  std::string encoding = node->GetString("encoding", "protobuf");
+  model->encoding      = ParseOtlpHttpEncoding(encoding);
 
   return model;
 }
