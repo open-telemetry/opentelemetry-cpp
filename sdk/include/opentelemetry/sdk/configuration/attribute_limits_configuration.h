@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <cstdint>
+#include <cstddef>
 
 #include "opentelemetry/version.h"
 
@@ -13,13 +13,13 @@ namespace sdk
 namespace configuration
 {
 
-// YAML-SCHEMA: schema/meter_provider.json
-// YAML-NODE: ExporterTemporalityPreference
-enum class TemporalityPreference : std::uint8_t
+// YAML-SCHEMA: schema/opentelemetry_configuration.json
+// YAML-NODE: AttributeLimits
+class AttributeLimitsConfiguration
 {
-  cumulative,
-  delta,
-  low_memory
+public:
+  std::size_t attribute_value_length_limit;
+  std::size_t attribute_count_limit;
 };
 
 }  // namespace configuration

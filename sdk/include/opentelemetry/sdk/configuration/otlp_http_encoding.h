@@ -13,13 +13,12 @@ namespace sdk
 namespace configuration
 {
 
-// YAML-SCHEMA: schema/meter_provider.json
-// YAML-NODE: ExporterTemporalityPreference
-enum class TemporalityPreference : std::uint8_t
+// YAML-SCHEMA: schema/common.json
+// YAML-NODE: OtlpHttpEncoding
+enum class OtlpHttpEncoding : std::uint8_t
 {
-  cumulative,
-  delta,
-  low_memory
+  protobuf,
+  json
 };
 
 }  // namespace configuration
