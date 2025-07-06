@@ -14,12 +14,11 @@ namespace configuration
 {
 
 // YAML-SCHEMA: schema/meter_provider.json
-// YAML-NODE: ExporterTemporalityPreference
-enum class TemporalityPreference : std::uint8_t
+// YAML-NODE: ExporterDefaultHistogramAggregation
+enum class DefaultHistogramAggregation : std::uint8_t
 {
-  cumulative,
-  delta,
-  low_memory
+  explicit_bucket_histogram,
+  base2_exponential_bucket_histogram
 };
 
 }  // namespace configuration
