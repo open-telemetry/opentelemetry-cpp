@@ -21,13 +21,6 @@ namespace configuration
 class ViewSelectorConfiguration
 {
 public:
-  ViewSelectorConfiguration()                                                  = default;
-  ViewSelectorConfiguration(ViewSelectorConfiguration &&)                      = default;
-  ViewSelectorConfiguration(const ViewSelectorConfiguration &)                 = default;
-  ViewSelectorConfiguration &operator=(ViewSelectorConfiguration &&)           = default;
-  ViewSelectorConfiguration &operator=(const ViewSelectorConfiguration &other) = default;
-  ~ViewSelectorConfiguration()                                                 = default;
-
   std::string instrument_name;
   InstrumentType instrument_type{InstrumentType::counter};
   std::string unit;
