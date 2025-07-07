@@ -506,10 +506,11 @@ ParseOtlpHttpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
 
-  std::string temporality_preference = node->GetString("temporality_preference", "");
+  std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
   model->temporality_preference      = ParseTemporalityPreference(temporality_preference);
 
-  std::string default_histogram_aggregation = node->GetString("default_histogram_aggregation", "");
+  std::string default_histogram_aggregation =
+      node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(default_histogram_aggregation);
 
@@ -541,10 +542,11 @@ ParseOtlpGrpcPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
 
-  std::string temporality_preference = node->GetString("temporality_preference", "");
+  std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
   model->temporality_preference      = ParseTemporalityPreference(temporality_preference);
 
-  std::string default_histogram_aggregation = node->GetString("default_histogram_aggregation", "");
+  std::string default_histogram_aggregation =
+      node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(default_histogram_aggregation);
 
@@ -562,10 +564,11 @@ ParseOtlpFilePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
 
   model->output_stream = node->GetString("output_stream", "");
 
-  std::string temporality_preference = node->GetString("temporality_preference", "");
+  std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
   model->temporality_preference      = ParseTemporalityPreference(temporality_preference);
 
-  std::string default_histogram_aggregation = node->GetString("default_histogram_aggregation", "");
+  std::string default_histogram_aggregation =
+      node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(default_histogram_aggregation);
 
@@ -577,6 +580,8 @@ ParseConsolePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> 
 {
   std::unique_ptr<ConsolePushMetricExporterConfiguration> model(
       new ConsolePushMetricExporterConfiguration);
+
+  // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/242
 
   return model;
 }
@@ -993,11 +998,20 @@ static std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfigurati
     model->readers.push_back(ParseMetricReaderConfiguration(*it));
   }
 
-  child = node->GetRequiredChildNode("views");
-
-  for (auto it = child->begin(); it != child->end(); ++it)
+  if (model->readers.size() == 0)
   {
-    model->views.push_back(ParseViewConfiguration(*it));
+    OTEL_INTERNAL_LOG_ERROR("ParseMeterProviderConfiguration: 0 readers ");
+    throw InvalidSchemaException("Illegal readers");
+  }
+
+  child = node->GetChildNode("views");
+
+  if (child != nullptr)
+  {
+    for (auto it = child->begin(); it != child->end(); ++it)
+    {
+      model->views.push_back(ParseViewConfiguration(*it));
+    }
   }
 
   return model;
