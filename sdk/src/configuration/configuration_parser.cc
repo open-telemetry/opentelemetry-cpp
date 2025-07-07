@@ -62,6 +62,7 @@
 #include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_http_encoding.h"
 #include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
@@ -100,6 +101,22 @@ namespace configuration
 
 // FIXME: proper sizing
 constexpr size_t MAX_SAMPLER_DEPTH = 10;
+
+static OtlpHttpEncoding ParseOtlpHttpEncoding(const std::string &name)
+{
+  if (name == "protobuf")
+  {
+    return OtlpHttpEncoding::protobuf;
+  }
+
+  if (name == "json")
+  {
+    return OtlpHttpEncoding::json;
+  }
+
+  OTEL_INTERNAL_LOG_ERROR("OtlpHttpEncoding: name = " << name);
+  throw InvalidSchemaException("Illegal OtlpHttpEncoding");
+}
 
 static std::unique_ptr<StringArrayConfiguration> ParseStringArrayConfiguration(
     const std::unique_ptr<DocumentNode> &node)
@@ -199,7 +216,9 @@ ParseOtlpHttpLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
-  // FIXME: encoding
+
+  std::string encoding = node->GetString("encoding", "protobuf");
+  model->encoding      = ParseOtlpHttpEncoding(encoding);
 
   return model;
 }
@@ -487,12 +506,16 @@ ParseOtlpHttpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
 
-  std::string temporality_preference = node->GetString("temporality_preference", "");
+  std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
   model->temporality_preference      = ParseTemporalityPreference(temporality_preference);
 
-  std::string default_histogram_aggregation = node->GetString("default_histogram_aggregation", "");
+  std::string default_histogram_aggregation =
+      node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(default_histogram_aggregation);
+
+  std::string encoding = node->GetString("encoding", "protobuf");
+  model->encoding      = ParseOtlpHttpEncoding(encoding);
 
   return model;
 }
@@ -519,10 +542,11 @@ ParseOtlpGrpcPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
 
-  std::string temporality_preference = node->GetString("temporality_preference", "");
+  std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
   model->temporality_preference      = ParseTemporalityPreference(temporality_preference);
 
-  std::string default_histogram_aggregation = node->GetString("default_histogram_aggregation", "");
+  std::string default_histogram_aggregation =
+      node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(default_histogram_aggregation);
 
@@ -540,10 +564,11 @@ ParseOtlpFilePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
 
   model->output_stream = node->GetString("output_stream", "");
 
-  std::string temporality_preference = node->GetString("temporality_preference", "");
+  std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
   model->temporality_preference      = ParseTemporalityPreference(temporality_preference);
 
-  std::string default_histogram_aggregation = node->GetString("default_histogram_aggregation", "");
+  std::string default_histogram_aggregation =
+      node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(default_histogram_aggregation);
 
@@ -555,6 +580,8 @@ ParseConsolePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> 
 {
   std::unique_ptr<ConsolePushMetricExporterConfiguration> model(
       new ConsolePushMetricExporterConfiguration);
+
+  // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/242
 
   return model;
 }
@@ -845,8 +872,8 @@ ParseBase2ExponentialBucketHistogramAggregationConfiguration(
   std::unique_ptr<Base2ExponentialBucketHistogramAggregationConfiguration> model(
       new Base2ExponentialBucketHistogramAggregationConfiguration);
 
-  model->max_scale      = node->GetInteger("max_scale", 0);  // FIXME: default ?
-  model->max_size       = node->GetInteger("max_size", 0);   // FIXME: default ?
+  model->max_scale      = node->GetInteger("max_scale", 20);
+  model->max_size       = node->GetInteger("max_size", 160);
   model->record_min_max = node->GetBoolean("record_min_max", true);
 
   return model;
@@ -971,11 +998,20 @@ static std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfigurati
     model->readers.push_back(ParseMetricReaderConfiguration(*it));
   }
 
-  child = node->GetRequiredChildNode("views");
-
-  for (auto it = child->begin(); it != child->end(); ++it)
+  if (model->readers.size() == 0)
   {
-    model->views.push_back(ParseViewConfiguration(*it));
+    OTEL_INTERNAL_LOG_ERROR("ParseMeterProviderConfiguration: 0 readers ");
+    throw InvalidSchemaException("Illegal readers");
+  }
+
+  child = node->GetChildNode("views");
+
+  if (child != nullptr)
+  {
+    for (auto it = child->begin(); it != child->end(); ++it)
+    {
+      model->views.push_back(ParseViewConfiguration(*it));
+    }
   }
 
   return model;
@@ -1047,6 +1083,7 @@ static std::unique_ptr<JaegerRemoteSamplerConfiguration> ParseJaegerRemoteSample
   std::unique_ptr<DocumentNode> child;
 
   // Unclear if endpoint and interval are required/optional
+  // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/238
   OTEL_INTERNAL_LOG_ERROR("JaegerRemoteSamplerConfiguration: FIXME");
 
   model->endpoint = node->GetString("endpoint", "FIXME");
@@ -1212,6 +1249,9 @@ static std::unique_ptr<OtlpHttpSpanExporterConfiguration> ParseOtlpHttpSpanExpor
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
+
+  std::string encoding = node->GetString("encoding", "protobuf");
+  model->encoding      = ParseOtlpHttpEncoding(encoding);
 
   return model;
 }
