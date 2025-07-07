@@ -45,6 +45,12 @@ if(NOT prometheus-cpp_FOUND)
 
   # Set the prometheus-cpp_VERSION variable from the git tag.
   string(REGEX REPLACE "^v([0-9]+\\.[0-9]+\\.[0-9]+)$" "\\1" prometheus-cpp_VERSION "${prometheus-cpp_GIT_TAG}")
+
+  # Disable iwyu and clang-tidy
+  foreach(_prometheus_target core pull civetweb)
+    set_target_properties(${_prometheus_target} PROPERTIES CXX_INCLUDE_WHAT_YOU_USE ""
+                                                     CXX_CLANG_TIDY "")
+  endforeach()
 endif()
 
 if(NOT TARGET prometheus-cpp::core OR
