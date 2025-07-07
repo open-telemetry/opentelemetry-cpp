@@ -34,6 +34,12 @@ if(NOT nlohmann_json_FOUND)
 
   # Set the nlohmann_json_VERSION variable from the git tag.
   string(REGEX REPLACE "^v([0-9]+\\.[0-9]+\\.[0-9]+)$" "\\1" nlohmann_json_VERSION "${nlohmann-json_GIT_TAG}")
+
+  #Disable iwyu and clang-tidy
+  if(TARGET nlohmann_json)
+    set_target_properties(nlohmann_json PROPERTIES CXX_INCLUDE_WHAT_YOU_USE ""
+                                                     CXX_CLANG_TIDY "")
+  endif()
 endif()
 
 if(NOT TARGET nlohmann_json::nlohmann_json)
