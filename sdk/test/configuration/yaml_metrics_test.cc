@@ -2,11 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "opentelemetry/sdk/configuration/configuration.h"
-#include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
+#include "opentelemetry/sdk/configuration/headers_configuration.h"
+#include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
+#include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_encoding.h"
@@ -14,6 +19,7 @@
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/temporality_preference.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
 
 static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(
@@ -440,13 +446,14 @@ meter_provider:
   ASSERT_NE(periodic->exporter, nullptr);
   auto *exporter = periodic->exporter.get();
   ASSERT_NE(exporter, nullptr);
+
+#if 0
   auto *console =
       reinterpret_cast<opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration *>(
           exporter);
 
   // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/242
 
-#if 0
   ASSERT_EQ(console->temporality_preference,
             opentelemetry::sdk::configuration::TemporalityPreference::cumulative);
   ASSERT_EQ(
@@ -480,13 +487,14 @@ meter_provider:
   ASSERT_NE(periodic->exporter, nullptr);
   auto *exporter = periodic->exporter.get();
   ASSERT_NE(exporter, nullptr);
+
+#if 0
   auto *console =
       reinterpret_cast<opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration *>(
           exporter);
 
   // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/242
 
-#if 0
   ASSERT_EQ(console->temporality_preference,
             opentelemetry::sdk::configuration::TemporalityPreference::cumulative);
   ASSERT_EQ(
