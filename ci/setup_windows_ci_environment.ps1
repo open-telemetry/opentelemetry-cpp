@@ -10,6 +10,9 @@ $VCPKG_DIR = (Get-Item -Path ".\").FullName
 ./bootstrap-vcpkg.bat
 ./vcpkg integrate install
 
+# Microsoft.GSL
+./vcpkg "--vcpkg-root=$VCPKG_DIR" install ms-gsl:x64-windows
+
 # Google Benchmark
 ./vcpkg "--vcpkg-root=$VCPKG_DIR" install benchmark:x64-windows
 
