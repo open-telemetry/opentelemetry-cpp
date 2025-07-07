@@ -13,7 +13,7 @@ single_version_override(
         "bazel/aspect_bazel_lib.patch",
     ],
 )
-bazel_dep(name = "bazel_skylib", version = "1.8.0")
+bazel_dep(name = "bazel_skylib", version = "1.8.1")
 bazel_dep(name = "boringssl", version = "0.20250701.0")
 single_version_override(
     module_name = "boringssl",
