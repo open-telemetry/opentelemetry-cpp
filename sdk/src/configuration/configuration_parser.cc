@@ -62,6 +62,7 @@
 #include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_http_encoding.h"
 #include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
@@ -866,8 +867,8 @@ ParseBase2ExponentialBucketHistogramAggregationConfiguration(
   std::unique_ptr<Base2ExponentialBucketHistogramAggregationConfiguration> model(
       new Base2ExponentialBucketHistogramAggregationConfiguration);
 
-  model->max_scale      = node->GetInteger("max_scale", 0);  // FIXME: default ?
-  model->max_size       = node->GetInteger("max_size", 0);   // FIXME: default ?
+  model->max_scale      = node->GetInteger("max_scale", 20);
+  model->max_size       = node->GetInteger("max_size", 160);
   model->record_min_max = node->GetBoolean("record_min_max", true);
 
   return model;
@@ -1068,6 +1069,7 @@ static std::unique_ptr<JaegerRemoteSamplerConfiguration> ParseJaegerRemoteSample
   std::unique_ptr<DocumentNode> child;
 
   // Unclear if endpoint and interval are required/optional
+  // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/238
   OTEL_INTERNAL_LOG_ERROR("JaegerRemoteSamplerConfiguration: FIXME");
 
   model->endpoint = node->GetString("endpoint", "FIXME");
