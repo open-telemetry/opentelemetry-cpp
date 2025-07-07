@@ -7,8 +7,8 @@
 #include <memory>
 #include <string>
 
-#include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/configuration/instrument_type.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

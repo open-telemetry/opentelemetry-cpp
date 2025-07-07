@@ -7,8 +7,8 @@
 #include <memory>
 #include <string>
 
-#include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

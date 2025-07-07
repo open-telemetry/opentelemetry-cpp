@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include "opentelemetry/sdk/configuration/string_array_configuration.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/configuration/string_array_configuration.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

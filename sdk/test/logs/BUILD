@@ -106,8 +106,8 @@ otel_cc_test(
         "logs",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/logs",
         "@googletest//:gtest_main",
-    ],
+    ]),
 )

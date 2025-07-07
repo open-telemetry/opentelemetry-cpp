@@ -6,9 +6,9 @@
 #include <memory>
 #include <string>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

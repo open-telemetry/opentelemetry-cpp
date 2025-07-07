@@ -30,8 +30,8 @@ otel_cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@googletest//:gtest_main",
-    ],
+    ]),
 )
