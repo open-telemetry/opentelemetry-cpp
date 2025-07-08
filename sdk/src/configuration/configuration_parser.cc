@@ -771,6 +771,11 @@ static std::unique_ptr<MetricReaderConfiguration> ParseMetricReaderConfiguration
 
 static InstrumentType ParseInstrumentType(const std::string &name)
 {
+  if (name == "")
+  {
+    return InstrumentType::none;
+  }
+
   if (name == "counter")
   {
     return InstrumentType::counter;
