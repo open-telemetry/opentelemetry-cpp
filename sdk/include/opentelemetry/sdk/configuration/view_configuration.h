@@ -3,8 +3,10 @@
 
 #pragma once
 
-#include <cstdint>
+#include <memory>
 
+#include "opentelemetry/sdk/configuration/view_selector_configuration.h"
+#include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -14,12 +16,12 @@ namespace configuration
 {
 
 // YAML-SCHEMA: schema/meter_provider.json
-// YAML-NODE: ExporterTemporalityPreference
-enum class TemporalityPreference : std::uint8_t
+// YAML-NODE: View
+class ViewConfiguration
 {
-  cumulative,
-  delta,
-  low_memory
+public:
+  std::unique_ptr<ViewSelectorConfiguration> selector;
+  std::unique_ptr<ViewStreamConfiguration> stream;
 };
 
 }  // namespace configuration
