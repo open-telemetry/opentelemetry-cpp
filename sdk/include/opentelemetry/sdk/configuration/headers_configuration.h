@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include <cstdint>
+#include <map>
+#include <string>
 
 #include "opentelemetry/version.h"
 
@@ -13,13 +14,10 @@ namespace sdk
 namespace configuration
 {
 
-// YAML-SCHEMA: schema/meter_provider.json
-// YAML-NODE: ExporterTemporalityPreference
-enum class TemporalityPreference : std::uint8_t
+class HeadersConfiguration
 {
-  cumulative,
-  delta,
-  low_memory
+public:
+  std::map<std::string, std::string> kv_map;
 };
 
 }  // namespace configuration

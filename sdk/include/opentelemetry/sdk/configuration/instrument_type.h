@@ -14,12 +14,15 @@ namespace configuration
 {
 
 // YAML-SCHEMA: schema/meter_provider.json
-// YAML-NODE: ExporterTemporalityPreference
-enum class TemporalityPreference : std::uint8_t
+// YAML-NODE: InstrumentType
+enum class InstrumentType : std::uint8_t
 {
-  cumulative,
-  delta,
-  low_memory
+  counter,
+  histogram,
+  observable_counter,
+  observable_gauge,
+  observable_up_down_counter,
+  up_down_counter
 };
 
 }  // namespace configuration
