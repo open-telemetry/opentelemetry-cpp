@@ -696,7 +696,9 @@ if(ZLIB_FOUND)
   message(STATUS "ZLIB: ${ZLIB_VERSION}")
 endif()
 if(USE_NLOHMANN_JSON)
-  message(STATUS "nlohmann-json: ${nlohmann_json_VERSION}")
+  message(
+    STATUS "nlohmann-json: ${nlohmann_json_VERSION} (${nlohmann_json_PROVIDER})"
+  )
 endif()
 if(prometheus-cpp_FOUND)
   message(STATUS "prometheus-cpp: ${prometheus-cpp_VERSION}")
