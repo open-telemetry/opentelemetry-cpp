@@ -105,17 +105,24 @@ public:
 class DocumentNodeConstIterator
 {
 public:
-  DocumentNodeConstIterator(DocumentNodeConstIteratorImpl *impl) : impl_(impl) {}
+  DocumentNodeConstIterator(std::unique_ptr<DocumentNodeConstIteratorImpl> impl)
+      : impl_(std::move(impl))
+  {}
   DocumentNodeConstIterator(DocumentNodeConstIterator &&)                      = default;
-  DocumentNodeConstIterator(const DocumentNodeConstIterator &)                 = default;
+  DocumentNodeConstIterator(const DocumentNodeConstIterator &)                 = delete;
   DocumentNodeConstIterator &operator=(DocumentNodeConstIterator &&)           = default;
-  DocumentNodeConstIterator &operator=(const DocumentNodeConstIterator &other) = default;
+  DocumentNodeConstIterator &operator=(const DocumentNodeConstIterator &other) = delete;
+  ~DocumentNodeConstIterator()                                                 = default;
 
-  ~DocumentNodeConstIterator() { delete impl_; }
+  bool operator==(const DocumentNodeConstIterator &rhs) const
+  {
+    return (impl_->Equal(rhs.impl_.get()));
+  }
 
-  bool operator==(const DocumentNodeConstIterator &rhs) const { return (impl_->Equal(rhs.impl_)); }
-
-  bool operator!=(const DocumentNodeConstIterator &rhs) const { return (!impl_->Equal(rhs.impl_)); }
+  bool operator!=(const DocumentNodeConstIterator &rhs) const
+  {
+    return (!impl_->Equal(rhs.impl_.get()));
+  }
 
   std::unique_ptr<DocumentNode> operator*() const { return impl_->Item(); }
 
@@ -126,27 +133,29 @@ public:
   }
 
 private:
-  DocumentNodeConstIteratorImpl *impl_;
+  std::unique_ptr<DocumentNodeConstIteratorImpl> impl_;
 };
 
 class PropertiesNodeConstIterator
 {
 public:
-  PropertiesNodeConstIterator(PropertiesNodeConstIteratorImpl *impl) : impl_(impl) {}
+  PropertiesNodeConstIterator(std::unique_ptr<PropertiesNodeConstIteratorImpl> impl)
+      : impl_(std::move(impl))
+  {}
   PropertiesNodeConstIterator(PropertiesNodeConstIterator &&)                      = default;
-  PropertiesNodeConstIterator(const PropertiesNodeConstIterator &)                 = default;
+  PropertiesNodeConstIterator(const PropertiesNodeConstIterator &)                 = delete;
   PropertiesNodeConstIterator &operator=(PropertiesNodeConstIterator &&)           = default;
-  PropertiesNodeConstIterator &operator=(const PropertiesNodeConstIterator &other) = default;
-  ~PropertiesNodeConstIterator() { delete impl_; }
+  PropertiesNodeConstIterator &operator=(const PropertiesNodeConstIterator &other) = delete;
+  ~PropertiesNodeConstIterator()                                                   = default;
 
   bool operator==(const PropertiesNodeConstIterator &rhs) const
   {
-    return (impl_->Equal(rhs.impl_));
+    return (impl_->Equal(rhs.impl_.get()));
   }
 
   bool operator!=(const PropertiesNodeConstIterator &rhs) const
   {
-    return (!impl_->Equal(rhs.impl_));
+    return (!impl_->Equal(rhs.impl_.get()));
   }
 
   std::string Name() const { return impl_->Name(); }
@@ -159,7 +168,7 @@ public:
   }
 
 private:
-  PropertiesNodeConstIteratorImpl *impl_;
+  std::unique_ptr<PropertiesNodeConstIteratorImpl> impl_;
 };
 
 }  // namespace configuration

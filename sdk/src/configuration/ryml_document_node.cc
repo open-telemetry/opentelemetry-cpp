@@ -6,6 +6,7 @@
 #include <ostream>
 #include <ryml.hpp>
 #include <string>
+#include <utility>
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
@@ -363,15 +364,20 @@ DocumentNodeConstIterator RymlDocumentNode::begin() const
   }
 #endif  // WITH_DEBUG_NODE
 
-  return DocumentNodeConstIterator(new RymlDocumentNodeConstIteratorImpl(node_, 0, depth_));
+  auto impl = std::unique_ptr<DocumentNodeConstIteratorImpl>(
+      new RymlDocumentNodeConstIteratorImpl(node_, 0, depth_));
+
+  return DocumentNodeConstIterator(std::move(impl));
 }
 
 DocumentNodeConstIterator RymlDocumentNode::end() const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::end()");
 
-  return DocumentNodeConstIterator(
+  auto impl = std::unique_ptr<DocumentNodeConstIteratorImpl>(
       new RymlDocumentNodeConstIteratorImpl(node_, node_.num_children(), depth_));
+
+  return DocumentNodeConstIterator(std::move(impl));
 }
 
 size_t RymlDocumentNode::num_children() const
@@ -400,15 +406,20 @@ PropertiesNodeConstIterator RymlDocumentNode::begin_properties() const
   }
 #endif  // WITH_DEBUG_NODE
 
-  return PropertiesNodeConstIterator(new RymlPropertiesNodeConstIteratorImpl(node_, 0, depth_));
+  auto impl = std::unique_ptr<PropertiesNodeConstIteratorImpl>(
+      new RymlPropertiesNodeConstIteratorImpl(node_, 0, depth_));
+
+  return PropertiesNodeConstIterator(std::move(impl));
 }
 
 PropertiesNodeConstIterator RymlDocumentNode::end_properties() const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::end_properties()");
 
-  return PropertiesNodeConstIterator(
+  auto impl = std::unique_ptr<PropertiesNodeConstIteratorImpl>(
       new RymlPropertiesNodeConstIteratorImpl(node_, node_.num_children(), depth_));
+
+  return PropertiesNodeConstIterator(std::move(impl));
 }
 
 RymlDocumentNodeConstIteratorImpl::RymlDocumentNodeConstIteratorImpl(ryml::ConstNodeRef parent,

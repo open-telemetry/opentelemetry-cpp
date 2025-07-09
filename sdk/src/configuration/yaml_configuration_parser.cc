@@ -57,22 +57,13 @@ std::unique_ptr<Configuration> YamlConfigurationParser::ParseFile(const std::str
   return conf;
 }
 
-static std::unique_ptr<Document> RymlParse(const std::string &source, const std::string &content)
-{
-  std::unique_ptr<Document> doc;
-
-  doc = RymlDocument::Parse(source, content);
-
-  return doc;
-}
-
 std::unique_ptr<Configuration> YamlConfigurationParser::ParseString(const std::string &source,
                                                                     const std::string &content)
 {
   std::unique_ptr<Document> doc;
   std::unique_ptr<Configuration> config;
 
-  doc = RymlParse(source, content);
+  doc = RymlDocument::Parse(source, content);
 
   try
   {
