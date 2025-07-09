@@ -7,12 +7,13 @@
 #include <string>
 #include <vector>
 
-#include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
+#include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
+#include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_configuration.h"
@@ -22,6 +23,7 @@
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/string_array_configuration.h"
 #include "opentelemetry/sdk/configuration/temporality_preference.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"

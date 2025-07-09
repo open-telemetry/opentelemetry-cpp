@@ -936,6 +936,7 @@ static opentelemetry::sdk::metrics::InstrumentType ConvertInstrumentType(
 
   switch (config)
   {
+    case opentelemetry::sdk::configuration::InstrumentType::none:
     case opentelemetry::sdk::configuration::InstrumentType::counter:
       sdk = opentelemetry::sdk::metrics::InstrumentType::kCounter;
       break;
@@ -1192,6 +1193,13 @@ void SdkBuilder::AddView(
     const std::unique_ptr<opentelemetry::sdk::configuration::ViewConfiguration> &model) const
 {
   auto *selector = model->selector.get();
+
+  if (selector->instrument_type == opentelemetry::sdk::configuration::InstrumentType::none)
+  {
+    std::string die("Runtime does not support InstrumentSelector for any instrument");
+    OTEL_INTERNAL_LOG_ERROR(die);
+    throw UnsupportedException(die);
+  }
 
   auto sdk_instrument_type = ConvertInstrumentType(selector->instrument_type);
 

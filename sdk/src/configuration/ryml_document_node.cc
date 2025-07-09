@@ -6,6 +6,7 @@
 #include <ostream>
 #include <ryml.hpp>
 #include <string>
+#include <utility>
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
