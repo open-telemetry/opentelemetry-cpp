@@ -45,7 +45,7 @@ if(NOT CURL_FOUND)
   endif()
 
   # Set the CURL_VERSION variable from the git tag.
-  string(REGEX REPLACE "^v([0-9]+\\.[0-9]+\\.[0-9]+)$" "\\1" CURL_VERSION "${curl_GIT_TAG}")
+  string(REGEX REPLACE "^curl-([0-9]+)_([0-9]+)_([0-9]+)$" "\\1.\\2.\\3" CURL_VERSION "${curl_GIT_TAG}")
 
   # disable iwyu and clang-tidy
   foreach(_curl_target libcurl_shared libcurl_static)
