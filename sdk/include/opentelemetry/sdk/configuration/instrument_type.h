@@ -17,6 +17,7 @@ namespace configuration
 // YAML-NODE: InstrumentType
 enum class InstrumentType : std::uint8_t
 {
+  none, /* Represents a null entry */
   counter,
   histogram,
   observable_counter,
