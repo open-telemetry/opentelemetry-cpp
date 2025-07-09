@@ -36,11 +36,6 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
-# Note: CMAKE_FIND_PACKAGE_PREFER_CONFIG requires cmake 3.15. Prefer cmake
-# CONFIG search mode to find dependencies. This is important to properly find
-# protobuf versions 3.22.0 and above due to the abseil-cpp dependency.
-set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
-
 # Don't use customized cmake modules if vcpkg is used to resolve dependence.
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/")
@@ -77,10 +72,6 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE
       "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       CACHE STRING "")
-endif()
-
-if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
-  include("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
 endif()
 
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
@@ -455,6 +446,14 @@ if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/nlohmann-json.cmake")
 endif()
 
+#
+# Do we need OpenTracing ?
+#
+
+if(WITH_OPENTRACING)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/opentracing-cpp.cmake")
+endif()
+
 if(OTELCPP_MAINTAINER_MODE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     message(STATUS "Building with gcc in maintainer mode.")
@@ -654,12 +653,18 @@ if(ZLIB_FOUND)
   message(STATUS "ZLIB: ${ZLIB_VERSION}")
 endif()
 if(USE_NLOHMANN_JSON)
-  message(STATUS "nlohmann-json: ${nlohmann_json_VERSION}")
+  message(
+    STATUS "nlohmann-json: ${nlohmann_json_VERSION} (${nlohmann_json_PROVIDER})"
+  )
 endif()
 if(WITH_PROMETHEUS)
   message(
     STATUS
       "prometheus-cpp: ${prometheus-cpp_VERSION} (${prometheus-cpp_PROVIDER})")
+endif()
+if(WITH_OPENTRACING)
+  message(
+    STATUS "opentracing-cpp: ${OpenTracing_VERSION} (${OpenTracing_PROVIDER})")
 endif()
 message(STATUS "---------------------------------------------")
 
@@ -684,30 +689,6 @@ endif()
 add_subdirectory(api)
 
 if(WITH_OPENTRACING)
-  find_package(OpenTracing CONFIG QUIET)
-  if(NOT OpenTracing_FOUND)
-    set(OPENTRACING_DIR "third_party/opentracing-cpp")
-    message(STATUS "Trying to use local ${OPENTRACING_DIR} from submodule")
-    if(EXISTS "${PROJECT_SOURCE_DIR}/${OPENTRACING_DIR}/.git")
-      set(SAVED_BUILD_TESTING ${BUILD_TESTING})
-      set(BUILD_TESTING OFF)
-      set(SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE
-          ${CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
-      set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "")
-      add_subdirectory(${OPENTRACING_DIR})
-      set(BUILD_TESTING ${SAVED_BUILD_TESTING})
-      set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE
-          ${SAVED_CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
-    else()
-      message(
-        FATAL_ERROR
-          "\nopentracing-cpp package was not found. Please either provide it manually or clone with submodules. "
-          "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
-          "git submodule update --init --recursive")
-    endif()
-  else()
-    message(STATUS "Using external opentracing-cpp")
-  endif()
   add_subdirectory(opentracing-shim)
 endif()
 
