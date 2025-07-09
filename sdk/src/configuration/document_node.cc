@@ -6,6 +6,7 @@
 #include <ostream>
 #include <string>
 
+#include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
@@ -106,7 +107,8 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text)
   std::string::size_type pos;
   std::string name;
   std::string fallback;
-  const char *sub;
+  std::string sub;
+  bool env_exists;
 
   if (len < 4)
   {
@@ -196,8 +198,8 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text)
     end_fallback   = len - 1;
   }
 
-  sub = std::getenv(name.c_str());
-  if (sub != nullptr)
+  env_exists = sdk::common::GetStringEnvironmentVariable(name.c_str(), sub);
+  if (env_exists)
   {
     return sub;
   }
