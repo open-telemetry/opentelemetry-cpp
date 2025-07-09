@@ -25,6 +25,11 @@ namespace otlp
 struct OPENTELEMETRY_EXPORT OtlpGrpcMetricExporterOptions : public OtlpGrpcClientOptions
 {
   OtlpGrpcMetricExporterOptions();
+  OtlpGrpcMetricExporterOptions(const OtlpGrpcMetricExporterOptions &)            = default;
+  OtlpGrpcMetricExporterOptions(OtlpGrpcMetricExporterOptions &&)                 = default;
+  OtlpGrpcMetricExporterOptions &operator=(const OtlpGrpcMetricExporterOptions &) = default;
+  OtlpGrpcMetricExporterOptions &operator=(OtlpGrpcMetricExporterOptions &&)      = default;
+  ~OtlpGrpcMetricExporterOptions() override;
 
   /** Preferred Aggregation Temporality. */
   PreferredAggregationTemporality aggregation_temporality;
