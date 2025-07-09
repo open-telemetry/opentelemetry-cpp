@@ -9,6 +9,7 @@
 #include <string>
 #include <utility>
 
+#include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_parser.h"
@@ -29,8 +30,12 @@ std::unique_ptr<Configuration> YamlConfigurationParser::ParseFile(const std::str
 
   if (input_file.empty())
   {
-    const char *env_var = std::getenv("OTEL_EXPERIMENTAL_CONFIG_FILE");
-    if (env_var != nullptr)
+    static std::string env_var_name("OTEL_EXPERIMENTAL_CONFIG_FILE");
+    std::string env_var;
+    bool env_exists;
+    env_exists = sdk::common::GetStringEnvironmentVariable(env_var_name.c_str(), env_var);
+
+    if (env_exists)
     {
       input_file = env_var;
     }

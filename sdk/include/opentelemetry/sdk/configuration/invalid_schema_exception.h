@@ -20,11 +20,6 @@ class InvalidSchemaException : public std::runtime_error
 {
 public:
   InvalidSchemaException(const std::string &msg) : std::runtime_error(msg) {}
-  InvalidSchemaException(InvalidSchemaException &&)                      = default;
-  InvalidSchemaException(const InvalidSchemaException &)                 = default;
-  InvalidSchemaException &operator=(InvalidSchemaException &&)           = default;
-  InvalidSchemaException &operator=(const InvalidSchemaException &other) = default;
-  ~InvalidSchemaException() override                                     = default;
 };
 
 }  // namespace configuration
