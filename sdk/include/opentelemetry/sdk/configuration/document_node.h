@@ -108,9 +108,9 @@ public:
   DocumentNodeConstIterator(std::unique_ptr<DocumentNodeConstIteratorImpl> impl)
       : impl_(std::move(impl))
   {}
-  DocumentNodeConstIterator(DocumentNodeConstIterator &&)                      = delete;
+  DocumentNodeConstIterator(DocumentNodeConstIterator &&)                      = default;
   DocumentNodeConstIterator(const DocumentNodeConstIterator &)                 = delete;
-  DocumentNodeConstIterator &operator=(DocumentNodeConstIterator &&)           = delete;
+  DocumentNodeConstIterator &operator=(DocumentNodeConstIterator &&)           = default;
   DocumentNodeConstIterator &operator=(const DocumentNodeConstIterator &other) = delete;
   ~DocumentNodeConstIterator()                                                 = default;
 
@@ -142,9 +142,9 @@ public:
   PropertiesNodeConstIterator(std::unique_ptr<PropertiesNodeConstIteratorImpl> impl)
       : impl_(std::move(impl))
   {}
-  PropertiesNodeConstIterator(PropertiesNodeConstIterator &&)                      = delete;
+  PropertiesNodeConstIterator(PropertiesNodeConstIterator &&)                      = default;
   PropertiesNodeConstIterator(const PropertiesNodeConstIterator &)                 = delete;
-  PropertiesNodeConstIterator &operator=(PropertiesNodeConstIterator &&)           = delete;
+  PropertiesNodeConstIterator &operator=(PropertiesNodeConstIterator &&)           = default;
   PropertiesNodeConstIterator &operator=(const PropertiesNodeConstIterator &other) = delete;
   ~PropertiesNodeConstIterator()                                                   = default;
 
