@@ -237,12 +237,10 @@ private:
     HttpSessionData() = default;
 
     explicit HttpSessionData(
-        std::shared_ptr<opentelemetry::ext::http::client::Session> input_session,
-        std::shared_ptr<opentelemetry::ext::http::client::EventHandler> input_handle)
-    {
-      session.swap(input_session);
-      event_handle.swap(input_handle);
-    }
+        std::shared_ptr<opentelemetry::ext::http::client::Session> &&input_session,
+        std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &&input_handle)
+        : session(std::move(input_session)), event_handle(std::move(input_handle))
+    {}
   };
 
   /**
