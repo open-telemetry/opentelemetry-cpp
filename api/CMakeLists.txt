@@ -9,22 +9,7 @@ target_include_directories(
 
 set_target_properties(opentelemetry_api PROPERTIES EXPORT_NAME api)
 
-otel_add_component(
-  COMPONENT
-  api
-  TARGETS
-  opentelemetry_api
-  FILES_DIRECTORY
-  "include/opentelemetry"
-  FILES_DESTINATION
-  "include"
-  FILES_MATCHING
-  PATTERN
-  "*.h")
-
-if(OPENTELEMETRY_INSTALL)
-  unset(TARGET_DEPS)
-endif()
+unset(TARGET_DEPS)
 
 if(BUILD_TESTING)
   add_subdirectory(test)
@@ -74,18 +59,8 @@ endif()
 
 if(WITH_GSL)
   target_compile_definitions(opentelemetry_api INTERFACE HAVE_GSL)
-
-  # Guidelines Support Library path. Used if we are not on not get C++20.
-  #
-  find_package(Microsoft.GSL QUIET)
-  if(TARGET Microsoft.GSL::GSL)
-    target_link_libraries(opentelemetry_api INTERFACE Microsoft.GSL::GSL)
-    list(APPEND TARGET_DEPS "gsl")
-  else()
-    set(GSL_DIR third_party/ms-gsl)
-    target_include_directories(
-      opentelemetry_api INTERFACE "$<BUILD_INTERFACE:${GSL_DIR}/include>")
-  endif()
+  target_link_libraries(opentelemetry_api INTERFACE Microsoft.GSL::GSL)
+  list(APPEND TARGET_DEPS "gsl")
 endif()
 
 if(WITH_NO_GETENV)
@@ -139,6 +114,19 @@ endif()
 if(APPLE)
   target_link_libraries(opentelemetry_api INTERFACE "-framework CoreFoundation")
 endif()
+
+otel_add_component(
+  COMPONENT
+  api
+  TARGETS
+  opentelemetry_api
+  FILES_DIRECTORY
+  "include/opentelemetry"
+  FILES_DESTINATION
+  "include"
+  FILES_MATCHING
+  PATTERN
+  "*.h")
 
 include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
 
