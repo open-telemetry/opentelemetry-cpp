@@ -22,11 +22,18 @@ if(DEFINED gRPC_PROVIDER AND NOT gRPC_PROVIDER STREQUAL "find_package" AND TARGE
   set(Protobuf_PROVIDER "grpc_submodule")
 else()
 
+  # Search for an installed Protobuf package explicitly using the CONFIG search mode first followed by the MODULE search mode.
+  # Protobuf versions < 3.22.0 may be found using the module mode and some protobuf apt packages do not support the CONFIG search.
+
   find_package(Protobuf CONFIG QUIET)
   set(Protobuf_PROVIDER "find_package")
 
   if(NOT Protobuf_FOUND)
-    FectchContent_Declare(
+    find_package(Protobuf MODULE QUIET)
+  endif()
+
+  if(NOT Protobuf_FOUND)
+    FetchContent_Declare(
       "protobuf"
       GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
       GIT_TAG "${protobuf_GIT_TAG}"
@@ -50,14 +57,14 @@ if(TARGET libprotobuf)
 endif()
 
 if(NOT TARGET protobuf::libprotobuf)
-  message(FATAL_ERROR "A required protobuf target (protobuf::libprotobuf) was not found")
+  message(FATAL_ERROR "A required protobuf target (protobuf::libprotobuf) was not imported")
 endif()
 
 if(CMAKE_CROSSCOMPILING)
   find_program(PROTOBUF_PROTOC_EXECUTABLE protoc)
 else()
   if(NOT TARGET protobuf::protoc)
-    message(FATAL_ERROR "A required protobuf target (protobuf::protoc) was not found")
+    message(FATAL_ERROR "A required protobuf target (protobuf::protoc) was not imported")
   endif()
   set(PROTOBUF_PROTOC_EXECUTABLE "$<TARGET_FILE:protobuf::protoc>")
 endif()
