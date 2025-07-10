@@ -173,6 +173,9 @@ Increment the:
 * [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.36.0
   [#3527](https://github.com/open-telemetry/opentelemetry-cpp/pull/3527)
 
+* [SDK] Fixes duration overflow
+  [#3529](https://github.com/open-telemetry/opentelemetry-cpp/pull/3529)
+
 Important changes:
 
 * [REMOVAL] Removed deprecated semantic convention header files
