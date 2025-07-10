@@ -54,8 +54,7 @@ std::string RymlDocumentNode::Key() const
 
   if (!node_.has_key())
   {
-    OTEL_INTERNAL_LOG_ERROR("Yaml: no key");
-    throw InvalidSchemaException("");
+    throw InvalidSchemaException("Yaml: no key");
   }
 
   ryml::csubstr k = node_.key();
@@ -63,82 +62,80 @@ std::string RymlDocumentNode::Key() const
   return name;
 }
 
-bool RymlDocumentNode::AsBoolean()
+bool RymlDocumentNode::AsBoolean() const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::AsBoolean()");
 
   if (!node_.is_val() && !node_.is_keyval())
   {
-    OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
-    throw InvalidSchemaException("");
+    throw InvalidSchemaException("Yaml: not scalar");
   }
   ryml::csubstr view = node_.val();
   std::string value(view.str, view.len);
   return BooleanFromString(value);
 }
 
-size_t RymlDocumentNode::AsInteger()
+size_t RymlDocumentNode::AsInteger() const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::AsInteger()");
 
   if (!node_.is_val() && !node_.is_keyval())
   {
-    OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
-    throw InvalidSchemaException("");
+    throw InvalidSchemaException("Yaml: not scalar");
   }
   ryml::csubstr view = node_.val();
   std::string value(view.str, view.len);
   return IntegerFromString(value);
 }
 
-double RymlDocumentNode::AsDouble()
+double RymlDocumentNode::AsDouble() const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::AsDouble()");
 
   if (!node_.is_val() && !node_.is_keyval())
   {
-    OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
-    throw InvalidSchemaException("");
+    throw InvalidSchemaException("Yaml: not scalar");
   }
   ryml::csubstr view = node_.val();
   std::string value(view.str, view.len);
   return DoubleFromString(value);
 }
 
-std::string RymlDocumentNode::AsString()
+std::string RymlDocumentNode::AsString() const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::AsString()");
 
   if (!node_.is_val() && !node_.is_keyval())
   {
-    OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
-    throw InvalidSchemaException("");
+    throw InvalidSchemaException("Yaml: not scalar");
   }
   ryml::csubstr view = node_.val();
   std::string value(view.str, view.len);
   return value;
 }
 
-ryml::ConstNodeRef RymlDocumentNode::GetRequiredRymlChildNode(const std::string &name)
+ryml::ConstNodeRef RymlDocumentNode::GetRequiredRymlChildNode(const std::string &name) const
 {
   if (!node_.is_map())
   {
-    OTEL_INTERNAL_LOG_ERROR("Yaml: not a map, looking for " << name);
-    throw InvalidSchemaException(name);
+    std::string message("Yaml: not a map, looking for: ");
+    message.append(name);
+    throw InvalidSchemaException(message);
   }
 
   const char *name_str = name.c_str();
   if (!node_.has_child(name_str))
   {
-    OTEL_INTERNAL_LOG_ERROR("Yaml: required node: " << name);
-    throw InvalidSchemaException(name);
+    std::string message("Yaml: required node: ");
+    message.append(name);
+    throw InvalidSchemaException(message);
   }
 
   ryml::ConstNodeRef ryml_child = node_[name_str];
   return ryml_child;
 }
 
-ryml::ConstNodeRef RymlDocumentNode::GetRymlChildNode(const std::string &name)
+ryml::ConstNodeRef RymlDocumentNode::GetRymlChildNode(const std::string &name) const
 {
   if (!node_.is_map())
   {
@@ -155,30 +152,32 @@ ryml::ConstNodeRef RymlDocumentNode::GetRymlChildNode(const std::string &name)
   return ryml_child;
 }
 
-std::unique_ptr<DocumentNode> RymlDocumentNode::GetRequiredChildNode(const std::string &name)
+std::unique_ptr<DocumentNode> RymlDocumentNode::GetRequiredChildNode(const std::string &name) const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetRequiredChildNode(" << depth_ << ", " << name
                                                                     << ")");
 
   if (depth_ >= MAX_NODE_DEPTH)
   {
-    OTEL_INTERNAL_LOG_ERROR("Yaml nested too deeply " << name);
-    throw InvalidSchemaException(name);
+    std::string message("Yaml nested too deeply: ");
+    message.append(name);
+    throw InvalidSchemaException(message);
   }
 
   auto ryml_child = GetRequiredRymlChildNode(name);
-  auto child      = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_child, depth_ + 1));
+  auto child      = std::make_unique<RymlDocumentNode>(ryml_child, depth_ + 1);
   return child;
 }
 
-std::unique_ptr<DocumentNode> RymlDocumentNode::GetChildNode(const std::string &name)
+std::unique_ptr<DocumentNode> RymlDocumentNode::GetChildNode(const std::string &name) const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetChildNode(" << depth_ << ", " << name << ")");
 
   if (depth_ >= MAX_NODE_DEPTH)
   {
-    OTEL_INTERNAL_LOG_ERROR("Yaml nested too deeply " << name);
-    throw InvalidSchemaException(name);
+    std::string message("Yaml nested too deeply: ");
+    message.append(name);
+    throw InvalidSchemaException(message);
   }
 
   std::unique_ptr<DocumentNode> child;
@@ -195,11 +194,11 @@ std::unique_ptr<DocumentNode> RymlDocumentNode::GetChildNode(const std::string &
   }
 
   ryml::ConstNodeRef ryml_child = node_[name_str];
-  child = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_child, depth_ + 1));
+  child                         = std::make_unique<RymlDocumentNode>(ryml_child, depth_ + 1);
   return child;
 }
 
-bool RymlDocumentNode::GetRequiredBoolean(const std::string &name)
+bool RymlDocumentNode::GetRequiredBoolean(const std::string &name) const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetRequiredBoolean(" << name << ")");
 
@@ -213,7 +212,7 @@ bool RymlDocumentNode::GetRequiredBoolean(const std::string &name)
   return BooleanFromString(value);
 }
 
-bool RymlDocumentNode::GetBoolean(const std::string &name, bool default_value)
+bool RymlDocumentNode::GetBoolean(const std::string &name, bool default_value) const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetBoolean(" << name << ", " << default_value << ")");
 
@@ -237,7 +236,7 @@ bool RymlDocumentNode::GetBoolean(const std::string &name, bool default_value)
   return BooleanFromString(value);
 }
 
-size_t RymlDocumentNode::GetRequiredInteger(const std::string &name)
+size_t RymlDocumentNode::GetRequiredInteger(const std::string &name) const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetRequiredInteger(" << name << ")");
 
@@ -251,7 +250,7 @@ size_t RymlDocumentNode::GetRequiredInteger(const std::string &name)
   return IntegerFromString(value);
 }
 
-size_t RymlDocumentNode::GetInteger(const std::string &name, size_t default_value)
+size_t RymlDocumentNode::GetInteger(const std::string &name, size_t default_value) const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetInteger(" << name << ", " << default_value << ")");
 
@@ -275,7 +274,7 @@ size_t RymlDocumentNode::GetInteger(const std::string &name, size_t default_valu
   return IntegerFromString(value);
 }
 
-double RymlDocumentNode::GetRequiredDouble(const std::string &name)
+double RymlDocumentNode::GetRequiredDouble(const std::string &name) const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetRequiredDouble(" << name << ")");
 
@@ -289,7 +288,7 @@ double RymlDocumentNode::GetRequiredDouble(const std::string &name)
   return DoubleFromString(value);
 }
 
-double RymlDocumentNode::GetDouble(const std::string &name, double default_value)
+double RymlDocumentNode::GetDouble(const std::string &name, double default_value) const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetDouble(" << name << ", " << default_value << ")");
 
@@ -313,7 +312,7 @@ double RymlDocumentNode::GetDouble(const std::string &name, double default_value
   return DoubleFromString(value);
 }
 
-std::string RymlDocumentNode::GetRequiredString(const std::string &name)
+std::string RymlDocumentNode::GetRequiredString(const std::string &name) const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetRequiredString(" << name << ")");
 
@@ -325,14 +324,16 @@ std::string RymlDocumentNode::GetRequiredString(const std::string &name)
 
   if (value.empty())
   {
-    OTEL_INTERNAL_LOG_ERROR("Yaml: string value is empty: " << name);
-    throw InvalidSchemaException(name);
+    std::string message("Yaml: string value is empty: ");
+    message.append(name);
+    throw InvalidSchemaException(message);
   }
 
   return value;
 }
 
-std::string RymlDocumentNode::GetString(const std::string &name, const std::string &default_value)
+std::string RymlDocumentNode::GetString(const std::string &name,
+                                        const std::string &default_value) const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetString(" << name << ", " << default_value << ")");
 
@@ -364,8 +365,7 @@ DocumentNodeConstIterator RymlDocumentNode::begin() const
   }
 #endif  // WITH_DEBUG_NODE
 
-  auto impl = std::unique_ptr<DocumentNodeConstIteratorImpl>(
-      new RymlDocumentNodeConstIteratorImpl(node_, 0, depth_));
+  auto impl = std::make_unique<RymlDocumentNodeConstIteratorImpl>(node_, 0, depth_);
 
   return DocumentNodeConstIterator(std::move(impl));
 }
@@ -374,8 +374,8 @@ DocumentNodeConstIterator RymlDocumentNode::end() const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::end()");
 
-  auto impl = std::unique_ptr<DocumentNodeConstIteratorImpl>(
-      new RymlDocumentNodeConstIteratorImpl(node_, node_.num_children(), depth_));
+  auto impl =
+      std::make_unique<RymlDocumentNodeConstIteratorImpl>(node_, node_.num_children(), depth_);
 
   return DocumentNodeConstIterator(std::move(impl));
 }
@@ -389,7 +389,7 @@ std::unique_ptr<DocumentNode> RymlDocumentNode::GetChild(size_t index) const
 {
   std::unique_ptr<DocumentNode> child;
   ryml::ConstNodeRef ryml_child = node_[index];
-  child = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_child, depth_ + 1));
+  child                         = std::make_unique<RymlDocumentNode>(ryml_child, depth_ + 1);
   return child;
 }
 
@@ -406,8 +406,7 @@ PropertiesNodeConstIterator RymlDocumentNode::begin_properties() const
   }
 #endif  // WITH_DEBUG_NODE
 
-  auto impl = std::unique_ptr<PropertiesNodeConstIteratorImpl>(
-      new RymlPropertiesNodeConstIteratorImpl(node_, 0, depth_));
+  auto impl = std::make_unique<RymlPropertiesNodeConstIteratorImpl>(node_, 0, depth_);
 
   return PropertiesNodeConstIterator(std::move(impl));
 }
@@ -416,8 +415,8 @@ PropertiesNodeConstIterator RymlDocumentNode::end_properties() const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::end_properties()");
 
-  auto impl = std::unique_ptr<PropertiesNodeConstIteratorImpl>(
-      new RymlPropertiesNodeConstIteratorImpl(node_, node_.num_children(), depth_));
+  auto impl =
+      std::make_unique<RymlPropertiesNodeConstIteratorImpl>(node_, node_.num_children(), depth_);
 
   return PropertiesNodeConstIterator(std::move(impl));
 }
@@ -441,10 +440,10 @@ std::unique_ptr<DocumentNode> RymlDocumentNodeConstIteratorImpl::Item() const
   ryml::ConstNodeRef ryml_item = parent_[index_];
   if (ryml_item.invalid())
   {
-    OTEL_INTERNAL_LOG_ERROR("iterator is lost ");
-    // Throw
+    // FIXME: runtime exception really
+    throw InvalidSchemaException("iterator is lost");
   }
-  item = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_item, depth_ + 1));
+  item = std::make_unique<RymlDocumentNode>(ryml_item, depth_ + 1);
   return item;
 }
 
@@ -486,7 +485,7 @@ std::unique_ptr<DocumentNode> RymlPropertiesNodeConstIteratorImpl::Value() const
   std::unique_ptr<DocumentNode> item;
 
   ryml::ConstNodeRef ryml_item = parent_[index_];
-  item = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_item, depth_ + 1));
+  item                         = std::make_unique<RymlDocumentNode>(ryml_item, depth_ + 1);
 
   OTEL_INTERNAL_LOG_DEBUG("RymlPropertiesNodeConstIteratorImpl::Value()");
 
