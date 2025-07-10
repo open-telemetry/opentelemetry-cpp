@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>
 #include <chrono>
 #include <memory>
 #include <utility>
@@ -75,39 +76,34 @@ void MultiLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexc
 
 bool MultiLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  // Convert to nanos to prevent overflow
-  std::chrono::nanoseconds timeout_ns = std::chrono::nanoseconds::max();
-  if (std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns) > timeout)
-  {
-    timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(timeout);
-  }
   bool result           = true;
   auto start_time       = std::chrono::system_clock::now();
   auto overflow_checker = std::chrono::system_clock::time_point::max();
   std::chrono::system_clock::time_point expire_time;
-  if (overflow_checker - start_time <= timeout_ns)
+  if (std::chrono::duration_cast<std::chrono::system_clock::duration>(overflow_checker -
+                                                                      start_time) <= timeout)
   {
     expire_time = overflow_checker;
   }
   else
   {
     expire_time =
-        start_time + std::chrono::duration_cast<std::chrono::system_clock::duration>(timeout_ns);
+        start_time + std::chrono::duration_cast<std::chrono::system_clock::duration>(timeout);
   }
   for (auto &processor : processors_)
   {
-    if (!processor->ForceFlush(std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns)))
+    if (!processor->ForceFlush(timeout))
     {
       result = false;
     }
     start_time = std::chrono::system_clock::now();
     if (expire_time > start_time)
     {
-      timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(expire_time - start_time);
+      timeout = std::chrono::duration_cast<std::chrono::microseconds>(expire_time - start_time);
     }
     else
     {
-      timeout_ns = std::chrono::nanoseconds::zero();
+      timeout = std::chrono::microseconds::zero();
     }
   }
   return result;
@@ -115,37 +111,31 @@ bool MultiLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noex
 
 bool MultiLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  // Converto nanos to prevent overflow
-  std::chrono::nanoseconds timeout_ns = std::chrono::nanoseconds::max();
-  if (std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns) > timeout)
-  {
-    timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(timeout);
-  }
   bool result           = true;
   auto start_time       = std::chrono::system_clock::now();
   auto overflow_checker = std::chrono::system_clock::time_point::max();
   std::chrono::system_clock::time_point expire_time;
-  if (overflow_checker - start_time <= timeout_ns)
+  if (std::chrono::duration_cast<std::chrono::system_clock::duration>(overflow_checker -
+                                                                      start_time) <= timeout)
   {
     expire_time = overflow_checker;
   }
   else
   {
     expire_time =
-        start_time + std::chrono::duration_cast<std::chrono::system_clock::duration>(timeout_ns);
+        start_time + std::chrono::duration_cast<std::chrono::system_clock::duration>(timeout);
   }
   for (auto &processor : processors_)
   {
-    result |=
-        processor->Shutdown(std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns));
+    result |= processor->Shutdown(timeout);
     start_time = std::chrono::system_clock::now();
     if (expire_time > start_time)
     {
-      timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(expire_time - start_time);
+      timeout = std::chrono::duration_cast<std::chrono::microseconds>(expire_time - start_time);
     }
     else
     {
-      timeout_ns = std::chrono::nanoseconds::zero();
+      timeout = std::chrono::microseconds::zero();
     }
   }
   return result;
