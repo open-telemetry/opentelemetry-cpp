@@ -21,43 +21,40 @@ namespace system
 {
 
 /**
-  Deprecated. Use @code cpu.frequency @endcode instead.
-
-  @deprecated
-  {"note": "Replaced by @code cpu.frequency @endcode.", "reason": "renamed", "renamed_to":
-  "cpu.frequency"} <p> gauge
+  Operating frequency of the logical CPU in Hertz.
+  <p>
+  gauge
  */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricSystemCpuFrequency =
-    "system.cpu.frequency";
-OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricSystemCpuFrequency =
-    "Deprecated. Use `cpu.frequency` instead.";
-OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricSystemCpuFrequency = "{Hz}";
+static constexpr const char *kMetricSystemCpuFrequency = "system.cpu.frequency";
+static constexpr const char *descrMetricSystemCpuFrequency =
+    "Operating frequency of the logical CPU in Hertz.";
+static constexpr const char *unitMetricSystemCpuFrequency = "Hz";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
-CreateSyncInt64MetricSystemCpuFrequency(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>> CreateSyncInt64MetricSystemCpuFrequency(
+    metrics::Meter *meter)
 {
   return meter->CreateInt64Gauge(kMetricSystemCpuFrequency, descrMetricSystemCpuFrequency,
                                  unitMetricSystemCpuFrequency);
 }
 
-OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<double>>
-CreateSyncDoubleMetricSystemCpuFrequency(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricSystemCpuFrequency(
+    metrics::Meter *meter)
 {
   return meter->CreateDoubleGauge(kMetricSystemCpuFrequency, descrMetricSystemCpuFrequency,
                                   unitMetricSystemCpuFrequency);
 }
 #endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
-OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricSystemCpuFrequency(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableGauge(kMetricSystemCpuFrequency, descrMetricSystemCpuFrequency,
                                            unitMetricSystemCpuFrequency);
 }
 
-OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricSystemCpuFrequency(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableGauge(
@@ -152,84 +149,78 @@ CreateAsyncDoubleMetricSystemCpuPhysicalCount(metrics::Meter *meter)
 }
 
 /**
-  Deprecated. Use @code cpu.time @endcode instead.
-
-  @deprecated
-  {"note": "Replaced by @code cpu.time @endcode.", "reason": "renamed", "renamed_to": "cpu.time"}
+  Seconds each logical CPU spent on each mode
   <p>
   counter
  */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricSystemCpuTime = "system.cpu.time";
-OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricSystemCpuTime =
-    "Deprecated. Use `cpu.time` instead.";
-OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricSystemCpuTime = "s";
+static constexpr const char *kMetricSystemCpuTime = "system.cpu.time";
+static constexpr const char *descrMetricSystemCpuTime =
+    "Seconds each logical CPU spent on each mode";
+static constexpr const char *unitMetricSystemCpuTime = "s";
 
-OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
-CreateSyncInt64MetricSystemCpuTime(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricSystemCpuTime(
+    metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricSystemCpuTime, descrMetricSystemCpuTime,
                                     unitMetricSystemCpuTime);
 }
 
-OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<double>>
-CreateSyncDoubleMetricSystemCpuTime(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricSystemCpuTime(
+    metrics::Meter *meter)
 {
   return meter->CreateDoubleCounter(kMetricSystemCpuTime, descrMetricSystemCpuTime,
                                     unitMetricSystemCpuTime);
 }
 
-OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricSystemCpuTime(metrics::Meter *meter)
+static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncInt64MetricSystemCpuTime(
+    metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricSystemCpuTime, descrMetricSystemCpuTime,
                                              unitMetricSystemCpuTime);
 }
 
-OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricSystemCpuTime(metrics::Meter *meter)
+static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDoubleMetricSystemCpuTime(
+    metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableCounter(kMetricSystemCpuTime, descrMetricSystemCpuTime,
                                               unitMetricSystemCpuTime);
 }
 
 /**
-  Deprecated. Use @code cpu.utilization @endcode instead.
-
-  @deprecated
-  {"note": "Replaced by @code cpu.utilization @endcode.", "reason": "renamed", "renamed_to":
-  "cpu.utilization"} <p> gauge
+  For each logical CPU, the utilization is calculated as the change in cumulative CPU time
+  (cpu.time) over a measurement interval, divided by the elapsed time. <p> gauge
  */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricSystemCpuUtilization =
-    "system.cpu.utilization";
-OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricSystemCpuUtilization =
-    "Deprecated. Use `cpu.utilization` instead.";
-OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricSystemCpuUtilization = "1";
+static constexpr const char *kMetricSystemCpuUtilization = "system.cpu.utilization";
+static constexpr const char *descrMetricSystemCpuUtilization =
+    "For each logical CPU, the utilization is calculated as the change in cumulative CPU time "
+    "(cpu.time) over a measurement interval, divided by the elapsed time.";
+static constexpr const char *unitMetricSystemCpuUtilization = "1";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
-CreateSyncInt64MetricSystemCpuUtilization(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Gauge<int64_t>> CreateSyncInt64MetricSystemCpuUtilization(
+    metrics::Meter *meter)
 {
   return meter->CreateInt64Gauge(kMetricSystemCpuUtilization, descrMetricSystemCpuUtilization,
                                  unitMetricSystemCpuUtilization);
 }
 
-OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<double>>
-CreateSyncDoubleMetricSystemCpuUtilization(metrics::Meter *meter)
+static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricSystemCpuUtilization(
+    metrics::Meter *meter)
 {
   return meter->CreateDoubleGauge(kMetricSystemCpuUtilization, descrMetricSystemCpuUtilization,
                                   unitMetricSystemCpuUtilization);
 }
 #endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
-OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricSystemCpuUtilization(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableGauge(
       kMetricSystemCpuUtilization, descrMetricSystemCpuUtilization, unitMetricSystemCpuUtilization);
 }
 
-OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricSystemCpuUtilization(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableGauge(
@@ -860,11 +851,58 @@ CreateAsyncDoubleMetricSystemMemoryUtilization(metrics::Meter *meter)
 /**
   updowncounter
  */
-static constexpr const char *kMetricSystemNetworkConnections     = "system.network.connections";
-static constexpr const char *descrMetricSystemNetworkConnections = "";
-static constexpr const char *unitMetricSystemNetworkConnections  = "{connection}";
+static constexpr const char *kMetricSystemNetworkConnectionCount =
+    "system.network.connection.count";
+static constexpr const char *descrMetricSystemNetworkConnectionCount = "";
+static constexpr const char *unitMetricSystemNetworkConnectionCount  = "{connection}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemNetworkConnectionCount(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricSystemNetworkConnectionCount,
+                                         descrMetricSystemNetworkConnectionCount,
+                                         unitMetricSystemNetworkConnectionCount);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemNetworkConnectionCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemNetworkConnectionCount,
+                                          descrMetricSystemNetworkConnectionCount,
+                                          unitMetricSystemNetworkConnectionCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemNetworkConnectionCount(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricSystemNetworkConnectionCount,
+                                                   descrMetricSystemNetworkConnectionCount,
+                                                   unitMetricSystemNetworkConnectionCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemNetworkConnectionCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricSystemNetworkConnectionCount,
+                                                    descrMetricSystemNetworkConnectionCount,
+                                                    unitMetricSystemNetworkConnectionCount);
+}
+
+/**
+  Deprecated, use @code system.network.connection.count @endcode instead
+
+  @deprecated
+  {"note": "Replaced by @code system.network.connection.count @endcode.", "reason": "renamed",
+  "renamed_to": "system.network.connection.count"} <p> updowncounter
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricSystemNetworkConnections =
+    "system.network.connections";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricSystemNetworkConnections =
+    "Deprecated, use `system.network.connection.count` instead";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricSystemNetworkConnections =
+    "{connection}";
+
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricSystemNetworkConnections(metrics::Meter *meter)
 {
   return meter->CreateInt64UpDownCounter(kMetricSystemNetworkConnections,
@@ -872,7 +910,7 @@ CreateSyncInt64MetricSystemNetworkConnections(metrics::Meter *meter)
                                          unitMetricSystemNetworkConnections);
 }
 
-static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricSystemNetworkConnections(metrics::Meter *meter)
 {
   return meter->CreateDoubleUpDownCounter(kMetricSystemNetworkConnections,
@@ -880,7 +918,7 @@ CreateSyncDoubleMetricSystemNetworkConnections(metrics::Meter *meter)
                                           unitMetricSystemNetworkConnections);
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricSystemNetworkConnections(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableUpDownCounter(kMetricSystemNetworkConnections,
@@ -888,7 +926,7 @@ CreateAsyncInt64MetricSystemNetworkConnections(metrics::Meter *meter)
                                                    unitMetricSystemNetworkConnections);
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricSystemNetworkConnections(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableUpDownCounter(kMetricSystemNetworkConnections,

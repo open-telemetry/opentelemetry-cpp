@@ -74,7 +74,7 @@ static constexpr const char *kCloudRegion = "cloud.region";
     <li><strong>GCP:</strong> The <a
   href="https://cloud.google.com/iam/docs/full-resource-names">URI of the resource</a></li>
     <li><strong>Azure:</strong> The <a
-  href="https://docs.microsoft.com/rest/api/resources/resources/get-by-id">Fully Qualified Resource
+  href="https://learn.microsoft.com/rest/api/resources/resources/get-by-id">Fully Qualified Resource
   ID</a> of the invoked function, <em>not</em> the function app, having the form
   @code
   /subscriptions/<SUBSCRIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>
@@ -139,37 +139,37 @@ static constexpr const char *kAwsOpenshift = "aws_openshift";
 /**
   Azure Virtual Machines
  */
-static constexpr const char *kAzureVm = "azure_vm";
+static constexpr const char *kAzureVm = "azure.vm";
 
 /**
   Azure Container Apps
  */
-static constexpr const char *kAzureContainerApps = "azure_container_apps";
+static constexpr const char *kAzureContainerApps = "azure.container_apps";
 
 /**
   Azure Container Instances
  */
-static constexpr const char *kAzureContainerInstances = "azure_container_instances";
+static constexpr const char *kAzureContainerInstances = "azure.container_instances";
 
 /**
   Azure Kubernetes Service
  */
-static constexpr const char *kAzureAks = "azure_aks";
+static constexpr const char *kAzureAks = "azure.aks";
 
 /**
   Azure Functions
  */
-static constexpr const char *kAzureFunctions = "azure_functions";
+static constexpr const char *kAzureFunctions = "azure.functions";
 
 /**
   Azure App Service
  */
-static constexpr const char *kAzureAppService = "azure_app_service";
+static constexpr const char *kAzureAppService = "azure.app_service";
 
 /**
   Azure Red Hat OpenShift
  */
-static constexpr const char *kAzureOpenshift = "azure_openshift";
+static constexpr const char *kAzureOpenshift = "azure.openshift";
 
 /**
   Google Bare Metal Solution (BMS)

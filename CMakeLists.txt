@@ -275,6 +275,10 @@ if(WITH_EXAMPLES_HTTP AND NOT WITH_EXAMPLES)
   message(FATAL_ERROR "WITH_EXAMPLES_HTTP=ON requires WITH_EXAMPLES=ON")
 endif()
 
+if(WITH_GSL)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/ms-gsl.cmake")
+endif()
+
 find_package(Threads)
 
 function(set_target_version target_name)
@@ -635,7 +639,9 @@ message(STATUS "CMake: ${CMAKE_VERSION}")
 message(STATUS "GTest: ${GTest_VERSION} (${GTest_PROVIDER})")
 message(STATUS "benchmark: ${benchmark_VERSION} (${benchmark_PROVIDER})")
 if(WITH_GSL)
-  message(STATUS "GSL: ${GSL_VERSION}")
+  message(
+    STATUS "Microsoft.GSL: ${Microsoft.GSL_VERSION} (${Microsoft.GSL_PROVIDER})"
+  )
 endif()
 if(absl_FOUND)
   message(STATUS "Abseil: ${absl_VERSION}")
