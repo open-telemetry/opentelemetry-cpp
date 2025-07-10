@@ -17,7 +17,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CustomSpanExporterBuild
   // Read yaml attributes
   std::string comment = model->node->GetRequiredString("comment");
 
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk(new CustomSpanExporter(comment));
+  auto sdk = std::make_unique<CustomSpanExporter>(comment);
 
   return sdk;
 }

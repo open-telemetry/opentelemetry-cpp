@@ -1590,7 +1590,7 @@ void SdkBuilder::SetResource(
 std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
     const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model) const
 {
-  std::unique_ptr<ConfiguredSdk> sdk(new ConfiguredSdk);
+  auto sdk = std::make_unique<ConfiguredSdk>();
 
   if (!model->disabled)
   {

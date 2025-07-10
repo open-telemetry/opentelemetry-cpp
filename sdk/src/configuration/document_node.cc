@@ -3,11 +3,9 @@
 
 #include <cctype>
 #include <cstdlib>
-#include <ostream>
 #include <string>
 
 #include "opentelemetry/sdk/common/env_variables.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/version.h"

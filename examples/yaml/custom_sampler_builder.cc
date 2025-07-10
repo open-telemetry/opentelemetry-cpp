@@ -15,7 +15,7 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> CustomSamplerBuilder::Build(
   // Read yaml attributes
   std::string comment = model->node->GetRequiredString("comment");
 
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> sdk(new CustomSampler(comment));
+  auto sdk = std::make_unique<CustomSampler>(comment);
 
   return sdk;
 }

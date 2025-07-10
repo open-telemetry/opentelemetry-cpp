@@ -13,8 +13,8 @@
 std::unique_ptr<opentelemetry::sdk::trace::Recordable>
 CustomSpanProcessor::MakeRecordable() noexcept
 {
-  return std::unique_ptr<opentelemetry::sdk::trace::Recordable>(
-      new opentelemetry::sdk::trace::SpanData);
+  auto recordable = std::make_unique<opentelemetry::sdk::trace::SpanData>();
+  return recordable;
 }
 
 void CustomSpanProcessor::OnStart(

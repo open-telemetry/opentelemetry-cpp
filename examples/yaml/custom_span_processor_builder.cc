@@ -17,7 +17,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CustomSpanProcessorBui
   // Read yaml attributes
   std::string comment = model->node->GetRequiredString("comment");
 
-  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> sdk(new CustomSpanProcessor(comment));
+  auto sdk = std::make_unique<CustomSpanProcessor>(comment);
 
   return sdk;
 }

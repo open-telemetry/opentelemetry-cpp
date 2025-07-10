@@ -9,8 +9,8 @@
 
 std::unique_ptr<opentelemetry::sdk::trace::Recordable> CustomSpanExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<opentelemetry::sdk::trace::Recordable>(
-      new opentelemetry::sdk::trace::SpanData);
+  auto recordable = std::make_unique<opentelemetry::sdk::trace::SpanData>();
+  return recordable;
 }
 
 opentelemetry::sdk::common::ExportResult CustomSpanExporter::Export(
