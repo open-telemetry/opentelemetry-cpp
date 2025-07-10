@@ -1,9 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <algorithm>
 #include <chrono>
 #include <memory>
+#include <ratio>
 #include <utility>
 #include <vector>
 
@@ -80,8 +80,8 @@ bool MultiLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noex
   auto start_time       = std::chrono::system_clock::now();
   auto overflow_checker = std::chrono::system_clock::time_point::max();
   std::chrono::system_clock::time_point expire_time;
-  if (std::chrono::duration_cast<std::chrono::system_clock::duration>(overflow_checker -
-                                                                      start_time) <= timeout)
+  if (std::chrono::duration_cast<std::chrono::microseconds>(overflow_checker - start_time) <=
+      timeout)
   {
     expire_time = overflow_checker;
   }
@@ -115,8 +115,8 @@ bool MultiLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexce
   auto start_time       = std::chrono::system_clock::now();
   auto overflow_checker = std::chrono::system_clock::time_point::max();
   std::chrono::system_clock::time_point expire_time;
-  if (std::chrono::duration_cast<std::chrono::system_clock::duration>(overflow_checker -
-                                                                      start_time) <= timeout)
+  if (std::chrono::duration_cast<std::chrono::microseconds>(overflow_checker - start_time) <=
+      timeout)
   {
     expire_time = overflow_checker;
   }
