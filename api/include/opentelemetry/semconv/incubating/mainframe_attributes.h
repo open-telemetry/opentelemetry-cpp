@@ -5,7 +5,7 @@
 
 /*
  * DO NOT EDIT, this is an Auto-generated file from:
- * buildscripts/semantic-convention/templates/registry/schema_url-h.j2
+ * buildscripts/semantic-convention/templates/registry/semantic_attributes-h.j2
  */
 
 #pragma once
@@ -16,9 +16,14 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace semconv
 {
+namespace mainframe
+{
+
 /**
- * The URL of the OpenTelemetry schema for these keys and values.
+  Name of the logical partition that hosts a systems with a mainframe operating system.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.36.0";
+static constexpr const char *kMainframeLparName = "mainframe.lpar.name";
+
+}  // namespace mainframe
 }  // namespace semconv
 OPENTELEMETRY_END_NAMESPACE

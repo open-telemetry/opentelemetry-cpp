@@ -426,12 +426,22 @@ static constexpr const char *kCohere = "cohere";
 /**
   Azure AI Inference
  */
+static constexpr const char *kAzureAiInference = "azure.ai.inference";
+
+/**
+  Azure OpenAI
+ */
+static constexpr const char *kAzureAiOpenai = "azure.ai.openai";
+
+/**
+  Azure AI Inference
+ */
 static constexpr const char *kAzAiInference = "az.ai.inference";
 
 /**
   Azure OpenAI
  */
-static constexpr const char *kAzAiOpenai = "az.ai.openai";
+static constexpr const char *kAzAiOpenai = "azure.ai.openai";
 
 /**
   IBM Watsonx AI
