@@ -640,6 +640,12 @@ endif()
 if(absl_FOUND)
   message(STATUS "Abseil: ${absl_VERSION}")
 endif()
+if(opentelemetry-proto_VERSION)
+  message(
+    STATUS
+      "opentelemetry-proto: ${opentelemetry-proto_VERSION} (${opentelemetry-proto_PROVIDER})"
+  )
+endif()
 if(Protobuf_FOUND)
   message(STATUS "Protobuf: ${Protobuf_VERSION}")
 endif()
