@@ -32,25 +32,26 @@ public:
 
   virtual std::string Key() const = 0;
 
-  virtual bool AsBoolean()        = 0;
-  virtual std::size_t AsInteger() = 0;
-  virtual double AsDouble()       = 0;
-  virtual std::string AsString()  = 0;
+  virtual bool AsBoolean() const        = 0;
+  virtual std::size_t AsInteger() const = 0;
+  virtual double AsDouble() const       = 0;
+  virtual std::string AsString() const  = 0;
 
-  virtual std::unique_ptr<DocumentNode> GetRequiredChildNode(const std::string &name) = 0;
-  virtual std::unique_ptr<DocumentNode> GetChildNode(const std::string &name)         = 0;
+  virtual std::unique_ptr<DocumentNode> GetRequiredChildNode(const std::string &name) const = 0;
+  virtual std::unique_ptr<DocumentNode> GetChildNode(const std::string &name) const         = 0;
 
-  virtual bool GetRequiredBoolean(const std::string &name)             = 0;
-  virtual bool GetBoolean(const std::string &name, bool default_value) = 0;
+  virtual bool GetRequiredBoolean(const std::string &name) const             = 0;
+  virtual bool GetBoolean(const std::string &name, bool default_value) const = 0;
 
-  virtual std::size_t GetRequiredInteger(const std::string &name)                    = 0;
-  virtual std::size_t GetInteger(const std::string &name, std::size_t default_value) = 0;
+  virtual std::size_t GetRequiredInteger(const std::string &name) const                    = 0;
+  virtual std::size_t GetInteger(const std::string &name, std::size_t default_value) const = 0;
 
-  virtual double GetRequiredDouble(const std::string &name)               = 0;
-  virtual double GetDouble(const std::string &name, double default_value) = 0;
+  virtual double GetRequiredDouble(const std::string &name) const               = 0;
+  virtual double GetDouble(const std::string &name, double default_value) const = 0;
 
-  virtual std::string GetRequiredString(const std::string &name)                           = 0;
-  virtual std::string GetString(const std::string &name, const std::string &default_value) = 0;
+  virtual std::string GetRequiredString(const std::string &name) const  = 0;
+  virtual std::string GetString(const std::string &name,
+                                const std::string &default_value) const = 0;
 
   virtual DocumentNodeConstIterator begin() const = 0;
   virtual DocumentNodeConstIterator end() const   = 0;
@@ -62,12 +63,12 @@ public:
   virtual PropertiesNodeConstIterator end_properties() const   = 0;
 
 protected:
-  std::string DoSubstitution(const std::string &text);
-  std::string DoOneSubstitution(const std::string &text);
+  std::string DoSubstitution(const std::string &text) const;
+  std::string DoOneSubstitution(const std::string &text) const;
 
-  bool BooleanFromString(const std::string &value);
-  std::size_t IntegerFromString(const std::string &value);
-  double DoubleFromString(const std::string &value);
+  bool BooleanFromString(const std::string &value) const;
+  std::size_t IntegerFromString(const std::string &value) const;
+  double DoubleFromString(const std::string &value) const;
 };
 
 class DocumentNodeConstIteratorImpl

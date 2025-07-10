@@ -53,15 +53,13 @@ std::unique_ptr<Document> RymlDocument::Parse(const std::string &source, const s
     return doc;
   }
 
-  RymlDocument *ryml_doc = new RymlDocument(tree);
-  doc                    = std::unique_ptr<Document>(ryml_doc);
+  doc = std::make_unique<RymlDocument>(tree);
   return doc;
 }
 
 std::unique_ptr<DocumentNode> RymlDocument::GetRootNode()
 {
-  RymlDocumentNode *ryml_node = new RymlDocumentNode(tree_.rootref(), 0);
-  std::unique_ptr<DocumentNode> node(ryml_node);
+  auto node = std::make_unique<RymlDocumentNode>(tree_.rootref(), 0);
   return node;
 }
 

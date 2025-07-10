@@ -29,25 +29,25 @@ public:
 
   std::string Key() const override;
 
-  bool AsBoolean() override;
-  std::size_t AsInteger() override;
-  double AsDouble() override;
-  std::string AsString() override;
+  bool AsBoolean() const override;
+  std::size_t AsInteger() const override;
+  double AsDouble() const override;
+  std::string AsString() const override;
 
-  std::unique_ptr<DocumentNode> GetRequiredChildNode(const std::string &name) override;
-  std::unique_ptr<DocumentNode> GetChildNode(const std::string &name) override;
+  std::unique_ptr<DocumentNode> GetRequiredChildNode(const std::string &name) const override;
+  std::unique_ptr<DocumentNode> GetChildNode(const std::string &name) const override;
 
-  bool GetRequiredBoolean(const std::string &name) override;
-  bool GetBoolean(const std::string &name, bool default_value) override;
+  bool GetRequiredBoolean(const std::string &name) const override;
+  bool GetBoolean(const std::string &name, bool default_value) const override;
 
-  std::size_t GetRequiredInteger(const std::string &name) override;
-  std::size_t GetInteger(const std::string &name, std::size_t default_value) override;
+  std::size_t GetRequiredInteger(const std::string &name) const override;
+  std::size_t GetInteger(const std::string &name, std::size_t default_value) const override;
 
-  double GetRequiredDouble(const std::string &name) override;
-  double GetDouble(const std::string &name, double default_value) override;
+  double GetRequiredDouble(const std::string &name) const override;
+  double GetDouble(const std::string &name, double default_value) const override;
 
-  std::string GetRequiredString(const std::string &name) override;
-  std::string GetString(const std::string &name, const std::string &default_value) override;
+  std::string GetRequiredString(const std::string &name) const override;
+  std::string GetString(const std::string &name, const std::string &default_value) const override;
 
   DocumentNodeConstIterator begin() const override;
   DocumentNodeConstIterator end() const override;
@@ -59,8 +59,8 @@ public:
   PropertiesNodeConstIterator end_properties() const override;
 
 private:
-  ryml::ConstNodeRef GetRequiredRymlChildNode(const std::string &name);
-  ryml::ConstNodeRef GetRymlChildNode(const std::string &name);
+  ryml::ConstNodeRef GetRequiredRymlChildNode(const std::string &name) const;
+  ryml::ConstNodeRef GetRymlChildNode(const std::string &name) const;
 
   ryml::ConstNodeRef node_;
   std::size_t depth_;

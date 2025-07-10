@@ -923,8 +923,8 @@ SdkBuilder::CreatePropagator(
     propagators.push_back(std::move(propagator));
   }
 
-  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> sdk(
-      new opentelemetry::context::propagation::CompositePropagator(std::move(propagators)));
+  auto sdk = std::make_unique<opentelemetry::context::propagation::CompositePropagator>(
+      std::move(propagators));
 
   return sdk;
 }
@@ -1203,13 +1203,11 @@ void SdkBuilder::AddView(
 
   auto sdk_instrument_type = ConvertInstrumentType(selector->instrument_type);
 
-  std::unique_ptr<opentelemetry::sdk::metrics::InstrumentSelector> sdk_instrument_selector(
-      new opentelemetry::sdk::metrics::InstrumentSelector(
-          sdk_instrument_type, selector->instrument_name, selector->unit));
+  auto sdk_instrument_selector = std::make_unique<opentelemetry::sdk::metrics::InstrumentSelector>(
+      sdk_instrument_type, selector->instrument_name, selector->unit);
 
-  std::unique_ptr<opentelemetry::sdk::metrics::MeterSelector> sdk_meter_selector(
-      new opentelemetry::sdk::metrics::MeterSelector(selector->meter_name, selector->meter_version,
-                                                     selector->meter_schema_url));
+  auto sdk_meter_selector = std::make_unique<opentelemetry::sdk::metrics::MeterSelector>(
+      selector->meter_name, selector->meter_version, selector->meter_schema_url);
 
   auto *stream = model->stream.get();
 
@@ -1224,9 +1222,9 @@ void SdkBuilder::AddView(
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>
       sdk_attribute_processor;  // FIXME
 
-  std::unique_ptr<opentelemetry::sdk::metrics::View> sdk_view(new opentelemetry::sdk::metrics::View(
+  auto sdk_view = std::make_unique<opentelemetry::sdk::metrics::View>(
       stream->name, stream->description, unit, sdk_aggregation_type, sdk_aggregation_config,
-      std::move(sdk_attribute_processor)));
+      std::move(sdk_attribute_processor));
 
   registry->AddView(std::move(sdk_instrument_selector), std::move(sdk_meter_selector),
                     std::move(sdk_view));

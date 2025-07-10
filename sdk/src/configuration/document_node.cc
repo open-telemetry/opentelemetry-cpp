@@ -26,7 +26,7 @@ namespace configuration
  * - Some text with ${SUBSTITUTION} in it
  * - Multiple ${SUBSTITUTION_A} substitutions ${SUBSTITUTION_B} in the line
  */
-std::string DocumentNode::DoSubstitution(const std::string &text)
+std::string DocumentNode::DoSubstitution(const std::string &text) const
 {
   static std::string begin_token{"${"};
   static std::string end_token{"}"};
@@ -90,9 +90,9 @@ std::string DocumentNode::DoSubstitution(const std::string &text)
   - ${ENV_NAME:-fallback} (including when ENV_NAME is actually "env")
   - ${env:ENV_NAME:-fallback}
 */
-std::string DocumentNode::DoOneSubstitution(const std::string &text)
+std::string DocumentNode::DoOneSubstitution(const std::string &text) const
 {
-  static std::string illegal_msg{"Illegal substitution expression"};
+  static std::string illegal_msg{"Illegal substitution expression: "};
 
   static std::string env_token{"env:"};
   static std::string env_with_replacement{"env:-"};
@@ -112,29 +112,33 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text)
 
   if (len < 4)
   {
-    OTEL_INTERNAL_LOG_ERROR(illegal_msg << ": " << text);
-    throw InvalidSchemaException(illegal_msg);
+    std::string message = illegal_msg;
+    message.append(text);
+    throw InvalidSchemaException(message);
   }
 
   c = text[0];
   if (c != '$')
   {
-    OTEL_INTERNAL_LOG_ERROR(illegal_msg << ": " << text);
-    throw InvalidSchemaException(illegal_msg);
+    std::string message = illegal_msg;
+    message.append(text);
+    throw InvalidSchemaException(message);
   }
 
   c = text[1];
   if (c != '{')
   {
-    OTEL_INTERNAL_LOG_ERROR(illegal_msg << ": " << text);
-    throw InvalidSchemaException(illegal_msg);
+    std::string message = illegal_msg;
+    message.append(text);
+    throw InvalidSchemaException(message);
   }
 
   c = text[len - 1];
   if (c != '}')
   {
-    OTEL_INTERNAL_LOG_ERROR(illegal_msg << ": " << text);
-    throw InvalidSchemaException(illegal_msg);
+    std::string message = illegal_msg;
+    message.append(text);
+    throw InvalidSchemaException(message);
   }
 
   begin_name = 2;
@@ -156,8 +160,9 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text)
   c = text[begin_name];
   if (!std::isalpha(c) && c != '_')
   {
-    OTEL_INTERNAL_LOG_ERROR(illegal_msg << ": " << text);
-    throw InvalidSchemaException(illegal_msg);
+    std::string message = illegal_msg;
+    message.append(text);
+    throw InvalidSchemaException(message);
   }
 
   end_name = begin_name + 1;
@@ -190,8 +195,9 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text)
     pos = text.find(replacement_token, end_name);
     if (pos != end_name)
     {
-      OTEL_INTERNAL_LOG_ERROR(illegal_msg << ": " << text);
-      throw InvalidSchemaException(illegal_msg);
+      std::string message = illegal_msg;
+      message.append(text);
+      throw InvalidSchemaException(message);
     }
     // text is of the form ${ENV_NAME:-fallback}
     begin_fallback = pos + replacement_token.length();
@@ -215,7 +221,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text)
   return fallback;
 }
 
-bool DocumentNode::BooleanFromString(const std::string &value)
+bool DocumentNode::BooleanFromString(const std::string &value) const
 {
   if (value == "true")
   {
@@ -227,11 +233,12 @@ bool DocumentNode::BooleanFromString(const std::string &value)
     return false;
   }
 
-  OTEL_INTERNAL_LOG_ERROR("Illegal integer value: " << value);
-  throw InvalidSchemaException("Illegal bool value");
+  std::string message("Illegal boolean value: ");
+  message.append(value);
+  throw InvalidSchemaException(message);
 }
 
-size_t DocumentNode::IntegerFromString(const std::string &value)
+size_t DocumentNode::IntegerFromString(const std::string &value) const
 {
   const char *ptr = value.c_str();
   char *end       = nullptr;
@@ -239,13 +246,14 @@ size_t DocumentNode::IntegerFromString(const std::string &value)
   size_t val      = strtoll(ptr, &end, 10);
   if (ptr + len != end)
   {
-    OTEL_INTERNAL_LOG_ERROR("Illegal integer value: " << value);
-    throw InvalidSchemaException("Illegal integer value");
+    std::string message("Illegal integer value: ");
+    message.append(value);
+    throw InvalidSchemaException(message);
   }
   return val;
 }
 
-double DocumentNode::DoubleFromString(const std::string &value)
+double DocumentNode::DoubleFromString(const std::string &value) const
 {
   const char *ptr = value.c_str();
   char *end       = nullptr;
@@ -253,8 +261,9 @@ double DocumentNode::DoubleFromString(const std::string &value)
   double val      = strtod(ptr, &end);
   if (ptr + len != end)
   {
-    OTEL_INTERNAL_LOG_ERROR("Illegal double value: " << value);
-    throw InvalidSchemaException("Illegal double value");
+    std::string message("Illegal double value: ");
+    message.append(value);
+    throw InvalidSchemaException(message);
   }
   return val;
 }
