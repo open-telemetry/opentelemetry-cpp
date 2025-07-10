@@ -21,115 +21,122 @@ namespace cpu
 {
 
 /**
-  Operating frequency of the logical CPU in Hertz.
-  <p>
-  gauge
+  Deprecated. Use @code system.cpu.frequency @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code system.cpu.frequency @endcode.", "reason": "renamed", "renamed_to":
+  "system.cpu.frequency"} <p> gauge
  */
-static constexpr const char *kMetricCpuFrequency = "cpu.frequency";
-static constexpr const char *descrMetricCpuFrequency =
-    "Operating frequency of the logical CPU in Hertz.";
-static constexpr const char *unitMetricCpuFrequency = "Hz";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricCpuFrequency = "cpu.frequency";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricCpuFrequency =
+    "Deprecated. Use `system.cpu.frequency` instead.";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricCpuFrequency = "{Hz}";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-static inline nostd::unique_ptr<metrics::Gauge<int64_t>> CreateSyncInt64MetricCpuFrequency(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
+CreateSyncInt64MetricCpuFrequency(metrics::Meter *meter)
 {
   return meter->CreateInt64Gauge(kMetricCpuFrequency, descrMetricCpuFrequency,
                                  unitMetricCpuFrequency);
 }
 
-static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricCpuFrequency(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<double>>
+CreateSyncDoubleMetricCpuFrequency(metrics::Meter *meter)
 {
   return meter->CreateDoubleGauge(kMetricCpuFrequency, descrMetricCpuFrequency,
                                   unitMetricCpuFrequency);
 }
 #endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncInt64MetricCpuFrequency(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricCpuFrequency(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableGauge(kMetricCpuFrequency, descrMetricCpuFrequency,
                                            unitMetricCpuFrequency);
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDoubleMetricCpuFrequency(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricCpuFrequency(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableGauge(kMetricCpuFrequency, descrMetricCpuFrequency,
                                             unitMetricCpuFrequency);
 }
 
 /**
-  Seconds each logical CPU spent on each mode
-  <p>
-  counter
- */
-static constexpr const char *kMetricCpuTime     = "cpu.time";
-static constexpr const char *descrMetricCpuTime = "Seconds each logical CPU spent on each mode";
-static constexpr const char *unitMetricCpuTime  = "s";
+  Deprecated. Use @code system.cpu.time @endcode instead.
 
-static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricCpuTime(
-    metrics::Meter *meter)
+  @deprecated
+  {"note": "Replaced by @code system.cpu.time @endcode.", "reason": "renamed", "renamed_to":
+  "system.cpu.time"} <p> counter
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricCpuTime = "cpu.time";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricCpuTime =
+    "Deprecated. Use `system.cpu.time` instead.";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricCpuTime = "s";
+
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricCpuTime(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricCpuTime, descrMetricCpuTime, unitMetricCpuTime);
 }
 
-static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricCpuTime(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricCpuTime(metrics::Meter *meter)
 {
   return meter->CreateDoubleCounter(kMetricCpuTime, descrMetricCpuTime, unitMetricCpuTime);
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncInt64MetricCpuTime(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricCpuTime(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricCpuTime, descrMetricCpuTime, unitMetricCpuTime);
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDoubleMetricCpuTime(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricCpuTime(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableCounter(kMetricCpuTime, descrMetricCpuTime,
                                               unitMetricCpuTime);
 }
 
 /**
-  For each logical CPU, the utilization is calculated as the change in cumulative CPU time
-  (cpu.time) over a measurement interval, divided by the elapsed time. <p> gauge
+  Deprecated. Use @code system.cpu.utilization @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code system.cpu.utilization @endcode.", "reason": "renamed", "renamed_to":
+  "system.cpu.utilization"} <p> gauge
  */
-static constexpr const char *kMetricCpuUtilization = "cpu.utilization";
-static constexpr const char *descrMetricCpuUtilization =
-    "For each logical CPU, the utilization is calculated as the change in cumulative CPU time "
-    "(cpu.time) over a measurement interval, divided by the elapsed time.";
-static constexpr const char *unitMetricCpuUtilization = "1";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricCpuUtilization = "cpu.utilization";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricCpuUtilization =
+    "Deprecated. Use `system.cpu.utilization` instead.";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricCpuUtilization = "1";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-static inline nostd::unique_ptr<metrics::Gauge<int64_t>> CreateSyncInt64MetricCpuUtilization(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
+CreateSyncInt64MetricCpuUtilization(metrics::Meter *meter)
 {
   return meter->CreateInt64Gauge(kMetricCpuUtilization, descrMetricCpuUtilization,
                                  unitMetricCpuUtilization);
 }
 
-static inline nostd::unique_ptr<metrics::Gauge<double>> CreateSyncDoubleMetricCpuUtilization(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<double>>
+CreateSyncDoubleMetricCpuUtilization(metrics::Meter *meter)
 {
   return meter->CreateDoubleGauge(kMetricCpuUtilization, descrMetricCpuUtilization,
                                   unitMetricCpuUtilization);
 }
 #endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncInt64MetricCpuUtilization(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricCpuUtilization(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableGauge(kMetricCpuUtilization, descrMetricCpuUtilization,
                                            unitMetricCpuUtilization);
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricCpuUtilization(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableGauge(kMetricCpuUtilization, descrMetricCpuUtilization,
