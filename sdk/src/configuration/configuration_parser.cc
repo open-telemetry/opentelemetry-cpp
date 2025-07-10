@@ -114,14 +114,15 @@ static OtlpHttpEncoding ParseOtlpHttpEncoding(const std::string &name)
     return OtlpHttpEncoding::json;
   }
 
-  OTEL_INTERNAL_LOG_ERROR("OtlpHttpEncoding: name = " << name);
-  throw InvalidSchemaException("Illegal OtlpHttpEncoding");
+  std::string message("Illegal OtlpHttpEncoding: ");
+  message.append(name);
+  throw InvalidSchemaException(message);
 }
 
 static std::unique_ptr<StringArrayConfiguration> ParseStringArrayConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<StringArrayConfiguration> model(new StringArrayConfiguration);
+  auto model = std::make_unique<StringArrayConfiguration>();
 
   for (auto it = node->begin(); it != node->end(); ++it)
   {
@@ -138,7 +139,7 @@ static std::unique_ptr<StringArrayConfiguration> ParseStringArrayConfiguration(
 static std::unique_ptr<IncludeExcludeConfiguration> ParseIncludeExcludeConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<IncludeExcludeConfiguration> model(new IncludeExcludeConfiguration);
+  auto model = std::make_unique<IncludeExcludeConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   child = node->GetChildNode("included");
@@ -159,7 +160,7 @@ static std::unique_ptr<IncludeExcludeConfiguration> ParseIncludeExcludeConfigura
 static std::unique_ptr<HeadersConfiguration> ParseHeadersConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<HeadersConfiguration> model(new HeadersConfiguration);
+  auto model = std::make_unique<HeadersConfiguration>();
   std::unique_ptr<DocumentNode> kv_pair;
   std::unique_ptr<DocumentNode> name_child;
   std::unique_ptr<DocumentNode> value_child;
@@ -187,7 +188,7 @@ static std::unique_ptr<HeadersConfiguration> ParseHeadersConfiguration(
 static std::unique_ptr<AttributeLimitsConfiguration> ParseAttributeLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<AttributeLimitsConfiguration> model(new AttributeLimitsConfiguration);
+  auto model = std::make_unique<AttributeLimitsConfiguration>();
 
   model->attribute_value_length_limit = node->GetInteger("attribute_value_length_limit", 4096);
   model->attribute_count_limit        = node->GetInteger("attribute_count_limit", 128);
@@ -198,8 +199,7 @@ static std::unique_ptr<AttributeLimitsConfiguration> ParseAttributeLimitsConfigu
 static std::unique_ptr<OtlpHttpLogRecordExporterConfiguration>
 ParseOtlpHttpLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<OtlpHttpLogRecordExporterConfiguration> model(
-      new OtlpHttpLogRecordExporterConfiguration);
+  auto model = std::make_unique<OtlpHttpLogRecordExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->endpoint                = node->GetRequiredString("endpoint");
@@ -226,8 +226,7 @@ ParseOtlpHttpLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> 
 static std::unique_ptr<OtlpGrpcLogRecordExporterConfiguration>
 ParseOtlpGrpcLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<OtlpGrpcLogRecordExporterConfiguration> model(
-      new OtlpGrpcLogRecordExporterConfiguration);
+  auto model = std::make_unique<OtlpGrpcLogRecordExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->endpoint                = node->GetRequiredString("endpoint");
@@ -252,8 +251,7 @@ ParseOtlpGrpcLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> 
 static std::unique_ptr<OtlpFileLogRecordExporterConfiguration>
 ParseOtlpFileLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<OtlpFileLogRecordExporterConfiguration> model(
-      new OtlpFileLogRecordExporterConfiguration);
+  auto model = std::make_unique<OtlpFileLogRecordExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->output_stream = node->GetString("output_stream", "");
@@ -264,8 +262,7 @@ ParseOtlpFileLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> 
 static std::unique_ptr<ConsoleLogRecordExporterConfiguration>
 ParseConsoleLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> & /* node */)
 {
-  std::unique_ptr<ConsoleLogRecordExporterConfiguration> model(
-      new ConsoleLogRecordExporterConfiguration);
+  auto model = std::make_unique<ConsoleLogRecordExporterConfiguration>();
 
   return model;
 }
@@ -274,10 +271,11 @@ static std::unique_ptr<ExtensionLogRecordExporterConfiguration>
 ParseExtensionLogRecordExporterConfiguration(const std::string &name,
                                              std::unique_ptr<DocumentNode> node)
 {
-  std::unique_ptr<ExtensionLogRecordExporterConfiguration> model(
-      new ExtensionLogRecordExporterConfiguration);
+  auto model = std::make_unique<ExtensionLogRecordExporterConfiguration>();
+
   model->name = name;
   model->node = std::move(node);
+
   return model;
 }
 
@@ -299,8 +297,9 @@ static std::unique_ptr<LogRecordExporterConfiguration> ParseLogRecordExporterCon
 
   if (count != 1)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseLogRecordExporterConfiguration: count " << count);
-    throw InvalidSchemaException("Illegal span exporter");
+    std::string message("Illegal log record exporter, count: ");
+    message.append(std::to_string(count));
+    throw InvalidSchemaException(message);
   }
 
   if (name == "otlp_http")
@@ -330,8 +329,7 @@ static std::unique_ptr<LogRecordExporterConfiguration> ParseLogRecordExporterCon
 static std::unique_ptr<BatchLogRecordProcessorConfiguration>
 ParseBatchLogRecordProcessorConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<BatchLogRecordProcessorConfiguration> model(
-      new BatchLogRecordProcessorConfiguration);
+  auto model = std::make_unique<BatchLogRecordProcessorConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->schedule_delay        = node->GetInteger("schedule_delay", 5000);
@@ -348,8 +346,7 @@ ParseBatchLogRecordProcessorConfiguration(const std::unique_ptr<DocumentNode> &n
 static std::unique_ptr<SimpleLogRecordProcessorConfiguration>
 ParseSimpleLogRecordProcessorConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<SimpleLogRecordProcessorConfiguration> model(
-      new SimpleLogRecordProcessorConfiguration);
+  auto model = std::make_unique<SimpleLogRecordProcessorConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   child           = node->GetRequiredChildNode("exporter");
@@ -362,10 +359,11 @@ static std::unique_ptr<ExtensionLogRecordProcessorConfiguration>
 ParseExtensionLogRecordProcessorConfiguration(const std::string &name,
                                               std::unique_ptr<DocumentNode> node)
 {
-  std::unique_ptr<ExtensionLogRecordProcessorConfiguration> model(
-      new ExtensionLogRecordProcessorConfiguration);
+  auto model = std::make_unique<ExtensionLogRecordProcessorConfiguration>();
+
   model->name = name;
   model->node = std::move(node);
+
   return model;
 }
 
@@ -387,8 +385,9 @@ static std::unique_ptr<LogRecordProcessorConfiguration> ParseLogRecordProcessorC
 
   if (count != 1)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseLogRecordProcessorConfiguration: count " << count);
-    throw InvalidSchemaException("Illegal log record processor");
+    std::string message("Illegal log record processor, count: ");
+    message.append(std::to_string(count));
+    throw InvalidSchemaException(message);
   }
 
   if (name == "batch")
@@ -410,7 +409,7 @@ static std::unique_ptr<LogRecordProcessorConfiguration> ParseLogRecordProcessorC
 static std::unique_ptr<LogRecordLimitsConfiguration> ParseLogRecordLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<LogRecordLimitsConfiguration> model(new LogRecordLimitsConfiguration);
+  auto model = std::make_unique<LogRecordLimitsConfiguration>();
 
   model->attribute_value_length_limit = node->GetInteger("attribute_value_length_limit", 4096);
   model->attribute_count_limit        = node->GetInteger("attribute_count_limit", 128);
@@ -421,7 +420,7 @@ static std::unique_ptr<LogRecordLimitsConfiguration> ParseLogRecordLimitsConfigu
 static std::unique_ptr<LoggerProviderConfiguration> ParseLoggerProviderConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<LoggerProviderConfiguration> model(new LoggerProviderConfiguration);
+  auto model = std::make_unique<LoggerProviderConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   child = node->GetRequiredChildNode("processors");
@@ -434,8 +433,8 @@ static std::unique_ptr<LoggerProviderConfiguration> ParseLoggerProviderConfigura
   size_t count = model->processors.size();
   if (count == 0)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseLoggerProviderConfiguration: 0 processors ");
-    throw InvalidSchemaException("Illegal processors");
+    std::string message("Illegal logger provider, 0 processors");
+    throw InvalidSchemaException(message);
   }
 
   child = node->GetChildNode("limits");
@@ -459,8 +458,9 @@ static DefaultHistogramAggregation ParseDefaultHistogramAggregation(const std::s
     return DefaultHistogramAggregation::base2_exponential_bucket_histogram;
   }
 
-  OTEL_INTERNAL_LOG_ERROR("ParseDefaultHistogramAggregation: name = " << name);
-  throw InvalidSchemaException("Illegal default_histogram_aggregation");
+  std::string message("Illegal default_histogram_aggregation: ");
+  message.append(name);
+  throw InvalidSchemaException(message);
 }
 
 static TemporalityPreference ParseTemporalityPreference(const std::string &name)
@@ -480,15 +480,15 @@ static TemporalityPreference ParseTemporalityPreference(const std::string &name)
     return TemporalityPreference::low_memory;
   }
 
-  OTEL_INTERNAL_LOG_ERROR("ParseTemporalityPreference: name = " << name);
-  throw InvalidSchemaException("Illegal temporality preference");
+  std::string message("Illegal temporality preference: ");
+  message.append(name);
+  throw InvalidSchemaException(message);
 }
 
 static std::unique_ptr<OtlpHttpPushMetricExporterConfiguration>
 ParseOtlpHttpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<OtlpHttpPushMetricExporterConfiguration> model(
-      new OtlpHttpPushMetricExporterConfiguration);
+  auto model = std::make_unique<OtlpHttpPushMetricExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->endpoint                = node->GetRequiredString("endpoint");
@@ -523,8 +523,7 @@ ParseOtlpHttpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
 static std::unique_ptr<OtlpGrpcPushMetricExporterConfiguration>
 ParseOtlpGrpcPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<OtlpGrpcPushMetricExporterConfiguration> model(
-      new OtlpGrpcPushMetricExporterConfiguration);
+  auto model = std::make_unique<OtlpGrpcPushMetricExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->endpoint                = node->GetRequiredString("endpoint");
@@ -558,8 +557,7 @@ ParseOtlpGrpcPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
 static std::unique_ptr<OtlpFilePushMetricExporterConfiguration>
 ParseOtlpFilePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<OtlpFilePushMetricExporterConfiguration> model(
-      new OtlpFilePushMetricExporterConfiguration);
+  auto model = std::make_unique<OtlpFilePushMetricExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->output_stream = node->GetString("output_stream", "");
@@ -578,8 +576,7 @@ ParseOtlpFilePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode>
 static std::unique_ptr<ConsolePushMetricExporterConfiguration>
 ParseConsolePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> & /* node */)
 {
-  std::unique_ptr<ConsolePushMetricExporterConfiguration> model(
-      new ConsolePushMetricExporterConfiguration);
+  auto model = std::make_unique<ConsolePushMetricExporterConfiguration>();
 
   // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/242
 
@@ -589,8 +586,7 @@ ParseConsolePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> 
 static std::unique_ptr<PrometheusPullMetricExporterConfiguration>
 ParsePrometheusPullMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<PrometheusPullMetricExporterConfiguration> model(
-      new PrometheusPullMetricExporterConfiguration);
+  auto model = std::make_unique<PrometheusPullMetricExporterConfiguration>();
 
   model->host                = node->GetString("host", "localhost");
   model->port                = node->GetInteger("port", 9464);
@@ -605,10 +601,11 @@ static std::unique_ptr<ExtensionPushMetricExporterConfiguration>
 ParsePushMetricExporterExtensionConfiguration(const std::string &name,
                                               std::unique_ptr<DocumentNode> node)
 {
-  std::unique_ptr<ExtensionPushMetricExporterConfiguration> model(
-      new ExtensionPushMetricExporterConfiguration);
+  auto model = std::make_unique<ExtensionPushMetricExporterConfiguration>();
+
   model->name = name;
   model->node = std::move(node);
+
   return model;
 }
 
@@ -616,10 +613,11 @@ static std::unique_ptr<ExtensionPullMetricExporterConfiguration>
 ParsePullMetricExporterExtensionConfiguration(const std::string &name,
                                               std::unique_ptr<DocumentNode> node)
 {
-  std::unique_ptr<ExtensionPullMetricExporterConfiguration> model(
-      new ExtensionPullMetricExporterConfiguration);
+  auto model = std::make_unique<ExtensionPullMetricExporterConfiguration>();
+
   model->name = name;
   model->node = std::move(node);
+
   return model;
 }
 
@@ -641,8 +639,9 @@ static std::unique_ptr<PushMetricExporterConfiguration> ParsePushMetricExporterC
 
   if (count != 1)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParsePushMetricExporterConfiguration: count " << count);
-    throw InvalidSchemaException("Illegal metric exporter");
+    std::string message("Illegal push metric exporter, count: ");
+    message.append(std::to_string(count));
+    throw InvalidSchemaException(message);
   }
 
   if (name == "otlp_http")
@@ -687,8 +686,9 @@ static std::unique_ptr<PullMetricExporterConfiguration> ParsePullMetricExporterC
 
   if (count != 1)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParsePullMetricExporterConfiguration: count " << count);
-    throw InvalidSchemaException("Illegal metric exporter");
+    std::string message("Illegal pull metric exporter, count: ");
+    message.append(std::to_string(count));
+    throw InvalidSchemaException(message);
   }
 
   if (name == "prometheus")
@@ -706,7 +706,7 @@ static std::unique_ptr<PullMetricExporterConfiguration> ParsePullMetricExporterC
 static std::unique_ptr<PeriodicMetricReaderConfiguration> ParsePeriodicMetricReaderConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<PeriodicMetricReaderConfiguration> model(new PeriodicMetricReaderConfiguration);
+  auto model = std::make_unique<PeriodicMetricReaderConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->interval = node->GetInteger("interval", 5000);
@@ -721,7 +721,7 @@ static std::unique_ptr<PeriodicMetricReaderConfiguration> ParsePeriodicMetricRea
 static std::unique_ptr<PullMetricReaderConfiguration> ParsePullMetricReaderConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<PullMetricReaderConfiguration> model(new PullMetricReaderConfiguration);
+  auto model = std::make_unique<PullMetricReaderConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   child           = node->GetRequiredChildNode("exporter");
@@ -748,8 +748,9 @@ static std::unique_ptr<MetricReaderConfiguration> ParseMetricReaderConfiguration
 
   if (count != 1)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseMetricReaderConfiguration: count " << count);
-    throw InvalidSchemaException("Illegal metric reader");
+    std::string message("Illegal metric reader, count: ");
+    message.append(std::to_string(count));
+    throw InvalidSchemaException(message);
   }
 
   if (name == "periodic")
@@ -762,8 +763,9 @@ static std::unique_ptr<MetricReaderConfiguration> ParseMetricReaderConfiguration
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseMetricReaderConfiguration: name " << name);
-    throw InvalidSchemaException("Illegal metric reader");
+    std::string message("Illegal metric reader: ");
+    message.append(name);
+    throw InvalidSchemaException(message);
   }
 
   return model;
@@ -806,14 +808,15 @@ static InstrumentType ParseInstrumentType(const std::string &name)
     return InstrumentType::up_down_counter;
   }
 
-  OTEL_INTERNAL_LOG_ERROR("ParseInstrumentType: name = " << name);
-  throw InvalidSchemaException("Illegal instrument_type");
+  std::string message("Illegal instrument type: ");
+  message.append(name);
+  throw InvalidSchemaException(message);
 }
 
 static std::unique_ptr<ViewSelectorConfiguration> ParseViewSelectorConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<ViewSelectorConfiguration> model(new ViewSelectorConfiguration);
+  auto model = std::make_unique<ViewSelectorConfiguration>();
 
   model->instrument_name = node->GetString("instrument_name", "");
 
@@ -831,7 +834,7 @@ static std::unique_ptr<ViewSelectorConfiguration> ParseViewSelectorConfiguration
 static std::unique_ptr<DefaultAggregationConfiguration> ParseDefaultAggregationConfiguration(
     const std::unique_ptr<DocumentNode> & /* node */)
 {
-  std::unique_ptr<DefaultAggregationConfiguration> model(new DefaultAggregationConfiguration);
+  auto model = std::make_unique<DefaultAggregationConfiguration>();
 
   return model;
 }
@@ -839,7 +842,7 @@ static std::unique_ptr<DefaultAggregationConfiguration> ParseDefaultAggregationC
 static std::unique_ptr<DropAggregationConfiguration> ParseDropAggregationConfiguration(
     const std::unique_ptr<DocumentNode> & /* node */)
 {
-  std::unique_ptr<DropAggregationConfiguration> model(new DropAggregationConfiguration);
+  auto model = std::make_unique<DropAggregationConfiguration>();
 
   return model;
 }
@@ -847,8 +850,7 @@ static std::unique_ptr<DropAggregationConfiguration> ParseDropAggregationConfigu
 static std::unique_ptr<ExplicitBucketHistogramAggregationConfiguration>
 ParseExplicitBucketHistogramAggregationConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<ExplicitBucketHistogramAggregationConfiguration> model(
-      new ExplicitBucketHistogramAggregationConfiguration);
+  auto model = std::make_unique<ExplicitBucketHistogramAggregationConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   child = node->GetChildNode("boundaries");
@@ -874,8 +876,7 @@ static std::unique_ptr<Base2ExponentialBucketHistogramAggregationConfiguration>
 ParseBase2ExponentialBucketHistogramAggregationConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<Base2ExponentialBucketHistogramAggregationConfiguration> model(
-      new Base2ExponentialBucketHistogramAggregationConfiguration);
+  auto model = std::make_unique<Base2ExponentialBucketHistogramAggregationConfiguration>();
 
   model->max_scale      = node->GetInteger("max_scale", 20);
   model->max_size       = node->GetInteger("max_size", 160);
@@ -887,7 +888,7 @@ ParseBase2ExponentialBucketHistogramAggregationConfiguration(
 static std::unique_ptr<LastValueAggregationConfiguration> ParseLastValueAggregationConfiguration(
     const std::unique_ptr<DocumentNode> & /* node */)
 {
-  std::unique_ptr<LastValueAggregationConfiguration> model(new LastValueAggregationConfiguration);
+  auto model = std::make_unique<LastValueAggregationConfiguration>();
 
   return model;
 }
@@ -895,7 +896,7 @@ static std::unique_ptr<LastValueAggregationConfiguration> ParseLastValueAggregat
 static std::unique_ptr<SumAggregationConfiguration> ParseSumAggregationConfiguration(
     const std::unique_ptr<DocumentNode> & /* node */)
 {
-  std::unique_ptr<SumAggregationConfiguration> model(new SumAggregationConfiguration);
+  auto model = std::make_unique<SumAggregationConfiguration>();
 
   return model;
 }
@@ -910,8 +911,9 @@ static std::unique_ptr<AggregationConfiguration> ParseAggregationConfiguration(
 
   if (count != 1)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseAggregationConfiguration: count " << count);
-    throw InvalidSchemaException("Illegal aggregation");
+    std::string message("Illegal aggregation, children: ");
+    message.append(std::to_string(count));
+    throw InvalidSchemaException(message);
   }
 
   child            = node->GetChild(0);
@@ -943,8 +945,9 @@ static std::unique_ptr<AggregationConfiguration> ParseAggregationConfiguration(
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseAggregationConfiguration: name " << name);
-    throw InvalidSchemaException("Illegal aggregation");
+    std::string message("Illegal aggregation: ");
+    message.append(name);
+    throw InvalidSchemaException(message);
   }
 
   return model;
@@ -953,7 +956,7 @@ static std::unique_ptr<AggregationConfiguration> ParseAggregationConfiguration(
 static std::unique_ptr<ViewStreamConfiguration> ParseViewStreamConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<ViewStreamConfiguration> model(new ViewStreamConfiguration);
+  auto model = std::make_unique<ViewStreamConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->name                          = node->GetString("name", "");
@@ -978,7 +981,7 @@ static std::unique_ptr<ViewStreamConfiguration> ParseViewStreamConfiguration(
 static std::unique_ptr<ViewConfiguration> ParseViewConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<ViewConfiguration> model(new ViewConfiguration);
+  auto model = std::make_unique<ViewConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   child           = node->GetRequiredChildNode("selector");
@@ -993,7 +996,7 @@ static std::unique_ptr<ViewConfiguration> ParseViewConfiguration(
 static std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<MeterProviderConfiguration> model(new MeterProviderConfiguration);
+  auto model = std::make_unique<MeterProviderConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   child = node->GetRequiredChildNode("readers");
@@ -1005,8 +1008,8 @@ static std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfigurati
 
   if (model->readers.size() == 0)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseMeterProviderConfiguration: 0 readers ");
-    throw InvalidSchemaException("Illegal readers");
+    std::string message("Illegal meter provider, 0 readers");
+    throw InvalidSchemaException(message);
   }
 
   child = node->GetChildNode("views");
@@ -1025,7 +1028,7 @@ static std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfigurati
 static std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<PropagatorConfiguration> model(new PropagatorConfiguration);
+  auto model = std::make_unique<PropagatorConfiguration>();
 
   std::unique_ptr<DocumentNode> child;
   child = node->GetRequiredChildNode("composite");
@@ -1045,7 +1048,7 @@ static std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
 static std::unique_ptr<SpanLimitsConfiguration> ParseSpanLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<SpanLimitsConfiguration> model(new SpanLimitsConfiguration);
+  auto model = std::make_unique<SpanLimitsConfiguration>();
 
   model->attribute_value_length_limit = node->GetInteger("attribute_value_length_limit", 4096);
   model->attribute_count_limit        = node->GetInteger("attribute_count_limit", 128);
@@ -1065,7 +1068,7 @@ static std::unique_ptr<AlwaysOffSamplerConfiguration> ParseAlwaysOffSamplerConfi
     const std::unique_ptr<DocumentNode> & /* node */,
     size_t /* depth */)
 {
-  std::unique_ptr<AlwaysOffSamplerConfiguration> model(new AlwaysOffSamplerConfiguration);
+  auto model = std::make_unique<AlwaysOffSamplerConfiguration>();
 
   return model;
 }
@@ -1074,7 +1077,7 @@ static std::unique_ptr<AlwaysOnSamplerConfiguration> ParseAlwaysOnSamplerConfigu
     const std::unique_ptr<DocumentNode> & /* node */,
     size_t /* depth */)
 {
-  std::unique_ptr<AlwaysOnSamplerConfiguration> model(new AlwaysOnSamplerConfiguration);
+  auto model = std::make_unique<AlwaysOnSamplerConfiguration>();
 
   return model;
 }
@@ -1084,7 +1087,7 @@ static std::unique_ptr<JaegerRemoteSamplerConfiguration> ParseJaegerRemoteSample
     const std::unique_ptr<DocumentNode> &node,
     size_t depth)
 {
-  std::unique_ptr<JaegerRemoteSamplerConfiguration> model(new JaegerRemoteSamplerConfiguration);
+  auto model = std::make_unique<JaegerRemoteSamplerConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   // Unclear if endpoint and interval are required/optional
@@ -1109,7 +1112,7 @@ static std::unique_ptr<ParentBasedSamplerConfiguration> ParseParentBasedSamplerC
     const std::unique_ptr<DocumentNode> &node,
     size_t depth)
 {
-  std::unique_ptr<ParentBasedSamplerConfiguration> model(new ParentBasedSamplerConfiguration);
+  auto model = std::make_unique<ParentBasedSamplerConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   child = node->GetChildNode("root");
@@ -1150,8 +1153,7 @@ static std::unique_ptr<TraceIdRatioBasedSamplerConfiguration>
 ParseTraceIdRatioBasedSamplerConfiguration(const std::unique_ptr<DocumentNode> &node,
                                            size_t /* depth */)
 {
-  std::unique_ptr<TraceIdRatioBasedSamplerConfiguration> model(
-      new TraceIdRatioBasedSamplerConfiguration);
+  auto model = std::make_unique<TraceIdRatioBasedSamplerConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->ratio = node->GetDouble("ratio", 0);
@@ -1164,10 +1166,12 @@ static std::unique_ptr<ExtensionSamplerConfiguration> ParseSamplerExtensionConfi
     std::unique_ptr<DocumentNode> node,
     size_t depth)
 {
-  std::unique_ptr<ExtensionSamplerConfiguration> model(new ExtensionSamplerConfiguration);
+  auto model = std::make_unique<ExtensionSamplerConfiguration>();
+
   model->name  = name;
   model->node  = std::move(node);
   model->depth = depth;
+
   return model;
 }
 
@@ -1182,8 +1186,9 @@ static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
    */
   if (depth >= MAX_SAMPLER_DEPTH)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseSamplerConfiguration: depth " << depth);
-    throw InvalidSchemaException("Samplers nested too deeply");
+    std::string message("Samplers nested too deeply: ");
+    message.append(std::to_string(depth));
+    throw InvalidSchemaException(message);
   }
 
   std::unique_ptr<SamplerConfiguration> model;
@@ -1201,8 +1206,9 @@ static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
 
   if (count != 1)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseSamplerConfiguration: count " << count);
-    throw InvalidSchemaException("Illegal sampler");
+    std::string message("Illegal sampler, properties count: ");
+    message.append(std::to_string(count));
+    throw InvalidSchemaException(message);
   }
 
   if (name == "always_off")
@@ -1237,7 +1243,7 @@ static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
 static std::unique_ptr<OtlpHttpSpanExporterConfiguration> ParseOtlpHttpSpanExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<OtlpHttpSpanExporterConfiguration> model(new OtlpHttpSpanExporterConfiguration);
+  auto model = std::make_unique<OtlpHttpSpanExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->endpoint                = node->GetRequiredString("endpoint");
@@ -1264,7 +1270,7 @@ static std::unique_ptr<OtlpHttpSpanExporterConfiguration> ParseOtlpHttpSpanExpor
 static std::unique_ptr<OtlpGrpcSpanExporterConfiguration> ParseOtlpGrpcSpanExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<OtlpGrpcSpanExporterConfiguration> model(new OtlpGrpcSpanExporterConfiguration);
+  auto model = std::make_unique<OtlpGrpcSpanExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->endpoint                = node->GetRequiredString("endpoint");
@@ -1289,7 +1295,7 @@ static std::unique_ptr<OtlpGrpcSpanExporterConfiguration> ParseOtlpGrpcSpanExpor
 static std::unique_ptr<OtlpFileSpanExporterConfiguration> ParseOtlpFileSpanExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<OtlpFileSpanExporterConfiguration> model(new OtlpFileSpanExporterConfiguration);
+  auto model = std::make_unique<OtlpFileSpanExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->output_stream = node->GetString("output_stream", "");
@@ -1300,7 +1306,7 @@ static std::unique_ptr<OtlpFileSpanExporterConfiguration> ParseOtlpFileSpanExpor
 static std::unique_ptr<ConsoleSpanExporterConfiguration> ParseConsoleSpanExporterConfiguration(
     const std::unique_ptr<DocumentNode> & /* node */)
 {
-  std::unique_ptr<ConsoleSpanExporterConfiguration> model(new ConsoleSpanExporterConfiguration);
+  auto model = std::make_unique<ConsoleSpanExporterConfiguration>();
 
   return model;
 }
@@ -1308,7 +1314,7 @@ static std::unique_ptr<ConsoleSpanExporterConfiguration> ParseConsoleSpanExporte
 static std::unique_ptr<ZipkinSpanExporterConfiguration> ParseZipkinSpanExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<ZipkinSpanExporterConfiguration> model(new ZipkinSpanExporterConfiguration);
+  auto model = std::make_unique<ZipkinSpanExporterConfiguration>();
 
   model->endpoint = node->GetRequiredString("endpoint");
   model->timeout  = node->GetInteger("timeout", 10000);
@@ -1320,9 +1326,11 @@ static std::unique_ptr<ExtensionSpanExporterConfiguration> ParseExtensionSpanExp
     const std::string &name,
     std::unique_ptr<DocumentNode> node)
 {
-  std::unique_ptr<ExtensionSpanExporterConfiguration> model(new ExtensionSpanExporterConfiguration);
+  auto model = std::make_unique<ExtensionSpanExporterConfiguration>();
+
   model->name = name;
   model->node = std::move(node);
+
   return model;
 }
 
@@ -1344,8 +1352,9 @@ static std::unique_ptr<SpanExporterConfiguration> ParseSpanExporterConfiguration
 
   if (count != 1)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseSpanExporterConfiguration: count " << count);
-    throw InvalidSchemaException("Illegal span exporter");
+    std::string message("Illegal span exporter, properties count: ");
+    message.append(std::to_string(count));
+    throw InvalidSchemaException(message);
   }
 
   if (name == "otlp_http")
@@ -1379,7 +1388,7 @@ static std::unique_ptr<SpanExporterConfiguration> ParseSpanExporterConfiguration
 static std::unique_ptr<BatchSpanProcessorConfiguration> ParseBatchSpanProcessorConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<BatchSpanProcessorConfiguration> model(new BatchSpanProcessorConfiguration);
+  auto model = std::make_unique<BatchSpanProcessorConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->schedule_delay        = node->GetInteger("schedule_delay", 5000);
@@ -1396,7 +1405,7 @@ static std::unique_ptr<BatchSpanProcessorConfiguration> ParseBatchSpanProcessorC
 static std::unique_ptr<SimpleSpanProcessorConfiguration> ParseSimpleSpanProcessorConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<SimpleSpanProcessorConfiguration> model(new SimpleSpanProcessorConfiguration);
+  auto model = std::make_unique<SimpleSpanProcessorConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   child           = node->GetRequiredChildNode("exporter");
@@ -1409,10 +1418,11 @@ static std::unique_ptr<ExtensionSpanProcessorConfiguration>
 ParseExtensionSpanProcessorConfiguration(const std::string &name,
                                          std::unique_ptr<DocumentNode> node)
 {
-  std::unique_ptr<ExtensionSpanProcessorConfiguration> model(
-      new ExtensionSpanProcessorConfiguration);
+  auto model = std::make_unique<ExtensionSpanProcessorConfiguration>();
+
   model->name = name;
   model->node = std::move(node);
+
   return model;
 }
 
@@ -1434,8 +1444,9 @@ static std::unique_ptr<SpanProcessorConfiguration> ParseSpanProcessorConfigurati
 
   if (count != 1)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseSpanProcessorConfiguration: count " << count);
-    throw InvalidSchemaException("Illegal span processor");
+    std::string message("Illegal span processor, properties count: ");
+    message.append(std::to_string(count));
+    throw InvalidSchemaException(message);
   }
 
   if (name == "batch")
@@ -1457,7 +1468,7 @@ static std::unique_ptr<SpanProcessorConfiguration> ParseSpanProcessorConfigurati
 static std::unique_ptr<TracerProviderConfiguration> ParseTracerProviderConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<TracerProviderConfiguration> model(new TracerProviderConfiguration);
+  auto model = std::make_unique<TracerProviderConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   child = node->GetRequiredChildNode("processors");
@@ -1470,8 +1481,8 @@ static std::unique_ptr<TracerProviderConfiguration> ParseTracerProviderConfigura
   size_t count = model->processors.size();
   if (count == 0)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseTracerProviderConfiguration: 0 processors ");
-    throw InvalidSchemaException("Illegal processors");
+    std::string message("Illegal tracer provider, 0 processors");
+    throw InvalidSchemaException(message);
   }
 
   child = node->GetChildNode("limits");
@@ -1492,7 +1503,7 @@ static std::unique_ptr<TracerProviderConfiguration> ParseTracerProviderConfigura
 static std::unique_ptr<StringAttributeValueConfiguration> ParseStringAttributeValueConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<StringAttributeValueConfiguration> model(new StringAttributeValueConfiguration);
+  auto model = std::make_unique<StringAttributeValueConfiguration>();
 
   model->value = node->AsString();
 
@@ -1502,7 +1513,7 @@ static std::unique_ptr<StringAttributeValueConfiguration> ParseStringAttributeVa
 static std::unique_ptr<IntegerAttributeValueConfiguration> ParseIntegerAttributeValueConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<IntegerAttributeValueConfiguration> model(new IntegerAttributeValueConfiguration);
+  auto model = std::make_unique<IntegerAttributeValueConfiguration>();
 
   model->value = node->AsInteger();
 
@@ -1512,7 +1523,7 @@ static std::unique_ptr<IntegerAttributeValueConfiguration> ParseIntegerAttribute
 static std::unique_ptr<DoubleAttributeValueConfiguration> ParseDoubleAttributeValueConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<DoubleAttributeValueConfiguration> model(new DoubleAttributeValueConfiguration);
+  auto model = std::make_unique<DoubleAttributeValueConfiguration>();
 
   model->value = node->AsDouble();
 
@@ -1522,7 +1533,7 @@ static std::unique_ptr<DoubleAttributeValueConfiguration> ParseDoubleAttributeVa
 static std::unique_ptr<BooleanAttributeValueConfiguration> ParseBooleanAttributeValueConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<BooleanAttributeValueConfiguration> model(new BooleanAttributeValueConfiguration);
+  auto model = std::make_unique<BooleanAttributeValueConfiguration>();
 
   model->value = node->AsBoolean();
 
@@ -1532,8 +1543,7 @@ static std::unique_ptr<BooleanAttributeValueConfiguration> ParseBooleanAttribute
 static std::unique_ptr<StringArrayAttributeValueConfiguration>
 ParseStringArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<StringArrayAttributeValueConfiguration> model(
-      new StringArrayAttributeValueConfiguration);
+  auto model = std::make_unique<StringArrayAttributeValueConfiguration>();
 
   for (auto it = node->begin(); it != node->end(); ++it)
   {
@@ -1550,8 +1560,7 @@ ParseStringArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> 
 static std::unique_ptr<IntegerArrayAttributeValueConfiguration>
 ParseIntegerArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<IntegerArrayAttributeValueConfiguration> model(
-      new IntegerArrayAttributeValueConfiguration);
+  auto model = std::make_unique<IntegerArrayAttributeValueConfiguration>();
 
   for (auto it = node->begin(); it != node->end(); ++it)
   {
@@ -1568,8 +1577,7 @@ ParseIntegerArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode>
 static std::unique_ptr<DoubleArrayAttributeValueConfiguration>
 ParseDoubleArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<DoubleArrayAttributeValueConfiguration> model(
-      new DoubleArrayAttributeValueConfiguration);
+  auto model = std::make_unique<DoubleArrayAttributeValueConfiguration>();
 
   for (auto it = node->begin(); it != node->end(); ++it)
   {
@@ -1586,8 +1594,7 @@ ParseDoubleArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> 
 static std::unique_ptr<BooleanArrayAttributeValueConfiguration>
 ParseBooleanArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<BooleanArrayAttributeValueConfiguration> model(
-      new BooleanArrayAttributeValueConfiguration);
+  auto model = std::make_unique<BooleanArrayAttributeValueConfiguration>();
 
   for (auto it = node->begin(); it != node->end(); ++it)
   {
@@ -1604,7 +1611,7 @@ ParseBooleanArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode>
 static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<AttributesConfiguration> model(new AttributesConfiguration);
+  auto model = std::make_unique<AttributesConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   std::unique_ptr<DocumentNode> attribute_name_value;
@@ -1676,8 +1683,9 @@ static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
     }
     else
     {
-      OTEL_INTERNAL_LOG_ERROR("ParseAttributesConfiguration: unknown type " << type);
-      throw InvalidSchemaException("Illegal attribute type");
+      std::string message("Illegal attribute type: ");
+      message.append(type);
+      throw InvalidSchemaException(message);
     }
 
     std::pair<std::string, std::unique_ptr<AttributeValueConfiguration>> entry(
@@ -1691,7 +1699,7 @@ static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
 static std::unique_ptr<ResourceConfiguration> ParseResourceConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<ResourceConfiguration> model(new ResourceConfiguration);
+  auto model = std::make_unique<ResourceConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->schema_url      = node->GetString("schema_url", "");
@@ -1715,7 +1723,8 @@ static std::unique_ptr<ResourceConfiguration> ParseResourceConfiguration(
 std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Document> doc)
 {
   std::unique_ptr<DocumentNode> node = doc->GetRootNode();
-  std::unique_ptr<Configuration> model(new Configuration(std::move(doc)));
+
+  auto model = std::make_unique<Configuration>(std::move(doc));
 
   model->file_format = node->GetRequiredString("file_format");
   model->disabled    = node->GetBoolean("disabled", false);
