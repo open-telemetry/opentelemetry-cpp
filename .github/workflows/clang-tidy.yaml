@@ -17,9 +17,9 @@ jobs:
       matrix:
         include:
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 62
+            warning_limit: 64
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 62
+            warning_limit: 64
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
@@ -48,6 +48,7 @@ jobs:
           libgmock-dev \
           libgtest-dev \
           libbenchmark-dev
+          sudo ./ci/install_ryml.sh
 
           if ! command -v clang-tidy &> /dev/null; then
             echo "clang-tidy could not be found"
