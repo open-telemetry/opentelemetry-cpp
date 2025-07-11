@@ -10,6 +10,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
@@ -91,7 +92,6 @@
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

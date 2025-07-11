@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"

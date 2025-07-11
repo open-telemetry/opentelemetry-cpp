@@ -8,12 +8,12 @@
 #include <ryml_std.hpp>
 #include <string>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/ryml_document.h"
 #include "opentelemetry/sdk/configuration/ryml_document_node.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

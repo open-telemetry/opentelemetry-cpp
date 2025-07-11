@@ -5,10 +5,10 @@
 #include <cstdlib>
 #include <string>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

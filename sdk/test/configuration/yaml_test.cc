@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"

@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"

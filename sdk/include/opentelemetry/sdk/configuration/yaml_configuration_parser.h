@@ -6,8 +6,8 @@
 #include <memory>
 #include <string>
 
-#include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/configuration/configuration.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -15,7 +15,7 @@ namespace sdk
 namespace configuration
 {
 
-class YamlConfigurationParser
+class OPENTELEMETRY_EXPORT_TYPE YamlConfigurationParser
 {
 public:
   static std::unique_ptr<Configuration> ParseFile(const std::string &filename);

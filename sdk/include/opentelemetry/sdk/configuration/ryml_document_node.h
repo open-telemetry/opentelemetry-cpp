@@ -8,8 +8,8 @@
 #include <ryml.hpp>
 #include <string>
 
-#include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/configuration/document_node.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -17,7 +17,7 @@ namespace sdk
 namespace configuration
 {
 
-class RymlDocumentNode : public DocumentNode
+class OPENTELEMETRY_EXPORT_TYPE RymlDocumentNode : public DocumentNode
 {
 public:
   RymlDocumentNode(ryml::ConstNodeRef node, std::size_t depth) : node_(node), depth_(depth) {}
@@ -66,7 +66,7 @@ private:
   std::size_t depth_;
 };
 
-class RymlDocumentNodeConstIteratorImpl : public DocumentNodeConstIteratorImpl
+class OPENTELEMETRY_EXPORT_TYPE RymlDocumentNodeConstIteratorImpl : public DocumentNodeConstIteratorImpl
 {
 public:
   RymlDocumentNodeConstIteratorImpl(ryml::ConstNodeRef parent,
@@ -89,7 +89,7 @@ private:
   std::size_t depth_;
 };
 
-class RymlPropertiesNodeConstIteratorImpl : public PropertiesNodeConstIteratorImpl
+class OPENTELEMETRY_EXPORT_TYPE RymlPropertiesNodeConstIteratorImpl : public PropertiesNodeConstIteratorImpl
 {
 public:
   RymlPropertiesNodeConstIteratorImpl(ryml::ConstNodeRef parent,

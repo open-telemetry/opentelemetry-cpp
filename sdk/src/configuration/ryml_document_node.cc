@@ -8,11 +8,11 @@
 #include <string>
 #include <utility>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/sdk/configuration/ryml_document_node.h"
-#include "opentelemetry/version.h"
 
 // Local debug, do not use in production
 // #define WITH_DEBUG_NODE
