@@ -25,7 +25,7 @@ jobs:
       - name: Install LLVM with winget (ignore if already installed)
         shell: pwsh
         run: |
-          winget install -e LLVM.LLVM -v 20.1.7 --accept-package-agreements --disable-interactivity --silent
+          winget install -e LLVM.LLVM -v 20.1.8 --accept-package-agreements --disable-interactivity --silent
           if ($LASTEXITCODE -ne 0) {
             Write-Host "Winget install failed or not needed (already installed)"
             exit 0
