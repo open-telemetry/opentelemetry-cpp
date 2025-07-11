@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.22 2025-07-10]
+## [1.22 2025-07-11]
 
 * [DOC] Udpate link to membership document
   [#3452](https://github.com/open-telemetry/opentelemetry-cpp/pull/3452)
@@ -181,6 +181,9 @@ Increment the:
 
 * [CONFIGURATION] File configuration - configuration parser
   [#3520](https://github.com/open-telemetry/opentelemetry-cpp/pull/3520)
+
+* [ADMIN] Remove file .github/repository-settings.md
+  [#3534](https://github.com/open-telemetry/opentelemetry-cpp/pull/3534)
 
 Important changes:
 
