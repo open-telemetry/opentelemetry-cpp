@@ -176,6 +176,12 @@ Increment the:
 * [SDK] Fixes duration overflow
   [#3529](https://github.com/open-telemetry/opentelemetry-cpp/pull/3529)
 
+* [CONFIGURATION] File configuration - yaml parser
+  [#3519](https://github.com/open-telemetry/opentelemetry-cpp/pull/3519)
+
+* [CONFIGURATION] File configuration - configuration parser
+  [#3520](https://github.com/open-telemetry/opentelemetry-cpp/pull/3520)
+
 Important changes:
 
 * [REMOVAL] Removed deprecated semantic convention header files
