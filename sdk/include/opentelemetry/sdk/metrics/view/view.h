@@ -31,13 +31,15 @@ public:
        std::shared_ptr<AggregationConfig> aggregation_config = nullptr,
        std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor =
            std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>(
-               new opentelemetry::sdk::metrics::DefaultAttributesProcessor()))
+               new opentelemetry::sdk::metrics::DefaultAttributesProcessor()),
+       size_t aggregation_cardinality_limit = 0)
       : name_(name),
         description_(description),
         unit_(unit),
         aggregation_type_{aggregation_type},
         aggregation_config_{aggregation_config},
-        attributes_processor_{std::move(attributes_processor)}
+        attributes_processor_{std::move(attributes_processor)},
+        aggregation_cardinality_limit_{aggregation_cardinality_limit}
   {}
 
   virtual ~View() = default;
@@ -59,6 +61,16 @@ public:
     return attributes_processor_;
   }
 
+  virtual size_t GetAggregationCardinalityLimit() const noexcept
+  {
+    return aggregation_cardinality_limit_;
+  }
+
+  virtual bool HasAggregationCardinalityLimit() const noexcept
+  {
+    return aggregation_cardinality_limit_ > 0;
+  }
+
 private:
   std::string name_;
   std::string description_;
@@ -66,6 +78,7 @@ private:
   AggregationType aggregation_type_;
   std::shared_ptr<AggregationConfig> aggregation_config_;
   std::shared_ptr<AttributesProcessor> attributes_processor_;
+  size_t aggregation_cardinality_limit_;
 };
 }  // namespace metrics
 }  // namespace sdk
