@@ -159,6 +159,10 @@ public:
   explicit OtlpHttpClient(OtlpHttpClientOptions &&options);
 
   ~OtlpHttpClient();
+  OtlpHttpClient(const OtlpHttpClient &)            = delete;
+  OtlpHttpClient &operator=(const OtlpHttpClient &) = delete;
+  OtlpHttpClient(OtlpHttpClient &&)                 = delete;
+  OtlpHttpClient &operator=(OtlpHttpClient &&)      = delete;
 
   /**
    * Sync export
@@ -230,28 +234,13 @@ private:
     std::shared_ptr<opentelemetry::ext::http::client::Session> session;
     std::shared_ptr<opentelemetry::ext::http::client::EventHandler> event_handle;
 
-    inline HttpSessionData() = default;
+    HttpSessionData() = default;
 
-    inline explicit HttpSessionData(
+    explicit HttpSessionData(
         std::shared_ptr<opentelemetry::ext::http::client::Session> &&input_session,
         std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &&input_handle)
-    {
-      session.swap(input_session);
-      event_handle.swap(input_handle);
-    }
-
-    inline HttpSessionData(HttpSessionData &&other)
-    {
-      session.swap(other.session);
-      event_handle.swap(other.event_handle);
-    }
-
-    inline HttpSessionData &operator=(HttpSessionData &&other) noexcept
-    {
-      session.swap(other.session);
-      event_handle.swap(other.event_handle);
-      return *this;
-    }
+        : session(std::move(input_session)), event_handle(std::move(input_handle))
+    {}
   };
 
   /**

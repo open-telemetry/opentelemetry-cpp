@@ -27,6 +27,8 @@ OtlpFileLogRecordExporterOptions::OtlpFileLogRecordExporterOptions()
   backend_options = fs_options;
 }
 
+OtlpFileLogRecordExporterOptions::~OtlpFileLogRecordExporterOptions() {}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
