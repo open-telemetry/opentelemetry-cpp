@@ -47,6 +47,28 @@ namespace client
 namespace curl
 {
 
+class HttpOperationAccessor
+{
+public:
+  OPENTELEMETRY_SANITIZER_NO_THREAD static std::thread::id GetThreadId(
+      const HttpOperation::AsyncData &async_data)
+  {
+#if !(defined(OPENTELEMETRY_HAVE_THREAD_SANITIZER) && OPENTELEMETRY_HAVE_THREAD_SANITIZER)
+    std::atomic_thread_fence(std::memory_order_acquire);
+#endif
+    return async_data.callback_thread;
+  }
+
+  OPENTELEMETRY_SANITIZER_NO_THREAD static void SetThreadId(HttpOperation::AsyncData &async_data,
+                                                            std::thread::id thread_id)
+  {
+    async_data.callback_thread = thread_id;
+#if !(defined(OPENTELEMETRY_HAVE_THREAD_SANITIZER) && OPENTELEMETRY_HAVE_THREAD_SANITIZER)
+    std::atomic_thread_fence(std::memory_order_release);
+#endif
+  }
+};
+
 size_t HttpOperation::WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
   HttpOperation *self = reinterpret_cast<HttpOperation *>(userp);
@@ -335,7 +357,7 @@ HttpOperation::~HttpOperation()
     case opentelemetry::ext::http::client::SessionState::Sending: {
       if (async_data_ && async_data_->result_future.valid())
       {
-        if (async_data_->callback_thread != std::this_thread::get_id())
+        if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
         {
           async_data_->result_future.wait();
           last_curl_result_ = async_data_->result_future.get();
@@ -360,7 +382,7 @@ void HttpOperation::Finish()
   if (async_data_ && async_data_->result_future.valid())
   {
     // We should not wait in callback from Cleanup()
-    if (async_data_->callback_thread != std::this_thread::get_id())
+    if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
     {
       async_data_->result_future.wait();
       last_curl_result_ = async_data_->result_future.get();
@@ -412,9 +434,9 @@ void HttpOperation::Cleanup()
     callback.swap(async_data_->callback);
     if (callback)
     {
-      async_data_->callback_thread = std::this_thread::get_id();
+      HttpOperationAccessor::SetThreadId(*async_data_, std::this_thread::get_id());
       callback(*this);
-      async_data_->callback_thread = std::thread::id();
+      HttpOperationAccessor::SetThreadId(*async_data_, std::thread::id());
     }
 
     // Set value to promise to continue Finish()
