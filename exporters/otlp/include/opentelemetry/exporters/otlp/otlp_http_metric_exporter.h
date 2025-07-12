@@ -72,7 +72,7 @@ private:
   OtlpHttpMetricExporterRuntimeOptions runtime_options_;
 
   // Aggregation Temporality Selector
-  const sdk::metrics::AggregationTemporalitySelector aggregation_temporality_selector_;
+  sdk::metrics::AggregationTemporalitySelector aggregation_temporality_selector_;
 
   // Object that stores the HTTP sessions that have been created
   std::unique_ptr<OtlpHttpClient> http_client_;

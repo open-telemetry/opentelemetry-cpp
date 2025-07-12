@@ -106,8 +106,11 @@ class OPENTELEMETRY_EXPORT_TYPE OtlpGrpcClient
 {
 public:
   OtlpGrpcClient(const OtlpGrpcClientOptions &options);
-
   ~OtlpGrpcClient();
+  OtlpGrpcClient(const OtlpGrpcClient &)            = delete;
+  OtlpGrpcClient(OtlpGrpcClient &&)                 = delete;
+  OtlpGrpcClient &operator=(const OtlpGrpcClient &) = delete;
+  OtlpGrpcClient &operator=(OtlpGrpcClient &&)      = delete;
 
   static std::string GetGrpcTarget(const std::string &endpoint);
 

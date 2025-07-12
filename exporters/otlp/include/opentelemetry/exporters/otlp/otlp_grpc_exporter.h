@@ -58,6 +58,10 @@ public:
   explicit OtlpGrpcExporter(const OtlpGrpcExporterOptions &options);
 
   ~OtlpGrpcExporter() override;
+  OtlpGrpcExporter(const OtlpGrpcExporter &)            = delete;
+  OtlpGrpcExporter(OtlpGrpcExporter &&)                 = delete;
+  OtlpGrpcExporter &operator=(const OtlpGrpcExporter &) = delete;
+  OtlpGrpcExporter &operator=(OtlpGrpcExporter &&)      = delete;
 
   /**
    * Create a span recordable.

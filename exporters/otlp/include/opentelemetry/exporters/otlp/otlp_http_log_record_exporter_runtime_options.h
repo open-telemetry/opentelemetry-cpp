@@ -19,8 +19,7 @@ namespace otlp
  */
 struct OPENTELEMETRY_EXPORT OtlpHttpLogRecordExporterRuntimeOptions
 {
-  OtlpHttpLogRecordExporterRuntimeOptions()  = default;
-  ~OtlpHttpLogRecordExporterRuntimeOptions() = default;
+  OtlpHttpLogRecordExporterRuntimeOptions() = default;
 
   std::shared_ptr<sdk::common::ThreadInstrumentation> thread_instrumentation =
       std::shared_ptr<sdk::common::ThreadInstrumentation>(nullptr);
