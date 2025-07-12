@@ -15,23 +15,85 @@ Increment the:
 
 ## [Unreleased]
 
-* [TEST] Test examples in CI with CMake Part 1
+## [1.22 2025-07-11]
+
+* [DOC] Udpate link to membership document
+  [#3452](https://github.com/open-telemetry/opentelemetry-cpp/pull/3452)
+
+* [CI] build examples with IWYU
+  [#3450](https://github.com/open-telemetry/opentelemetry-cpp/pull/3450)
+
+* Bump ossf/scorecard-action from 2.4.1 to 2.4.2
+  [#3455](https://github.com/open-telemetry/opentelemetry-cpp/pull/3455)
+
+* [SDK] Use shared_ptr internally for AttributesProcessor to prevent use-after-free
+  [#3457](https://github.com/open-telemetry/opentelemetry-cpp/pull/3457)
+
+* [CI] build iwyu
+  [#3459](https://github.com/open-telemetry/opentelemetry-cpp/pull/3459)
+
+* Bump github/codeql-action from 3.28.18 to 3.28.19
+  [#3462](https://github.com/open-telemetry/opentelemetry-cpp/pull/3462)
+
+* [DOC] Update doc comments to pass -WDocumention check
+  [#3375](https://github.com/open-telemetry/opentelemetry-cpp/pull/3375)
+
+* [TEST] test examples in CI with CMake Part 1
   [#3449](https://github.com/open-telemetry/opentelemetry-cpp/pull/3449)
 
-* [EXPORTER] Add `credentials` option to OTLP Exporter’s gRPC Client
+* [BUILD] Allow compilation with CXX26
+  [#3464](https://github.com/open-telemetry/opentelemetry-cpp/pull/3464)
+
+* [SDK] Add credentials option to OTLP gRPC client
   [#3403](https://github.com/open-telemetry/opentelemetry-cpp/pull/3403)
 
-  * To enable with CMake: `-DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON`
-  * To enable with Bazel: `--@io_opentelemetry_cpp//exporters/otlp:with_otlp_grpc_credential_preview=true`
+* [CI] Remove windows 2019
+  [#3466](https://github.com/open-telemetry/opentelemetry-cpp/pull/3466)
 
-* [BUILD] Upgrade opentelemetry-proto to 1.7.0
+* [CodeHealth] fix include-what-you-use, part 8
+  [#3465](https://github.com/open-telemetry/opentelemetry-cpp/pull/3465)
+
+* [BUILD] Upgrade to opentelemetry-proto 1.7.0
   [#3443](https://github.com/open-telemetry/opentelemetry-cpp/pull/3443)
+
+* Bump github/codeql-action from 3.28.19 to 3.29.0
+  [#3472](https://github.com/open-telemetry/opentelemetry-cpp/pull/3472)
+
+* Bump step-security/harden-runner from 2.12.0 to 2.12.1
+  [#3471](https://github.com/open-telemetry/opentelemetry-cpp/pull/3471)
+
+* [SDK] BatchLogRecordProcessor::ForceFlush is not waking up bg thread
+  [#3448](https://github.com/open-telemetry/opentelemetry-cpp/pull/3448)
+
+* [CI] rely on github installed cmake for ci runners
+  [#3482](https://github.com/open-telemetry/opentelemetry-cpp/pull/3482)
+
+* [CI] Increase code coverage of iwyu and clang-tidy ci jobs
+  [#3469](https://github.com/open-telemetry/opentelemetry-cpp/pull/3469)
+
+* [REMOVAL] Remove CMake option WITH_REMOVE_METER_PREVIEW
+  [#3476](https://github.com/open-telemetry/opentelemetry-cpp/pull/3476)
 
 * [REMOVAL] Removed deprecated semantic convention header files
   [#3475](https://github.com/open-telemetry/opentelemetry-cpp/pull/3475)
 
+* Bump docker/setup-buildx-action from 3.10.0 to 3.11.0
+  [#3483](https://github.com/open-telemetry/opentelemetry-cpp/pull/3483)
+
+* Bump docker/setup-buildx-action from 3.11.0 to 3.11.1
+  [#3488](https://github.com/open-telemetry/opentelemetry-cpp/pull/3488)
+
+* [Code Health] include-what-you-use cleanup, part 9
+  [#3492](https://github.com/open-telemetry/opentelemetry-cpp/pull/3492)
+
 * [CodeHealth] Fix clang-tidy warnings part 1
   [#3493](https://github.com/open-telemetry/opentelemetry-cpp/pull/3493)
+
+* [CMAKE] Add thirdparty install cmake project and install bash script
+  [#3486](https://github.com/open-telemetry/opentelemetry-cpp/pull/3486)
+
+* [DOC] Update community member listings
+  [#3499](https://github.com/open-telemetry/opentelemetry-cpp/pull/3499)
 
 * [CodeHealth] Fix clang-tidy warnings part 2
   [#3496](https://github.com/open-telemetry/opentelemetry-cpp/pull/3496)
@@ -39,11 +101,89 @@ Increment the:
 * [CodeHealth] Fix clang-tidy warnings part 3
   [#3498](https://github.com/open-telemetry/opentelemetry-cpp/pull/3498)
 
-* [CodeHealth] Fix clang-tidy warnings part 4
+* [DOC] Fix outdated community membership link
+  [#3500](https://github.com/open-telemetry/opentelemetry-cpp/pull/3500)
+
+* [CONFIGURATION] File configuration - trace model
+  [#3467](https://github.com/open-telemetry/opentelemetry-cpp/pull/3467)
+
+* [CONFIGURATION] File configuration - sampler model
+  [#3468](https://github.com/open-telemetry/opentelemetry-cpp/pull/3468)
+
+* [BUILD] Fixes grpc linking for OTLP exporter's tests
+  [#3435](https://github.com/open-telemetry/opentelemetry-cpp/pull/3435)
+
+* [CONFIGURATION] File configuration - log model
+  [#3473](https://github.com/open-telemetry/opentelemetry-cpp/pull/3473)
+
+* [CONFIGURATION] File configuration - metric model
+  [#3474](https://github.com/open-telemetry/opentelemetry-cpp/pull/3474)
+
+* Bump github/codeql-action from 3.29.0 to 3.29.1
+  [#3505](https://github.com/open-telemetry/opentelemetry-cpp/pull/3505)
+
+* [EXPORTER] Add bytes support for OTLP recordables
+  [#3495](https://github.com/open-telemetry/opentelemetry-cpp/pull/3495)
+
+* [CodeHealth] Fix clang tidy warnings part 4
   [#3501](https://github.com/open-telemetry/opentelemetry-cpp/pull/3501)
 
-* [CMAKE] Clean up googletest and benchmark dependency management
+* [CodeHealth] Fix clang-tidy warnings part 5
+  [#3506](https://github.com/open-telemetry/opentelemetry-cpp/pull/3506)
+
+* [CI] Add minimum token permissions for all github workflow files
+  [#3508](https://github.com/open-telemetry/opentelemetry-cpp/pull/3508)
+
+* Bump step-security/harden-runner from 2.12.1 to 2.12.2
+  [#3509](https://github.com/open-telemetry/opentelemetry-cpp/pull/3509)
+
+* Bump github/codeql-action from 3.29.1 to 3.29.2
+  [#3510](https://github.com/open-telemetry/opentelemetry-cpp/pull/3510)
+
+* [BUILD] Fixes compiling problems in NDK r27
+  [#3517](https://github.com/open-telemetry/opentelemetry-cpp/pull/3517)
+
+* [CMAKE] clean up googletest and benchmark dependency management
   [#3485](https://github.com/open-telemetry/opentelemetry-cpp/pull/3485)
+
+* [CONFIGURATION] File configuration - extension model
+  [#3503](https://github.com/open-telemetry/opentelemetry-cpp/pull/3503)
+
+* [CONFIGURATION] File configuration - misc model
+  [#3504](https://github.com/open-telemetry/opentelemetry-cpp/pull/3504)
+
+* [CONFIGURATION] File configuration - metric aggregation model
+  [#3502](https://github.com/open-telemetry/opentelemetry-cpp/pull/3502)
+
+* [CMAKE] find or fetch nlohmann-json
+  [#3523](https://github.com/open-telemetry/opentelemetry-cpp/pull/3523)
+
+* [CMAKE] Address the vcpkg opentelemetry-cpp port CMake patches
+  [#3518](https://github.com/open-telemetry/opentelemetry-cpp/pull/3518)
+
+* [CMAKE] Add CMake script to find or fetch prometheus-cpp
+  [#3522](https://github.com/open-telemetry/opentelemetry-cpp/pull/3522)
+
+* [CMAKE] Switch opentelemetry-proto to use FetchContent
+  [#3524](https://github.com/open-telemetry/opentelemetry-cpp/pull/3524)
+
+* [CMAKE] Add CMake script to find or fetch Microsoft.GSL
+  [#3521](https://github.com/open-telemetry/opentelemetry-cpp/pull/3521)
+
+* [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.36.0
+  [#3527](https://github.com/open-telemetry/opentelemetry-cpp/pull/3527)
+
+* [SDK] Fixes duration overflow
+  [#3529](https://github.com/open-telemetry/opentelemetry-cpp/pull/3529)
+
+* [CONFIGURATION] File configuration - yaml parser
+  [#3519](https://github.com/open-telemetry/opentelemetry-cpp/pull/3519)
+
+* [CONFIGURATION] File configuration - configuration parser
+  [#3520](https://github.com/open-telemetry/opentelemetry-cpp/pull/3520)
+
+* [ADMIN] Remove file .github/repository-settings.md
+  [#3534](https://github.com/open-telemetry/opentelemetry-cpp/pull/3534)
 
 Important changes:
 
