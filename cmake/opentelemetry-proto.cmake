@@ -174,20 +174,6 @@ foreach(IMPORT_DIR ${PROTOBUF_IMPORT_DIRS})
   list(APPEND PROTOBUF_INCLUDE_FLAGS "-I${IMPORT_DIR}")
 endforeach()
 
-if(WITH_OTLP_GRPC)
-  if(CMAKE_CROSSCOMPILING)
-    find_program(gRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin)
-  else()
-    if(TARGET gRPC::grpc_cpp_plugin)
-      project_build_tools_get_imported_location(gRPC_CPP_PLUGIN_EXECUTABLE
-                                                gRPC::grpc_cpp_plugin)
-    else()
-      find_program(gRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin)
-    endif()
-  endif()
-  message(STATUS "gRPC_CPP_PLUGIN_EXECUTABLE=${gRPC_CPP_PLUGIN_EXECUTABLE}")
-endif()
-
 set(PROTOBUF_COMMON_FLAGS "--proto_path=${PROTO_PATH}"
                           "--cpp_out=${GENERATED_PROTOBUF_PATH}")
 # --experimental_allow_proto3_optional is available from 3.13 and be stable and
@@ -239,7 +225,10 @@ set(PROTOBUF_GENERATED_FILES
     ${PROFILES_SERVICE_PB_H_FILE}
     ${PROFILES_SERVICE_PB_CPP_FILE})
 
+set(PROTOBUF_GENERATE_DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE})
+
 if(WITH_OTLP_GRPC)
+  list(APPEND PROTOBUF_GENERATE_DEPENDS ${gRPC_CPP_PLUGIN_EXECUTABLE})
   list(APPEND PROTOBUF_COMMON_FLAGS
        "--grpc_out=generate_mock_code=true:${GENERATED_PROTOBUF_PATH}"
        --plugin=protoc-gen-grpc="${gRPC_CPP_PLUGIN_EXECUTABLE}")
@@ -284,7 +273,7 @@ add_custom_command(
     ${LOGS_PROTO} ${METRICS_PROTO} ${TRACE_SERVICE_PROTO} ${LOGS_SERVICE_PROTO}
     ${METRICS_SERVICE_PROTO} ${PROFILES_PROTO} ${PROFILES_SERVICE_PROTO}
   COMMENT "[Run]: ${PROTOBUF_RUN_PROTOC_COMMAND}"
-  DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE})
+  DEPENDS ${PROTOBUF_GENERATE_DEPENDS})
 
 unset(OTELCPP_PROTO_TARGET_OPTIONS)
 if(CMAKE_SYSTEM_NAME MATCHES "Windows|MinGW|WindowsStore")
