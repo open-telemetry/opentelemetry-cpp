@@ -36,6 +36,10 @@ struct OPENTELEMETRY_EXPORT OtlpHttpExporterOptions
   OtlpHttpExporterOptions();
   /** No defaults. */
   OtlpHttpExporterOptions(void * /* raw */);
+  OtlpHttpExporterOptions(const OtlpHttpExporterOptions &)            = default;
+  OtlpHttpExporterOptions(OtlpHttpExporterOptions &&)                 = default;
+  OtlpHttpExporterOptions &operator=(const OtlpHttpExporterOptions &) = default;
+  OtlpHttpExporterOptions &operator=(OtlpHttpExporterOptions &&)      = default;
   ~OtlpHttpExporterOptions();
 
   /** The endpoint to export to. */
