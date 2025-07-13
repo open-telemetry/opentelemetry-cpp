@@ -16,7 +16,7 @@ disabled: false
 # Environment variable: OTEL_PROPAGATORS
 propagator:
   # composite: [tracecontext, baggage, b3, b3multi, jaeger, xray, ottrace]
-  simple: tracecontext
+  composite: tracecontext
 
 # Configure tracer provider.
 tracer_provider:
@@ -56,3 +56,27 @@ tracer_provider:
     my_custom_sampler:
       comment: "This is a sampler extension point, with properties."
 
+meter_provider:
+  readers:
+    - pull:
+        exporter:
+          my_custom_pull_metric_exporter:
+            comment: "This is a pull metric exporter extension point, with properties."
+    - periodic:
+        exporter:
+          my_custom_push_metric_exporter:
+            comment: "This is a push metric exporter extension point, with properties."
+
+logger_provider:
+  processors:
+    - simple:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be console.
+          console: {}
+    - my_custom_log_record_processor:
+        comment: "This is a log record processor extension point, with properties."
+    - batch:
+        exporter:
+          my_custom_log_record_exporter:
+            comment: "This is a log record exporter extension point, with properties."

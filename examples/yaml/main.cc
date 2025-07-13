@@ -15,6 +15,10 @@
 #include "opentelemetry/sdk/init/configured_sdk.h"
 #include "opentelemetry/sdk/init/registry.h"
 
+#include "custom_log_record_exporter_builder.h"
+#include "custom_log_record_processor_builder.h"
+#include "custom_pull_metric_exporter_builder.h"
+#include "custom_push_metric_exporter_builder.h"
 #include "custom_sampler_builder.h"
 #include "custom_span_exporter_builder.h"
 #include "custom_span_processor_builder.h"
@@ -109,6 +113,10 @@ void InitOtel(const std::string &config_file)
   CustomSamplerBuilder::Register(registry.get());
   CustomSpanExporterBuilder::Register(registry.get());
   CustomSpanProcessorBuilder::Register(registry.get());
+  CustomPushMetricExporterBuilder::Register(registry.get());
+  CustomPullMetricExporterBuilder::Register(registry.get());
+  CustomLogRecordExporterBuilder::Register(registry.get());
+  CustomLogRecordProcessorBuilder::Register(registry.get());
 
   /* 4 - Parse a config.yaml */
 

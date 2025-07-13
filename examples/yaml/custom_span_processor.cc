@@ -21,24 +21,24 @@ void CustomSpanProcessor::OnStart(
     opentelemetry::sdk::trace::Recordable & /* span */,
     const opentelemetry::trace::SpanContext & /* parent_context */) noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomSpanProcessor::OnStart(): FIXME");
+  OTEL_INTERNAL_LOG_ERROR("CustomSpanProcessor::OnStart(): YOUR CODE HERE");
 }
 
 void CustomSpanProcessor::OnEnd(
     std::unique_ptr<opentelemetry::sdk::trace::Recordable> &&span) noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomSpanProcessor::OnEnd(): FIXME");
+  OTEL_INTERNAL_LOG_ERROR("CustomSpanProcessor::OnEnd(): YOUR CODE HERE");
   auto unused = std::move(span);
 }
 
 bool CustomSpanProcessor::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomSpanProcessor::ForceFlush(): FIXME");
+  OTEL_INTERNAL_LOG_ERROR("CustomSpanProcessor::ForceFlush(): YOUR CODE HERE");
   return false;
 }
 
 bool CustomSpanProcessor::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomSpanProcessor::Shutdown(): FIXME");
+  OTEL_INTERNAL_LOG_ERROR("CustomSpanProcessor::Shutdown(): YOUR CODE HERE");
   return false;
 }

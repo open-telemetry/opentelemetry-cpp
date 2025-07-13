@@ -15,7 +15,15 @@ add_executable(
   custom_span_exporter.cc
   custom_span_exporter_builder.cc
   custom_span_processor.cc
-  custom_span_processor_builder.cc)
+  custom_span_processor_builder.cc
+  custom_push_metric_exporter.cc
+  custom_push_metric_exporter_builder.cc
+  custom_pull_metric_exporter.cc
+  custom_pull_metric_exporter_builder.cc
+  custom_log_record_exporter.cc
+  custom_log_record_exporter_builder.cc
+  custom_log_record_processor.cc
+  custom_log_record_processor_builder.cc)
 
 target_link_libraries(
   example_yaml

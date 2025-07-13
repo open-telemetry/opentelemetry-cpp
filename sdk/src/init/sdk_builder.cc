@@ -1056,7 +1056,8 @@ SdkBuilder::CreateExtensionPushMetricExporter(
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionPushMetricExporter() using registered builder" << name);
+    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionPushMetricExporter() using registered builder "
+                            << name);
     sdk = builder->Build(model);
   }
   else
@@ -1106,7 +1107,8 @@ SdkBuilder::CreateExtensionPullMetricExporter(
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionPullMetricExporter() using registered builder" << name);
+    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionPullMetricExporter() using registered builder "
+                            << name);
     sdk = builder->Build(model);
   }
   else
