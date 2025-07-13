@@ -4,10 +4,10 @@
 #pragma once
 
 #include <chrono>
-#include <memory>
 #include <string>
 
 #include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 class CustomPushMetricExporter : public opentelemetry::sdk::metrics::PushMetricExporter

@@ -15,7 +15,7 @@ opentelemetry::sdk::common::ExportResult CustomPushMetricExporter::Export(
 
 opentelemetry::sdk::metrics::AggregationTemporality
 CustomPushMetricExporter::GetAggregationTemporality(
-    opentelemetry::sdk::metrics::InstrumentType instrument_type) const noexcept
+    opentelemetry::sdk::metrics::InstrumentType /* instrument_type */) const noexcept
 {
   OTEL_INTERNAL_LOG_ERROR("CustomPushMetricExporter::GetAggregationTemporality(): YOUR CODE HERE");
   return opentelemetry::sdk::metrics::AggregationTemporality::kCumulative;

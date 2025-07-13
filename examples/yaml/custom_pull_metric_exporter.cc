@@ -8,7 +8,7 @@
 
 opentelemetry::sdk::metrics::AggregationTemporality
 CustomPullMetricExporter::GetAggregationTemporality(
-    opentelemetry::sdk::metrics::InstrumentType instrument_type) const noexcept
+    opentelemetry::sdk::metrics::InstrumentType /* instrument_type */) const noexcept
 {
   OTEL_INTERNAL_LOG_ERROR("CustomPullMetricExporter::GetAggregationTemporality(): YOUR CODE HERE");
   return opentelemetry::sdk::metrics::AggregationTemporality::kCumulative;

@@ -67,8 +67,7 @@ OtlpHttpExporterOptions::OtlpHttpExporterOptions(void *)
       ssl_cipher(),
       ssl_cipher_suite(),
       compression()
-{
-}
+{}
 
 OtlpHttpExporterOptions::~OtlpHttpExporterOptions() {}
 
