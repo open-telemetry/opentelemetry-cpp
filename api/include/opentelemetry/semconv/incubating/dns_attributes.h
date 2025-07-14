@@ -20,6 +20,11 @@ namespace dns
 {
 
 /**
+  The list of IPv4 or IPv6 addresses resolved during DNS lookup.
+ */
+static constexpr const char *kDnsAnswers = "dns.answers";
+
+/**
   The name being queried.
   <p>
   If the name field contains non-printable characters (below 32 or above 126), those characters

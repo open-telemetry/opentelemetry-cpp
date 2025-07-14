@@ -57,6 +57,10 @@ public:
   OtlpGrpcLogRecordExporter(const OtlpGrpcLogRecordExporterOptions &options);
 
   ~OtlpGrpcLogRecordExporter() override;
+  OtlpGrpcLogRecordExporter(const OtlpGrpcLogRecordExporter &)            = delete;
+  OtlpGrpcLogRecordExporter(OtlpGrpcLogRecordExporter &&)                 = delete;
+  OtlpGrpcLogRecordExporter &operator=(const OtlpGrpcLogRecordExporter &) = delete;
+  OtlpGrpcLogRecordExporter &operator=(OtlpGrpcLogRecordExporter &&)      = delete;
 
   /**
    * Creates a recordable that stores the data in protobuf.

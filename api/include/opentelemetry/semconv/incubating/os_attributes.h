@@ -99,9 +99,14 @@ static constexpr const char *kAix = "aix";
 static constexpr const char *kSolaris = "solaris";
 
 /**
-  IBM z/OS
+  Deprecated. Use @code zos @endcode instead.
  */
 static constexpr const char *kZOs = "z_os";
+
+/**
+  IBM z/OS
+ */
+static constexpr const char *kZos = "zos";
 
 }  // namespace OsTypeValues
 

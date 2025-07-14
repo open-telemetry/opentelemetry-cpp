@@ -806,40 +806,42 @@ CreateAsyncDoubleMetricOtelSdkProcessorSpanQueueSize(metrics::Meter *meter)
 }
 
 /**
-  The number of created spans for which the end operation was called
-  <p>
-  For spans with @code recording=true @endcode: Implementations MUST record both @code
-  otel.sdk.span.live @endcode and @code otel.sdk.span.ended @endcode. For spans with @code
-  recording=false @endcode: If implementations decide to record this metric, they MUST also record
-  @code otel.sdk.span.live @endcode. <p> counter
- */
-static constexpr const char *kMetricOtelSdkSpanEnded = "otel.sdk.span.ended";
-static constexpr const char *descrMetricOtelSdkSpanEnded =
-    "The number of created spans for which the end operation was called";
-static constexpr const char *unitMetricOtelSdkSpanEnded = "{span}";
+  Use @code otel.sdk.span.started @endcode minus @code otel.sdk.span.live @endcode to derive this
+  value.
 
-static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricOtelSdkSpanEnded(
-    metrics::Meter *meter)
+  @deprecated
+  {"note": "Obsoleted.", "reason": "obsoleted"}
+  <p>
+  counter
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricOtelSdkSpanEnded =
+    "otel.sdk.span.ended";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricOtelSdkSpanEnded =
+    "Use `otel.sdk.span.started` minus `otel.sdk.span.live` to derive this value.";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricOtelSdkSpanEnded = "{span}";
+
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricOtelSdkSpanEnded(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricOtelSdkSpanEnded, descrMetricOtelSdkSpanEnded,
                                     unitMetricOtelSdkSpanEnded);
 }
 
-static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricOtelSdkSpanEnded(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricOtelSdkSpanEnded(metrics::Meter *meter)
 {
   return meter->CreateDoubleCounter(kMetricOtelSdkSpanEnded, descrMetricOtelSdkSpanEnded,
                                     unitMetricOtelSdkSpanEnded);
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricOtelSdkSpanEnded(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricOtelSdkSpanEnded, descrMetricOtelSdkSpanEnded,
                                              unitMetricOtelSdkSpanEnded);
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricOtelSdkSpanEnded(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableCounter(kMetricOtelSdkSpanEnded, descrMetricOtelSdkSpanEnded,
@@ -847,16 +849,18 @@ CreateAsyncDoubleMetricOtelSdkSpanEnded(metrics::Meter *meter)
 }
 
 /**
-  Deprecated, use @code otel.sdk.span.ended @endcode instead.
+  Use @code otel.sdk.span.started @endcode minus @code otel.sdk.span.live @endcode to derive this
+  value.
 
   @deprecated
-  {"note": "Replaced by @code otel.sdk.span.ended @endcode.", "reason": "renamed", "renamed_to":
-  "otel.sdk.span.ended"} <p> counter
+  {"note": "Obsoleted.", "reason": "obsoleted"}
+  <p>
+  counter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricOtelSdkSpanEndedCount =
     "otel.sdk.span.ended.count";
 OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricOtelSdkSpanEndedCount =
-    "Deprecated, use `otel.sdk.span.ended` instead.";
+    "Use `otel.sdk.span.started` minus `otel.sdk.span.live` to derive this value.";
 OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricOtelSdkSpanEndedCount = "{span}";
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -890,16 +894,13 @@ CreateAsyncDoubleMetricOtelSdkSpanEndedCount(metrics::Meter *meter)
 }
 
 /**
-  The number of created spans for which the end operation has not been called yet
-  <p>
-  For spans with @code recording=true @endcode: Implementations MUST record both @code
-  otel.sdk.span.live @endcode and @code otel.sdk.span.ended @endcode. For spans with @code
-  recording=false @endcode: If implementations decide to record this metric, they MUST also record
-  @code otel.sdk.span.ended @endcode. <p> updowncounter
+  The number of created spans with @code recording=true @endcode for which the end operation has not
+  been called yet <p> updowncounter
  */
 static constexpr const char *kMetricOtelSdkSpanLive = "otel.sdk.span.live";
 static constexpr const char *descrMetricOtelSdkSpanLive =
-    "The number of created spans for which the end operation has not been called yet";
+    "The number of created spans with `recording=true` for which the end operation has not been "
+    "called yet";
 static constexpr const char *unitMetricOtelSdkSpanLive = "{span}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -969,6 +970,45 @@ CreateAsyncDoubleMetricOtelSdkSpanLiveCount(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableUpDownCounter(
       kMetricOtelSdkSpanLiveCount, descrMetricOtelSdkSpanLiveCount, unitMetricOtelSdkSpanLiveCount);
+}
+
+/**
+  The number of created spans
+  <p>
+  Implementations MUST record this metric for all spans, even for non-recording ones.
+  <p>
+  counter
+ */
+static constexpr const char *kMetricOtelSdkSpanStarted     = "otel.sdk.span.started";
+static constexpr const char *descrMetricOtelSdkSpanStarted = "The number of created spans";
+static constexpr const char *unitMetricOtelSdkSpanStarted  = "{span}";
+
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricOtelSdkSpanStarted(
+    metrics::Meter *meter)
+{
+  return meter->CreateUInt64Counter(kMetricOtelSdkSpanStarted, descrMetricOtelSdkSpanStarted,
+                                    unitMetricOtelSdkSpanStarted);
+}
+
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricOtelSdkSpanStarted(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricOtelSdkSpanStarted, descrMetricOtelSdkSpanStarted,
+                                    unitMetricOtelSdkSpanStarted);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricOtelSdkSpanStarted(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableCounter(
+      kMetricOtelSdkSpanStarted, descrMetricOtelSdkSpanStarted, unitMetricOtelSdkSpanStarted);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricOtelSdkSpanStarted(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(
+      kMetricOtelSdkSpanStarted, descrMetricOtelSdkSpanStarted, unitMetricOtelSdkSpanStarted);
 }
 
 }  // namespace otel

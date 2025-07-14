@@ -8,6 +8,7 @@
 #-----------------------------------------------------------------------
 set(OTEL_THIRDPARTY_DEPENDENCIES_SUPPORTED
      Threads
+     Microsoft.GSL
      ZLIB
      CURL
      nlohmann_json
@@ -29,6 +30,7 @@ set(OTEL_Protobuf_TARGET_NAMESPACE "protobuf")
 # # set(OTEL_<dependency>_SEARCH_MODE "<search mode>")
 #-----------------------------------------------------------------------
 set(OTEL_Threads_SEARCH_MODE "")
+set(OTEL_Microsoft.GSL_SEARCH_MODE "CONFIG")
 set(OTEL_ZLIB_SEARCH_MODE "")
 set(OTEL_CURL_SEARCH_MODE "")
 set(OTEL_nlohmann_json_SEARCH_MODE "CONFIG")
