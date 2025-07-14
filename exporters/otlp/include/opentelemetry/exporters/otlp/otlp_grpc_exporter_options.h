@@ -24,7 +24,11 @@ namespace otlp
 struct OPENTELEMETRY_EXPORT OtlpGrpcExporterOptions : public OtlpGrpcClientOptions
 {
   OtlpGrpcExporterOptions();
-  ~OtlpGrpcExporterOptions();
+  OtlpGrpcExporterOptions(const OtlpGrpcExporterOptions &)            = default;
+  OtlpGrpcExporterOptions(OtlpGrpcExporterOptions &&)                 = default;
+  OtlpGrpcExporterOptions &operator=(const OtlpGrpcExporterOptions &) = default;
+  OtlpGrpcExporterOptions &operator=(OtlpGrpcExporterOptions &&)      = default;
+  ~OtlpGrpcExporterOptions() override;
 };
 
 }  // namespace otlp
