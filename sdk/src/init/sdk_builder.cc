@@ -14,6 +14,7 @@
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
@@ -29,9 +30,9 @@
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
@@ -39,6 +40,7 @@
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
 #include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/integer_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/integer_attribute_value_configuration.h"
@@ -496,14 +498,14 @@ public:
     aggregation_config = m_sdk_builder->CreateBase2ExponentialBucketHistogramAggregation(model);
   }
 
-  void VisitDefault(
-      const opentelemetry::sdk::configuration::DefaultAggregationConfiguration *model) override
+  void VisitDefault(const opentelemetry::sdk::configuration::DefaultAggregationConfiguration
+                        * /* model */) override
   {
     aggregation_type = opentelemetry::sdk::metrics::AggregationType::kDefault;
   }
 
   void VisitDrop(
-      const opentelemetry::sdk::configuration::DropAggregationConfiguration *model) override
+      const opentelemetry::sdk::configuration::DropAggregationConfiguration * /* model */) override
   {
     aggregation_type = opentelemetry::sdk::metrics::AggregationType::kDrop;
   }
@@ -516,14 +518,14 @@ public:
     aggregation_config = m_sdk_builder->CreateExplicitBucketHistogramAggregation(model);
   }
 
-  void VisitLastValue(
-      const opentelemetry::sdk::configuration::LastValueAggregationConfiguration *model) override
+  void VisitLastValue(const opentelemetry::sdk::configuration::LastValueAggregationConfiguration
+                          * /* model */) override
   {
     aggregation_type = opentelemetry::sdk::metrics::AggregationType::kLastValue;
   }
 
   void VisitSum(
-      const opentelemetry::sdk::configuration::SumAggregationConfiguration *model) override
+      const opentelemetry::sdk::configuration::SumAggregationConfiguration * /* model */) override
   {
     aggregation_type = opentelemetry::sdk::metrics::AggregationType::kSum;
   }
@@ -1252,8 +1254,8 @@ std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> SdkBuilder::Crea
 
 std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>
 SdkBuilder::CreateAttributesProcessor(
-    const std::unique_ptr<opentelemetry::sdk::configuration::IncludeExcludeConfiguration> &model)
-    const
+    const std::unique_ptr<opentelemetry::sdk::configuration::IncludeExcludeConfiguration>
+        & /* model */) const
 {
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk;
 
