@@ -5,7 +5,6 @@
 
 #include <map>
 #include <ostream>
-#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 
@@ -37,13 +36,39 @@ OPENTELEMETRY_EXPORT bool AttributeIsValidString(nostd::string_view value) noexc
 
 OPENTELEMETRY_EXPORT bool AttributeValidator::IsValid(const OwnedAttributeValue &value) noexcept
 {
-  return nostd::visit(GetSharedAttributeValidator(), value);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+
+    return nostd::visit(GetSharedAttributeValidator(), value);
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (...)
+  {
+    return false;
+  }
+#endif
 }
 
 OPENTELEMETRY_EXPORT bool AttributeValidator::IsValid(
     const opentelemetry::common::AttributeValue &value) noexcept
 {
-  return nostd::visit(GetSharedAttributeValidator(), value);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+
+    return nostd::visit(GetSharedAttributeValidator(), value);
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (...)
+  {
+    return false;
+  }
+#endif
 }
 
 OPENTELEMETRY_EXPORT bool AttributeValidator::IsAllValid(const AttributeMap &attributes) noexcept

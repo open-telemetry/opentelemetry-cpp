@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <chrono>
+#include <ostream>
 #include <utility>
 
 #include "opentelemetry/nostd/function_ref.h"
