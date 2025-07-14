@@ -49,14 +49,9 @@ static FORCE_INLINE_ATTR bool utf8_range_AsciiIsAscii(unsigned char c)
   return c < 128;
 }
 
-static FORCE_INLINE_ATTR bool utf8_range_IsTrailByteOk(const char c)
+static FORCE_INLINE_ATTR bool utf8_range_IsTrailByteOk(unsigned char c)
 {
-  return static_cast<int8_t>(c) <= static_cast<int8_t>(0xBF);
-}
-
-static FORCE_INLINE_ATTR bool utf8_range_IsTrailByteOk(const unsigned char c)
-{
-  return utf8_range_IsTrailByteOk(static_cast<const char>(c));
+  return c <= static_cast<unsigned char>(0xBF);
 }
 
 /* If return_position is false then it returns 1 if |data| is a valid utf8
@@ -98,7 +93,8 @@ static size_t utf8_range_ValidateUTF8Naive(const char *data, const char *end, in
       continue;
     }
     /* [C2..DF], [80..BF] -> 2 bytes */
-    if (len >= 2 && byte1 >= 0xC2 && byte1 <= 0xDF && utf8_range_IsTrailByteOk(data[1]))
+    if (len >= 2 && byte1 >= 0xC2 && byte1 <= 0xDF &&
+        utf8_range_IsTrailByteOk(static_cast<unsigned char>(data[1])))
     {
       codepoint_bytes = 2;
       continue;
@@ -168,15 +164,15 @@ static size_t utf8_range_ValidateUTF8Naive(const char *data, const char *end, in
 static inline int utf8_range_CodepointSkipBackwards(int32_t codepoint_word)
 {
   const int8_t *const codepoint = (const int8_t *)(&codepoint_word);
-  if (!utf8_range_IsTrailByteOk(codepoint[3]))
+  if (!utf8_range_IsTrailByteOk(static_cast<unsigned char>(codepoint[3])))
   {
     return 1;
   }
-  else if (!utf8_range_IsTrailByteOk(codepoint[2]))
+  else if (!utf8_range_IsTrailByteOk(static_cast<unsigned char>(codepoint[2])))
   {
     return 2;
   }
-  else if (!utf8_range_IsTrailByteOk(codepoint[1]))
+  else if (!utf8_range_IsTrailByteOk(static_cast<unsigned char>(codepoint[1])))
   {
     return 3;
   }

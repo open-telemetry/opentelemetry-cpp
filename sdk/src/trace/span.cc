@@ -170,7 +170,8 @@ void Span::AddLink(const opentelemetry::trace::SpanContext &target,
     return;
   }
 
-  recordable_->AddLink(target, common::KeyValueFilterIterable(attrs, "[Trace Span Link] "));
+  recordable_->AddLink(
+      target, opentelemetry::sdk::common::KeyValueFilterIterable(attrs, "[Trace Span Link] "));
 }
 
 void Span::AddLinks(const opentelemetry::trace::SpanContextKeyValueIterable &links) noexcept
