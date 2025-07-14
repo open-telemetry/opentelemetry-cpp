@@ -1,4 +1,5 @@
-// Copyright 2023 Google LLC
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 //
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE file or at
@@ -17,9 +18,10 @@
  */
 #include "src/common/internal/utf8_range/utf8_range.h"
 
-#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+
+#include "opentelemetry/version.h"
 
 #if defined(__GNUC__)
 #  define FORCE_INLINE_ATTR __attribute__((always_inline)) inline
@@ -42,14 +44,19 @@ static FORCE_INLINE_ATTR uint64_t utf8_range_UnalignedLoad64(const void *p)
   return t;
 }
 
-static FORCE_INLINE_ATTR int utf8_range_AsciiIsAscii(unsigned char c)
+static FORCE_INLINE_ATTR bool utf8_range_AsciiIsAscii(unsigned char c)
 {
   return c < 128;
 }
 
-static FORCE_INLINE_ATTR int utf8_range_IsTrailByteOk(const char c)
+static FORCE_INLINE_ATTR bool utf8_range_IsTrailByteOk(const char c)
 {
-  return (int8_t)(c) <= (int8_t)(0xBF);
+  return static_cast<int8_t>(c) <= static_cast<int8_t>(0xBF);
+}
+
+static FORCE_INLINE_ATTR bool utf8_range_IsTrailByteOk(const unsigned char c)
+{
+  return utf8_range_IsTrailByteOk(static_cast<const char>(c));
 }
 
 /* If return_position is false then it returns 1 if |data| is a valid utf8
