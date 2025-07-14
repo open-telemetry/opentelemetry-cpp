@@ -24,7 +24,7 @@ namespace resource
 {
 
 Resource::Resource(const ResourceAttributes &attributes, const std::string &schema_url) noexcept
-    : attributes_(attributes), schema_url_(schema_url)
+    : schema_url_(schema_url)
 {
   attributes_.reserve(attributes.size());
   for (auto &kv : attributes)
