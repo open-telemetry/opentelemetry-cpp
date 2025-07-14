@@ -1,94 +1,48 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-#
-# The dependency on nlohmann_json can be provided different ways. By order of
-# decreasing priority, options are:
-#
-# 1 - Search for a nlohmann_json package
-#
-# Packages installed on the local machine are used if found.
-#
-# The nlohmann_json dependency is not installed, as it already is.
-#
-# 2 - Search for a nlohmann_json git submodule
-#
-# When git submodule is used, the nlohmann_json code is located in:
-# third_party/nlohmann-json
-#
-# The nlohmann_json dependency is installed, by building the sub directory with
-# JSON_Install=ON
-#
-# 3 - Download nlohmann_json from github
-#
-# Code from the development branch is used, unless a specific release tag is
-# provided in variable ${nlohmann-json}
-#
-# The nlohmann_json dependency is installed, by building the downloaded code
-# with JSON_Install=ON
-#
+# Import nlohmann_json target (nlohmann_json::nlohmann_json).
+# 1. Find an installed nlohmann-json package
+# 2. Use FetchContent to build nlohmann-json from a git submodule
+# 3. Use FetchContent to fetch and build nlohmann-json from GitHub
 
-# nlohmann_json package is required for most SDK build configurations
-find_package(nlohmann_json QUIET)
-set(nlohmann_json_clone FALSE)
-if(nlohmann_json_FOUND)
-  message(STATUS "nlohmann::json dependency satisfied by: package")
-elseif(TARGET nlohmann_json)
-  message(STATUS "nlohmann::json is already added as a CMake target!")
-elseif(EXISTS ${PROJECT_SOURCE_DIR}/.git
-       AND EXISTS
-           ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/CMakeLists.txt)
-  message(STATUS "nlohmann::json dependency satisfied by: git submodule")
-  set(JSON_BuildTests
-      OFF
-      CACHE INTERNAL "")
-  set(JSON_Install
-      ON
-      CACHE INTERNAL "")
-  # This option allows to link nlohmann_json::nlohmann_json target
-  add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
-  # This option allows to add header to include directories
-  include_directories(
-    ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
-else()
-  if("${nlohmann-json}" STREQUAL "")
-    set(nlohmann-json "develop")
+find_package(nlohmann_json CONFIG QUIET)
+set(nlohmann_json_PROVIDER "find_package")
+
+if(NOT nlohmann_json_FOUND)
+  set(_NLOHMANN_JSON_SUBMODULE_DIR "${opentelemetry-cpp_SOURCE_DIR}/third_party/nlohmann-json")
+  if(EXISTS "${_NLOHMANN_JSON_SUBMODULE_DIR}/.git")
+    FetchContent_Declare(
+       "nlohmann_json"
+       SOURCE_DIR "${_NLOHMANN_JSON_SUBMODULE_DIR}"
+       )
+    set(nlohmann_json_PROVIDER "fetch_source")
+  else()
+    FetchContent_Declare(
+      "nlohmann_json"
+      GIT_REPOSITORY  "https://github.com/nlohmann/json.git"
+      GIT_TAG "${nlohmann-json_GIT_TAG}"
+      )
+    set(nlohmann_json_PROVIDER "fetch_repository")
   endif()
-  message(STATUS "nlohmann::json dependency satisfied by: github download")
-  set(nlohmann_json_clone TRUE)
-  include(ExternalProject)
-  ExternalProject_Add(
-    nlohmann_json_download
-    PREFIX third_party
-    GIT_REPOSITORY https://github.com/nlohmann/json.git
-    GIT_TAG "${nlohmann-json}"
-    UPDATE_COMMAND ""
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-               -DJSON_BuildTests=OFF -DJSON_Install=ON
-               -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-    TEST_AFTER_INSTALL 0
-    DOWNLOAD_NO_PROGRESS 1
-    LOG_CONFIGURE 1
-    LOG_BUILD 1
-    LOG_INSTALL 1)
 
-  ExternalProject_Get_Property(nlohmann_json_download INSTALL_DIR)
-  set(NLOHMANN_JSON_INCLUDE_DIR
-      ${INSTALL_DIR}/src/nlohmann_json_download/single_include)
-  add_library(nlohmann_json_ INTERFACE)
-  target_include_directories(
-    nlohmann_json_ INTERFACE "$<BUILD_INTERFACE:${NLOHMANN_JSON_INCLUDE_DIR}>"
-                             "$<INSTALL_INTERFACE:include>")
-  add_dependencies(nlohmann_json_ nlohmann_json_download)
-  add_library(nlohmann_json::nlohmann_json ALIAS nlohmann_json_)
+  set(JSON_BuildTests OFF CACHE BOOL "" FORCE)
+  set(JSON_Install ${OPENTELEMETRY_INSTALL} CACHE BOOL "" FORCE)
+  set(JSON_MultipleHeaders OFF CACHE BOOL "" FORCE)
 
-  if(OPENTELEMETRY_INSTALL)
-    install(
-      TARGETS nlohmann_json_
-      EXPORT "${PROJECT_NAME}-third_party_nlohmann_json_target"
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      COMPONENT third_party_nlohmann_json)
+  FetchContent_MakeAvailable(nlohmann_json)
+
+  # Set the nlohmann_json_VERSION variable from the git tag.
+  string(REGEX REPLACE "^v([0-9]+\\.[0-9]+\\.[0-9]+)$" "\\1" nlohmann_json_VERSION "${nlohmann-json_GIT_TAG}")
+
+  #Disable iwyu and clang-tidy
+  if(TARGET nlohmann_json)
+    set_target_properties(nlohmann_json PROPERTIES CXX_INCLUDE_WHAT_YOU_USE ""
+                                                     CXX_CLANG_TIDY "")
   endif()
 endif()
+
+if(NOT TARGET nlohmann_json::nlohmann_json)
+  message(FATAL_ERROR "A required nlohmann_json target (nlohmann_json::nlohmann_json) was not imported")
+endif()
+

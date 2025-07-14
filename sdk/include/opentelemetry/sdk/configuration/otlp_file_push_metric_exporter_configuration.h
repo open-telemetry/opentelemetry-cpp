@@ -29,8 +29,9 @@ public:
   }
 
   std::string output_stream;
-  enum_temporality_preference temporality_preference{cumulative};
-  enum_default_histogram_aggregation default_histogram_aggregation{explicit_bucket_histogram};
+  TemporalityPreference temporality_preference{TemporalityPreference::cumulative};
+  DefaultHistogramAggregation default_histogram_aggregation{
+      DefaultHistogramAggregation::explicit_bucket_histogram};
 };
 
 }  // namespace configuration
