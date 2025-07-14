@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
@@ -13,6 +14,7 @@
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
@@ -180,6 +182,24 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CreateMetricReader(
       const std::unique_ptr<opentelemetry::sdk::configuration::MetricReaderConfiguration> &model)
+      const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig>
+  CreateBase2ExponentialBucketHistogramAggregation(
+      const opentelemetry::sdk::configuration::
+          Base2ExponentialBucketHistogramAggregationConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig>
+  CreateExplicitBucketHistogramAggregation(
+      const opentelemetry::sdk::configuration::ExplicitBucketHistogramAggregationConfiguration
+          *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> CreateAggregationConfig(
+      const std::unique_ptr<opentelemetry::sdk::configuration::AggregationConfiguration> &model,
+      opentelemetry::sdk::metrics::AggregationType &aggregation_type) const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> CreateAttributesProcessor(
+      const std::unique_ptr<opentelemetry::sdk::configuration::IncludeExcludeConfiguration> &model)
       const;
 
   void AddView(

@@ -14,11 +14,13 @@
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/configuration/aggregation_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
+#include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
@@ -27,6 +29,7 @@
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
@@ -474,6 +477,64 @@ private:
   const SdkBuilder *m_sdk_builder;
 };
 
+class AggregationConfigBuilder
+    : public opentelemetry::sdk::configuration::AggregationConfigurationVisitor
+{
+public:
+  AggregationConfigBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  AggregationConfigBuilder(AggregationConfigBuilder &&)                      = delete;
+  AggregationConfigBuilder(const AggregationConfigBuilder &)                 = delete;
+  AggregationConfigBuilder &operator=(AggregationConfigBuilder &&)           = delete;
+  AggregationConfigBuilder &operator=(const AggregationConfigBuilder &other) = delete;
+  ~AggregationConfigBuilder() override                                       = default;
+
+  void VisitBase2ExponentialBucketHistogram(
+      const opentelemetry::sdk::configuration::
+          Base2ExponentialBucketHistogramAggregationConfiguration *model) override
+  {
+    aggregation_type   = opentelemetry::sdk::metrics::AggregationType::kBase2ExponentialHistogram;
+    aggregation_config = m_sdk_builder->CreateBase2ExponentialBucketHistogramAggregation(model);
+  }
+
+  void VisitDefault(
+      const opentelemetry::sdk::configuration::DefaultAggregationConfiguration *model) override
+  {
+    aggregation_type = opentelemetry::sdk::metrics::AggregationType::kDefault;
+  }
+
+  void VisitDrop(
+      const opentelemetry::sdk::configuration::DropAggregationConfiguration *model) override
+  {
+    aggregation_type = opentelemetry::sdk::metrics::AggregationType::kDrop;
+  }
+
+  void VisitExplicitBucketHistogram(
+      const opentelemetry::sdk::configuration::ExplicitBucketHistogramAggregationConfiguration
+          *model) override
+  {
+    aggregation_type   = opentelemetry::sdk::metrics::AggregationType::kHistogram;
+    aggregation_config = m_sdk_builder->CreateExplicitBucketHistogramAggregation(model);
+  }
+
+  void VisitLastValue(
+      const opentelemetry::sdk::configuration::LastValueAggregationConfiguration *model) override
+  {
+    aggregation_type = opentelemetry::sdk::metrics::AggregationType::kLastValue;
+  }
+
+  void VisitSum(
+      const opentelemetry::sdk::configuration::SumAggregationConfiguration *model) override
+  {
+    aggregation_type = opentelemetry::sdk::metrics::AggregationType::kSum;
+  }
+
+  opentelemetry::sdk::metrics::AggregationType aggregation_type;
+  std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> aggregation_config;
+
+private:
+  const SdkBuilder *m_sdk_builder;
+};
+
 class LogRecordProcessorBuilder
     : public opentelemetry::sdk::configuration::LogRecordProcessorConfigurationVisitor
 {
@@ -583,8 +644,7 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateJaegerRemo
 {
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sdk;
 
-  std::string die("JeagerRemoteSampler not available in opentelemetry-cpp");
-  OTEL_INTERNAL_LOG_ERROR(die);
+  static const std::string die("JeagerRemoteSampler not supported");
   throw UnsupportedException(die);
 
   return sdk;
@@ -630,15 +690,12 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateExtensionS
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateExtensionSampler() using registered builder " << name);
     sdk = builder->Build(model);
+    return sdk;
   }
-  else
-  {
-    std::string die("CreateExtensionSampler() no builder for ");
-    die.append(name);
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
-  }
-  return sdk;
+
+  std::string die("CreateExtensionSampler() no builder for ");
+  die.append(name);
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateSampler(
@@ -667,8 +724,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpH
     return sdk;
   }
 
-  std::string die("No http builder for OtlpHttpSpanExporter");
-  OTEL_INTERNAL_LOG_ERROR(die);
+  static const std::string die("No http builder for OtlpHttpSpanExporter");
   throw UnsupportedException(die);
 }
 
@@ -686,8 +742,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpG
     return sdk;
   }
 
-  std::string die("No builder for OtlpGrpcSpanExporter");
-  OTEL_INTERNAL_LOG_ERROR(die);
+  static const std::string die("No builder for OtlpGrpcSpanExporter");
   throw UnsupportedException(die);
 }
 
@@ -705,8 +760,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpF
     return sdk;
   }
 
-  std::string die("No builder for OtlpFileSpanExporter");
-  OTEL_INTERNAL_LOG_ERROR(die);
+  static const std::string die("No builder for OtlpFileSpanExporter");
   throw UnsupportedException(die);
 }
 
@@ -720,15 +774,11 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateConso
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateConsoleSpanExporter() using registered builder");
     sdk = builder->Build(model);
-  }
-  else
-  {
-    std::string die("No builder for ConsoleSpanExporter");
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
+    return sdk;
   }
 
-  return sdk;
+  static const std::string die("No builder for ConsoleSpanExporter");
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateZipkinSpanExporter(
@@ -741,15 +791,11 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateZipki
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateZipkinSpanExporter() using registered builder");
     sdk = builder->Build(model);
-  }
-  else
-  {
-    std::string die("No builder for ZipkinSpanExporter");
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
+    return sdk;
   }
 
-  return sdk;
+  static const std::string die("No builder for ZipkinSpanExporter");
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateExtensionSpanExporter(
@@ -764,15 +810,12 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateExten
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateExtensionSpanExporter() using registered builder " << name);
     sdk = builder->Build(model);
+    return sdk;
   }
-  else
-  {
-    std::string die("CreateExtensionSpanExporter() no builder for ");
-    die.append(name);
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
-  }
-  return sdk;
+
+  std::string die("CreateExtensionSpanExporter() no builder for ");
+  die.append(name);
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateSpanExporter(
@@ -834,15 +877,12 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateExte
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateExtensionSpanProcessor() using registered builder " << name);
     sdk = builder->Build(model);
+    return sdk;
   }
-  else
-  {
-    std::string die("CreateExtensionSpanProcessor() no builder for ");
-    die.append(name);
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
-  }
-  return sdk;
+
+  std::string die("CreateExtensionSpanProcessor() no builder for ");
+  die.append(name);
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateSpanProcessor(
@@ -899,15 +939,12 @@ SdkBuilder::CreateTextMapPropagator(const std::string &name) const
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateTextMapPropagator() using registered builder " << name);
     sdk = builder->Build();
+    return sdk;
   }
-  else
-  {
-    std::string die("CreateTextMapPropagator() no builder for ");
-    die.append(name);
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
-  }
-  return sdk;
+
+  std::string die("CreateTextMapPropagator() no builder for ");
+  die.append(name);
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>
@@ -975,8 +1012,7 @@ SdkBuilder::CreateOtlpHttpPushMetricExporter(
     return sdk;
   }
 
-  std::string die("No http builder for OtlpPushMetricExporter");
-  OTEL_INTERNAL_LOG_ERROR(die);
+  static const std::string die("No http builder for OtlpPushMetricExporter");
   throw UnsupportedException(die);
 }
 
@@ -995,8 +1031,7 @@ SdkBuilder::CreateOtlpGrpcPushMetricExporter(
     return sdk;
   }
 
-  std::string die("No grpc builder for OtlpPushMetricExporter");
-  OTEL_INTERNAL_LOG_ERROR(die);
+  static const std::string die("No grpc builder for OtlpPushMetricExporter");
   throw UnsupportedException(die);
 }
 
@@ -1015,8 +1050,7 @@ SdkBuilder::CreateOtlpFilePushMetricExporter(
     return sdk;
   }
 
-  std::string die("No file builder for OtlpPushMetricExporter");
-  OTEL_INTERNAL_LOG_ERROR(die);
+  static const std::string die("No file builder for OtlpPushMetricExporter");
   throw UnsupportedException(die);
 }
 
@@ -1033,15 +1067,11 @@ SdkBuilder::CreateConsolePushMetricExporter(
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateConsolePushMetricExporter() using registered builder");
     sdk = builder->Build(model);
-  }
-  else
-  {
-    std::string die("No builder for ConsolePushMetricExporter");
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
+    return sdk;
   }
 
-  return sdk;
+  static const std::string die("No builder for ConsolePushMetricExporter");
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
@@ -1059,16 +1089,12 @@ SdkBuilder::CreateExtensionPushMetricExporter(
     OTEL_INTERNAL_LOG_DEBUG("CreateExtensionPushMetricExporter() using registered builder "
                             << name);
     sdk = builder->Build(model);
-  }
-  else
-  {
-    std::string die("No builder for ExtensionPushMetricExporter ");
-    die.append(name);
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
+    return sdk;
   }
 
-  return sdk;
+  std::string die("No builder for ExtensionPushMetricExporter ");
+  die.append(name);
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::MetricReader>
@@ -1084,15 +1110,11 @@ SdkBuilder::CreatePrometheusPullMetricExporter(
   {
     OTEL_INTERNAL_LOG_DEBUG("CreatePrometheusPullMetricExporter() using registered builder");
     sdk = builder->Build(model);
-  }
-  else
-  {
-    std::string die("No builder for PrometheusMetricExporter");
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
+    return sdk;
   }
 
-  return sdk;
+  static const std::string die("No builder for PrometheusMetricExporter");
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::MetricReader>
@@ -1110,16 +1132,12 @@ SdkBuilder::CreateExtensionPullMetricExporter(
     OTEL_INTERNAL_LOG_DEBUG("CreateExtensionPullMetricExporter() using registered builder "
                             << name);
     sdk = builder->Build(model);
-  }
-  else
-  {
-    std::string die("No builder for ExtensionPullMetricExporter ");
-    die.append(name);
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
+    return sdk;
   }
 
-  return sdk;
+  std::string die("No builder for ExtensionPullMetricExporter ");
+  die.append(name);
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
@@ -1190,6 +1208,61 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreateMet
   return sdk;
 }
 
+std::unique_ptr<opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig>
+SdkBuilder::CreateBase2ExponentialBucketHistogramAggregation(
+    const opentelemetry::sdk::configuration::Base2ExponentialBucketHistogramAggregationConfiguration
+        *model) const
+{
+  auto sdk =
+      std::make_unique<opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig>();
+
+  sdk->max_buckets_    = model->max_size;
+  sdk->max_scale_      = model->max_scale;
+  sdk->record_min_max_ = model->record_min_max;
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig>
+SdkBuilder::CreateExplicitBucketHistogramAggregation(
+    const opentelemetry::sdk::configuration::ExplicitBucketHistogramAggregationConfiguration *model)
+    const
+{
+  auto sdk = std::make_unique<opentelemetry::sdk::metrics::HistogramAggregationConfig>();
+
+  sdk->boundaries_     = model->boundaries;
+  sdk->record_min_max_ = model->record_min_max;
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> SdkBuilder::CreateAggregationConfig(
+    const std::unique_ptr<opentelemetry::sdk::configuration::AggregationConfiguration> &model,
+    opentelemetry::sdk::metrics::AggregationType &aggregation_type) const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> sdk;
+
+  AggregationConfigBuilder builder(this);
+  model->Accept(&builder);
+  aggregation_type = builder.aggregation_type;
+  sdk              = std::move(builder.aggregation_config);
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>
+SdkBuilder::CreateAttributesProcessor(
+    const std::unique_ptr<opentelemetry::sdk::configuration::IncludeExcludeConfiguration> &model)
+    const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk;
+
+  // FIXME-SDK: Need a subclass of AttributesProcessor for IncludeExclude
+  OTEL_INTERNAL_LOG_ERROR("CreateAttributesProcessor() FIXME-SDK");
+
+  return sdk;
+}
+
 void SdkBuilder::AddView(
     opentelemetry::sdk::metrics::ViewRegistry *registry,
     const std::unique_ptr<opentelemetry::sdk::configuration::ViewConfiguration> &model) const
@@ -1198,8 +1271,7 @@ void SdkBuilder::AddView(
 
   if (selector->instrument_type == opentelemetry::sdk::configuration::InstrumentType::none)
   {
-    std::string die("Runtime does not support InstrumentSelector for any instrument");
-    OTEL_INTERNAL_LOG_ERROR(die);
+    std::string die("Runtime does not support instrument_type: null");
     throw UnsupportedException(die);
   }
 
@@ -1213,16 +1285,22 @@ void SdkBuilder::AddView(
 
   auto *stream = model->stream.get();
 
-  std::string unit("FIXME");
-
   opentelemetry::sdk::metrics::AggregationType sdk_aggregation_type =
-      opentelemetry::sdk::metrics::AggregationType::kDefault;  // FIXME
+      opentelemetry::sdk::metrics::AggregationType::kDefault;
 
-  std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> sdk_aggregation_config =
-      nullptr;  // FIXME
+  std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> sdk_aggregation_config;
 
-  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>
-      sdk_attribute_processor;  // FIXME
+  sdk_aggregation_config = CreateAggregationConfig(stream->aggregation, sdk_aggregation_type);
+
+  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk_attribute_processor;
+
+  if (stream->attribute_keys != nullptr)
+  {
+    sdk_attribute_processor = CreateAttributesProcessor(stream->attribute_keys);
+  }
+
+  // FIXME-SDK: unit is unused in class View, should be removed.
+  std::string unit("FIXME-SDK");
 
   auto sdk_view = std::make_unique<opentelemetry::sdk::metrics::View>(
       stream->name, stream->description, unit, sdk_aggregation_type, sdk_aggregation_config,
@@ -1230,8 +1308,6 @@ void SdkBuilder::AddView(
 
   registry->AddView(std::move(sdk_instrument_selector), std::move(sdk_meter_selector),
                     std::move(sdk_view));
-
-  OTEL_INTERNAL_LOG_ERROR("AddView() FIXME");
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMeterProvider(
@@ -1277,8 +1353,7 @@ SdkBuilder::CreateOtlpHttpLogRecordExporter(
     return sdk;
   }
 
-  std::string die("No http builder for OtlpLogRecordExporter");
-  OTEL_INTERNAL_LOG_ERROR(die);
+  static const std::string die("No http builder for OtlpLogRecordExporter");
   throw UnsupportedException(die);
 }
 
@@ -1297,8 +1372,7 @@ SdkBuilder::CreateOtlpGrpcLogRecordExporter(
     return sdk;
   }
 
-  std::string die("No grpc builder for OtlpLogRecordExporter");
-  OTEL_INTERNAL_LOG_ERROR(die);
+  static const std::string die("No grpc builder for OtlpLogRecordExporter");
   throw UnsupportedException(die);
 }
 
@@ -1317,8 +1391,7 @@ SdkBuilder::CreateOtlpFileLogRecordExporter(
     return sdk;
   }
 
-  std::string die("No file builder for OtlpLogRecordExporter");
-  OTEL_INTERNAL_LOG_ERROR(die);
+  static const std::string die("No file builder for OtlpLogRecordExporter");
   throw UnsupportedException(die);
 }
 
@@ -1333,15 +1406,11 @@ SdkBuilder::CreateConsoleLogRecordExporter(
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateConsoleLogRecordExporter() using registered builder");
     sdk = builder->Build(model);
-  }
-  else
-  {
-    std::string die("No builder for ConsoleLogRecordExporter");
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
+    return sdk;
   }
 
-  return sdk;
+  static const std::string die("No builder for ConsoleLogRecordExporter");
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
@@ -1358,15 +1427,12 @@ SdkBuilder::CreateExtensionLogRecordExporter(
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateExtensionLogRecordExporter() using registered builder " << name);
     sdk = builder->Build(model);
+    return sdk;
   }
-  else
-  {
-    std::string die("CreateExtensionLogRecordExporter() no builder for ");
-    die.append(name);
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
-  }
-  return sdk;
+
+  std::string die("CreateExtensionLogRecordExporter() no builder for ");
+  die.append(name);
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> SdkBuilder::CreateLogRecordExporter(
@@ -1429,15 +1495,12 @@ SdkBuilder::CreateExtensionLogRecordProcessor(
     OTEL_INTERNAL_LOG_DEBUG("CreateExtensionLogRecordProcessor() using registered builder "
                             << name);
     sdk = builder->Build(model);
+    return sdk;
   }
-  else
-  {
-    std::string die("CreateExtensionLogRecordProcessor() no builder for ");
-    die.append(name);
-    OTEL_INTERNAL_LOG_ERROR(die);
-    throw UnsupportedException(die);
-  }
-  return sdk;
+
+  std::string die("CreateExtensionLogRecordProcessor() no builder for ");
+  die.append(name);
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> SdkBuilder::CreateLogRecordProcessor(
