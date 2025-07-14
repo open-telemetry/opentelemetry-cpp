@@ -3,8 +3,13 @@
 
 #include "opentelemetry/sdk/common/attribute_validity.h"
 
+#include <map>
+#include <ostream>
+#include <unordered_map>
 #include <unordered_set>
+#include <utility>
 
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/version.h"
 

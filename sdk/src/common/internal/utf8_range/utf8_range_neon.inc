@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include <arm_neon.h>
 
 /* This code is almost the same as SSE implementation, please reference
