@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <string>
+#include <utility>
 
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
@@ -25,6 +26,6 @@ std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CustomLogRecordExpo
 void CustomLogRecordExporterBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   auto builder = std::make_unique<CustomLogRecordExporterBuilder>();
-  registry->AddExtensionLogRecordExporterBuilder("my_custom_log_record_exporter",
+  registry->SetExtensionLogRecordExporterBuilder("my_custom_log_record_exporter",
                                                  std::move(builder));
 }

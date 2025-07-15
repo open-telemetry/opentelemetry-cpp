@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <string>
+#include <utility>
 
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
@@ -27,6 +28,6 @@ void CustomPushMetricExporterBuilder::Register(
     opentelemetry::sdk::configuration::Registry *registry)
 {
   auto builder = std::make_unique<CustomPushMetricExporterBuilder>();
-  registry->AddExtensionPushMetricExporterBuilder("my_custom_push_metric_exporter",
+  registry->SetExtensionPushMetricExporterBuilder("my_custom_push_metric_exporter",
                                                   std::move(builder));
 }

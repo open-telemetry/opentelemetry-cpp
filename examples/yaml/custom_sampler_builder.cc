@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <string>
+#include <utility>
 
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/registry.h"
@@ -23,5 +24,5 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> CustomSamplerBuilder::Build(
 void CustomSamplerBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   auto builder = std::make_unique<CustomSamplerBuilder>();
-  registry->AddExtensionSamplerBuilder("my_custom_sampler", std::move(builder));
+  registry->SetExtensionSamplerBuilder("my_custom_sampler", std::move(builder));
 }

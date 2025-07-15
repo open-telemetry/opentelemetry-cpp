@@ -8,6 +8,13 @@
 
 #include "opentelemetry/baggage/propagation/baggage_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/extension_log_record_processor_builder.h"
+#include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/extension_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/extension_span_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/extension_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
 #include "opentelemetry/trace/propagation/b3_propagator.h"
@@ -73,11 +80,11 @@ public:
 
 Registry::Registry()
 {
-  AddTextMapPropagatorBuilder("tracecontext", std::make_unique<TraceContextBuilder>());
-  AddTextMapPropagatorBuilder("baggage", std::make_unique<BaggageBuilder>());
-  AddTextMapPropagatorBuilder("b3", std::make_unique<B3Builder>());
-  AddTextMapPropagatorBuilder("b3multi", std::make_unique<B3MultiBuilder>());
-  AddTextMapPropagatorBuilder("jaeger", std::make_unique<JaegerBuilder>());
+  SetTextMapPropagatorBuilder("tracecontext", std::make_unique<TraceContextBuilder>());
+  SetTextMapPropagatorBuilder("baggage", std::make_unique<BaggageBuilder>());
+  SetTextMapPropagatorBuilder("b3", std::make_unique<B3Builder>());
+  SetTextMapPropagatorBuilder("b3multi", std::make_unique<B3MultiBuilder>());
+  SetTextMapPropagatorBuilder("jaeger", std::make_unique<JaegerBuilder>());
 }
 
 const TextMapPropagatorBuilder *Registry::GetTextMapPropagatorBuilder(const std::string &name) const
@@ -91,7 +98,7 @@ const TextMapPropagatorBuilder *Registry::GetTextMapPropagatorBuilder(const std:
   return builder;
 }
 
-void Registry::AddTextMapPropagatorBuilder(const std::string &name,
+void Registry::SetTextMapPropagatorBuilder(const std::string &name,
                                            std::unique_ptr<TextMapPropagatorBuilder> &&builder)
 {
   propagator_builders_.erase(name);
@@ -109,7 +116,7 @@ const ExtensionSamplerBuilder *Registry::GetExtensionSamplerBuilder(const std::s
   return builder;
 }
 
-void Registry::AddExtensionSamplerBuilder(const std::string &name,
+void Registry::SetExtensionSamplerBuilder(const std::string &name,
                                           std::unique_ptr<ExtensionSamplerBuilder> &&builder)
 {
   sampler_builders_.erase(name);
@@ -128,7 +135,7 @@ const ExtensionSpanExporterBuilder *Registry::GetExtensionSpanExporterBuilder(
   return builder;
 }
 
-void Registry::AddExtensionSpanExporterBuilder(
+void Registry::SetExtensionSpanExporterBuilder(
     const std::string &name,
     std::unique_ptr<ExtensionSpanExporterBuilder> &&builder)
 {
@@ -148,7 +155,7 @@ const ExtensionSpanProcessorBuilder *Registry::GetExtensionSpanProcessorBuilder(
   return builder;
 }
 
-void Registry::AddExtensionSpanProcessorBuilder(
+void Registry::SetExtensionSpanProcessorBuilder(
     const std::string &name,
     std::unique_ptr<ExtensionSpanProcessorBuilder> &&builder)
 {
@@ -168,7 +175,7 @@ const ExtensionPushMetricExporterBuilder *Registry::GetExtensionPushMetricExport
   return builder;
 }
 
-void Registry::AddExtensionPushMetricExporterBuilder(
+void Registry::SetExtensionPushMetricExporterBuilder(
     const std::string &name,
     std::unique_ptr<ExtensionPushMetricExporterBuilder> &&builder)
 {
@@ -188,7 +195,7 @@ const ExtensionPullMetricExporterBuilder *Registry::GetExtensionPullMetricExport
   return builder;
 }
 
-void Registry::AddExtensionPullMetricExporterBuilder(
+void Registry::SetExtensionPullMetricExporterBuilder(
     const std::string &name,
     std::unique_ptr<ExtensionPullMetricExporterBuilder> &&builder)
 {
@@ -208,7 +215,7 @@ const ExtensionLogRecordExporterBuilder *Registry::GetExtensionLogRecordExporter
   return builder;
 }
 
-void Registry::AddExtensionLogRecordExporterBuilder(
+void Registry::SetExtensionLogRecordExporterBuilder(
     const std::string &name,
     std::unique_ptr<ExtensionLogRecordExporterBuilder> &&builder)
 {
@@ -228,7 +235,7 @@ const ExtensionLogRecordProcessorBuilder *Registry::GetExtensionLogRecordProcess
   return builder;
 }
 
-void Registry::AddExtensionLogRecordProcessorBuilder(
+void Registry::SetExtensionLogRecordProcessorBuilder(
     const std::string &name,
     std::unique_ptr<ExtensionLogRecordProcessorBuilder> &&builder)
 {

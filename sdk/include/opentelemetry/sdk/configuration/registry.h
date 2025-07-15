@@ -198,51 +198,51 @@ public:
 
   const TextMapPropagatorBuilder *GetTextMapPropagatorBuilder(const std::string &name) const;
 
-  void AddTextMapPropagatorBuilder(const std::string &name,
+  void SetTextMapPropagatorBuilder(const std::string &name,
                                    std::unique_ptr<TextMapPropagatorBuilder> &&builder);
 
   const ExtensionSamplerBuilder *GetExtensionSamplerBuilder(const std::string &name) const;
 
-  void AddExtensionSamplerBuilder(const std::string &name,
+  void SetExtensionSamplerBuilder(const std::string &name,
                                   std::unique_ptr<ExtensionSamplerBuilder> &&builder);
 
   const ExtensionSpanExporterBuilder *GetExtensionSpanExporterBuilder(
       const std::string &name) const;
 
-  void AddExtensionSpanExporterBuilder(const std::string &name,
+  void SetExtensionSpanExporterBuilder(const std::string &name,
                                        std::unique_ptr<ExtensionSpanExporterBuilder> &&builder);
 
   const ExtensionSpanProcessorBuilder *GetExtensionSpanProcessorBuilder(
       const std::string &name) const;
 
-  void AddExtensionSpanProcessorBuilder(const std::string &name,
+  void SetExtensionSpanProcessorBuilder(const std::string &name,
                                         std::unique_ptr<ExtensionSpanProcessorBuilder> &&builder);
 
   const ExtensionPushMetricExporterBuilder *GetExtensionPushMetricExporterBuilder(
       const std::string &name) const;
 
-  void AddExtensionPushMetricExporterBuilder(
+  void SetExtensionPushMetricExporterBuilder(
       const std::string &name,
       std::unique_ptr<ExtensionPushMetricExporterBuilder> &&builder);
 
   const ExtensionPullMetricExporterBuilder *GetExtensionPullMetricExporterBuilder(
       const std::string &name) const;
 
-  void AddExtensionPullMetricExporterBuilder(
+  void SetExtensionPullMetricExporterBuilder(
       const std::string &name,
       std::unique_ptr<ExtensionPullMetricExporterBuilder> &&builder);
 
   const ExtensionLogRecordExporterBuilder *GetExtensionLogRecordExporterBuilder(
       const std::string &name) const;
 
-  void AddExtensionLogRecordExporterBuilder(
+  void SetExtensionLogRecordExporterBuilder(
       const std::string &name,
       std::unique_ptr<ExtensionLogRecordExporterBuilder> &&builder);
 
   const ExtensionLogRecordProcessorBuilder *GetExtensionLogRecordProcessorBuilder(
       const std::string &name) const;
 
-  void AddExtensionLogRecordProcessorBuilder(
+  void SetExtensionLogRecordProcessorBuilder(
       const std::string &name,
       std::unique_ptr<ExtensionLogRecordProcessorBuilder> &&builder);
 

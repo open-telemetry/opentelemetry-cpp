@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <string>
+#include <utility>
 
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
@@ -27,6 +28,6 @@ void CustomLogRecordProcessorBuilder::Register(
     opentelemetry::sdk::configuration::Registry *registry)
 {
   auto builder = std::make_unique<CustomLogRecordProcessorBuilder>();
-  registry->AddExtensionLogRecordProcessorBuilder("my_custom_log_record_processor",
+  registry->SetExtensionLogRecordProcessorBuilder("my_custom_log_record_processor",
                                                   std::move(builder));
 }

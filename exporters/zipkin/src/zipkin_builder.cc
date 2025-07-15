@@ -9,6 +9,7 @@
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_factory.h"
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/zipkin_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/version.h"

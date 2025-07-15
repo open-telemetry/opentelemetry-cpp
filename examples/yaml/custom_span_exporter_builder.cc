@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <string>
+#include <utility>
 
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
@@ -25,5 +26,5 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CustomSpanExporterBuild
 void CustomSpanExporterBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   auto builder = std::make_unique<CustomSpanExporterBuilder>();
-  registry->AddExtensionSpanExporterBuilder("my_custom_span_exporter", std::move(builder));
+  registry->SetExtensionSpanExporterBuilder("my_custom_span_exporter", std::move(builder));
 }

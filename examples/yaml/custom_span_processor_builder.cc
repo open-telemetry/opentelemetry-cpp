@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <string>
+#include <utility>
 
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
@@ -25,5 +26,5 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CustomSpanProcessorBui
 void CustomSpanProcessorBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   auto builder = std::make_unique<CustomSpanProcessorBuilder>();
-  registry->AddExtensionSpanProcessorBuilder("my_custom_span_processor", std::move(builder));
+  registry->SetExtensionSpanProcessorBuilder("my_custom_span_processor", std::move(builder));
 }

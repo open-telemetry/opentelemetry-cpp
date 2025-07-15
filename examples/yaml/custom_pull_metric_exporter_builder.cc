@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <string>
+#include <utility>
 
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
@@ -26,6 +27,6 @@ void CustomPullMetricExporterBuilder::Register(
     opentelemetry::sdk::configuration::Registry *registry)
 {
   auto builder = std::make_unique<CustomPullMetricExporterBuilder>();
-  registry->AddExtensionPullMetricExporterBuilder("my_custom_pull_metric_exporter",
+  registry->SetExtensionPullMetricExporterBuilder("my_custom_pull_metric_exporter",
                                                   std::move(builder));
 }
