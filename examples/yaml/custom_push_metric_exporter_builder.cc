@@ -23,10 +23,10 @@ CustomPushMetricExporterBuilder::Build(
   return sdk;
 }
 
-static CustomPushMetricExporterBuilder singleton;
-
 void CustomPushMetricExporterBuilder::Register(
     opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->AddExtensionPushMetricExporterBuilder("my_custom_push_metric_exporter", &singleton);
+  auto builder = std::make_unique<CustomPushMetricExporterBuilder>();
+  registry->AddExtensionPushMetricExporterBuilder("my_custom_push_metric_exporter",
+                                                  std::move(builder));
 }

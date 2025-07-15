@@ -12,11 +12,10 @@ namespace exporter
 namespace otlp
 {
 
-static OtlpGrpcPushMetricBuilder singleton;
-
 void OtlpGrpcPushMetricBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->SetOtlpGrpcPushMetricExporterBuilder(&singleton);
+  auto builder = std::make_unique<OtlpGrpcPushMetricBuilder>();
+  registry->SetOtlpGrpcPushMetricExporterBuilder(std::move(builder));
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpGrpcPushMetricBuilder::Build(

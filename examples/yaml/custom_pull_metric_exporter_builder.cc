@@ -22,10 +22,10 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CustomPullMetricExpor
   return sdk;
 }
 
-static CustomPullMetricExporterBuilder singleton;
-
 void CustomPullMetricExporterBuilder::Register(
     opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->AddExtensionPullMetricExporterBuilder("my_custom_pull_metric_exporter", &singleton);
+  auto builder = std::make_unique<CustomPullMetricExporterBuilder>();
+  registry->AddExtensionPullMetricExporterBuilder("my_custom_pull_metric_exporter",
+                                                  std::move(builder));
 }

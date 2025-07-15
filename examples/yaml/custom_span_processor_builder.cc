@@ -22,9 +22,8 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CustomSpanProcessorBui
   return sdk;
 }
 
-static CustomSpanProcessorBuilder singleton;
-
 void CustomSpanProcessorBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->AddExtensionSpanProcessorBuilder("my_custom_span_processor", &singleton);
+  auto builder = std::make_unique<CustomSpanProcessorBuilder>();
+  registry->AddExtensionSpanProcessorBuilder("my_custom_span_processor", std::move(builder));
 }

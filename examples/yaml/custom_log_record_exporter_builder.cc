@@ -22,9 +22,9 @@ std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CustomLogRecordExpo
   return sdk;
 }
 
-static CustomLogRecordExporterBuilder singleton;
-
 void CustomLogRecordExporterBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->AddExtensionLogRecordExporterBuilder("my_custom_log_record_exporter", &singleton);
+  auto builder = std::make_unique<CustomLogRecordExporterBuilder>();
+  registry->AddExtensionLogRecordExporterBuilder("my_custom_log_record_exporter",
+                                                 std::move(builder));
 }

@@ -19,11 +19,10 @@ namespace exporter
 namespace otlp
 {
 
-static OtlpHttpSpanBuilder singleton;
-
 void OtlpHttpSpanBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->SetOtlpHttpSpanBuilder(&singleton);
+  auto builder = std::make_unique<OtlpHttpSpanBuilder>();
+  registry->SetOtlpHttpSpanBuilder(std::move(builder));
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpSpanBuilder::Build(

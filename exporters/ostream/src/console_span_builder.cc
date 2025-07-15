@@ -11,11 +11,10 @@ namespace exporter
 namespace trace
 {
 
-static ConsoleSpanBuilder singleton;
-
 void ConsoleSpanBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->SetConsoleSpanBuilder(&singleton);
+  auto builder = std::make_unique<ConsoleSpanBuilder>();
+  registry->SetConsoleSpanBuilder(std::move(builder));
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ConsoleSpanBuilder::Build(

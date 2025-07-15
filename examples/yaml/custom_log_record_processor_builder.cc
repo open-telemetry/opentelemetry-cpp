@@ -23,10 +23,10 @@ CustomLogRecordProcessorBuilder::Build(
   return sdk;
 }
 
-static CustomLogRecordProcessorBuilder singleton;
-
 void CustomLogRecordProcessorBuilder::Register(
     opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->AddExtensionLogRecordProcessorBuilder("my_custom_log_record_processor", &singleton);
+  auto builder = std::make_unique<CustomLogRecordProcessorBuilder>();
+  registry->AddExtensionLogRecordProcessorBuilder("my_custom_log_record_processor",
+                                                  std::move(builder));
 }

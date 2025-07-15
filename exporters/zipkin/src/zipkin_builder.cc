@@ -22,7 +22,8 @@ static ZipkinBuilder singleton;
 
 void ZipkinBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->SetZipkinSpanBuilder(&singleton);
+  auto builder = std::make_unique<ZipkinBuilder>();
+  registry->SetZipkinSpanBuilder(std::move(builder));
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinBuilder::Build(

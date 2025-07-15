@@ -22,9 +22,8 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CustomSpanExporterBuild
   return sdk;
 }
 
-static CustomSpanExporterBuilder singleton;
-
 void CustomSpanExporterBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->AddExtensionSpanExporterBuilder("my_custom_span_exporter", &singleton);
+  auto builder = std::make_unique<CustomSpanExporterBuilder>();
+  registry->AddExtensionSpanExporterBuilder("my_custom_span_exporter", std::move(builder));
 }

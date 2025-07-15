@@ -17,11 +17,10 @@ namespace exporter
 namespace metrics
 {
 
-static PrometheusPullBuilder singleton;
-
 void PrometheusPullBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->SetPrometheusPullMetricExporterBuilder(&singleton);
+  auto builder = std::make_unique<PrometheusPullBuilder>();
+  registry->SetPrometheusPullMetricExporterBuilder(std::move(builder));
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> PrometheusPullBuilder::Build(

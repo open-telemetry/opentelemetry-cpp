@@ -12,11 +12,10 @@ namespace exporter
 namespace otlp
 {
 
-static OtlpGrpcSpanBuilder singleton;
-
 void OtlpGrpcSpanBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->SetOtlpGrpcSpanBuilder(&singleton);
+  auto builder = std::make_unique<OtlpGrpcSpanBuilder>();
+  registry->SetOtlpGrpcSpanBuilder(std::move(builder));
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcSpanBuilder::Build(

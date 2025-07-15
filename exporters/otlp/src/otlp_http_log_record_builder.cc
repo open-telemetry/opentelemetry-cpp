@@ -12,11 +12,10 @@ namespace exporter
 namespace otlp
 {
 
-static OtlpHttpLogRecordBuilder singleton;
-
 void OtlpHttpLogRecordBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->SetOtlpHttpLogRecordBuilder(&singleton);
+  auto builder = std::make_unique<OtlpHttpLogRecordBuilder>();
+  registry->SetOtlpHttpLogRecordBuilder(std::move(builder));
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> OtlpHttpLogRecordBuilder::Build(

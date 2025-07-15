@@ -11,11 +11,10 @@ namespace exporter
 namespace logs
 {
 
-static ConsoleLogRecordBuilder singleton;
-
 void ConsoleLogRecordBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->SetConsoleLogRecordBuilder(&singleton);
+  auto builder = std::make_unique<ConsoleLogRecordBuilder>();
+  registry->SetConsoleLogRecordBuilder(std::move(builder));
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> ConsoleLogRecordBuilder::Build(

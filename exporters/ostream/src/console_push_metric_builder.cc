@@ -11,11 +11,10 @@ namespace exporter
 namespace metrics
 {
 
-static ConsolePushMetricBuilder singleton;
-
 void ConsolePushMetricBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->SetConsolePushMetricExporterBuilder(&singleton);
+  auto builder = std::make_unique<ConsolePushMetricBuilder>();
+  registry->SetConsolePushMetricExporterBuilder(std::move(builder));
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> ConsolePushMetricBuilder::Build(

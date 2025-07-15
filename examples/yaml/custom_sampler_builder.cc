@@ -20,9 +20,8 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> CustomSamplerBuilder::Build(
   return sdk;
 }
 
-static CustomSamplerBuilder singleton;
-
 void CustomSamplerBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
-  registry->AddExtensionSamplerBuilder("my_custom_sampler", &singleton);
+  auto builder = std::make_unique<CustomSamplerBuilder>();
+  registry->AddExtensionSamplerBuilder("my_custom_sampler", std::move(builder));
 }

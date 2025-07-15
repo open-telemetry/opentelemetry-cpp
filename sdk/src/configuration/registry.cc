@@ -71,30 +71,13 @@ public:
   }
 };
 
-static TraceContextBuilder trace_context_builder;
-static BaggageBuilder baggage_builder;
-static B3Builder b3_builder;
-static B3MultiBuilder b3_multi_builder;
-static JaegerBuilder jaeger_builder;
-
 Registry::Registry()
 {
-  std::pair<std::string, TextMapPropagatorBuilder *> entry;
-
-  entry = {"tracecontext", &trace_context_builder};
-  propagator_builders_.insert(entry);
-
-  entry = {"baggage", &baggage_builder};
-  propagator_builders_.insert(entry);
-
-  entry = {"b3", &b3_builder};
-  propagator_builders_.insert(entry);
-
-  entry = {"b3multi", &b3_multi_builder};
-  propagator_builders_.insert(entry);
-
-  entry = {"jaeger", &jaeger_builder};
-  propagator_builders_.insert(entry);
+  AddTextMapPropagatorBuilder("tracecontext", std::make_unique<TraceContextBuilder>());
+  AddTextMapPropagatorBuilder("baggage", std::make_unique<BaggageBuilder>());
+  AddTextMapPropagatorBuilder("b3", std::make_unique<B3Builder>());
+  AddTextMapPropagatorBuilder("b3multi", std::make_unique<B3MultiBuilder>());
+  AddTextMapPropagatorBuilder("jaeger", std::make_unique<JaegerBuilder>());
 }
 
 const TextMapPropagatorBuilder *Registry::GetTextMapPropagatorBuilder(const std::string &name) const
@@ -103,16 +86,15 @@ const TextMapPropagatorBuilder *Registry::GetTextMapPropagatorBuilder(const std:
   auto search                       = propagator_builders_.find(name);
   if (search != propagator_builders_.end())
   {
-    builder = search->second;
+    builder = search->second.get();
   }
   return builder;
 }
 
 void Registry::AddTextMapPropagatorBuilder(const std::string &name,
-                                           TextMapPropagatorBuilder *builder)
+                                           std::unique_ptr<TextMapPropagatorBuilder> &&builder)
 {
-  std::pair<std::string, TextMapPropagatorBuilder *> entry{name, builder};
-  propagator_builders_.insert(entry);
+  propagator_builders_.insert_or_assign(name, std::move(builder));
 }
 
 const ExtensionSamplerBuilder *Registry::GetExtensionSamplerBuilder(const std::string &name) const
@@ -121,15 +103,15 @@ const ExtensionSamplerBuilder *Registry::GetExtensionSamplerBuilder(const std::s
   auto search                      = sampler_builders_.find(name);
   if (search != sampler_builders_.end())
   {
-    builder = search->second;
+    builder = search->second.get();
   }
   return builder;
 }
 
-void Registry::AddExtensionSamplerBuilder(const std::string &name, ExtensionSamplerBuilder *builder)
+void Registry::AddExtensionSamplerBuilder(const std::string &name,
+                                          std::unique_ptr<ExtensionSamplerBuilder> &&builder)
 {
-  std::pair<std::string, ExtensionSamplerBuilder *> entry{name, builder};
-  sampler_builders_.insert(entry);
+  sampler_builders_.insert_or_assign(name, std::move(builder));
 }
 
 const ExtensionSpanExporterBuilder *Registry::GetExtensionSpanExporterBuilder(
@@ -139,16 +121,16 @@ const ExtensionSpanExporterBuilder *Registry::GetExtensionSpanExporterBuilder(
   auto search                           = span_exporter_builders_.find(name);
   if (search != span_exporter_builders_.end())
   {
-    builder = search->second;
+    builder = search->second.get();
   }
   return builder;
 }
 
-void Registry::AddExtensionSpanExporterBuilder(const std::string &name,
-                                               ExtensionSpanExporterBuilder *builder)
+void Registry::AddExtensionSpanExporterBuilder(
+    const std::string &name,
+    std::unique_ptr<ExtensionSpanExporterBuilder> &&builder)
 {
-  std::pair<std::string, ExtensionSpanExporterBuilder *> entry{name, builder};
-  span_exporter_builders_.insert(entry);
+  span_exporter_builders_.insert_or_assign(name, std::move(builder));
 }
 
 const ExtensionSpanProcessorBuilder *Registry::GetExtensionSpanProcessorBuilder(
@@ -158,16 +140,16 @@ const ExtensionSpanProcessorBuilder *Registry::GetExtensionSpanProcessorBuilder(
   auto search                            = span_processor_builders_.find(name);
   if (search != span_processor_builders_.end())
   {
-    builder = search->second;
+    builder = search->second.get();
   }
   return builder;
 }
 
-void Registry::AddExtensionSpanProcessorBuilder(const std::string &name,
-                                                ExtensionSpanProcessorBuilder *builder)
+void Registry::AddExtensionSpanProcessorBuilder(
+    const std::string &name,
+    std::unique_ptr<ExtensionSpanProcessorBuilder> &&builder)
 {
-  std::pair<std::string, ExtensionSpanProcessorBuilder *> entry{name, builder};
-  span_processor_builders_.insert(entry);
+  span_processor_builders_.insert_or_assign(name, std::move(builder));
 }
 
 const ExtensionPushMetricExporterBuilder *Registry::GetExtensionPushMetricExporterBuilder(
@@ -177,16 +159,16 @@ const ExtensionPushMetricExporterBuilder *Registry::GetExtensionPushMetricExport
   auto search                                 = push_metric_exporter_builders_.find(name);
   if (search != push_metric_exporter_builders_.end())
   {
-    builder = search->second;
+    builder = search->second.get();
   }
   return builder;
 }
 
-void Registry::AddExtensionPushMetricExporterBuilder(const std::string &name,
-                                                     ExtensionPushMetricExporterBuilder *builder)
+void Registry::AddExtensionPushMetricExporterBuilder(
+    const std::string &name,
+    std::unique_ptr<ExtensionPushMetricExporterBuilder> &&builder)
 {
-  std::pair<std::string, ExtensionPushMetricExporterBuilder *> entry{name, builder};
-  push_metric_exporter_builders_.insert(entry);
+  push_metric_exporter_builders_.insert_or_assign(name, std::move(builder));
 }
 
 const ExtensionPullMetricExporterBuilder *Registry::GetExtensionPullMetricExporterBuilder(
@@ -196,16 +178,16 @@ const ExtensionPullMetricExporterBuilder *Registry::GetExtensionPullMetricExport
   auto search                                 = pull_metric_exporter_builders_.find(name);
   if (search != pull_metric_exporter_builders_.end())
   {
-    builder = search->second;
+    builder = search->second.get();
   }
   return builder;
 }
 
-void Registry::AddExtensionPullMetricExporterBuilder(const std::string &name,
-                                                     ExtensionPullMetricExporterBuilder *builder)
+void Registry::AddExtensionPullMetricExporterBuilder(
+    const std::string &name,
+    std::unique_ptr<ExtensionPullMetricExporterBuilder> &&builder)
 {
-  std::pair<std::string, ExtensionPullMetricExporterBuilder *> entry{name, builder};
-  pull_metric_exporter_builders_.insert(entry);
+  pull_metric_exporter_builders_.insert_or_assign(name, std::move(builder));
 }
 
 const ExtensionLogRecordExporterBuilder *Registry::GetExtensionLogRecordExporterBuilder(
@@ -215,16 +197,16 @@ const ExtensionLogRecordExporterBuilder *Registry::GetExtensionLogRecordExporter
   auto search                                = log_record_exporter_builders_.find(name);
   if (search != log_record_exporter_builders_.end())
   {
-    builder = search->second;
+    builder = search->second.get();
   }
   return builder;
 }
 
-void Registry::AddExtensionLogRecordExporterBuilder(const std::string &name,
-                                                    ExtensionLogRecordExporterBuilder *builder)
+void Registry::AddExtensionLogRecordExporterBuilder(
+    const std::string &name,
+    std::unique_ptr<ExtensionLogRecordExporterBuilder> &&builder)
 {
-  std::pair<std::string, ExtensionLogRecordExporterBuilder *> entry{name, builder};
-  log_record_exporter_builders_.insert(entry);
+  log_record_exporter_builders_.insert_or_assign(name, std::move(builder));
 }
 
 const ExtensionLogRecordProcessorBuilder *Registry::GetExtensionLogRecordProcessorBuilder(
@@ -234,16 +216,16 @@ const ExtensionLogRecordProcessorBuilder *Registry::GetExtensionLogRecordProcess
   auto search                                 = log_record_processor_builders_.find(name);
   if (search != log_record_processor_builders_.end())
   {
-    builder = search->second;
+    builder = search->second.get();
   }
   return builder;
 }
 
-void Registry::AddExtensionLogRecordProcessorBuilder(const std::string &name,
-                                                     ExtensionLogRecordProcessorBuilder *builder)
+void Registry::AddExtensionLogRecordProcessorBuilder(
+    const std::string &name,
+    std::unique_ptr<ExtensionLogRecordProcessorBuilder> &&builder)
 {
-  std::pair<std::string, ExtensionLogRecordProcessorBuilder *> entry{name, builder};
-  log_record_processor_builders_.insert(entry);
+  log_record_processor_builders_.insert_or_assign(name, std::move(builder));
 }
 
 }  // namespace configuration
