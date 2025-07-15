@@ -14,7 +14,7 @@ namespace otlp
 
 static OtlpFileSpanBuilder singleton;
 
-void OtlpFileSpanBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void OtlpFileSpanBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->SetOtlpFileSpanBuilder(&singleton);
 }

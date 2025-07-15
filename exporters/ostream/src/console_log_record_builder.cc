@@ -13,7 +13,7 @@ namespace logs
 
 static ConsoleLogRecordBuilder singleton;
 
-void ConsoleLogRecordBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void ConsoleLogRecordBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->SetConsoleLogRecordBuilder(&singleton);
 }

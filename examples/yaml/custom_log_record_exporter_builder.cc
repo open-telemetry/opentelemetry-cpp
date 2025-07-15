@@ -5,7 +5,7 @@
 
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 
 #include "custom_log_record_exporter.h"
@@ -24,7 +24,7 @@ std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CustomLogRecordExpo
 
 static CustomLogRecordExporterBuilder singleton;
 
-void CustomLogRecordExporterBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void CustomLogRecordExporterBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->AddExtensionLogRecordExporterBuilder("my_custom_log_record_exporter", &singleton);
 }

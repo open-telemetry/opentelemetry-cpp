@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/version.h"
@@ -10,7 +12,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace init
+namespace configuration
 {
 
 class ConsolePushMetricExporterBuilder
@@ -29,6 +31,6 @@ public:
       const = 0;
 };
 
-}  // namespace init
+}  // namespace configuration
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

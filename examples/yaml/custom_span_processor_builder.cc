@@ -5,7 +5,7 @@
 
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/trace/processor.h"
 
 #include "custom_span_processor.h"
@@ -24,7 +24,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CustomSpanProcessorBui
 
 static CustomSpanProcessorBuilder singleton;
 
-void CustomSpanProcessorBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void CustomSpanProcessorBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->AddExtensionSpanProcessorBuilder("my_custom_span_processor", &singleton);
 }

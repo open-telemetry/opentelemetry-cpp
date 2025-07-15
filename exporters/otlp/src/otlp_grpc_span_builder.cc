@@ -14,7 +14,7 @@ namespace otlp
 
 static OtlpGrpcSpanBuilder singleton;
 
-void OtlpGrpcSpanBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void OtlpGrpcSpanBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->SetOtlpGrpcSpanBuilder(&singleton);
 }

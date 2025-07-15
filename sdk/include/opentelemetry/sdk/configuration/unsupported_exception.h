@@ -11,7 +11,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace init
+namespace configuration
 {
 
 class UnsupportedException : public std::runtime_error
@@ -25,6 +25,6 @@ public:
   ~UnsupportedException() override                                   = default;
 };
 
-}  // namespace init
+}  // namespace configuration
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

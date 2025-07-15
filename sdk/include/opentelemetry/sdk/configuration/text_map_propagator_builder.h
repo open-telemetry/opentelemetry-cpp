@@ -3,13 +3,15 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace init
+namespace configuration
 {
 
 class TextMapPropagatorBuilder
@@ -25,6 +27,6 @@ public:
   virtual std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> Build() const = 0;
 };
 
-}  // namespace init
+}  // namespace configuration
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

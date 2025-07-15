@@ -3,9 +3,11 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -15,7 +17,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace init
+namespace configuration
 {
 
 class ConfiguredSdk
@@ -37,6 +39,6 @@ public:
   std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> m_logger_provider;
 };
 
-}  // namespace init
+}  // namespace configuration
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

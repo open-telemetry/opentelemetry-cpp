@@ -13,7 +13,7 @@ namespace trace
 
 static ConsoleSpanBuilder singleton;
 
-void ConsoleSpanBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void ConsoleSpanBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->SetConsoleSpanBuilder(&singleton);
 }

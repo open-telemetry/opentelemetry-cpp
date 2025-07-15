@@ -5,9 +5,9 @@
 
 #include <memory>
 
+#include "opentelemetry/sdk/configuration/otlp_file_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h"
-#include "opentelemetry/sdk/init/otlp_file_span_exporter_builder.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/version.h"
 
@@ -18,10 +18,10 @@ namespace otlp
 {
 
 class OPENTELEMETRY_EXPORT OtlpFileSpanBuilder
-    : public opentelemetry::sdk::init::OtlpFileSpanExporterBuilder
+    : public opentelemetry::sdk::configuration::OtlpFileSpanExporterBuilder
 {
 public:
-  static void Register(opentelemetry::sdk::init::Registry *registry);
+  static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
   OtlpFileSpanBuilder()           = default;
   ~OtlpFileSpanBuilder() override = default;

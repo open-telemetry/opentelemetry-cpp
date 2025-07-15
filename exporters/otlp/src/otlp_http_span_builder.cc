@@ -9,7 +9,7 @@
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_http_span_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/version.h"
 
@@ -21,7 +21,7 @@ namespace otlp
 
 static OtlpHttpSpanBuilder singleton;
 
-void OtlpHttpSpanBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void OtlpHttpSpanBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->SetOtlpHttpSpanBuilder(&singleton);
 }

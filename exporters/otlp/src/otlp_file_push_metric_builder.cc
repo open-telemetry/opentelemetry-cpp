@@ -14,7 +14,7 @@ namespace otlp
 
 static OtlpFilePushMetricBuilder singleton;
 
-void OtlpFilePushMetricBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void OtlpFilePushMetricBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->SetOtlpFilePushMetricExporterBuilder(&singleton);
 }

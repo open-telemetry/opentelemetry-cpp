@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/version.h"
@@ -10,7 +12,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace init
+namespace configuration
 {
 
 class ConsoleSpanExporterBuilder
@@ -27,6 +29,6 @@ public:
       const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) const = 0;
 };
 
-}  // namespace init
+}  // namespace configuration
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

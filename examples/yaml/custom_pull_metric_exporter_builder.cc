@@ -5,7 +5,7 @@
 
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 
 #include "custom_pull_metric_exporter.h"
@@ -24,7 +24,8 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CustomPullMetricExpor
 
 static CustomPullMetricExporterBuilder singleton;
 
-void CustomPullMetricExporterBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void CustomPullMetricExporterBuilder::Register(
+    opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->AddExtensionPullMetricExporterBuilder("my_custom_pull_metric_exporter", &singleton);
 }

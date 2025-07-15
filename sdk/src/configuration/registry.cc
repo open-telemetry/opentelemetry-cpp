@@ -8,8 +8,8 @@
 
 #include "opentelemetry/baggage/propagation/baggage_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
-#include "opentelemetry/sdk/init/registry.h"
-#include "opentelemetry/sdk/init/text_map_propagator_builder.h"
+#include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
 #include "opentelemetry/trace/propagation/b3_propagator.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/propagation/jaeger.h"
@@ -18,7 +18,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace init
+namespace configuration
 {
 
 class TraceContextBuilder : public TextMapPropagatorBuilder
@@ -82,26 +82,26 @@ Registry::Registry()
   std::pair<std::string, TextMapPropagatorBuilder *> entry;
 
   entry = {"tracecontext", &trace_context_builder};
-  m_propagator_builders.insert(entry);
+  propagator_builders_.insert(entry);
 
   entry = {"baggage", &baggage_builder};
-  m_propagator_builders.insert(entry);
+  propagator_builders_.insert(entry);
 
   entry = {"b3", &b3_builder};
-  m_propagator_builders.insert(entry);
+  propagator_builders_.insert(entry);
 
   entry = {"b3multi", &b3_multi_builder};
-  m_propagator_builders.insert(entry);
+  propagator_builders_.insert(entry);
 
   entry = {"jaeger", &jaeger_builder};
-  m_propagator_builders.insert(entry);
+  propagator_builders_.insert(entry);
 }
 
-const TextMapPropagatorBuilder *Registry::GetTextMapPropagatorBuilder(const std::string &name)
+const TextMapPropagatorBuilder *Registry::GetTextMapPropagatorBuilder(const std::string &name) const
 {
   TextMapPropagatorBuilder *builder = nullptr;
-  auto search                       = m_propagator_builders.find(name);
-  if (search != m_propagator_builders.end())
+  auto search                       = propagator_builders_.find(name);
+  if (search != propagator_builders_.end())
   {
     builder = search->second;
   }
@@ -112,14 +112,14 @@ void Registry::AddTextMapPropagatorBuilder(const std::string &name,
                                            TextMapPropagatorBuilder *builder)
 {
   std::pair<std::string, TextMapPropagatorBuilder *> entry{name, builder};
-  m_propagator_builders.insert(entry);
+  propagator_builders_.insert(entry);
 }
 
-const ExtensionSamplerBuilder *Registry::GetExtensionSamplerBuilder(const std::string &name)
+const ExtensionSamplerBuilder *Registry::GetExtensionSamplerBuilder(const std::string &name) const
 {
   ExtensionSamplerBuilder *builder = nullptr;
-  auto search                      = m_sampler_builders.find(name);
-  if (search != m_sampler_builders.end())
+  auto search                      = sampler_builders_.find(name);
+  if (search != sampler_builders_.end())
   {
     builder = search->second;
   }
@@ -129,15 +129,15 @@ const ExtensionSamplerBuilder *Registry::GetExtensionSamplerBuilder(const std::s
 void Registry::AddExtensionSamplerBuilder(const std::string &name, ExtensionSamplerBuilder *builder)
 {
   std::pair<std::string, ExtensionSamplerBuilder *> entry{name, builder};
-  m_sampler_builders.insert(entry);
+  sampler_builders_.insert(entry);
 }
 
 const ExtensionSpanExporterBuilder *Registry::GetExtensionSpanExporterBuilder(
-    const std::string &name)
+    const std::string &name) const
 {
   ExtensionSpanExporterBuilder *builder = nullptr;
-  auto search                           = m_span_exporter_builders.find(name);
-  if (search != m_span_exporter_builders.end())
+  auto search                           = span_exporter_builders_.find(name);
+  if (search != span_exporter_builders_.end())
   {
     builder = search->second;
   }
@@ -148,15 +148,15 @@ void Registry::AddExtensionSpanExporterBuilder(const std::string &name,
                                                ExtensionSpanExporterBuilder *builder)
 {
   std::pair<std::string, ExtensionSpanExporterBuilder *> entry{name, builder};
-  m_span_exporter_builders.insert(entry);
+  span_exporter_builders_.insert(entry);
 }
 
 const ExtensionSpanProcessorBuilder *Registry::GetExtensionSpanProcessorBuilder(
-    const std::string &name)
+    const std::string &name) const
 {
   ExtensionSpanProcessorBuilder *builder = nullptr;
-  auto search                            = m_span_processor_builders.find(name);
-  if (search != m_span_processor_builders.end())
+  auto search                            = span_processor_builders_.find(name);
+  if (search != span_processor_builders_.end())
   {
     builder = search->second;
   }
@@ -167,15 +167,15 @@ void Registry::AddExtensionSpanProcessorBuilder(const std::string &name,
                                                 ExtensionSpanProcessorBuilder *builder)
 {
   std::pair<std::string, ExtensionSpanProcessorBuilder *> entry{name, builder};
-  m_span_processor_builders.insert(entry);
+  span_processor_builders_.insert(entry);
 }
 
 const ExtensionPushMetricExporterBuilder *Registry::GetExtensionPushMetricExporterBuilder(
-    const std::string &name)
+    const std::string &name) const
 {
   ExtensionPushMetricExporterBuilder *builder = nullptr;
-  auto search                                 = m_push_metric_exporter_builders.find(name);
-  if (search != m_push_metric_exporter_builders.end())
+  auto search                                 = push_metric_exporter_builders_.find(name);
+  if (search != push_metric_exporter_builders_.end())
   {
     builder = search->second;
   }
@@ -186,15 +186,15 @@ void Registry::AddExtensionPushMetricExporterBuilder(const std::string &name,
                                                      ExtensionPushMetricExporterBuilder *builder)
 {
   std::pair<std::string, ExtensionPushMetricExporterBuilder *> entry{name, builder};
-  m_push_metric_exporter_builders.insert(entry);
+  push_metric_exporter_builders_.insert(entry);
 }
 
 const ExtensionPullMetricExporterBuilder *Registry::GetExtensionPullMetricExporterBuilder(
-    const std::string &name)
+    const std::string &name) const
 {
   ExtensionPullMetricExporterBuilder *builder = nullptr;
-  auto search                                 = m_pull_metric_exporter_builders.find(name);
-  if (search != m_pull_metric_exporter_builders.end())
+  auto search                                 = pull_metric_exporter_builders_.find(name);
+  if (search != pull_metric_exporter_builders_.end())
   {
     builder = search->second;
   }
@@ -205,15 +205,15 @@ void Registry::AddExtensionPullMetricExporterBuilder(const std::string &name,
                                                      ExtensionPullMetricExporterBuilder *builder)
 {
   std::pair<std::string, ExtensionPullMetricExporterBuilder *> entry{name, builder};
-  m_pull_metric_exporter_builders.insert(entry);
+  pull_metric_exporter_builders_.insert(entry);
 }
 
 const ExtensionLogRecordExporterBuilder *Registry::GetExtensionLogRecordExporterBuilder(
-    const std::string &name)
+    const std::string &name) const
 {
   ExtensionLogRecordExporterBuilder *builder = nullptr;
-  auto search                                = m_log_record_exporter_builders.find(name);
-  if (search != m_log_record_exporter_builders.end())
+  auto search                                = log_record_exporter_builders_.find(name);
+  if (search != log_record_exporter_builders_.end())
   {
     builder = search->second;
   }
@@ -224,15 +224,15 @@ void Registry::AddExtensionLogRecordExporterBuilder(const std::string &name,
                                                     ExtensionLogRecordExporterBuilder *builder)
 {
   std::pair<std::string, ExtensionLogRecordExporterBuilder *> entry{name, builder};
-  m_log_record_exporter_builders.insert(entry);
+  log_record_exporter_builders_.insert(entry);
 }
 
 const ExtensionLogRecordProcessorBuilder *Registry::GetExtensionLogRecordProcessorBuilder(
-    const std::string &name)
+    const std::string &name) const
 {
   ExtensionLogRecordProcessorBuilder *builder = nullptr;
-  auto search                                 = m_log_record_processor_builders.find(name);
-  if (search != m_log_record_processor_builders.end())
+  auto search                                 = log_record_processor_builders_.find(name);
+  if (search != log_record_processor_builders_.end())
   {
     builder = search->second;
   }
@@ -243,9 +243,9 @@ void Registry::AddExtensionLogRecordProcessorBuilder(const std::string &name,
                                                      ExtensionLogRecordProcessorBuilder *builder)
 {
   std::pair<std::string, ExtensionLogRecordProcessorBuilder *> entry{name, builder};
-  m_log_record_processor_builders.insert(entry);
+  log_record_processor_builders_.insert(entry);
 }
 
-}  // namespace init
+}  // namespace configuration
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

@@ -10,5 +10,4 @@ add_subdirectory(resource)
 
 if(WITH_CONFIGURATION)
   add_subdirectory(configuration)
-  add_subdirectory(init)
 endif()

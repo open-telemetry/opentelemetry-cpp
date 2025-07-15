@@ -5,7 +5,7 @@
 
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 #include "custom_push_metric_exporter.h"
@@ -25,7 +25,8 @@ CustomPushMetricExporterBuilder::Build(
 
 static CustomPushMetricExporterBuilder singleton;
 
-void CustomPushMetricExporterBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void CustomPushMetricExporterBuilder::Register(
+    opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->AddExtensionPushMetricExporterBuilder("my_custom_push_metric_exporter", &singleton);
 }

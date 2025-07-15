@@ -13,7 +13,7 @@ namespace metrics
 
 static ConsolePushMetricBuilder singleton;
 
-void ConsolePushMetricBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void ConsolePushMetricBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->SetConsolePushMetricExporterBuilder(&singleton);
 }

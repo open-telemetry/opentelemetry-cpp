@@ -5,7 +5,7 @@
 
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/logs/processor.h"
 
 #include "custom_log_record_processor.h"
@@ -25,7 +25,8 @@ CustomLogRecordProcessorBuilder::Build(
 
 static CustomLogRecordProcessorBuilder singleton;
 
-void CustomLogRecordProcessorBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void CustomLogRecordProcessorBuilder::Register(
+    opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->AddExtensionLogRecordProcessorBuilder("my_custom_log_record_processor", &singleton);
 }

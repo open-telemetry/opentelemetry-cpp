@@ -5,9 +5,9 @@
 
 #include <memory>
 
+#include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/init/otlp_http_log_record_exporter_builder.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/version.h"
 
@@ -18,10 +18,10 @@ namespace otlp
 {
 
 class OPENTELEMETRY_EXPORT OtlpHttpLogRecordBuilder
-    : public opentelemetry::sdk::init::OtlpHttpLogRecordExporterBuilder
+    : public opentelemetry::sdk::configuration::OtlpHttpLogRecordExporterBuilder
 {
 public:
-  static void Register(opentelemetry::sdk::init::Registry *registry);
+  static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
   OtlpHttpLogRecordBuilder()           = default;
   ~OtlpHttpLogRecordBuilder() override = default;

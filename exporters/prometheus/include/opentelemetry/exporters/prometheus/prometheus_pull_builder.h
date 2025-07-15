@@ -5,9 +5,9 @@
 
 #include <memory>
 
+#include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/init/prometheus_pull_metric_exporter_builder.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/version.h"
 
@@ -18,10 +18,10 @@ namespace metrics
 {
 
 class OPENTELEMETRY_EXPORT PrometheusPullBuilder
-    : public opentelemetry::sdk::init::PrometheusPullMetricExporterBuilder
+    : public opentelemetry::sdk::configuration::PrometheusPullMetricExporterBuilder
 {
 public:
-  static void Register(opentelemetry::sdk::init::Registry *registry);
+  static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
   PrometheusPullBuilder()           = default;
   ~PrometheusPullBuilder() override = default;

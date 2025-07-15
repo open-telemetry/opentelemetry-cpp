@@ -14,7 +14,7 @@ namespace otlp
 
 static OtlpGrpcPushMetricBuilder singleton;
 
-void OtlpGrpcPushMetricBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void OtlpGrpcPushMetricBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->SetOtlpGrpcPushMetricExporterBuilder(&singleton);
 }

@@ -14,7 +14,7 @@ namespace otlp
 
 static OtlpFileLogRecordBuilder singleton;
 
-void OtlpFileLogRecordBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void OtlpFileLogRecordBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->SetOtlpFileLogRecordBuilder(&singleton);
 }

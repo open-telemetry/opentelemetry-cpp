@@ -14,7 +14,7 @@ namespace otlp
 
 static OtlpGrpcLogRecordBuilder singleton;
 
-void OtlpGrpcLogRecordBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void OtlpGrpcLogRecordBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->SetOtlpGrpcLogRecordBuilder(&singleton);
 }

@@ -5,16 +5,16 @@
 
 #include <memory>
 
+#include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/init/extension_log_record_exporter_builder.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 
 class CustomLogRecordExporterBuilder
-    : public opentelemetry::sdk::init::ExtensionLogRecordExporterBuilder
+    : public opentelemetry::sdk::configuration::ExtensionLogRecordExporterBuilder
 {
 public:
-  static void Register(opentelemetry::sdk::init::Registry *registry);
+  static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Build(
       const opentelemetry::sdk::configuration::ExtensionLogRecordExporterConfiguration *model)

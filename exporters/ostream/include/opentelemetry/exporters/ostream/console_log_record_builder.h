@@ -5,9 +5,9 @@
 
 #include <memory>
 
+#include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/init/console_log_record_exporter_builder.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/version.h"
 
@@ -18,10 +18,10 @@ namespace logs
 {
 
 class OPENTELEMETRY_EXPORT ConsoleLogRecordBuilder
-    : public opentelemetry::sdk::init::ConsoleLogRecordExporterBuilder
+    : public opentelemetry::sdk::configuration::ConsoleLogRecordExporterBuilder
 {
 public:
-  static void Register(opentelemetry::sdk::init::Registry *registry);
+  static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
   ConsoleLogRecordBuilder()           = default;
   ~ConsoleLogRecordBuilder() override = default;

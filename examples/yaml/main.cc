@@ -11,9 +11,9 @@
 #include "opentelemetry/exporters/ostream/console_span_builder.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
+#include "opentelemetry/sdk/configuration/configured_sdk.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
-#include "opentelemetry/sdk/init/configured_sdk.h"
-#include "opentelemetry/sdk/init/registry.h"
 
 #include "custom_log_record_exporter_builder.h"
 #include "custom_log_record_processor_builder.h"
@@ -60,7 +60,7 @@
 static bool opt_help              = false;
 static std::string yaml_file_path = "";
 
-static std::unique_ptr<opentelemetry::sdk::init::ConfiguredSdk> sdk;
+static std::unique_ptr<opentelemetry::sdk::configuration::ConfiguredSdk> sdk;
 
 namespace
 {
@@ -73,8 +73,8 @@ void InitOtel(const std::string &config_file)
 
   /* 1 - Create a registry */
 
-  std::shared_ptr<opentelemetry::sdk::init::Registry> registry(
-      new opentelemetry::sdk::init::Registry);
+  std::shared_ptr<opentelemetry::sdk::configuration::Registry> registry(
+      new opentelemetry::sdk::configuration::Registry);
 
   /* 2 - Populate the registry with the core components supported */
 
@@ -126,7 +126,7 @@ void InitOtel(const std::string &config_file)
 
   /* 5 - Build the SDK from the parsed config.yaml */
 
-  sdk = opentelemetry::sdk::init::ConfiguredSdk::Create(registry, model);
+  sdk = opentelemetry::sdk::configuration::ConfiguredSdk::Create(registry, model);
 
   /* 6 - Deploy the SDK */
 

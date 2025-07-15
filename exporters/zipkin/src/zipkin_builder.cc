@@ -7,8 +7,8 @@
 #include "opentelemetry/exporters/zipkin/zipkin_builder.h"
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_factory.h"
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
-#include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/version.h"
 
@@ -20,7 +20,7 @@ namespace zipkin
 
 static ZipkinBuilder singleton;
 
-void ZipkinBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void ZipkinBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   registry->SetZipkinSpanBuilder(&singleton);
 }

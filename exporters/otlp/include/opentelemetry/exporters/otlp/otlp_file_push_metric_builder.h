@@ -5,9 +5,9 @@
 
 #include <memory>
 
+#include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/init/otlp_file_push_metric_exporter_builder.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/version.h"
 
@@ -18,10 +18,10 @@ namespace otlp
 {
 
 class OPENTELEMETRY_EXPORT OtlpFilePushMetricBuilder
-    : public opentelemetry::sdk::init::OtlpFilePushMetricExporterBuilder
+    : public opentelemetry::sdk::configuration::OtlpFilePushMetricExporterBuilder
 {
 public:
-  static void Register(opentelemetry::sdk::init::Registry *registry);
+  static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
   OtlpFilePushMetricBuilder()           = default;
   ~OtlpFilePushMetricBuilder() override = default;

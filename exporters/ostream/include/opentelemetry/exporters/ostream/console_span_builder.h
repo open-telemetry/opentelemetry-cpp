@@ -5,9 +5,9 @@
 
 #include <memory>
 
+#include "opentelemetry/sdk/configuration/console_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
-#include "opentelemetry/sdk/init/console_span_exporter_builder.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/version.h"
 
@@ -18,10 +18,10 @@ namespace trace
 {
 
 class OPENTELEMETRY_EXPORT ConsoleSpanBuilder
-    : public opentelemetry::sdk::init::ConsoleSpanExporterBuilder
+    : public opentelemetry::sdk::configuration::ConsoleSpanExporterBuilder
 {
 public:
-  static void Register(opentelemetry::sdk::init::Registry *registry);
+  static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
   ConsoleSpanBuilder()           = default;
   ~ConsoleSpanBuilder() override = default;

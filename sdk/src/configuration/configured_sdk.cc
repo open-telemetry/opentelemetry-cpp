@@ -12,9 +12,9 @@
 #include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
-#include "opentelemetry/sdk/init/configured_sdk.h"
-#include "opentelemetry/sdk/init/registry.h"
-#include "opentelemetry/sdk/init/sdk_builder.h"
+#include "opentelemetry/sdk/configuration/configured_sdk.h"
+#include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
@@ -25,7 +25,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace init
+namespace configuration
 {
 
 std::unique_ptr<ConfiguredSdk> ConfiguredSdk::Create(
@@ -96,6 +96,6 @@ void ConfiguredSdk::UnInstall()
   }
 }
 
-}  // namespace init
+}  // namespace configuration
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
