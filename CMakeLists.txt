@@ -304,10 +304,6 @@ endif()
 # GNUInstallDirs.
 include(GNUInstallDirs)
 
-if(WITH_PROMETHEUS)
-  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/prometheus-cpp.cmake")
-endif()
-
 #
 # Do we need HTTP CLIENT CURL ?
 #
@@ -323,33 +319,29 @@ else()
 endif()
 
 #
-# Do we need CURL ?
-#
-
-if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
-  # No specific version required.
-  find_package(CURL REQUIRED)
-  # Set the CURL_VERSION from the legacy CURL_VERSION_STRING Required for CMake
-  # versions below 4.0
-  if(NOT DEFINED CURL_VERSION AND DEFINED CURL_VERSION_STRING)
-    set(CURL_VERSION ${CURL_VERSION_STRING})
-  endif()
-endif()
-
-#
 # Do we need ZLIB ?
 #
 
 if((NOT WITH_API_ONLY)
    AND WITH_HTTP_CLIENT_CURL
    AND WITH_OTLP_HTTP_COMPRESSION)
-  # No specific version required.
-  find_package(ZLIB REQUIRED)
-  # Set the ZLIB_VERSION from the legacy ZLIB_VERSION_STRING Required for CMake
-  # versions below 3.26
-  if(NOT DEFINED ZLIB_VERSION AND DEFINED ZLIB_VERSION_STRING)
-    set(ZLIB_VERSION ${ZLIB_VERSION_STRING})
-  endif()
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/zlib.cmake")
+endif()
+
+#
+# Do we need CURL ?
+#
+
+if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/curl.cmake")
+endif()
+
+#
+# Do we need prometheus-cpp ?
+#
+
+if(WITH_PROMETHEUS)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/prometheus-cpp.cmake")
 endif()
 
 #
@@ -597,11 +589,11 @@ endif()
 if(gRPC_VERSION)
   message(STATUS "gRPC: ${gRPC_VERSION} (${gRPC_PROVIDER})")
 endif()
-if(CURL_FOUND)
-  message(STATUS "CURL: ${CURL_VERSION}")
+if(CURL_VERSION)
+  message(STATUS "CURL: ${CURL_VERSION} (${CURL_PROVIDER})")
 endif()
-if(ZLIB_FOUND)
-  message(STATUS "ZLIB: ${ZLIB_VERSION}")
+if(ZLIB_VERSION)
+  message(STATUS "ZLIB: ${ZLIB_VERSION} (${ZLIB_PROVIDER})")
 endif()
 if(USE_NLOHMANN_JSON)
   message(
