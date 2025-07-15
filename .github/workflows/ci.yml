@@ -73,7 +73,7 @@ jobs:
     - name: install dependencies
       run: |
         sudo -E apt-get update
-        sudo -E apt-get install -y zlib1g-dev libcurl4-openssl-dev libabsl-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
+        sudo -E apt-get install -y zlib1g-dev libabsl-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
     - name: run fetch content cmake test
       run: |
         ./ci/do_ci.sh cmake.fetch_content.test
