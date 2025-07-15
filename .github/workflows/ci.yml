@@ -183,25 +183,28 @@ jobs:
   cmake_clang_yaml_config:
     name: CMake clang 18 (maintainer mode, yaml config)
     runs-on: ubuntu-24.04
+    env:
+      CC: /usr/bin/clang-18
+      CXX: /usr/bin/clang++-18
+      CXX_STANDARD: '14'
     steps:
-    - uses: actions/checkout@v4
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+      with:
+        egress-policy: audit
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CC: /usr/bin/clang-18
-        CXX: /usr/bin/clang++-18
-        PROTOBUF_VERSION: 21.12
       run: |
-        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/install_protobuf.sh
+    - name: install dependencies
+      run: |
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
+    - name: install ryml
+      run: |
         sudo -E ./ci/install_ryml.sh
     - name: run cmake clang (maintainer mode, sync)
-      env:
-        CC: /usr/bin/clang-18
-        CXX: /usr/bin/clang++-18
       run: |
         ./ci/do_ci.sh cmake.maintainer.yaml.test
     - name: generate test cert
