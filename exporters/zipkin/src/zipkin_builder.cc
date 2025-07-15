@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "opentelemetry/exporters/zipkin/zipkin_builder.h"
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_factory.h"

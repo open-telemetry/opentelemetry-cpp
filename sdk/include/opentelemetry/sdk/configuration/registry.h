@@ -40,10 +40,10 @@ class Registry
 {
 public:
   Registry();
-  Registry(Registry &&)                      = default;
-  Registry(const Registry &)                 = default;
-  Registry &operator=(Registry &&)           = default;
-  Registry &operator=(const Registry &other) = default;
+  Registry(Registry &&)                      = delete;
+  Registry(const Registry &)                 = delete;
+  Registry &operator=(Registry &&)           = delete;
+  Registry &operator=(const Registry &other) = delete;
 
   ~Registry() = default;
 
