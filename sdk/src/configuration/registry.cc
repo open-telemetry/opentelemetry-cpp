@@ -94,7 +94,8 @@ const TextMapPropagatorBuilder *Registry::GetTextMapPropagatorBuilder(const std:
 void Registry::AddTextMapPropagatorBuilder(const std::string &name,
                                            std::unique_ptr<TextMapPropagatorBuilder> &&builder)
 {
-  propagator_builders_.insert_or_assign(name, std::move(builder));
+  propagator_builders_.erase(name);
+  propagator_builders_.insert({name, std::move(builder)});
 }
 
 const ExtensionSamplerBuilder *Registry::GetExtensionSamplerBuilder(const std::string &name) const
@@ -111,7 +112,8 @@ const ExtensionSamplerBuilder *Registry::GetExtensionSamplerBuilder(const std::s
 void Registry::AddExtensionSamplerBuilder(const std::string &name,
                                           std::unique_ptr<ExtensionSamplerBuilder> &&builder)
 {
-  sampler_builders_.insert_or_assign(name, std::move(builder));
+  sampler_builders_.erase(name);
+  sampler_builders_.insert({name, std::move(builder)});
 }
 
 const ExtensionSpanExporterBuilder *Registry::GetExtensionSpanExporterBuilder(
@@ -130,7 +132,8 @@ void Registry::AddExtensionSpanExporterBuilder(
     const std::string &name,
     std::unique_ptr<ExtensionSpanExporterBuilder> &&builder)
 {
-  span_exporter_builders_.insert_or_assign(name, std::move(builder));
+  span_exporter_builders_.erase(name);
+  span_exporter_builders_.insert({name, std::move(builder)});
 }
 
 const ExtensionSpanProcessorBuilder *Registry::GetExtensionSpanProcessorBuilder(
@@ -149,7 +152,8 @@ void Registry::AddExtensionSpanProcessorBuilder(
     const std::string &name,
     std::unique_ptr<ExtensionSpanProcessorBuilder> &&builder)
 {
-  span_processor_builders_.insert_or_assign(name, std::move(builder));
+  span_processor_builders_.erase(name);
+  span_processor_builders_.insert({name, std::move(builder)});
 }
 
 const ExtensionPushMetricExporterBuilder *Registry::GetExtensionPushMetricExporterBuilder(
@@ -168,7 +172,8 @@ void Registry::AddExtensionPushMetricExporterBuilder(
     const std::string &name,
     std::unique_ptr<ExtensionPushMetricExporterBuilder> &&builder)
 {
-  push_metric_exporter_builders_.insert_or_assign(name, std::move(builder));
+  push_metric_exporter_builders_.erase(name);
+  push_metric_exporter_builders_.insert({name, std::move(builder)});
 }
 
 const ExtensionPullMetricExporterBuilder *Registry::GetExtensionPullMetricExporterBuilder(
@@ -187,7 +192,8 @@ void Registry::AddExtensionPullMetricExporterBuilder(
     const std::string &name,
     std::unique_ptr<ExtensionPullMetricExporterBuilder> &&builder)
 {
-  pull_metric_exporter_builders_.insert_or_assign(name, std::move(builder));
+  pull_metric_exporter_builders_.erase(name);
+  pull_metric_exporter_builders_.insert({name, std::move(builder)});
 }
 
 const ExtensionLogRecordExporterBuilder *Registry::GetExtensionLogRecordExporterBuilder(
@@ -206,7 +212,8 @@ void Registry::AddExtensionLogRecordExporterBuilder(
     const std::string &name,
     std::unique_ptr<ExtensionLogRecordExporterBuilder> &&builder)
 {
-  log_record_exporter_builders_.insert_or_assign(name, std::move(builder));
+  log_record_exporter_builders_.erase(name);
+  log_record_exporter_builders_.insert({name, std::move(builder)});
 }
 
 const ExtensionLogRecordProcessorBuilder *Registry::GetExtensionLogRecordProcessorBuilder(
@@ -225,7 +232,8 @@ void Registry::AddExtensionLogRecordProcessorBuilder(
     const std::string &name,
     std::unique_ptr<ExtensionLogRecordProcessorBuilder> &&builder)
 {
-  log_record_processor_builders_.insert_or_assign(name, std::move(builder));
+  log_record_processor_builders_.erase(name);
+  log_record_processor_builders_.insert({name, std::move(builder)});
 }
 
 }  // namespace configuration
