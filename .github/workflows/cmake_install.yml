@@ -112,6 +112,10 @@ jobs:
       env:
         BUILD_SHARED_LIBS: 'OFF'
       run: ./ci/do_ci.sh cmake.install.test
+    - name: Run Tests (shared libs)
+      env:
+        BUILD_SHARED_LIBS: 'ON'
+      run: ./ci/do_ci.sh cmake.install.test
 
   ubuntu_2204_stable:
     name: Ubuntu 22.04 stable versions cxx17 (static libs - shared libs)
