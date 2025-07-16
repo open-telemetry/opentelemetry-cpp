@@ -4,11 +4,11 @@
 
 #include <cmath>
 #include <cstdint>
-#include <cstring>
 #include <map>
 #include <memory>
 #include <string>
 
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio.h"
