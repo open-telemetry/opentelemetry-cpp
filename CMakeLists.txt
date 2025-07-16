@@ -359,6 +359,7 @@ if(WITH_OTLP_GRPC
   endif()
 
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/protobuf.cmake")
+
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/opentelemetry-proto.cmake")
 endif()
 
@@ -584,10 +585,13 @@ if(opentelemetry-proto_VERSION)
   )
 endif()
 if(Protobuf_VERSION)
-  message(STATUS "Protobuf: ${Protobuf_VERSION} (${Protobuf_PROVIDER})")
+  message(
+    STATUS
+      "Protobuf: ${Protobuf_VERSION} (${Protobuf_PROVIDER} - ${protobuf_lib_type})"
+  )
 endif()
 if(gRPC_VERSION)
-  message(STATUS "gRPC: ${gRPC_VERSION} (${gRPC_PROVIDER})")
+  message(STATUS "gRPC: ${gRPC_VERSION} (${gRPC_PROVIDER} - ${grpc_lib_type})")
 endif()
 if(CURL_VERSION)
   message(STATUS "CURL: ${CURL_VERSION} (${CURL_PROVIDER})")

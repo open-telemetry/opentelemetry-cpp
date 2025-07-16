@@ -49,11 +49,12 @@ else()
 
     # Set the Protobuf_VERSION variable from the git tag.
     string(REGEX REPLACE "^v([0-9]+\\.[0-9]+\\.[0-9]+)$" "\\1" Protobuf_VERSION "${protobuf_GIT_TAG}")
-  endif()
-endif()
 
-if(TARGET libprotobuf)
-  set_target_properties(libprotobuf PROPERTIES POSITION_INDEPENDENT_CODE ON CXX_CLANG_TIDY "" CXX_INCLUDE_WHAT_YOU_USE "")
+    if(TARGET libprotobuf)
+      set_target_properties(libprotobuf PROPERTIES POSITION_INDEPENDENT_CODE ON CXX_CLANG_TIDY "" CXX_INCLUDE_WHAT_YOU_USE "")
+    endif()
+
+  endif()
 endif()
 
 if(NOT TARGET protobuf::libprotobuf)
