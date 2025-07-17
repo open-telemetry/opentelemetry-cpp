@@ -27,16 +27,16 @@ public:
       std::shared_ptr<Registry> registry,
       const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model);
 
-  ConfiguredSdk() : m_resource(opentelemetry::sdk::resource::Resource::GetEmpty()) {}
+  ConfiguredSdk() : resource(opentelemetry::sdk::resource::Resource::GetEmpty()) {}
 
   void Install();
   void UnInstall();
 
-  opentelemetry::sdk::resource::Resource m_resource;
-  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> m_tracer_provider;
-  std::shared_ptr<opentelemetry::context::propagation::TextMapPropagator> m_propagator;
-  std::shared_ptr<opentelemetry::sdk::metrics::MeterProvider> m_meter_provider;
-  std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> m_logger_provider;
+  opentelemetry::sdk::resource::Resource resource;
+  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> tracer_provider;
+  std::shared_ptr<opentelemetry::context::propagation::TextMapPropagator> propagator;
+  std::shared_ptr<opentelemetry::sdk::metrics::MeterProvider> meter_provider;
+  std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> logger_provider;
 };
 
 }  // namespace configuration

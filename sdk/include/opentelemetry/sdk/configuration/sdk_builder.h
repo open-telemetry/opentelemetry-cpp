@@ -66,7 +66,7 @@ namespace configuration
 class SdkBuilder
 {
 public:
-  SdkBuilder(std::shared_ptr<Registry> registry) : m_registry(std::move(registry)) {}
+  SdkBuilder(std::shared_ptr<Registry> registry) : registry_(std::move(registry)) {}
   SdkBuilder(SdkBuilder &&)                      = default;
   SdkBuilder(const SdkBuilder &)                 = default;
   SdkBuilder &operator=(SdkBuilder &&)           = default;
@@ -205,7 +205,7 @@ public:
       const;
 
   void AddView(
-      opentelemetry::sdk::metrics::ViewRegistry *registry,
+      opentelemetry::sdk::metrics::ViewRegistry *view_registry,
       const std::unique_ptr<opentelemetry::sdk::configuration::ViewConfiguration> &model) const;
 
   std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> CreateMeterProvider(
@@ -250,32 +250,6 @@ public:
       const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,
       const opentelemetry::sdk::resource::Resource &resource) const;
 
-  opentelemetry::common::AttributeValue CreateStringAttribute(
-      const opentelemetry::sdk::configuration::StringAttributeValueConfiguration *model) const;
-
-  opentelemetry::common::AttributeValue CreateIntegerAttribute(
-      const opentelemetry::sdk::configuration::IntegerAttributeValueConfiguration *model) const;
-
-  opentelemetry::common::AttributeValue CreateDoubleAttribute(
-      const opentelemetry::sdk::configuration::DoubleAttributeValueConfiguration *model) const;
-
-  opentelemetry::common::AttributeValue CreateBooleanAttribute(
-      const opentelemetry::sdk::configuration::BooleanAttributeValueConfiguration *model) const;
-
-  opentelemetry::common::AttributeValue CreateStringArrayAttribute(
-      const opentelemetry::sdk::configuration::StringArrayAttributeValueConfiguration *model) const;
-
-  opentelemetry::common::AttributeValue CreateIntegerArrayAttribute(
-      const opentelemetry::sdk::configuration::IntegerArrayAttributeValueConfiguration *model)
-      const;
-
-  opentelemetry::common::AttributeValue CreateDoubleArrayAttribute(
-      const opentelemetry::sdk::configuration::DoubleArrayAttributeValueConfiguration *model) const;
-
-  opentelemetry::common::AttributeValue CreateBooleanArrayAttribute(
-      const opentelemetry::sdk::configuration::BooleanArrayAttributeValueConfiguration *model)
-      const;
-
   void SetResourceAttribute(
       opentelemetry::sdk::resource::ResourceAttributes &resource_attributes,
       const std::string &name,
@@ -289,7 +263,7 @@ public:
       const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model) const;
 
 private:
-  std::shared_ptr<Registry> m_registry;
+  std::shared_ptr<Registry> registry_;
 };
 
 }  // namespace configuration

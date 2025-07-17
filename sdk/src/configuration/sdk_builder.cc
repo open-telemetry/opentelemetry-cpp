@@ -159,73 +159,130 @@ namespace sdk
 namespace configuration
 {
 
-class AttributeValueBuilder
+class AttributeValueSetter
     : public opentelemetry::sdk::configuration::AttributeValueConfigurationVisitor
 {
 public:
-  AttributeValueBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  AttributeValueBuilder(AttributeValueBuilder &&)                      = delete;
-  AttributeValueBuilder(const AttributeValueBuilder &)                 = delete;
-  AttributeValueBuilder &operator=(AttributeValueBuilder &&)           = delete;
-  AttributeValueBuilder &operator=(const AttributeValueBuilder &other) = delete;
-  ~AttributeValueBuilder() override                                    = default;
+  AttributeValueSetter(const SdkBuilder *b,
+                       opentelemetry::sdk::resource::ResourceAttributes &resource_attributes,
+                       const std::string &name)
+      : m_sdk_builder(b), resource_attributes_(resource_attributes), name_(name)
+  {}
+  AttributeValueSetter(AttributeValueSetter &&)                      = delete;
+  AttributeValueSetter(const AttributeValueSetter &)                 = delete;
+  AttributeValueSetter &operator=(AttributeValueSetter &&)           = delete;
+  AttributeValueSetter &operator=(const AttributeValueSetter &other) = delete;
+  ~AttributeValueSetter() override                                   = default;
 
   void VisitString(
       const opentelemetry::sdk::configuration::StringAttributeValueConfiguration *model) override
   {
-    attribute_value = m_sdk_builder->CreateStringAttribute(model);
+    opentelemetry::common::AttributeValue attribute_value(model->value);
+    resource_attributes_.SetAttribute(name_, attribute_value);
   }
 
   void VisitInteger(
       const opentelemetry::sdk::configuration::IntegerAttributeValueConfiguration *model) override
   {
-    attribute_value = m_sdk_builder->CreateIntegerAttribute(model);
+    opentelemetry::common::AttributeValue attribute_value(model->value);
+    resource_attributes_.SetAttribute(name_, attribute_value);
   }
 
   void VisitDouble(
       const opentelemetry::sdk::configuration::DoubleAttributeValueConfiguration *model) override
   {
-    attribute_value = m_sdk_builder->CreateDoubleAttribute(model);
+    opentelemetry::common::AttributeValue attribute_value(model->value);
+    resource_attributes_.SetAttribute(name_, attribute_value);
   }
 
   void VisitBoolean(
       const opentelemetry::sdk::configuration::BooleanAttributeValueConfiguration *model) override
   {
-    attribute_value = m_sdk_builder->CreateBooleanAttribute(model);
+    opentelemetry::common::AttributeValue attribute_value(model->value);
+    resource_attributes_.SetAttribute(name_, attribute_value);
   }
 
   void VisitStringArray(
       const opentelemetry::sdk::configuration::StringArrayAttributeValueConfiguration *model)
       override
   {
-    attribute_value = m_sdk_builder->CreateStringArrayAttribute(model);
+    size_t length = model->value.size();
+    std::vector<nostd::string_view> string_view_array(length);
+
+    for (int i = 0; i < length; i++)
+    {
+      string_view_array[i] = model->value[i];
+    }
+
+    nostd::span<const nostd::string_view> span(string_view_array.data(), string_view_array.size());
+
+    opentelemetry::common::AttributeValue attribute_value(span);
+    resource_attributes_.SetAttribute(name_, attribute_value);
   }
 
   void VisitIntegerArray(
       const opentelemetry::sdk::configuration::IntegerArrayAttributeValueConfiguration *model)
       override
   {
-    attribute_value = m_sdk_builder->CreateIntegerArrayAttribute(model);
+    size_t length = model->value.size();
+    std::vector<int64_t> int_array(length);
+
+    for (int i = 0; i < length; i++)
+    {
+      int_array[i] = model->value[i];
+    }
+
+    nostd::span<const int64_t> span(int_array.data(), int_array.size());
+
+    opentelemetry::common::AttributeValue attribute_value(span);
+    resource_attributes_.SetAttribute(name_, attribute_value);
   }
 
   void VisitDoubleArray(
       const opentelemetry::sdk::configuration::DoubleArrayAttributeValueConfiguration *model)
       override
   {
-    attribute_value = m_sdk_builder->CreateDoubleArrayAttribute(model);
+    size_t length = model->value.size();
+    std::vector<double> double_array(length);
+
+    for (int i = 0; i < length; i++)
+    {
+      double_array[i] = model->value[i];
+    }
+
+    nostd::span<const double> span(double_array.data(), double_array.size());
+
+    opentelemetry::common::AttributeValue attribute_value(span);
+    resource_attributes_.SetAttribute(name_, attribute_value);
   }
 
   void VisitBooleanArray(
       const opentelemetry::sdk::configuration::BooleanArrayAttributeValueConfiguration *model)
       override
   {
-    attribute_value = m_sdk_builder->CreateBooleanArrayAttribute(model);
+    size_t length = model->value.size();
+
+    // Can not use std::vector<bool>,
+    // it has no data() to convert it to a span
+    std::unique_ptr<bool[]> bool_array(new bool[length]);
+
+    for (int i = 0; i < length; i++)
+    {
+      bool_array[i] = model->value[i];
+    }
+
+    nostd::span<const bool> span(&bool_array[0], length);
+
+    opentelemetry::common::AttributeValue attribute_value(span);
+    resource_attributes_.SetAttribute(name_, attribute_value);
   }
 
   opentelemetry::common::AttributeValue attribute_value;
 
 private:
   const SdkBuilder *m_sdk_builder;
+  opentelemetry::sdk::resource::ResourceAttributes &resource_attributes_;
+  std::string name_;
 };
 
 class SamplerBuilder : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
@@ -724,7 +781,7 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateExtensionS
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sdk;
   std::string name = model->name;
 
-  const ExtensionSamplerBuilder *builder = m_registry->GetExtensionSamplerBuilder(name);
+  const ExtensionSamplerBuilder *builder = registry_->GetExtensionSamplerBuilder(name);
 
   if (builder != nullptr)
   {
@@ -756,7 +813,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpH
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
   const OtlpHttpSpanExporterBuilder *builder;
 
-  builder = m_registry->GetOtlpHttpSpanBuilder();
+  builder = registry_->GetOtlpHttpSpanBuilder();
   if (builder != nullptr)
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateOtlpHttpSpanExporter() using registered http builder");
@@ -774,7 +831,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpG
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
   const OtlpGrpcSpanExporterBuilder *builder;
 
-  builder = m_registry->GetOtlpGrpcSpanBuilder();
+  builder = registry_->GetOtlpGrpcSpanBuilder();
   if (builder != nullptr)
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateOtlpGrpcSpanExporter() using registered grpc builder");
@@ -792,7 +849,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpF
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
   const OtlpFileSpanExporterBuilder *builder;
 
-  builder = m_registry->GetOtlpFileSpanBuilder();
+  builder = registry_->GetOtlpFileSpanBuilder();
   if (builder != nullptr)
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateOtlpFileSpanExporter() using registered file builder");
@@ -808,7 +865,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateConso
     const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
-  const ConsoleSpanExporterBuilder *builder = m_registry->GetConsoleSpanBuilder();
+  const ConsoleSpanExporterBuilder *builder = registry_->GetConsoleSpanBuilder();
 
   if (builder != nullptr)
   {
@@ -825,7 +882,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateZipki
     const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
-  const ZipkinSpanExporterBuilder *builder = m_registry->GetZipkinSpanBuilder();
+  const ZipkinSpanExporterBuilder *builder = registry_->GetZipkinSpanBuilder();
 
   if (builder != nullptr)
   {
@@ -844,7 +901,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateExten
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
   std::string name = model->name;
 
-  const ExtensionSpanExporterBuilder *builder = m_registry->GetExtensionSpanExporterBuilder(name);
+  const ExtensionSpanExporterBuilder *builder = registry_->GetExtensionSpanExporterBuilder(name);
 
   if (builder != nullptr)
   {
@@ -911,7 +968,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateExte
   std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> sdk;
   std::string name = model->name;
 
-  const ExtensionSpanProcessorBuilder *builder = m_registry->GetExtensionSpanProcessorBuilder(name);
+  const ExtensionSpanProcessorBuilder *builder = registry_->GetExtensionSpanProcessorBuilder(name);
 
   if (builder != nullptr)
   {
@@ -974,7 +1031,7 @@ SdkBuilder::CreateTextMapPropagator(const std::string &name) const
 {
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> sdk;
 
-  const TextMapPropagatorBuilder *builder = m_registry->GetTextMapPropagatorBuilder(name);
+  const TextMapPropagatorBuilder *builder = registry_->GetTextMapPropagatorBuilder(name);
 
   if (builder != nullptr)
   {
@@ -1045,7 +1102,7 @@ SdkBuilder::CreateOtlpHttpPushMetricExporter(
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
   const OtlpHttpPushMetricExporterBuilder *builder;
 
-  builder = m_registry->GetOtlpHttpPushMetricExporterBuilder();
+  builder = registry_->GetOtlpHttpPushMetricExporterBuilder();
   if (builder != nullptr)
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateOtlpHttpPushMetricExporter() using registered http builder");
@@ -1064,7 +1121,7 @@ SdkBuilder::CreateOtlpGrpcPushMetricExporter(
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
   const OtlpGrpcPushMetricExporterBuilder *builder;
 
-  builder = m_registry->GetOtlpGrpcPushMetricExporterBuilder();
+  builder = registry_->GetOtlpGrpcPushMetricExporterBuilder();
   if (builder != nullptr)
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateOtlpGrpcPushMetricExporter() using registered grpc builder");
@@ -1083,7 +1140,7 @@ SdkBuilder::CreateOtlpFilePushMetricExporter(
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
   const OtlpFilePushMetricExporterBuilder *builder;
 
-  builder = m_registry->GetOtlpFilePushMetricExporterBuilder();
+  builder = registry_->GetOtlpFilePushMetricExporterBuilder();
   if (builder != nullptr)
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateOtlpFilePushMetricExporter() using registered file builder");
@@ -1102,7 +1159,7 @@ SdkBuilder::CreateConsolePushMetricExporter(
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
 
   const ConsolePushMetricExporterBuilder *builder =
-      m_registry->GetConsolePushMetricExporterBuilder();
+      registry_->GetConsolePushMetricExporterBuilder();
 
   if (builder != nullptr)
   {
@@ -1123,7 +1180,7 @@ SdkBuilder::CreateExtensionPushMetricExporter(
   std::string name = model->name;
 
   const ExtensionPushMetricExporterBuilder *builder =
-      m_registry->GetExtensionPushMetricExporterBuilder(name);
+      registry_->GetExtensionPushMetricExporterBuilder(name);
 
   if (builder != nullptr)
   {
@@ -1145,7 +1202,7 @@ SdkBuilder::CreatePrometheusPullMetricExporter(
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
 
   const PrometheusPullMetricExporterBuilder *builder =
-      m_registry->GetPrometheusPullMetricExporterBuilder();
+      registry_->GetPrometheusPullMetricExporterBuilder();
 
   if (builder != nullptr)
   {
@@ -1166,7 +1223,7 @@ SdkBuilder::CreateExtensionPullMetricExporter(
   std::string name = model->name;
 
   const ExtensionPullMetricExporterBuilder *builder =
-      m_registry->GetExtensionPullMetricExporterBuilder(name);
+      registry_->GetExtensionPullMetricExporterBuilder(name);
 
   if (builder != nullptr)
   {
@@ -1306,7 +1363,7 @@ SdkBuilder::CreateAttributesProcessor(
 }
 
 void SdkBuilder::AddView(
-    opentelemetry::sdk::metrics::ViewRegistry *registry,
+    opentelemetry::sdk::metrics::ViewRegistry *view_registry,
     const std::unique_ptr<opentelemetry::sdk::configuration::ViewConfiguration> &model) const
 {
   auto *selector = model->selector.get();
@@ -1349,8 +1406,8 @@ void SdkBuilder::AddView(
       stream->name, stream->description, unit, sdk_aggregation_type, sdk_aggregation_config,
       std::move(sdk_attribute_processor));
 
-  registry->AddView(std::move(sdk_instrument_selector), std::move(sdk_meter_selector),
-                    std::move(sdk_view));
+  view_registry->AddView(std::move(sdk_instrument_selector), std::move(sdk_meter_selector),
+                         std::move(sdk_view));
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMeterProvider(
@@ -1388,7 +1445,7 @@ SdkBuilder::CreateOtlpHttpLogRecordExporter(
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> sdk;
   const OtlpHttpLogRecordExporterBuilder *builder;
 
-  builder = m_registry->GetOtlpHttpLogRecordBuilder();
+  builder = registry_->GetOtlpHttpLogRecordBuilder();
   if (builder != nullptr)
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateOtlpHttpLogRecordExporter() using registered http builder");
@@ -1407,7 +1464,7 @@ SdkBuilder::CreateOtlpGrpcLogRecordExporter(
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> sdk;
   const OtlpGrpcLogRecordExporterBuilder *builder;
 
-  builder = m_registry->GetOtlpGrpcLogRecordBuilder();
+  builder = registry_->GetOtlpGrpcLogRecordBuilder();
   if (builder != nullptr)
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateOtlpGrpcLogRecordExporter() using registered grpc builder");
@@ -1426,7 +1483,7 @@ SdkBuilder::CreateOtlpFileLogRecordExporter(
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> sdk;
   const OtlpFileLogRecordExporterBuilder *builder;
 
-  builder = m_registry->GetOtlpFileLogRecordBuilder();
+  builder = registry_->GetOtlpFileLogRecordBuilder();
   if (builder != nullptr)
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateOtlpFileLogRecordExporter() using registered file builder");
@@ -1443,7 +1500,7 @@ SdkBuilder::CreateConsoleLogRecordExporter(
     const opentelemetry::sdk::configuration::ConsoleLogRecordExporterConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> sdk;
-  const ConsoleLogRecordExporterBuilder *builder = m_registry->GetConsoleLogRecordBuilder();
+  const ConsoleLogRecordExporterBuilder *builder = registry_->GetConsoleLogRecordBuilder();
 
   if (builder != nullptr)
   {
@@ -1464,7 +1521,7 @@ SdkBuilder::CreateExtensionLogRecordExporter(
   std::string name = model->name;
 
   const ExtensionLogRecordExporterBuilder *builder =
-      m_registry->GetExtensionLogRecordExporterBuilder(name);
+      registry_->GetExtensionLogRecordExporterBuilder(name);
 
   if (builder != nullptr)
   {
@@ -1531,7 +1588,7 @@ SdkBuilder::CreateExtensionLogRecordProcessor(
   std::string name = model->name;
 
   const ExtensionLogRecordProcessorBuilder *builder =
-      m_registry->GetExtensionLogRecordProcessorBuilder(name);
+      registry_->GetExtensionLogRecordProcessorBuilder(name);
 
   if (builder != nullptr)
   {
@@ -1580,83 +1637,14 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
   return sdk;
 }
 
-opentelemetry::common::AttributeValue SdkBuilder::CreateStringAttribute(
-    const opentelemetry::sdk::configuration::StringAttributeValueConfiguration *model) const
-{
-  opentelemetry::common::AttributeValue result(model->value);
-
-  return result;
-}
-
-opentelemetry::common::AttributeValue SdkBuilder::CreateIntegerAttribute(
-    const opentelemetry::sdk::configuration::IntegerAttributeValueConfiguration *model) const
-{
-  opentelemetry::common::AttributeValue result(model->value);
-
-  return result;
-}
-
-opentelemetry::common::AttributeValue SdkBuilder::CreateDoubleAttribute(
-    const opentelemetry::sdk::configuration::DoubleAttributeValueConfiguration *model) const
-{
-  opentelemetry::common::AttributeValue result(model->value);
-
-  return result;
-}
-
-opentelemetry::common::AttributeValue SdkBuilder::CreateBooleanAttribute(
-    const opentelemetry::sdk::configuration::BooleanAttributeValueConfiguration *model) const
-{
-  bool value = model->value;
-  opentelemetry::common::AttributeValue result(value);
-
-  return result;
-}
-
-opentelemetry::common::AttributeValue SdkBuilder::CreateStringArrayAttribute(
-    const opentelemetry::sdk::configuration::StringArrayAttributeValueConfiguration * /*model*/)
-    const
-{
-  opentelemetry::common::AttributeValue result("FIXME");
-
-  return result;
-}
-
-opentelemetry::common::AttributeValue SdkBuilder::CreateIntegerArrayAttribute(
-    const opentelemetry::sdk::configuration::IntegerArrayAttributeValueConfiguration * /*model*/)
-    const
-{
-  opentelemetry::common::AttributeValue result("FIXME");
-
-  return result;
-}
-
-opentelemetry::common::AttributeValue SdkBuilder::CreateDoubleArrayAttribute(
-    const opentelemetry::sdk::configuration::DoubleArrayAttributeValueConfiguration *model) const
-{
-  nostd::span<const double> data{model->value.data(), model->value.size()};
-  opentelemetry::common::AttributeValue result(data);
-
-  return result;
-}
-
-opentelemetry::common::AttributeValue SdkBuilder::CreateBooleanArrayAttribute(
-    const opentelemetry::sdk::configuration::BooleanArrayAttributeValueConfiguration * /*model*/)
-    const
-{
-  opentelemetry::common::AttributeValue result("FIXME");
-
-  return result;
-}
-
 void SdkBuilder::SetResourceAttribute(
     opentelemetry::sdk::resource::ResourceAttributes &resource_attributes,
     const std::string &name,
     const opentelemetry::sdk::configuration::AttributeValueConfiguration *model) const
 {
-  AttributeValueBuilder builder(this);
-  model->Accept(&builder);
-  resource_attributes.SetAttribute(name, builder.attribute_value);
+  AttributeValueSetter setter(this, resource_attributes, name);
+  // Invokes resource_attributes.SetAttribute(name, <proper value from model>)
+  model->Accept(&setter);
 }
 
 void SdkBuilder::SetResource(
@@ -1668,17 +1656,36 @@ void SdkBuilder::SetResource(
   {
     opentelemetry::sdk::resource::ResourceAttributes sdk_attributes;
 
+    // First, scan attributes_list, which has low priority.
+    if (opt_model->attributes_list.size() != 0)
+    {
+      opentelemetry::common::KeyValueStringTokenizer tokenizer{opt_model->attributes_list};
+
+      opentelemetry::nostd::string_view attribute_key;
+      opentelemetry::nostd::string_view attribute_value;
+      bool attribute_valid = true;
+
+      while (tokenizer.next(attribute_valid, attribute_key, attribute_value))
+      {
+        if (attribute_valid)
+        {
+          opentelemetry::common::AttributeValue wrapped_attribute_value(attribute_value);
+          sdk_attributes.SetAttribute(attribute_key, wrapped_attribute_value);
+        }
+        else
+        {
+          OTEL_INTERNAL_LOG_WARN("Found invalid key/value pair in attributes_list");
+        }
+      }
+    }
+
+    // Second, scan attributes, which has high priority.
     if (opt_model->attributes)
     {
       for (const auto &kv : opt_model->attributes->kv_map)
       {
         SetResourceAttribute(sdk_attributes, kv.first, kv.second.get());
       }
-    }
-
-    if (opt_model->attributes_list.size() != 0)
-    {
-      OTEL_INTERNAL_LOG_ERROR("SdkBuilder::SetResource: FIXME attributes_list");
     }
 
     if (opt_model->detectors != nullptr)
@@ -1705,7 +1712,7 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
 
   if (!model->disabled)
   {
-    SetResource(sdk->m_resource, model->resource);
+    SetResource(sdk->resource, model->resource);
 
     if (model->attribute_limits)
     {
@@ -1716,22 +1723,22 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
 
     if (model->tracer_provider)
     {
-      sdk->m_tracer_provider = CreateTracerProvider(model->tracer_provider, sdk->m_resource);
+      sdk->tracer_provider = CreateTracerProvider(model->tracer_provider, sdk->resource);
     }
 
     if (model->propagator)
     {
-      sdk->m_propagator = CreatePropagator(model->propagator);
+      sdk->propagator = CreatePropagator(model->propagator);
     }
 
     if (model->meter_provider)
     {
-      sdk->m_meter_provider = CreateMeterProvider(model->meter_provider, sdk->m_resource);
+      sdk->meter_provider = CreateMeterProvider(model->meter_provider, sdk->resource);
     }
 
     if (model->logger_provider)
     {
-      sdk->m_logger_provider = CreateLoggerProvider(model->logger_provider, sdk->m_resource);
+      sdk->logger_provider = CreateLoggerProvider(model->logger_provider, sdk->resource);
     }
   }
 
