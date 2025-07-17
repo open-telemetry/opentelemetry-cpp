@@ -657,14 +657,51 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateParentBase
     const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sdk;
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> remote_parent_sampled_sdk;
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> remote_parent_not_sampled_sdk;
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> local_parent_sampled_sdk;
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> local_parent_not_sampled_sdk;
 
-  auto root_sdk                      = SdkBuilder::CreateSampler(model->root);
-  auto remote_parent_sampled_sdk     = SdkBuilder::CreateSampler(model->remote_parent_sampled);
-  auto remote_parent_not_sampled_sdk = SdkBuilder::CreateSampler(model->remote_parent_not_sampled);
-  auto local_parent_sampled_sdk      = SdkBuilder::CreateSampler(model->local_parent_sampled);
-  auto local_parent_not_sampled_sdk  = SdkBuilder::CreateSampler(model->local_parent_not_sampled);
+  auto root_sdk = SdkBuilder::CreateSampler(model->root);
 
-  OTEL_INTERNAL_LOG_ERROR("CreateParentBasedSampler: FIXME, missing param in parent factory");
+  if (model->remote_parent_sampled != nullptr)
+  {
+    remote_parent_sampled_sdk = SdkBuilder::CreateSampler(model->remote_parent_sampled);
+  }
+  else
+  {
+    remote_parent_sampled_sdk = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
+  }
+
+  if (model->remote_parent_not_sampled != nullptr)
+  {
+    remote_parent_not_sampled_sdk = SdkBuilder::CreateSampler(model->remote_parent_not_sampled);
+  }
+  else
+  {
+    remote_parent_not_sampled_sdk = opentelemetry::sdk::trace::AlwaysOffSamplerFactory::Create();
+  }
+
+  if (model->local_parent_sampled != nullptr)
+  {
+    local_parent_sampled_sdk = SdkBuilder::CreateSampler(model->local_parent_sampled);
+  }
+  else
+  {
+    local_parent_sampled_sdk = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
+  }
+
+  if (model->local_parent_not_sampled != nullptr)
+  {
+    local_parent_not_sampled_sdk = SdkBuilder::CreateSampler(model->local_parent_not_sampled);
+  }
+  else
+  {
+    local_parent_not_sampled_sdk = opentelemetry::sdk::trace::AlwaysOffSamplerFactory::Create();
+  }
+
+  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3545
+  OTEL_INTERNAL_LOG_ERROR("CreateParentBasedSampler: FIXME-SDK, missing param in parent factory");
   std::shared_ptr<opentelemetry::sdk::trace::Sampler> delegate_sampler = std::move(root_sdk);
   sdk = opentelemetry::sdk::trace::ParentBasedSamplerFactory::Create(delegate_sampler);
 
@@ -908,7 +945,7 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
   std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> sdk;
 
   // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/70
-  OTEL_INTERNAL_LOG_ERROR("CreateTracerProvider: FIXME (IdGenerator)");
+  OTEL_INTERNAL_LOG_ERROR("CreateTracerProvider: FIXME-CONFIG (IdGenerator)");
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sampler;
 
@@ -924,9 +961,10 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
     sdk_processors.push_back(CreateSpanProcessor(processor_model));
   }
 
-  // FIXME: use sampler, limits, id_generator, ...
-  sdk =
-      opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(sdk_processors), resource);
+  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3303
+  // FIXME-SDK: use limits, id_generator, ...
+  sdk = opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(sdk_processors),
+                                                                 resource, std::move(sampler));
 
   return sdk;
 }
@@ -1260,8 +1298,9 @@ SdkBuilder::CreateAttributesProcessor(
 {
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk;
 
+  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3546
   // FIXME-SDK: Need a subclass of AttributesProcessor for IncludeExclude
-  OTEL_INTERNAL_LOG_ERROR("CreateAttributesProcessor() FIXME-SDK");
+  OTEL_INTERNAL_LOG_ERROR("CreateAttributesProcessor() FIXME-SDK IncludeExclude");
 
   return sdk;
 }
@@ -1302,6 +1341,7 @@ void SdkBuilder::AddView(
     sdk_attribute_processor = CreateAttributesProcessor(stream->attribute_keys);
   }
 
+  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3547
   // FIXME-SDK: unit is unused in class View, should be removed.
   std::string unit("FIXME-SDK");
 
@@ -1532,7 +1572,8 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
     sdk_processors.push_back(CreateLogRecordProcessor(processor_model));
   }
 
-  // FIXME: use limits
+  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3303
+  // FIXME-SDK: use limits
   sdk =
       opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(sdk_processors), resource);
 
@@ -1642,7 +1683,9 @@ void SdkBuilder::SetResource(
 
     if (opt_model->detectors != nullptr)
     {
-      OTEL_INTERNAL_LOG_ERROR("SdkBuilder::SetResource: FIXME detectors");
+      // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3548
+      // FIXME-SDK: Implement resource detectors
+      OTEL_INTERNAL_LOG_ERROR("SdkBuilder::SetResource: FIXME-SDK detectors");
     }
 
     auto sdk_resource =
@@ -1666,9 +1709,9 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
 
     if (model->attribute_limits)
     {
-      OTEL_INTERNAL_LOG_ERROR("SdkBuilder::CreateConfiguredSdk: FIXME limits");
-      // Ignore limits
-      // throw UnsupportedException("attribute_limits not available in opentelemetry-cpp");
+      // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3303
+      // FIXME-SDK: Implement attribute limits
+      OTEL_INTERNAL_LOG_WARN("attribute_limits not supported, ignoring");
     }
 
     if (model->tracer_provider)
