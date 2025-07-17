@@ -36,7 +36,6 @@
 #include <opentelemetry/metrics/provider.h>
 #include <opentelemetry/sdk/common/global_log_handler.h>
 #include <opentelemetry/sdk/common/env_variables.h>
-#include <opentelemetry/sdk/resource/semantic_conventions.h>
 #include <opentelemetry/sdk/metrics/meter_provider_factory.h>
 #include <opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h>
 #include <opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h>
@@ -46,7 +45,6 @@
 #include <opentelemetry/logs/provider.h>
 #include <opentelemetry/sdk/common/global_log_handler.h>
 #include <opentelemetry/sdk/common/env_variables.h>
-#include <opentelemetry/sdk/resource/semantic_conventions.h>
 #include <opentelemetry/sdk/trace/tracer_provider.h>
 #include <opentelemetry/sdk/trace/tracer_provider_factory.h>
 #include <opentelemetry/sdk/trace/batch_span_processor_options.h>
@@ -65,8 +63,6 @@
 
 #include <opentelemetry/sdk/common/global_log_handler.h>
 #include <opentelemetry/sdk/common/env_variables.h>
-
-#include <opentelemetry/sdk/resource/semantic_conventions.h>
 
 #include <opentelemetry/sdk/logs/logger_provider_factory.h>
 #include <opentelemetry/sdk/logs/simple_log_record_processor_factory.h>
@@ -88,6 +84,8 @@
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 #include "opentelemetry/exporters/ostream/metric_exporter_factory.h"
 
+#include "opentelemetry/semconv/incubating/process_attributes.h"
+
 int main(int argc, const char* argv[])
 {
 
@@ -108,7 +106,7 @@ int main(int argc, const char* argv[])
     using namespace sdk::resource;
     ResourceAttributes resources
     {
-            { SemanticConventions::kProcessVpid, index },
+            { semconv::process::kProcessVpid, index },
     };
     auto resource = Resource::Create( resources );
     Resource::GetDefault() = resource;
