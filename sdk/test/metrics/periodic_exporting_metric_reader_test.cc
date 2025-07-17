@@ -4,7 +4,9 @@
 #include <gtest/gtest.h>
 #include <stddef.h>
 #include <chrono>
+#include <cstdlib>
 #include <memory>
+#include <ratio>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -18,8 +20,9 @@
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 #if defined(_MSC_VER)
-using opentelemetry::common::setenv;
-using opentelemetry::common::unsetenv;
+#  include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
 #endif
 
 using namespace opentelemetry;
@@ -112,41 +115,6 @@ TEST(PeriodicExportingMetricReader, Timeout)
   reader->SetMetricProducer(&producer);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   reader->Shutdown();
-}
-
-TEST(GetEnvDurationTest, Absent)
-{
-  const char *env = "OTEL_TEST";
-  unsetenv(env);
-  EXPECT_EQ(GetEnvDuration(env, std::chrono::milliseconds(42)), std::chrono::milliseconds(42));
-}
-
-TEST(GetEnvDurationTest, NotSet)
-{
-  const char *env = "OTEL_TEST";
-  setenv(env, "", 1);
-  EXPECT_EQ(GetEnvDuration(env, std::chrono::milliseconds(42)), std::chrono::milliseconds(42));
-  unsetenv(env);
-}
-
-TEST(GetEnvDurationTest, Valid)
-{
-  const char *env = "OTEL_TEST";
-  setenv(env, "1243ms", 1);
-  EXPECT_EQ(GetEnvDuration(env, std::chrono::milliseconds(42)), std::chrono::milliseconds(1243));
-
-  setenv(env, "3s", 1);
-  EXPECT_EQ(GetEnvDuration(env, std::chrono::milliseconds(42)), std::chrono::milliseconds(3000));
-
-  unsetenv(env);
-}
-
-TEST(GetEnvDurationTest, Invalid)
-{
-  const char *env = "OTEL_TEST";
-  setenv(env, "not_a_duration", 1);
-  EXPECT_EQ(GetEnvDuration(env, std::chrono::milliseconds(42)), std::chrono::milliseconds(42));
-  unsetenv(env);
 }
 
 TEST(PeriodicExportingMetricReaderOptions, UsesEnvVars)

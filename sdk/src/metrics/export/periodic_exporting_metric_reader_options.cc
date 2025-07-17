@@ -24,10 +24,12 @@ std::chrono::milliseconds GetEnvDuration(nostd::string_view env_var_name,
   }
   return default_value;
 }
+
 PeriodicExportingMetricReaderOptions::PeriodicExportingMetricReaderOptions()
     : export_interval_millis(GetEnvDuration("OTEL_METRIC_EXPORT_INTERVAL", kExportIntervalMillis)),
       export_timeout_millis(GetEnvDuration("OTEL_METRIC_EXPORT_TIMEOUT", kExportTimeOutMillis))
 {}
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
