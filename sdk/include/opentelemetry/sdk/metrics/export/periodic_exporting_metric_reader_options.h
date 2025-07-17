@@ -3,9 +3,10 @@
 
 #pragma once
 
-#include "opentelemetry/version.h"
-
 #include <chrono>
+
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -16,6 +17,9 @@ namespace metrics
 constexpr std::chrono::milliseconds kExportIntervalMillis = std::chrono::milliseconds(60000);
 constexpr std::chrono::milliseconds kExportTimeOutMillis  = std::chrono::milliseconds(30000);
 
+std::chrono::milliseconds GetEnvDuration(nostd::string_view env_var_name,
+                                         std::chrono::milliseconds default_value);
+
 /**
  * Struct to hold PeriodicExortingMetricReader options.
  */
@@ -23,11 +27,12 @@ constexpr std::chrono::milliseconds kExportTimeOutMillis  = std::chrono::millise
 struct PeriodicExportingMetricReaderOptions
 {
   /* The time interval between two consecutive exports. */
-  std::chrono::milliseconds export_interval_millis =
-      std::chrono::milliseconds(kExportIntervalMillis);
+  std::chrono::milliseconds export_interval_millis;
 
   /*  how long the export can run before it is cancelled. */
-  std::chrono::milliseconds export_timeout_millis = std::chrono::milliseconds(kExportTimeOutMillis);
+  std::chrono::milliseconds export_timeout_millis;
+
+  PeriodicExportingMetricReaderOptions();
 };
 
 }  // namespace metrics

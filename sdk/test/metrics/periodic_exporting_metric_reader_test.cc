@@ -5,7 +5,6 @@
 #include <stddef.h>
 #include <chrono>
 #include <memory>
-#include <ratio>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -17,6 +16,11 @@
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+
+#if defined(_MSC_VER)
+using opentelemetry::common::setenv;
+using opentelemetry::common::unsetenv;
+#endif
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
@@ -76,7 +80,7 @@ private:
   size_t data_sent_size_{0};
 };
 
-TEST(PeriodicExporingMetricReader, BasicTests)
+TEST(PeriodicExportingMetricReader, BasicTests)
 {
   std::unique_ptr<PushMetricExporter> exporter(
       new MockPushMetricExporter(std::chrono::milliseconds{0}));
@@ -95,7 +99,7 @@ TEST(PeriodicExporingMetricReader, BasicTests)
             static_cast<MockMetricProducer *>(&producer)->GetDataCount());
 }
 
-TEST(PeriodicExporingMetricReader, Timeout)
+TEST(PeriodicExportingMetricReader, Timeout)
 {
   std::unique_ptr<PushMetricExporter> exporter(
       new MockPushMetricExporter(std::chrono::milliseconds{2000}));
@@ -108,4 +112,68 @@ TEST(PeriodicExporingMetricReader, Timeout)
   reader->SetMetricProducer(&producer);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   reader->Shutdown();
+}
+
+TEST(GetEnvDurationTest, Absent)
+{
+  const char *env = "OTEL_TEST";
+  unsetenv(env);
+  EXPECT_EQ(GetEnvDuration(env, std::chrono::milliseconds(42)), std::chrono::milliseconds(42));
+}
+
+TEST(GetEnvDurationTest, NotSet)
+{
+  const char *env = "OTEL_TEST";
+  setenv(env, "", 1);
+  EXPECT_EQ(GetEnvDuration(env, std::chrono::milliseconds(42)), std::chrono::milliseconds(42));
+  unsetenv(env);
+}
+
+TEST(GetEnvDurationTest, Valid)
+{
+  const char *env = "OTEL_TEST";
+  setenv(env, "1243ms", 1);
+  EXPECT_EQ(GetEnvDuration(env, std::chrono::milliseconds(42)), std::chrono::milliseconds(1243));
+
+  setenv(env, "3s", 1);
+  EXPECT_EQ(GetEnvDuration(env, std::chrono::milliseconds(42)), std::chrono::milliseconds(3000));
+
+  unsetenv(env);
+}
+
+TEST(GetEnvDurationTest, Invalid)
+{
+  const char *env = "OTEL_TEST";
+  setenv(env, "not_a_duration", 1);
+  EXPECT_EQ(GetEnvDuration(env, std::chrono::milliseconds(42)), std::chrono::milliseconds(42));
+  unsetenv(env);
+}
+
+TEST(PeriodicExportingMetricReaderOptions, UsesEnvVars)
+{
+  const char *env_interval = "OTEL_METRIC_EXPORT_INTERVAL";
+  const char *env_timeout  = "OTEL_METRIC_EXPORT_TIMEOUT";
+
+  setenv(env_interval, "1500ms", 1);
+  setenv(env_timeout, "1000ms", 1);
+
+  PeriodicExportingMetricReaderOptions options;
+  EXPECT_EQ(options.export_interval_millis, std::chrono::milliseconds(1500));
+  EXPECT_EQ(options.export_timeout_millis, std::chrono::milliseconds(1000));
+
+  unsetenv(env_interval);
+  unsetenv(env_timeout);
+}
+
+TEST(PeriodicExportingMetricReaderOptions, UsesDefault)
+{
+  const char *env_interval = "OTEL_METRIC_EXPORT_INTERVAL";
+  const char *env_timeout  = "OTEL_METRIC_EXPORT_TIMEOUT";
+
+  unsetenv(env_interval);
+  unsetenv(env_timeout);
+
+  PeriodicExportingMetricReaderOptions options;
+  EXPECT_EQ(options.export_interval_millis, std::chrono::milliseconds(60000));
+  EXPECT_EQ(options.export_timeout_millis, std::chrono::milliseconds(30000));
 }
