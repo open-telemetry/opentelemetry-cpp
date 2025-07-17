@@ -88,7 +88,7 @@ jobs:
       run: ./ci/do_ci.sh cmake.install.test
 
   ubuntu_2404_latest:
-    name: Ubuntu 24.04 latest versions cxx20 (static libs)
+    name: Ubuntu 24.04 latest versions cxx20 (static libs - shared libs)
     runs-on: ubuntu-24.04
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
@@ -111,6 +111,10 @@ jobs:
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
+      run: ./ci/do_ci.sh cmake.install.test
+    - name: Run Tests (shared libs)
+      env:
+        BUILD_SHARED_LIBS: 'ON'
       run: ./ci/do_ci.sh cmake.install.test
 
   ubuntu_2204_stable:
