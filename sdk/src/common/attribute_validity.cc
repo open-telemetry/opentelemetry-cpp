@@ -34,6 +34,16 @@ OPENTELEMETRY_EXPORT bool AttributeIsValidString(nostd::string_view value) noexc
   return 0 != utf8_range::utf8_range_IsValid(value.data(), value.size());
 }
 
+OPENTELEMETRY_EXPORT bool AttributeValidator::IsValid(const std::string &value) noexcept
+{
+  return AttributeIsValidString(value);
+}
+
+OPENTELEMETRY_EXPORT bool AttributeValidator::IsValid(nostd::string_view value) noexcept
+{
+  return AttributeIsValidString(value);
+}
+
 OPENTELEMETRY_EXPORT bool AttributeValidator::IsValid(const OwnedAttributeValue &value) noexcept
 {
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
@@ -102,9 +112,18 @@ OPENTELEMETRY_EXPORT void AttributeValidator::Filter(AttributeMap &attributes,
   std::unordered_set<std::string> invalid_keys;
   for (auto &kv : attributes)
   {
+    if (!common::AttributeValidator::IsValid(kv.first))
+    {
+      OTEL_INTERNAL_LOG_WARN(log_hint << " Invalid attribute key " << kv.first
+                                      << ". This attribute will be ignored.");
+
+      invalid_keys.insert(kv.first);
+      continue;
+    }
+
     if (!common::AttributeValidator::IsValid(kv.second))
     {
-      OTEL_INTERNAL_LOG_WARN(log_hint << " Invalid attribute value for: " << kv.first
+      OTEL_INTERNAL_LOG_WARN(log_hint << " Invalid attribute value for " << kv.first
                                       << ". This attribute will be ignored.");
 
       invalid_keys.insert(kv.first);
@@ -123,9 +142,18 @@ OPENTELEMETRY_EXPORT void AttributeValidator::Filter(OrderedAttributeMap &attrib
   std::unordered_set<std::string> invalid_keys;
   for (auto &kv : attributes)
   {
+    if (!common::AttributeValidator::IsValid(kv.first))
+    {
+      OTEL_INTERNAL_LOG_WARN(log_hint << " Invalid attribute key " << kv.first
+                                      << ". This attribute will be ignored.");
+
+      invalid_keys.insert(kv.first);
+      continue;
+    }
+
     if (!common::AttributeValidator::IsValid(kv.second))
     {
-      OTEL_INTERNAL_LOG_WARN(log_hint << " Invalid attribute value for: " << kv.first
+      OTEL_INTERNAL_LOG_WARN(log_hint << " Invalid attribute value for " << kv.first
                                       << ". This attribute will be ignored.");
 
       invalid_keys.insert(kv.first);
@@ -155,7 +183,7 @@ bool KeyValueFilterIterable::ForEachKeyValue(
   bool ret =
       origin_->ForEachKeyValue([&size, &callback, this](opentelemetry::nostd::string_view k,
                                                         opentelemetry::common::AttributeValue v) {
-        if (AttributeValidator::IsValid(v))
+        if (AttributeValidator::IsValid(k) && AttributeValidator::IsValid(v))
         {
           ++size;
           return callback(k, v);
@@ -184,8 +212,8 @@ size_t KeyValueFilterIterable::size() const noexcept
 
   size_t size = 0;
   origin_->ForEachKeyValue(
-      [&size](opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue v) {
-        if (AttributeValidator::IsValid(v))
+      [&size](opentelemetry::nostd::string_view k, opentelemetry::common::AttributeValue v) {
+        if (AttributeValidator::IsValid(k) && AttributeValidator::IsValid(v))
         {
           ++size;
         }

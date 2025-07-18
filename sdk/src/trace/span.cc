@@ -78,14 +78,17 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
 
   recordable_->SetTraceFlags(span_context_->trace_flags());
 
-  attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
-    recordable_->SetAttribute(key, value);
-    return true;
-  });
+  opentelemetry::sdk::common::KeyValueFilterIterable attributes_filter(attributes, "[Trace Span] ");
+  attributes_filter.ForEachKeyValue(
+      [&](nostd::string_view key, common::AttributeValue value) noexcept {
+        recordable_->SetAttribute(key, value);
+        return true;
+      });
 
   links.ForEachKeyValue([&](const opentelemetry::trace::SpanContext &span_context,
                             const common::KeyValueIterable &attributes) {
-    recordable_->AddLink(span_context, attributes);
+    recordable_->AddLink(span_context, opentelemetry::sdk::common::KeyValueFilterIterable(
+                                           attributes, "[Trace Span Link] "));
     return true;
   });
 
@@ -109,9 +112,16 @@ void Span::SetAttribute(nostd::string_view key, const common::AttributeValue &va
     return;
   }
 
+  if (!sdk::common::AttributeValidator::IsValid(key))
+  {
+    OTEL_INTERNAL_LOG_WARN("[Trace Span] Invalid span attribute key "
+                           << key << ". This attribute will be ignored.");
+    return;
+  }
+
   if (!sdk::common::AttributeValidator::IsValid(value))
   {
-    OTEL_INTERNAL_LOG_WARN("[Trace Span] Invalid span attribute value for: "
+    OTEL_INTERNAL_LOG_WARN("[Trace Span] Invalid span attribute value for "
                            << key << ". This attribute will be ignored.");
     return;
   }
@@ -146,7 +156,8 @@ void Span::AddEvent(nostd::string_view name, const common::KeyValueIterable &att
   {
     return;
   }
-  recordable_->AddEvent(name, attributes);
+  recordable_->AddEvent(
+      name, opentelemetry::sdk::common::KeyValueFilterIterable(attributes, "[Trace Span Event] "));
 }
 
 void Span::AddEvent(nostd::string_view name,
@@ -158,7 +169,9 @@ void Span::AddEvent(nostd::string_view name,
   {
     return;
   }
-  recordable_->AddEvent(name, timestamp, attributes);
+  recordable_->AddEvent(
+      name, timestamp,
+      opentelemetry::sdk::common::KeyValueFilterIterable(attributes, "[Trace Span Event] "));
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -185,7 +198,8 @@ void Span::AddLinks(const opentelemetry::trace::SpanContextKeyValueIterable &lin
 
   links.ForEachKeyValue([&](const opentelemetry::trace::SpanContext &span_context,
                             const common::KeyValueIterable &attributes) {
-    recordable_->AddLink(span_context, attributes);
+    recordable_->AddLink(span_context, opentelemetry::sdk::common::KeyValueFilterIterable(
+                                           attributes, "[Trace Span Link] "));
     return true;
   });
 }
