@@ -213,9 +213,12 @@ jobs:
       run: |
         sudo -E ./tools/setup-cfssl.sh
         (cd ./functional/cert; ./generate_cert.sh)
-    - name: run func test
+    - name: run otlp func test
       run: |
         (cd ./functional/otlp; ./run_test.sh)
+    - name: run configuration func test
+      run: |
+        (cd ./functional/configuration; ./run_test.sh)
 
   cmake_clang_maintainer_async_test:
     name: CMake clang 18 (maintainer mode, async)

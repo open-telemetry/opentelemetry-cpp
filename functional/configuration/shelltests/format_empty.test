@@ -1,0 +1,1 @@
+otel_configuration_check --yaml shelltests/format_empty.yaml
