@@ -162,20 +162,20 @@ namespace sdk
 namespace configuration
 {
 
-class AttributeValueSetter
+class ResourceAttributeValueSetter
     : public opentelemetry::sdk::configuration::AttributeValueConfigurationVisitor
 {
 public:
-  AttributeValueSetter(const SdkBuilder *b,
-                       opentelemetry::sdk::resource::ResourceAttributes &resource_attributes,
-                       const std::string &name)
-      : m_sdk_builder(b), resource_attributes_(resource_attributes), name_(name)
+  ResourceAttributeValueSetter(
+      opentelemetry::sdk::resource::ResourceAttributes &resource_attributes,
+      const std::string &name)
+      : resource_attributes_(resource_attributes), name_(name)
   {}
-  AttributeValueSetter(AttributeValueSetter &&)                      = delete;
-  AttributeValueSetter(const AttributeValueSetter &)                 = delete;
-  AttributeValueSetter &operator=(AttributeValueSetter &&)           = delete;
-  AttributeValueSetter &operator=(const AttributeValueSetter &other) = delete;
-  ~AttributeValueSetter() override                                   = default;
+  ResourceAttributeValueSetter(ResourceAttributeValueSetter &&)                      = delete;
+  ResourceAttributeValueSetter(const ResourceAttributeValueSetter &)                 = delete;
+  ResourceAttributeValueSetter &operator=(ResourceAttributeValueSetter &&)           = delete;
+  ResourceAttributeValueSetter &operator=(const ResourceAttributeValueSetter &other) = delete;
+  ~ResourceAttributeValueSetter() override                                           = default;
 
   void VisitString(
       const opentelemetry::sdk::configuration::StringAttributeValueConfiguration *model) override
@@ -274,7 +274,7 @@ public:
     // We have: std::vector<bool>
     // We need: nostd::span<const bool>
 
-    for (int i = 0; i < length; i++)
+    for (size_t i = 0; i < length; i++)
     {
       bool_array[i] = model->value[i];
     }
@@ -288,7 +288,6 @@ public:
   opentelemetry::common::AttributeValue attribute_value;
 
 private:
-  const SdkBuilder *m_sdk_builder;
   opentelemetry::sdk::resource::ResourceAttributes &resource_attributes_;
   std::string name_;
 };
@@ -1650,7 +1649,7 @@ void SdkBuilder::SetResourceAttribute(
     const std::string &name,
     const opentelemetry::sdk::configuration::AttributeValueConfiguration *model) const
 {
-  AttributeValueSetter setter(this, resource_attributes, name);
+  ResourceAttributeValueSetter setter(resource_attributes, name);
   // Invokes resource_attributes.SetAttribute(name, <proper value from model>)
   model->Accept(&setter);
 }
