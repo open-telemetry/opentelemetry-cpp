@@ -39,7 +39,8 @@ static inline size_t GetSimpleFixedReservoirDefaultSize(const AggregationType ag
   {
     const auto *histogram_agg_config =
         static_cast<const Base2ExponentialHistogramAggregationConfig *>(agg_config);
-    return std::min(kMaxBase2ExponentialHistogramReservoirSize, histogram_agg_config->max_buckets_);
+    return (std::min)(kMaxBase2ExponentialHistogramReservoirSize,
+                      histogram_agg_config->max_buckets_);
   }
 
   return SimpleFixedSizeExemplarReservoir::kDefaultSimpleReservoirSize;
