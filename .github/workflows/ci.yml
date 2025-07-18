@@ -207,6 +207,8 @@ jobs:
     - name: run cmake clang (maintainer mode, sync)
       run: |
         ./ci/do_ci.sh cmake.maintainer.yaml.test
+    - name: install shelltest
+      run: sudo apt update && sudo apt-get install -y shelltestrunner
     - name: generate test cert
       env:
         CFSSL_VERSION: 1.6.3

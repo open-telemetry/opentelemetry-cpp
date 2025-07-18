@@ -17,13 +17,13 @@ export PATH=${PATH}:${TEST_BIN_DIR}
 
 which otel_configuration_check
 
-otel_configuration_check --help
+# otel_configuration_check --help
 
-which shelltest
+which shelltest || true
 
-shelltest --version
+shelltest --version || true
 
-shelltest --help
+shelltest --help || true
 
 shelltest ./shelltests
 
