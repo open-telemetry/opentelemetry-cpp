@@ -16,6 +16,7 @@ ForceFlush@LoggerProvider@logs@sdk@v1@opentelemetry
 OStreamLogRecordExporter@logs@exporter@v1@opentelemetry
 Create@OStreamMetricExporterFactory@metrics@exporter@v1@opentelemetry
 Create@PeriodicExportingMetricReaderFactory@metrics@sdk@v1@opentelemetry
+PeriodicExportingMetricReaderOptions@metrics@sdk@v1@opentelemetry
 Create@MeterProviderFactory@metrics@sdk@v1@opentelemetry
 Create@MeterContextFactory@metrics@sdk@v1@opentelemetry
 Create@ViewFactory@metrics@sdk@v1@opentelemetry
