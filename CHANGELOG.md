@@ -18,6 +18,9 @@ Increment the:
 * [TEST] Shared otel-cpp libs linked to latest static protobuf and grpc
   [#3544](https://github.com/open-telemetry/opentelemetry-cpp/pull/3544)
 
+* [SDK] Set SimpleFixedSizeExemplarReservoir default size for exponential
+  histograms based on maximum bucket count
+
 ## [1.22 2025-07-11]
 
 * [DOC] Udpate link to membership document
