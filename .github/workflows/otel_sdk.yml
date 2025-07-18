@@ -24,7 +24,7 @@ jobs:
       - run: cmd /c "dir c:\ || echo swallowing errors"
       - run: cmd /c "dir d:\ || echo swallowing errors"
       - run: |
-          winget remove --all --verbose --force --purge --accept-package-agreements --disable-interactivity Anaconda.Miniconda3 Mozilla.Firefox ShiningLight.OpenSSL.Dev PostgreSQL.PostgreSQL.17 RProject.R RProject.Rtools Unity.UnityHub Amazon.SAM-CLI Microsoft.AzureCLI Microsoft.webpicmd Google.Chrome StrawberryPerl.StrawberryPerl Microsoft.ServiceFabricSDK OpenJS.NodeJS.LTS Amazon.AWSCLI Microsoft.WebDeploy Microsoft.Azure.CosmosEmulator MongoDB.Shell MongoDB.Server WiXToolset.WiXToolset Amazon.SessionManagerPlugin sbt.sbt
+          winget remove --all --verbose --force --purge --disable-interactivity Anaconda.Miniconda3 Mozilla.Firefox ShiningLight.OpenSSL.Dev PostgreSQL.PostgreSQL.17 RProject.R RProject.Rtools Unity.UnityHub Amazon.SAM-CLI Microsoft.AzureCLI Microsoft.webpicmd Google.Chrome StrawberryPerl.StrawberryPerl Microsoft.ServiceFabricSDK OpenJS.NodeJS.LTS Amazon.AWSCLI Microsoft.WebDeploy Microsoft.Azure.CosmosEmulator MongoDB.Shell MongoDB.Server WiXToolset.WiXToolset Amazon.SessionManagerPlugin sbt.sbt
           echo Done! LASTEXITCODE=$LASTEXITCODE
       - run: cmd /c "dir c:\ || echo swallowing errors"
       - run: cmd /c "dir d:\ || echo swallowing errors"
