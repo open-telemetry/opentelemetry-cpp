@@ -21,13 +21,13 @@ jobs:
       - run: choco uninstall bazel --yes
       # - uses: Cyberboss/install-winget@6f566e9e227561d5d31e45d65f9b777b3fa8f56f
       - run: winget list --accept-source-agreements --disable-interactivity
-      - run: cmd /c dir c:\ || echo "swallowing errors"
-      - run: cmd /c dir d:\ || echo "swallowing errors"
+      - run: cmd /c "dir c:\ || echo swallowing errors"
+      - run: cmd /c "dir d:\ || echo swallowing errors"
       - run: |
           winget remove --all --verbose --force --purge --accept-package-agreements --disable-interactivity Anaconda.Miniconda3 Mozilla.Firefox ShiningLight.OpenSSL.Dev PostgreSQL.PostgreSQL.17 RProject.R RProject.Rtools Unity.UnityHub Amazon.SAM-CLI Microsoft.AzureCLI Microsoft.webpicmd Google.Chrome StrawberryPerl.StrawberryPerl Microsoft.ServiceFabricSDK OpenJS.NodeJS.LTS Amazon.AWSCLI Microsoft.WebDeploy Microsoft.Azure.CosmosEmulator MongoDB.Shell MongoDB.Server WiXToolset.WiXToolset Amazon.SessionManagerPlugin sbt.sbt
           echo Done! LASTEXITCODE=$LASTEXITCODE
-      - run: cmd /c dir c:\ || echo "swallowing errors"
-      - run: cmd /c dir d:\ || echo "swallowing errors"
+      - run: cmd /c "dir c:\ || echo swallowing errors"
+      - run: cmd /c "dir d:\ || echo swallowing errors"
       - run: winget install bazelisk -r bazel --accept-package-agreements --disable-interactivity --silent
       - name: Install LLVM with winget (ignore if already installed)
         shell: pwsh
@@ -66,7 +66,7 @@ jobs:
           $part | Add-PartitionAccessPath -AccessPath c:/d -Verbose
           ls c:/d.vhdx
           echo empty > c:\d\empty.txt
-          cmd /c dir c:\d || echo "swallowing errors"
+          cmd /c "dir c:\d || echo swallowing errors"
           refsutil dedup c:\d /s
       - name: build minimal otel_sdk
         # On the CI, the github runner does not have constant vs2022 msvc release, but has the same vs2019 (14.29.30133)
@@ -80,7 +80,7 @@ jobs:
           ./otel_sdk_build.cmd minimal
           ./otel_sdk_build.cmd shutdown
       - run: |
-          cmd /c dir c:\d || echo "swallowing errors"
+          cmd /c "dir c:\d || echo swallowing errors"
           Dismount-VHD -Path "c:/d.vhdx" -Verbose
           ls c:/d.vhdx
           Resize-VHD -Path "c:/d.vhdx" -ToMinimumSize -Verbose -ErrorAction SilentlyContinue
