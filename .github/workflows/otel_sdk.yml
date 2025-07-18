@@ -21,6 +21,13 @@ jobs:
       - run: choco uninstall bazel --yes
       # - uses: Cyberboss/install-winget@6f566e9e227561d5d31e45d65f9b777b3fa8f56f
       - run: winget list --accept-source-agreements --disable-interactivity
+      - run: cmd /c dir c:\ || echo "swallowing errors"
+      - run: cmd /c dir d:\ || echo "swallowing errors"
+      - run: |
+          winget remove --all --verbose --force --purge --accept-package-agreements --disable-interactivity Anaconda.Miniconda3 Mozilla.Firefox ShiningLight.OpenSSL.Dev PostgreSQL.PostgreSQL.17 RProject.R RProject.Rtools Unity.UnityHub Amazon.SAM-CLI Microsoft.AzureCLI Microsoft.webpicmd Google.Chrome StrawberryPerl.StrawberryPerl Microsoft.ServiceFabricSDK OpenJS.NodeJS.LTS Amazon.AWSCLI Microsoft.WebDeploy Microsoft.Azure.CosmosEmulator MongoDB.Shell MongoDB.Server WiXToolset.WiXToolset Amazon.SessionManagerPlugin sbt.sbt
+          echo Done! LASTEXITCODE=$LASTEXITCODE
+      - run: cmd /c dir c:\ || echo "swallowing errors"
+      - run: cmd /c dir d:\ || echo "swallowing errors"
       - run: winget install bazelisk -r bazel --accept-package-agreements --disable-interactivity --silent
       - name: Install LLVM with winget (ignore if already installed)
         shell: pwsh
