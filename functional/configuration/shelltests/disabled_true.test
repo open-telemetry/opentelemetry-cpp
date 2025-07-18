@@ -1,4 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-otel_configuration_check --yaml shelltests/disabled_true.yaml
+$ otel_configuration_check --yaml shelltests/disabled_true.yaml
+>
+MODEL PARSED
+SDK CREATED
+>= 0

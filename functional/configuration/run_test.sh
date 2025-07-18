@@ -15,15 +15,5 @@ export TEST_BIN_DIR="${BUILD_DIR}/functional/configuration/"
 
 export PATH=${PATH}:${TEST_BIN_DIR}
 
-which otel_configuration_check
-
-# otel_configuration_check --help
-
-which shelltest || true
-
-shelltest --version || true
-
-shelltest --help || true
-
 shelltest ./shelltests
 

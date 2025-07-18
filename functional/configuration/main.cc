@@ -211,7 +211,7 @@ void CleanupOtel()
 static void usage(FILE *out)
 {
   static const char *msg =
-      "Usage: example_yaml [options]\n"
+      "Usage: otel_configuration_check [options]\n"
       "Valid options are:\n"
       "  --help            Print this help\n"
       "  --yaml            Path to a yaml configuration file\n"

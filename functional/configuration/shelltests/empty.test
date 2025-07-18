@@ -1,4 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-otel_configuration_check --yaml shelltests/empty.yaml
+$ otel_configuration_check --yaml shelltests/empty.yaml
+>
+[ERROR] [Yaml Configuration Parser] Parse failed with exception: Yaml: not a map, looking for: file_format
+FAILED TO PARSE MODEL
+>= 1
