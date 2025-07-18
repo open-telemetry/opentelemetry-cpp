@@ -75,6 +75,10 @@ struct AttributeValidator
   bool operator()(const std::vector<uint64_t> & /*v*/) noexcept { return true; }
   bool operator()(const std::vector<uint8_t> & /*v*/) noexcept { return true; }
 
+  OPENTELEMETRY_EXPORT static bool IsValid(const std::string &value) noexcept;
+
+  OPENTELEMETRY_EXPORT static bool IsValid(nostd::string_view value) noexcept;
+
   OPENTELEMETRY_EXPORT static bool IsValid(const OwnedAttributeValue &value) noexcept;
 
   OPENTELEMETRY_EXPORT static bool IsValid(

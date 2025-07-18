@@ -29,9 +29,16 @@ Resource::Resource(const ResourceAttributes &attributes, const std::string &sche
   attributes_.reserve(attributes.size());
   for (auto &kv : attributes)
   {
+    if (!common::AttributeValidator::IsValid(kv.first))
+    {
+      OTEL_INTERNAL_LOG_WARN("[Resource] Invalid attribute key "
+                             << kv.first << ". This attribute will be ignored.");
+      continue;
+    }
+
     if (!common::AttributeValidator::IsValid(kv.second))
     {
-      OTEL_INTERNAL_LOG_WARN("[Resource] Invalid attribute value for: "
+      OTEL_INTERNAL_LOG_WARN("[Resource] Invalid attribute value for "
                              << kv.first << ". This attribute will be ignored.");
       continue;
     }
