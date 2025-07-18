@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <stddef.h>
 #include <stdint.h>
 #include <chrono>
 #include <map>
@@ -11,9 +12,11 @@
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/context/propagation/composite_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration_visitor.h"
@@ -159,20 +162,20 @@ namespace sdk
 namespace configuration
 {
 
-class AttributeValueSetter
+class ResourceAttributeValueSetter
     : public opentelemetry::sdk::configuration::AttributeValueConfigurationVisitor
 {
 public:
-  AttributeValueSetter(const SdkBuilder *b,
-                       opentelemetry::sdk::resource::ResourceAttributes &resource_attributes,
-                       const std::string &name)
-      : m_sdk_builder(b), resource_attributes_(resource_attributes), name_(name)
+  ResourceAttributeValueSetter(
+      opentelemetry::sdk::resource::ResourceAttributes &resource_attributes,
+      const std::string &name)
+      : resource_attributes_(resource_attributes), name_(name)
   {}
-  AttributeValueSetter(AttributeValueSetter &&)                      = delete;
-  AttributeValueSetter(const AttributeValueSetter &)                 = delete;
-  AttributeValueSetter &operator=(AttributeValueSetter &&)           = delete;
-  AttributeValueSetter &operator=(const AttributeValueSetter &other) = delete;
-  ~AttributeValueSetter() override                                   = default;
+  ResourceAttributeValueSetter(ResourceAttributeValueSetter &&)                      = delete;
+  ResourceAttributeValueSetter(const ResourceAttributeValueSetter &)                 = delete;
+  ResourceAttributeValueSetter &operator=(ResourceAttributeValueSetter &&)           = delete;
+  ResourceAttributeValueSetter &operator=(const ResourceAttributeValueSetter &other) = delete;
+  ~ResourceAttributeValueSetter() override                                           = default;
 
   void VisitString(
       const opentelemetry::sdk::configuration::StringAttributeValueConfiguration *model) override
@@ -209,7 +212,10 @@ public:
     size_t length = model->value.size();
     std::vector<nostd::string_view> string_view_array(length);
 
-    for (int i = 0; i < length; i++)
+    // We have: std::vector<std::string>
+    // We need: nostd::span<const nostd::string_view>
+
+    for (size_t i = 0; i < length; i++)
     {
       string_view_array[i] = model->value[i];
     }
@@ -227,7 +233,10 @@ public:
     size_t length = model->value.size();
     std::vector<int64_t> int_array(length);
 
-    for (int i = 0; i < length; i++)
+    // We have: std::vector<size_t>
+    // We need: nostd::span<const int64_t>
+
+    for (size_t i = 0; i < length; i++)
     {
       int_array[i] = model->value[i];
     }
@@ -242,15 +251,11 @@ public:
       const opentelemetry::sdk::configuration::DoubleArrayAttributeValueConfiguration *model)
       override
   {
-    size_t length = model->value.size();
-    std::vector<double> double_array(length);
+    // We have: std::vector<double>
+    // We need: nostd::span<const double>
+    // so no data conversion needed
 
-    for (int i = 0; i < length; i++)
-    {
-      double_array[i] = model->value[i];
-    }
-
-    nostd::span<const double> span(double_array.data(), double_array.size());
+    nostd::span<const double> span(model->value.data(), model->value.size());
 
     opentelemetry::common::AttributeValue attribute_value(span);
     resource_attributes_.SetAttribute(name_, attribute_value);
@@ -266,7 +271,10 @@ public:
     // it has no data() to convert it to a span
     std::unique_ptr<bool[]> bool_array(new bool[length]);
 
-    for (int i = 0; i < length; i++)
+    // We have: std::vector<bool>
+    // We need: nostd::span<const bool>
+
+    for (size_t i = 0; i < length; i++)
     {
       bool_array[i] = model->value[i];
     }
@@ -280,7 +288,6 @@ public:
   opentelemetry::common::AttributeValue attribute_value;
 
 private:
-  const SdkBuilder *m_sdk_builder;
   opentelemetry::sdk::resource::ResourceAttributes &resource_attributes_;
   std::string name_;
 };
@@ -1642,7 +1649,7 @@ void SdkBuilder::SetResourceAttribute(
     const std::string &name,
     const opentelemetry::sdk::configuration::AttributeValueConfiguration *model) const
 {
-  AttributeValueSetter setter(this, resource_attributes, name);
+  ResourceAttributeValueSetter setter(resource_attributes, name);
   // Invokes resource_attributes.SetAttribute(name, <proper value from model>)
   model->Accept(&setter);
 }
