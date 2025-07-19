@@ -295,7 +295,7 @@ private:
 class SamplerBuilder : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
 {
 public:
-  SamplerBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  SamplerBuilder(const SdkBuilder *b) : sdk_builder_(b) {}
   SamplerBuilder(SamplerBuilder &&)                      = delete;
   SamplerBuilder(const SamplerBuilder &)                 = delete;
   SamplerBuilder &operator=(SamplerBuilder &&)           = delete;
@@ -305,51 +305,51 @@ public:
   void VisitAlwaysOff(
       const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration *model) override
   {
-    sampler = m_sdk_builder->CreateAlwaysOffSampler(model);
+    sampler = sdk_builder_->CreateAlwaysOffSampler(model);
   }
 
   void VisitAlwaysOn(
       const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration *model) override
   {
-    sampler = m_sdk_builder->CreateAlwaysOnSampler(model);
+    sampler = sdk_builder_->CreateAlwaysOnSampler(model);
   }
 
   void VisitJaegerRemote(
       const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration *model) override
   {
-    sampler = m_sdk_builder->CreateJaegerRemoteSampler(model);
+    sampler = sdk_builder_->CreateJaegerRemoteSampler(model);
   }
 
   void VisitParentBased(
       const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *model) override
   {
-    sampler = m_sdk_builder->CreateParentBasedSampler(model);
+    sampler = sdk_builder_->CreateParentBasedSampler(model);
   }
 
   void VisitTraceIdRatioBased(
       const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *model)
       override
   {
-    sampler = m_sdk_builder->CreateTraceIdRatioBasedSampler(model);
+    sampler = sdk_builder_->CreateTraceIdRatioBasedSampler(model);
   }
 
   void VisitExtension(
       const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *model) override
   {
-    sampler = m_sdk_builder->CreateExtensionSampler(model);
+    sampler = sdk_builder_->CreateExtensionSampler(model);
   }
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sampler;
 
 private:
-  const SdkBuilder *m_sdk_builder;
+  const SdkBuilder *sdk_builder_;
 };
 
 class SpanProcessorBuilder
     : public opentelemetry::sdk::configuration::SpanProcessorConfigurationVisitor
 {
 public:
-  SpanProcessorBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  SpanProcessorBuilder(const SdkBuilder *b) : sdk_builder_(b) {}
   SpanProcessorBuilder(SpanProcessorBuilder &&)                      = delete;
   SpanProcessorBuilder(const SpanProcessorBuilder &)                 = delete;
   SpanProcessorBuilder &operator=(SpanProcessorBuilder &&)           = delete;
@@ -359,32 +359,32 @@ public:
   void VisitBatch(
       const opentelemetry::sdk::configuration::BatchSpanProcessorConfiguration *model) override
   {
-    processor = m_sdk_builder->CreateBatchSpanProcessor(model);
+    processor = sdk_builder_->CreateBatchSpanProcessor(model);
   }
 
   void VisitSimple(
       const opentelemetry::sdk::configuration::SimpleSpanProcessorConfiguration *model) override
   {
-    processor = m_sdk_builder->CreateSimpleSpanProcessor(model);
+    processor = sdk_builder_->CreateSimpleSpanProcessor(model);
   }
 
   void VisitExtension(
       const opentelemetry::sdk::configuration::ExtensionSpanProcessorConfiguration *model) override
   {
-    processor = m_sdk_builder->CreateExtensionSpanProcessor(model);
+    processor = sdk_builder_->CreateExtensionSpanProcessor(model);
   }
 
   std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> processor;
 
 private:
-  const SdkBuilder *m_sdk_builder;
+  const SdkBuilder *sdk_builder_;
 };
 
 class SpanExporterBuilder
     : public opentelemetry::sdk::configuration::SpanExporterConfigurationVisitor
 {
 public:
-  SpanExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  SpanExporterBuilder(const SdkBuilder *b) : sdk_builder_(b) {}
   SpanExporterBuilder(SpanExporterBuilder &&)                      = delete;
   SpanExporterBuilder(const SpanExporterBuilder &)                 = delete;
   SpanExporterBuilder &operator=(SpanExporterBuilder &&)           = delete;
@@ -394,50 +394,50 @@ public:
   void VisitOtlpHttp(
       const opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *model) override
   {
-    exporter = m_sdk_builder->CreateOtlpHttpSpanExporter(model);
+    exporter = sdk_builder_->CreateOtlpHttpSpanExporter(model);
   }
 
   void VisitOtlpGrpc(
       const opentelemetry::sdk::configuration::OtlpGrpcSpanExporterConfiguration *model) override
   {
-    exporter = m_sdk_builder->CreateOtlpGrpcSpanExporter(model);
+    exporter = sdk_builder_->CreateOtlpGrpcSpanExporter(model);
   }
 
   void VisitOtlpFile(
       const opentelemetry::sdk::configuration::OtlpFileSpanExporterConfiguration *model) override
   {
-    exporter = m_sdk_builder->CreateOtlpFileSpanExporter(model);
+    exporter = sdk_builder_->CreateOtlpFileSpanExporter(model);
   }
 
   void VisitConsole(
       const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) override
   {
-    exporter = m_sdk_builder->CreateConsoleSpanExporter(model);
+    exporter = sdk_builder_->CreateConsoleSpanExporter(model);
   }
 
   void VisitZipkin(
       const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) override
   {
-    exporter = m_sdk_builder->CreateZipkinSpanExporter(model);
+    exporter = sdk_builder_->CreateZipkinSpanExporter(model);
   }
 
   void VisitExtension(
       const opentelemetry::sdk::configuration::ExtensionSpanExporterConfiguration *model) override
   {
-    exporter = m_sdk_builder->CreateExtensionSpanExporter(model);
+    exporter = sdk_builder_->CreateExtensionSpanExporter(model);
   }
 
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter;
 
 private:
-  const SdkBuilder *m_sdk_builder;
+  const SdkBuilder *sdk_builder_;
 };
 
 class MetricReaderBuilder
     : public opentelemetry::sdk::configuration::MetricReaderConfigurationVisitor
 {
 public:
-  MetricReaderBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  MetricReaderBuilder(const SdkBuilder *b) : sdk_builder_(b) {}
   MetricReaderBuilder(MetricReaderBuilder &&)                      = delete;
   MetricReaderBuilder(const MetricReaderBuilder &)                 = delete;
   MetricReaderBuilder &operator=(MetricReaderBuilder &&)           = delete;
@@ -447,26 +447,26 @@ public:
   void VisitPeriodic(
       const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *model) override
   {
-    metric_reader = m_sdk_builder->CreatePeriodicMetricReader(model);
+    metric_reader = sdk_builder_->CreatePeriodicMetricReader(model);
   }
 
   void VisitPull(
       const opentelemetry::sdk::configuration::PullMetricReaderConfiguration *model) override
   {
-    metric_reader = m_sdk_builder->CreatePullMetricReader(model);
+    metric_reader = sdk_builder_->CreatePullMetricReader(model);
   }
 
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> metric_reader;
 
 private:
-  const SdkBuilder *m_sdk_builder;
+  const SdkBuilder *sdk_builder_;
 };
 
 class PushMetricExporterBuilder
     : public opentelemetry::sdk::configuration::PushMetricExporterConfigurationVisitor
 {
 public:
-  PushMetricExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  PushMetricExporterBuilder(const SdkBuilder *b) : sdk_builder_(b) {}
   PushMetricExporterBuilder(PushMetricExporterBuilder &&)                      = delete;
   PushMetricExporterBuilder(const PushMetricExporterBuilder &)                 = delete;
   PushMetricExporterBuilder &operator=(PushMetricExporterBuilder &&)           = delete;
@@ -477,47 +477,47 @@ public:
       const opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *model)
       override
   {
-    exporter = m_sdk_builder->CreateOtlpHttpPushMetricExporter(model);
+    exporter = sdk_builder_->CreateOtlpHttpPushMetricExporter(model);
   }
 
   void VisitOtlpGrpc(
       const opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *model)
       override
   {
-    exporter = m_sdk_builder->CreateOtlpGrpcPushMetricExporter(model);
+    exporter = sdk_builder_->CreateOtlpGrpcPushMetricExporter(model);
   }
 
   void VisitOtlpFile(
       const opentelemetry::sdk::configuration::OtlpFilePushMetricExporterConfiguration *model)
       override
   {
-    exporter = m_sdk_builder->CreateOtlpFilePushMetricExporter(model);
+    exporter = sdk_builder_->CreateOtlpFilePushMetricExporter(model);
   }
 
   void VisitConsole(const opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration
                         *model) override
   {
-    exporter = m_sdk_builder->CreateConsolePushMetricExporter(model);
+    exporter = sdk_builder_->CreateConsolePushMetricExporter(model);
   }
 
   void VisitExtension(
       const opentelemetry::sdk::configuration::ExtensionPushMetricExporterConfiguration *model)
       override
   {
-    exporter = m_sdk_builder->CreateExtensionPushMetricExporter(model);
+    exporter = sdk_builder_->CreateExtensionPushMetricExporter(model);
   }
 
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter;
 
 private:
-  const SdkBuilder *m_sdk_builder;
+  const SdkBuilder *sdk_builder_;
 };
 
 class PullMetricExporterBuilder
     : public opentelemetry::sdk::configuration::PullMetricExporterConfigurationVisitor
 {
 public:
-  PullMetricExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  PullMetricExporterBuilder(const SdkBuilder *b) : sdk_builder_(b) {}
   PullMetricExporterBuilder(PullMetricExporterBuilder &&)                      = delete;
   PullMetricExporterBuilder(const PullMetricExporterBuilder &)                 = delete;
   PullMetricExporterBuilder &operator=(PullMetricExporterBuilder &&)           = delete;
@@ -528,27 +528,27 @@ public:
       const opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *model)
       override
   {
-    exporter = m_sdk_builder->CreatePrometheusPullMetricExporter(model);
+    exporter = sdk_builder_->CreatePrometheusPullMetricExporter(model);
   }
 
   void VisitExtension(
       const opentelemetry::sdk::configuration::ExtensionPullMetricExporterConfiguration *model)
       override
   {
-    exporter = m_sdk_builder->CreateExtensionPullMetricExporter(model);
+    exporter = sdk_builder_->CreateExtensionPullMetricExporter(model);
   }
 
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> exporter;
 
 private:
-  const SdkBuilder *m_sdk_builder;
+  const SdkBuilder *sdk_builder_;
 };
 
 class AggregationConfigBuilder
     : public opentelemetry::sdk::configuration::AggregationConfigurationVisitor
 {
 public:
-  AggregationConfigBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  AggregationConfigBuilder(const SdkBuilder *b) : sdk_builder_(b) {}
   AggregationConfigBuilder(AggregationConfigBuilder &&)                      = delete;
   AggregationConfigBuilder(const AggregationConfigBuilder &)                 = delete;
   AggregationConfigBuilder &operator=(AggregationConfigBuilder &&)           = delete;
@@ -560,7 +560,7 @@ public:
           Base2ExponentialBucketHistogramAggregationConfiguration *model) override
   {
     aggregation_type   = opentelemetry::sdk::metrics::AggregationType::kBase2ExponentialHistogram;
-    aggregation_config = m_sdk_builder->CreateBase2ExponentialBucketHistogramAggregation(model);
+    aggregation_config = sdk_builder_->CreateBase2ExponentialBucketHistogramAggregation(model);
   }
 
   void VisitDefault(const opentelemetry::sdk::configuration::DefaultAggregationConfiguration
@@ -580,7 +580,7 @@ public:
           *model) override
   {
     aggregation_type   = opentelemetry::sdk::metrics::AggregationType::kHistogram;
-    aggregation_config = m_sdk_builder->CreateExplicitBucketHistogramAggregation(model);
+    aggregation_config = sdk_builder_->CreateExplicitBucketHistogramAggregation(model);
   }
 
   void VisitLastValue(const opentelemetry::sdk::configuration::LastValueAggregationConfiguration
@@ -599,14 +599,14 @@ public:
   std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> aggregation_config;
 
 private:
-  const SdkBuilder *m_sdk_builder;
+  const SdkBuilder *sdk_builder_;
 };
 
 class LogRecordProcessorBuilder
     : public opentelemetry::sdk::configuration::LogRecordProcessorConfigurationVisitor
 {
 public:
-  LogRecordProcessorBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  LogRecordProcessorBuilder(const SdkBuilder *b) : sdk_builder_(b) {}
   LogRecordProcessorBuilder(LogRecordProcessorBuilder &&)                      = delete;
   LogRecordProcessorBuilder(const LogRecordProcessorBuilder &)                 = delete;
   LogRecordProcessorBuilder &operator=(LogRecordProcessorBuilder &&)           = delete;
@@ -616,33 +616,33 @@ public:
   void VisitBatch(
       const opentelemetry::sdk::configuration::BatchLogRecordProcessorConfiguration *model) override
   {
-    processor = m_sdk_builder->CreateBatchLogRecordProcessor(model);
+    processor = sdk_builder_->CreateBatchLogRecordProcessor(model);
   }
 
   void VisitSimple(const opentelemetry::sdk::configuration::SimpleLogRecordProcessorConfiguration
                        *model) override
   {
-    processor = m_sdk_builder->CreateSimpleLogRecordProcessor(model);
+    processor = sdk_builder_->CreateSimpleLogRecordProcessor(model);
   }
 
   void VisitExtension(
       const opentelemetry::sdk::configuration::ExtensionLogRecordProcessorConfiguration *model)
       override
   {
-    processor = m_sdk_builder->CreateExtensionLogRecordProcessor(model);
+    processor = sdk_builder_->CreateExtensionLogRecordProcessor(model);
   }
 
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> processor;
 
 private:
-  const SdkBuilder *m_sdk_builder;
+  const SdkBuilder *sdk_builder_;
 };
 
 class LogRecordExporterBuilder
     : public opentelemetry::sdk::configuration::LogRecordExporterConfigurationVisitor
 {
 public:
-  LogRecordExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  LogRecordExporterBuilder(const SdkBuilder *b) : sdk_builder_(b) {}
   LogRecordExporterBuilder(LogRecordExporterBuilder &&)                      = delete;
   LogRecordExporterBuilder(const LogRecordExporterBuilder &)                 = delete;
   LogRecordExporterBuilder &operator=(LogRecordExporterBuilder &&)           = delete;
@@ -652,38 +652,38 @@ public:
   void VisitOtlpHttp(const opentelemetry::sdk::configuration::OtlpHttpLogRecordExporterConfiguration
                          *model) override
   {
-    exporter = m_sdk_builder->CreateOtlpHttpLogRecordExporter(model);
+    exporter = sdk_builder_->CreateOtlpHttpLogRecordExporter(model);
   }
 
   void VisitOtlpGrpc(const opentelemetry::sdk::configuration::OtlpGrpcLogRecordExporterConfiguration
                          *model) override
   {
-    exporter = m_sdk_builder->CreateOtlpGrpcLogRecordExporter(model);
+    exporter = sdk_builder_->CreateOtlpGrpcLogRecordExporter(model);
   }
 
   void VisitOtlpFile(const opentelemetry::sdk::configuration::OtlpFileLogRecordExporterConfiguration
                          *model) override
   {
-    exporter = m_sdk_builder->CreateOtlpFileLogRecordExporter(model);
+    exporter = sdk_builder_->CreateOtlpFileLogRecordExporter(model);
   }
 
   void VisitConsole(const opentelemetry::sdk::configuration::ConsoleLogRecordExporterConfiguration
                         *model) override
   {
-    exporter = m_sdk_builder->CreateConsoleLogRecordExporter(model);
+    exporter = sdk_builder_->CreateConsoleLogRecordExporter(model);
   }
 
   void VisitExtension(
       const opentelemetry::sdk::configuration::ExtensionLogRecordExporterConfiguration *model)
       override
   {
-    exporter = m_sdk_builder->CreateExtensionLogRecordExporter(model);
+    exporter = sdk_builder_->CreateExtensionLogRecordExporter(model);
   }
 
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> exporter;
 
 private:
-  const SdkBuilder *m_sdk_builder;
+  const SdkBuilder *sdk_builder_;
 };
 
 std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateAlwaysOffSampler(
@@ -1064,6 +1064,8 @@ SdkBuilder::CreatePropagator(
     propagator = CreateTextMapPropagator(name);
     propagators.push_back(std::move(propagator));
   }
+
+  // FIXME: composite_list
 
   auto sdk = std::make_unique<opentelemetry::context::propagation::CompositePropagator>(
       std::move(propagators));

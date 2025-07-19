@@ -20,6 +20,7 @@ class PropagatorConfiguration
 {
 public:
   std::vector<std::string> composite;
+  std::string composite_list;
 };
 
 }  // namespace configuration
