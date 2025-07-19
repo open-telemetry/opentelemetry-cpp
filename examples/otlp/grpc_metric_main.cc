@@ -83,8 +83,7 @@ void InitMetrics(std::string &name)
       std::move(histogram_aggregation_config));
 
   auto histogram_view = metric_sdk::ViewFactory::Create(
-      name, "des", unit, metric_sdk::AggregationType::kBase2ExponentialHistogram,
-      aggregation_config);
+      name, "des", metric_sdk::AggregationType::kBase2ExponentialHistogram, aggregation_config);
 
   provider->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
                     std::move(histogram_view));

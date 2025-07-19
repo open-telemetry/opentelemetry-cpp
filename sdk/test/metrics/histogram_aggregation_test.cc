@@ -87,8 +87,7 @@ TEST(CounterToHistogram, Double)
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
 
-  std::unique_ptr<View> view{
-      new View("view1", "view1_description", "unit", AggregationType::kHistogram)};
+  std::unique_ptr<View> view{new View("view1", "view1_description", AggregationType::kHistogram)};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kCounter, "counter1", "unit")};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};

@@ -71,8 +71,8 @@ void InitMetrics(const std::string &name)
 
   auto meter_selector = metrics_sdk::MeterSelectorFactory::Create(name, version, schema);
 
-  auto sum_view = metrics_sdk::ViewFactory::Create(name, "description", unit,
-                                                   metrics_sdk::AggregationType::kSum);
+  auto sum_view =
+      metrics_sdk::ViewFactory::Create(name, "description", metrics_sdk::AggregationType::kSum);
 
   provider->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(sum_view));
 
@@ -84,7 +84,7 @@ void InitMetrics(const std::string &name)
 
   auto observable_meter_selector = metrics_sdk::MeterSelectorFactory::Create(name, version, schema);
 
-  auto observable_sum_view = metrics_sdk::ViewFactory::Create(name, "test_description", unit,
+  auto observable_sum_view = metrics_sdk::ViewFactory::Create(name, "test_description",
                                                               metrics_sdk::AggregationType::kSum);
 
   provider->AddView(std::move(observable_instrument_selector), std::move(observable_meter_selector),
@@ -109,7 +109,7 @@ void InitMetrics(const std::string &name)
       std::move(histogram_aggregation_config));
 
   auto histogram_view = metrics_sdk::ViewFactory::Create(
-      name, "description", unit, metrics_sdk::AggregationType::kHistogram, aggregation_config);
+      name, "description", metrics_sdk::AggregationType::kHistogram, aggregation_config);
 
   provider->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
                     std::move(histogram_view));
@@ -132,7 +132,7 @@ void InitMetrics(const std::string &name)
       std::move(histogram_base2_aggregation_config));
 
   auto histogram_base2_view = metrics_sdk::ViewFactory::Create(
-      name, "description", unit, metrics_sdk::AggregationType::kBase2ExponentialHistogram,
+      name, "description", metrics_sdk::AggregationType::kBase2ExponentialHistogram,
       base2_aggregation_config);
 
   provider->AddView(std::move(histogram_base2_instrument_selector),
