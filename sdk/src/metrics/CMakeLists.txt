@@ -15,6 +15,7 @@ add_library(
   instrument_metadata_validator.cc
   export/periodic_exporting_metric_reader.cc
   export/periodic_exporting_metric_reader_factory.cc
+  export/periodic_exporting_metric_reader_options.cc
   state/filtered_ordered_attribute_map.cc
   state/metric_collector.cc
   state/observable_registry.cc
