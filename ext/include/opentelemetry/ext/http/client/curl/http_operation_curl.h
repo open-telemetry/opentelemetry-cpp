@@ -338,6 +338,7 @@ private:
     std::promise<CURLcode> result_promise;
     std::future<CURLcode> result_future;
   };
+  friend class HttpOperationAccessor;
   std::unique_ptr<AsyncData> async_data_;
 };
 }  // namespace curl
