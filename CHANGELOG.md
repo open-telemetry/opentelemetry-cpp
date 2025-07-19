@@ -21,6 +21,9 @@ Increment the:
 * [SDK] Implement env var configuration for PeriodicExportingMetricReader
   [#3549](https://github.com/open-telemetry/opentelemetry-cpp/pull/3549)
 
+* [SDK] Update default exemplar reservoir size for exponential histograms
+  [#3551](https://github.com/open-telemetry/opentelemetry-cpp/pull/3551)
+
 ## [1.22 2025-07-11]
 
 * [DOC] Udpate link to membership document
