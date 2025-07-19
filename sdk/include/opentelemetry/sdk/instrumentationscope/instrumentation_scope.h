@@ -102,9 +102,16 @@ public:
     result->attributes_.reserve(opentelemetry::nostd::size(arg));
     for (auto &argv : arg)
     {
+      if (!common::AttributeValidator::IsValid(argv.first))
+      {
+        OTEL_INTERNAL_LOG_WARN("[InstrumentationScope] Invalid attribute key "
+                               << std::string{argv.first} << ". This attribute will be ignored.");
+        continue;
+      }
+
       if (!common::AttributeValidator::IsValid(argv.second))
       {
-        OTEL_INTERNAL_LOG_WARN("[InstrumentationScope] Invalid attribute value for: "
+        OTEL_INTERNAL_LOG_WARN("[InstrumentationScope] Invalid attribute value for "
                                << std::string{argv.first} << ". This attribute will be ignored.");
         continue;
       }
@@ -168,9 +175,16 @@ public:
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept
   {
+    if (!common::AttributeValidator::IsValid(key))
+    {
+      OTEL_INTERNAL_LOG_WARN("[InstrumentationScope] Invalid attribute key "
+                             << std::string{key} << ". This attribute will be ignored.");
+      return;
+    }
+
     if (!common::AttributeValidator::IsValid(value))
     {
-      OTEL_INTERNAL_LOG_WARN("[InstrumentationScope] Invalid attribute value for: "
+      OTEL_INTERNAL_LOG_WARN("[InstrumentationScope] Invalid attribute value for "
                              << std::string{key} << ". This attribute will be ignored.");
       return;
     }

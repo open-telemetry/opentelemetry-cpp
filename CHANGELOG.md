@@ -27,6 +27,9 @@ Increment the:
 * [SDK] Implements options for the ParentBasedSampler with default values
   [#3553](https://github.com/open-telemetry/opentelemetry-cpp/pull/3553)
 
+* [SDK] Add bundle version of utf8_range to validate attributes
+  [#3512](https://github.com/open-telemetry/opentelemetry-cpp/pull/3512)
+
 ## [1.22 2025-07-11]
 
 * [DOC] Udpate link to membership document
