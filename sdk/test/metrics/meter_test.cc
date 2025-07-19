@@ -668,7 +668,7 @@ TEST_F(MeterCreateInstrumentTest, SyncInstrumentWithInvalidAttributes)
       1,
       {{"key", "value1"}, {"invalid-key\xff", "valid-value"}, {"valid-key", "invalid-value\xff"}});
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
     // only one metric_data object expected after correction with the view
     EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
@@ -691,7 +691,7 @@ TEST_F(MeterCreateInstrumentTest, AsyncInstrumentWithInvalidAttributes)
 
   observable_counter1->AddCallback(callback1, nullptr);
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
     EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
     auto &point_data_attr = metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_;
