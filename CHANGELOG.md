@@ -21,6 +21,9 @@ Increment the:
 * [SDK] Implement env var configuration for PeriodicExportingMetricReader
   [#3549](https://github.com/open-telemetry/opentelemetry-cpp/pull/3549)
 
+* [SDK] Add bundle version of utf8_range to validate attributes
+  [#3512](https://github.com/open-telemetry/opentelemetry-cpp/pull/3512)
+
 ## [1.22 2025-07-11]
 
 * [DOC] Udpate link to membership document
