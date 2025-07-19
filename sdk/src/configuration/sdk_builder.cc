@@ -711,7 +711,7 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateJaegerRemo
 {
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sdk;
 
-  static const std::string die("JeagerRemoteSampler not supported");
+  static const std::string die("JaegerRemoteSampler not supported");
   throw UnsupportedException(die);
 
   return sdk;

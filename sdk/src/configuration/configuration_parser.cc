@@ -691,7 +691,7 @@ static std::unique_ptr<PullMetricExporterConfiguration> ParsePullMetricExporterC
     throw InvalidSchemaException(message);
   }
 
-  if (name == "prometheus")
+  if (name == "prometheus/development")
   {
     model = ParsePrometheusPullMetricExporterConfiguration(child);
   }

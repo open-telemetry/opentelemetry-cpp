@@ -1,0 +1,16 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+$ otel_configuration_check --yaml shelltests/kitchen-sink.yaml
+>
+MODEL PARSED
+[WARNING] attribute_limits not supported, ignoring
+[ERROR] CreateTracerProvider: FIXME-CONFIG (IdGenerator)
+[ERROR] CreateParentBasedSampler: FIXME-SDK, missing param in parent factory
+[ERROR] CreateAttributesProcessor() FIXME-SDK IncludeExclude
+[WARNING] [Periodic Exporting Metric Reader] Invalid configuration: export_timeout_millis_ should be less than export_interval_millis_, using default values
+[WARNING] [Periodic Exporting Metric Reader] Invalid configuration: export_timeout_millis_ should be less than export_interval_millis_, using default values
+[WARNING] [Periodic Exporting Metric Reader] Invalid configuration: export_timeout_millis_ should be less than export_interval_millis_, using default values
+[WARNING] [Periodic Exporting Metric Reader] Invalid configuration: export_timeout_millis_ should be less than export_interval_millis_, using default values
+SDK CREATED
+>= 0
