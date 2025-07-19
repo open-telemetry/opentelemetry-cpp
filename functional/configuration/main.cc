@@ -1,6 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+// NOTE: This file is adapted from example/yaml/main.cc,
+// to execute functional tests driven by shelltest.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -198,7 +201,7 @@ void InitOtel(const std::string &config_file)
 
   if (sdk != nullptr)
   {
-    sdk->Install();
+    sdk->Init();
   }
 }
 
@@ -206,7 +209,7 @@ void CleanupOtel()
 {
   if (sdk != nullptr)
   {
-    sdk->UnInstall();
+    sdk->Cleanup();
   }
   sdk.reset(nullptr);
 }

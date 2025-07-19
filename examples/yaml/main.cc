@@ -132,7 +132,7 @@ void InitOtel(const std::string &config_file)
 
   if (sdk != nullptr)
   {
-    sdk->Install();
+    sdk->Init();
   }
 }
 
@@ -140,7 +140,7 @@ void CleanupOtel()
 {
   if (sdk != nullptr)
   {
-    sdk->UnInstall();
+    sdk->Cleanup();
   }
   sdk.reset(nullptr);
 }
