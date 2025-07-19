@@ -24,6 +24,17 @@ Increment the:
 * [SDK] Update default exemplar reservoir size for exponential histograms
   [#3551](https://github.com/open-telemetry/opentelemetry-cpp/pull/3551)
 
+* [SDK] View should not have a unit
+  [#3552](https://github.com/open-telemetry/opentelemetry-cpp/pull/3552)
+
+Breaking changes:
+
+* [SDK] View should not have a unit
+  [#3552](https://github.com/open-telemetry/opentelemetry-cpp/pull/3552)
+  * The `unit` parameter has been removed from the `View` constructor
+    and `ViewFactory::Create` methods.
+  * Please adjust SDK configuration code accordingly.
+
 ## [1.22 2025-07-11]
 
 * [DOC] Udpate link to membership document
