@@ -61,13 +61,20 @@ if(NOT TARGET protobuf::libprotobuf)
   message(FATAL_ERROR "A required protobuf target (protobuf::libprotobuf) was not imported")
 endif()
 
+if(PROTOBUF_PROTOC_EXECUTABLE AND NOT Protobuf_PROTOC_EXECUTABLE)
+  message(WARNING "Use of PROTOBUF_PROTOC_EXECUTABLE is deprecated. Please use Protobuf_PROTOC_EXECUTABLE instead.")
+  set(Protobuf_PROTOC_EXECUTABLE "${PROTOBUF_PROTOC_EXECUTABLE}")
+endif()
+
 if(CMAKE_CROSSCOMPILING)
-  find_program(PROTOBUF_PROTOC_EXECUTABLE protoc)
+  find_program(Protobuf_PROTOC_EXECUTABLE protoc)
 else()
   if(NOT TARGET protobuf::protoc)
     message(FATAL_ERROR "A required protobuf target (protobuf::protoc) was not imported")
   endif()
-  set(PROTOBUF_PROTOC_EXECUTABLE "$<TARGET_FILE:protobuf::protoc>")
+  set(Protobuf_PROTOC_EXECUTABLE "$<TARGET_FILE:protobuf::protoc>")
 endif()
+
+set(PROTOBUF_PROTOC_EXECUTABLE "${Protobuf_PROTOC_EXECUTABLE}")
 
 message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
