@@ -80,6 +80,8 @@ jobs:
           ./otel_sdk_build.cmd minimal
           ./otel_sdk_build.cmd shutdown
       - run: |
+          cmd /c "dir c:\ || echo swallowing errors"
+          cmd /c "dir d:\ || echo swallowing errors"
           cmd /c "dir c:\d || echo swallowing errors"
           Dismount-VHD -Path "c:/d.vhdx" -Verbose
           ls c:/d.vhdx
@@ -101,8 +103,12 @@ jobs:
           path: ./*.tracing.json
           if-no-files-found: warn
       - run: ./otel_sdk_build.cmd test
+      - run: cmd /c "dir c:\ || echo swallowing errors"
+      - run: cmd /c "dir d:\ || echo swallowing errors"
       - run: ./otel_sdk_build.cmd zip
       - run: ./otel_sdk_build.cmd shutdown
+      - run: cmd /c "dir c:\ || echo swallowing errors"
+      - run: cmd /c "dir d:\ || echo swallowing errors"
       - run: ls c:/d.vhdx
       - uses: actions/upload-artifact@v4
         if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
