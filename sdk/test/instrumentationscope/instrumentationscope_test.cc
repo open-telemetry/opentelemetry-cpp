@@ -66,7 +66,6 @@ TEST(InstrumentationScope, CreateInstrumentationScopeWithInvalidAttributes)
   std::string library_name    = "opentelemetry-cpp";
   std::string library_version = "0.1.0";
   std::string schema_url      = "https://opentelemetry.io/schemas/1.2.0";
-  uint32_t attrubite_value3[] = {7, 8, 9};
   auto instrumentation_scope =
       InstrumentationScope::Create(library_name, library_version, schema_url,
                                    {{"attribute-key1", "attribute-value"},
