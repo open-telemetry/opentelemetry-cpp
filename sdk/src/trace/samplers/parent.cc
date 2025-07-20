@@ -21,9 +21,18 @@ namespace sdk
 {
 namespace trace
 {
-ParentBasedSampler::ParentBasedSampler(const std::shared_ptr<Sampler> &delegate_sampler) noexcept
-    : delegate_sampler_(delegate_sampler),
-      description_("ParentBased{" + std::string{delegate_sampler->GetDescription()} + "}")
+ParentBasedSampler::ParentBasedSampler(
+    const std::shared_ptr<Sampler> &root_sampler,
+    const std::shared_ptr<Sampler> &remote_parent_sampled_sampler,
+    const std::shared_ptr<Sampler> &remote_parent_nonsampled_sampler,
+    const std::shared_ptr<Sampler> &local_parent_sampled_sampler,
+    const std::shared_ptr<Sampler> &local_parent_nonsampled_sampler) noexcept
+    : root_sampler_(root_sampler),
+      remote_parent_sampled_sampler_(remote_parent_sampled_sampler),
+      remote_parent_nonsampled_sampler_(remote_parent_nonsampled_sampler),
+      local_parent_sampled_sampler_(local_parent_sampled_sampler),
+      local_parent_nonsampled_sampler_(local_parent_nonsampled_sampler),
+      description_("ParentBased{" + std::string{root_sampler->GetDescription()} + "}")
 {}
 
 SamplingResult ParentBasedSampler::ShouldSample(
@@ -36,24 +45,38 @@ SamplingResult ParentBasedSampler::ShouldSample(
 {
   if (!parent_context.IsValid())
   {
-    // If no parent (root span) exists returns the result of the delegateSampler
-    return delegate_sampler_->ShouldSample(parent_context, trace_id, name, span_kind, attributes,
-                                           links);
+    // If no parent (root span) exists returns the result of the root_sampler
+    return root_sampler_->ShouldSample(parent_context, trace_id, name, span_kind, attributes,
+                                       links);
   }
 
   // If parent exists:
   if (parent_context.IsSampled())
   {
-    return {Decision::RECORD_AND_SAMPLE, nullptr, parent_context.trace_state()};
+    if (parent_context.IsRemote())
+    {
+      return remote_parent_sampled_sampler_->ShouldSample(parent_context, trace_id, name, span_kind,
+                                                          attributes, links);
+    }
+    return local_parent_sampled_sampler_->ShouldSample(parent_context, trace_id, name, span_kind,
+                                                       attributes, links);
   }
 
-  return {Decision::DROP, nullptr, parent_context.trace_state()};
+  // Parent is not sampled
+  if (parent_context.IsRemote())
+  {
+    return remote_parent_nonsampled_sampler_->ShouldSample(parent_context, trace_id, name,
+                                                           span_kind, attributes, links);
+  }
+  return local_parent_nonsampled_sampler_->ShouldSample(parent_context, trace_id, name, span_kind,
+                                                        attributes, links);
 }
 
 nostd::string_view ParentBasedSampler::GetDescription() const noexcept
 {
   return description_;
 }
+
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
