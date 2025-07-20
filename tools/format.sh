@@ -10,7 +10,21 @@ fi
 
 set -e
 
-FIND="find . -name third_party -prune -o -name tools -prune -o -name .git -prune -o -name _deps -prune -o -name .build -prune -o -name out -prune -o -name .vs -prune -o -name opentelemetry_logo.png -prune -o -name TraceLoggingDynamic.h -prune -o"
+FIND="find . -name third_party -prune -o"
+FIND="${FIND} -name tools -prune -o"
+FIND="${FIND} -name .git -prune -o"
+FIND="${FIND} -name _deps -prune -o"
+FIND="${FIND} -name .build -prune -o"
+FIND="${FIND} -name out -prune -o"
+FIND="${FIND} -name .vs -prune -o"
+FIND="${FIND} -name opentelemetry_logo.png -prune -o"
+FIND="${FIND} -name TraceLoggingDynamic.h -prune -o"
+# Do not format yaml files
+FIND="${FIND} -name \"*.yaml\" -prune -o"
+# Do not format shelltest files
+FIND="${FIND} -name \"*.test\"-prune -o"
+# Do not format patch files
+FIND="${FIND} -name \"*.patch\"-prune -o"
 
 # GNU syntax.
 SED=(sed -i)
@@ -23,8 +37,8 @@ fi
 # No CRLF line endings, except Windows files.
 "${SED[@]}" 's/\r$//' $($FIND -name '*.ps1' -prune -o \
   -name '*.cmd' -prune -o -type f -print)
-# No trailing spaces, except in patch.
-"${SED[@]}" 's/ \+$//' $($FIND -name "*.patch" -prune -o -type f -print)
+# No trailing spaces.
+"${SED[@]}" 's/ \+$//' $($FIND -type f -print)
 
 # If not overridden, try to use clang-format-18 or clang-format.
 if [[ -z "$CLANG_FORMAT" ]]; then
