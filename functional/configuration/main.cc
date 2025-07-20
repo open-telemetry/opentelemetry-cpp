@@ -289,6 +289,10 @@ int main(int argc, char *argv[])
 
   InitOtel(yaml_file_path);
 
+  // Do not record noise during payload
+  auto level = opentelemetry::sdk::common::internal_log::LogLevel::None;
+  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogLevel(level);
+
   foo_library();
   foo_library::counter_example("yaml");
   foo_library::observable_counter_example("yaml");

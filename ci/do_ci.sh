@@ -223,6 +223,7 @@ elif [[ "$1" == "cmake.maintainer.yaml.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
