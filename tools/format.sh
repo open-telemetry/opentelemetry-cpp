@@ -22,9 +22,9 @@ FIND="${FIND} -name TraceLoggingDynamic.h -prune -o"
 # Do not format yaml files
 FIND="${FIND} -name \"*.yaml\" -prune -o"
 # Do not format shelltest files
-FIND="${FIND} -name \"*.test\"-prune -o"
+FIND="${FIND} -name \"*.test\" -prune -o"
 # Do not format patch files
-FIND="${FIND} -name \"*.patch\"-prune -o"
+FIND="${FIND} -name \"*.patch\" -prune -o"
 
 # GNU syntax.
 SED=(sed -i)
