@@ -126,8 +126,8 @@ otel_cc_library(
         "test",
     ],
     deps = [
-        ":in_memory_span_data",
         ":in_memory_data",
+        ":in_memory_span_data",
         "//sdk/src/trace",
     ],
 )

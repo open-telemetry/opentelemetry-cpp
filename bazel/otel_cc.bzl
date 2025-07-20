@@ -18,6 +18,7 @@ def if_asanwin(a):
 def otel_cc_library(**kwargs):
     # Link as .o (.obj) files, not .a (.lib)
     kwargs["alwayslink"] = kwargs.get("alwayslink", True)
+
     # Don't create .so files for dbg/fastbuild, always create static libs
     kwargs["linkstatic"] = kwargs.get("linkstatic", True)
     rules_cc_library(**kwargs)

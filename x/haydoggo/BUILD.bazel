@@ -1,5 +1,5 @@
 cc_test(
-   name = "hang",
-   srcs = ["hang.cc"],
-   deps = ["@otel_sdk//:dll"],
+    name = "hang",
+    srcs = ["hang.cc"],
+    deps = ["@otel_sdk//:dll"],
 )

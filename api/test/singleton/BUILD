@@ -183,6 +183,10 @@ otel_cc_test(
         "api",
         "test",
     ],
+    target_compatible_with = select({
+        "//:with_dll_enabled": None,
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = dll_deps([
         "component_a",
         "component_b",
@@ -194,8 +198,4 @@ otel_cc_test(
         "@googletest//:gtest_main",
         "//:windows_only",
     ]),
-    target_compatible_with = select({
-        "//:with_dll_enabled": None,
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
 )

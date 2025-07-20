@@ -12,9 +12,6 @@ otel_cc_library(
         "http_client_factory_curl.cc",
         "http_operation_curl.cc",
     ],
-    local_defines = [
-        "ENABLE_CURL_LOGGING",
-    ],
     include_prefix = "src/http/client/curl",
     linkopts = select({
         "//bazel:windows": [
@@ -25,6 +22,9 @@ otel_cc_library(
         ],
         "//conditions:default": [],
     }),
+    local_defines = [
+        "ENABLE_CURL_LOGGING",
+    ],
     deps = [
         "//api",
         "//ext:headers",

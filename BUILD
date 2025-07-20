@@ -3,6 +3,7 @@
 #load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+
 #load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
@@ -10,7 +11,6 @@ load("@otel_sdk//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_c
 load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files", pkg_strip_prefix = "strip_prefix")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("dll_deps.bzl", "force_compilation_mode")
-
 
 package(default_visibility = ["//visibility:public"])
 
@@ -108,7 +108,7 @@ otel_cc_library(
     scope = ["@otel_sdk//:otel_sdk_deps"],
     strict = True,
 ) for (os, exceptions) in [
-    ("non_windows", ""), #"@otel_sdk//exporters/etw:etw_exporter"),
+    ("non_windows", ""),  #"@otel_sdk//exporters/etw:etw_exporter"),
     ("windows", ""),
 ]]
 

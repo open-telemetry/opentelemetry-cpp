@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
-load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 load("//:dll_deps.bzl", "dll_deps")
 load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_library", "otel_cc_test")
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -56,9 +56,9 @@ otel_cc_library(
     ],
     deps = [
         ":otlp_grpc_client",
-        ":otlp_grpc_metric_exporter",
-        ":otlp_grpc_log_record_exporter",
         ":otlp_grpc_exporter",
+        ":otlp_grpc_log_record_exporter",
+        ":otlp_grpc_metric_exporter",
         "//ext:headers",
         "//sdk/src/common:global_log_handler",
         "@grpc//:grpc++",

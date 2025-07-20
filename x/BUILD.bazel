@@ -12,26 +12,39 @@ package(default_visibility = ["//visibility:public"])
 #    tags = ["manual", "external", "no-cache"],
 #
 #    # Minimal set of env vars for Visual Studio
-#    env_inherit = [ 
+#    env_inherit = [
 #        "windir", # Mandatory
 #        #"USERPROFILE", # In order to avoid creating %USERPROFILE%
 #    ],
 #)
 
-[cc_test(
-    name = "t" + index,
-    srcs = ["t.cpp"],
-    deps = ["@otel_sdk//:dll"],
-    args = [index],
-#    local = True,
-#    tags = ["manual", "external", "no-cache"],
-    # Minimal set of env vars for Visual Studio
-    env_inherit = [ 
-        "windir", # Mandatory
-        #"USERPROFILE", # In order to avoid creating %USERPROFILE%
-    ],
-)
-for (index) in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]]
+[
+    cc_test(
+        name = "t" + index,
+        srcs = ["t.cpp"],
+        args = [index],
+        #    local = True,
+        #    tags = ["manual", "external", "no-cache"],
+        # Minimal set of env vars for Visual Studio
+        env_inherit = [
+            "windir",  # Mandatory
+            #"USERPROFILE", # In order to avoid creating %USERPROFILE%
+        ],
+        deps = ["@otel_sdk//:dll"],
+    )
+    for index in [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+    ]
+]
 
 #cc_test(
 #    name = "m",
@@ -41,7 +54,7 @@ for (index) in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]]
 #    tags = ["manual", "external", "no-cache"],
 #
 #    # Minimal set of env vars for Visual Studio
-#    env_inherit = [ 
+#    env_inherit = [
 #        "windir", # Mandatory
 #        #"USERPROFILE", # In order to avoid creating %USERPROFILE%
 #    ],

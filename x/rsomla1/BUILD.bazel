@@ -15,7 +15,7 @@ cc_shared_library(
 filegroup(
     name = "lib_imp_or_lo",
     srcs = [":lib_dll_or_so"],
-    output_group = "interface_library"
+    output_group = "interface_library",
 )
 
 # Re-import back using the .imp/.lo + .dll/.so/.dylib
@@ -26,10 +26,10 @@ cc_import(
 )
 
 cc_test(
-   name = "try",
-   srcs = ["try.cc"],
-   deps = [
-       "@otel_sdk//:dll", 
-       ":lib",
-   ],
+    name = "try",
+    srcs = ["try.cc"],
+    deps = [
+        ":lib",
+        "@otel_sdk//:dll",
+    ],
 )

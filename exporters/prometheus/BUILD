@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//:dll_deps.bzl", "dll_deps")
-load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_test_library", "otel_cc_test")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_test", "otel_cc_test_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -86,9 +86,9 @@ otel_cc_test(
         "test/exporter_test.cc",
     ],
     tags = [
+        "manual",  # malkia: this has recently became broken, civetweb can't allocate port on localhost:9464
         "prometheus",
         "test",
-        "manual", # malkia: this has recently became broken, civetweb can't allocate port on localhost:9464
     ],
     deps = dll_deps([
         ":prometheus_exporter",
