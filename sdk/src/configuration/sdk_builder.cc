@@ -1717,16 +1717,11 @@ void SdkBuilder::SetResource(
 std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
     const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model) const
 {
-  std::unique_ptr<ConfiguredSdk> sdk;
-  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
-  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> tracer_provider;
-  std::shared_ptr<opentelemetry::context::propagation::TextMapPropagator> propagator;
-  std::shared_ptr<opentelemetry::sdk::metrics::MeterProvider> meter_provider;
-  std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> logger_provider;
+  auto sdk = std::make_unique<ConfiguredSdk>();
 
   if (!model->disabled)
   {
-    SetResource(resource, model->resource);
+    SetResource(sdk->resource, model->resource);
 
     if (model->attribute_limits)
     {
@@ -1737,27 +1732,25 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
 
     if (model->tracer_provider)
     {
-      tracer_provider = CreateTracerProvider(model->tracer_provider, resource);
+      sdk->tracer_provider = CreateTracerProvider(model->tracer_provider, sdk->resource);
     }
 
     if (model->propagator)
     {
-      propagator = CreatePropagator(model->propagator);
+      sdk->propagator = CreatePropagator(model->propagator);
     }
 
     if (model->meter_provider)
     {
-      meter_provider = CreateMeterProvider(model->meter_provider, resource);
+      sdk->meter_provider = CreateMeterProvider(model->meter_provider, sdk->resource);
     }
 
     if (model->logger_provider)
     {
-      logger_provider = CreateLoggerProvider(model->logger_provider, resource);
+      sdk->logger_provider = CreateLoggerProvider(model->logger_provider, sdk->resource);
     }
   }
 
-  sdk = std::make_unique<ConfiguredSdk>(std::move(resource), tracer_provider, propagator,
-                                        meter_provider, logger_provider);
   return sdk;
 }
 

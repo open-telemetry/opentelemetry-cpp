@@ -56,53 +56,53 @@ std::unique_ptr<ConfiguredSdk> ConfiguredSdk::Create(
   return sdk;
 }
 
-void ConfiguredSdk::Init()
+void ConfiguredSdk::Install()
 {
-  if (propagator_)
+  if (propagator)
   {
-    opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(propagator_);
+    opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(propagator);
   }
 
-  if (tracer_provider_)
+  if (tracer_provider)
   {
-    std::shared_ptr<opentelemetry::trace::TracerProvider> api_tracer_provider = tracer_provider_;
+    std::shared_ptr<opentelemetry::trace::TracerProvider> api_tracer_provider = tracer_provider;
     opentelemetry::trace::Provider::SetTracerProvider(api_tracer_provider);
   }
 
-  if (meter_provider_)
+  if (meter_provider)
   {
-    std::shared_ptr<opentelemetry::metrics::MeterProvider> api_meter_provider = meter_provider_;
+    std::shared_ptr<opentelemetry::metrics::MeterProvider> api_meter_provider = meter_provider;
     opentelemetry::metrics::Provider::SetMeterProvider(api_meter_provider);
   }
 
-  if (logger_provider_)
+  if (logger_provider)
   {
-    std::shared_ptr<opentelemetry::logs::LoggerProvider> api_logger_provider = logger_provider_;
+    std::shared_ptr<opentelemetry::logs::LoggerProvider> api_logger_provider = logger_provider;
     opentelemetry::logs::Provider::SetLoggerProvider(api_logger_provider);
   }
 }
 
-void ConfiguredSdk::Cleanup()
+void ConfiguredSdk::UnInstall()
 {
-  if (propagator_)
+  if (propagator)
   {
     std::shared_ptr<opentelemetry::context::propagation::TextMapPropagator> none;
     opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(none);
   }
 
-  if (tracer_provider_)
+  if (tracer_provider)
   {
     std::shared_ptr<opentelemetry::trace::TracerProvider> none;
     opentelemetry::trace::Provider::SetTracerProvider(none);
   }
 
-  if (meter_provider_)
+  if (meter_provider)
   {
     std::shared_ptr<opentelemetry::metrics::MeterProvider> none;
     opentelemetry::metrics::Provider::SetMeterProvider(none);
   }
 
-  if (logger_provider_)
+  if (logger_provider)
   {
     std::shared_ptr<opentelemetry::logs::LoggerProvider> none;
     opentelemetry::logs::Provider::SetLoggerProvider(none);
