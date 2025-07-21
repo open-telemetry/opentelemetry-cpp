@@ -1,4 +1,3 @@
-load("@otel_sdk//:dll_deps_generated_non_windows.bzl", dll_deps_non_windows = "DLL_DEPS")
 load("@otel_sdk//:dll_deps_generated_windows.bzl", dll_deps_windows = "DLL_DEPS")
 
 # Filter libs that were compiled into the the otel_sdk.dll already

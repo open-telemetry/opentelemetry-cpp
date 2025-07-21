@@ -1,6 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load("@rules_cc//cc:cc_shared_library.bzl", "cc_shared_library")
 load(
     "@rules_cc//cc:defs.bzl",
     rules_cc_binary = "cc_binary",
@@ -40,4 +41,4 @@ def otel_cc_import(**kwargs):
 
 def otel_cc_shared_library(**kwargs):
     kwargs["deps"] = kwargs.get("deps", []) + if_asanwin(["@llvm_windows_install//:asan"])
-    native.cc_shared_library(**kwargs)
+    cc_shared_library(**kwargs)

@@ -1,6 +1,4 @@
-load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory")
-load("@aspect_bazel_lib//lib:run_binary.bzl", "run_binary")
-load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 package(default_visibility = ["//visibility:public"])
 

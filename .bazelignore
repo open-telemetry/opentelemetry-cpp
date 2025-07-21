@@ -14,3 +14,5 @@ WORKSPACE
 otel_sdk_build.cmd
 .git
 x
+sdk/src/configuration
+sdk/test/configuration
