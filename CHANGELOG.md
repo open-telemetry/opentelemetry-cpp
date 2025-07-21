@@ -24,6 +24,9 @@ Increment the:
 * [SDK] Update default exemplar reservoir size for exponential histograms
   [#3551](https://github.com/open-telemetry/opentelemetry-cpp/pull/3551)
 
+* [SDK] Implements options for the ParentBasedSampler with default values
+  [#3553](https://github.com/open-telemetry/opentelemetry-cpp/pull/3553)
+
 ## [1.22 2025-07-11]
 
 * [DOC] Udpate link to membership document
