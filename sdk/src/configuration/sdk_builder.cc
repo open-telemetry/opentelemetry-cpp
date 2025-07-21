@@ -764,10 +764,19 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateParentBase
     local_parent_not_sampled_sdk = opentelemetry::sdk::trace::AlwaysOffSamplerFactory::Create();
   }
 
-  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3545
-  OTEL_INTERNAL_LOG_ERROR("CreateParentBasedSampler: FIXME-SDK, missing param in parent factory");
-  std::shared_ptr<opentelemetry::sdk::trace::Sampler> delegate_sampler = std::move(root_sdk);
-  sdk = opentelemetry::sdk::trace::ParentBasedSamplerFactory::Create(delegate_sampler);
+  std::shared_ptr<opentelemetry::sdk::trace::Sampler> shared_root = std::move(root_sdk);
+  std::shared_ptr<opentelemetry::sdk::trace::Sampler> shared_remote_parent_sampled =
+      std::move(remote_parent_sampled_sdk);
+  std::shared_ptr<opentelemetry::sdk::trace::Sampler> shared_remote_parent_not_sampled =
+      std::move(remote_parent_not_sampled_sdk);
+  std::shared_ptr<opentelemetry::sdk::trace::Sampler> shared_local_parent_sampled =
+      std::move(local_parent_sampled_sdk);
+  std::shared_ptr<opentelemetry::sdk::trace::Sampler> shared_local_parent_not_sampled =
+      std::move(local_parent_not_sampled_sdk);
+
+  sdk = opentelemetry::sdk::trace::ParentBasedSamplerFactory::Create(
+      shared_root, shared_remote_parent_sampled, shared_remote_parent_not_sampled,
+      shared_local_parent_sampled, shared_local_parent_not_sampled);
 
   return sdk;
 }
@@ -1009,7 +1018,7 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
   std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> sdk;
 
   // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/70
-  OTEL_INTERNAL_LOG_ERROR("CreateTracerProvider: FIXME-CONFIG (IdGenerator)");
+  // FIXME-CONFIG: Add support for IdGenerator
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sampler;
 
@@ -1366,7 +1375,7 @@ SdkBuilder::CreateAttributesProcessor(
 
   // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3546
   // FIXME-SDK: Need a subclass of AttributesProcessor for IncludeExclude
-  OTEL_INTERNAL_LOG_ERROR("CreateAttributesProcessor() FIXME-SDK IncludeExclude");
+  OTEL_INTERNAL_LOG_WARN("IncludeExclude attribute processor not supported, ignoring");
 
   return sdk;
 }
@@ -1701,7 +1710,7 @@ void SdkBuilder::SetResource(
     {
       // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3548
       // FIXME-SDK: Implement resource detectors
-      OTEL_INTERNAL_LOG_ERROR("SdkBuilder::SetResource: FIXME-SDK detectors");
+      OTEL_INTERNAL_LOG_WARN("resource detectors not supported, ignoring");
     }
 
     auto sdk_resource =
