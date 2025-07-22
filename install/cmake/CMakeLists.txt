@@ -232,6 +232,7 @@ if(grpc IN_LIST _THIRDPARTY_PACKAGE_LIST)
                "-DRE2_BUILD_TESTING=OFF"
                "-DgRPC_ZLIB_PROVIDER=package"
                "-DgRPC_PROTOBUF_PROVIDER=package"
+               "-DgRPC_PROTOBUF_PACKAGE_TYPE=CONFIG"
                "-DgRPC_ABSL_PROVIDER=package")
 
   add_dependencies(grpc-build zlib-install abseil-install protobuf-install)
