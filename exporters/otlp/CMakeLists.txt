@@ -32,7 +32,6 @@ target_link_libraries(opentelemetry_otlp_recordable
                       PUBLIC opentelemetry_metrics)
 
 if(WITH_OTLP_GRPC)
-  find_package(gRPC REQUIRED)
   if(NOT DEFINED grpc_lib_type)
     message(
       FATAL_ERROR "cmake/opentelemetry-proto.cmake should be included first")
