@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
@@ -55,7 +56,6 @@
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/tracer_provider.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -63,7 +63,7 @@ namespace sdk
 namespace configuration
 {
 
-class SdkBuilder
+class OPENTELEMETRY_EXPORT_TYPE SdkBuilder
 {
 public:
   SdkBuilder(std::shared_ptr<Registry> registry) : registry_(std::move(registry)) {}

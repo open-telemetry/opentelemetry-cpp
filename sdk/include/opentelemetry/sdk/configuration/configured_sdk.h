@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
@@ -12,7 +13,6 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -25,7 +25,7 @@ namespace configuration
  * A SDK contains various objects, like propagators and providers for each
  * signals, that collectively describe the opentelemetry configuration.
  */
-class ConfiguredSdk
+class OPENTELEMETRY_EXPORT_TYPE ConfiguredSdk
 {
 public:
   static std::unique_ptr<ConfiguredSdk> Create(

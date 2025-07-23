@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_builder.h"
@@ -28,7 +29,6 @@
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_builder.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -36,7 +36,7 @@ namespace sdk
 namespace configuration
 {
 
-class Registry
+class OPENTELEMETRY_EXPORT_TYPE Registry
 {
 public:
   Registry();
