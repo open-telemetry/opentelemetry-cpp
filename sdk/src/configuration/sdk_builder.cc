@@ -1074,7 +1074,26 @@ SdkBuilder::CreatePropagator(
     propagators.push_back(std::move(propagator));
   }
 
-  // FIXME: composite_list
+  if (model->composite_list.size() > 0)
+  {
+    std::string str_list = model->composite_list;
+    size_t start_pos = 0;
+    size_t end_pos = 0;
+    char separator = ',';
+    std::string name;
+
+    while ((end_pos = str_list.find(separator, start_pos)) != std::string::npos)
+    {
+      name = str_list.substr(start_pos, end_pos - start_pos);
+      propagator = CreateTextMapPropagator(name);
+      propagators.push_back(std::move(propagator));
+      start_pos = end_pos + 1;
+    }
+
+    name = str_list.substr(start_pos);
+    propagator = CreateTextMapPropagator(name);
+    propagators.push_back(std::move(propagator));
+  }
 
   auto sdk = std::make_unique<opentelemetry::context::propagation::CompositePropagator>(
       std::move(propagators));
@@ -1295,6 +1314,11 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
 
   auto exporter_sdk = CreatePushMetricExporter(model->exporter);
 
+  if (model->producers.size() > 0)
+  {
+    OTEL_INTERNAL_LOG_WARN("metric producer not supported, ignoring");
+  }
+
   sdk = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
       std::move(exporter_sdk), options);
 
@@ -1307,6 +1331,11 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePul
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
 
   sdk = CreatePullMetricExporter(model->exporter);
+
+  if (model->producers.size() > 0)
+  {
+    OTEL_INTERNAL_LOG_WARN("metric producer not supported, ignoring");
+  }
 
   return sdk;
 }
