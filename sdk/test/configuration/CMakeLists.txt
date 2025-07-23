@@ -1,8 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-foreach(testname yaml_test yaml_trace_test yaml_resource_test yaml_logs_test
-                 yaml_metrics_test)
+foreach(testname yaml_test yaml_propagator_test yaml_trace_test
+                 yaml_resource_test yaml_logs_test yaml_metrics_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_configuration)

@@ -1031,34 +1031,37 @@ static std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
   auto model = std::make_unique<PropagatorConfiguration>();
 
   std::unique_ptr<DocumentNode> child;
-  child = node->GetRequiredChildNode("composite");
+  child = node->GetChildNode("composite");
   std::string name;
   int num_child = 0;
 
-  for (auto it = child->begin(); it != child->end(); ++it)
+  if (child)
   {
-    // This is an entry in the composite array
-    std::unique_ptr<DocumentNode> element(*it);
-    num_child++;
-    int count = 0;
-
-    // Find out its name, we expect an object with a unique property.
-    for (auto it2 = element->begin_properties(); it2 != element->end_properties(); ++it2)
+    for (auto it = child->begin(); it != child->end(); ++it)
     {
-      name = it2.Name();
-      count++;
-    }
+      // This is an entry in the composite array
+      std::unique_ptr<DocumentNode> element(*it);
+      num_child++;
+      int count = 0;
 
-    if (count != 1)
-    {
-      std::string message("Illegal composite child ");
-      message.append(std::to_string(num_child));
-      message.append(", properties count: ");
-      message.append(std::to_string(count));
-      throw InvalidSchemaException(message);
-    }
+      // Find out its name, we expect an object with a unique property.
+      for (auto it2 = element->begin_properties(); it2 != element->end_properties(); ++it2)
+      {
+        name = it2.Name();
+        count++;
+      }
 
-    model->composite.push_back(name);
+      if (count != 1)
+      {
+        std::string message("Illegal composite child ");
+        message.append(std::to_string(num_child));
+        message.append(", properties count: ");
+        message.append(std::to_string(count));
+        throw InvalidSchemaException(message);
+      }
+
+      model->composite.push_back(name);
+    }
   }
 
   model->composite_list = node->GetString("composite_list", "");
