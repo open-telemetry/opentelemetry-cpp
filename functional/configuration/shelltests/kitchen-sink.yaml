@@ -562,7 +562,11 @@ propagator:
   # The value is a comma separated list of propagator identifiers matching the format of OTEL_PROPAGATORS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.
   # Built-in propagator identifiers include: tracecontext, baggage, b3, b3multi, jaeger, ottrace. Known third party identifiers include: xray.
   # If the resolved list of propagators (from .composite and .composite_list) is empty, a noop propagator is used.
-  composite_list: "tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray"
+#  composite_list: "tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray"
+
+# ottrace, xray not supported in opentelemetry-cpp
+  composite_list: "tracecontext,baggage,b3,b3multi,jaeger"
+
 # Configure tracer provider.
 # If omitted, a noop tracer provider is used.
 tracer_provider:

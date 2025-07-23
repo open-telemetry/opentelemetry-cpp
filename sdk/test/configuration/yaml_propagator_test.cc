@@ -146,3 +146,27 @@ propagator:
   ASSERT_EQ(config->propagator->composite[2], "ccc");
   ASSERT_EQ(config->propagator->composite_list, "ddd,eee,fff");
 }
+
+TEST(YamlPropagator, propagator_duplicates)
+{
+  std::string yaml = R"(
+file_format: xx.yy
+propagator:
+  composite:
+    - aaa:
+    - bbb:
+    - bbb:
+    - ccc:
+  composite_list: "aaa,eee,eee,fff,ccc"
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->propagator, nullptr);
+  ASSERT_EQ(config->propagator->composite.size(), 4);
+  ASSERT_EQ(config->propagator->composite[0], "aaa");
+  ASSERT_EQ(config->propagator->composite[1], "bbb");
+  ASSERT_EQ(config->propagator->composite[2], "bbb");
+  ASSERT_EQ(config->propagator->composite[3], "ccc");
+  ASSERT_EQ(config->propagator->composite_list, "aaa,eee,eee,fff,ccc");
+}
