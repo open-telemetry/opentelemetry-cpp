@@ -1061,21 +1061,87 @@ SdkBuilder::CreateTextMapPropagator(const std::string &name) const
   throw UnsupportedException(die);
 }
 
+static bool IsDuplicate(const std::vector<std::string> &propagator_seen, const std::string &name)
+{
+  bool duplicate = false;
+  for (const auto &seen : propagator_seen)
+  {
+    if (name == seen)
+    {
+      duplicate = true;
+    }
+  }
+
+  return duplicate;
+}
+
 std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>
 SdkBuilder::CreatePropagator(
     const std::unique_ptr<opentelemetry::sdk::configuration::PropagatorConfiguration> &model) const
 {
+  std::unique_ptr<opentelemetry::context::propagation::CompositePropagator> sdk;
   std::vector<std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>> propagators;
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> propagator;
+  std::vector<std::string> propagator_seen;
+  bool duplicate;
+
+  /*
+   * Note that the spec only requires to check duplicates between
+   * composite and composite_list.
+   * Here we check for duplicates globally, for ease of use.
+   */
 
   for (const auto &name : model->composite)
   {
-    propagator = CreateTextMapPropagator(name);
-    propagators.push_back(std::move(propagator));
+    duplicate = IsDuplicate(propagator_seen, name);
+
+    if (!duplicate)
+    {
+      propagator = CreateTextMapPropagator(name);
+      propagators.push_back(std::move(propagator));
+      propagator_seen.push_back(name);
+    }
   }
 
-  auto sdk = std::make_unique<opentelemetry::context::propagation::CompositePropagator>(
-      std::move(propagators));
+  if (model->composite_list.size() > 0)
+  {
+    std::string str_list = model->composite_list;
+    size_t start_pos     = 0;
+    size_t end_pos       = 0;
+    char separator       = ',';
+    std::string name;
+
+    while ((end_pos = str_list.find(separator, start_pos)) != std::string::npos)
+    {
+      name = str_list.substr(start_pos, end_pos - start_pos);
+
+      duplicate = IsDuplicate(propagator_seen, name);
+
+      if (!duplicate)
+      {
+        propagator = CreateTextMapPropagator(name);
+        propagators.push_back(std::move(propagator));
+        propagator_seen.push_back(name);
+      }
+      start_pos = end_pos + 1;
+    }
+
+    name = str_list.substr(start_pos);
+
+    duplicate = IsDuplicate(propagator_seen, name);
+
+    if (!duplicate)
+    {
+      propagator = CreateTextMapPropagator(name);
+      propagators.push_back(std::move(propagator));
+    }
+  }
+
+  if (propagators.size() > 0)
+  {
+    sdk = std::make_unique<opentelemetry::context::propagation::CompositePropagator>(
+        std::move(propagators));
+  }
 
   return sdk;
 }
@@ -1293,6 +1359,11 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
 
   auto exporter_sdk = CreatePushMetricExporter(model->exporter);
 
+  if (model->producers.size() > 0)
+  {
+    OTEL_INTERNAL_LOG_WARN("metric producer not supported, ignoring");
+  }
+
   sdk = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
       std::move(exporter_sdk), options);
 
@@ -1305,6 +1376,11 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePul
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
 
   sdk = CreatePullMetricExporter(model->exporter);
+
+  if (model->producers.size() > 0)
+  {
+    OTEL_INTERNAL_LOG_WARN("metric producer not supported, ignoring");
+  }
 
   return sdk;
 }
