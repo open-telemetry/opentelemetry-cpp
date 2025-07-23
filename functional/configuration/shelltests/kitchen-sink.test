@@ -6,6 +6,8 @@ $ otel_configuration_check --yaml shelltests/kitchen-sink.yaml | egrep -v "(obse
 MODEL PARSED
 [WARNING] attribute_limits not supported, ignoring
 [WARNING] IncludeExclude attribute processor not supported, ignoring
+[WARNING] metric producer not supported, ignoring
+[WARNING] metric producer not supported, ignoring
 [WARNING] [Periodic Exporting Metric Reader] Invalid configuration: export_timeout_millis_ should be less than export_interval_millis_, using default values
 [WARNING] [Periodic Exporting Metric Reader] Invalid configuration: export_timeout_millis_ should be less than export_interval_millis_, using default values
 [WARNING] [Periodic Exporting Metric Reader] Invalid configuration: export_timeout_millis_ should be less than export_interval_millis_, using default values
