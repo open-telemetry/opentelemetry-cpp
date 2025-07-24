@@ -38,6 +38,7 @@
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_metric_producer_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
@@ -56,7 +57,9 @@
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
+#include "opentelemetry/sdk/configuration/metric_producer_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/open_census_metric_producer_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h"
@@ -691,13 +694,68 @@ static std::unique_ptr<PullMetricExporterConfiguration> ParsePullMetricExporterC
     throw InvalidSchemaException(message);
   }
 
-  if (name == "prometheus")
+  if (name == "prometheus/development")
   {
     model = ParsePrometheusPullMetricExporterConfiguration(child);
   }
   else
   {
     model = ParsePullMetricExporterExtensionConfiguration(name, std::move(child));
+  }
+
+  return model;
+}
+
+static std::unique_ptr<OpenCensusMetricProducerConfiguration>
+ParseOpenCensusMetricProducerConfiguration(const std::unique_ptr<DocumentNode> & /* node */)
+{
+  auto model = std::make_unique<OpenCensusMetricProducerConfiguration>();
+
+  return model;
+}
+
+static std::unique_ptr<ExtensionMetricProducerConfiguration>
+ParseExtensionMetricProducerConfiguration(const std::string &name,
+                                          std::unique_ptr<DocumentNode> node)
+{
+  auto model = std::make_unique<ExtensionMetricProducerConfiguration>();
+
+  model->name = name;
+  model->node = std::move(node);
+
+  return model;
+}
+
+static std::unique_ptr<MetricProducerConfiguration> ParseMetricProducerConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<MetricProducerConfiguration> model;
+
+  std::string name;
+  std::unique_ptr<DocumentNode> child;
+  size_t count = 0;
+
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    name  = it.Name();
+    child = it.Value();
+    count++;
+  }
+
+  if (count != 1)
+  {
+    std::string message("Illegal metric producer, properties count: ");
+    message.append(std::to_string(count));
+    throw InvalidSchemaException(message);
+  }
+
+  if (name == "opencensus")
+  {
+    model = ParseOpenCensusMetricProducerConfiguration(child);
+  }
+  else
+  {
+    model = ParseExtensionMetricProducerConfiguration(name, std::move(child));
   }
 
   return model;
@@ -715,6 +773,16 @@ static std::unique_ptr<PeriodicMetricReaderConfiguration> ParsePeriodicMetricRea
   child           = node->GetRequiredChildNode("exporter");
   model->exporter = ParsePushMetricExporterConfiguration(child);
 
+  child = node->GetChildNode("producers");
+
+  if (child)
+  {
+    for (auto it = child->begin(); it != child->end(); ++it)
+    {
+      model->producers.push_back(ParseMetricProducerConfiguration(*it));
+    }
+  }
+
   return model;
 }
 
@@ -726,6 +794,16 @@ static std::unique_ptr<PullMetricReaderConfiguration> ParsePullMetricReaderConfi
 
   child           = node->GetRequiredChildNode("exporter");
   model->exporter = ParsePullMetricExporterConfiguration(child);
+
+  child = node->GetChildNode("producers");
+
+  if (child)
+  {
+    for (auto it = child->begin(); it != child->end(); ++it)
+    {
+      model->producers.push_back(ParseMetricProducerConfiguration(*it));
+    }
+  }
 
   return model;
 }
@@ -1031,16 +1109,40 @@ static std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
   auto model = std::make_unique<PropagatorConfiguration>();
 
   std::unique_ptr<DocumentNode> child;
-  child = node->GetRequiredChildNode("composite");
+  child = node->GetChildNode("composite");
+  std::string name;
+  int num_child = 0;
 
-  for (auto it = child->begin(); it != child->end(); ++it)
+  if (child)
   {
-    std::unique_ptr<DocumentNode> element(*it);
+    for (auto it = child->begin(); it != child->end(); ++it)
+    {
+      // This is an entry in the composite array
+      std::unique_ptr<DocumentNode> element(*it);
+      num_child++;
+      int count = 0;
 
-    std::string name = element->AsString();
+      // Find out its name, we expect an object with a unique property.
+      for (auto it2 = element->begin_properties(); it2 != element->end_properties(); ++it2)
+      {
+        name = it2.Name();
+        count++;
+      }
 
-    model->composite.push_back(name);
+      if (count != 1)
+      {
+        std::string message("Illegal composite child ");
+        message.append(std::to_string(num_child));
+        message.append(", properties count: ");
+        message.append(std::to_string(count));
+        throw InvalidSchemaException(message);
+      }
+
+      model->composite.push_back(name);
+    }
   }
+
+  model->composite_list = node->GetString("composite_list", "");
 
   return model;
 }

@@ -145,7 +145,7 @@ meter_provider:
   readers:
     - pull:
         exporter:
-          prometheus:
+          prometheus/development:
 )";
 
   auto config = DoParse(yaml);
@@ -520,7 +520,7 @@ meter_provider:
   readers:
     - pull:
         exporter:
-          prometheus:
+          prometheus/development:
 )";
 
   auto config = DoParse(yaml);
@@ -551,7 +551,7 @@ meter_provider:
   readers:
     - pull:
         exporter:
-          prometheus:
+          prometheus/development:
             host: "prometheus"
             port: 1234
             without_units: true
