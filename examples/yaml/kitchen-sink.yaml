@@ -11,7 +11,7 @@
 # The file format version.
 # The yaml format is documented at
 # https://github.com/open-telemetry/opentelemetry-configuration/tree/main/schema
-file_format: "0.3"
+file_format: "1.0-rc.1"
 # Configure if the SDK is disabled or not.
 # If omitted or null, false is used.
 disabled: false
@@ -167,6 +167,24 @@ logger_provider:
     # Value must be non-negative.
     # If omitted or null, 128 is used.
     attribute_count_limit: 128
+  # Configure loggers.
+  # This type is in development and subject to breaking changes in minor versions.
+  logger_configurator/development:
+    # Configure the default logger config used there is no matching entry in .logger_configurator/development.loggers.
+    default_config:
+      # Configure if the logger is enabled or not.
+      disabled: true
+    # Configure loggers.
+    loggers:
+      - # Configure logger names to match, evaluated as follows:
+        #
+        #  * If the logger name exactly matches.
+        #  * If the logger name matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+        name: io.opentelemetry.contrib.*
+        # The logger config.
+        config:
+          # Configure if the logger is enabled or not.
+          disabled: false
 # Configure meter provider.
 # If omitted, a noop meter provider is used.
 meter_provider:
@@ -177,7 +195,8 @@ meter_provider:
         # Configure exporter.
         exporter:
           # Configure exporter to be prometheus.
-          prometheus:
+          # This type is in development and subject to breaking changes in minor versions.
+          prometheus/development:
             # Configure host.
             # If omitted or null, localhost is used.
             host: localhost
@@ -213,6 +232,33 @@ meter_provider:
         producers:
           - # Configure metric producer to be opencensus.
             opencensus:
+        # Configure cardinality limits.
+        cardinality_limits:
+          # Configure default cardinality limit for all instrument types.
+          # Instrument-specific cardinality limits take priority.
+          # If omitted or null, 2000 is used.
+          default: 2000
+          # Configure default cardinality limit for counter instruments.
+          # If omitted or null, the value from .default is used.
+          counter: 2000
+          # Configure default cardinality limit for gauge instruments.
+          # If omitted or null, the value from .default is used.
+          gauge: 2000
+          # Configure default cardinality limit for histogram instruments.
+          # If omitted or null, the value from .default is used.
+          histogram: 2000
+          # Configure default cardinality limit for observable_counter instruments.
+          # If omitted or null, the value from .default is used.
+          observable_counter: 2000
+          # Configure default cardinality limit for observable_gauge instruments.
+          # If omitted or null, the value from .default is used.
+          observable_gauge: 2000
+          # Configure default cardinality limit for observable_up_down_counter instruments.
+          # If omitted or null, the value from .default is used.
+          observable_up_down_counter: 2000
+          # Configure default cardinality limit for up_down_counter instruments.
+          # If omitted or null, the value from .default is used.
+          up_down_counter: 2000
     - # Configure a periodic metric reader.
       periodic:
         # Configure delay interval (in milliseconds) between start of two consecutive exports.
@@ -275,6 +321,33 @@ meter_provider:
         producers:
           - # Configure metric producer to be prometheus.
             prometheus:
+        # Configure cardinality limits.
+        cardinality_limits:
+          # Configure default cardinality limit for all instrument types.
+          # Instrument-specific cardinality limits take priority.
+          # If omitted or null, 2000 is used.
+          default: 2000
+          # Configure default cardinality limit for counter instruments.
+          # If omitted or null, the value from .default is used.
+          counter: 2000
+          # Configure default cardinality limit for gauge instruments.
+          # If omitted or null, the value from .default is used.
+          gauge: 2000
+          # Configure default cardinality limit for histogram instruments.
+          # If omitted or null, the value from .default is used.
+          histogram: 2000
+          # Configure default cardinality limit for observable_counter instruments.
+          # If omitted or null, the value from .default is used.
+          observable_counter: 2000
+          # Configure default cardinality limit for observable_gauge instruments.
+          # If omitted or null, the value from .default is used.
+          observable_gauge: 2000
+          # Configure default cardinality limit for observable_up_down_counter instruments.
+          # If omitted or null, the value from .default is used.
+          observable_up_down_counter: 2000
+          # Configure default cardinality limit for up_down_counter instruments.
+          # If omitted or null, the value from .default is used.
+          up_down_counter: 2000
     - # Configure a periodic metric reader.
       periodic:
         # Configure exporter.
@@ -375,6 +448,7 @@ meter_provider:
         # If omitted or null, all instrument names match.
         instrument_name: my-instrument
         # Configure instrument type selection criteria.
+        # Values include: counter, gauge, histogram, observable_counter, observable_gauge, observable_up_down_counter, up_down_counter.
         # If omitted or null, all instrument types match.
         instrument_type: histogram
         # Configure the instrument unit selection criteria.
@@ -426,6 +500,9 @@ meter_provider:
             # Configure record min and max.
             # If omitted or null, true is used.
             record_min_max: true
+        # Configure the aggregation cardinality limit.
+        # If omitted or null, the metric reader's default cardinality limit is used.
+        aggregation_cardinality_limit: 2000
         # Configure attribute keys retained in the resulting stream(s).
         attribute_keys:
           # Configure list of attribute keys to include in the resulting stream(s). All other attributes are dropped.
@@ -441,12 +518,55 @@ meter_provider:
   # Values include: trace_based, always_on, always_off. For behavior of values see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#metrics-sdk-configuration.
   # If omitted or null, trace_based is used.
   exemplar_filter: trace_based
+  # Configure meters.
+  # This type is in development and subject to breaking changes in minor versions.
+  meter_configurator/development:
+    # Configure the default meter config used there is no matching entry in .meter_configurator/development.meters.
+    default_config:
+      # Configure if the meter is enabled or not.
+      disabled: true
+    # Configure meters.
+    meters:
+      - # Configure meter names to match, evaluated as follows:
+        #
+        #  * If the meter name exactly matches.
+        #  * If the meter name matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+        name: io.opentelemetry.contrib.*
+        # The meter config.
+        config:
+          # Configure if the meter is enabled or not.
+          disabled: false
 # Configure text map context propagators.
-# If omitted, tracecontext and baggage are used.
+# If omitted, a noop propagator is used.
 propagator:
-  # Configure the set of propagators to include in the composite text map propagator.
-  # Built-in values include: tracecontext, baggage, b3, b3multi, jaeger, none. Known third party values include: xray, ottrace. For behavior of values see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration.
-  composite: [ tracecontext, baggage, b3, b3multi, jaeger ]
+  # Configure the propagators in the composite text map propagator. Entries from .composite_list are appended to the list here with duplicates filtered out.
+  # Built-in propagator keys include: tracecontext, baggage, b3, b3multi, jaeger, ottrace. Known third party keys include: xray.
+  # If the resolved list of propagators (from .composite and .composite_list) is empty, a noop propagator is used.
+  composite:
+    - # Include the w3c trace context propagator.
+      tracecontext:
+    - # Include the w3c baggage propagator.
+      baggage:
+    - # Include the zipkin b3 propagator.
+      b3:
+    - # Include the zipkin b3 multi propagator.
+      b3multi:
+    - # Include the jaeger propagator.
+      jaeger:
+
+# ottrace not supported in opentelemetry-cpp
+#    - # Include the opentracing propagator.
+#      ottrace:
+
+  # Configure the propagators in the composite text map propagator. Entries are appended to .composite with duplicates filtered out.
+  # The value is a comma separated list of propagator identifiers matching the format of OTEL_PROPAGATORS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.
+  # Built-in propagator identifiers include: tracecontext, baggage, b3, b3multi, jaeger, ottrace. Known third party identifiers include: xray.
+  # If the resolved list of propagators (from .composite and .composite_list) is empty, a noop propagator is used.
+#  composite_list: "tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray"
+
+# ottrace, xray not supported in opentelemetry-cpp
+  composite_list: "tracecontext,baggage,b3,b3multi,jaeger"
+
 # Configure tracer provider.
 # If omitted, a noop tracer provider is used.
 tracer_provider:
@@ -650,6 +770,24 @@ tracer_provider:
       local_parent_not_sampled:
         # Configure sampler to be always_off.
         always_off:
+  # Configure tracers.
+  # This type is in development and subject to breaking changes in minor versions.
+  tracer_configurator/development:
+    # Configure the default tracer config used there is no matching entry in .tracer_configurator/development.tracers.
+    default_config:
+      # Configure if the tracer is enabled or not.
+      disabled: true
+    # Configure tracers.
+    tracers:
+      - # Configure tracer names to match, evaluated as follows:
+        #
+        #  * If the tracer name exactly matches.
+        #  * If the tracer name matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+        name: io.opentelemetry.contrib.*
+        # The tracer config.
+        config:
+          # Configure if the tracer is enabled or not.
+          disabled: false
 # Configure resource for all signals.
 # If omitted, the default resource is used.
 resource:
@@ -687,8 +825,10 @@ resource:
   # The value is a list of comma separated key-value pairs matching the format of OTEL_RESOURCE_ATTRIBUTES. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.
   # If omitted or null, no resource attributes are added.
   attributes_list: "service.namespace=my-namespace,service.version=1.0.0"
-  # Configure resource detectors.
-  detectors:
+  # Configure resource detection.
+  # This type is in development and subject to breaking changes in minor versions.
+  # If omitted or null, resource detection is disabled.
+  detection/development:
     # Configure attributes provided by resource detectors.
     attributes:
       # Configure list of attribute key patterns to include from resource detectors.
@@ -705,6 +845,18 @@ resource:
       # If omitted, .included attributes are included.
       excluded:
         - process.command_args
+    # Configure resource detectors.
+    # Resource detector names are dependent on the SDK language ecosystem. Please consult documentation for each respective language.
+    # If omitted or null, no resource detectors are enabled.
+    detectors:
+      - # Enable the container resource detector, which populates container.* attributes.
+        container:
+      - # Enable the host resource detector, which populates host.* and os.* attributes.
+        host:
+      - # Enable the process resource detector, which populates process.* attributes.
+        process:
+      - # Enable the service detector, which populates service.name based on the OTEL_SERVICE_NAME environment variable and service.instance.id.
+        service:
   # Configure resource schema URL.
   # If omitted or null, no schema URL is used.
   schema_url: https://opentelemetry.io/schemas/1.16.0

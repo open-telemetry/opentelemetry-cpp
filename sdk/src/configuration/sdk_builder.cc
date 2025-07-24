@@ -1083,7 +1083,7 @@ SdkBuilder::CreatePropagator(
   std::vector<std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>> propagators;
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> propagator;
   std::vector<std::string> propagator_seen;
-  bool duplicate;
+  bool duplicate = false;
 
   /*
    * Note that the spec only requires to check duplicates between
