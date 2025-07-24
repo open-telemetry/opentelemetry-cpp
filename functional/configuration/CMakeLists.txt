@@ -14,43 +14,55 @@ target_link_libraries(
   ${CMAKE_THREAD_LIBS_INIT}
   common_metrics_foo_library
   common_logs_foo_library
-  opentelemetry_exporter_ostream_span
-  opentelemetry_exporter_ostream_metrics
-  opentelemetry_exporter_ostream_logs)
+  opentelemetry_exporter_ostream_span_builder
+  opentelemetry_exporter_ostream_metrics_builder
+  opentelemetry_exporter_ostream_logs_builder)
 
 if(WITH_OTLP_HTTP)
   include_directories(${CMAKE_SOURCE_DIR}/exporters/otlp/include)
   add_definitions(-DOTEL_HAVE_OTLP_HTTP)
   target_link_libraries(otel_configuration_check
-                        opentelemetry_otlp_http_builder)
+                        opentelemetry_exporter_otlp_http_builder)
+  target_link_libraries(otel_configuration_check
+                        opentelemetry_exporter_otlp_http_log_builder)
+  target_link_libraries(otel_configuration_check
+                        opentelemetry_exporter_otlp_http_metric_builder)
 endif()
 
 if(WITH_OTLP_GRPC)
   include_directories(${CMAKE_SOURCE_DIR}/exporters/otlp/include)
   add_definitions(-DOTEL_HAVE_OTLP_GRPC)
   target_link_libraries(otel_configuration_check
-                        opentelemetry_otlp_grpc_builder)
+                        opentelemetry_exporter_otlp_grpc_builder)
+  target_link_libraries(otel_configuration_check
+                        opentelemetry_exporter_otlp_grpc_log_builder)
+  target_link_libraries(otel_configuration_check
+                        opentelemetry_exporter_otlp_grpc_metrics_builder)
 endif()
 
 if(WITH_OTLP_FILE)
   include_directories(${CMAKE_SOURCE_DIR}/exporters/otlp/include)
   add_definitions(-DOTEL_HAVE_OTLP_FILE)
   target_link_libraries(otel_configuration_check
-                        opentelemetry_otlp_file_builder)
+                        opentelemetry_exporter_otlp_file_builder)
+  target_link_libraries(otel_configuration_check
+                        opentelemetry_exporter_otlp_file_log_builder)
+  target_link_libraries(otel_configuration_check
+                        opentelemetry_exporter_otlp_file_metric_builder)
 endif()
 
 if(WITH_ZIPKIN)
   include_directories(${CMAKE_SOURCE_DIR}/exporters/zipkin/include)
   add_definitions(-DOTEL_HAVE_ZIPKIN)
   target_link_libraries(otel_configuration_check
-                        opentelemetry_exporter_zipkin_trace)
+                        opentelemetry_exporter_zipkin_trace_builder)
 endif()
 
 if(WITH_PROMETHEUS)
   include_directories(${CMAKE_SOURCE_DIR}/exporters/prometheus/include)
   add_definitions(-DOTEL_HAVE_PROMETHEUS)
   target_link_libraries(otel_configuration_check
-                        opentelemetry_exporter_prometheus)
+                        opentelemetry_exporter_prometheus_builder)
 endif()
 
 if(DEFINED OPENTELEMETRY_BUILD_DLL)

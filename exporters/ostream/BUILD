@@ -6,13 +6,11 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "ostream_log_record_exporter",
     srcs = [
-        "src/console_log_record_builder.cc",
         "src/log_record_exporter.cc",
         "src/log_record_exporter_factory.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/ostream/common_utils.h",
-        "include/opentelemetry/exporters/ostream/console_log_record_builder.h",
         "include/opentelemetry/exporters/ostream/log_record_exporter.h",
         "include/opentelemetry/exporters/ostream/log_record_exporter_factory.h",
     ],
@@ -39,13 +37,11 @@ cc_test(
 cc_library(
     name = "ostream_metric_exporter",
     srcs = [
-        "src/console_push_metric_builder.cc",
         "src/metric_exporter.cc",
         "src/metric_exporter_factory.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/ostream/common_utils.h",
-        "include/opentelemetry/exporters/ostream/console_push_metric_builder.h",
         "include/opentelemetry/exporters/ostream/metric_exporter.h",
         "include/opentelemetry/exporters/ostream/metric_exporter_factory.h",
     ],
@@ -75,13 +71,11 @@ cc_test(
 cc_library(
     name = "ostream_span_exporter",
     srcs = [
-        "src/console_span_builder.cc",
         "src/span_exporter.cc",
         "src/span_exporter_factory.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/ostream/common_utils.h",
-        "include/opentelemetry/exporters/ostream/console_span_builder.h",
         "include/opentelemetry/exporters/ostream/span_exporter.h",
         "include/opentelemetry/exporters/ostream/span_exporter_factory.h",
     ],
