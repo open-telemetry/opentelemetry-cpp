@@ -18,6 +18,15 @@ Increment the:
 * [TEST] Shared otel-cpp libs linked to latest static protobuf and grpc
   [#3544](https://github.com/open-telemetry/opentelemetry-cpp/pull/3544)
 
+* [SDK] Implement env var configuration for PeriodicExportingMetricReader
+  [#3549](https://github.com/open-telemetry/opentelemetry-cpp/pull/3549)
+
+* [SDK] Update default exemplar reservoir size for exponential histograms
+  [#3551](https://github.com/open-telemetry/opentelemetry-cpp/pull/3551)
+
+* [SDK] Implements options for the ParentBasedSampler with default values
+  [#3553](https://github.com/open-telemetry/opentelemetry-cpp/pull/3553)
+
 ## [1.22 2025-07-11]
 
 * [DOC] Udpate link to membership document
@@ -1407,7 +1416,7 @@ Important changes:
 * [ETW EXPORTER] Remove namespace using in ETW exporter which affects global
   namespace
   [#2531](https://github.com/open-telemetry/opentelemetry-cpp/pull/2531)
-* [BUILD] Don't invoke vcpkg from this repo with CMAKE_TOOLCHAIN_FILE set
+* [BUILD] Don't invoke vcpkg from this repo with CMAKE_TOOLCHAIN_FILE set
   [#2527](https://github.com/open-telemetry/opentelemetry-cpp/pull/2527)
 * [EXPORTER] Async exporting for otlp grpc
   [#2407](https://github.com/open-telemetry/opentelemetry-cpp/pull/2407)
