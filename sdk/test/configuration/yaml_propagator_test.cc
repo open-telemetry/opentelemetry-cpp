@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
