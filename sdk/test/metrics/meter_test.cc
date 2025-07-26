@@ -656,6 +656,50 @@ TEST_F(MeterCreateInstrumentTest, ViewCorrectedDuplicateSyncInstrumentsByDescrip
   });
 }
 
+TEST_F(MeterCreateInstrumentTest, SyncInstrumentWithInvalidAttributes)
+{
+  InstrumentDescriptor descriptor{"my_counter", "desc", "unit", InstrumentType::kCounter,
+                                  InstrumentValueType::kDouble};
+  AddDescriptionCorrectionView(descriptor.name_, descriptor.unit_, descriptor.type_,
+                               descriptor.description_);
+
+  auto counter1 = meter_->CreateDoubleCounter("my_counter", "desc", "unit");
+  counter1->Add(
+      1,
+      {{"key", "value1"}, {"invalid-key\xff", "valid-value"}, {"valid-key", "invalid-value\xff"}});
+
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    // only one metric_data object expected after correction with the view
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_.size(), 1);
+    return true;
+  });
+}
+
+TEST_F(MeterCreateInstrumentTest, AsyncInstrumentWithInvalidAttributes)
+{
+  auto observable_counter1 =
+      meter_->CreateInt64ObservableCounter("observable_counter", "desc", "unit");
+  auto callback1 = [](opentelemetry::metrics::ObserverResult observer, void * /* state */) {
+    auto observer_long =
+        nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>>>(observer);
+    observer_long->Observe(12, {{"key", "value1"},
+                                {"invalid-key\xff", "valid-value"},
+                                {"valid-key", "invalid-value\xff"}});
+  };
+
+  observable_counter1->AddCallback(callback1, nullptr);
+
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
+    auto &point_data_attr = metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_;
+    EXPECT_EQ(point_data_attr.size(), 1);
+    return true;
+  });
+}
+
 TEST_F(MeterCreateInstrumentTest, IdenticalAsyncInstruments)
 {
   auto observable_counter1 =
