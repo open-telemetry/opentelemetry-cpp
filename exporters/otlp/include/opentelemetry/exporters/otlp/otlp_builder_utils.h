@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <memory>
+#include <string>
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"  // For OtlpHeaders
 #include "opentelemetry/exporters/otlp/otlp_http.h"

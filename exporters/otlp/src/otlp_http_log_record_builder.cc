@@ -1,10 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <chrono>
 #include <memory>
+#include <string>
 #include <utility>
 
 #include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
+#include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_builder.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"

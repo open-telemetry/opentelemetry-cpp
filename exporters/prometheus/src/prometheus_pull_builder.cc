@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <memory>
+#include <string>
 #include <utility>
 
 #include "opentelemetry/exporters/prometheus/exporter_factory.h"

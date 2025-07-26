@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
+#include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_http_span_builder.h"

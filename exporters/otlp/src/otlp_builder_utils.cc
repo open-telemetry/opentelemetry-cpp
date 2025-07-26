@@ -21,8 +21,10 @@ HttpRequestContentType OtlpBuilderUtils::ConvertOtlpHttpEncoding(
   {
     case opentelemetry::sdk::configuration::OtlpHttpEncoding::protobuf:
       result = exporter::otlp::HttpRequestContentType::kBinary;
+      break;
     case opentelemetry::sdk::configuration::OtlpHttpEncoding::json:
       result = exporter::otlp::HttpRequestContentType::kJson;
+      break;
   }
 
   return result;
@@ -90,10 +92,13 @@ PreferredAggregationTemporality OtlpBuilderUtils::ConvertTemporalityPreference(
   {
     case opentelemetry::sdk::configuration::TemporalityPreference::cumulative:
       result = exporter::otlp::PreferredAggregationTemporality::kCumulative;
+      break;
     case opentelemetry::sdk::configuration::TemporalityPreference::delta:
       result = exporter::otlp::PreferredAggregationTemporality::kDelta;
+      break;
     case opentelemetry::sdk::configuration::TemporalityPreference::low_memory:
       result = exporter::otlp::PreferredAggregationTemporality::kLowMemory;
+      break;
   }
 
   return result;
