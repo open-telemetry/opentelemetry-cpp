@@ -43,6 +43,36 @@ OtlpHttpLogRecordExporterOptions::OtlpHttpLogRecordExporterOptions()
       retry_policy_backoff_multiplier(GetOtlpDefaultLogsRetryBackoffMultiplier())
 {}
 
+OtlpHttpLogRecordExporterOptions::OtlpHttpLogRecordExporterOptions(void *)
+    : url(),
+      content_type(exporter::otlp::HttpRequestContentType::kBinary),
+      json_bytes_mapping(JsonBytesMappingKind::kHexId),
+      use_json_name(false),
+      console_debug(false),
+      timeout(),
+      http_headers(),
+#ifdef ENABLE_ASYNC_EXPORT
+      max_concurrent_requests{64},
+      max_requests_per_connection{8},
+#endif
+      ssl_insecure_skip_verify(false),
+      ssl_ca_cert_path(),
+      ssl_ca_cert_string(),
+      ssl_client_key_path(),
+      ssl_client_key_string(),
+      ssl_client_cert_path(),
+      ssl_client_cert_string(),
+      ssl_min_tls(),
+      ssl_max_tls(),
+      ssl_cipher(),
+      ssl_cipher_suite(),
+      compression(),
+      retry_policy_max_attempts(),
+      retry_policy_initial_backoff(),
+      retry_policy_max_backoff(),
+      retry_policy_backoff_multiplier()
+{}
+
 OtlpHttpLogRecordExporterOptions::~OtlpHttpLogRecordExporterOptions() {}
 
 }  // namespace otlp

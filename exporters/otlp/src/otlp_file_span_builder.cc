@@ -28,8 +28,10 @@ void OtlpFileSpanBuilder::Register(opentelemetry::sdk::configuration::Registry *
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpFileSpanBuilder::Build(
     const opentelemetry::sdk::configuration::OtlpFileSpanExporterConfiguration * /* model */) const
 {
-  // FIXME, use model
   OtlpFileExporterOptions options;
+
+  // FIXME: unclear how to map model->output_stream to a OtlpFileClientBackendOptions
+
   return OtlpFileExporterFactory::Create(options);
 }
 

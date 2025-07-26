@@ -29,8 +29,10 @@ std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> OtlpFileLogRecordBu
     const opentelemetry::sdk::configuration::OtlpFileLogRecordExporterConfiguration * /* model */)
     const
 {
-  // FIXME, use model
   OtlpFileLogRecordExporterOptions options;
+
+  // FIXME: unclear how to map model->output_stream to a OtlpFileClientBackendOptions
+
   return OtlpFileLogRecordExporterFactory::Create(options);
 }
 

@@ -4,6 +4,7 @@
 #include <memory>
 #include <utility>
 
+#include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_builder.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
@@ -26,11 +27,25 @@ void OtlpHttpLogRecordBuilder::Register(opentelemetry::sdk::configuration::Regis
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> OtlpHttpLogRecordBuilder::Build(
-    const opentelemetry::sdk::configuration::OtlpHttpLogRecordExporterConfiguration * /* model */)
-    const
+    const opentelemetry::sdk::configuration::OtlpHttpLogRecordExporterConfiguration *model) const
 {
-  // FIXME, use model
-  OtlpHttpLogRecordExporterOptions options;
+  OtlpHttpLogRecordExporterOptions options(nullptr);
+
+  options.url                = model->endpoint;
+  options.content_type       = OtlpBuilderUtils::ConvertOtlpHttpEncoding(model->encoding);
+  options.json_bytes_mapping = JsonBytesMappingKind::kHexId;
+  options.use_json_name      = false;
+  options.console_debug      = false;
+  options.timeout            = std::chrono::duration_cast<std::chrono::system_clock::duration>(
+      std::chrono::seconds{model->timeout});
+  options.http_headers =
+      OtlpBuilderUtils::ConvertHeadersConfigurationModel(model->headers.get(), model->headers_list);
+  options.ssl_insecure_skip_verify = false;
+  options.ssl_ca_cert_path         = model->certificate_file;
+  options.ssl_client_key_path      = model->client_key_file;
+  options.ssl_client_cert_path     = model->client_certificate_file;
+  options.compression              = model->compression;
+
   return OtlpHttpLogRecordExporterFactory::Create(options);
 }
 

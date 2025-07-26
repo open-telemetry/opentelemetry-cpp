@@ -4,6 +4,7 @@
 #include <memory>
 #include <utility>
 
+#include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_push_metric_builder.h"
@@ -26,11 +27,15 @@ void OtlpFilePushMetricBuilder::Register(opentelemetry::sdk::configuration::Regi
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpFilePushMetricBuilder::Build(
-    const opentelemetry::sdk::configuration::OtlpFilePushMetricExporterConfiguration * /* model */)
-    const
+    const opentelemetry::sdk::configuration::OtlpFilePushMetricExporterConfiguration *model) const
 {
-  // FIXME, use model
   OtlpFileMetricExporterOptions options;
+
+  // FIXME: unclear how to map model->output_stream to a OtlpFileClientBackendOptions
+
+  options.aggregation_temporality =
+      OtlpBuilderUtils::ConvertTemporalityPreference(model->temporality_preference);
+
   return OtlpFileMetricExporterFactory::Create(options);
 }
 

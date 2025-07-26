@@ -35,7 +35,7 @@ struct OPENTELEMETRY_EXPORT OtlpHttpExporterOptions
   /** Lookup environment variables. */
   OtlpHttpExporterOptions();
   /** No defaults. */
-  OtlpHttpExporterOptions(void * /* raw */);
+  OtlpHttpExporterOptions(void *);
   OtlpHttpExporterOptions(const OtlpHttpExporterOptions &)            = default;
   OtlpHttpExporterOptions(OtlpHttpExporterOptions &&)                 = default;
   OtlpHttpExporterOptions &operator=(const OtlpHttpExporterOptions &) = default;

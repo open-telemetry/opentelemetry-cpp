@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 
+#include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_http_span_builder.h"
@@ -31,14 +32,22 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpSpanBuilder::Bu
     const opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *model) const
 {
   OtlpHttpExporterOptions options(nullptr);
-  options.url = model->endpoint;
-  // options.content_type = xxx;
-  options.timeout = std::chrono::duration_cast<std::chrono::system_clock::duration>(
+
+  options.url                = model->endpoint;
+  options.content_type       = OtlpBuilderUtils::ConvertOtlpHttpEncoding(model->encoding);
+  options.json_bytes_mapping = JsonBytesMappingKind::kHexId;
+  options.use_json_name      = false;
+  options.console_debug      = false;
+  options.timeout            = std::chrono::duration_cast<std::chrono::system_clock::duration>(
       std::chrono::seconds{model->timeout});
-  // options.http_headers = model->xxx;
-  options.ssl_ca_cert_path     = model->certificate_file;
-  options.ssl_client_key_path  = model->client_key_file;
-  options.ssl_client_cert_path = model->client_certificate_file;
+  options.http_headers =
+      OtlpBuilderUtils::ConvertHeadersConfigurationModel(model->headers.get(), model->headers_list);
+  options.ssl_insecure_skip_verify = false;
+  options.ssl_ca_cert_path         = model->certificate_file;
+  options.ssl_client_key_path      = model->client_key_file;
+  options.ssl_client_cert_path     = model->client_certificate_file;
+  options.compression              = model->compression;
+
   return OtlpHttpExporterFactory::Create(options);
 }
 

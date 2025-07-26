@@ -4,6 +4,7 @@
 #include <memory>
 #include <utility>
 
+#include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_push_metric_builder.h"
@@ -26,11 +27,28 @@ void OtlpGrpcPushMetricBuilder::Register(opentelemetry::sdk::configuration::Regi
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpGrpcPushMetricBuilder::Build(
-    const opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration * /* model */)
-    const
+    const opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *model) const
 {
-  // FIXME, use model
-  OtlpGrpcMetricExporterOptions options;
+  OtlpGrpcMetricExporterOptions options(nullptr);
+
+  options.endpoint            = model->endpoint;
+  options.use_ssl_credentials = !model->insecure;
+
+  options.ssl_credentials_cacert_path = model->certificate_file;
+#ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
+  options.ssl_client_key_path  = model->client_key_file;
+  options.ssl_client_cert_path = model->client_certificate_file;
+#endif
+
+  options.timeout = std::chrono::duration_cast<std::chrono::system_clock::duration>(
+      std::chrono::seconds{model->timeout});
+  options.metadata =
+      OtlpBuilderUtils::ConvertHeadersConfigurationModel(model->headers.get(), model->headers_list);
+  options.compression = model->compression;
+
+  options.aggregation_temporality =
+      OtlpBuilderUtils::ConvertTemporalityPreference(model->temporality_preference);
+
   return OtlpGrpcMetricExporterFactory::Create(options);
 }
 
