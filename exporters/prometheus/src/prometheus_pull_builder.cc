@@ -26,24 +26,19 @@ void PrometheusPullBuilder::Register(opentelemetry::sdk::configuration::Registry
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> PrometheusPullBuilder::Build(
-    const opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration
-        * /* model */) const
+    const opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *model) const
 {
-  opentelemetry::exporter::metrics::PrometheusExporterOptions options;
+  opentelemetry::exporter::metrics::PrometheusExporterOptions options(nullptr);
 
-#ifdef LATER
-  // Expected
-  options.url                  = model->xxx;
-  options.populate_target_info = model->xxx;
-  options.without_otel_scope   = model->xxx;
+  std::string url(model->host);
+  url.append(":");
+  url.append(std::to_string(model->port));
 
-  // Configuration model
-  options.xxx = model->host;
-  options.xxx = model->port;
-  options.xxx = model->without_units;
-  options.xxx = model->without_type_suffix;
-  options.xxx = model->without_scope_info;
-#endif
+  options.url                  = url;
+  options.populate_target_info = true;
+  options.without_otel_scope   = model->without_scope_info;
+  options.without_units        = model->without_units;
+  options.without_type_suffix  = model->without_type_suffix;
 
   return PrometheusExporterFactory::Create(options);
 }

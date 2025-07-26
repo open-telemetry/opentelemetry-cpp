@@ -31,13 +31,9 @@ void ZipkinBuilder::Register(opentelemetry::sdk::configuration::Registry *regist
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinBuilder::Build(
     const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) const
 {
-  ZipkinExporterOptions options;
+  ZipkinExporterOptions options(nullptr);
 
   options.endpoint = model->endpoint;
-
-#ifdef LATER
-  options.xxx = model->timeout;
-#endif
 
   return ZipkinExporterFactory::Create(options);
 }
