@@ -77,6 +77,14 @@ PrometheusExporterOptions::PrometheusExporterOptions()
       without_type_suffix(GetPrometheusWithoutTypeSuffix())
 {}
 
+PrometheusExporterOptions::PrometheusExporterOptions(void *)
+    : url(""),
+      populate_target_info(true),
+      without_otel_scope(false),
+      without_units(false),
+      without_type_suffix(false)
+{}
+
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

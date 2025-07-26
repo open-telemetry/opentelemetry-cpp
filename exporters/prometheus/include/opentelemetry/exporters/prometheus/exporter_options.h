@@ -18,7 +18,11 @@ namespace metrics
  */
 struct PrometheusExporterOptions
 {
+  // Lookup environment variables
   PrometheusExporterOptions();
+
+  // No defaults
+  PrometheusExporterOptions(void *);
 
   // The endpoint the Prometheus backend can collect metrics from
   std::string url;
