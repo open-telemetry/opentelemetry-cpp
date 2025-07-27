@@ -77,13 +77,7 @@ PrometheusExporterOptions::PrometheusExporterOptions()
       without_type_suffix(GetPrometheusWithoutTypeSuffix())
 {}
 
-PrometheusExporterOptions::PrometheusExporterOptions(void *)
-    : url(""),
-      populate_target_info(true),
-      without_otel_scope(false),
-      without_units(false),
-      without_type_suffix(false)
-{}
+PrometheusExporterOptions::PrometheusExporterOptions(void *) : url("") {}
 
 }  // namespace metrics
 }  // namespace exporter

@@ -1,8 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
+#include <map>
+#include <utility>
+
 #include "opentelemetry/common/kv_properties.h"
+#include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/version.h"
 
