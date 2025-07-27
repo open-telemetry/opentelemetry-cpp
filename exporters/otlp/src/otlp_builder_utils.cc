@@ -2,12 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <map>
+#include <string>
 #include <utility>
 
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_http.h"
+#include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/configuration/headers_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_http_encoding.h"
+#include "opentelemetry/sdk/configuration/temporality_preference.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
