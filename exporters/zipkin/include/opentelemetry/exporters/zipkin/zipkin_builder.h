@@ -23,9 +23,6 @@ class OPENTELEMETRY_EXPORT ZipkinBuilder
 public:
   static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
-  ZipkinBuilder()           = default;
-  ~ZipkinBuilder() override = default;
-
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
       const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model)
       const override;
