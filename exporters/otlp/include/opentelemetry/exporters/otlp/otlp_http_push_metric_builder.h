@@ -23,9 +23,6 @@ class OPENTELEMETRY_EXPORT OtlpHttpPushMetricBuilder
 public:
   static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
-  OtlpHttpPushMetricBuilder()           = default;
-  ~OtlpHttpPushMetricBuilder() override = default;
-
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Build(
       const opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *model)
       const override;
