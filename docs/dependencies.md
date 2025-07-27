@@ -6,7 +6,7 @@ There are
 - Internal dependencies as the part of code from external libraries
   backported/copied in main repo.
 
-The minimum required versions of the third-party libraries that are required can be found in the [third_party_minimum](../install/cmake/third_party_minimum) file. The minimum supported versions are listed here for convenience but the authorative source is always the linked file.
+The minimum required versions of the third-party libraries that are required can be found in the [third_party_minimum](../install/cmake/third_party_minimum) file. The minimum supported versions are listed here for convenience but the authoritative source is always the linked file.
 
 Both these dependencies are listed here:
 
