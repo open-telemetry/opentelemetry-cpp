@@ -4,6 +4,8 @@
 # Minimum supported version git tags of third-party dependencies
 # Format: <dependency_name>=<release_git_tag>
 
+# Update docs/dependencies.md whenever the minimum version of a library is modified.
+
 abseil=20220623.2
 zlib=v1.2.11
 curl=curl-7_81_0
