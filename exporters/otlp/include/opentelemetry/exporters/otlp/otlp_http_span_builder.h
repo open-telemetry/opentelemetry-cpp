@@ -23,9 +23,6 @@ class OPENTELEMETRY_EXPORT OtlpHttpSpanBuilder
 public:
   static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
-  OtlpHttpSpanBuilder()           = default;
-  ~OtlpHttpSpanBuilder() override = default;
-
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
       const opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *model)
       const override;

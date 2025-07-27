@@ -23,9 +23,6 @@ class OPENTELEMETRY_EXPORT ConsoleLogRecordBuilder
 public:
   static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
-  ConsoleLogRecordBuilder()           = default;
-  ~ConsoleLogRecordBuilder() override = default;
-
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Build(
       const opentelemetry::sdk::configuration::ConsoleLogRecordExporterConfiguration *model)
       const override;

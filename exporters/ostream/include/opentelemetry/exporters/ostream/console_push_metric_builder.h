@@ -23,9 +23,6 @@ class OPENTELEMETRY_EXPORT ConsolePushMetricBuilder
 public:
   static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
-  ConsolePushMetricBuilder()           = default;
-  ~ConsolePushMetricBuilder() override = default;
-
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Build(
       const opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration *model)
       const override;

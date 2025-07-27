@@ -23,9 +23,6 @@ class OPENTELEMETRY_EXPORT OtlpGrpcLogRecordBuilder
 public:
   static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
-  OtlpGrpcLogRecordBuilder()           = default;
-  ~OtlpGrpcLogRecordBuilder() override = default;
-
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Build(
       const opentelemetry::sdk::configuration::OtlpGrpcLogRecordExporterConfiguration *model)
       const override;

@@ -23,9 +23,6 @@ class OPENTELEMETRY_EXPORT PrometheusPullBuilder
 public:
   static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
-  PrometheusPullBuilder()           = default;
-  ~PrometheusPullBuilder() override = default;
-
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> Build(
       const opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *model)
       const override;

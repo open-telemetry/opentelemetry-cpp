@@ -20,8 +20,6 @@ namespace exporter
 namespace zipkin
 {
 
-static ZipkinBuilder singleton;
-
 void ZipkinBuilder::Register(opentelemetry::sdk::configuration::Registry *registry)
 {
   auto builder = std::make_unique<ZipkinBuilder>();

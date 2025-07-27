@@ -23,9 +23,6 @@ class OPENTELEMETRY_EXPORT ConsoleSpanBuilder
 public:
   static void Register(opentelemetry::sdk::configuration::Registry *registry);
 
-  ConsoleSpanBuilder()           = default;
-  ~ConsoleSpanBuilder() override = default;
-
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
       const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model)
       const override;
