@@ -58,6 +58,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       CXX_STANDARD: '17'
+      CMAKE_VERSION: '3.14.0'
       BUILD_TYPE: 'Debug'
     steps:
     - name: Harden the runner (Audit all outbound calls)
@@ -70,6 +71,7 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
     - name: install dependencies
       run: |
         sudo -E apt-get update
