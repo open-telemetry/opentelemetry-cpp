@@ -49,8 +49,7 @@ TEST(HistogramToSum, Double)
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
 
-  std::unique_ptr<View> view{
-      new View("view1", "view1_description", instrument_unit, AggregationType::kSum)};
+  std::unique_ptr<View> view{new View("view1", "view1_description", AggregationType::kSum)};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kHistogram, instrument_name, instrument_unit)};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
@@ -109,9 +108,8 @@ TEST(HistogramToSumFilterAttributes, Double)
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
 
-  std::unique_ptr<View> view{new View("view1", "view1_description", instrument_unit,
-                                      AggregationType::kSum, dummy_aggregation_config,
-                                      std::move(attrproc))};
+  std::unique_ptr<View> view{new View("view1", "view1_description", AggregationType::kSum,
+                                      dummy_aggregation_config, std::move(attrproc))};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kHistogram, instrument_name, instrument_unit)};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
@@ -153,7 +151,7 @@ TEST(CounterToSum, Double)
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
 
-  std::unique_ptr<View> view{new View("view1", "view1_description", "ms", AggregationType::kSum)};
+  std::unique_ptr<View> view{new View("view1", "view1_description", AggregationType::kSum)};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kCounter, "counter1", "ms")};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
@@ -212,9 +210,8 @@ TEST(CounterToSumFilterAttributes, Double)
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
 
-  std::unique_ptr<View> view{new View("view1", "view1_description", instrument_unit,
-                                      AggregationType::kSum, dummy_aggregation_config,
-                                      std::move(attrproc))};
+  std::unique_ptr<View> view{new View("view1", "view1_description", AggregationType::kSum,
+                                      dummy_aggregation_config, std::move(attrproc))};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kCounter, instrument_name, instrument_unit)};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
@@ -265,8 +262,7 @@ TEST_P(UpDownCounterToSumFixture, Double)
 
   if (is_matching_view)
   {
-    std::unique_ptr<View> view{
-        new View("view1", "view1_description", instrument_unit, AggregationType::kSum)};
+    std::unique_ptr<View> view{new View("view1", "view1_description", AggregationType::kSum)};
     std::unique_ptr<InstrumentSelector> instrument_selector{
         new InstrumentSelector(InstrumentType::kUpDownCounter, instrument_name, instrument_unit)};
     std::unique_ptr<MeterSelector> meter_selector{
