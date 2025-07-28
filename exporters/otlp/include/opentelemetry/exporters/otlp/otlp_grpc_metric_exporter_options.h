@@ -24,7 +24,10 @@ namespace otlp
  */
 struct OPENTELEMETRY_EXPORT OtlpGrpcMetricExporterOptions : public OtlpGrpcClientOptions
 {
+  /** Lookup environment variables. */
   OtlpGrpcMetricExporterOptions();
+  /** No defaults. */
+  OtlpGrpcMetricExporterOptions(void *);
   OtlpGrpcMetricExporterOptions(const OtlpGrpcMetricExporterOptions &)            = default;
   OtlpGrpcMetricExporterOptions(OtlpGrpcMetricExporterOptions &&)                 = default;
   OtlpGrpcMetricExporterOptions &operator=(const OtlpGrpcMetricExporterOptions &) = default;

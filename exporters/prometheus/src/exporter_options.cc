@@ -77,6 +77,8 @@ PrometheusExporterOptions::PrometheusExporterOptions()
       without_type_suffix(GetPrometheusWithoutTypeSuffix())
 {}
 
+PrometheusExporterOptions::PrometheusExporterOptions(void *) : url("") {}
+
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
