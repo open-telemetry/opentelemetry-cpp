@@ -47,6 +47,17 @@ OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions()
   retry_policy_backoff_multiplier = GetOtlpDefaultMetricsRetryBackoffMultiplier();
 }
 
+OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions(void *)
+    : aggregation_temporality(PreferredAggregationTemporality::kCumulative)
+{
+  use_ssl_credentials = true;
+  max_threads         = 0;
+
+#ifdef ENABLE_ASYNC_EXPORT
+  max_concurrent_requests = 64;
+#endif
+}
+
 OtlpGrpcMetricExporterOptions::~OtlpGrpcMetricExporterOptions() {}
 
 }  // namespace otlp
