@@ -116,8 +116,7 @@ void RunBase2ExponentialHistogramAggregation(benchmark::State &state, int scale)
   config.max_scale_ = scale;
 
   std::unique_ptr<View> histogram_view{
-      new View("base2_expohisto", "description", instrument_unit,
-               AggregationType::kBase2ExponentialHistogram,
+      new View("base2_expohisto", "description", AggregationType::kBase2ExponentialHistogram,
                std::make_shared<Base2ExponentialHistogramAggregationConfig>(config))};
 
   std::unique_ptr<ViewRegistry> views{new ViewRegistry()};
