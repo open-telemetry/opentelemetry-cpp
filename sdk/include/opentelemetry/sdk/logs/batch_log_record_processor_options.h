@@ -16,7 +16,7 @@ namespace logs
 {
 
 /**
- * Struct to hold batch SpanProcessor options.
+ * Struct to hold batch LogRecordProcessor options.
  */
 struct BatchLogRecordProcessorOptions
 {
