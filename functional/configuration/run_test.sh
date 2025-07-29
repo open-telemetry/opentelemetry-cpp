@@ -11,8 +11,9 @@ set -e
 
 [ -z "${BUILD_DIR}" ] && export BUILD_DIR="${HOME}/build"
 
-export EXAMPLE_BIN_DIR="${BUILD_DIR}/example/configuration/"
+export EXAMPLE_BIN_DIR="${BUILD_DIR}/examples/configuration/"
 
+# Make sure `example_yaml` is in the path
 export PATH=${PATH}:${EXAMPLE_BIN_DIR}
 
 shelltest ./shelltests

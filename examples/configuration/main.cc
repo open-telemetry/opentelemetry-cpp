@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <memory>
 #include <string>
 
 #include "opentelemetry/exporters/ostream/console_log_record_builder.h"
