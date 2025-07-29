@@ -33,5 +33,5 @@ if(WITH_EXAMPLES_HTTP)
 endif()
 
 if(WITH_CONFIGURATION)
-  add_subdirectory(yaml)
+  add_subdirectory(configuration)
 endif()

@@ -20,7 +20,6 @@ namespace metrics
 class OPENTELEMETRY_EXPORT PeriodicExportingMetricReaderFactory
 {
 public:
-  // FIXME, return type
   static std::unique_ptr<MetricReader> Create(std::unique_ptr<PushMetricExporter> exporter,
                                               const PeriodicExportingMetricReaderOptions &options);
 

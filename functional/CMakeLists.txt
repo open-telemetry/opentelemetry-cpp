@@ -4,7 +4,3 @@
 if(WITH_OTLP_HTTP)
   add_subdirectory(otlp)
 endif()
-
-if(WITH_CONFIGURATION)
-  add_subdirectory(configuration)
-endif()

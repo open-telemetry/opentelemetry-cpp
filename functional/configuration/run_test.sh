@@ -11,9 +11,9 @@ set -e
 
 [ -z "${BUILD_DIR}" ] && export BUILD_DIR="${HOME}/build"
 
-export TEST_BIN_DIR="${BUILD_DIR}/functional/configuration/"
+export EXAMPLE_BIN_DIR="${BUILD_DIR}/example/configuration/"
 
-export PATH=${PATH}:${TEST_BIN_DIR}
+export PATH=${PATH}:${EXAMPLE_BIN_DIR}
 
 shelltest ./shelltests
 

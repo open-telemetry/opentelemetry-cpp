@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-$ otel_configuration_check --yaml shelltests/kitchen-sink.yaml | egrep -v "(observed_timestamp|trace_id|span_id)"
+$ example_yaml --test --yaml shelltests/kitchen-sink.yaml | egrep -v "(observed_timestamp|trace_id|span_id)"
 >
 MODEL PARSED
 [WARNING] attribute_limits not supported, ignoring
