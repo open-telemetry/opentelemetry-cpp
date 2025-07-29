@@ -35,8 +35,9 @@ if(NOT nlohmann_json_FOUND)
   # Set the nlohmann_json_VERSION variable from the git tag.
   string(REGEX REPLACE "^v([0-9]+\\.[0-9]+\\.[0-9]+)$" "\\1" nlohmann_json_VERSION "${nlohmann-json_GIT_TAG}")
 
-  #Disable iwyu and clang-tidy
-  if(TARGET nlohmann_json)
+  # Disable iwyu and clang-tidy only if the CMake version is greater or equal to 3.19.
+  # CMake 3.19+ is needed to set the iwyu and clang-tidy properties on the INTERFACE target
+  if(TARGET nlohmann_json AND CMAKE_VERSION VERSION_GREATER_EQUAL "3.19")
     set_target_properties(nlohmann_json PROPERTIES CXX_INCLUDE_WHAT_YOU_USE ""
                                                      CXX_CLANG_TIDY "")
   endif()
