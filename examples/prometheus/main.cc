@@ -66,7 +66,7 @@ void InitMetrics(const std::string &name, const std::string &addr)
 
   auto meter_selector = metrics_sdk::MeterSelectorFactory::Create(name, version, schema);
 
-  auto sum_view = metrics_sdk::ViewFactory::Create(counter_name, "description", counter_unit,
+  auto sum_view = metrics_sdk::ViewFactory::Create(counter_name, "description",
                                                    metrics_sdk::AggregationType::kSum);
 
   p->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(sum_view));
@@ -80,8 +80,8 @@ void InitMetrics(const std::string &name, const std::string &addr)
 
   auto histogram_meter_selector = metrics_sdk::MeterSelectorFactory::Create(name, version, schema);
 
-  auto histogram_view = metrics_sdk::ViewFactory::Create(
-      histogram_name, "description", histogram_unit, metrics_sdk::AggregationType::kHistogram);
+  auto histogram_view = metrics_sdk::ViewFactory::Create(histogram_name, "description",
+                                                         metrics_sdk::AggregationType::kHistogram);
 
   p->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
              std::move(histogram_view));
