@@ -58,6 +58,17 @@ cc_library(
 )
 
 cc_library(
+    name = "container",
+    srcs = [
+        "container.cc",
+    ],
+    deps = [
+        "//api",
+        "//sdk:headers",
+    ],
+)
+
+cc_library(
     name = "global_log_handler",
     srcs = [
         "global_log_handler.cc",

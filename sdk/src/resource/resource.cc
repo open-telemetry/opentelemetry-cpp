@@ -41,8 +41,9 @@ Resource Resource::Merge(const Resource &other) const noexcept
 Resource Resource::Create(const ResourceAttributes &attributes, const std::string &schema_url)
 {
   static auto otel_resource = OTELResourceDetector().Detect();
+  static auto container_resource = ContainerResourceDetector().Detect();
   auto resource =
-      Resource::GetDefault().Merge(otel_resource).Merge(Resource{attributes, schema_url});
+      Resource::GetDefault().Merge(otel_resource).Merge(container_resource).Merge(Resource{attributes, schema_url});
 
   if (resource.attributes_.find(semconv::service::kServiceName) == resource.attributes_.end())
   {

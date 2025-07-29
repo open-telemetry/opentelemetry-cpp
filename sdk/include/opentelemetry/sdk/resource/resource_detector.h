@@ -39,6 +39,17 @@ public:
   Resource Detect() noexcept override;
 };
 
+/**
+ * ContainerResourceDetector to detect resource attributes when running inside a containerized environment.
+ * This detector extracts metadata such as container ID from cgroup information
+ * and sets attributes like container.id following the OpenTelemetry semantic conventions.
+ */
+class ContainerResourceDetector : public ResourceDetector
+{
+public:
+  Resource Detect() noexcept override;
+};
+
 }  // namespace resource
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
