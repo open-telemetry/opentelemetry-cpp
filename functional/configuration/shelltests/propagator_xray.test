@@ -1,0 +1,9 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+$ example_yaml --test --yaml shelltests/propagator_xray.yaml
+>
+MODEL PARSED
+[ERROR] [Configured Sdk] builder failed with exception: CreateTextMapPropagator() no builder for xray
+FAILED TO CREATE SDK
+>= 2
