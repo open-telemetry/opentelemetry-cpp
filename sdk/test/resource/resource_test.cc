@@ -4,11 +4,11 @@
 #include <gtest/gtest.h>
 #include <stdint.h>
 #include <cstdlib>
+#include <fstream>
 #include <map>
 #include <string>
 #include <unordered_map>
 #include <utility>
-#include<fstream>
 
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
@@ -295,9 +295,10 @@ TEST(ResourceTest, DerivedResourceDetector)
   EXPECT_TRUE(received_attributes.find("key") != received_attributes.end());
 }
 
-TEST(ResourceTest, ExctractValidContainerId)
+TEST(ResourceTest, ExtractValidContainerId)
 {
-  std::string line = "13:name=systemd:/podruntime/docker/kubepods/ac679f8a8319c8cf7d38e1adf263bc08d23.aaaa";
+  std::string line =
+      "13:name=systemd:/podruntime/docker/kubepods/ac679f8a8319c8cf7d38e1adf263bc08d23.aaaa";
   std::string extracted_id = opentelemetry::sdk::common::ExtractContainerIDFromLine(line);
   EXPECT_EQ(std::string{"ac679f8a8319c8cf7d38e1adf263bc08d23"}, extracted_id);
 }
@@ -308,12 +309,15 @@ TEST(ResourceTest, ExtractIdFromMockUpCGroupFile)
 
   {
     std::ofstream outfile(filename);
-    outfile << "13:name=systemd:/kuberuntime/containerd/kubepods-pod872d2066_00ef_48ea_a7d8_51b18b72d739:cri-containerd:e857a4bf05a69080a759574949d7a0e69572e27647800fa7faff6a05a8332aa1\n";
+    outfile << "13:name=systemd:/kuberuntime/containerd"
+               "/kubepods-pod872d2066_00ef_48ea_a7d8_51b18b72d739:cri-containerd:"
+               "e857a4bf05a69080a759574949d7a0e69572e27647800fa7faff6a05a8332aa1\n";
     outfile << "9:cpu:/not-a-container\n";
   }
 
   std::string container_id = opentelemetry::sdk::common::GetContainerIDFromCgroup(filename);
-  EXPECT_EQ(container_id, std::string{"e857a4bf05a69080a759574949d7a0e69572e27647800fa7faff6a05a8332aa1"});
+  EXPECT_EQ(container_id,
+            std::string{"e857a4bf05a69080a759574949d7a0e69572e27647800fa7faff6a05a8332aa1"});
 
   std::remove(filename);
 }
@@ -321,7 +325,7 @@ TEST(ResourceTest, ExtractIdFromMockUpCGroupFile)
 TEST(ResourceTest, DoesNotExtractInvalidLine)
 {
   std::string line = "this line does not contain a container id";
-  std::string id = opentelemetry::sdk::common::ExtractContainerIDFromLine(line);
+  std::string id   = opentelemetry::sdk::common::ExtractContainerIDFromLine(line);
   EXPECT_EQ(id, std::string{""});
 }
 

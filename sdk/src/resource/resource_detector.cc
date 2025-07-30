@@ -3,11 +3,11 @@
 
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/common/container.h"
+#include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/semconv/service_attributes.h"
 #include "opentelemetry/semconv/incubating/container_attributes.h"
+#include "opentelemetry/semconv/service_attributes.h"
 #include "opentelemetry/version.h"
 
 #include <stddef.h>
@@ -21,12 +21,8 @@ namespace sdk
 namespace resource
 {
 
-const char *OTEL_RESOURCE_ATTRIBUTES = "OTEL_RESOURCE_ATTRIBUTES";
-const char *OTEL_SERVICE_NAME        = "OTEL_SERVICE_NAME";
-/**
- * This is the file path from where we can get container.id
-*/
-const char *C_GROUP_PATH = "/proc/self/cgroup";
+const char *KOtelResourceAttributes = "OTEL_RESOURCE_ATTRIBUTES";
+const char *KOtelServiceName        = "OTEL_SERVICE_NAME";
 
 Resource ResourceDetector::Create(const ResourceAttributes &attributes,
                                   const std::string &schema_url)
@@ -39,9 +35,9 @@ Resource OTELResourceDetector::Detect() noexcept
   std::string attributes_str, service_name;
 
   bool attributes_exists = opentelemetry::sdk::common::GetStringEnvironmentVariable(
-      OTEL_RESOURCE_ATTRIBUTES, attributes_str);
+      KOtelResourceAttributes, attributes_str);
   bool service_name_exists =
-      opentelemetry::sdk::common::GetStringEnvironmentVariable(OTEL_SERVICE_NAME, service_name);
+      opentelemetry::sdk::common::GetStringEnvironmentVariable(KOtelServiceName, service_name);
 
   if (!attributes_exists && !service_name_exists)
   {
@@ -71,23 +67,6 @@ Resource OTELResourceDetector::Detect() noexcept
     attributes[semconv::service::kServiceName] = service_name;
   }
 
-  return ResourceDetector::Create(attributes);
-}
-
-Resource ContainerResourceDetector::Detect() noexcept 
-{
-  std::string container_id = opentelemetry::sdk::common::GetContainerIDFromCgroup(C_GROUP_PATH);
-  if(container_id.empty())
-  {
-    return ResourceDetector::Create({});
-  }
-
-  ResourceAttributes attributes;
-
-  if(!container_id.empty())
-  {
-    attributes[semconv::container::kContainerId] = container_id;
-  }
   return ResourceDetector::Create(attributes);
 }
 

@@ -21,10 +21,10 @@ std::string GetContainerIDFromCgroup(const char *file_path);
 
 /**
   Matches the line with the regex to find container.id
-  @param line contains 
+  @param line a single line of text, typically from the /proc/self/cgroup file
   @return matched id or empty string
 */
-std::string ExtractContainerIDFromLine(std::string &line);
+std::string ExtractContainerIDFromLine(const std::string &line);
 }  // namespace common
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

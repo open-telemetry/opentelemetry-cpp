@@ -40,9 +40,9 @@ public:
 };
 
 /**
- * ContainerResourceDetector to detect resource attributes when running inside a containerized environment.
- * This detector extracts metadata such as container ID from cgroup information
- * and sets attributes like container.id following the OpenTelemetry semantic conventions.
+ * ContainerResourceDetector to detect resource attributes when running inside a containerized
+ * environment. This detector extracts metadata such as container ID from cgroup information and
+ * sets attributes like container.id following the OpenTelemetry semantic conventions.
  */
 class ContainerResourceDetector : public ResourceDetector
 {

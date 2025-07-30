@@ -20,23 +20,23 @@ namespace sdk
 {
 namespace common
 {
-std::string GetContainerIDFromCgroup(const char* file_path) 
+std::string GetContainerIDFromCgroup(const char *file_path)
 {
   std::ifstream cgroup_file(file_path);
   std::string line;
 
-  while(std::getline(cgroup_file, line))
+  while (std::getline(cgroup_file, line))
   {
     std::string container_id = ExtractContainerIDFromLine(line);
-    if(!container_id.empty()) 
+    if (!container_id.empty())
     {
-      return container_id;  
+      return container_id;
     }
   }
   return "";
 }
 
-std::string ExtractContainerIDFromLine(std::string &line)
+std::string ExtractContainerIDFromLine(const std::string &line)
 {
   static const std::regex container_id_regex(R"(^.*/(?:.*[-:])?([0-9a-f]+)(?:\.|\s*$))");
   std::smatch match;
