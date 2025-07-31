@@ -138,33 +138,33 @@
     "binaries": [
       {
         "kind": "archive",
-        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.130.0/otelcol-contrib_0.130.0_linux_amd64.tar.gz",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.131.0/otelcol-contrib_0.131.0_linux_amd64.tar.gz",
         "file": "otelcol-contrib",
-        "sha256": "292ac0d698e80282ec3d848238ffd6976c3cb97c3c169dec955754efc2293e71",
+        "sha256": "336894d4464c34faa99906a980197edea956fa87b8fc5bf2f8484e6925f94875",
         "os": "linux",
         "cpu": "x86_64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.130.0/otelcol-contrib_0.130.0_darwin_arm64.tar.gz",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.131.0/otelcol-contrib_0.131.0_darwin_arm64.tar.gz",
         "file": "otelcol-contrib",
-        "sha256": "f851c6c59a896badcbdb76b40571f8c70f9df0d1af32834784ba7240be1bc774",
+        "sha256": "032b1ed9a23890b4e914b4493a2e752a0027456fca570055c0bd72ba836470d6",
         "os": "macos",
         "cpu": "arm64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.130.0/otelcol-contrib_0.130.0_darwin_amd64.tar.gz",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.131.0/otelcol-contrib_0.131.0_darwin_amd64.tar.gz",
         "file": "otelcol-contrib",
-        "sha256": "092ab65031d08dec2c7a22fc80551e791a3f14bee0b3d04a26f84366da39d0f3",
+        "sha256": "81856efeaefb1c1eaf18317dcd2925a5f3a297d77e9cfec5efec9e24e43e4c81",
         "os": "macos",
         "cpu": "x86_64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.130.0/otelcol-contrib_0.130.0_windows_amd64.tar.gz",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.131.0/otelcol-contrib_0.131.0_windows_amd64.tar.gz",
         "file": "otelcol-contrib.exe",
-        "sha256": "9a004164c87bc827b9e841b946372f516454e786743b008340d9f8a309f84ec1",
+        "sha256": "81914374116645ea7360c6fe45a3e874fe81b16eed4e9346dbd9f312a174e410",
         "os": "windows",
         "cpu": "x86_64"
       }
@@ -246,36 +246,36 @@
     "binaries": [
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.50.0/sentry-cli-Linux-aarch64",
-        "sha256": "d9bc23158a30b4987dfc36494375aa86f1adcf1fb3dd2acb1245d3a4fae4179c",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.50.2/sentry-cli-Linux-aarch64",
+        "sha256": "872afe27ff00c71f1c346931d625e8fa2897bd1543d31be16075cc97f5ea99ab",
         "os": "linux",
         "cpu": "arm64"
       },
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.50.0/sentry-cli-Linux-x86_64",
-        "sha256": "89b1b1cd10c16d817a70ee5bb6673ccdcc48936648f6f281b8d576a3044430c9",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.50.2/sentry-cli-Linux-x86_64",
+        "sha256": "d003d220e2fe07c84297f9586682fc2fbd848357833ae13de5e214ff42a62f16",
         "os": "linux",
         "cpu": "x86_64"
       },
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.50.0/sentry-cli-Darwin-arm64",
-        "sha256": "e06af6e72fd23b6d5a6b7baaab61767cb71fc6fea486c7f5498a08bfcd58eedd",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.50.2/sentry-cli-Darwin-arm64",
+        "sha256": "421ddd9d6efb690502af1ae4e7a55dffa7b0f8469f43083cd1aa8cf21d96ae8f",
         "os": "macos",
         "cpu": "arm64"
       },
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.50.0/sentry-cli-Darwin-x86_64",
-        "sha256": "a055429e5e671d35ccc020934dd0a2ec0572efc47656be29b4315f388653ec98",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.50.2/sentry-cli-Darwin-x86_64",
+        "sha256": "0fc5dbb6403e61641e979d3f6cac9b98051c30cd8891a4e2bf1d84d207cb8c47",
         "os": "macos",
         "cpu": "x86_64"
       },
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.50.0/sentry-cli-Windows-x86_64.exe",
-        "sha256": "090fdd6d59c88436c0de98d91d930b4be2905e60f4f948396750fd33340fa62b",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.50.2/sentry-cli-Windows-x86_64.exe",
+        "sha256": "022d1e14fb76612a80cd209af4387ffeb0c02374910de5b61b0ecf3822b50947",
         "os": "windows",
         "cpu": "x86_64"
       }
