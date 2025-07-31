@@ -3,13 +3,6 @@
 
 #include "opentelemetry/sdk/common/container.h"
 
-#ifdef _MSC_VER
-#  include <string.h>
-#  define strcasecmp _stricmp
-#else
-#  include <strings.h>
-#endif
-
 #include <fstream>
 #include <regex>
 

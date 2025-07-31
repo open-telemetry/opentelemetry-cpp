@@ -3,10 +3,8 @@
 
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/common/container.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/semconv/incubating/container_attributes.h"
 #include "opentelemetry/semconv/service_attributes.h"
 #include "opentelemetry/version.h"
 

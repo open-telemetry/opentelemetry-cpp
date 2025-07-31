@@ -10,7 +10,7 @@ cc_library(
     deps = [
         "//api",
         "//sdk:headers",
-        "//sdk/src/common:env_variables",
         "//sdk/src/common:container",
+        "//sdk/src/common:env_variables",
     ],
 )
