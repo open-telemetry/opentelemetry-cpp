@@ -10,6 +10,7 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/attribute_validity.h"
 #include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 #include "opentelemetry/version.h"
 
@@ -50,7 +51,8 @@ public:
   MetricAttributes process(
       const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
   {
-    MetricAttributes result(attributes);
+    MetricAttributes result(
+        opentelemetry::sdk::common::KeyValueFilterIterable(attributes, "[Metrics] "));
     return result;
   }
 
@@ -78,7 +80,9 @@ public:
       const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
   {
     MetricAttributes result;
-    attributes.ForEachKeyValue(
+    opentelemetry::sdk::common::KeyValueFilterIterable validate_attributes{attributes,
+                                                                           "[Metrics] "};
+    validate_attributes.ForEachKeyValue(
         [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
           if (allowed_attribute_keys_.find(key.data()) != allowed_attribute_keys_.end())
           {
