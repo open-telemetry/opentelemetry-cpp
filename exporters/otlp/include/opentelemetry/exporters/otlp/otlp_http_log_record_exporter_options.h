@@ -32,7 +32,10 @@ namespace otlp
  */
 struct OPENTELEMETRY_EXPORT OtlpHttpLogRecordExporterOptions
 {
+  /** Lookup environment variables. */
   OtlpHttpLogRecordExporterOptions();
+  /** No defaults. */
+  OtlpHttpLogRecordExporterOptions(void *);
   OtlpHttpLogRecordExporterOptions(const OtlpHttpLogRecordExporterOptions &)            = default;
   OtlpHttpLogRecordExporterOptions(OtlpHttpLogRecordExporterOptions &&)                 = default;
   OtlpHttpLogRecordExporterOptions &operator=(const OtlpHttpLogRecordExporterOptions &) = default;

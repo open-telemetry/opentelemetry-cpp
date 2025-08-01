@@ -23,6 +23,12 @@ namespace sdk
 namespace resource
 {
 
+Resource::Resource() noexcept : attributes_(), schema_url_() {}
+
+Resource::Resource(const ResourceAttributes &attributes) noexcept
+    : attributes_(attributes), schema_url_()
+{}
+
 Resource::Resource(const ResourceAttributes &attributes, const std::string &schema_url) noexcept
     : schema_url_(schema_url)
 {

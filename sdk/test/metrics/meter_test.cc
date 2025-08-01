@@ -925,7 +925,7 @@ TEST(MeterTest, RecordAfterProviderDestructionWithCustomProcessor_NoResetInMain)
 
   // Register a View with custom processor
   std::unique_ptr<View> view(
-      new View("my_counter", "", "", AggregationType::kSum, nullptr, std::move(processor)));
+      new View("my_counter", "", AggregationType::kSum, nullptr, std::move(processor)));
   std::unique_ptr<InstrumentSelector> instr_selector(
       new InstrumentSelector(InstrumentType::kCounter, "my_counter", ""));
   std::unique_ptr<MeterSelector> meter_selector(new MeterSelector("test_meter", "", ""));
