@@ -4,6 +4,7 @@
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/resource/container_resource_detector.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/semconv/incubating/container_attributes.h"
 #include "opentelemetry/version.h"
 

@@ -5,6 +5,7 @@
 
 #include <fstream>
 #include <regex>
+#include <string>
 
 #include "opentelemetry/version.h"
 
