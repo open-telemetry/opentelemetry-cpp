@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/common/container.h"
+#include "opentelemetry/sdk/resource/container_resource_detector.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/semconv/incubating/container_attributes.h"
 #include "opentelemetry/version.h"
 
@@ -24,7 +23,7 @@ const char *KCGroupPath = "/proc/self/cgroup";
 
 Resource ContainerResourceDetector::Detect() noexcept
 {
-  std::string container_id = opentelemetry::sdk::common::GetContainerIDFromCgroup(KCGroupPath);
+  std::string container_id = opentelemetry::sdk::resource::GetContainerIDFromCgroup(KCGroupPath);
   if (container_id.empty())
   {
     return ResourceDetector::Create({});

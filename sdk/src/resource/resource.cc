@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/resource/container_resource_detector.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/version/version.h"

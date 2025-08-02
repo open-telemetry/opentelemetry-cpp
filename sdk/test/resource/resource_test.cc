@@ -13,7 +13,7 @@
 
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
-#include "opentelemetry/sdk/common/container.h"
+#include "opentelemetry/sdk/resource/container_resource_detector.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/version/version.h"
@@ -300,7 +300,7 @@ TEST(ResourceTest, ExtractValidContainerId)
 {
   std::string line =
       "13:name=systemd:/podruntime/docker/kubepods/ac679f8a8319c8cf7d38e1adf263bc08d23.aaaa";
-  std::string extracted_id = opentelemetry::sdk::common::ExtractContainerIDFromLine(line);
+  std::string extracted_id = opentelemetry::sdk::resource::ExtractContainerIDFromLine(line);
   EXPECT_EQ(std::string{"ac679f8a8319c8cf7d38e1adf263bc08d23"}, extracted_id);
 }
 
@@ -316,7 +316,7 @@ TEST(ResourceTest, ExtractIdFromMockUpCGroupFile)
     outfile << "9:cpu:/not-a-container\n";
   }
 
-  std::string container_id = opentelemetry::sdk::common::GetContainerIDFromCgroup(filename);
+  std::string container_id = opentelemetry::sdk::resource::GetContainerIDFromCgroup(filename);
   EXPECT_EQ(container_id,
             std::string{"e857a4bf05a69080a759574949d7a0e69572e27647800fa7faff6a05a8332aa1"});
 
@@ -326,7 +326,7 @@ TEST(ResourceTest, ExtractIdFromMockUpCGroupFile)
 TEST(ResourceTest, DoesNotExtractInvalidLine)
 {
   std::string line = "this line does not contain a container id";
-  std::string id   = opentelemetry::sdk::common::ExtractContainerIDFromLine(line);
+  std::string id   = opentelemetry::sdk::resource::ExtractContainerIDFromLine(line);
   EXPECT_EQ(id, std::string{""});
 }
 
@@ -339,7 +339,7 @@ TEST(ContainerIdDetectorTest, ReturnsEmptyOnNoMatch)
     outfile << "no container id here\n";
   }
 
-  std::string id = opentelemetry::sdk::common::GetContainerIDFromCgroup(filename);
+  std::string id = opentelemetry::sdk::resource::GetContainerIDFromCgroup(filename);
   EXPECT_EQ(id, std::string{""});
 
   std::remove(filename);  // cleanup
