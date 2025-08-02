@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/resource/container_resource_detector.h"
+#include "opentelemetry/resource_detectors/container_resource_detector.h"
 
 #include <fstream>
 #include <regex>
