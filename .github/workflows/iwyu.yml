@@ -3,9 +3,10 @@ name: include-what-you-use
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, nb ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read

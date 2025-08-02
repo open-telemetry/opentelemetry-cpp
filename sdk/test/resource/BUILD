@@ -9,6 +9,7 @@ cc_test(
     tags = ["test"],
     deps = [
         "//api",
+        "//resource_detectors",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
