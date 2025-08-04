@@ -12,7 +12,7 @@
 class CustomPullMetricExporter : public opentelemetry::sdk::metrics::MetricReader
 {
 public:
-  CustomPullMetricExporter(const std::string & /* comment */) {}
+  CustomPullMetricExporter(const std::string &comment) : comment_(comment) {}
   CustomPullMetricExporter(CustomPullMetricExporter &&)                      = delete;
   CustomPullMetricExporter(const CustomPullMetricExporter &)                 = delete;
   CustomPullMetricExporter &operator=(CustomPullMetricExporter &&)           = delete;
@@ -27,4 +27,7 @@ public:
   bool OnShutDown(std::chrono::microseconds timeout) noexcept override;
 
   void OnInitialized() noexcept override;
+
+private:
+  std::string comment_;
 };

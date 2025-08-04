@@ -15,7 +15,7 @@
 class CustomSpanExporter : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
-  CustomSpanExporter(const std::string & /* comment */) {}
+  CustomSpanExporter(const std::string &comment) : comment_(comment) {}
   CustomSpanExporter(CustomSpanExporter &&)                      = delete;
   CustomSpanExporter(const CustomSpanExporter &)                 = delete;
   CustomSpanExporter &operator=(CustomSpanExporter &&)           = delete;
@@ -31,4 +31,7 @@ public:
   bool ForceFlush(std::chrono::microseconds timeout) noexcept override;
 
   bool Shutdown(std::chrono::microseconds timeout) noexcept override;
+
+private:
+  std::string comment_;
 };

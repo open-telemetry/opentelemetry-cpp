@@ -13,7 +13,7 @@
 class CustomPushMetricExporter : public opentelemetry::sdk::metrics::PushMetricExporter
 {
 public:
-  CustomPushMetricExporter(const std::string & /* comment */) {}
+  CustomPushMetricExporter(const std::string &comment) : comment_(comment) {}
   CustomPushMetricExporter(CustomPushMetricExporter &&)                      = delete;
   CustomPushMetricExporter(const CustomPushMetricExporter &)                 = delete;
   CustomPushMetricExporter &operator=(CustomPushMetricExporter &&)           = delete;
@@ -29,4 +29,7 @@ public:
   bool ForceFlush(std::chrono::microseconds timeout) noexcept override;
 
   bool Shutdown(std::chrono::microseconds timeout) noexcept override;
+
+private:
+  std::string comment_;
 };

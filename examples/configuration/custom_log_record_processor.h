@@ -13,7 +13,7 @@
 class CustomLogRecordProcessor : public opentelemetry::sdk::logs::LogRecordProcessor
 {
 public:
-  CustomLogRecordProcessor(const std::string &comment) : m_comment(comment) {}
+  CustomLogRecordProcessor(const std::string &comment) : comment_(comment) {}
   CustomLogRecordProcessor(CustomLogRecordProcessor &&)                      = delete;
   CustomLogRecordProcessor(const CustomLogRecordProcessor &)                 = delete;
   CustomLogRecordProcessor &operator=(CustomLogRecordProcessor &&)           = delete;
@@ -29,5 +29,5 @@ public:
   bool Shutdown(std::chrono::microseconds timeout) noexcept override;
 
 private:
-  std::string m_comment;
+  std::string comment_;
 };

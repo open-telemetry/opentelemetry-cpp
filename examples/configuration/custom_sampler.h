@@ -16,7 +16,7 @@
 class CustomSampler : public opentelemetry::sdk::trace::Sampler
 {
 public:
-  CustomSampler(const std::string & /* comment */) {}
+  CustomSampler(const std::string &comment) : comment_(comment) {}
   CustomSampler(CustomSampler &&)                      = delete;
   CustomSampler(const CustomSampler &)                 = delete;
   CustomSampler &operator=(CustomSampler &&)           = delete;
@@ -32,4 +32,7 @@ public:
       const opentelemetry::trace::SpanContextKeyValueIterable &links) noexcept override;
 
   opentelemetry::nostd::string_view GetDescription() const noexcept override;
+
+private:
+  std::string comment_;
 };
