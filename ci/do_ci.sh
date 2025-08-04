@@ -238,6 +238,7 @@ elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}" \
         -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
         -DWITH_OPENTRACING=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         "${SRC_DIR}"
   make -j $(nproc)
   make test
@@ -249,6 +250,7 @@ elif [[ "$1" == "cmake.opentracing_shim.install.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}" \
         -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
         -DWITH_OPENTRACING=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
         "${SRC_DIR}"
   make -j $(nproc)
@@ -398,6 +400,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.shared_libs.with_static_grpc.test" ]]
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_FILE=ON \
         -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
   proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"

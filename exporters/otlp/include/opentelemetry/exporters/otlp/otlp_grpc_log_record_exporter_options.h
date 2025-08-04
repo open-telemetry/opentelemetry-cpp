@@ -23,8 +23,15 @@ namespace otlp
  */
 struct OPENTELEMETRY_EXPORT OtlpGrpcLogRecordExporterOptions : public OtlpGrpcClientOptions
 {
+  /** Lookup environment variables. */
   OtlpGrpcLogRecordExporterOptions();
-  ~OtlpGrpcLogRecordExporterOptions();
+  /** No defaults. */
+  OtlpGrpcLogRecordExporterOptions(void *);
+  OtlpGrpcLogRecordExporterOptions(const OtlpGrpcLogRecordExporterOptions &)            = default;
+  OtlpGrpcLogRecordExporterOptions(OtlpGrpcLogRecordExporterOptions &&)                 = default;
+  OtlpGrpcLogRecordExporterOptions &operator=(const OtlpGrpcLogRecordExporterOptions &) = default;
+  OtlpGrpcLogRecordExporterOptions &operator=(OtlpGrpcLogRecordExporterOptions &&)      = default;
+  ~OtlpGrpcLogRecordExporterOptions() override;
 };
 
 }  // namespace otlp

@@ -26,7 +26,6 @@ class View
 public:
   View(const std::string &name,
        const std::string &description                        = "",
-       const std::string &unit                               = "",
        AggregationType aggregation_type                      = AggregationType::kDefault,
        std::shared_ptr<AggregationConfig> aggregation_config = nullptr,
        std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor =
@@ -35,7 +34,6 @@ public:
        size_t aggregation_cardinality_limit = 0)
       : name_(name),
         description_(description),
-        unit_(unit),
         aggregation_type_{aggregation_type},
         aggregation_config_{aggregation_config},
         attributes_processor_{std::move(attributes_processor)},
@@ -74,7 +72,6 @@ public:
 private:
   std::string name_;
   std::string description_;
-  std::string unit_;
   AggregationType aggregation_type_;
   std::shared_ptr<AggregationConfig> aggregation_config_;
   std::shared_ptr<AttributesProcessor> attributes_processor_;

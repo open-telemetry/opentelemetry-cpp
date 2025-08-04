@@ -32,7 +32,6 @@ target_link_libraries(opentelemetry_otlp_recordable
                       PUBLIC opentelemetry_metrics)
 
 if(WITH_OTLP_GRPC)
-  find_package(gRPC REQUIRED)
   if(NOT DEFINED grpc_lib_type)
     message(
       FATAL_ERROR "cmake/opentelemetry-proto.cmake should be included first")
@@ -151,10 +150,6 @@ if(WITH_OTLP_HTTP)
             "$<BUILD_INTERFACE:nlohmann_json::nlohmann_json>"
             "$<INSTALL_INTERFACE:opentelemetry_http_client_curl>")
 
-  if(nlohmann_json_clone)
-    add_dependencies(opentelemetry_exporter_otlp_http_client
-                     nlohmann_json::nlohmann_json)
-  endif()
   target_include_directories(
     opentelemetry_exporter_otlp_http_client
     PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
@@ -228,10 +223,6 @@ if(WITH_OTLP_FILE)
     PUBLIC opentelemetry_sdk opentelemetry_common
     PRIVATE opentelemetry_proto $<BUILD_INTERFACE:nlohmann_json::nlohmann_json>)
 
-  if(nlohmann_json_clone)
-    add_dependencies(opentelemetry_exporter_otlp_file_client
-                     nlohmann_json::nlohmann_json)
-  endif()
   target_include_directories(
     opentelemetry_exporter_otlp_file_client
     PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"

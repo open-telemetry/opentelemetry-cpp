@@ -33,7 +33,14 @@ namespace otlp
  */
 struct OPENTELEMETRY_EXPORT OtlpHttpMetricExporterOptions
 {
+  /** Lookup environment variables. */
   OtlpHttpMetricExporterOptions();
+  /** No defaults. */
+  OtlpHttpMetricExporterOptions(void *);
+  OtlpHttpMetricExporterOptions(const OtlpHttpMetricExporterOptions &)            = default;
+  OtlpHttpMetricExporterOptions(OtlpHttpMetricExporterOptions &&)                 = default;
+  OtlpHttpMetricExporterOptions &operator=(const OtlpHttpMetricExporterOptions &) = default;
+  OtlpHttpMetricExporterOptions &operator=(OtlpHttpMetricExporterOptions &&)      = default;
   ~OtlpHttpMetricExporterOptions();
 
   /** The endpoint to export to. */
