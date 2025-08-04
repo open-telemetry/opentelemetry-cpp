@@ -14,7 +14,7 @@
 class CustomSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor
 {
 public:
-  CustomSpanProcessor(const std::string &comment) : m_comment(comment) {}
+  CustomSpanProcessor(const std::string &comment) : comment_(comment) {}
   CustomSpanProcessor(CustomSpanProcessor &&)                      = delete;
   CustomSpanProcessor(const CustomSpanProcessor &)                 = delete;
   CustomSpanProcessor &operator=(CustomSpanProcessor &&)           = delete;
@@ -33,5 +33,5 @@ public:
   bool Shutdown(std::chrono::microseconds timeout) noexcept override;
 
 private:
-  std::string m_comment;
+  std::string comment_;
 };

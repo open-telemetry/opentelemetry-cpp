@@ -15,7 +15,7 @@
 class CustomLogRecordExporter : public opentelemetry::sdk::logs::LogRecordExporter
 {
 public:
-  CustomLogRecordExporter(const std::string & /* comment */) {}
+  CustomLogRecordExporter(const std::string &comment) : comment_(comment) {}
   CustomLogRecordExporter(CustomLogRecordExporter &&)                      = delete;
   CustomLogRecordExporter(const CustomLogRecordExporter &)                 = delete;
   CustomLogRecordExporter &operator=(CustomLogRecordExporter &&)           = delete;
@@ -31,4 +31,7 @@ public:
   bool ForceFlush(std::chrono::microseconds timeout) noexcept override;
 
   bool Shutdown(std::chrono::microseconds timeout) noexcept override;
+
+private:
+  std::string comment_;
 };
