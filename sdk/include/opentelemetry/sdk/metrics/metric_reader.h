@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <stddef.h>
 #include <atomic>
 #include <chrono>
 
@@ -40,6 +41,19 @@ public:
 
   virtual AggregationTemporality GetAggregationTemporality(
       InstrumentType instrument_type) const noexcept = 0;
+
+  /**
+   * Get the default cardinality limit for given Instrument Type for this reader.
+   * 
+   * @param instrument_type The instrument type to get the cardinality limit for
+   * @return The cardinality limit, or 0 if no limit is set
+   */
+  virtual size_t GetDefaultCardinalityLimit(InstrumentType instrument_type) const noexcept
+  {
+    // Default implementation returns no limit
+    (void)instrument_type;
+    return 0;
+  }
 
   /**
    * Shutdown the metric reader.
