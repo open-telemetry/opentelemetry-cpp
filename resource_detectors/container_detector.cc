@@ -20,7 +20,7 @@ namespace resource
 /**
  * This is the file path from where we can get container.id
  */
-const char *KCGroupPath = "/proc/self/cgroup";
+constexpr const char *KCGroupPath = "/proc/self/cgroup";
 
 Resource ContainerResourceDetector::Detect() noexcept
 {
@@ -32,7 +32,7 @@ Resource ContainerResourceDetector::Detect() noexcept
 
   ResourceAttributes attributes;
 
-  attributes[semconv::container::kContainerId] = container_id;
+  attributes[semconv::container::kContainerId] = std::move(container_id);
   return ResourceDetector::Create(attributes);
 }
 

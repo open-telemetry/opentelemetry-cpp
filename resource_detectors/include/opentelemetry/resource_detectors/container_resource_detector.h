@@ -36,7 +36,7 @@ std::string GetContainerIDFromCgroup(const char *file_path);
  * @param line a single line of text, typically from the /proc/self/cgroup file
  * @return matched id or empty string
  */
-std::string ExtractContainerIDFromLine(const std::string &line);
+std::string ExtractContainerIDFromLine(std::string_view line);
 
 }  // namespace resource
 }  // namespace sdk

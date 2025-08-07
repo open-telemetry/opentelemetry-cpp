@@ -19,8 +19,8 @@ namespace sdk
 namespace resource
 {
 
-const char *KOtelResourceAttributes = "OTEL_RESOURCE_ATTRIBUTES";
-const char *KOtelServiceName        = "OTEL_SERVICE_NAME";
+constexpr const char *KOtelResourceAttributes = "OTEL_RESOURCE_ATTRIBUTES";
+constexpr const char *KOtelServiceName        = "OTEL_SERVICE_NAME";
 
 Resource ResourceDetector::Create(const ResourceAttributes &attributes,
                                   const std::string &schema_url)
