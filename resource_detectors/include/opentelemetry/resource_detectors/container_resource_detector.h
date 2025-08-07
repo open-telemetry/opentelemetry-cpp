@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/version.h"
@@ -36,7 +37,7 @@ std::string GetContainerIDFromCgroup(const char *file_path);
  * @param line a single line of text, typically from the /proc/self/cgroup file
  * @return matched id or empty string
  */
-std::string ExtractContainerIDFromLine(std::string_view line);
+std::string ExtractContainerIDFromLine(nostd::string_view line);
 
 }  // namespace resource
 }  // namespace sdk

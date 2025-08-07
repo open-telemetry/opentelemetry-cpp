@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/resource_detectors/container_resource_detector.h"
 
 #include <fstream>
@@ -30,7 +31,7 @@ std::string GetContainerIDFromCgroup(const char *file_path)
   return std::string();
 }
 
-std::string ExtractContainerIDFromLine(std::string_view line)
+std::string ExtractContainerIDFromLine(nostd::string_view line)
 {
   /**
    * This regex is designed to extract container IDs from cgroup file lines.
@@ -47,7 +48,7 @@ std::string ExtractContainerIDFromLine(std::string_view line)
 
   if (std::regex_search(line.begin(), line.end(), match, container_id_regex))
   {
-    return std::string(match[1].first, match[1].second);
+    return match.str(1);
   }
 
   return std::string();
