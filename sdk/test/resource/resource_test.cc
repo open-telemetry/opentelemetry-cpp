@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <utility>
 
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/resource_detectors/container_resource_detector.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"

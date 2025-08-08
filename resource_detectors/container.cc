@@ -44,9 +44,9 @@ std::string ExtractContainerIDFromLine(nostd::string_view line)
    * Please see the test cases in resource_test.cc for more examples.
    */
   static const std::regex container_id_regex(R"(^.*/(?:.*[-:])?([0-9a-f]+)(?:\.|\s*$))");
-  std::match_results<std::string_view::const_iterator> match;
+  std::match_results<const char *> match;
 
-  if (std::regex_search(line.begin(), line.end(), match, container_id_regex))
+  if (std::regex_search(line.data(), line.data() + line.size(), match, container_id_regex))
   {
     return match.str(1);
   }
