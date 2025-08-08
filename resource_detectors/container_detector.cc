@@ -21,11 +21,11 @@ namespace resource
 /**
  * This is the file path from where we can get container.id
  */
-constexpr const char *KCGroupPath = "/proc/self/cgroup";
+constexpr const char *kCGroupPath = "/proc/self/cgroup";
 
 Resource ContainerResourceDetector::Detect() noexcept
 {
-  std::string container_id = opentelemetry::sdk::resource::GetContainerIDFromCgroup(KCGroupPath);
+  std::string container_id = opentelemetry::sdk::resource::GetContainerIDFromCgroup(kCGroupPath);
   if (container_id.empty())
   {
     return ResourceDetector::Create({});
