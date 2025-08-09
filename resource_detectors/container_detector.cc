@@ -1,8 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/resource_detectors/container_detector.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/resource_detectors/container_resource_detector.h"
+#include "opentelemetry/resource_detectors/container_detector_utils.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/semconv/incubating/container_attributes.h"
@@ -13,7 +14,7 @@
 #include <utility>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
+namespace resource_detector
 {
 namespace resource
 {
@@ -23,20 +24,21 @@ namespace resource
  */
 constexpr const char *kCGroupPath = "/proc/self/cgroup";
 
-Resource ContainerResourceDetector::Detect() noexcept
+opentelemetry::sdk::resource::Resource ContainerResourceDetector::Detect() noexcept
 {
-  std::string container_id = opentelemetry::sdk::resource::GetContainerIDFromCgroup(kCGroupPath);
+  std::string container_id =
+      opentelemetry::resource_detector::detail::GetContainerIDFromCgroup(kCGroupPath);
   if (container_id.empty())
   {
     return ResourceDetector::Create({});
   }
 
-  ResourceAttributes attributes;
+  opentelemetry::sdk::resource::ResourceAttributes attributes;
 
   attributes[semconv::container::kContainerId] = std::move(container_id);
   return ResourceDetector::Create(attributes);
 }
 
 }  // namespace resource
-}  // namespace sdk
+}  // namespace resource_detector
 OPENTELEMETRY_END_NAMESPACE

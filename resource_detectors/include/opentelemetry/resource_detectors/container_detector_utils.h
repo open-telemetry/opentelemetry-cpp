@@ -9,26 +9,15 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
+namespace resource_detector
 {
-namespace resource
+namespace detail
 {
-
-/**
- * ContainerResourceDetector to detect resource attributes when running inside a containerized
- * environment. This detector extracts metadata such as container ID from cgroup information and
- * sets attributes like container.id following the OpenTelemetry semantic conventions.
- */
-class ContainerResourceDetector : public ResourceDetector
-{
-public:
-  Resource Detect() noexcept override;
-};
 
 /**
  * Reads the container.id from /proc/self/cgroup file.
  * @param file_path file path of cgroup
- * @return container.id as string or empty string
+ * @return container.id as string or an empty string if not found on error
  */
 std::string GetContainerIDFromCgroup(const char *file_path);
 
@@ -39,6 +28,6 @@ std::string GetContainerIDFromCgroup(const char *file_path);
  */
 std::string ExtractContainerIDFromLine(nostd::string_view line);
 
-}  // namespace resource
-}  // namespace sdk
+}  // namespace detail
+}  // namespace resource_detector
 OPENTELEMETRY_END_NAMESPACE

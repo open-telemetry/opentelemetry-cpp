@@ -1,8 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/resource_detectors/container_detector_utils.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/resource_detectors/container_resource_detector.h"
+#include "opentelemetry/resource_detectors/container_detector.h"
 
 #include <fstream>
 #include <regex>
@@ -11,10 +12,11 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
+namespace resource_detector
 {
-namespace resource
+namespace detail
 {
+
 std::string GetContainerIDFromCgroup(const char *file_path)
 {
   std::ifstream cgroup_file(file_path);
@@ -53,6 +55,7 @@ std::string ExtractContainerIDFromLine(nostd::string_view line)
 
   return std::string();
 }
-}  // namespace resource
-}  // namespace sdk
+
+}  // namespace detail
+}  // namespace resource_detector
 OPENTELEMETRY_END_NAMESPACE

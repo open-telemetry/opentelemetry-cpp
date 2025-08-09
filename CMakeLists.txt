@@ -634,7 +634,6 @@ if(DEFINED OPENTELEMETRY_BUILD_DLL)
 endif()
 
 add_subdirectory(api)
-add_subdirectory(resource_detectors)
 
 if(WITH_OPENTRACING)
   add_subdirectory(opentracing-shim)
@@ -646,6 +645,7 @@ if(NOT WITH_API_ONLY)
   add_subdirectory(sdk)
   add_subdirectory(ext)
   add_subdirectory(exporters)
+  add_subdirectory(resource_detectors)
 
   if(BUILD_TESTING)
     add_subdirectory(test_common)
