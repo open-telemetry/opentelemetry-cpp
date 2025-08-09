@@ -3,7 +3,6 @@
 
 #include "opentelemetry/resource_detectors/container_detector_utils.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/resource_detectors/container_detector.h"
 
 #include <fstream>
 #include <regex>

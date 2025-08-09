@@ -3,9 +3,9 @@
 
 #pragma once
 
+#include <string>
+
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

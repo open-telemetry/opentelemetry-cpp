@@ -2,15 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <cstdio>
 #include <fstream>
 #include <string>
-#include <utility>
 
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/resource_detectors/container_detector.h"
 #include "opentelemetry/resource_detectors/container_detector_utils.h"
-#include "opentelemetry/sdk/resource/resource.h"
 
 TEST(ContainerIdDetectorTest, ExtractValidContainerIdFromLine)
 {
