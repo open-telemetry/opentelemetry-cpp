@@ -16,8 +16,6 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace resource_detector
 {
-namespace resource
-{
 
 /**
  * This is the file path from where we can get container.id
@@ -39,6 +37,5 @@ opentelemetry::sdk::resource::Resource ContainerResourceDetector::Detect() noexc
   return ResourceDetector::Create(attributes);
 }
 
-}  // namespace resource
 }  // namespace resource_detector
 OPENTELEMETRY_END_NAMESPACE

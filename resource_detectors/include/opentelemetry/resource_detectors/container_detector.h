@@ -10,8 +10,6 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace resource_detector
 {
-namespace resource
-{
 
 /**
  * ContainerResourceDetector to detect resource attributes when running inside a containerized
@@ -24,6 +22,5 @@ public:
   opentelemetry::sdk::resource::Resource Detect() noexcept override;
 };
 
-}  // namespace resource
 }  // namespace resource_detector
 OPENTELEMETRY_END_NAMESPACE
