@@ -438,6 +438,7 @@ switch ($action) {
       -DWITH_ZIPKIN=OFF `
       -DWITH_ELASTICSEARCH=OFF `
       -DWITH_EXAMPLES=OFF `
+      -DWITH_EXAMPLES_HTTP=OFF
 
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
