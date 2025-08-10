@@ -12,8 +12,8 @@ target_link_libraries(opentelemetry_resource_detectors
                       PUBLIC opentelemetry_resources)
 target_include_directories(
   opentelemetry_resource_detectors
-  PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/resource_detectors/include>"
-         "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
 
 otel_add_component(
   COMPONENT
