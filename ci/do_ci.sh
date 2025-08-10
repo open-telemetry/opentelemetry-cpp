@@ -125,6 +125,7 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
+        -DWITH_OPENTRACING=OFF \
         -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
@@ -137,6 +138,7 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
+        -DWITH_OPENTRACING=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
         "${SRC_DIR}"
@@ -149,6 +151,7 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_STANDARD=11 \
         -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
+        -DWITH_OPENTRACING=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
         "${SRC_DIR}"
@@ -160,6 +163,7 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -C ${SRC_DIR}/test_common/cmake/all-options-abiv2-preview.cmake \
+        -DWITH_OPENTRACING=OFF \
         -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
