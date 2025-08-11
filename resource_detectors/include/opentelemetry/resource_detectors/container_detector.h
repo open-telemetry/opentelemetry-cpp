@@ -3,9 +3,9 @@
 
 #pragma once
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace resource_detector
@@ -16,7 +16,7 @@ namespace resource_detector
  * environment. This detector extracts metadata such as container ID from cgroup information and
  * sets attributes like container.id following the OpenTelemetry semantic conventions.
  */
-class ContainerResourceDetector : public opentelemetry::sdk::resource::ResourceDetector
+class OPENTELEMETRY_EXPORT_TYPE ContainerResourceDetector : public opentelemetry::sdk::resource::ResourceDetector
 {
 public:
   opentelemetry::sdk::resource::Resource Detect() noexcept override;

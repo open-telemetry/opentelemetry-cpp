@@ -72,7 +72,7 @@ otel_cc_library(
     name = "otel_sdk_deps",
     visibility = ["//visibility:private"],
     deps = [
-        # "@otel_sdk//exporters/elasticsearch:es_log_record_exporter",
+        "@otel_sdk//exporters/elasticsearch:es_log_record_exporter",
         "@otel_sdk//exporters/memory:in_memory_data",
         "@otel_sdk//exporters/memory:in_memory_metric_data",
         "@otel_sdk//exporters/memory:in_memory_metric_exporter_factory",
@@ -87,12 +87,13 @@ otel_cc_library(
         "@otel_sdk//exporters/otlp:otlp_grpc_forward_proxy",
         "@otel_sdk//exporters/otlp:otlp_grpc_log_record_exporter",
         "@otel_sdk//exporters/otlp:otlp_grpc_metric_exporter",
-        # "@otel_sdk//exporters/otlp:otlp_http_exporter",
-        # "@otel_sdk//exporters/otlp:otlp_http_log_record_exporter",
-        # "@otel_sdk//exporters/otlp:otlp_http_metric_exporter",
-        # "@otel_sdk//exporters/prometheus:prometheus_exporter",
-        # "@otel_sdk//exporters/prometheus:prometheus_push_exporter",
-        # "@otel_sdk//exporters/zipkin:zipkin_exporter",
+        "@otel_sdk//exporters/otlp:otlp_http_exporter",
+        "@otel_sdk//exporters/otlp:otlp_http_log_record_exporter",
+        "@otel_sdk//exporters/otlp:otlp_http_metric_exporter",
+        "@otel_sdk//exporters/prometheus:prometheus_exporter",
+        "@otel_sdk//exporters/prometheus:prometheus_push_exporter",
+        "@otel_sdk//exporters/zipkin:zipkin_exporter",
+        "@otel_sdk//resource_detectors",
     ] + select({
         # "@platforms//os:windows": ["@otel_sdk//exporters/etw:etw_exporter"],
         "//conditions:default": [],
@@ -229,6 +230,7 @@ alias(
         "//exporters/zipkin:headers",
         "//ext:headers",
         "//sdk:headers",
+        "//resource_detectors:headers",
     ] + select({
         "@platforms//os:windows": [
             "//exporters/etw:headers",
@@ -268,6 +270,7 @@ pkg_files(
         "//exporters/prometheus:header_files",
         "//exporters/zipkin:header_files",
         "//ext:header_files",
+        "//resource_detectors:header_files",
         "//sdk:header_files",
     ] + select({
         "@platforms//os:windows": [

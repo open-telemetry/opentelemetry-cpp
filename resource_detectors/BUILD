@@ -1,15 +1,17 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load("//bazel:otel_cc.bzl", "otel_cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
+otel_cc_library(
     name = "headers",
     hdrs = glob(["include/**/*.h"]),
     strip_include_prefix = "include",
 )
 
-cc_library(
+otel_cc_library(
     name = "resource_detectors",
     srcs = [
         "container_detector.cc",
@@ -21,4 +23,10 @@ cc_library(
         "//sdk:headers",
         "//sdk/src/resource",
     ],
+)
+
+# This is used for otel_sdk.zip packaging
+filegroup(
+    name = "header_files",
+    srcs = glob(["include/**/*.h"]),
 )
