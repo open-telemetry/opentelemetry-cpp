@@ -1,0 +1,58 @@
+name: Post-Release Version Bump
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract release version and decide bump type
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
+
+          MAJOR=$(echo "$TAG_VERSION" | cut -d. -f1)
+          MINOR=$(echo "$TAG_VERSION" | cut -d. -f2)
+          PATCH=$(echo "$TAG_VERSION" | cut -d. -f3)
+
+          if [ "$PATCH" -gt 0 ]; then
+            # Patch release → bump patch
+            NEW_MAJOR=$MAJOR
+            NEW_MINOR=$MINOR
+            NEW_PATCH=$((PATCH + 1))
+          else
+            # Minor release → bump minor, reset patch
+            NEW_MAJOR=$MAJOR
+            NEW_MINOR=$((MINOR + 1))
+            NEW_PATCH=0
+          fi
+
+          echo "NEW_MAJOR=$NEW_MAJOR" >> $GITHUB_ENV
+          echo "NEW_MINOR=$NEW_MINOR" >> $GITHUB_ENV
+          echo "NEW_PATCH=$NEW_PATCH" >> $GITHUB_ENV
+
+      - name: Update version.h to DEV version
+        run: |
+          FILE_PATH="include/opentelemetry/version.h"
+          sed -i "s|#define OPENTELEMETRY_VERSION \".*\"|#define OPENTELEMETRY_VERSION \"${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-DEV\"|" "$FILE_PATH"
+          sed -i "s|#define OPENTELEMETRY_VERSION_MAJOR .*|#define OPENTELEMETRY_VERSION_MAJOR ${NEW_MAJOR}|" "$FILE_PATH"
+          sed -i "s|#define OPENTELEMETRY_VERSION_MINOR .*|#define OPENTELEMETRY_VERSION_MINOR ${NEW_MINOR}|" "$FILE_PATH"
+          sed -i "s|#define OPENTELEMETRY_VERSION_PATCH .*|#define OPENTELEMETRY_VERSION_PATCH ${NEW_PATCH}|" "$FILE_PATH"
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add include/opentelemetry/version.h
+          git commit -m "Bump version to ${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-DEV after release" || echo "No changes to commit"
+          git push origin main
+

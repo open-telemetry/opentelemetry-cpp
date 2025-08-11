@@ -1,0 +1,54 @@
+name: Pre-Release Preparation
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. 1.23.0)'
+        required: true
+        type: string
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate current version contains -DEV
+        run: |
+          FILE_PATH="include/opentelemetry/version.h"
+          if ! grep -q -- "-DEV" "$FILE_PATH"; then
+            echo "Error: version.h does not contain -DEV. Aborting to prevent overwriting a release."
+            exit 1
+          fi
+
+      - name: Remove -DEV from version.h
+        run: |
+          FILE_PATH="include/opentelemetry/version.h"
+          VERSION="${{ github.event.inputs.version }}"
+
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          MINOR=$(echo "$VERSION" | cut -d. -f2)
+          PATCH=$(echo "$VERSION" | cut -d. -f3)
+
+          sed -i "s|#define OPENTELEMETRY_VERSION \".*\"|#define OPENTELEMETRY_VERSION \"${VERSION}\"|" "$FILE_PATH"
+          sed -i "s|#define OPENTELEMETRY_VERSION_MAJOR .*|#define OPENTELEMETRY_VERSION_MAJOR ${MAJOR}|" "$FILE_PATH"
+          sed -i "s|#define OPENTELEMETRY_VERSION_MINOR .*|#define OPENTELEMETRY_VERSION_MINOR ${MINOR}|" "$FILE_PATH"
+          sed -i "s|#define OPENTELEMETRY_VERSION_PATCH .*|#define OPENTELEMETRY_VERSION_PATCH ${PATCH}|" "$FILE_PATH"
+
+      - name: Commit clean release version
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add include/opentelemetry/version.h
+          git commit -m "Prepare release ${{ github.event.inputs.version }}" || echo "No changes to commit"
+          git push origin main
+
+      - name: Create and push tag
+        run: |
+          git tag -a "v${{ github.event.inputs.version }}" -m "Release v${{ github.event.inputs.version }}"
+          git push origin "v${{ github.event.inputs.version }}"
