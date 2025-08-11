@@ -55,7 +55,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add include/opentelemetry/version.h
+          git add api/include/opentelemetry/version.h
           git commit -m "Bump version to ${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-DEV after release" || echo "No changes to commit"
           git push origin main
 
