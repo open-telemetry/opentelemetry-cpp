@@ -28,7 +28,7 @@ jobs:
 
       - name: Remove -DEV from version.h
         run: |
-          FILE_PATH="include/opentelemetry/version.h"
+          FILE_PATH="api/include/opentelemetry/version.h"
           VERSION="${{ github.event.inputs.version }}"
 
           MAJOR=$(echo "$VERSION" | cut -d. -f1)
