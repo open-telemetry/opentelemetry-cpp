@@ -34,7 +34,10 @@ jobs:
             NEW_MAJOR=$MAJOR
             NEW_MINOR=$((MINOR + 1))
             NEW_PATCH=0
-          fi
+          # Always bump minor version and reset patch
+          NEW_MAJOR=$MAJOR
+          NEW_MINOR=$((MINOR + 1))
+          NEW_PATCH=0
 
           echo "NEW_MAJOR=$NEW_MAJOR" >> $GITHUB_ENV
           echo "NEW_MINOR=$NEW_MINOR" >> $GITHUB_ENV
