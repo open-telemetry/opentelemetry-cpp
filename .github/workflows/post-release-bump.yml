@@ -45,7 +45,7 @@ jobs:
 
       - name: Update version.h to DEV version
         run: |
-          FILE_PATH="include/opentelemetry/version.h"
+          FILE_PATH="api/include/opentelemetry/version.h"
           sed -i "s|#define OPENTELEMETRY_VERSION \".*\"|#define OPENTELEMETRY_VERSION \"${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}-DEV\"|" "$FILE_PATH"
           sed -i "s|#define OPENTELEMETRY_VERSION_MAJOR .*|#define OPENTELEMETRY_VERSION_MAJOR ${NEW_MAJOR}|" "$FILE_PATH"
           sed -i "s|#define OPENTELEMETRY_VERSION_MINOR .*|#define OPENTELEMETRY_VERSION_MINOR ${NEW_MINOR}|" "$FILE_PATH"
