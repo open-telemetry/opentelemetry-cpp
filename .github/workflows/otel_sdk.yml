@@ -37,7 +37,7 @@ jobs:
             Write-Host "Winget install failed or not needed (already installed)"
             exit 0
           }
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/cache/restore@v4
         with:
           path: c:/d.vhdx
