@@ -20,7 +20,7 @@ jobs:
 
       - name: Validate current version contains -DEV
         run: |
-          FILE_PATH="include/opentelemetry/version.h"
+          FILE_PATH="api/include/opentelemetry/version.h"
           if ! grep -q -- "-DEV" "$FILE_PATH"; then
             echo "Error: version.h does not contain -DEV. Aborting to prevent overwriting a release."
             exit 1
