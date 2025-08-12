@@ -114,17 +114,16 @@ otel_cc_test(
     ]),
 )
 
+filegroup(
+    name = "header_files",
+    srcs = glob(["include/**/*.h"]),
+)
+
 otel_cc_library(
     name = "headers",
-    hdrs = glob(["include/**/*.h"]),
+    hdrs = [":header_files"],
     strip_include_prefix = "include",
     deps = [
         "//sdk:headers",
     ],
-)
-
-# This is used for otel_sdk.zip packaging
-filegroup(
-    name = "header_files",
-    srcs = glob(["include/**/*.h"]),
 )

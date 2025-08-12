@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/resource_detectors/container_detector_utils.h"
 
