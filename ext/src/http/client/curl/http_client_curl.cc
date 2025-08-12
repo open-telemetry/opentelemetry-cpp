@@ -101,13 +101,13 @@ int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *m
     have           = 0;
     while (ret == Z_OK)
     {
-      strm->avail_out =
-          strm->avail_in ? strm->next_in - strm->next_out : (buf + *max_len) - strm->next_out;
+      strm->avail_out = static_cast<decltype(z_stream::avail_out)>(
+          strm->avail_in ? strm->next_in - strm->next_out : (buf + *max_len) - strm->next_out);
       ret = deflate(strm, Z_FINISH);
     }
     if (ret != Z_BUF_ERROR || strm->avail_in == 0)
     {
-      *max_len = strm->next_out - buf;
+      *max_len = static_cast<uint32_t>(strm->next_out - buf);
       return ret == Z_STREAM_END ? Z_OK : ret;
     }
   }
@@ -130,10 +130,10 @@ int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *m
     std::memcpy(buf, temp.data(), have);
     strm->next_out = buf + have;
   }
-  strm->avail_out = (buf + *max_len) - strm->next_out;
+  strm->avail_out = static_cast<decltype(z_stream::avail_out)>((buf + *max_len) - strm->next_out);
   ret             = deflate(strm, Z_FINISH);
   strm->zfree(strm->opaque, hold);
-  *max_len = strm->next_out - buf;
+  *max_len = static_cast<uint32_t>(strm->next_out - buf);
   return ret == Z_OK ? Z_BUF_ERROR : (ret == Z_STREAM_END ? Z_OK : ret);
 }
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW

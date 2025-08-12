@@ -102,18 +102,21 @@ void assert_basic(prometheus_client::MetricFamily &metric,
   switch (type)
   {
     case prometheus_client::MetricType::Counter: {
-      ASSERT_DOUBLE_EQ(metric_data.counter.value, vals[0]);
+      ASSERT_DOUBLE_EQ(static_cast<double>(metric_data.counter.value),
+                       static_cast<double>(vals[0]));
       break;
     }
     case prometheus_client::MetricType::Histogram: {
-      ASSERT_DOUBLE_EQ(metric_data.histogram.sample_count, vals[0]);
-      ASSERT_DOUBLE_EQ(metric_data.histogram.sample_sum, vals[1]);
+      ASSERT_DOUBLE_EQ(static_cast<double>(metric_data.histogram.sample_count),
+                       static_cast<double>(vals[0]));
+      ASSERT_DOUBLE_EQ(static_cast<double>(metric_data.histogram.sample_sum),
+                       static_cast<double>(vals[1]));
       auto buckets = metric_data.histogram.bucket;
       ASSERT_EQ(buckets.size(), vals[2]);
       break;
     }
     case prometheus_client::MetricType::Gauge: {
-      ASSERT_DOUBLE_EQ(metric_data.gauge.value, vals[0]);
+      ASSERT_DOUBLE_EQ(static_cast<double>(metric_data.gauge.value), static_cast<double>(vals[0]));
       break;
     }
     break;

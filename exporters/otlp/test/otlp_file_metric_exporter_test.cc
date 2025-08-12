@@ -95,8 +95,9 @@ public:
         opentelemetry::sdk::resource::ResourceAttributes{}, "resource_url");
     data.resource_ = &resource;
 
-    auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
-        "library_name", "1.5.0", "scope_url", {{"scope_key", "scope_value"}});
+    auto instrumentation_scope =
+        opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+            "library_name", "1.5.0", "scope_url", {{"scope_key", "scope_value"}});
 
     opentelemetry::sdk::metrics::MetricData metric_data{
         opentelemetry::sdk::metrics::InstrumentDescriptor{
@@ -110,7 +111,8 @@ public:
             {opentelemetry::sdk::metrics::PointAttributes{{"a2", "b2"}}, sum_point_data2}}};
 
     data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
-        {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
+        {instrumentation_scope.get(),
+         std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
 
     auto result = exporter->Export(data);
     EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
@@ -180,10 +182,12 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
-        "library_name", "1.5.0");
+    auto instrumentation_scope =
+        opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("library_name",
+                                                                               "1.5.0");
     data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
-        {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
+        {instrumentation_scope.get(),
+         std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
 
     auto result = exporter->Export(data);
     EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
@@ -250,10 +254,12 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
-        "library_name", "1.5.0");
+    auto instrumentation_scope =
+        opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("library_name",
+                                                                               "1.5.0");
     data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
-        {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
+        {instrumentation_scope.get(),
+         std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
 
     auto result = exporter->Export(data);
     EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
