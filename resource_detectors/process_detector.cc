@@ -1,0 +1,64 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+#include "opentelemetry/resource_detectors/process_detector.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/resource_detectors/process_detector_utils.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/resource/resource_detector.h"
+#include "opentelemetry/semconv/incubating/process_attributes.h"
+#include "opentelemetry/version.h"
+
+#include <string>
+#include <unordered_map>
+#include <utility>
+
+#ifdef _MSC_VER
+#  include <process.h>
+#  define getpid _getpid
+#else
+#  include <unistd.h>
+#endif
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace resource_detector
+{
+
+opentelemetry::sdk::resource::Resource ProcessResourceDetector::Detect() noexcept
+{
+  int32_t pid = getpid();
+  opentelemetry::sdk::resource::ResourceAttributes attributes;
+  attributes[semconv::process::kProcessPid] = pid;
+
+  std::string executable_path = opentelemetry::resource_detector::detail::GetExecutablePath(pid);
+  if (!executable_path.empty())
+  {
+    attributes[semconv::process::kProcessExecutablePath] = std::move(executable_path);
+  }
+
+  std::string command = opentelemetry::resource_detector::detail::GetCommand(pid);
+  if (!command.empty())
+  {
+    attributes[semconv::process::kProcessCommand] = std::move(command);
+  }
+
+  return ResourceDetector::Create(attributes);
+}
+
+opentelemetry::sdk::resource::Resource ProcessResourceDetector::DetectCommandLineArgs() noexcept
+{
+  int32_t pid = getpid();
+  opentelemetry::sdk::resource::ResourceAttributes attributes;
+
+  std::vector<std::string> command_line_args =
+      opentelemetry::resource_detector::detail::GetCommandLineArgs(pid);
+  if (!command_line_args.empty())
+  {
+    attributes[semconv::process::kProcessCommandArgs] = std::move(command_line_args);
+  }
+
+  return ResourceDetector::Create(attributes);
+}
+
+}  // namespace resource_detector
+OPENTELEMETRY_END_NAMESPACE
