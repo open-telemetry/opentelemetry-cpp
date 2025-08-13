@@ -1,0 +1,26 @@
+{
+    "$schema": "https://aka.ms/winget-settings.schema.json",
+    "source": {
+        "autoUpdateIntervalInMinutes": 0
+    },
+    "visual": {
+        "progressBar": "disabled",
+        "anonymizeDisplayedPaths": false
+    },
+    "installBehavior": {
+        "disableInstallNotes": true
+    },
+    "uninstallBehavior": {
+        "purgePortablePackage": true
+    },
+    "telemetry": {
+        "disable": true
+    },
+    "logging": {
+        "level": "verbose",
+        "channels": ["all"]
+    },
+    "interactivity": {
+        "disable": true
+    }
+}
