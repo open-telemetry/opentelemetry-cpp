@@ -28,9 +28,9 @@ jobs:
       - run: choco uninstall bazel --yes
       - run: cmd /c "dir c:\ || echo swallowing errors"
       - run: cmd /c "dir d:\ || echo swallowing errors"
+      - run: cmd /c "copy .github\workflows\winget_settings.json %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json || echo swallowing errors"
       - run: winget list --accept-source-agreements --disable-interactivity 
       - run: cmd /c "winget --info || echo swallowing errors"
-      - run: cmd /c "copy .github\workflows\winget_settings.json %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json || echo swallowing errors"
       - run: |
           winget remove --all --verbose --force --purge --disable-interactivity `
           Amazon.AWSCLI `
