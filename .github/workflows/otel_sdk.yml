@@ -23,6 +23,8 @@ jobs:
       - run: winget list --accept-source-agreements --disable-interactivity 
       - run: cmd /c "winget --info || echo swallowing errors"
       - run: cmd /c "winget settings export || echo swallowing errors"
+      - run: cmd /c "type .github\workflows\winget_settings.json || echo swallowing errors"
+      - run: cmd /c "echo A=%LOCALAPPDATA% || echo swalloing wrrroe"
       - run: cmd /c "dir %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe /s || echo swalloing errors"
       - run: cmd /c "type %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json || echo swallowing errors"
       - run: cmd /c "copy .github\workflows\winget_settings.json %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json || echo swallowing errors"
