@@ -16,27 +16,25 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v5
+      - name: Install PowerShell profile
+        shell: pwsh
+        run: |
+          $profileDir = Split-Path -Parent $PROFILE.CurrentUserAllHosts
+          New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
+          Copy-Item .github/workflows/pwsh_profile.ps1 $PROFILE.CurrentUserAllHosts -Force
       - run: systeminfo
       - run: ls "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC"
       - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize -Wrap
       - run: choco uninstall bazel --yes
-      # - uses: Cyberboss/install-winget@6f566e9e227561d5d31e45d65f9b777b3fa8f56f
-      - run: winget list --accept-source-agreements --disable-interactivity 
-      - run: cmd /c "winget --info || echo swallowing errors"
-      - run: cmd /c "winget settings export || echo swallowing errors"
-      - run: cmd /c "echo %CD% || echo swallowing errors"
-      - run: cmd /c "type .github\workflows\winget_settings.json || echo swallowing errors"
-      - run: cmd /c "echo A=%LOCALAPPDATA% || echo swalloing wrrroe"
-      - run: cmd /c "dir %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe /s || echo swalloing errors"
-      - run: cmd /c "type %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json || echo swallowing errors"
-      - run: cmd /c "copy .github\workflows\winget_settings.json %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json || echo swallowing errors"
-      - run: cmd /c "type %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json || echo swallowing errors"
-      - run: cmd /c "winget settings export || echo swallowing errors"
       - run: cmd /c "dir c:\ || echo swallowing errors"
       - run: cmd /c "dir d:\ || echo swallowing errors"
+      - run: winget list --accept-source-agreements --disable-interactivity 
+      - run: cmd /c "winget --info || echo swallowing errors"
+      - run: cmd /c "copy .github\workflows\winget_settings.json %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json || echo swallowing errors"
       - run: |
           winget remove --all --verbose --force --purge --disable-interactivity Anaconda.Miniconda3 Mozilla.Firefox ShiningLight.OpenSSL.Dev PostgreSQL.PostgreSQL.17 RProject.R RProject.Rtools Unity.UnityHub Amazon.SAM-CLI Microsoft.AzureCLI Microsoft.webpicmd Google.Chrome StrawberryPerl.StrawberryPerl Microsoft.ServiceFabricSDK OpenJS.NodeJS.LTS Amazon.AWSCLI Microsoft.WebDeploy Microsoft.Azure.CosmosEmulator MongoDB.Shell MongoDB.Server WiXToolset.WiXToolset Amazon.SessionManagerPlugin sbt.sbt
           echo Done! LASTEXITCODE=$LASTEXITCODE
+      - run: winget list --accept-source-agreements --disable-interactivity 
       - run: cmd /c "dir c:\ || echo swallowing errors"
       - run: cmd /c "dir d:\ || echo swallowing errors"
       - run: winget install bazelisk -r bazel --accept-package-agreements --disable-interactivity --silent
