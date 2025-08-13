@@ -20,8 +20,10 @@ jobs:
       - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize -Wrap
       - run: choco uninstall bazel --yes
       # - uses: Cyberboss/install-winget@6f566e9e227561d5d31e45d65f9b777b3fa8f56f
+      - run: winget list --accept-source-agreements --disable-interactivity 
       - run: cmd /c "winget --info || echo swallowing errors"
       - run: cmd /c "winget settings export || echo swallowing errors"
+      - run: cmd /c "dir %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe /s || echo swalloing errors"
       - run: cmd /c "type %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json || echo swallowing errors"
       - run: cmd /c "copy .github\workflows\winget_settings.json %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json || echo swallowing errors"
       - run: cmd /c "type %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json || echo swallowing errors"
