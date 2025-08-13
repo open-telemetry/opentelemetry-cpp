@@ -40,26 +40,11 @@ std::string GetExecutablePath(int32_t &pid);
 std::string ExtractCommand(std::string &command_line_path);
 
 /**
- * Retrieves the command line arguments of the process for a given PID.
- * Platform-specific behavior:
- *   - Windows: Uses GetCommandLineW() to get the command line arguments of the current process.
- *   - Linux/Unix: Reads the /proc/<pid>/cmdline file and splits it into null-delimited strings.
- */
-std::vector<std::string> ExtractCommandLineArgs(std::string &command_line_path);
-
-/**
  * Retrieves the command used to launch the process for a given PID.
  * This function is a wrapper around ExtractCommand() and is provided for convenience and
  * testability of ExtractCommand().
  */
 std::string GetCommand(int32_t &pid);
-
-/**
- * Retrieves the command line arguments of the process for a given PID.
- * This function is a wrapper around ExtractCommandLineArgs() and is provided for convenience and
- * testability of ExtractCommandLineArgs().
- */
-std::vector<std::string> GetCommandLineArgs(int32_t &pid);
 
 }  // namespace detail
 }  // namespace resource_detector

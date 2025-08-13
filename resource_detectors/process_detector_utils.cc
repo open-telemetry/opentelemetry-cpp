@@ -91,33 +91,12 @@ std::string GetCommand(int32_t &pid)
 #endif
 }
 
-std::vector<std::string> GetCommandLineArgs(int32_t &pid)
-{
-  std::string command_line_path = FormFilePath(pid, kCmdlineName);
-  return ExtractCommandLineArgs(command_line_path);
-}
-
 std::string ExtractCommand(std::string &command_line_path)
 {
   std::string command;
   std::ifstream command_line_file(command_line_path, std::ios::in | std::ios::binary);
   std::getline(command_line_file, command, '\0');
   return command;
-}
-
-std::vector<std::string> ExtractCommandLineArgs(std::string &command_line_path)
-{
-  std::vector<std::string> args;
-  std::ifstream command_line_file(command_line_path, std::ios::in | std::ios::binary);
-  std::string line;
-  while (std::getline(command_line_file, line, '\0'))
-  {
-    if (!line.empty())
-    {
-      args.push_back(line);
-    }
-  }
-  return args;
 }
 
 std::string FormFilePath(int32_t &pid, const char *process_type)

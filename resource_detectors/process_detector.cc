@@ -9,6 +9,7 @@
 #include "opentelemetry/semconv/incubating/process_attributes.h"
 #include "opentelemetry/version.h"
 
+#include <stdint.h>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -40,21 +41,6 @@ opentelemetry::sdk::resource::Resource ProcessResourceDetector::Detect() noexcep
   if (!command.empty())
   {
     attributes[semconv::process::kProcessCommand] = std::move(command);
-  }
-
-  return ResourceDetector::Create(attributes);
-}
-
-opentelemetry::sdk::resource::Resource ProcessResourceDetector::DetectCommandLineArgs() noexcept
-{
-  int32_t pid = getpid();
-  opentelemetry::sdk::resource::ResourceAttributes attributes;
-
-  std::vector<std::string> command_line_args =
-      opentelemetry::resource_detector::detail::GetCommandLineArgs(pid);
-  if (!command_line_args.empty())
-  {
-    attributes[semconv::process::kProcessCommandArgs] = std::move(command_line_args);
   }
 
   return ResourceDetector::Create(attributes);

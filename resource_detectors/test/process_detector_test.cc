@@ -34,23 +34,14 @@ TEST(ProcessDetectorUtilsTest, ExtractCommand)
   std::remove(filename.c_str());  // Cleanup
 }
 
-TEST(ProcessDetectorUtilsTest, ExtractCommandLineArgs)
+TEST(ProcessDetectorUtilsTest, EmptyCommandFile)
 {
-  std::string filename{"test_args.txt"};
+  std::string filename{"empty_command.txt"};
+  std::ofstream outfile(filename, std::ios::binary);
+  outfile.close();
 
-  {
-    std::ofstream outfile(filename, std::ios::binary);
-    const char raw_data[] = "test_command\0arg1\0arg2\0arg3\0";
-    outfile.write(raw_data, sizeof(raw_data) - 1);
-  }
-
-  std::vector<std::string> args =
-      opentelemetry::resource_detector::detail::ExtractCommandLineArgs(filename);
-  EXPECT_EQ(args.size(), 4);
-  EXPECT_EQ(args[0], "test_command");
-  EXPECT_EQ(args[1], "arg1");
-  EXPECT_EQ(args[2], "arg2");
-  EXPECT_EQ(args[3], "arg3");
+  std::string command = opentelemetry::resource_detector::detail::ExtractCommand(filename);
+  EXPECT_EQ(command, std::string{""});
 
   std::remove(filename.c_str());  // Cleanup
 }
