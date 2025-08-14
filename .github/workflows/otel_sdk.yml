@@ -43,7 +43,6 @@ jobs:
           Microsoft.AzureCLI `
           Microsoft.msodbcsql.17 `
           Microsoft.ServiceFabricSDK `
-          Microsoft.VSTOR `
           Microsoft.WebDeploy `
           Microsoft.webpicmd `
           Microsoft.WindowsApplicationDriver `
