@@ -26,6 +26,41 @@ jobs:
       - run: ls "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC"
       - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize -Wrap
       - run: choco list
+      - run: |
+          choco uninstall --yes `
+          7zip.install `
+          ant `
+          apache-httpd `
+          aria2 `
+          awscli `
+          azcopy10 `
+          bazel `
+          bicep `
+          cmake.install `
+          composer `
+          gradle `
+          imagemagick `
+          imagemagick.app `
+          jq `
+          julia `
+          kubernetes-cli `
+          kubernetes-helm `
+          llvm `
+          maven `
+          Minikube `
+          nginx `
+          ninja `
+          nssm `
+          nuget.commandline `
+          packer `
+          php `
+          pulumi `
+          R.Project `
+          rtools `
+          sbt `
+          strawberryperl `
+          swig `
+          wixtoolset 
       - run: choco uninstall bazel --yes
       - run: cmd /c "dir c:\ || echo swallowing errors"
       - run: cmd /c "dir d:\ || echo swallowing errors"
