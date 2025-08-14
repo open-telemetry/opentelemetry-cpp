@@ -25,6 +25,8 @@ jobs:
       - run: systeminfo
       - run: ls "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC"
       - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize -Wrap
+      - run: cmd /c "dir c:\ || echo swallowing errors"
+      - run: cmd /c "dir d:\ || echo swallowing errors"
       - run: choco list
       - run: |
           choco uninstall --yes `
@@ -61,7 +63,6 @@ jobs:
           strawberryperl `
           swig `
           wixtoolset 
-      - run: choco uninstall bazel --yes
       - run: cmd /c "dir c:\ || echo swallowing errors"
       - run: cmd /c "dir d:\ || echo swallowing errors"
       - run: cmd /c "copy .github\workflows\winget_settings.json %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json || echo swallowing errors"
