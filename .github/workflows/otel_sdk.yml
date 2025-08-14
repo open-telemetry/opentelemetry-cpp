@@ -70,12 +70,10 @@ jobs:
       - run: cmd /c "winget --info || echo swallowing errors"
       - run: |
           winget remove --all --verbose --force --purge --disable-interactivity `
-          Amazon.AWSCLI `
           Amazon.SAM-CLI `
           Amazon.SessionManagerPlugin `
           Anaconda.Miniconda3 `
           Google.Chrome `
-          ImageMagick.ImageMagick `
           Microsoft.Azure.CosmosEmulator `
           Microsoft.AzureCLI `
           Microsoft.msodbcsql.17 `
@@ -88,13 +86,8 @@ jobs:
           Mozilla.Firefox `
           OpenJS.NodeJS.LTS `
           PostgreSQL.PostgreSQL.17 `
-          RProject.R `
-          RProject.Rtools `
-          sbt.sbt `
           ShiningLight.OpenSSL.Dev `
-          StrawberryPerl.StrawberryPerl `
-          Unity.UnityHub `
-          WiXToolset.WiXToolset
+          Unity.UnityHub
           echo Done! LASTEXITCODE=$LASTEXITCODE
       - run: winget list --accept-source-agreements --disable-interactivity 
       - run: cmd /c "dir c:\ || echo swallowing errors"
