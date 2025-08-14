@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/resource_detectors/process_detector_utils.h"
-#include "opentelemetry/nostd/string_view.h"
 
 #include <fstream>
 #include <string>
@@ -11,6 +10,7 @@
 #  include <psapi.h>
 #  include <windows.h>
 #else
+#  include <sys/types.h>
 #  include <unistd.h>
 #  include <cstdio>
 #endif
@@ -26,7 +26,7 @@ namespace detail
 constexpr const char *kExecutableName = "exe";
 constexpr const char *kCmdlineName    = "cmdline";
 
-std::string GetExecutablePath(int32_t &pid)
+std::string GetExecutablePath(const int32_t &pid)
 {
 #ifdef _MSC_VER
   HANDLE hProcess =
@@ -66,7 +66,7 @@ std::string GetExecutablePath(int32_t &pid)
 #endif
 }
 
-std::string GetCommand(int32_t &pid)
+std::string GetCommand(const int32_t &pid)
 {
 #ifdef _MSC_VER
   // On Windows, GetCommandLineW only works for the CURRENT process,
@@ -91,7 +91,7 @@ std::string GetCommand(int32_t &pid)
 #endif
 }
 
-std::string ExtractCommand(std::string &command_line_path)
+std::string ExtractCommand(const std::string &command_line_path)
 {
   std::string command;
   std::ifstream command_line_file(command_line_path, std::ios::in | std::ios::binary);
@@ -99,9 +99,9 @@ std::string ExtractCommand(std::string &command_line_path)
   return command;
 }
 
-std::string FormFilePath(int32_t &pid, const char *process_type)
+std::string FormFilePath(const int32_t &pid, const char *process_type)
 {
-  static char buff[64];
+  char buff[64];
   int len = std::snprintf(buff, sizeof(buff), "/proc/%d/%s", pid, process_type);
   return std::string(buff, len);
 }
