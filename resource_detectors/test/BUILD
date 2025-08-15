@@ -5,6 +5,7 @@ cc_test(
     name = "resource_detector_test",
     srcs = [
         "container_detector_test.cc",
+        "process_detector_test.cc",
     ],
     tags = ["test"],
     deps = [
