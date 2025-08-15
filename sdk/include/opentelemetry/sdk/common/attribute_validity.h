@@ -36,7 +36,7 @@ struct AttributeValidator
   bool operator()(uint64_t /*v*/) noexcept { return true; }
   bool operator()(double /*v*/) noexcept { return true; }
   bool operator()(nostd::string_view v) noexcept { return AttributeIsValidString(v); }
-  bool operator()(std::string v) noexcept { return AttributeIsValidString(v); }
+  bool operator()(const std::string &v) noexcept { return AttributeIsValidString(v); }
   bool operator()(const char *v) noexcept { return AttributeIsValidString(v); }
   bool operator()(nostd::span<const uint8_t> /*v*/) noexcept { return true; }
   bool operator()(nostd::span<const bool> /*v*/) noexcept { return true; }
