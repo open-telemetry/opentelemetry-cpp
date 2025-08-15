@@ -7,8 +7,10 @@
 #include <string>
 
 #ifdef _MSC_VER
-#  include <psapi.h>
+// clang-format off
 #  include <windows.h>
+#  include <psapi.h>
+// clang-format on
 #else
 #  include <sys/types.h>
 #  include <unistd.h>
@@ -45,7 +47,7 @@ std::string GetExecutablePath(const int32_t &pid)
     return std::string();
   }
 
-  // Convert UTF-16 (wide string) to UTF-8
+  // Convert UTF-16 to UTF-8
   int size_needed = WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, NULL, 0, NULL, NULL);
   std::string utf8_path(size_needed, 0);
   WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, &utf8_path[0], size_needed, NULL, NULL);
@@ -75,7 +77,7 @@ std::string GetCommand(const int32_t &pid)
   if (!wcmd)
     return std::string();
 
-  // Convert UTF-16 → UTF-8
+  // Convert UTF-16 to UTF-8
   int size_needed = WideCharToMultiByte(CP_UTF8, 0, wcmd, -1, NULL, 0, NULL, NULL);
   if (size_needed <= 0)
     return std::string();
