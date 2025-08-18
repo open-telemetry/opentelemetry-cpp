@@ -141,9 +141,8 @@ TEST(ProcessDetectorUtilsTest, GetCommandTest)
   // This is the path to get the command that was used to start the process
   std::string command_line_path =
       opentelemetry::resource_detector::detail::FormFilePath(pid, "cmdline");
-  command = opentelemetry::resource_detector::detail::GetCommand(pid);
+  command = opentelemetry::resource_detector::detail::ExtractCommand(command_line_path);
 #endif
-  std::string expected_command =
-      opentelemetry::resource_detector::detail::ExtractCommand(command_line_path);
+  std::string expected_command = opentelemetry::resource_detector::detail::GetCommand(pid);
   EXPECT_EQ(command, expected_command);
 }
