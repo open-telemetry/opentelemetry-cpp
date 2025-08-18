@@ -3,11 +3,23 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
-#include <cstdio>
 #include <fstream>
 #include <string>
 
-#include "opentelemetry/resource_detectors/process_detector_utils.h"
+#ifdef _MSC_VER
+// clang-format off
+#  include <process.h>
+#  include <windows.h>
+#  include <psapi.h>
+#  define getpid _getpid
+// clang-format on
+#else
+#  include <sys/types.h>
+#  include <unistd.h>
+#  include <cstdio>
+#endif
+
+#include "opentelemetry/resource_detectors/detail/process_detector_utils.h"
 
 TEST(ProcessDetectorUtilsTest, FormFilePath)
 {
@@ -45,4 +57,54 @@ TEST(ProcessDetectorUtilsTest, EmptyCommandFile)
   EXPECT_EQ(command, std::string{""});
 
   std::remove(filename.c_str());  // Cleanup
+}
+
+TEST(ProcessDetectorUtilsTest, GetExecutablePathTest)
+{
+  int32_t pid = getpid();
+  std::string path;
+  #ifdef _MSC_VER
+  HANDLE hProcess =
+      OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, static_cast<DWORD>(pid));
+  if (!hProcess)
+  {
+    path = std::string();
+  }
+  else 
+  {
+
+    WCHAR wbuffer[MAX_PATH];
+    DWORD len = GetProcessImageFileNameW(hProcess, wbuffer, MAX_PATH);
+    CloseHandle(hProcess);
+
+    if (len == 0)
+    {
+      path = std::string();
+    }
+    else
+    {
+      int size_needed = WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, NULL, 0, NULL, NULL);
+      std::string utf8_path(size_needed, 0);
+      WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, &utf8_path[0], size_needed, NULL, NULL);
+
+      path = utf8_path;
+    }
+  }
+#else
+  std::string exe_path = opentelemetry::resource_detector::detail::FormFilePath(pid, "exe");
+  char buffer[4096];
+
+  ssize_t len = readlink(exe_path.c_str(), buffer, sizeof(buffer) - 1);
+  if (len != -1)
+  {
+    buffer[len] = '\0';
+    path = std::string(buffer);
+  }
+  else
+  {
+    path = std::string();
+  }
+#endif
+  std::string expected_path = opentelemetry::resource_detector::detail::GetExecutablePath(pid);
+  EXPECT_EQ(path, expected_path);
 }

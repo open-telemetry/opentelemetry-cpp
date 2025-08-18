@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/resource_detectors/process_detector_utils.h"
+#include "opentelemetry/resource_detectors/detail/process_detector_utils.h"
 
 #include <fstream>
 #include <string>
@@ -75,12 +75,16 @@ std::string GetCommand(const int32_t &pid)
   // so we ignore `pid` and just return the current process's command line.
   LPCWSTR wcmd = GetCommandLineW();
   if (!wcmd)
+  {
     return std::string();
+  }
 
   // Convert UTF-16 to UTF-8
   int size_needed = WideCharToMultiByte(CP_UTF8, 0, wcmd, -1, NULL, 0, NULL, NULL);
   if (size_needed <= 0)
+  {
     return std::string();
+  }
 
   std::string utf8_command(size_needed - 1, 0);  // exclude null terminator
   WideCharToMultiByte(CP_UTF8, 0, wcmd, -1, &utf8_command[0], size_needed, NULL, NULL);

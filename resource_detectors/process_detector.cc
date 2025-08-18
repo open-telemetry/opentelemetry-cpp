@@ -3,13 +3,15 @@
 
 #include "opentelemetry/resource_detectors/process_detector.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/resource_detectors/process_detector_utils.h"
+#include "opentelemetry/resource_detectors/detail/process_detector_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/semconv/incubating/process_attributes.h"
 #include "opentelemetry/version.h"
 
 #include <stdint.h>
+#include <exception>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -31,16 +33,32 @@ opentelemetry::sdk::resource::Resource ProcessResourceDetector::Detect() noexcep
   opentelemetry::sdk::resource::ResourceAttributes attributes;
   attributes[semconv::process::kProcessPid] = pid;
 
-  std::string executable_path = opentelemetry::resource_detector::detail::GetExecutablePath(pid);
-  if (!executable_path.empty())
+  try
   {
-    attributes[semconv::process::kProcessExecutablePath] = std::move(executable_path);
+    std::string executable_path = opentelemetry::resource_detector::detail::GetExecutablePath(pid);
+    if (!executable_path.empty())
+    {
+      attributes[semconv::process::kProcessExecutablePath] = std::move(executable_path);
+    }
+  }
+  catch (const ::std::exception &ex)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Process Resource Detector] "
+                            << "Error extracting the executable path: " << ex.what());
   }
 
-  std::string command = opentelemetry::resource_detector::detail::GetCommand(pid);
-  if (!command.empty())
+  try
   {
-    attributes[semconv::process::kProcessCommand] = std::move(command);
+    std::string command = opentelemetry::resource_detector::detail::GetCommand(pid);
+    if (!command.empty())
+    {
+      attributes[semconv::process::kProcessCommand] = std::move(command);
+    }
+  }
+  catch (const std::exception &ex)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Process Resource Detector] " << "Error extracting command: "
+                                                           << ex.what());
   }
 
   return ResourceDetector::Create(attributes);

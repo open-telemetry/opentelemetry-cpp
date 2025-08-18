@@ -30,7 +30,7 @@ otel_add_component(
   PATTERN
   "*.h"
   PATTERN
-  "container_detector_utils.h"
+  "resource_detectors/detail/*"
   EXCLUDE)
 
 if(BUILD_TESTING)
