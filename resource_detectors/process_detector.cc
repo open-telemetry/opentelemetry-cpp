@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include <exception>
+#include <ostream>
 #include <string>
 #include <unordered_map>
 #include <utility>

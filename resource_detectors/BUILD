@@ -17,6 +17,7 @@ cc_library(
         "process_detector.cc",
         "process_detector_utils.cc",
     ],
+    copts = ["-fexceptions"],
     deps = [
         "//api",
         "//resource_detectors:headers",

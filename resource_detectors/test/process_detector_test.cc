@@ -63,14 +63,14 @@ TEST(ProcessDetectorUtilsTest, GetExecutablePathTest)
 {
   int32_t pid = getpid();
   std::string path;
-  #ifdef _MSC_VER
+#ifdef _MSC_VER
   HANDLE hProcess =
       OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, static_cast<DWORD>(pid));
   if (!hProcess)
   {
     path = std::string();
   }
-  else 
+  else
   {
 
     WCHAR wbuffer[MAX_PATH];
@@ -98,7 +98,7 @@ TEST(ProcessDetectorUtilsTest, GetExecutablePathTest)
   if (len != -1)
   {
     buffer[len] = '\0';
-    path = std::string(buffer);
+    path        = std::string(buffer);
   }
   else
   {
@@ -107,4 +107,43 @@ TEST(ProcessDetectorUtilsTest, GetExecutablePathTest)
 #endif
   std::string expected_path = opentelemetry::resource_detector::detail::GetExecutablePath(pid);
   EXPECT_EQ(path, expected_path);
+}
+
+TEST(ProcessDetectorUtilsTest, GetCommandTest)
+{
+  int32_t pid = getpid();
+  std::string command;
+#ifdef _MSC_VER
+  // On Windows, GetCommandLineW only works for the CURRENT process,
+  // so we ignore `pid` and just return the current process's command line.
+  LPCWSTR wcmd = GetCommandLineW();
+  if (!wcmd)
+  {
+    command = std::string();
+  }
+  else
+  {
+
+    // Convert UTF-16 to UTF-8
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, wcmd, -1, NULL, 0, NULL, NULL);
+    if (size_needed <= 0)
+    {
+      command = std::string();
+    }
+    else
+    {
+      std::string utf8_command(size_needed - 1, 0);  // exclude null terminator
+      WideCharToMultiByte(CP_UTF8, 0, wcmd, -1, &utf8_command[0], size_needed, NULL, NULL);
+      command = utf8_command;
+    }
+  }
+#else
+  // This is the path to get the command that was used to start the process
+  std::string command_line_path =
+      opentelemetry::resource_detector::detail::FormFilePath(pid, "cmdline");
+  command = opentelemetry::resource_detector::detail::GetCommand(pid);
+#endif
+  std::string expected_command =
+      opentelemetry::resource_detector::detail::ExtractCommand(command_line_path);
+  EXPECT_EQ(command, expected_command);
 }
