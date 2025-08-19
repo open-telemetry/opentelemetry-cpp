@@ -22,10 +22,10 @@ std::string FormFilePath(const int32_t &pid, const char *process_type);
 
 /**
  * Retrieves the absolute file system path to the executable for a given PID.
- *
  * Platform-specific behavior:
  *   - Windows: Uses OpenProcess() + GetProcessImageFileNameW().
  *   - Linux/Unix: Reads the /proc/<pid>/exe symbolic link.
+ *   - TODO: Need to implement for Darwin
  *
  * @param pid Process ID.
  */
@@ -36,6 +36,7 @@ std::string GetExecutablePath(const int32_t &pid);
  * Platform-specific behavior:
  *   - Windows: Uses GetCommandLineW() to get the command of the current process.
  *   - Linux/Unix: Reads the zeroth string of /proc/<pid>/cmdline file.
+ *   - TODO: Need to implement for Darwin
  */
 std::string ExtractCommand(const std::string &command_line_path);
 
