@@ -109,6 +109,15 @@ std::string FormFilePath(const int32_t &pid, const char *process_type)
 {
   char buff[64];
   int len = std::snprintf(buff, sizeof(buff), "/proc/%d/%s", pid, process_type);
+  if (len < 0)
+  {
+    // in case snprintf fails
+    return std::string();
+  }
+  if (len >= static_cast<int>(sizeof(buff)))
+  {
+    return std::string(buff, sizeof(buff) - 1);
+  }
   return std::string(buff, len);
 }
 
