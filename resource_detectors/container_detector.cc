@@ -3,7 +3,7 @@
 
 #include "opentelemetry/resource_detectors/container_detector.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/resource_detectors/container_detector_utils.h"
+#include "opentelemetry/resource_detectors/detail/container_detector_utils.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/semconv/incubating/container_attributes.h"
