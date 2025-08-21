@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.16)
 
 # See https://cmake.org/cmake/help/latest/policy/CMP0074.html required by
 # certain version of zlib which CURL depends on.

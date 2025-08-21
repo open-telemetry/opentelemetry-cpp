@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       CXX_STANDARD: '17'
-      CMAKE_VERSION: '3.14.0'
+      CMAKE_VERSION: '3.16.0'
       BUILD_TYPE: 'Debug'
     steps:
     - name: Harden the runner (Audit all outbound calls)
