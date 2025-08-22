@@ -32,39 +32,23 @@ std::string FormFilePath(const int32_t &pid, const char *process_type);
 std::string GetExecutablePath(const int32_t &pid);
 
 /**
- * Retrieves the command used to launch the process for a given PID.
- * Platform-specific behavior:
- *   - Windows: Uses GetCommandLineW() to get the command of the current process.
- *   - Linux/Unix: Reads the zeroth string of /proc/<pid>/cmdline file.
- *   - TODO: Need to implement for Darwin
- */
-std::string ExtractCommand(const std::string &command_line_path);
-
-/**
- * Extracts the command-line arguments from the command line path.
+ * Extracts the command-line arguments and the command.
  * Platform-specific behavior:
  *   - Windows: Uses CommandLineToArgvW() to parse the command line.
- *   - Linux/Unix: Reads the /proc/<pid>/cmdline file and splits it into arguments.
+ *   - Linux/Unix: Reads the /proc/<pid>/cmdline file and splits it into command and arguments.
  *   - TODO: Need to implement for Darwin
  */
 std::vector<std::string> ExtractCommandWithArgs(const std::string &command_line_path);
 
 /**
- * Retrieves the command used to launch the process for a given PID.
- * This function is a wrapper around ExtractCommand() and is provided for convenience and
- * testability of ExtractCommand().
- */
-std::string GetCommand(const int32_t &pid);
-
-/**
- * Retrieves the command-line arguments used to launch the process for a given PID.
+ * Retrieves the command-line arguments and the command used to launch the process for a given PID.
  * This function is a wrapper around ExtractCommandWithArgs() and is provided for convenience and
  * testability of ExtractCommandWithArgs().
  */
 std::vector<std::string> GetCommandWithArgs(const int32_t &pid);
 
 /**
- * Converts a vector of command-line arguments into a single command-line string.
+ * Converts a vector of command-line arguments and command into a single command-line string.
  * process.command_line is the string representation of the command line that we collected using
  * GetCommandWithArgs().
  */

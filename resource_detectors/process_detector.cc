@@ -50,28 +50,15 @@ opentelemetry::sdk::resource::Resource ProcessResourceDetector::Detect() noexcep
 
   try
   {
-    std::string command = opentelemetry::resource_detector::detail::GetCommand(pid);
-    if (!command.empty())
-    {
-      attributes[semconv::process::kProcessCommand] = std::move(command);
-    }
-  }
-  catch (const std::exception &ex)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[Process Resource Detector] " << "Error extracting command: "
-                                                           << ex.what());
-  }
-
-  try
-  {
-    std::vector<std::string> args =
+    std::vector<std::string> command_with_args =
         opentelemetry::resource_detector::detail::GetCommandWithArgs(pid);
-    if (!args.empty())
+    if (!command_with_args.empty())
     {
       std::string commandline_args =
-          opentelemetry::resource_detector::detail::ConvertCommandArgsToString(args);
+          opentelemetry::resource_detector::detail::ConvertCommandArgsToString(command_with_args);
       attributes[semconv::process::kProcessCommandLine] = std::move(commandline_args);
-      attributes[semconv::process::kProcessCommandArgs] = std::move(args);
+      attributes[semconv::process::kProcessCommand]     = command_with_args[0];
+      attributes[semconv::process::kProcessCommandArgs] = std::move(command_with_args);
     }
   }
   catch (const std::exception &ex)
