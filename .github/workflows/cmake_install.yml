@@ -153,7 +153,7 @@ jobs:
     env:
       INSTALL_TEST_DIR: '/home/runner/install_test'
       # Set to the current minimum version of cmake
-      CMAKE_VERSION: '3.14.0'
+      CMAKE_VERSION: '3.16.0'
       # cxx14 is the default for Ubuntu 22.04
       CXX_STANDARD: '14'
       BUILD_TYPE: 'Debug'
