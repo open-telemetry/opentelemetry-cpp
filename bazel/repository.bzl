@@ -25,10 +25,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_google_benchmark",
-        sha256 = "6bc180a57d23d4d9515519f92b0c83d61b05b5bab188961f36ac7b06b0d9e9ce",
-        strip_prefix = "benchmark-1.8.3",
+        sha256 = "b334658edd35efcf06a99d9be21e4e93e092bd5f95074c1673d5c8705d95c104",
+        strip_prefix = "benchmark-1.9.4",
         urls = [
-            "https://github.com/google/benchmark/archive/v1.8.3.tar.gz",
+            "https://github.com/google/benchmark/archive/v1.9.4.tar.gz",
         ],
     )
 
@@ -37,10 +37,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_google_googletest",
-        sha256 = "8ad598c73ad796e0d8280b082cebd82a630d73e73cd3c70057938a6501bba5d7",
-        strip_prefix = "googletest-1.14.0",
+        sha256 = "65fab701d9829d38cb77c14acdc431d2108bfdbf8979e40eb8ae567edf10b27c",
+        strip_prefix = "googletest-1.17.0",
         urls = [
-            "https://github.com/google/googletest/archive/v1.14.0.tar.gz",
+            "https://github.com/google/googletest/archive/v1.17.0.tar.gz",
         ],
     )
 
