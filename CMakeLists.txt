@@ -9,7 +9,7 @@ if(POLICY CMP0092)
   cmake_policy(SET CMP0092 OLD)
 endif()
 
-# MSVC RTTI flag /GR should not be not added to CMAKE_CXX_FLAGS by default. @see
+# MSVC RTTI flag /GR should not be added to CMAKE_CXX_FLAGS by default. @see
 # https://cmake.org/cmake/help/latest/policy/CMP0117.html
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.20.0")
   cmake_policy(SET CMP0117 NEW)
@@ -19,11 +19,6 @@ project(opentelemetry-cpp)
 
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
-
-# Don't use customized cmake modules if vcpkg is used to resolve dependence.
-if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/")
-endif()
 
 # Set the third-party release git tags.
 if(EXISTS "${opentelemetry-cpp_SOURCE_DIR}/third_party_release")
