@@ -41,11 +41,34 @@ std::string GetExecutablePath(const int32_t &pid);
 std::string ExtractCommand(const std::string &command_line_path);
 
 /**
+ * Extracts the command-line arguments from the command line path.
+ * Platform-specific behavior:
+ *   - Windows: Uses CommandLineToArgvW() to parse the command line.
+ *   - Linux/Unix: Reads the /proc/<pid>/cmdline file and splits it into arguments.
+ *   - TODO: Need to implement for Darwin
+ */
+std::vector<std::string> ExtractCommandWithArgs(const std::string &command_line_path);
+
+/**
  * Retrieves the command used to launch the process for a given PID.
  * This function is a wrapper around ExtractCommand() and is provided for convenience and
  * testability of ExtractCommand().
  */
 std::string GetCommand(const int32_t &pid);
+
+/**
+ * Retrieves the command-line arguments used to launch the process for a given PID.
+ * This function is a wrapper around ExtractCommandWithArgs() and is provided for convenience and
+ * testability of ExtractCommandWithArgs().
+ */
+std::vector<std::string> GetCommandWithArgs(const int32_t &pid);
+
+/**
+ * Converts a vector of command-line arguments into a single command-line string.
+ * process.command_line is the string representation of the command line that we collected using
+ * GetCommandWithArgs().
+ */
+std::string ConvertCommandArgsToString(const std::vector<std::string> &command_args);
 
 }  // namespace detail
 }  // namespace resource_detector

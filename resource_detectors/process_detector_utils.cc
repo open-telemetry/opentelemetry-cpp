@@ -5,11 +5,13 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 
 #ifdef _MSC_VER
 // clang-format off
 #  include <windows.h>
 #  include <psapi.h>
+#  include <shellapi.h>
 // clang-format on
 #else
 #  include <sys/types.h>
@@ -103,6 +105,66 @@ std::string ExtractCommand(const std::string &command_line_path)
   std::ifstream command_line_file(command_line_path, std::ios::in | std::ios::binary);
   std::getline(command_line_file, command, '\0');
   return command;
+}
+
+std::vector<std::string> GetCommandWithArgs(const int32_t &pid)
+{
+#ifdef _MSC_VER
+  int argc      = 0;
+  LPWSTR *argvW = CommandLineToArgvW(GetCommandLineW(), &argc);
+  if (!argvW)
+  {
+    return {};
+  }
+
+  std::vector<std::string> args;
+  for (int i = 0; i < argc; i++)
+  {
+    // Convert UTF-16 to UTF-8
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, NULL, 0, NULL, NULL);
+    if (size_needed > 0)
+    {
+      std::string arg(size_needed - 1, 0);
+      WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, &arg[0], size_needed, NULL, NULL);
+      args.push_back(arg);
+    }
+  }
+
+  LocalFree(argvW);
+  return args;
+#else
+  std::string command_line_path = FormFilePath(pid, kCmdlineName);
+  return ExtractCommandWithArgs(command_line_path);
+#endif
+}
+
+std::vector<std::string> ExtractCommandWithArgs(const std::string &command_line_path)
+{
+  std::vector<std::string> commands;
+  std::ifstream command_line_file(command_line_path, std::ios::in | std::ios::binary);
+  std::string command;
+  while (std::getline(command_line_file, command, '\0'))
+  {
+    if (!command.empty())
+    {
+      commands.push_back(command);
+    }
+  }
+  return commands;
+}
+
+std::string ConvertCommandArgsToString(const std::vector<std::string> &command_args)
+{
+  std::string command_line;
+  for (const auto &arg : command_args)
+  {
+    if (!command_line.empty())
+    {
+      command_line += " ";
+    }
+    command_line += arg;
+  }
+  return command_line;
 }
 
 std::string FormFilePath(const int32_t &pid, const char *process_type)
