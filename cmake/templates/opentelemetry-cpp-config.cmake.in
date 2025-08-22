@@ -211,10 +211,13 @@ endforeach()
 # handle the QUIETLY and REQUIRED arguments and set opentelemetry-cpp_FOUND to
 # TRUE if all variables listed contain valid results, e.g. valid file paths.
 include("FindPackageHandleStandardArgs")
+
+set(${CMAKE_FIND_PACKAGE_NAME}_CONFIG ${CMAKE_CURRENT_LIST_FILE})
+
 find_package_handle_standard_args(
-  ${CMAKE_FIND_PACKAGE_NAME}
-  FOUND_VAR ${CMAKE_FIND_PACKAGE_NAME}_FOUND
-  REQUIRED_VARS OPENTELEMETRY_CPP_INCLUDE_DIRS OPENTELEMETRY_CPP_LIBRARIES)
+   ${CMAKE_FIND_PACKAGE_NAME}
+   CONFIG_MODE
+   REQUIRED_VARS OPENTELEMETRY_CPP_INCLUDE_DIRS OPENTELEMETRY_CPP_LIBRARIES)
 
 if(${CMAKE_FIND_PACKAGE_NAME}_FOUND)
   set(OPENTELEMETRY_CPP_FOUND
