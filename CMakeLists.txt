@@ -263,6 +263,9 @@ option(WITH_METRICS_EXEMPLAR_PREVIEW
 option(WITH_THREAD_INSTRUMENTATION_PREVIEW
        "Whether to enable thread instrumentation" OFF)
 
+option(WITH_RESOURCE_DETECTORS_PREVIEW
+       "Whether to enable inbuilt resource detectors" OFF)
+
 option(OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS
        "Whether to build test libraries that are always linked as shared libs"
        OFF)
@@ -659,6 +662,9 @@ if(NOT WITH_API_ONLY)
   add_subdirectory(sdk)
   add_subdirectory(ext)
   add_subdirectory(exporters)
+  if(WITH_RESOURCE_DETECTORS_PREVIEW)
+    add_subdirectory(resource_detectors)
+  endif()
 
   if(BUILD_TESTING)
     add_subdirectory(test_common)
