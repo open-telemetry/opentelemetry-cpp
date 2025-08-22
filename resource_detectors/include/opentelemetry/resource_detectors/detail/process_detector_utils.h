@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 #include "opentelemetry/version.h"
 

@@ -70,6 +70,21 @@ std::string GetExecutablePath(const int32_t &pid)
 #endif
 }
 
+std::vector<std::string> ExtractCommandWithArgs(const std::string &command_line_path)
+{
+  std::vector<std::string> commands;
+  std::ifstream command_line_file(command_line_path, std::ios::in | std::ios::binary);
+  std::string command;
+  while (std::getline(command_line_file, command, '\0'))
+  {
+    if (!command.empty())
+    {
+      commands.push_back(command);
+    }
+  }
+  return commands;
+}
+
 std::vector<std::string> GetCommandWithArgs(const int32_t &pid)
 {
 #ifdef _MSC_VER
@@ -99,21 +114,6 @@ std::vector<std::string> GetCommandWithArgs(const int32_t &pid)
   std::string command_line_path = FormFilePath(pid, kCmdlineName);
   return ExtractCommandWithArgs(command_line_path);
 #endif
-}
-
-std::vector<std::string> ExtractCommandWithArgs(const std::string &command_line_path)
-{
-  std::vector<std::string> commands;
-  std::ifstream command_line_file(command_line_path, std::ios::in | std::ios::binary);
-  std::string command;
-  while (std::getline(command_line_file, command, '\0'))
-  {
-    if (!command.empty())
-    {
-      commands.push_back(command);
-    }
-  }
-  return commands;
 }
 
 std::string ConvertCommandArgsToString(const std::vector<std::string> &command_args)

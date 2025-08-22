@@ -173,7 +173,7 @@ TEST(ProcessDetectorUtilsTest, GetCommandWithArgsTest)
   LPWSTR *argvW = CommandLineToArgvW(GetCommandLineW(), &argc);
   if (!argvW)
   {
-    return {};
+    args = {};
   }
 
   for (int i = 0; i < argc; i++)
