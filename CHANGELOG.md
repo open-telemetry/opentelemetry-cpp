@@ -30,6 +30,11 @@ Increment the:
 * [SDK] View should not have a unit
   [#3552](https://github.com/open-telemetry/opentelemetry-cpp/pull/3552)
 
+Important changes:
+
+* [CMAKE] Upgrade CMake minimum version to 3.16
+  [#3599](https://github.com/open-telemetry/opentelemetry-cpp/pull/3599)
+
 Breaking changes:
 
 * [SDK] View should not have a unit
