@@ -14,5 +14,7 @@ TEST(VersionTest, Consistency)
            OPENTELEMETRY_VERSION_MINOR, OPENTELEMETRY_VERSION_PATCH);
 
   std::string actual = OPENTELEMETRY_VERSION;
-  EXPECT_EQ(actual, expected);
+  /* OPENTELEMETRY_VERSION may contain a -dev suffix */
+  std::string prefix = actual.substr(0, strlen(expected));
+  EXPECT_EQ(prefix, expected);
 }
