@@ -15,13 +15,16 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.20.0")
   cmake_policy(SET CMP0117 NEW)
 endif()
 
-# Read the opentelemetry-cpp project and abi version from the api version header
-# file and set the third-party version tags
-include("${CMAKE_CURRENT_LIST_DIR}/cmake/version.cmake")
+set(OPENTELEMETRY_VERSION_NUMBER "1.22.0")
+set(OPENTELEMETRY_VERSION_SUFFIX "")
+set(OPENTELEMETRY_VERSION
+    "${OPENTELEMETRY_VERSION_NUMBER}${OPENTELEMETRY_VERSION_SUFFIX}")
+
+set(OPENTELEMETRY_ABI_VERSION_NO_DEFAULT "1")
 
 project(
   opentelemetry-cpp
-  VERSION ${OPENTELEMETRY_VERSION}
+  VERSION "${OPENTELEMETRY_VERSION_NUMBER}"
   LANGUAGES CXX)
 
 # Mark variables as used so cmake doesn't complain about them
@@ -92,7 +95,7 @@ if(WITH_ABI_VERSION_2)
 elseif(WITH_ABI_VERSION_1)
   set(OPENTELEMETRY_ABI_VERSION_NO "1")
 else()
-  set(OPENTELEMETRY_ABI_VERSION_NO ${OPENTELEMETRY_ABI_VERSION_DEFAULT})
+  set(OPENTELEMETRY_ABI_VERSION_NO "${OPENTELEMETRY_ABI_VERSION_NO_DEFAULT}")
 endif()
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
@@ -460,7 +463,7 @@ endif()
 message(STATUS "---------------------------------------------")
 message(STATUS "build settings")
 message(STATUS "---------------------------------------------")
-message(STATUS "OpenTelemetry: ${OPENTELEMETRY_VERSION}")
+message(STATUS "OpenTelemetry VERSION: ${OPENTELEMETRY_VERSION}")
 message(STATUS "OpenTelemetry ABI: ${OPENTELEMETRY_ABI_VERSION_NO}")
 message(STATUS "CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "CXX: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
