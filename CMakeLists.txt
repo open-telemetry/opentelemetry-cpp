@@ -15,7 +15,17 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.20.0")
   cmake_policy(SET CMP0117 NEW)
 endif()
 
-project(opentelemetry-cpp)
+set(OPENTELEMETRY_VERSION_NUMBER "1.22.0")
+set(OPENTELEMETRY_VERSION_SUFFIX "")
+set(OPENTELEMETRY_VERSION
+    "${OPENTELEMETRY_VERSION_NUMBER}${OPENTELEMETRY_VERSION_SUFFIX}")
+
+set(OPENTELEMETRY_ABI_VERSION_DEFAULT "1")
+
+project(
+  opentelemetry-cpp
+  VERSION "${OPENTELEMETRY_VERSION_NUMBER}"
+  LANGUAGES CXX)
 
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
@@ -56,9 +66,6 @@ endif()
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
 option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
 
-file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
-     OPENTELEMETRY_CPP_HEADER_VERSION_H)
-
 #
 # We do not want to have WITH_ABI_VERSION = "1" or "2", and instead prefer two
 # distinct flags, WITH_ABI_VERSION_1 and WITH_ABI_VERSION_2.
@@ -88,30 +95,8 @@ if(WITH_ABI_VERSION_2)
 elseif(WITH_ABI_VERSION_1)
   set(OPENTELEMETRY_ABI_VERSION_NO "1")
 else()
-  if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
-     "OPENTELEMETRY_ABI_VERSION_NO[ \t\r\n]+\"?([0-9]+)\"?")
-    math(EXPR OPENTELEMETRY_ABI_VERSION_NO ${CMAKE_MATCH_1})
-  else()
-    message(
-      FATAL_ERROR
-        "OPENTELEMETRY_ABI_VERSION_NO not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
-    )
-  endif()
+  set(OPENTELEMETRY_ABI_VERSION_NO "${OPENTELEMETRY_ABI_VERSION_DEFAULT}")
 endif()
-
-message(STATUS "OPENTELEMETRY_ABI_VERSION_NO=${OPENTELEMETRY_ABI_VERSION_NO}")
-
-if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
-   "OPENTELEMETRY_VERSION[ \t\r\n]+\"?([^\"]+)\"?")
-  set(OPENTELEMETRY_VERSION ${CMAKE_MATCH_1})
-else()
-  message(
-    FATAL_ERROR
-      "OPENTELEMETRY_VERSION not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
-  )
-endif()
-
-message(STATUS "OPENTELEMETRY_VERSION=${OPENTELEMETRY_VERSION}")
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
 
@@ -478,7 +463,7 @@ endif()
 message(STATUS "---------------------------------------------")
 message(STATUS "build settings")
 message(STATUS "---------------------------------------------")
-message(STATUS "OpenTelemetry: ${OPENTELEMETRY_VERSION}")
+message(STATUS "OpenTelemetry VERSION: ${OPENTELEMETRY_VERSION}")
 message(STATUS "OpenTelemetry ABI: ${OPENTELEMETRY_ABI_VERSION_NO}")
 message(STATUS "CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "CXX: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
@@ -662,3 +647,13 @@ if(OPENTELEMETRY_INSTALL)
     include(CPack)
   endif()
 endif()
+
+# Make the version and ABI version available to the user for in-tree builds
+# These are the same variables that are cached with
+# find_package(opentelemetry-cpp CONFIG)
+set(OPENTELEMETRY_ABI_VERSION_NO
+    "${OPENTELEMETRY_ABI_VERSION_NO}"
+    CACHE STRING "opentelemetry-cpp ABI version" FORCE)
+set(OPENTELEMETRY_VERSION
+    "${OPENTELEMETRY_VERSION}"
+    CACHE STRING "opentelemetry-cpp version" FORCE)
