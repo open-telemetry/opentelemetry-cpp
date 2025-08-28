@@ -1490,12 +1490,8 @@ void SdkBuilder::AddView(
     sdk_attribute_processor = CreateAttributesProcessor(stream->attribute_keys);
   }
 
-  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3547
-  // FIXME-SDK: unit is unused in class View, should be removed.
-  std::string unit("FIXME-SDK");
-
   auto sdk_view = std::make_unique<opentelemetry::sdk::metrics::View>(
-      stream->name, stream->description, unit, sdk_aggregation_type, sdk_aggregation_config,
+      stream->name, stream->description, sdk_aggregation_type, sdk_aggregation_config,
       std::move(sdk_attribute_processor));
 
   view_registry->AddView(std::move(sdk_instrument_selector), std::move(sdk_meter_selector),

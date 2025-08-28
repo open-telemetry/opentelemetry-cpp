@@ -1,0 +1,10 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+$ example_yaml --test --yaml shelltests/sampler_jaeger.yaml
+>
+[ERROR] JaegerRemoteSamplerConfiguration: FIXME
+MODEL PARSED
+[ERROR] [Configured Sdk] builder failed with exception: JaegerRemoteSampler not supported
+FAILED TO CREATE SDK
+>= 2
