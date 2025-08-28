@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <stdio.h>
+#include <string.h>
 #include <string>
 
 #include "opentelemetry/version.h"
