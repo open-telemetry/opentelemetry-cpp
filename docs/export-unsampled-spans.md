@@ -58,3 +58,7 @@ This feature maintains full backward compatibility:
 - Default behavior is unchanged (only sampled spans are exported)
 - Existing constructors continue to work as before
 - Test spans with invalid contexts are always exported for compatibility
+
+## Example
+
+See [examples/unsampled_spans_demo.cc](../examples/unsampled_spans_demo.cc) for a complete working example demonstrating the feature.
