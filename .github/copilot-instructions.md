@@ -79,6 +79,10 @@ cd build && make -j$(nproc) && ctest --output-on-failure
 # 3. Format code properly
 ./tools/format.sh
 # Takes ~30 seconds. Must complete without errors.
+
+# 4. Validate with maintainer mode (CRITICAL for warnings)
+./ci/do_ci.sh cmake.maintainer.sync.test
+# Takes ~4-6 minutes. NEVER CANCEL. Ensures all warnings are resolved.
 ```
 
 #### Required Tools for Formatting
@@ -90,6 +94,23 @@ go install github.com/bazelbuild/buildtools/buildifier@latest  # For Bazel files
 # clang-format should already be available on most systems
 ```
 
+### Maintainer Mode Validation
+
+**CRITICAL**: Always run maintainer mode builds to ensure warning-free code:
+
+```bash
+# Run maintainer mode validation
+./ci/do_ci.sh cmake.maintainer.sync.test
+
+# What this does:
+# - Enables -Wall -Werror -Wextra compiler flags
+# - Treats all warnings as errors
+# - Ensures strict code quality standards
+# - Required for all contributions
+```
+
+Maintainer mode (`-DOTELCPP_MAINTAINER_MODE=ON`) is essential for catching potential issues that would cause CI failures. It enables the strictest warning levels and treats warnings as compilation errors.
+
 ### CI Integration
 
 Always run these before committing to ensure CI will pass:
@@ -100,6 +121,10 @@ Always run these before committing to ensure CI will pass:
 
 # Run linting (if shellcheck available for shell scripts)
 shellcheck --severity=error ci/*.sh
+
+# CRITICAL: Validate with maintainer mode to catch all warnings
+./ci/do_ci.sh cmake.maintainer.sync.test
+# Takes ~4-6 minutes. Enables -Wall -Werror -Wextra for strict validation.
 
 # Validate build with additional exporters
 ./ci/do_ci.sh cmake.test
@@ -172,13 +197,16 @@ third_party/          - External dependencies
 ### CI Script Targets (./ci/do_ci.sh)
 
 ```bash
-cmake.test                    # Standard CMake build with exporters (~5.2 min)
-cmake.maintainer.test         # Maintainer mode with stricter warnings
-cmake.legacy.test             # GCC 4.8 compatibility testing
-cmake.c++20.test             # C++20 standard testing
-bazel.test                   # Standard Bazel build and test
-format                       # Run formatting tools
-code.coverage               # Build with coverage analysis
+cmake.test                       # Standard CMake build with exporters (~5.2 min)
+cmake.maintainer.sync.test       # Maintainer mode: -Wall -Werror -Wextra (~4-6 min)
+cmake.maintainer.async.test      # Maintainer mode with async export enabled
+cmake.maintainer.cpp11.async.test # Maintainer mode with C++11
+cmake.maintainer.abiv2.test      # Maintainer mode with ABI v2
+cmake.legacy.test                # GCC 4.8 compatibility testing
+cmake.c++20.test                # C++20 standard testing
+bazel.test                      # Standard Bazel build and test
+format                          # Run formatting tools
+code.coverage                   # Build with coverage analysis
 ```
 
 ### CMake Configuration Options
@@ -206,6 +234,7 @@ premature cancellation.
 | CMake build (parallel) | 3 minutes | 15 minutes |
 | Test execution (ctest) | 24 seconds | 5 minutes |
 | CI cmake.test | 5.2 minutes | 20 minutes |
+| CI cmake.maintainer.sync.test | 4-6 minutes | 20 minutes |
 | Format script | 17 seconds | 2 minutes |
 | Bazel build | Varies | 15+ minutes |
 
@@ -262,7 +291,8 @@ For offline development, use CMake with pre-installed dependencies.
 2. Build and test: `cd build && make -j$(nproc) && ctest`
 3. Run example: `./examples/simple/example_simple`
 4. Format code: `./tools/format.sh`
-5. Final validation: `./ci/do_ci.sh cmake.test`
+5. Validate warnings: `./ci/do_ci.sh cmake.maintainer.sync.test`
+6. Final validation: `./ci/do_ci.sh cmake.test`
 
 **Key Standards**:
 
