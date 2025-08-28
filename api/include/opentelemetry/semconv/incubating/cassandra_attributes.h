@@ -55,57 +55,57 @@ static constexpr const char *kCassandraSpeculativeExecutionCount =
 namespace CassandraConsistencyLevelValues
 {
 /**
-  none
+  All
  */
 static constexpr const char *kAll = "all";
 
 /**
-  none
+  Each Quorum
  */
 static constexpr const char *kEachQuorum = "each_quorum";
 
 /**
-  none
+  Quorum
  */
 static constexpr const char *kQuorum = "quorum";
 
 /**
-  none
+  Local Quorum
  */
 static constexpr const char *kLocalQuorum = "local_quorum";
 
 /**
-  none
+  One
  */
 static constexpr const char *kOne = "one";
 
 /**
-  none
+  Two
  */
 static constexpr const char *kTwo = "two";
 
 /**
-  none
+  Three
  */
 static constexpr const char *kThree = "three";
 
 /**
-  none
+  Local One
  */
 static constexpr const char *kLocalOne = "local_one";
 
 /**
-  none
+  Any
  */
 static constexpr const char *kAny = "any";
 
 /**
-  none
+  Serial
  */
 static constexpr const char *kSerial = "serial";
 
 /**
-  none
+  Local Serial
  */
 static constexpr const char *kLocalSerial = "local_serial";
 

@@ -130,8 +130,28 @@ static constexpr const char *kContainerName = "container.name";
 
 /**
   The container runtime managing this container.
+
+  @deprecated
+  {"note": "Replaced by @code container.runtime.name @endcode.", "reason": "renamed", "renamed_to":
+  "container.runtime.name"}
  */
-static constexpr const char *kContainerRuntime = "container.runtime";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kContainerRuntime = "container.runtime";
+
+/**
+  A description about the runtime which could include, for example details about the CRI/API version
+  being used or other customisations.
+ */
+static constexpr const char *kContainerRuntimeDescription = "container.runtime.description";
+
+/**
+  The container runtime managing this container.
+ */
+static constexpr const char *kContainerRuntimeName = "container.runtime.name";
+
+/**
+  The version of the runtime of this process, as returned by the runtime without modification.
+ */
+static constexpr const char *kContainerRuntimeVersion = "container.runtime.version";
 
 namespace ContainerCpuStateValues
 {

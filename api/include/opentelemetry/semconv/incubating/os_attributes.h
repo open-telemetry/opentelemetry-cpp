@@ -100,8 +100,11 @@ static constexpr const char *kSolaris = "solaris";
 
 /**
   Deprecated. Use @code zos @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code zos @endcode.", "reason": "renamed", "renamed_to": "zos"}
  */
-static constexpr const char *kZOs = "z_os";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kZOs = "z_os";
 
 /**
   IBM z/OS

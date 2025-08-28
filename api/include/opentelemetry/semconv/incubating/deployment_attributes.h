@@ -20,7 +20,7 @@ namespace deployment
 {
 
 /**
-  'Deprecated, use @code deployment.environment.name @endcode instead.'
+  Deprecated, use @code deployment.environment.name @endcode instead.
 
   @deprecated
   {"note": "Replaced by @code deployment.environment.name @endcode.", "reason": "renamed",
