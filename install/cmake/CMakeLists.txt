@@ -22,7 +22,7 @@
 # CMAKE_CXX_STANDARD: The C++ standard to use for all third-party packages.
 # Defaults to 14 if not set.
 
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.16)
 project(opentelemetry-cpp-thirdparty-install LANGUAGES CXX)
 
 # Added in CMake 3.16. ExternalProject_Add() with GIT_SUBMODULES "" initializes
