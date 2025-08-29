@@ -12,8 +12,6 @@
 #  include <process.h>
 #  include <windows.h>
 #  include <psapi.h>
-#  include <shellapi.h>
-#  pragma comment(lib, "shell32.lib")
 #  define getpid _getpid
 // clang-format on
 #else
@@ -173,16 +171,18 @@ TEST(ProcessDetectorUtilsTest, GetCommandWithArgsTest)
   {
     args = {};
   }
-
-  for (int i = 0; i < argc; i++)
+  else
   {
-    // Convert UTF-16 to UTF-8
-    int size_needed = WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, NULL, 0, NULL, NULL);
-    if (size_needed > 0)
+    for (int i = 0; i < argc; i++)
     {
-      std::string arg(size_needed - 1, 0);
-      WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, &arg[0], size_needed, NULL, NULL);
-      args.push_back(arg);
+      // Convert UTF-16 to UTF-8
+      int size_needed = WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, NULL, 0, NULL, NULL);
+      if (size_needed > 0)
+      {
+        std::string arg(size_needed - 1, 0);
+        WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, &arg[0], size_needed, NULL, NULL);
+        args.push_back(arg);
+      }
     }
   }
 

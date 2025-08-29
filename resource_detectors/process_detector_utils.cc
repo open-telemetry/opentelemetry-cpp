@@ -12,6 +12,7 @@
 #  include <windows.h>
 #  include <psapi.h>
 #  include <shellapi.h>
+#  pragma comment(lib, "shell32.lib")
 // clang-format on
 #else
 #  include <sys/types.h>
@@ -92,7 +93,7 @@ std::vector<std::string> GetCommandWithArgs(const int32_t &pid)
   LPWSTR *argvW = CommandLineToArgvW(GetCommandLineW(), &argc);
   if (!argvW)
   {
-    return {};
+    return {};  // returns an empty vector if CommandLineToArgvW fails
   }
 
   std::vector<std::string> args;
