@@ -92,27 +92,27 @@ static constexpr const char *kDirect = "direct";
 namespace AzureCosmosdbConsistencyLevelValues
 {
 /**
-  none
+  Strong
  */
 static constexpr const char *kStrong = "Strong";
 
 /**
-  none
+  Bounded Staleness
  */
 static constexpr const char *kBoundedStaleness = "BoundedStaleness";
 
 /**
-  none
+  Session
  */
 static constexpr const char *kSession = "Session";
 
 /**
-  none
+  Eventual
  */
 static constexpr const char *kEventual = "Eventual";
 
 /**
-  none
+  Consistent Prefix
  */
 static constexpr const char *kConsistentPrefix = "ConsistentPrefix";
 

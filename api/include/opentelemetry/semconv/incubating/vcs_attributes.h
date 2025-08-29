@@ -254,8 +254,11 @@ static constexpr const char *kGitlab = "gitlab";
 
 /**
   Deprecated, use @code gitea @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code gitea @endcode.", "reason": "renamed", "renamed_to": "gitea"}
  */
-static constexpr const char *kGittea = "gittea";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kGittea = "gittea";
 
 /**
   <a href="https://gitea.io">Gitea</a>

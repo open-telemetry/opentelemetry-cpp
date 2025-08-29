@@ -26,14 +26,9 @@ static constexpr const char *kLinuxMemorySlabState = "linux.memory.slab.state";
 
 namespace LinuxMemorySlabStateValues
 {
-/**
-  none
- */
+
 static constexpr const char *kReclaimable = "reclaimable";
 
-/**
-  none
- */
 static constexpr const char *kUnreclaimable = "unreclaimable";
 
 }  // namespace LinuxMemorySlabStateValues
