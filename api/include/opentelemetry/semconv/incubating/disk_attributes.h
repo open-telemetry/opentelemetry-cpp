@@ -26,14 +26,9 @@ static constexpr const char *kDiskIoDirection = "disk.io.direction";
 
 namespace DiskIoDirectionValues
 {
-/**
-  none
- */
+
 static constexpr const char *kRead = "read";
 
-/**
-  none
- */
 static constexpr const char *kWrite = "write";
 
 }  // namespace DiskIoDirectionValues
