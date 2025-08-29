@@ -93,15 +93,15 @@ void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
   }
 
   // Check if we should export this span based on sampling status
-  auto *span_data = static_cast<SpanData*>(span.get());
+  auto *span_data          = static_cast<SpanData *>(span.get());
   const auto &span_context = span_data->GetSpanContext();
-  
+
   // For backward compatibility: always export spans with invalid context (e.g., test spans)
-  // For valid contexts: export sampled spans or unsampled spans if export_unsampled_spans is enabled
-  bool should_export = !span_context.IsValid() || 
-                       span_context.IsSampled() || 
-                       export_unsampled_spans_;
-  
+  // For valid contexts: export sampled spans or unsampled spans if export_unsampled_spans is
+  // enabled
+  bool should_export =
+      !span_context.IsValid() || span_context.IsSampled() || export_unsampled_spans_;
+
   if (!should_export)
   {
     // Drop unsampled spans if export_unsampled_spans is not enabled
