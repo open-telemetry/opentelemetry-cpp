@@ -63,13 +63,13 @@ CreateAsyncDoubleMetricSystemCpuFrequency(metrics::Meter *meter)
 
 /**
   Reports the number of logical (virtual) processor cores created by the operating system to manage
-  multitasking <p> Calculated by multiplying the number of sockets by the number of cores per
+  multitasking. <p> Calculated by multiplying the number of sockets by the number of cores per
   socket, and then by the number of threads per core <p> updowncounter
  */
 static constexpr const char *kMetricSystemCpuLogicalCount = "system.cpu.logical.count";
 static constexpr const char *descrMetricSystemCpuLogicalCount =
     "Reports the number of logical (virtual) processor cores created by the operating system to "
-    "manage multitasking";
+    "manage multitasking.";
 static constexpr const char *unitMetricSystemCpuLogicalCount = "{cpu}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -105,7 +105,7 @@ CreateAsyncDoubleMetricSystemCpuLogicalCount(metrics::Meter *meter)
 }
 
 /**
-  Reports the number of actual physical processor cores on the hardware
+  Reports the number of actual physical processor cores on the hardware.
   <p>
   Calculated by multiplying the number of sockets by the number of cores per socket
   <p>
@@ -113,7 +113,7 @@ CreateAsyncDoubleMetricSystemCpuLogicalCount(metrics::Meter *meter)
  */
 static constexpr const char *kMetricSystemCpuPhysicalCount = "system.cpu.physical.count";
 static constexpr const char *descrMetricSystemCpuPhysicalCount =
-    "Reports the number of actual physical processor cores on the hardware";
+    "Reports the number of actual physical processor cores on the hardware.";
 static constexpr const char *unitMetricSystemCpuPhysicalCount = "{cpu}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -149,13 +149,13 @@ CreateAsyncDoubleMetricSystemCpuPhysicalCount(metrics::Meter *meter)
 }
 
 /**
-  Seconds each logical CPU spent on each mode
+  Seconds each logical CPU spent on each mode.
   <p>
   counter
  */
 static constexpr const char *kMetricSystemCpuTime = "system.cpu.time";
 static constexpr const char *descrMetricSystemCpuTime =
-    "Seconds each logical CPU spent on each mode";
+    "Seconds each logical CPU spent on each mode.";
 static constexpr const char *unitMetricSystemCpuTime = "s";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricSystemCpuTime(
@@ -228,10 +228,12 @@ CreateAsyncDoubleMetricSystemCpuUtilization(metrics::Meter *meter)
 }
 
 /**
+  TODO.
+  <p>
   counter
  */
 static constexpr const char *kMetricSystemDiskIo     = "system.disk.io";
-static constexpr const char *descrMetricSystemDiskIo = "";
+static constexpr const char *descrMetricSystemDiskIo = "TODO.";
 static constexpr const char *unitMetricSystemDiskIo  = "By";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricSystemDiskIo(
@@ -263,7 +265,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
-  Time disk spent activated
+  Time disk spent activated.
   <p>
   The real elapsed time ("wall clock") used in the I/O path (time from operations running in
   parallel are not counted). Measured as: <ul> <li>Linux: Field 13 from <a
@@ -277,7 +279,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
   counter
  */
 static constexpr const char *kMetricSystemDiskIoTime     = "system.disk.io_time";
-static constexpr const char *descrMetricSystemDiskIoTime = "Time disk spent activated";
+static constexpr const char *descrMetricSystemDiskIoTime = "Time disk spent activated.";
 static constexpr const char *unitMetricSystemDiskIoTime  = "s";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricSystemDiskIoTime(
@@ -309,12 +311,12 @@ CreateAsyncDoubleMetricSystemDiskIoTime(metrics::Meter *meter)
 }
 
 /**
-  The total storage capacity of the disk
+  The total storage capacity of the disk.
   <p>
   updowncounter
  */
 static constexpr const char *kMetricSystemDiskLimit     = "system.disk.limit";
-static constexpr const char *descrMetricSystemDiskLimit = "The total storage capacity of the disk";
+static constexpr const char *descrMetricSystemDiskLimit = "The total storage capacity of the disk.";
 static constexpr const char *unitMetricSystemDiskLimit  = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -346,10 +348,12 @@ CreateAsyncDoubleMetricSystemDiskLimit(metrics::Meter *meter)
 }
 
 /**
+  TODO.
+  <p>
   counter
  */
 static constexpr const char *kMetricSystemDiskMerged     = "system.disk.merged";
-static constexpr const char *descrMetricSystemDiskMerged = "";
+static constexpr const char *descrMetricSystemDiskMerged = "TODO.";
 static constexpr const char *unitMetricSystemDiskMerged  = "{operation}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricSystemDiskMerged(
@@ -381,7 +385,7 @@ CreateAsyncDoubleMetricSystemDiskMerged(metrics::Meter *meter)
 }
 
 /**
-  Sum of the time each operation took to complete
+  Sum of the time each operation took to complete.
   <p>
   Because it is the sum of time each request took, parallel-issued requests each contribute to make
   the count grow. Measured as: <ul> <li>Linux: Fields 7 & 11 from <a
@@ -394,7 +398,7 @@ CreateAsyncDoubleMetricSystemDiskMerged(metrics::Meter *meter)
  */
 static constexpr const char *kMetricSystemDiskOperationTime = "system.disk.operation_time";
 static constexpr const char *descrMetricSystemDiskOperationTime =
-    "Sum of the time each operation took to complete";
+    "Sum of the time each operation took to complete.";
 static constexpr const char *unitMetricSystemDiskOperationTime = "s";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -430,10 +434,12 @@ CreateAsyncDoubleMetricSystemDiskOperationTime(metrics::Meter *meter)
 }
 
 /**
+  TODO.
+  <p>
   counter
  */
 static constexpr const char *kMetricSystemDiskOperations     = "system.disk.operations";
-static constexpr const char *descrMetricSystemDiskOperations = "";
+static constexpr const char *descrMetricSystemDiskOperations = "TODO.";
 static constexpr const char *unitMetricSystemDiskOperations  = "{operation}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -465,13 +471,13 @@ CreateAsyncDoubleMetricSystemDiskOperations(metrics::Meter *meter)
 }
 
 /**
-  The total storage capacity of the filesystem
+  The total storage capacity of the filesystem.
   <p>
   updowncounter
  */
 static constexpr const char *kMetricSystemFilesystemLimit = "system.filesystem.limit";
 static constexpr const char *descrMetricSystemFilesystemLimit =
-    "The total storage capacity of the filesystem";
+    "The total storage capacity of the filesystem.";
 static constexpr const char *unitMetricSystemFilesystemLimit = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -551,10 +557,12 @@ CreateAsyncDoubleMetricSystemFilesystemUsage(metrics::Meter *meter)
 }
 
 /**
+  TODO.
+  <p>
   gauge
  */
 static constexpr const char *kMetricSystemFilesystemUtilization = "system.filesystem.utilization";
-static constexpr const char *descrMetricSystemFilesystemUtilization = "";
+static constexpr const char *descrMetricSystemFilesystemUtilization = "TODO.";
 static constexpr const char *unitMetricSystemFilesystemUtilization  = "1";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -594,7 +602,7 @@ CreateAsyncDoubleMetricSystemFilesystemUtilization(metrics::Meter *meter)
 
 /**
   An estimate of how much memory is available for starting new applications, without causing
-  swapping <p> This is an alternative to @code system.memory.usage @endcode metric with @code
+  swapping. <p> This is an alternative to @code system.memory.usage @endcode metric with @code
   state=free @endcode. Linux starting from 3.14 exports "available" memory. It takes "free" memory
   as a baseline, and then factors in kernel-specific values. This is supposed to be more accurate
   than just "free" memory. For reference, see the calculations <a
@@ -604,7 +612,7 @@ CreateAsyncDoubleMetricSystemFilesystemUtilization(metrics::Meter *meter)
 static constexpr const char *kMetricSystemLinuxMemoryAvailable = "system.linux.memory.available";
 static constexpr const char *descrMetricSystemLinuxMemoryAvailable =
     "An estimate of how much memory is available for starting new applications, without causing "
-    "swapping";
+    "swapping.";
 static constexpr const char *unitMetricSystemLinuxMemoryAvailable = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -688,15 +696,14 @@ CreateAsyncDoubleMetricSystemLinuxMemorySlabUsage(metrics::Meter *meter)
 }
 
 /**
-  Total memory available in the system.
-  <p>
-  Its value SHOULD equal the sum of @code system.memory.state @endcode over all states.
+  Total virtual memory available in the system.
   <p>
   updowncounter
  */
-static constexpr const char *kMetricSystemMemoryLimit     = "system.memory.limit";
-static constexpr const char *descrMetricSystemMemoryLimit = "Total memory available in the system.";
-static constexpr const char *unitMetricSystemMemoryLimit  = "By";
+static constexpr const char *kMetricSystemMemoryLimit = "system.memory.limit";
+static constexpr const char *descrMetricSystemMemoryLimit =
+    "Total virtual memory available in the system.";
+static constexpr const char *unitMetricSystemMemoryLimit = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricSystemMemoryLimit(metrics::Meter *meter)
@@ -770,9 +777,6 @@ CreateAsyncDoubleMetricSystemMemoryShared(metrics::Meter *meter)
 /**
   Reports memory in use by state.
   <p>
-  The sum over all @code system.memory.state @endcode values SHOULD equal the total memory
-  available on the system, that is @code system.memory.limit @endcode.
-  <p>
   updowncounter
  */
 static constexpr const char *kMetricSystemMemoryUsage     = "system.memory.usage";
@@ -808,10 +812,12 @@ CreateAsyncDoubleMetricSystemMemoryUsage(metrics::Meter *meter)
 }
 
 /**
+  TODO.
+  <p>
   gauge
  */
 static constexpr const char *kMetricSystemMemoryUtilization     = "system.memory.utilization";
-static constexpr const char *descrMetricSystemMemoryUtilization = "";
+static constexpr const char *descrMetricSystemMemoryUtilization = "TODO.";
 static constexpr const char *unitMetricSystemMemoryUtilization  = "1";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -849,11 +855,13 @@ CreateAsyncDoubleMetricSystemMemoryUtilization(metrics::Meter *meter)
 }
 
 /**
+  TODO.
+  <p>
   updowncounter
  */
 static constexpr const char *kMetricSystemNetworkConnectionCount =
     "system.network.connection.count";
-static constexpr const char *descrMetricSystemNetworkConnectionCount = "";
+static constexpr const char *descrMetricSystemNetworkConnectionCount = "TODO.";
 static constexpr const char *unitMetricSystemNetworkConnectionCount  = "{connection}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -889,7 +897,7 @@ CreateAsyncDoubleMetricSystemNetworkConnectionCount(metrics::Meter *meter)
 }
 
 /**
-  Deprecated, use @code system.network.connection.count @endcode instead
+  Deprecated, use @code system.network.connection.count @endcode instead.
 
   @deprecated
   {"note": "Replaced by @code system.network.connection.count @endcode.", "reason": "renamed",
@@ -898,7 +906,7 @@ CreateAsyncDoubleMetricSystemNetworkConnectionCount(metrics::Meter *meter)
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricSystemNetworkConnections =
     "system.network.connections";
 OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricSystemNetworkConnections =
-    "Deprecated, use `system.network.connection.count` instead";
+    "Deprecated, use `system.network.connection.count` instead.";
 OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricSystemNetworkConnections =
     "{connection}";
 
@@ -935,60 +943,11 @@ CreateAsyncDoubleMetricSystemNetworkConnections(metrics::Meter *meter)
 }
 
 /**
-  Count of packets that are dropped or discarded even though there was no error
+  Count of network errors detected.
   <p>
   Measured as:
   <ul>
-    <li>Linux: the @code drop @endcode column in @code /proc/dev/net @endcode (<a
-  href="https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html">source</a>)</li>
-    <li>Windows: <a
-  href="https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2">@code
-  InDiscards @endcode/@code OutDiscards @endcode</a> from <a
-  href="https://docs.microsoft.com/windows/win32/api/netioapi/nf-netioapi-getifentry2">@code
-  GetIfEntry2 @endcode</a></li>
-  </ul>
-  <p>
-  counter
- */
-static constexpr const char *kMetricSystemNetworkDropped = "system.network.dropped";
-static constexpr const char *descrMetricSystemNetworkDropped =
-    "Count of packets that are dropped or discarded even though there was no error";
-static constexpr const char *unitMetricSystemNetworkDropped = "{packet}";
-
-static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
-CreateSyncInt64MetricSystemNetworkDropped(metrics::Meter *meter)
-{
-  return meter->CreateUInt64Counter(kMetricSystemNetworkDropped, descrMetricSystemNetworkDropped,
-                                    unitMetricSystemNetworkDropped);
-}
-
-static inline nostd::unique_ptr<metrics::Counter<double>>
-CreateSyncDoubleMetricSystemNetworkDropped(metrics::Meter *meter)
-{
-  return meter->CreateDoubleCounter(kMetricSystemNetworkDropped, descrMetricSystemNetworkDropped,
-                                    unitMetricSystemNetworkDropped);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricSystemNetworkDropped(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableCounter(
-      kMetricSystemNetworkDropped, descrMetricSystemNetworkDropped, unitMetricSystemNetworkDropped);
-}
-
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricSystemNetworkDropped(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableCounter(
-      kMetricSystemNetworkDropped, descrMetricSystemNetworkDropped, unitMetricSystemNetworkDropped);
-}
-
-/**
-  Count of network errors detected
-  <p>
-  Measured as:
-  <ul>
-    <li>Linux: the @code errs @endcode column in @code /proc/dev/net @endcode (<a
+    <li>Linux: the @code errs @endcode column in @code /proc/net/dev @endcode (<a
   href="https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html">source</a>).</li>
     <li>Windows: <a
   href="https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2">@code
@@ -1000,7 +959,7 @@ CreateAsyncDoubleMetricSystemNetworkDropped(metrics::Meter *meter)
   counter
  */
 static constexpr const char *kMetricSystemNetworkErrors     = "system.network.errors";
-static constexpr const char *descrMetricSystemNetworkErrors = "Count of network errors detected";
+static constexpr const char *descrMetricSystemNetworkErrors = "Count of network errors detected.";
 static constexpr const char *unitMetricSystemNetworkErrors  = "{error}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -1032,10 +991,12 @@ CreateAsyncDoubleMetricSystemNetworkErrors(metrics::Meter *meter)
 }
 
 /**
+  TODO.
+  <p>
   counter
  */
 static constexpr const char *kMetricSystemNetworkIo     = "system.network.io";
-static constexpr const char *descrMetricSystemNetworkIo = "";
+static constexpr const char *descrMetricSystemNetworkIo = "TODO.";
 static constexpr const char *unitMetricSystemNetworkIo  = "By";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricSystemNetworkIo(
@@ -1067,45 +1028,106 @@ CreateAsyncDoubleMetricSystemNetworkIo(metrics::Meter *meter)
 }
 
 /**
+  TODO.
+  <p>
   counter
  */
-static constexpr const char *kMetricSystemNetworkPackets     = "system.network.packets";
-static constexpr const char *descrMetricSystemNetworkPackets = "";
-static constexpr const char *unitMetricSystemNetworkPackets  = "{packet}";
+static constexpr const char *kMetricSystemNetworkPacketCount     = "system.network.packet.count";
+static constexpr const char *descrMetricSystemNetworkPacketCount = "TODO.";
+static constexpr const char *unitMetricSystemNetworkPacketCount  = "{packet}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
-CreateSyncInt64MetricSystemNetworkPackets(metrics::Meter *meter)
+CreateSyncInt64MetricSystemNetworkPacketCount(metrics::Meter *meter)
 {
-  return meter->CreateUInt64Counter(kMetricSystemNetworkPackets, descrMetricSystemNetworkPackets,
-                                    unitMetricSystemNetworkPackets);
+  return meter->CreateUInt64Counter(kMetricSystemNetworkPacketCount,
+                                    descrMetricSystemNetworkPacketCount,
+                                    unitMetricSystemNetworkPacketCount);
 }
 
 static inline nostd::unique_ptr<metrics::Counter<double>>
-CreateSyncDoubleMetricSystemNetworkPackets(metrics::Meter *meter)
+CreateSyncDoubleMetricSystemNetworkPacketCount(metrics::Meter *meter)
 {
-  return meter->CreateDoubleCounter(kMetricSystemNetworkPackets, descrMetricSystemNetworkPackets,
-                                    unitMetricSystemNetworkPackets);
+  return meter->CreateDoubleCounter(kMetricSystemNetworkPacketCount,
+                                    descrMetricSystemNetworkPacketCount,
+                                    unitMetricSystemNetworkPacketCount);
 }
 
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricSystemNetworkPackets(metrics::Meter *meter)
+CreateAsyncInt64MetricSystemNetworkPacketCount(metrics::Meter *meter)
 {
-  return meter->CreateInt64ObservableCounter(
-      kMetricSystemNetworkPackets, descrMetricSystemNetworkPackets, unitMetricSystemNetworkPackets);
+  return meter->CreateInt64ObservableCounter(kMetricSystemNetworkPacketCount,
+                                             descrMetricSystemNetworkPacketCount,
+                                             unitMetricSystemNetworkPacketCount);
 }
 
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricSystemNetworkPackets(metrics::Meter *meter)
+CreateAsyncDoubleMetricSystemNetworkPacketCount(metrics::Meter *meter)
 {
-  return meter->CreateDoubleObservableCounter(
-      kMetricSystemNetworkPackets, descrMetricSystemNetworkPackets, unitMetricSystemNetworkPackets);
+  return meter->CreateDoubleObservableCounter(kMetricSystemNetworkPacketCount,
+                                              descrMetricSystemNetworkPacketCount,
+                                              unitMetricSystemNetworkPacketCount);
 }
 
 /**
+  Count of packets that are dropped or discarded even though there was no error.
+  <p>
+  Measured as:
+  <ul>
+    <li>Linux: the @code drop @endcode column in @code /proc/net/dev @endcode (<a
+  href="https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html">source</a>)</li>
+    <li>Windows: <a
+  href="https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2">@code
+  InDiscards @endcode/@code OutDiscards @endcode</a> from <a
+  href="https://docs.microsoft.com/windows/win32/api/netioapi/nf-netioapi-getifentry2">@code
+  GetIfEntry2 @endcode</a></li>
+  </ul>
+  <p>
+  counter
+ */
+static constexpr const char *kMetricSystemNetworkPacketDropped = "system.network.packet.dropped";
+static constexpr const char *descrMetricSystemNetworkPacketDropped =
+    "Count of packets that are dropped or discarded even though there was no error.";
+static constexpr const char *unitMetricSystemNetworkPacketDropped = "{packet}";
+
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricSystemNetworkPacketDropped(metrics::Meter *meter)
+{
+  return meter->CreateUInt64Counter(kMetricSystemNetworkPacketDropped,
+                                    descrMetricSystemNetworkPacketDropped,
+                                    unitMetricSystemNetworkPacketDropped);
+}
+
+static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricSystemNetworkPacketDropped(metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricSystemNetworkPacketDropped,
+                                    descrMetricSystemNetworkPacketDropped,
+                                    unitMetricSystemNetworkPacketDropped);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemNetworkPacketDropped(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableCounter(kMetricSystemNetworkPacketDropped,
+                                             descrMetricSystemNetworkPacketDropped,
+                                             unitMetricSystemNetworkPacketDropped);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemNetworkPacketDropped(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(kMetricSystemNetworkPacketDropped,
+                                              descrMetricSystemNetworkPacketDropped,
+                                              unitMetricSystemNetworkPacketDropped);
+}
+
+/**
+  TODO.
+  <p>
   counter
  */
 static constexpr const char *kMetricSystemPagingFaults     = "system.paging.faults";
-static constexpr const char *descrMetricSystemPagingFaults = "";
+static constexpr const char *descrMetricSystemPagingFaults = "TODO.";
 static constexpr const char *unitMetricSystemPagingFaults  = "{fault}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricSystemPagingFaults(
@@ -1137,10 +1159,12 @@ CreateAsyncDoubleMetricSystemPagingFaults(metrics::Meter *meter)
 }
 
 /**
+  TODO.
+  <p>
   counter
  */
 static constexpr const char *kMetricSystemPagingOperations     = "system.paging.operations";
-static constexpr const char *descrMetricSystemPagingOperations = "";
+static constexpr const char *descrMetricSystemPagingOperations = "TODO.";
 static constexpr const char *unitMetricSystemPagingOperations  = "{operation}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -1176,12 +1200,12 @@ CreateAsyncDoubleMetricSystemPagingOperations(metrics::Meter *meter)
 }
 
 /**
-  Unix swap or windows pagefile usage
+  Unix swap or windows pagefile usage.
   <p>
   updowncounter
  */
 static constexpr const char *kMetricSystemPagingUsage     = "system.paging.usage";
-static constexpr const char *descrMetricSystemPagingUsage = "Unix swap or windows pagefile usage";
+static constexpr const char *descrMetricSystemPagingUsage = "Unix swap or windows pagefile usage.";
 static constexpr const char *unitMetricSystemPagingUsage  = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -1213,10 +1237,12 @@ CreateAsyncDoubleMetricSystemPagingUsage(metrics::Meter *meter)
 }
 
 /**
+  TODO.
+  <p>
   gauge
  */
 static constexpr const char *kMetricSystemPagingUtilization     = "system.paging.utilization";
-static constexpr const char *descrMetricSystemPagingUtilization = "";
+static constexpr const char *descrMetricSystemPagingUtilization = "TODO.";
 static constexpr const char *unitMetricSystemPagingUtilization  = "1";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -1254,13 +1280,13 @@ CreateAsyncDoubleMetricSystemPagingUtilization(metrics::Meter *meter)
 }
 
 /**
-  Total number of processes in each state
+  Total number of processes in each state.
   <p>
   updowncounter
  */
 static constexpr const char *kMetricSystemProcessCount = "system.process.count";
 static constexpr const char *descrMetricSystemProcessCount =
-    "Total number of processes in each state";
+    "Total number of processes in each state.";
 static constexpr const char *unitMetricSystemProcessCount = "{process}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -1292,13 +1318,13 @@ CreateAsyncDoubleMetricSystemProcessCount(metrics::Meter *meter)
 }
 
 /**
-  Total number of processes created over uptime of the host
+  Total number of processes created over uptime of the host.
   <p>
   counter
  */
 static constexpr const char *kMetricSystemProcessCreated = "system.process.created";
 static constexpr const char *descrMetricSystemProcessCreated =
-    "Total number of processes created over uptime of the host";
+    "Total number of processes created over uptime of the host.";
 static constexpr const char *unitMetricSystemProcessCreated = "{process}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -1330,14 +1356,14 @@ CreateAsyncDoubleMetricSystemProcessCreated(metrics::Meter *meter)
 }
 
 /**
-  The time the system has been running
+  The time the system has been running.
   <p>
   Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
   as a floating point number with the highest precision available. The actual accuracy would depend
   on the instrumentation and operating system. <p> gauge
  */
 static constexpr const char *kMetricSystemUptime     = "system.uptime";
-static constexpr const char *descrMetricSystemUptime = "The time the system has been running";
+static constexpr const char *descrMetricSystemUptime = "The time the system has been running.";
 static constexpr const char *unitMetricSystemUptime  = "s";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2

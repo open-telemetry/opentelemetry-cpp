@@ -44,64 +44,29 @@ static constexpr const char *kTelemetrySdkVersion = "telemetry.sdk.version";
 
 namespace TelemetrySdkLanguageValues
 {
-/**
-  none
- */
+
 static constexpr const char *kCpp = "cpp";
 
-/**
-  none
- */
 static constexpr const char *kDotnet = "dotnet";
 
-/**
-  none
- */
 static constexpr const char *kErlang = "erlang";
 
-/**
-  none
- */
 static constexpr const char *kGo = "go";
 
-/**
-  none
- */
 static constexpr const char *kJava = "java";
 
-/**
-  none
- */
 static constexpr const char *kNodejs = "nodejs";
 
-/**
-  none
- */
 static constexpr const char *kPhp = "php";
 
-/**
-  none
- */
 static constexpr const char *kPython = "python";
 
-/**
-  none
- */
 static constexpr const char *kRuby = "ruby";
 
-/**
-  none
- */
 static constexpr const char *kRust = "rust";
 
-/**
-  none
- */
 static constexpr const char *kSwift = "swift";
 
-/**
-  none
- */
 static constexpr const char *kWebjs = "webjs";
 
 }  // namespace TelemetrySdkLanguageValues
