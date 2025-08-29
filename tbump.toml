@@ -7,7 +7,7 @@
 # RESOURCES:
 #   https://github.com/your-tools/tbump
 #   https://hackernoon.com/lets-automate-version-number-updates-not-a91q3x7n
-# 
+#
 # USAGE:
 #   When making a new opentelemetry-cpp release:
 #   tbump 1.23.0 --only-patch
@@ -33,7 +33,6 @@ regex = '''
   \.
   (?P<patch>\d+)
   ((?P<dash>-)(?P<release>[a-z]+))?
-  (-(?P<crap>[a-z]+))?
   '''
 
 [[field]]
@@ -94,26 +93,26 @@ search = "#define OPENTELEMETRY_VERSION_PATCH {current_version}"
 src = "sdk/include/opentelemetry/sdk/version/version.h"
 search = "#define OPENTELEMETRY_SDK_VERSION \"{current_version}\""
 
-# [[file]]
-# src = "sdk/src/version/version.cc"
-# version_template = "{major}"
-# search = "const int major_version\\s*=\\s*{current_version}"
+[[file]]
+src = "sdk/src/version/version.cc"
+version_template = "{major}"
+search = "const int major_version\\s*=\\s*{current_version}"
 
-# [[file]]
-# src = "sdk/src/version/version.cc"
-# version_template = "{minor}"
-# search = "const int minor_version\\s*=\\s*{current_version}"
+[[file]]
+src = "sdk/src/version/version.cc"
+version_template = "{minor}"
+search = "const int minor_version\\s*=\\s*{current_version}"
 
-# [[file]]
-# src = "sdk/src/version/version.cc"
-# version_template = "{patch}"
-# search = "const int patch_version\\s*=\\s*{current_version}"
+[[file]]
+src = "sdk/src/version/version.cc"
+version_template = "{patch}"
+search = "const int patch_version\\s*=\\s*{current_version}"
 
-# [[file]]
-# src = "sdk/src/version/version.cc"
-# # Longer template because release can be empty.
-# version_template = "= \"{release}\""
-# search = "pre_release\\s*{current_version}"
+[[file]]
+src = "sdk/src/version/version.cc"
+# Longer template because release can be empty.
+version_template = "= \"{release}\""
+search = "pre_release\\s*{current_version}"
 
 [[file]]
 src = "sdk/src/version/version.cc"
