@@ -33,6 +33,13 @@ struct BatchSpanProcessorOptions
    * equal to max_queue_size.
    */
   size_t max_export_batch_size = 512;
+
+  /**
+   * Whether to export unsampled but recording spans.
+   * By default, only sampled spans (Decision::RECORD_AND_SAMPLE) are exported.
+   * When set to true, unsampled recording spans (Decision::RECORD_ONLY) are also exported.
+   */
+  bool export_unsampled_spans = false;
 };
 
 }  // namespace trace
