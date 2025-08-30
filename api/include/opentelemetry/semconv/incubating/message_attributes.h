@@ -59,14 +59,9 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kMessageUncompressedSize =
 
 namespace MessageTypeValues
 {
-/**
-  none
- */
+
 static constexpr const char *kSent = "SENT";
 
-/**
-  none
- */
 static constexpr const char *kReceived = "RECEIVED";
 
 }  // namespace MessageTypeValues

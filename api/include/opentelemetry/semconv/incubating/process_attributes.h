@@ -247,47 +247,29 @@ static constexpr const char *kProcessWorkingDirectory = "process.working_directo
 
 namespace ProcessContextSwitchTypeValues
 {
-/**
-  none
- */
+
 static constexpr const char *kVoluntary = "voluntary";
 
-/**
-  none
- */
 static constexpr const char *kInvoluntary = "involuntary";
 
 }  // namespace ProcessContextSwitchTypeValues
 
 namespace ProcessCpuStateValues
 {
-/**
-  none
- */
+
 static constexpr const char *kSystem = "system";
 
-/**
-  none
- */
 static constexpr const char *kUser = "user";
 
-/**
-  none
- */
 static constexpr const char *kWait = "wait";
 
 }  // namespace ProcessCpuStateValues
 
 namespace ProcessPagingFaultTypeValues
 {
-/**
-  none
- */
+
 static constexpr const char *kMajor = "major";
 
-/**
-  none
- */
 static constexpr const char *kMinor = "minor";
 
 }  // namespace ProcessPagingFaultTypeValues

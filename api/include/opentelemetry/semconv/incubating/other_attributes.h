@@ -30,14 +30,9 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kState = "state";
 
 namespace StateValues
 {
-/**
-  none
- */
+
 static constexpr const char *kIdle = "idle";
 
-/**
-  none
- */
 static constexpr const char *kUsed = "used";
 
 }  // namespace StateValues

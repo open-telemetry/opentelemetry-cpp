@@ -70,6 +70,11 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kOtelLibraryVersion = "ote
 static constexpr const char *kOtelScopeName = "otel.scope.name";
 
 /**
+  The schema URL of the instrumentation scope.
+ */
+static constexpr const char *kOtelScopeSchemaUrl = "otel.scope.schema_url";
+
+/**
   The version of the instrumentation scope - (@code InstrumentationScope.Version @endcode in OTLP).
  */
 static constexpr const char *kOtelScopeVersion = "otel.scope.version";

@@ -32,42 +32,42 @@ static constexpr const char *kCpuMode = "cpu.mode";
 namespace CpuModeValues
 {
 /**
-  none
+  User
  */
 static constexpr const char *kUser = "user";
 
 /**
-  none
+  System
  */
 static constexpr const char *kSystem = "system";
 
 /**
-  none
+  Nice
  */
 static constexpr const char *kNice = "nice";
 
 /**
-  none
+  Idle
  */
 static constexpr const char *kIdle = "idle";
 
 /**
-  none
+  IO Wait
  */
 static constexpr const char *kIowait = "iowait";
 
 /**
-  none
+  Interrupt
  */
 static constexpr const char *kInterrupt = "interrupt";
 
 /**
-  none
+  Steal
  */
 static constexpr const char *kSteal = "steal";
 
 /**
-  none
+  Kernel
  */
 static constexpr const char *kKernel = "kernel";
 
