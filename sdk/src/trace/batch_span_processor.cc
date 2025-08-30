@@ -359,6 +359,19 @@ void BatchSpanProcessor::GetWaitAdjustedTime(
 
 bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  return InternalShutdown(timeout);
+}
+
+BatchSpanProcessor::~BatchSpanProcessor()
+{
+  if (synchronization_data_->is_shutdown.load() == false)
+  {
+    InternalShutdown();
+  }
+}
+
+bool BatchSpanProcessor::InternalShutdown(std::chrono::microseconds timeout) noexcept
+{
   auto start_time = std::chrono::system_clock::now();
   std::lock_guard<std::mutex> shutdown_guard{synchronization_data_->shutdown_m};
   bool already_shutdown = synchronization_data_->is_shutdown.exchange(true);
@@ -378,14 +391,6 @@ bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
   }
 
   return true;
-}
-
-BatchSpanProcessor::~BatchSpanProcessor()
-{
-  if (synchronization_data_->is_shutdown.load() == false)
-  {
-    Shutdown();
-  }
 }
 
 }  // namespace trace
