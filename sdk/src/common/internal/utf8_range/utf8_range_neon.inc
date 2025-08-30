@@ -9,10 +9,10 @@
  * straightforward.
  */
 
-static FORCE_INLINE_ATTR inline size_t utf8_range_ValidateUTF8Simd(const char *data_original,
-                                                                   const char *data,
-                                                                   const char *end,
-                                                                   int return_position)
+static FORCE_INLINE_ATTR size_t utf8_range_ValidateUTF8Simd(const char *data_original,
+                                                            const char *data,
+                                                            const char *end,
+                                                            int return_position)
 {
   const uint8x16_t first_len_tbl = {
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 3,
