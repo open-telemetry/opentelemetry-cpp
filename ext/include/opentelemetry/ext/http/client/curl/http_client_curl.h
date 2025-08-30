@@ -323,6 +323,8 @@ public:
 
   void SetMaxSessionsPerConnection(std::size_t max_requests_per_connection) noexcept override;
 
+  bool InternalCancelAllSessions() noexcept;
+
   inline uint64_t GetMaxSessionsPerConnection() const noexcept
   {
     return max_sessions_per_connection_;

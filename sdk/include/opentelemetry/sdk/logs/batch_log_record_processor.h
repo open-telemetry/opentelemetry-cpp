@@ -93,10 +93,11 @@ public:
 
   /**
    * Shuts down the processor and does any cleanup required. Completely drains the buffer/queue of
-   * all its logs and passes them to the exporter. Any subsequent calls to
-   * ForceFlush or Shutdown will return immediately without doing anything.
+   * all its logs and passes them to the exporter.
    *
-   * NOTE: Timeout functionality not supported yet.
+   * @param timeout minimum amount of microseconds to wait for shutdown before giving up and
+   * returning failure.
+   * @return true if the shutdown succeeded, false otherwise
    */
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
@@ -107,6 +108,13 @@ public:
   ~BatchLogRecordProcessor() override;
 
 protected:
+  /**
+   * Shuts down the processor and does any cleanup required. Completely drains the buffer/queue of
+   * all its logs and passes them to the exporter.
+   */
+  bool InternalShutdown(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+
   /**
    * The background routine performed by the worker thread.
    */
