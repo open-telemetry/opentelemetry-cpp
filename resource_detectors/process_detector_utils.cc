@@ -89,17 +89,20 @@ std::vector<std::string> ExtractCommandWithArgs(const std::string &command_line_
 std::vector<std::string> GetCommandWithArgs(const int32_t &pid)
 {
 #ifdef _MSC_VER
-  int argc      = 0;
-  LPWSTR *argvW = CommandLineToArgvW(GetCommandLineW(), &argc);
+  int argc       = 0;
+  LPTSTR cmdLine = GetCommandLine();
+
+#  ifdef UNICODE
+  // for UNICODE
+  LPWSTR *argvW = CommandLineToArgvW(cmdLine, &argc);
   if (!argvW)
   {
-    return {};  // returns an empty vector if CommandLineToArgvW fails
+    return {};
   }
 
   std::vector<std::string> args;
   for (int i = 0; i < argc; i++)
   {
-    // Convert UTF-16 to UTF-8
     int size_needed = WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, NULL, 0, NULL, NULL);
     if (size_needed > 0)
     {
@@ -111,7 +114,23 @@ std::vector<std::string> GetCommandWithArgs(const int32_t &pid)
 
   LocalFree(argvW);
   return args;
-#else
+#  else
+  // for Non-UNICODE
+  LPSTR *argvA = CommandLineToArgvA(cmdLine, &argc);
+  if (!argvA)
+  {
+    return {};
+  }
+
+  std::vector<std::string> args;
+  for (int i = 0; i < argc; i++)
+  {
+    args.push_back(argvA[i]);
+  }
+
+  LocalFree(argvA);
+  return args;
+#  endif  // endif for UNICODE
   std::string command_line_path = FormFilePath(pid, kCmdlineName);
   return ExtractCommandWithArgs(command_line_path);
 #endif
