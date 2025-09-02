@@ -25,7 +25,6 @@
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
-#include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/version.h"
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
@@ -48,7 +47,6 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
       max_queue_size_(options.max_queue_size),
       schedule_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
-      export_unsampled_spans_(options.export_unsampled_spans),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_instrumentation_(nullptr),
@@ -65,7 +63,6 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
       max_queue_size_(options.max_queue_size),
       schedule_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
-      export_unsampled_spans_(options.export_unsampled_spans),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_instrumentation_(runtime_options.thread_instrumentation),
@@ -89,22 +86,6 @@ void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
 {
   if (synchronization_data_->is_shutdown.load() == true)
   {
-    return;
-  }
-
-  // Check if we should export this span based on sampling status
-  auto *span_data          = static_cast<SpanData *>(span.get());
-  const auto &span_context = span_data->GetSpanContext();
-
-  // For backward compatibility: always export spans with invalid context (e.g., test spans)
-  // For valid contexts: export sampled spans or unsampled spans if export_unsampled_spans is
-  // enabled
-  bool should_export =
-      !span_context.IsValid() || span_context.IsSampled() || export_unsampled_spans_;
-
-  if (!should_export)
-  {
-    // Drop unsampled spans if export_unsampled_spans is not enabled
     return;
   }
 

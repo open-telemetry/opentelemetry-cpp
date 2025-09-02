@@ -164,7 +164,6 @@ protected:
   const size_t max_queue_size_;
   const std::chrono::milliseconds schedule_delay_millis_;
   const size_t max_export_batch_size_;
-  const bool export_unsampled_spans_;
 
   /* The buffer/queue to which the ended spans are added */
   opentelemetry::sdk::common::CircularBuffer<Recordable> buffer_;
