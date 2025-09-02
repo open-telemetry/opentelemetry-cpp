@@ -386,13 +386,19 @@ static constexpr const char *kSettle = "settle";
 
 /**
   Deprecated. Use @code process @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code process @endcode.", "reason": "renamed", "renamed_to": "process"}
  */
-static constexpr const char *kDeliver = "deliver";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kDeliver = "deliver";
 
 /**
   Deprecated. Use @code send @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code send @endcode.", "reason": "renamed", "renamed_to": "send"}
  */
-static constexpr const char *kPublish = "publish";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kPublish = "publish";
 
 }  // namespace MessagingOperationTypeValues
 
@@ -464,6 +470,11 @@ namespace MessagingSystemValues
   Apache ActiveMQ
  */
 static constexpr const char *kActivemq = "activemq";
+
+/**
+  Amazon Simple Notification Service (SNS)
+ */
+static constexpr const char *kAwsSns = "aws.sns";
 
 /**
   Amazon Simple Queue Service (SQS)

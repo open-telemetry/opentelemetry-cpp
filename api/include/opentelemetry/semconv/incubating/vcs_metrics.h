@@ -22,12 +22,12 @@ namespace vcs
 
 /**
   The number of changes (pull requests/merge requests/changelists) in a repository, categorized by
-  their state (e.g. open or merged) <p> updowncounter
+  their state (e.g. open or merged). <p> updowncounter
  */
 static constexpr const char *kMetricVcsChangeCount = "vcs.change.count";
 static constexpr const char *descrMetricVcsChangeCount =
     "The number of changes (pull requests/merge requests/changelists) in a repository, categorized "
-    "by their state (e.g. open or merged)";
+    "by their state (e.g. open or merged).";
 static constexpr const char *unitMetricVcsChangeCount = "{change}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -185,13 +185,13 @@ CreateAsyncDoubleMetricVcsChangeTimeToMerge(metrics::Meter *meter)
 }
 
 /**
-  The number of unique contributors to a repository
+  The number of unique contributors to a repository.
   <p>
   gauge
  */
 static constexpr const char *kMetricVcsContributorCount = "vcs.contributor.count";
 static constexpr const char *descrMetricVcsContributorCount =
-    "The number of unique contributors to a repository";
+    "The number of unique contributors to a repository.";
 static constexpr const char *unitMetricVcsContributorCount = "{contributor}";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -310,7 +310,7 @@ CreateAsyncDoubleMetricVcsRefLinesDelta(metrics::Meter *meter)
 
 /**
   The number of revisions (commits) a ref (branch) is ahead/behind the branch from the @code
-  vcs.ref.base.name @endcode attribute <p> This metric should be reported for each @code
+  vcs.ref.base.name @endcode attribute. <p> This metric should be reported for each @code
   vcs.revision_delta.direction @endcode value. For example if branch @code a @endcode is 3 commits
   behind and 2 commits ahead of @code trunk @endcode, instrumentation SHOULD report two
   measurements: 3 and 2 (both positive numbers) and @code vcs.ref.base.name @endcode is set to @code
@@ -319,7 +319,7 @@ CreateAsyncDoubleMetricVcsRefLinesDelta(metrics::Meter *meter)
 static constexpr const char *kMetricVcsRefRevisionsDelta = "vcs.ref.revisions_delta";
 static constexpr const char *descrMetricVcsRefRevisionsDelta =
     "The number of revisions (commits) a ref (branch) is ahead/behind the branch from the "
-    "`vcs.ref.base.name` attribute";
+    "`vcs.ref.base.name` attribute.";
 static constexpr const char *unitMetricVcsRefRevisionsDelta = "{revision}";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -355,12 +355,12 @@ CreateAsyncDoubleMetricVcsRefRevisionsDelta(metrics::Meter *meter)
 
 /**
   Time a ref (branch) created from the default branch (trunk) has existed. The @code ref.type
-  @endcode attribute will always be @code branch @endcode <p> gauge
+  @endcode attribute will always be @code branch @endcode. <p> gauge
  */
 static constexpr const char *kMetricVcsRefTime = "vcs.ref.time";
 static constexpr const char *descrMetricVcsRefTime =
     "Time a ref (branch) created from the default branch (trunk) has existed. The `ref.type` "
-    "attribute will always be `branch`";
+    "attribute will always be `branch`.";
 static constexpr const char *unitMetricVcsRefTime = "s";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2

@@ -30,10 +30,21 @@ Increment the:
 * [SDK] View should not have a unit
   [#3552](https://github.com/open-telemetry/opentelemetry-cpp/pull/3552)
 
+* [BUILD] Use -dev versions in main branch
+  [#3609](https://github.com/open-telemetry/opentelemetry-cpp/pull/3609)
+
 Important changes:
 
 * [CMAKE] Upgrade CMake minimum version to 3.16
   [#3599](https://github.com/open-telemetry/opentelemetry-cpp/pull/3599)
+
+* [BUILD] Use -dev versions in main branch
+  [#3609](https://github.com/open-telemetry/opentelemetry-cpp/pull/3609)
+  * The version number in the main branch has changed,
+    to better differentiate with the latest release.
+  * For example:
+    * With a latest release 1.22.0, the main branch is 1.23.0-dev
+    * Upon release of 1.23.0, the main branch becomes 1.24.0-dev
 
 Breaking changes:
 
