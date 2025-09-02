@@ -15,6 +15,8 @@
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/sdk/trace/simple_processor_options.h"
+#include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 
@@ -40,7 +42,17 @@ public:
    * @param exporter the exporter used by the span processor
    */
   explicit SimpleSpanProcessor(std::unique_ptr<SpanExporter> &&exporter) noexcept
-      : exporter_(std::move(exporter))
+      : exporter_(std::move(exporter)), export_unsampled_spans_(false)
+  {}
+
+  /**
+   * Initialize a simple span processor with options.
+   * @param exporter the exporter used by the span processor
+   * @param options the processor options
+   */
+  explicit SimpleSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
+                               const SimpleSpanProcessorOptions &options) noexcept
+      : exporter_(std::move(exporter)), export_unsampled_spans_(options.export_unsampled_spans)
   {}
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
@@ -54,6 +66,22 @@ public:
 
   void OnEnd(std::unique_ptr<Recordable> &&span) noexcept override
   {
+    // Check if we should export this span based on sampling status
+    auto *span_data          = static_cast<SpanData *>(span.get());
+    const auto &span_context = span_data->GetSpanContext();
+
+    // For backward compatibility: always export spans with invalid context (e.g., test spans)
+    // For valid contexts: export sampled spans or unsampled spans if export_unsampled_spans is
+    // enabled
+    bool should_export =
+        !span_context.IsValid() || span_context.IsSampled() || export_unsampled_spans_;
+
+    if (!should_export)
+    {
+      // Drop unsampled spans if export_unsampled_spans is not enabled
+      return;
+    }
+
     nostd::span<std::unique_ptr<Recordable>> batch(&span, 1);
     const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
     if (exporter_->Export(batch) == sdk::common::ExportResult::kFailure)
@@ -89,6 +117,7 @@ public:
 
 private:
   std::unique_ptr<SpanExporter> exporter_;
+  const bool export_unsampled_spans_;
   opentelemetry::common::SpinLockMutex lock_;
 #if defined(__cpp_lib_atomic_value_initialization) && \
     __cpp_lib_atomic_value_initialization >= 201911L

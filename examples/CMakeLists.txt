@@ -28,6 +28,10 @@ add_subdirectory(metrics_simple)
 add_subdirectory(multithreaded)
 add_subdirectory(multi_processor)
 
+# Add unsampled spans demo example
+add_executable(unsampled_spans_demo unsampled_spans_demo.cc)
+target_link_libraries(unsampled_spans_demo PRIVATE opentelemetry-cpp::trace)
+
 if(WITH_EXAMPLES_HTTP)
   add_subdirectory(http)
 endif()
