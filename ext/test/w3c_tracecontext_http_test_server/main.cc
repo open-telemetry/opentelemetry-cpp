@@ -4,7 +4,6 @@
 #include <ctype.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <iostream>
@@ -15,6 +14,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/exporters/ostream/span_exporter.h"
@@ -119,7 +119,7 @@ struct Uri
     size_t port_end = uri.substr(host_end + 1, std::string::npos).find('/');
 
     host = uri.substr(0, host_end + 7);
-    port = std::stoi(uri.substr(7 + host_end + 1, port_end));
+    port = static_cast<uint16_t>(std::stoi(uri.substr(7 + host_end + 1, port_end)));
     path = uri.substr(host_end + port_end + 2, std::string::npos);
   }
 };
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
   {
-    port = atoi(argv[1]);
+    port = static_cast<uint16_t>(atoi(argv[1]));
   }
   else
   {

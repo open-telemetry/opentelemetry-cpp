@@ -5,7 +5,7 @@
 #include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/version/version.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
@@ -21,7 +21,7 @@ namespace
 opentelemetry::nostd::shared_ptr<trace::Tracer> get_tracer()
 {
   auto provider = trace::Provider::GetTracerProvider();
-  return provider->GetTracer("foo_library", OPENTELEMETRY_SDK_VERSION);
+  return provider->GetTracer("foo_library");
 }
 
 opentelemetry::nostd::shared_ptr<logs::Logger> get_logger()

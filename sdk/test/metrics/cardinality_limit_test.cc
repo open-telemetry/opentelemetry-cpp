@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <algorithm>
 #include <chrono>
 #include <functional>
 #include <map>
@@ -15,11 +14,11 @@
 #include "common.h"
 
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
@@ -33,6 +32,7 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
 using namespace opentelemetry::sdk::metrics;
@@ -51,9 +51,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 0; i < 10; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-    static_cast<LongSumAggregation *>(
-        hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
+    static_cast<LongSumAggregation *>(hash_map.GetOrSetDefault(attributes, aggregation_callback))
         ->Aggregate(record_value);
   }
   EXPECT_EQ(hash_map.Size(), 10);
@@ -62,9 +60,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 10; i < 15; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-    static_cast<LongSumAggregation *>(
-        hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
+    static_cast<LongSumAggregation *>(hash_map.GetOrSetDefault(attributes, aggregation_callback))
         ->Aggregate(record_value);
   }
   EXPECT_EQ(hash_map.Size(), 10);  // only one more metric point should be added as overflow.
@@ -73,17 +69,13 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 0; i < 5; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-    static_cast<LongSumAggregation *>(
-        hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
+    static_cast<LongSumAggregation *>(hash_map.GetOrSetDefault(attributes, aggregation_callback))
         ->Aggregate(record_value);
   }
   EXPECT_EQ(hash_map.Size(), 10);  // no new metric point added
 
   // get the overflow metric point
-  auto agg1 = hash_map.GetOrSetDefault(
-      FilteredOrderedAttributeMap({{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}}),
-      aggregation_callback, kOverflowAttributesHash);
+  auto agg1 = hash_map.GetOrSetDefault(kOverflowAttributes, aggregation_callback);
   EXPECT_NE(agg1, nullptr);
   auto sum_agg1 = static_cast<LongSumAggregation *>(agg1);
   EXPECT_EQ(nostd::get<int64_t>(nostd::get<SumPointData>(sum_agg1->ToPoint()).value_),
@@ -92,10 +84,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 0; i < 9; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-    auto agg2 = hash_map.GetOrSetDefault(
-        FilteredOrderedAttributeMap({{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}}),
-        aggregation_callback, hash);
+    auto agg2 = hash_map.GetOrSetDefault(attributes, aggregation_callback);
     EXPECT_NE(agg2, nullptr);
     auto sum_agg2 = static_cast<LongSumAggregation *>(agg2);
     if (i < 5)
@@ -121,11 +110,10 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
   const size_t attributes_limit   = 10;
   InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kCounter,
                                      InstrumentValueType::kLong};
-
   AggregationConfig aggConfig(attributes_limit);
-  std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
+  std::shared_ptr<DefaultAttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
-  SyncMetricStorage storage(instr_desc, AggregationType::kSum, default_attributes_processor.get(),
+  SyncMetricStorage storage(instr_desc, AggregationType::kSum, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
                             ExemplarFilterType::kAlwaysOff,
                             ExemplarReservoir::GetNoExemplarReservoir(),

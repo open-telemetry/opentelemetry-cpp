@@ -6,40 +6,52 @@
 #include <stdint.h>
 #include <algorithm>
 #include <atomic>
+#include <chrono>
+#include <initializer_list>  // IWYU pragma: keep
 #include <iostream>
 #include <string>
 #include <thread>
+#include <type_traits>
 #include <utility>
 #include <vector>
 #include "common.h"
 
 #include <functional>
-#include "opentelemetry/context/context.h"
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/context/context.h"  // IWYU pragma: keep
 #include "opentelemetry/metrics/async_instruments.h"
 #include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/sdk/metrics/meter_config.h"
-#include "opentelemetry/sdk/metrics/view/view_registry.h"
-#include "opentelemetry/sdk/resource/resource.h"
-
-#include <opentelemetry/sdk/metrics/view/view_registry_factory.h>
-
 #include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/metrics/sync_instruments.h"  // IWYU pragma: keep
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/data/exemplar_data.h"  // IWYU pragma: keep
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
+#include "opentelemetry/sdk/metrics/view/view_registry_factory.h"
+#include "opentelemetry/sdk/resource/resource.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
+using namespace opentelemetry::sdk::common::internal_log;
 
 namespace
 {
@@ -86,6 +98,112 @@ std::shared_ptr<metrics::MeterProvider> GetMeterProviderWithScopeConfigurator(
   p->AddMetricReader(std::move(metric_reader));
   return p;
 }
+
+class TestLogHandler : public LogHandler
+{
+public:
+  void Handle(LogLevel level,
+              const char * /*file*/,
+              int /*line*/,
+              const char *msg,
+              const sdk::common::AttributeMap & /*attributes*/) noexcept override
+
+  {
+    if (LogLevel::Warning == level)
+    {
+      std::cout << msg << "\n";
+      warnings.push_back(msg);
+    }
+  }
+
+  bool HasNameCaseConflictWarning() const
+  {
+    return std::any_of(warnings.begin(), warnings.end(), [](const std::string &warning) {
+      return warning.find("WarnOnNameCaseConflict") != std::string::npos;
+    });
+  }
+
+  bool HasDuplicateInstrumentWarning() const
+  {
+    return std::any_of(warnings.begin(), warnings.end(), [](const std::string &warning) {
+      return warning.find("WarnOnDuplicateInstrument") != std::string::npos;
+    });
+  }
+
+private:
+  std::vector<std::string> warnings;
+};
+
+class MeterCreateInstrumentTest : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
+    ASSERT_TRUE(log_handler_ != nullptr);
+    ASSERT_TRUE(metric_reader_ptr_ != nullptr);
+    ASSERT_TRUE(provider_ != nullptr);
+    GlobalLogHandler::SetLogHandler(std::static_pointer_cast<LogHandler>(log_handler_));
+    GlobalLogHandler::SetLogLevel(LogLevel::Warning);
+
+    provider_->AddMetricReader(metric_reader_ptr_);
+    meter_ = provider_->GetMeter("test_meter");
+    ASSERT_TRUE(meter_ != nullptr);
+  }
+
+  void TearDown() override {}
+
+  void AddNameCorrectionView(const std::string &name,
+                             const std::string &unit,
+                             InstrumentType type,
+                             const std::string &new_name)
+  {
+    std::unique_ptr<View> corrective_view{new View(new_name)};
+    std::unique_ptr<InstrumentSelector> instrument_selector{
+        new InstrumentSelector(type, name, unit)};
+
+    std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("test_meter", "", "")};
+
+    provider_->AddView(std::move(instrument_selector), std::move(meter_selector),
+                       std::move(corrective_view));
+  }
+
+  void AddDescriptionCorrectionView(const std::string &name,
+                                    const std::string &unit,
+                                    InstrumentType type,
+                                    const std::string &new_description)
+  {
+    std::unique_ptr<View> corrective_view{new View(name, new_description)};
+    std::unique_ptr<InstrumentSelector> instrument_selector{
+        new InstrumentSelector(type, name, unit)};
+
+    std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("test_meter", "", "")};
+
+    provider_->AddView(std::move(instrument_selector), std::move(meter_selector),
+                       std::move(corrective_view));
+  }
+
+  std::shared_ptr<sdk::metrics::MeterProvider> provider_{new sdk::metrics::MeterProvider()};
+  std::shared_ptr<TestLogHandler> log_handler_{new TestLogHandler()};
+  opentelemetry::nostd::shared_ptr<opentelemetry::metrics::Meter> meter_{nullptr};
+
+  std::shared_ptr<MetricReader> metric_reader_ptr_{new MockMetricReader()};
+};
+
+class TestProcessor : public sdk::metrics::AttributesProcessor
+{
+public:
+  explicit TestProcessor() = default;
+
+  sdk::metrics::MetricAttributes process(
+      const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
+  {
+    // Just forward attributes
+    return sdk::metrics::MetricAttributes(attributes);
+  }
+
+  bool isPresent(nostd::string_view /*key*/) const noexcept override { return true; }
+};
+
 }  // namespace
 
 TEST(MeterTest, BasicAsyncTests)
@@ -371,4 +489,428 @@ TEST(MeterTest, MeterWithCustomConfig)
     EXPECT_FALSE(unexpected_instrument_found);
     return true;
   });
+}
+
+TEST_F(MeterCreateInstrumentTest, IdenticalSyncInstruments)
+{
+  auto counter1 = meter_->CreateDoubleCounter("my_counter", "desc", "unit");
+  auto counter2 = meter_->CreateDoubleCounter("my_counter", "desc", "unit");
+
+  counter1->Add(1.0, {{"key", "value1"}});
+  counter2->Add(2.5, {{"key", "value2"}});
+
+  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_.size(), 2);
+    auto &point_data1 =
+        metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_[0].point_data;
+    auto &point_data2 =
+        metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_[1].point_data;
+
+    auto sum_point_data1 = nostd::get<sdk::metrics::SumPointData>(point_data1);
+    auto sum_point_data2 = nostd::get<sdk::metrics::SumPointData>(point_data2);
+
+    const double sum =
+        nostd::get<double>(sum_point_data1.value_) + nostd::get<double>(sum_point_data2.value_);
+    EXPECT_DOUBLE_EQ(sum, 3.5);
+    EXPECT_FALSE(log_handler_->HasDuplicateInstrumentWarning());
+    EXPECT_FALSE(log_handler_->HasNameCaseConflictWarning());
+    return true;
+  });
+}
+
+TEST_F(MeterCreateInstrumentTest, NameCaseConflictSyncInstruments)
+{
+  auto counter1 = meter_->CreateUInt64Counter("My_CountER", "desc", "unit");
+  auto counter2 = meter_->CreateUInt64Counter("my_counter", "desc", "unit");
+
+  counter1->Add(1);
+  counter2->Add(2);
+
+  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_.size(), 1);
+    auto &point_data =
+        metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_[0].point_data;
+    auto sum_point_data = nostd::get<sdk::metrics::SumPointData>(point_data);
+    const auto sum      = nostd::get<int64_t>(sum_point_data.value_);
+    EXPECT_EQ(sum, 3);
+    EXPECT_FALSE(log_handler_->HasDuplicateInstrumentWarning());
+    EXPECT_TRUE(log_handler_->HasNameCaseConflictWarning());
+    return true;
+  });
+}
+
+TEST_F(MeterCreateInstrumentTest, ViewCorrectedNameCaseConflictSyncInstruments)
+{
+  InstrumentDescriptor descriptor{"My_CountER", "desc", "unit", InstrumentType::kCounter,
+                                  InstrumentValueType::kLong};
+
+  AddNameCorrectionView(descriptor.name_, descriptor.unit_, descriptor.type_, "my_counter");
+
+  auto counter1 =
+      meter_->CreateUInt64Counter("My_CountER", descriptor.description_, descriptor.unit_);
+  auto counter2 =
+      meter_->CreateUInt64Counter("my_counter", descriptor.description_, descriptor.unit_);
+
+  counter1->Add(1);
+  counter2->Add(2);
+
+  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_.size(), 1);
+    auto &point_data =
+        metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_[0].point_data;
+    auto sum_point_data = nostd::get<sdk::metrics::SumPointData>(point_data);
+    const auto sum      = nostd::get<int64_t>(sum_point_data.value_);
+    EXPECT_EQ(sum, 3);
+    // no warnings expected after correction with the view
+    EXPECT_FALSE(log_handler_->HasDuplicateInstrumentWarning());
+    EXPECT_FALSE(log_handler_->HasNameCaseConflictWarning());
+    return true;
+  });
+}
+
+TEST_F(MeterCreateInstrumentTest, DuplicateSyncInstrumentsByKind)
+{
+  auto counter1 = meter_->CreateDoubleCounter("my_counter", "desc", "unit");
+  auto counter2 = meter_->CreateUInt64Counter("my_counter", "desc", "unit");
+
+  counter1->Add(1, {{"key", "value1"}});
+  counter2->Add(1, {{"key", "value2"}});
+
+  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 2);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[1].point_data_attr_.size(), 1);
+    EXPECT_TRUE(log_handler_->HasDuplicateInstrumentWarning());
+    EXPECT_FALSE(log_handler_->HasNameCaseConflictWarning());
+    return true;
+  });
+}
+
+TEST_F(MeterCreateInstrumentTest, DuplicateSyncInstrumentsByUnits)
+{
+  auto counter1 = meter_->CreateDoubleCounter("my_counter", "desc", "unit");
+  auto counter2 = meter_->CreateDoubleCounter("my_counter", "desc", "another_unit");
+
+  counter1->Add(1, {{"key", "value1"}});
+  counter2->Add(1, {{"key", "value2"}});
+
+  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 2);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[1].point_data_attr_.size(), 1);
+    EXPECT_TRUE(log_handler_->HasDuplicateInstrumentWarning());
+    EXPECT_FALSE(log_handler_->HasNameCaseConflictWarning());
+    return true;
+  });
+}
+
+TEST_F(MeterCreateInstrumentTest, DuplicateSyncInstrumentsByDescription)
+{
+  auto counter1 = meter_->CreateDoubleCounter("my_counter", "desc", "unit");
+  auto counter2 = meter_->CreateDoubleCounter("my_counter", "another_desc", "unit");
+
+  counter1->Add(1, {{"key", "value1"}});
+  counter2->Add(1, {{"key", "value2"}});
+
+  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 2);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[1].point_data_attr_.size(), 1);
+    EXPECT_TRUE(log_handler_->HasDuplicateInstrumentWarning());
+    EXPECT_FALSE(log_handler_->HasNameCaseConflictWarning());
+    return true;
+  });
+}
+
+TEST_F(MeterCreateInstrumentTest, ViewCorrectedDuplicateSyncInstrumentsByDescription)
+{
+  InstrumentDescriptor descriptor{"my_counter", "desc", "unit", InstrumentType::kCounter,
+                                  InstrumentValueType::kDouble};
+  AddDescriptionCorrectionView(descriptor.name_, descriptor.unit_, descriptor.type_,
+                               descriptor.description_);
+
+  auto counter1 = meter_->CreateDoubleCounter("my_counter", "desc", "unit");
+  auto counter2 = meter_->CreateDoubleCounter("my_counter", "another_desc", "unit");
+
+  counter1->Add(1, {{"key", "value1"}});
+  counter2->Add(1, {{"key", "value2"}});
+
+  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    // only one metric_data object expected after correction with the view
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_.size(), 2);
+    // no warnings expected after correction with the view
+    EXPECT_FALSE(log_handler_->HasDuplicateInstrumentWarning());
+    EXPECT_FALSE(log_handler_->HasNameCaseConflictWarning());
+    return true;
+  });
+}
+
+TEST_F(MeterCreateInstrumentTest, IdenticalAsyncInstruments)
+{
+  auto observable_counter1 =
+      meter_->CreateInt64ObservableCounter("observable_counter", "desc", "unit");
+  auto observable_counter2 =
+      meter_->CreateInt64ObservableCounter("observable_counter", "desc", "unit");
+
+  auto callback1 = [](opentelemetry::metrics::ObserverResult observer, void * /* state */) {
+    auto observer_long =
+        nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>>>(observer);
+    observer_long->Observe(12, {{"key", "value1"}});
+  };
+
+  auto callback2 = [](opentelemetry::metrics::ObserverResult observer, void * /* state */) {
+    auto observer_long =
+        nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>>>(observer);
+    observer_long->Observe(2, {{"key", "value2"}});
+  };
+
+  observable_counter1->AddCallback(callback1, nullptr);
+  observable_counter2->AddCallback(callback2, nullptr);
+
+  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
+    auto &point_data_attr = metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_;
+    EXPECT_EQ(point_data_attr.size(), 2);
+
+    auto &point_data1 = point_data_attr[0].point_data;
+    auto &point_data2 = point_data_attr[1].point_data;
+
+    auto sum_point_data1 = nostd::get<sdk::metrics::SumPointData>(point_data1);
+    auto sum_point_data2 = nostd::get<sdk::metrics::SumPointData>(point_data2);
+
+    int64_t sum =
+        nostd::get<int64_t>(sum_point_data1.value_) + nostd::get<int64_t>(sum_point_data2.value_);
+    EXPECT_EQ(sum, 14);
+    EXPECT_FALSE(log_handler_->HasDuplicateInstrumentWarning());
+    EXPECT_FALSE(log_handler_->HasNameCaseConflictWarning());
+    return true;
+  });
+}
+
+TEST_F(MeterCreateInstrumentTest, NameCaseConflictAsyncInstruments)
+{
+  auto observable_counter1 =
+      meter_->CreateDoubleObservableCounter("OBServable_CounTER", "desc", "unit");
+  auto observable_counter2 =
+      meter_->CreateDoubleObservableCounter("observable_counter", "desc", "unit");
+
+  auto callback1 = [](opentelemetry::metrics::ObserverResult observer, void * /* state */) {
+    auto observer_double =
+        nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(observer);
+    observer_double->Observe(22.22, {{"key", "value1"}});
+  };
+
+  auto callback2 = [](opentelemetry::metrics::ObserverResult observer, void * /* state */) {
+    auto observer_double =
+        nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(observer);
+    observer_double->Observe(55.55, {{"key", "value2"}});
+  };
+
+  observable_counter1->AddCallback(callback1, nullptr);
+  observable_counter2->AddCallback(callback2, nullptr);
+
+  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
+    auto &point_data_attr = metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_;
+    EXPECT_EQ(point_data_attr.size(), 2);
+
+    auto &point_data1    = point_data_attr[0].point_data;
+    auto &point_data2    = point_data_attr[1].point_data;
+    auto sum_point_data1 = nostd::get<sdk::metrics::SumPointData>(point_data1);
+    auto sum_point_data2 = nostd::get<sdk::metrics::SumPointData>(point_data2);
+
+    const double sum =
+        nostd::get<double>(sum_point_data1.value_) + nostd::get<double>(sum_point_data2.value_);
+    EXPECT_DOUBLE_EQ(sum, 77.77);
+    EXPECT_FALSE(log_handler_->HasDuplicateInstrumentWarning());
+    EXPECT_TRUE(log_handler_->HasNameCaseConflictWarning());
+    return true;
+  });
+}
+
+TEST_F(MeterCreateInstrumentTest, ViewCorrectedNameCaseConflictAsyncInstruments)
+{
+  AddNameCorrectionView("OBServable_CounTER", "unit", InstrumentType::kObservableCounter,
+                        "observable_counter");
+
+  auto observable_counter1 =
+      meter_->CreateDoubleObservableCounter("OBServable_CounTER", "desc", "unit");
+  auto observable_counter2 =
+      meter_->CreateDoubleObservableCounter("observable_counter", "desc", "unit");
+
+  auto callback1 = [](opentelemetry::metrics::ObserverResult observer, void * /* state */) {
+    auto observer_double =
+        nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(observer);
+    observer_double->Observe(22.22, {{"key", "value1"}});
+  };
+
+  auto callback2 = [](opentelemetry::metrics::ObserverResult observer, void * /* state */) {
+    auto observer_double =
+        nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(observer);
+    observer_double->Observe(55.55, {{"key", "value2"}});
+  };
+
+  observable_counter1->AddCallback(callback1, nullptr);
+  observable_counter2->AddCallback(callback2, nullptr);
+
+  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
+    auto &point_data_attr = metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_;
+    EXPECT_EQ(point_data_attr.size(), 2);
+
+    auto &point_data1    = point_data_attr[0].point_data;
+    auto &point_data2    = point_data_attr[1].point_data;
+    auto sum_point_data1 = nostd::get<sdk::metrics::SumPointData>(point_data1);
+    auto sum_point_data2 = nostd::get<sdk::metrics::SumPointData>(point_data2);
+
+    const double sum =
+        nostd::get<double>(sum_point_data1.value_) + nostd::get<double>(sum_point_data2.value_);
+    EXPECT_DOUBLE_EQ(sum, 77.77);
+    // no warnings expected after correction with the view
+    EXPECT_FALSE(log_handler_->HasDuplicateInstrumentWarning());
+    EXPECT_FALSE(log_handler_->HasNameCaseConflictWarning());
+    return true;
+  });
+}
+
+TEST_F(MeterCreateInstrumentTest, DuplicateAsyncInstrumentsByKind)
+{
+  auto observable_counter1 = meter_->CreateDoubleObservableCounter("observable_counter");
+  auto observable_counter2 = meter_->CreateDoubleObservableGauge("observable_counter");
+
+  observable_counter1->AddCallback(asyc_generate_measurements_double, nullptr);
+  observable_counter2->AddCallback(asyc_generate_measurements_double, nullptr);
+
+  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 2);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_.size(), 1);
+    EXPECT_TRUE(log_handler_->HasDuplicateInstrumentWarning());
+    EXPECT_FALSE(log_handler_->HasNameCaseConflictWarning());
+    return true;
+  });
+}
+
+TEST_F(MeterCreateInstrumentTest, DuplicateAsyncInstrumentsByUnits)
+{
+  auto observable_counter1 =
+      meter_->CreateDoubleObservableCounter("observable_counter", "desc", "unit");
+  auto observable_counter2 =
+      meter_->CreateDoubleObservableCounter("observable_counter", "desc", "another_unit");
+
+  observable_counter1->AddCallback(asyc_generate_measurements_double, nullptr);
+  observable_counter2->AddCallback(asyc_generate_measurements_double, nullptr);
+
+  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 2);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_.size(), 1);
+    EXPECT_TRUE(log_handler_->HasDuplicateInstrumentWarning());
+    EXPECT_FALSE(log_handler_->HasNameCaseConflictWarning());
+    return true;
+  });
+}
+
+TEST_F(MeterCreateInstrumentTest, DuplicateAsyncInstrumentsByDescription)
+{
+  auto observable_counter1 =
+      meter_->CreateDoubleObservableCounter("observable_counter", "desc", "unit");
+  auto observable_counter2 =
+      meter_->CreateDoubleObservableCounter("observable_counter", "another_desc", "unit");
+
+  observable_counter1->AddCallback(asyc_generate_measurements_double, nullptr);
+  observable_counter2->AddCallback(asyc_generate_measurements_double, nullptr);
+
+  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 2);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_.size(), 1);
+    EXPECT_TRUE(log_handler_->HasDuplicateInstrumentWarning());
+    EXPECT_FALSE(log_handler_->HasNameCaseConflictWarning());
+    return true;
+  });
+}
+
+TEST_F(MeterCreateInstrumentTest, ViewCorrectedDuplicateAsyncInstrumentsByDescription)
+{
+  InstrumentDescriptor descriptor{"observable_counter", "desc", "unit",
+                                  InstrumentType::kObservableCounter, InstrumentValueType::kDouble};
+
+  AddDescriptionCorrectionView(descriptor.name_, descriptor.unit_, descriptor.type_,
+                               descriptor.description_);
+
+  auto observable_counter1 = meter_->CreateDoubleObservableCounter(
+      descriptor.name_, descriptor.description_, descriptor.unit_);
+  auto observable_counter2 =
+      meter_->CreateDoubleObservableCounter(descriptor.name_, "another_desc", descriptor.unit_);
+
+  observable_counter1->AddCallback(asyc_generate_measurements_double, nullptr);
+  observable_counter2->AddCallback(asyc_generate_measurements_double, nullptr);
+
+  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
+    EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_[0].point_data_attr_.size(), 1);
+    // no warnings expected after correction with the view
+    EXPECT_FALSE(log_handler_->HasDuplicateInstrumentWarning());
+    EXPECT_FALSE(log_handler_->HasNameCaseConflictWarning());
+    return true;
+  });
+}
+
+TEST(MeterTest, RecordAfterProviderDestructionWithCustomProcessor_NoResetInMain)
+{
+  std::unique_ptr<AttributesProcessor> processor(new TestProcessor());
+
+  // MeterProvider is owned by unique_ptr for explicit control
+  std::unique_ptr<MeterProvider> provider(new MeterProvider());
+
+  // Register a View with custom processor
+  std::unique_ptr<View> view(
+      new View("my_counter", "", AggregationType::kSum, nullptr, std::move(processor)));
+  std::unique_ptr<InstrumentSelector> instr_selector(
+      new InstrumentSelector(InstrumentType::kCounter, "my_counter", ""));
+  std::unique_ptr<MeterSelector> meter_selector(new MeterSelector("test_meter", "", ""));
+  provider->AddView(std::move(instr_selector), std::move(meter_selector), std::move(view));
+
+  auto meter   = provider->GetMeter("test_meter");
+  auto counter = meter->CreateUInt64Counter("my_counter");
+
+  // Move the counter to the thread
+  std::atomic<bool> thread_ready{false};
+  std::atomic<bool> thread_done{false};
+
+  std::thread t([c = std::move(counter), &thread_ready, &thread_done]() mutable {
+    thread_ready = true;
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    // Safe after provider destruction
+    c->Add(12345, {{"thread", "after_provider_destruction"}});
+    thread_done = true;
+  });
+
+  // Wait for thread to be ready
+  while (!thread_ready.load())
+    std::this_thread::yield();
+
+  // Destroy the provider (and its storage etc)
+  provider.reset();
+
+  // Wait for thread to finish
+  while (!thread_done.load())
+    std::this_thread::yield();
+  t.join();
 }

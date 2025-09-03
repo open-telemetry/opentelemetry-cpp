@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdint.h>
-#include <algorithm>
 #include <chrono>
+#include <cstdint>
+#include <cstring>
 #include <map>
 #include <string>
 #include <utility>
@@ -257,22 +257,98 @@ TEST(OtlpRecordable, AddLink)
 TEST(OtlpRecordable, SetResource)
 {
   OtlpRecordable rec;
-  const std::string service_name_key = "service.name";
-  std::string service_name           = "test-otlp";
-  auto resource = resource::Resource::Create({{service_name_key, service_name}});
+  bool array_bool[]                                = {true, false, true};
+  int32_t array_int[]                              = {1, 2, 3};
+  double array_double[]                            = {1.1, 2.2, 3.3};
+  opentelemetry::nostd::string_view array_string[] = {"str1", "str2", "str3"};
+
+  resource::ResourceAttributes attributes{
+      {"service.name", opentelemetry::nostd::string_view{"test-otlp"}},
+      {"bool_value", true},
+      {"int_value", 3},
+      {"double_value", static_cast<double>(1.4)},
+      {"bytes_value",
+       opentelemetry::nostd::span<const uint8_t>{reinterpret_cast<const uint8_t *>("\1\0\3abc"),
+                                                 6}},
+      {"bool_array", opentelemetry::nostd::span<const bool>{array_bool}},
+      {"int_array", opentelemetry::nostd::span<const int32_t>{array_int}},
+      {"double_array", opentelemetry::nostd::span<const double>{array_double}},
+      {"string_array",
+       opentelemetry::nostd::span<const opentelemetry::nostd::string_view>{array_string}}};
+
+  auto resource = resource::Resource::Create(attributes);
   rec.SetResource(resource);
 
-  auto proto_resource     = rec.ProtoResource();
-  bool found_service_name = false;
+  auto proto_resource          = rec.ProtoResource();
+  size_t found_attribute_count = 0;
   for (int i = 0; i < proto_resource.attributes_size(); i++)
   {
     const auto &attr = proto_resource.attributes(static_cast<int>(i));
-    if (attr.key() == service_name_key && attr.value().string_value() == service_name)
+    if (attr.key() == "service.name")
     {
-      found_service_name = true;
+      EXPECT_EQ(attr.value().string_value(), std::string{"test-otlp"});
+      ++found_attribute_count;
+    }
+    else if (attr.key() == "bool_value")
+    {
+      EXPECT_EQ(attr.value().bool_value(), true);
+      ++found_attribute_count;
+    }
+    else if (attr.key() == "int_value")
+    {
+      EXPECT_EQ(attr.value().int_value(), 3);
+      ++found_attribute_count;
+    }
+    else if (attr.key() == "double_value")
+    {
+      EXPECT_EQ(attr.value().double_value(), static_cast<double>(1.4));
+      ++found_attribute_count;
+    }
+    else if (attr.key() == "bytes_value")
+    {
+      EXPECT_EQ(attr.value().array_value().values_size(), 6);
+      EXPECT_EQ(attr.value().array_value().values(0).int_value(), 1);
+      EXPECT_EQ(attr.value().array_value().values(1).int_value(), 0);
+      EXPECT_EQ(attr.value().array_value().values(2).int_value(), 3);
+      EXPECT_EQ(attr.value().array_value().values(3).int_value(), static_cast<int>('a'));
+      EXPECT_EQ(attr.value().array_value().values(4).int_value(), static_cast<int>('b'));
+      EXPECT_EQ(attr.value().array_value().values(5).int_value(), static_cast<int>('c'));
+      ++found_attribute_count;
+    }
+    else if (attr.key() == "bool_array")
+    {
+      EXPECT_EQ(attr.value().array_value().values_size(), 3);
+      EXPECT_EQ(attr.value().array_value().values(0).bool_value(), true);
+      EXPECT_EQ(attr.value().array_value().values(1).bool_value(), false);
+      EXPECT_EQ(attr.value().array_value().values(2).bool_value(), true);
+      ++found_attribute_count;
+    }
+    else if (attr.key() == "int_array")
+    {
+      EXPECT_EQ(attr.value().array_value().values_size(), 3);
+      EXPECT_EQ(attr.value().array_value().values(0).int_value(), 1);
+      EXPECT_EQ(attr.value().array_value().values(1).int_value(), 2);
+      EXPECT_EQ(attr.value().array_value().values(2).int_value(), 3);
+      ++found_attribute_count;
+    }
+    else if (attr.key() == "double_array")
+    {
+      EXPECT_EQ(attr.value().array_value().values_size(), 3);
+      EXPECT_EQ(attr.value().array_value().values(0).double_value(), 1.1);
+      EXPECT_EQ(attr.value().array_value().values(1).double_value(), 2.2);
+      EXPECT_EQ(attr.value().array_value().values(2).double_value(), 3.3);
+      ++found_attribute_count;
+    }
+    else if (attr.key() == "string_array")
+    {
+      EXPECT_EQ(attr.value().array_value().values_size(), 3);
+      EXPECT_EQ(attr.value().array_value().values(0).string_value(), "str1");
+      EXPECT_EQ(attr.value().array_value().values(1).string_value(), "str2");
+      EXPECT_EQ(attr.value().array_value().values(2).string_value(), "str3");
+      ++found_attribute_count;
     }
   }
-  EXPECT_TRUE(found_service_name);
+  EXPECT_EQ(found_attribute_count, attributes.size());
 }
 
 TEST(OtlpRecordable, SetResourceWithSchemaURL)
@@ -304,6 +380,12 @@ TEST(OtlpRecordable, SetSingleAttribute)
   common::AttributeValue str_val(nostd::string_view("Test"));
   rec.SetAttribute(str_key, str_val);
 
+  nostd::string_view byte_key = "byte_attr";
+  uint8_t byte_arr[]          = {'T', 'e', 's', 't'};
+  common::AttributeValue byte_val(
+      nostd::span<const uint8_t>{reinterpret_cast<const uint8_t *>(byte_arr), 4});
+  rec.SetAttribute(byte_key, byte_val);
+
   EXPECT_EQ(rec.span().attributes(0).key(), bool_key);
   EXPECT_EQ(rec.span().attributes(0).value().bool_value(), nostd::get<bool>(bool_val));
 
@@ -313,6 +395,17 @@ TEST(OtlpRecordable, SetSingleAttribute)
   EXPECT_EQ(rec.span().attributes(2).key(), str_key);
   EXPECT_EQ(rec.span().attributes(2).value().string_value(),
             nostd::get<nostd::string_view>(str_val).data());
+
+  EXPECT_EQ(rec.span().attributes(3).key(), byte_key);
+  EXPECT_EQ(rec.span().attributes(3).value().array_value().values_size(), 4);
+  EXPECT_EQ(rec.span().attributes(3).value().array_value().values(0).int_value(),
+            static_cast<int>('T'));
+  EXPECT_EQ(rec.span().attributes(3).value().array_value().values(1).int_value(),
+            static_cast<int>('e'));
+  EXPECT_EQ(rec.span().attributes(3).value().array_value().values(2).int_value(),
+            static_cast<int>('s'));
+  EXPECT_EQ(rec.span().attributes(3).value().array_value().values(3).int_value(),
+            static_cast<int>('t'));
 }
 
 // Test non-int array types. Int array types are tested using templates (see IntAttributeTest)

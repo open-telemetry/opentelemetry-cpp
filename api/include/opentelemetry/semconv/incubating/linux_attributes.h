@@ -20,20 +20,15 @@ namespace linux
 {
 
 /**
- * The Linux Slab memory state
+  The Linux Slab memory state
  */
 static constexpr const char *kLinuxMemorySlabState = "linux.memory.slab.state";
 
 namespace LinuxMemorySlabStateValues
 {
-/**
- * none
- */
+
 static constexpr const char *kReclaimable = "reclaimable";
 
-/**
- * none
- */
 static constexpr const char *kUnreclaimable = "unreclaimable";
 
 }  // namespace LinuxMemorySlabStateValues

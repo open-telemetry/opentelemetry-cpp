@@ -7,6 +7,7 @@
 #include <chrono>
 #include <cstddef>
 #include <memory>
+#include <ratio>
 #include <string>
 #include <thread>
 #include <utility>
@@ -143,7 +144,7 @@ private:
   std::shared_ptr<std::atomic<std::size_t>> force_flush_counter_;
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
-  const std::chrono::milliseconds export_delay_;
+  std::chrono::milliseconds export_delay_;
 };
 
 /**

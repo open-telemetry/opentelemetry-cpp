@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/context_value.h"
 #include "opentelemetry/context/runtime_context.h"

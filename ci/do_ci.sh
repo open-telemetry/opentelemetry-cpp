@@ -62,12 +62,14 @@ function run_benchmarks
 mkdir -p "${BUILD_DIR}"
 [ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
 mkdir -p "${PLUGIN_DIR}"
+[ -z "${INSTALL_TEST_DIR}" ] && export INSTALL_TEST_DIR=$HOME/install_test
+mkdir -p "${INSTALL_TEST_DIR}"
 
 MAKE_COMMAND="make -k -j \$(nproc)"
 
 echo "make command: ${MAKE_COMMAND}"
 
-BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
+BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW --//exporters/otlp:with_otlp_grpc_credential_preview=true"
 BAZEL_OPTIONS="$BAZEL_OPTIONS_DEFAULT"
 
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
@@ -81,12 +83,27 @@ BAZEL_MACOS_TEST_OPTIONS="$BAZEL_MACOS_OPTIONS --test_output=errors"
 
 BAZEL_STARTUP_OPTIONS="--output_user_root=$HOME/.cache/bazel"
 
-CMAKE_OPTIONS=(-DCMAKE_BUILD_TYPE=Debug)
-if [ ! -z "${CXX_STANDARD}" ]; then
-  CMAKE_OPTIONS=(${CMAKE_OPTIONS[@]} "-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
+if [[ "${BUILD_TYPE}" =~ ^(Debug|Release|RelWithDebInfo|MinSizeRel)$ ]]; then
+  CMAKE_OPTIONS=(-DCMAKE_BUILD_TYPE=${BUILD_TYPE})
 else
-  CMAKE_OPTIONS=(${CMAKE_OPTIONS[@]} "-DCMAKE_CXX_STANDARD=14")
+  CMAKE_OPTIONS=(-DCMAKE_BUILD_TYPE=Debug)
 fi
+
+if [ -n "${CXX_STANDARD}" ]; then
+  CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
+else
+  CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD=14")
+fi
+
+CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD_REQUIRED=ON")
+CMAKE_OPTIONS+=("-DCMAKE_CXX_EXTENSIONS=OFF")
+
+if [ -n "$CMAKE_TOOLCHAIN_FILE" ]; then
+  echo "CMAKE_TOOLCHAIN_FILE is set to: $CMAKE_TOOLCHAIN_FILE"
+  CMAKE_OPTIONS+=("-DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE")
+fi
+
+echo "CMAKE_OPTIONS:" "${CMAKE_OPTIONS[@]}"
 
 export CTEST_OUTPUT_ON_FAILURE=1
 
@@ -107,22 +124,11 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_GRPC=ON \
-        -DWITH_OTLP_FILE=ON \
-        -DWITH_PROMETHEUS=ON \
-        -DWITH_EXAMPLES=ON \
-        -DWITH_EXAMPLES_HTTP=ON \
-        -DWITH_ZIPKIN=ON \
-        -DBUILD_W3CTRACECONTEXT_TEST=ON \
-        -DWITH_ELASTICSEARCH=ON \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
+        -DWITH_OPENTRACING=OFF \
         -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
-        -DWITH_OTLP_HTTP_COMPRESSION=ON \
-        -DWITH_OTLP_RETRY_PREVIEW=ON \
-        -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -131,22 +137,10 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_GRPC=ON \
-        -DWITH_OTLP_FILE=ON \
-        -DWITH_PROMETHEUS=ON \
-        -DWITH_EXAMPLES=ON \
-        -DWITH_EXAMPLES_HTTP=ON \
-        -DWITH_ZIPKIN=ON \
-        -DBUILD_W3CTRACECONTEXT_TEST=ON \
-        -DWITH_ELASTICSEARCH=ON \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
+        -DWITH_OPENTRACING=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
-        -DWITH_OTLP_HTTP_COMPRESSION=ON \
-        -DWITH_OTLP_RETRY_PREVIEW=ON \
-        -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -156,21 +150,10 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_STANDARD=11 \
-        -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_FILE=ON \
-        -DWITH_PROMETHEUS=ON \
-        -DWITH_EXAMPLES=ON \
-        -DWITH_EXAMPLES_HTTP=ON \
-        -DWITH_ZIPKIN=ON \
-        -DBUILD_W3CTRACECONTEXT_TEST=ON \
-        -DWITH_ELASTICSEARCH=ON \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
+        -DWITH_OPENTRACING=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
-        -DWITH_OTLP_HTTP_COMPRESSION=ON \
-        -DWITH_OTLP_RETRY_PREVIEW=ON \
-        -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         "${SRC_DIR}"
   make -k -j $(nproc)
   make test
@@ -179,24 +162,11 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_GRPC=ON \
-        -DWITH_OTLP_FILE=ON \
-        -DWITH_PROMETHEUS=ON \
-        -DWITH_EXAMPLES=ON \
-        -DWITH_EXAMPLES_HTTP=ON \
-        -DWITH_ZIPKIN=ON \
-        -DBUILD_W3CTRACECONTEXT_TEST=ON \
-        -DWITH_ELASTICSEARCH=ON \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -C ${SRC_DIR}/test_common/cmake/all-options-abiv2-preview.cmake \
+        -DWITH_OPENTRACING=OFF \
         -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
-        -DWITH_ABI_VERSION_1=OFF \
-        -DWITH_ABI_VERSION_2=ON \
-        -DWITH_OTLP_HTTP_COMPRESSION=ON \
-        -DWITH_OTLP_RETRY_PREVIEW=ON \
-        -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -215,27 +185,49 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
   make -j $(nproc)
   make test
   exit 0
-elif [[ "$1" == "cmake.abseil.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_ABSEIL=ON \
-        "${SRC_DIR}"
-  make -j $(nproc)
-  make test
-  exit 0
 elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}" \
         -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
         -DWITH_OPENTRACING=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         "${SRC_DIR}"
   make -j $(nproc)
   make test
+  exit 0
+elif [[ "$1" == "cmake.opentracing_shim.install.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  rm -rf ${INSTALL_TEST_DIR}/*
+  cmake "${CMAKE_OPTIONS[@]}" \
+        -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
+        -DWITH_OPENTRACING=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+        -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
+        "${SRC_DIR}"
+  make -j $(nproc)
+  make test
+  make install
+  export LD_LIBRARY_PATH="${INSTALL_TEST_DIR}/lib:$LD_LIBRARY_PATH"
+  CMAKE_OPTIONS_STRING=$(IFS=" "; echo "${CMAKE_OPTIONS[*]}")
+  EXPECTED_COMPONENTS=(
+    "api"
+    "sdk"
+    "ext_common"
+    "exporters_in_memory"
+    "exporters_ostream"
+    "shims_opentracing"
+  )
+  EXPECTED_COMPONENTS_STRING=$(IFS=\;; echo "${EXPECTED_COMPONENTS[*]}")
+  mkdir -p "${BUILD_DIR}/install_test"
+  cd "${BUILD_DIR}/install_test"
+  cmake "${CMAKE_OPTIONS[@]}" \
+        "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
+        "-DINSTALL_TEST_CMAKE_OPTIONS=${CMAKE_OPTIONS_STRING}" \
+        "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}" \
+        -S "${SRC_DIR}/install/test/cmake"
+  ctest --output-on-failure
   exit 0
 elif [[ "$1" == "cmake.c++20.test" ]]; then
   cd "${BUILD_DIR}"
@@ -339,14 +331,12 @@ elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
 elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  if [[ ! -z "${WITH_ABSEIL}" ]]; then
-    CMAKE_OPTIONS=(${CMAKE_OPTIONS[@]} "-DWITH_ABSEIL=${WITH_ABSEIL}")
-  fi
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_FILE=ON \
         -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
+        -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
         -DWITH_OTLP_RETRY_PREVIEW=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
@@ -363,6 +353,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.shared_libs.with_static_grpc.test" ]]
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_FILE=ON \
         -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
   proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
@@ -412,17 +403,79 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   cd exporters/otlp && make test
   exit 0
 elif [[ "$1" == "cmake.install.test" ]]; then
+  if [[ -n "${BUILD_SHARED_LIBS}" && "${BUILD_SHARED_LIBS}" == "ON" ]]; then
+    CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=ON")
+    echo "BUILD_SHARED_LIBS is set to: ON"
+  else
+    CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=OFF")
+    echo "BUILD_SHARED_LIBS is set to: OFF"
+  fi
+  CMAKE_OPTIONS+=("-DCMAKE_POSITION_INDEPENDENT_CODE=ON")
+
+  cd "${BUILD_DIR}"
+  rm -rf *
+  rm -rf ${INSTALL_TEST_DIR}/*
+
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
+        -C ${SRC_DIR}/test_common/cmake/all-options-abiv2-preview.cmake \
+        -DOPENTELEMETRY_INSTALL=ON \
+        "${SRC_DIR}"
+
+  make -j $(nproc)
+  make test
+  make install
+  export LD_LIBRARY_PATH="${INSTALL_TEST_DIR}/lib:$LD_LIBRARY_PATH"
+
+  CMAKE_OPTIONS_STRING=$(IFS=" "; echo "${CMAKE_OPTIONS[*]}")
+
+  EXPECTED_COMPONENTS=(
+    "api"
+    "sdk"
+    "ext_common"
+    "ext_http_curl"
+    "exporters_in_memory"
+    "exporters_ostream"
+    "exporters_otlp_common"
+    "exporters_otlp_file"
+    "exporters_otlp_grpc"
+    "exporters_otlp_http"
+    "exporters_prometheus"
+    "exporters_elasticsearch"
+    "exporters_zipkin"
+  )
+  EXPECTED_COMPONENTS_STRING=$(IFS=\;; echo "${EXPECTED_COMPONENTS[*]}")
+  mkdir -p "${BUILD_DIR}/install_test"
+  cd "${BUILD_DIR}/install_test"
+  cmake  "${CMAKE_OPTIONS[@]}" \
+         "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
+         "-DINSTALL_TEST_CMAKE_OPTIONS=${CMAKE_OPTIONS_STRING}" \
+         "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}" \
+         -S "${SRC_DIR}/install/test/cmake"
+  ctest --output-on-failure
+  exit 0
+elif [[ "$1" == "cmake.fetch_content.test" ]]; then
+  if [[ -n "${BUILD_SHARED_LIBS}" && "${BUILD_SHARED_LIBS}" == "ON" ]]; then
+    CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=ON")
+    echo "BUILD_SHARED_LIBS is set to: ON"
+  else
+    CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=OFF")
+    echo "BUILD_SHARED_LIBS is set to: OFF"
+  fi
+  CMAKE_OPTIONS+=("-DCMAKE_POSITION_INDEPENDENT_CODE=ON")
+
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_ABSEIL=ON \
-        "${SRC_DIR}"
+        -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
+        -C ${SRC_DIR}/test_common/cmake/all-options-abiv2-preview.cmake \
+        -DOPENTELEMETRY_INSTALL=OFF \
+        -DOPENTELEMETRY_CPP_SRC_DIR="${SRC_DIR}" \
+        "${SRC_DIR}/install/test/cmake/fetch_content_test"
   make -j $(nproc)
-  sudo make install
+  make test
   exit 0
+
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
   cd "${BUILD_DIR}"
@@ -462,8 +515,8 @@ elif [[ "$1" == "bazel.no_bzlmod.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS test --enable_bzlmod=false $BAZEL_TEST_OPTIONS //...
   exit 0
 elif [[ "$1" == "bazel.test" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS //...
-  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS //...
+  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS $BAZEL_WITH_PREVIEW //...
+  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS $BAZEL_WITH_PREVIEW //...
   exit 0
 elif [[ "$1" == "bazel.with_async_export.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...

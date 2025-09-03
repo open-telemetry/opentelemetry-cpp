@@ -87,7 +87,11 @@ public:
   Tracer(std::shared_ptr<DynamicLibraryHandle> library_handle,
          std::unique_ptr<TracerHandle> &&tracer_handle) noexcept
       : library_handle_{std::move(library_handle)}, tracer_handle_{std::move(tracer_handle)}
-  {}
+  {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    UpdateEnabled(true);
+#endif
+  }
 
   // trace::Tracer
   nostd::shared_ptr<trace::Span> StartSpan(

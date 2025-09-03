@@ -1,8 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <nlohmann/json.hpp>
+
 #include <limits.h>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -13,7 +14,6 @@
 #include <fstream>
 #include <functional>
 #include <mutex>
-#include <nlohmann/json.hpp>
 #include <ratio>
 #include <string>
 #include <thread>
@@ -720,11 +720,11 @@ static inline char HexEncode(unsigned char byte)
 #endif
   if (byte >= 10)
   {
-    return byte - 10 + 'a';
+    return static_cast<char>(byte - 10 + 'a');
   }
   else
   {
-    return byte + '0';
+    return static_cast<char>(byte + '0');
   }
 }
 
@@ -1005,6 +1005,11 @@ public:
     }
   }
 
+  OtlpFileSystemBackend(const OtlpFileSystemBackend &)            = delete;
+  OtlpFileSystemBackend &operator=(const OtlpFileSystemBackend &) = delete;
+  OtlpFileSystemBackend(OtlpFileSystemBackend &&)                 = delete;
+  OtlpFileSystemBackend &operator=(OtlpFileSystemBackend &&)      = delete;
+
   // Written size is not required to be precise, we can just ignore tsan report here.
   OPENTELEMETRY_SANITIZER_NO_THREAD void MaybeRotateLog(std::size_t data_size)
   {
@@ -1024,13 +1029,13 @@ public:
 
     MaybeRotateLog(data.size());
 
-    std::shared_ptr<FILE> out = OpenLogFile(true);
+    std::shared_ptr<std::FILE> out = OpenLogFile(true);
     if (!out)
     {
       return;
     }
 
-    fwrite(data.data(), 1, data.size(), out.get());
+    std::fwrite(data.data(), 1, data.size(), out.get());
 
     {
       std::lock_guard<std::mutex> lock_guard{file_->file_lock};
@@ -1038,7 +1043,7 @@ public:
       file_->record_count += record_count;
 
       // Pipe file size always returns 0, we ignore the size limit of it.
-      auto written_size = ftell(out.get());
+      auto written_size = std::ftell(out.get());
       if (written_size >= 0)
       {
         file_->written_size = static_cast<std::size_t>(written_size);
@@ -1050,7 +1055,7 @@ public:
         {
           file_->left_flush_record_count = options_.flush_count;
 
-          fflush(out.get());
+          std::fflush(out.get());
 
           file_->flushed_record_count.store(file_->record_count.load(std::memory_order_acquire),
                                             std::memory_order_release);
@@ -1196,7 +1201,7 @@ private:
       {
         if (file_pattern[i] == '%')
         {
-          int checked = static_cast<int>(file_pattern[i + 1]);
+          int checked = static_cast<unsigned char>(file_pattern[i + 1]);
           if (checked > 0 && checked < 128 && check_interval[checked] > 0)
           {
             if (0 == check_file_path_interval_ ||
@@ -1212,7 +1217,7 @@ private:
     OpenLogFile(false);
   }
 
-  std::shared_ptr<FILE> OpenLogFile(bool destroy_content)
+  std::shared_ptr<std::FILE> OpenLogFile(bool destroy_content)
   {
     std::lock_guard<std::mutex> lock_guard{file_->file_lock};
 
@@ -1233,8 +1238,6 @@ private:
       return nullptr;
     }
     file_path[file_path_size] = 0;
-
-    std::shared_ptr<FILE> of = std::make_shared<FILE>();
 
     std::string directory_name = FileSystemUtil::DirName(file_path);
     if (!directory_name.empty())
@@ -1290,10 +1293,10 @@ private:
                               << " failed with pattern: " << options_.file_pattern << hint);
       return nullptr;
     }
-    of = std::shared_ptr<std::FILE>(new_file, fclose);
+    std::shared_ptr<std::FILE> of = std::shared_ptr<std::FILE>(new_file, fclose);
 
-    fseek(of.get(), 0, SEEK_END);
-    file_->written_size = static_cast<size_t>(ftell(of.get()));
+    std::fseek(of.get(), 0, SEEK_END);
+    file_->written_size = static_cast<size_t>(std::ftell(of.get()));
 
     file_->current_file    = of;
     file_->last_checkpoint = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -1509,7 +1512,7 @@ private:
 
             if (concurrency_file->current_file)
             {
-              fflush(concurrency_file->current_file.get());
+              std::fflush(concurrency_file->current_file.get());
             }
 
             concurrency_file->flushed_record_count.store(current_record_count,
@@ -1564,7 +1567,7 @@ private:
     std::size_t rotate_index;
     std::size_t written_size;
     std::size_t left_flush_record_count;
-    std::shared_ptr<FILE> current_file;
+    std::shared_ptr<std::FILE> current_file;
     std::mutex file_lock;
     std::time_t last_checkpoint;
     std::string file_path;
@@ -1589,11 +1592,9 @@ class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileOstreamBackend : public OtlpFileAppende
 public:
   explicit OtlpFileOstreamBackend(const std::reference_wrapper<std::ostream> &os) : os_(os) {}
 
-  ~OtlpFileOstreamBackend() override {}
-
   void Export(nostd::string_view data, std::size_t /*record_count*/) override
   {
-    os_.get().write(data.data(), data.size());
+    os_.get().write(data.data(), static_cast<std::streamsize>(data.size()));
   }
 
   bool ForceFlush(std::chrono::microseconds /*timeout*/) noexcept override
@@ -1612,8 +1613,8 @@ private:
 OtlpFileClient::OtlpFileClient(OtlpFileClientOptions &&options,
                                OtlpFileClientRuntimeOptions &&runtime_options)
     : is_shutdown_(false),
-      options_(std::move(options)),
-      runtime_options_(std::move(runtime_options))
+      options_{std::move(options)},
+      runtime_options_{std::move(runtime_options)}
 {
   if (nostd::holds_alternative<OtlpFileClientFileSystemOptions>(options_.backend_options))
   {

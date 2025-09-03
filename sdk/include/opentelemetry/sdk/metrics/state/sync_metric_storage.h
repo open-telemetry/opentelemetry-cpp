@@ -58,7 +58,7 @@ class SyncMetricStorage : public MetricStorage, public SyncWritableMetricStorage
 public:
   SyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                     const AggregationType aggregation_type,
-                    const AttributesProcessor *attributes_processor,
+                    std::shared_ptr<const AttributesProcessor> attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
                     ExemplarFilterType exempler_filter_type,
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
@@ -68,7 +68,7 @@ public:
         aggregation_config_(aggregation_config),
         attributes_hashmap_(new AttributesHashMap(
             aggregation_config ? aggregation_config->cardinality_limit_ : kAggregationCardinalityLimit)),
-        attributes_processor_(attributes_processor),
+        attributes_processor_(std::move(attributes_processor)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_filter_type_(exempler_filter_type),
         exemplar_reservoir_(exemplar_reservoir),
@@ -96,9 +96,9 @@ public:
       exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
     }
 #endif
-    static size_t hash = opentelemetry::sdk::common::GetHash("");
+    static MetricAttributes attr = MetricAttributes{};
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
-    attributes_hashmap_->GetOrSetDefault(create_default_aggregation_, hash)->Aggregate(value);
+    attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
   void RecordLong(int64_t value,
@@ -117,21 +117,10 @@ public:
                                             std::chrono::system_clock::now());
     }
 #endif
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
-        attributes, [this](nostd::string_view key) {
-          if (attributes_processor_)
-          {
-            return attributes_processor_->isPresent(key);
-          }
-          else
-          {
-            return true;
-          }
-        });
 
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     attributes_hashmap_
-        ->GetOrSetDefault(attributes, attributes_processor_, create_default_aggregation_, hash)
+        ->GetOrSetDefault(attributes, attributes_processor_.get(), create_default_aggregation_)
         ->Aggregate(value);
   }
 
@@ -149,9 +138,9 @@ public:
       exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
     }
 #endif
-    static size_t hash = opentelemetry::sdk::common::GetHash("");
+    static MetricAttributes attr = MetricAttributes{};
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
-    attributes_hashmap_->GetOrSetDefault(create_default_aggregation_, hash)->Aggregate(value);
+    attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
   void RecordDouble(double value,
@@ -170,20 +159,9 @@ public:
                                             std::chrono::system_clock::now());
     }
 #endif
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
-        attributes, [this](nostd::string_view key) {
-          if (attributes_processor_)
-          {
-            return attributes_processor_->isPresent(key);
-          }
-          else
-          {
-            return true;
-          }
-        });
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     attributes_hashmap_
-        ->GetOrSetDefault(attributes, attributes_processor_, create_default_aggregation_, hash)
+        ->GetOrSetDefault(attributes, attributes_processor_.get(), create_default_aggregation_)
         ->Aggregate(value);
   }
 
@@ -199,7 +177,7 @@ private:
   const AggregationConfig *aggregation_config_;
   std::unique_ptr<AttributesHashMap> attributes_hashmap_;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
-  const AttributesProcessor *attributes_processor_;
+  std::shared_ptr<const AttributesProcessor> attributes_processor_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
   ExemplarFilterType exemplar_filter_type_;
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;

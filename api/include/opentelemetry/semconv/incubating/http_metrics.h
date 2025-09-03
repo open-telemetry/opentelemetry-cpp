@@ -21,9 +21,9 @@ namespace http
 {
 
 /**
- * Number of active HTTP requests.
- * <p>
- * updowncounter
+  Number of active HTTP requests.
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricHttpClientActiveRequests = "http.client.active_requests";
 static constexpr const char *descrMetricHttpClientActiveRequests =
@@ -63,9 +63,9 @@ CreateAsyncDoubleMetricHttpClientActiveRequests(metrics::Meter *meter)
 }
 
 /**
- * The duration of the successfully established outbound HTTP connections.
- * <p>
- * histogram
+  The duration of the successfully established outbound HTTP connections.
+  <p>
+  histogram
  */
 static constexpr const char *kMetricHttpClientConnectionDuration =
     "http.client.connection.duration";
@@ -90,9 +90,9 @@ CreateSyncDoubleMetricHttpClientConnectionDuration(metrics::Meter *meter)
 }
 
 /**
- * Number of outbound HTTP connections that are currently active or idle on the client.
- * <p>
- * updowncounter
+  Number of outbound HTTP connections that are currently active or idle on the client.
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricHttpClientOpenConnections = "http.client.open_connections";
 static constexpr const char *descrMetricHttpClientOpenConnections =
@@ -132,12 +132,12 @@ CreateAsyncDoubleMetricHttpClientOpenConnections(metrics::Meter *meter)
 }
 
 /**
- * Size of HTTP client request bodies.
- * <p>
- * The size of the request payload body in bytes. This is the number of bytes transferred excluding
- * headers and is often, but not always, present as the <a
- * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
- * header. For requests using transport encoding, this should be the compressed size. <p> histogram
+  Size of HTTP client request bodies.
+  <p>
+  The size of the request payload body in bytes. This is the number of bytes transferred excluding
+  headers and is often, but not always, present as the <a
+  href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a> header.
+  For requests using transport encoding, this should be the compressed size. <p> histogram
  */
 static constexpr const char *kMetricHttpClientRequestBodySize = "http.client.request.body.size";
 static constexpr const char *descrMetricHttpClientRequestBodySize =
@@ -161,9 +161,9 @@ CreateSyncDoubleMetricHttpClientRequestBodySize(metrics::Meter *meter)
 }
 
 /**
- * Duration of HTTP client requests.
- * <p>
- * histogram
+  Duration of HTTP client requests.
+  <p>
+  histogram
  */
 static constexpr const char *kMetricHttpClientRequestDuration = "http.client.request.duration";
 static constexpr const char *descrMetricHttpClientRequestDuration =
@@ -187,12 +187,12 @@ CreateSyncDoubleMetricHttpClientRequestDuration(metrics::Meter *meter)
 }
 
 /**
- * Size of HTTP client response bodies.
- * <p>
- * The size of the response payload body in bytes. This is the number of bytes transferred excluding
- * headers and is often, but not always, present as the <a
- * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
- * header. For requests using transport encoding, this should be the compressed size. <p> histogram
+  Size of HTTP client response bodies.
+  <p>
+  The size of the response payload body in bytes. This is the number of bytes transferred excluding
+  headers and is often, but not always, present as the <a
+  href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a> header.
+  For requests using transport encoding, this should be the compressed size. <p> histogram
  */
 static constexpr const char *kMetricHttpClientResponseBodySize = "http.client.response.body.size";
 static constexpr const char *descrMetricHttpClientResponseBodySize =
@@ -216,9 +216,9 @@ CreateSyncDoubleMetricHttpClientResponseBodySize(metrics::Meter *meter)
 }
 
 /**
- * Number of active HTTP server requests.
- * <p>
- * updowncounter
+  Number of active HTTP server requests.
+  <p>
+  updowncounter
  */
 static constexpr const char *kMetricHttpServerActiveRequests = "http.server.active_requests";
 static constexpr const char *descrMetricHttpServerActiveRequests =
@@ -258,12 +258,12 @@ CreateAsyncDoubleMetricHttpServerActiveRequests(metrics::Meter *meter)
 }
 
 /**
- * Size of HTTP server request bodies.
- * <p>
- * The size of the request payload body in bytes. This is the number of bytes transferred excluding
- * headers and is often, but not always, present as the <a
- * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
- * header. For requests using transport encoding, this should be the compressed size. <p> histogram
+  Size of HTTP server request bodies.
+  <p>
+  The size of the request payload body in bytes. This is the number of bytes transferred excluding
+  headers and is often, but not always, present as the <a
+  href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a> header.
+  For requests using transport encoding, this should be the compressed size. <p> histogram
  */
 static constexpr const char *kMetricHttpServerRequestBodySize = "http.server.request.body.size";
 static constexpr const char *descrMetricHttpServerRequestBodySize =
@@ -287,9 +287,9 @@ CreateSyncDoubleMetricHttpServerRequestBodySize(metrics::Meter *meter)
 }
 
 /**
- * Duration of HTTP server requests.
- * <p>
- * histogram
+  Duration of HTTP server requests.
+  <p>
+  histogram
  */
 static constexpr const char *kMetricHttpServerRequestDuration = "http.server.request.duration";
 static constexpr const char *descrMetricHttpServerRequestDuration =
@@ -313,12 +313,12 @@ CreateSyncDoubleMetricHttpServerRequestDuration(metrics::Meter *meter)
 }
 
 /**
- * Size of HTTP server response bodies.
- * <p>
- * The size of the response payload body in bytes. This is the number of bytes transferred excluding
- * headers and is often, but not always, present as the <a
- * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
- * header. For requests using transport encoding, this should be the compressed size. <p> histogram
+  Size of HTTP server response bodies.
+  <p>
+  The size of the response payload body in bytes. This is the number of bytes transferred excluding
+  headers and is often, but not always, present as the <a
+  href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a> header.
+  For requests using transport encoding, this should be the compressed size. <p> histogram
  */
 static constexpr const char *kMetricHttpServerResponseBodySize = "http.server.response.body.size";
 static constexpr const char *descrMetricHttpServerResponseBodySize =

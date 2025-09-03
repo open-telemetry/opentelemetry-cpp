@@ -3,8 +3,6 @@
 
 #include <curl/curl.h>
 #include <curl/curlver.h>
-#include <algorithm>
-#include <array>
 #include <atomic>
 #include <chrono>
 #include <cstdint>
@@ -25,13 +23,16 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 #  include <zconf.h>
 #  include <zlib.h>
+#  include <algorithm>
+#  include <array>
+
+#  include "opentelemetry/nostd/type_traits.h"
 #else
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 #endif
@@ -100,13 +101,13 @@ int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *m
     have           = 0;
     while (ret == Z_OK)
     {
-      strm->avail_out =
-          strm->avail_in ? strm->next_in - strm->next_out : (buf + *max_len) - strm->next_out;
+      strm->avail_out = static_cast<decltype(z_stream::avail_out)>(
+          strm->avail_in ? strm->next_in - strm->next_out : (buf + *max_len) - strm->next_out);
       ret = deflate(strm, Z_FINISH);
     }
     if (ret != Z_BUF_ERROR || strm->avail_in == 0)
     {
-      *max_len = strm->next_out - buf;
+      *max_len = static_cast<uint32_t>(strm->next_out - buf);
       return ret == Z_STREAM_END ? Z_OK : ret;
     }
   }
@@ -129,10 +130,10 @@ int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *m
     std::memcpy(buf, temp.data(), have);
     strm->next_out = buf + have;
   }
-  strm->avail_out = (buf + *max_len) - strm->next_out;
+  strm->avail_out = static_cast<decltype(z_stream::avail_out)>((buf + *max_len) - strm->next_out);
   ret             = deflate(strm, Z_FINISH);
   strm->zfree(strm->opaque, hold);
-  *max_len = strm->next_out - buf;
+  *max_len = static_cast<uint32_t>(strm->next_out - buf);
   return ret == Z_OK ? Z_BUF_ERROR : (ret == Z_STREAM_END ? Z_OK : ret);
 }
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW

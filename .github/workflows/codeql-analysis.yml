@@ -7,12 +7,24 @@ on:
     # The branches below must be a subset of the branches above
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   CodeQL-Build:
+    permissions:
+      actions: read  # for github/codeql-action/init to get workflow details
+      contents: read  # for actions/checkout to fetch code
+      security-events: write  # for github/codeql-action/autobuild to send a status report
     runs-on: ubuntu-latest
     steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
+      with:
+        egress-policy: audit
+
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
          submodules: 'recursive'
     - name: Remove Third_party Modules from Code Scan
@@ -22,15 +34,13 @@ jobs:
       env:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
-        GOOGLETEST_VERSION: 1.12.1
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@2d92b76c45b91eb80fc44c74ce3fce0ee94e8f9d # v3.30.0
       with:
        languages: cpp
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
+      uses: github/codeql-action/autobuild@2d92b76c45b91eb80fc44c74ce3fce0ee94e8f9d # v3.30.0
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@2d92b76c45b91eb80fc44c74ce3fce0ee94e8f9d # v3.30.0

@@ -3,29 +3,43 @@
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
 
-#if defined(HAVE_GSL)
-#  include <gsl/gsl>
-#else
-#  include <assert.h>
-#endif
-
+#include <grpc/compression.h>
+#include <grpcpp/resource_quota.h>
+#include <grpcpp/security/credentials.h>
+#include <grpcpp/support/channel_arguments.h>
+#include <stdint.h>
 #include <atomic>
 #include <chrono>
-#include <condition_variable>
-#include <cstdio>
 #include <fstream>
 #include <iterator>
+#include <map>
 #include <memory>
-#include <mutex>
 #include <string>
-#include <thread>
-#include <unordered_set>
+#include <utility>
 
-#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
-#include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
+#include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
+#include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
+
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <google/protobuf/arena.h>
+#  include <algorithm>
+#  include <condition_variable>
+#  include <cstdio>
+#  include <mutex>
+#  include <ratio>
+#  include <unordered_set>
+
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/nostd/string_view.h"
+#endif /* ENABLE_ASYNC_EXPORT */
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -53,8 +67,12 @@ public:
       opentelemetry::sdk::common::ExportResult::kFailure;
   GrpcAsyncCallback grpc_async_callback = nullptr;
 
-  OtlpGrpcAsyncCallDataBase() {}
-  virtual ~OtlpGrpcAsyncCallDataBase() {}
+  OtlpGrpcAsyncCallDataBase()                                             = default;
+  virtual ~OtlpGrpcAsyncCallDataBase()                                    = default;
+  OtlpGrpcAsyncCallDataBase(const OtlpGrpcAsyncCallDataBase &)            = delete;
+  OtlpGrpcAsyncCallDataBase &operator=(const OtlpGrpcAsyncCallDataBase &) = delete;
+  OtlpGrpcAsyncCallDataBase(OtlpGrpcAsyncCallDataBase &&)                 = delete;
+  OtlpGrpcAsyncCallDataBase &operator=(OtlpGrpcAsyncCallDataBase &&)      = delete;
 };
 
 // When building with -fvisibility=default, we hide the symbols and vtable to ensure we always use
@@ -76,8 +94,7 @@ public:
                      ResponseType *)>
       result_callback;
 
-  OtlpGrpcAsyncCallData() {}
-  virtual ~OtlpGrpcAsyncCallData() {}
+  OtlpGrpcAsyncCallData() = default;
 };
 }  // namespace
 #endif
@@ -221,7 +238,7 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
   stub->experimental_async()
 #  endif
       ->Export(call_data->grpc_context.get(), call_data->request, call_data->response,
-               [call_data, async_data, export_data_name](::grpc::Status grpc_status) {
+               [call_data, async_data, export_data_name](const ::grpc::Status &grpc_status) {
                  {
                    std::lock_guard<std::mutex> lock{async_data->running_calls_lock};
                    async_data->running_calls.erase(
@@ -309,6 +326,32 @@ OtlpGrpcClient::~OtlpGrpcClient()
 #endif
 }
 
+std::string OtlpGrpcClient::GetGrpcTarget(const std::string &endpoint)
+{
+  //
+  // Scheme is allowed in OTLP endpoint definition, but is not allowed for creating gRPC
+  // channel. Passing URI with scheme to grpc::CreateChannel could resolve the endpoint to some
+  // unexpected address.
+  //
+  ext::http::common::UrlParser url(endpoint);
+  if (!url.success_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] invalid endpoint: " << endpoint);
+    return "";
+  }
+
+  std::string grpc_target;
+  if (url.scheme_ == "unix")
+  {
+    grpc_target = "unix:" + url.path_;
+  }
+  else
+  {
+    grpc_target = url.host_ + ":" + std::to_string(static_cast<int>(url.port_));
+  }
+  return grpc_target;
+}
+
 std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientOptions &options)
 {
 
@@ -318,22 +361,16 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
 
     return nullptr;
   }
-  //
-  // Scheme is allowed in OTLP endpoint definition, but is not allowed for creating gRPC
-  // channel. Passing URI with scheme to grpc::CreateChannel could resolve the endpoint to some
-  // unexpected address.
-  //
 
-  ext::http::common::UrlParser url(options.endpoint);
-  if (!url.success_)
+  std::shared_ptr<grpc::Channel> channel;
+  std::string grpc_target = GetGrpcTarget(options.endpoint);
+
+  if (grpc_target.empty())
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] invalid endpoint: " << options.endpoint);
-
     return nullptr;
   }
 
-  std::shared_ptr<grpc::Channel> channel;
-  std::string grpc_target = url.host_ + ":" + std::to_string(static_cast<int>(url.port_));
   grpc::ChannelArguments grpc_arguments;
   grpc_arguments.SetUserAgentPrefix(options.user_agent);
 
@@ -412,6 +449,19 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
     channel =
         grpc::CreateCustomChannel(grpc_target, grpc::InsecureChannelCredentials(), grpc_arguments);
   }
+
+#ifdef ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
+  if (options.credentials)
+  {
+    if (options.use_ssl_credentials)
+    {
+      OTEL_INTERNAL_LOG_WARN(
+          "[OTLP GRPC Client] Both 'credentials' and 'use_ssl_credentials' options are set. "
+          "The former takes priority.");
+    }
+    channel = grpc::CreateCustomChannel(grpc_target, options.credentials, grpc_arguments);
+  }
+#endif  // ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
 
   return channel;
 }

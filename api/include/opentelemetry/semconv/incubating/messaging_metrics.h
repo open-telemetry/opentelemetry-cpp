@@ -21,13 +21,13 @@ namespace messaging
 {
 
 /**
- * Number of messages that were delivered to the application.
- * <p>
- * Records the number of messages pulled from the broker or number of messages dispatched to the
- * application in push-based scenarios. The metric SHOULD be reported once per message delivery. For
- * example, if receiving and processing operations are both instrumented for a single message
- * delivery, this counter is incremented when the message is received and not reported when it is
- * processed. <p> counter
+  Number of messages that were delivered to the application.
+  <p>
+  Records the number of messages pulled from the broker or number of messages dispatched to the
+  application in push-based scenarios. The metric SHOULD be reported once per message delivery. For
+  example, if receiving and processing operations are both instrumented for a single message
+  delivery, this counter is incremented when the message is received and not reported when it is
+  processed. <p> counter
  */
 static constexpr const char *kMetricMessagingClientConsumedMessages =
     "messaging.client.consumed.messages";
@@ -68,10 +68,10 @@ CreateAsyncDoubleMetricMessagingClientConsumedMessages(metrics::Meter *meter)
 }
 
 /**
- * Duration of messaging operation initiated by a producer or consumer client.
- * <p>
- * This metric SHOULD NOT be used to report processing duration - processing duration is reported in
- * @code messaging.process.duration @endcode metric. <p> histogram
+  Duration of messaging operation initiated by a producer or consumer client.
+  <p>
+  This metric SHOULD NOT be used to report processing duration - processing duration is reported in
+  @code messaging.process.duration @endcode metric. <p> histogram
  */
 static constexpr const char *kMetricMessagingClientOperationDuration =
     "messaging.client.operation.duration";
@@ -96,12 +96,11 @@ CreateSyncDoubleMetricMessagingClientOperationDuration(metrics::Meter *meter)
 }
 
 /**
- * Deprecated. Use @code messaging.client.sent.messages @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code messaging.client.sent.messages @endcode.", "reason": "uncategorized"}
- * <p>
- * counter
+  Deprecated. Use @code messaging.client.sent.messages @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code messaging.client.sent.messages @endcode.", "reason": "renamed",
+  "renamed_to": "messaging.client.sent.messages"} <p> counter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricMessagingClientPublishedMessages =
     "messaging.client.published.messages";
@@ -143,11 +142,11 @@ CreateAsyncDoubleMetricMessagingClientPublishedMessages(metrics::Meter *meter)
 }
 
 /**
- * Number of messages producer attempted to send to the broker.
- * <p>
- * This metric MUST NOT count messages that were created but haven't yet been sent.
- * <p>
- * counter
+  Number of messages producer attempted to send to the broker.
+  <p>
+  This metric MUST NOT count messages that were created but haven't yet been sent.
+  <p>
+  counter
  */
 static constexpr const char *kMetricMessagingClientSentMessages = "messaging.client.sent.messages";
 static constexpr const char *descrMetricMessagingClientSentMessages =
@@ -187,10 +186,10 @@ CreateAsyncDoubleMetricMessagingClientSentMessages(metrics::Meter *meter)
 }
 
 /**
- * Duration of processing operation.
- * <p>
- * This metric MUST be reported for operations with @code messaging.operation.type @endcode that
- * matches @code process @endcode. <p> histogram
+  Duration of processing operation.
+  <p>
+  This metric MUST be reported for operations with @code messaging.operation.type @endcode that
+  matches @code process @endcode. <p> histogram
  */
 static constexpr const char *kMetricMessagingProcessDuration = "messaging.process.duration";
 static constexpr const char *descrMetricMessagingProcessDuration =
@@ -214,11 +213,11 @@ CreateSyncDoubleMetricMessagingProcessDuration(metrics::Meter *meter)
 }
 
 /**
- * Deprecated. Use @code messaging.client.consumed.messages @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code messaging.client.consumed.messages @endcode.", "reason":
- * "uncategorized"} <p> counter
+  Deprecated. Use @code messaging.client.consumed.messages @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code messaging.client.consumed.messages @endcode.", "reason": "renamed",
+  "renamed_to": "messaging.client.consumed.messages"} <p> counter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricMessagingProcessMessages =
     "messaging.process.messages";
@@ -260,11 +259,11 @@ CreateAsyncDoubleMetricMessagingProcessMessages(metrics::Meter *meter)
 }
 
 /**
- * Deprecated. Use @code messaging.client.operation.duration @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code messaging.client.operation.duration @endcode.", "reason":
- * "uncategorized"} <p> histogram
+  Deprecated. Use @code messaging.client.operation.duration @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code messaging.client.operation.duration @endcode.", "reason": "renamed",
+  "renamed_to": "messaging.client.operation.duration"} <p> histogram
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricMessagingPublishDuration =
     "messaging.publish.duration";
@@ -289,16 +288,16 @@ CreateSyncDoubleMetricMessagingPublishDuration(metrics::Meter *meter)
 }
 
 /**
- * Deprecated. Use @code messaging.client.produced.messages @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code messaging.client.produced.messages @endcode.", "reason":
- * "uncategorized"} <p> counter
+  Deprecated. Use @code messaging.client.sent.messages @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code messaging.client.sent.messages @endcode.", "reason": "renamed",
+  "renamed_to": "messaging.client.sent.messages"} <p> counter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricMessagingPublishMessages =
     "messaging.publish.messages";
 OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricMessagingPublishMessages =
-    "Deprecated. Use `messaging.client.produced.messages` instead.";
+    "Deprecated. Use `messaging.client.sent.messages` instead.";
 OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricMessagingPublishMessages =
     "{message}";
 
@@ -335,11 +334,11 @@ CreateAsyncDoubleMetricMessagingPublishMessages(metrics::Meter *meter)
 }
 
 /**
- * Deprecated. Use @code messaging.client.operation.duration @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code messaging.client.operation.duration @endcode.", "reason":
- * "uncategorized"} <p> histogram
+  Deprecated. Use @code messaging.client.operation.duration @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code messaging.client.operation.duration @endcode.", "reason": "renamed",
+  "renamed_to": "messaging.client.operation.duration"} <p> histogram
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricMessagingReceiveDuration =
     "messaging.receive.duration";
@@ -364,11 +363,11 @@ CreateSyncDoubleMetricMessagingReceiveDuration(metrics::Meter *meter)
 }
 
 /**
- * Deprecated. Use @code messaging.client.consumed.messages @endcode instead.
- *
- * @deprecated
- * {"note": "Replaced by @code messaging.client.consumed.messages @endcode.", "reason":
- * "uncategorized"} <p> counter
+  Deprecated. Use @code messaging.client.consumed.messages @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code messaging.client.consumed.messages @endcode.", "reason": "renamed",
+  "renamed_to": "messaging.client.consumed.messages"} <p> counter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricMessagingReceiveMessages =
     "messaging.receive.messages";

@@ -9,7 +9,7 @@
 project_build_tools_patch_default_imported_config(ZLIB::ZLIB)
 
 # protobuf targets
-if(Protobuf_FOUND OR PROTOBUF_FOUND)
+if(Protobuf_FOUND)
   project_build_tools_patch_default_imported_config(
     utf8_range::utf8_range utf8_range::utf8_validity protobuf::libprotobuf-lite
     protobuf::libprotobuf protobuf::libprotoc)
@@ -29,7 +29,7 @@ if(TARGET CURL::libcurl
 endif()
 
 # abseil targets
-if(WITH_ABSEIL OR WITH_OTLP_GRPC)
+if(TARGET absl::bad_variant_access)
   project_build_tools_patch_default_imported_config(
     absl::bad_variant_access
     absl::raw_logging_internal

@@ -14,13 +14,16 @@
 #include <string>
 #include <utility>
 
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/semconv/incubating/rpc_attributes.h"
 #include "opentelemetry/trace/context.h"
+#include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_metadata.h"
@@ -127,7 +130,7 @@ int main(int argc, char **argv)
   uint16_t port;
   if (argc > 1)
   {
-    port = atoi(argv[1]);
+    port = static_cast<uint16_t>(atoi(argv[1]));
   }
   else
   {

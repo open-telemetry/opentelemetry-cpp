@@ -10,6 +10,7 @@
 #include <memory>
 #include <random>
 #include <thread>
+#include <utility>
 #include <vector>
 #include "benchmark/benchmark.h"
 
@@ -29,8 +30,10 @@ static uint64_t ConsumeBufferNumbers(BaselineCircularBuffer<uint64_t> &buffer) n
 {
   uint64_t result = 0;
   buffer.Consume([&](std::unique_ptr<uint64_t> &&x) {
-    result += *x;
-    x.reset();
+    auto val = std::move(x);
+
+    result += *val;
+    val.reset();
   });
   return result;
 }

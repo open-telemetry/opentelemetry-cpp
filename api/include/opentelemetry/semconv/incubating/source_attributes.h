@@ -20,15 +20,15 @@ namespace source
 {
 
 /**
- * Source address - domain name if available without reverse DNS lookup; otherwise, IP address or
- * Unix domain socket name. <p> When observed from the destination side, and when communicating
- * through an intermediary, @code source.address @endcode SHOULD represent the source address behind
- * any intermediaries, for example proxies, if it's available.
+  Source address - domain name if available without reverse DNS lookup; otherwise, IP address or
+  Unix domain socket name. <p> When observed from the destination side, and when communicating
+  through an intermediary, @code source.address @endcode SHOULD represent the source address behind
+  any intermediaries, for example proxies, if it's available.
  */
 static constexpr const char *kSourceAddress = "source.address";
 
 /**
- * Source port number
+  Source port number
  */
 static constexpr const char *kSourcePort = "source.port";
 

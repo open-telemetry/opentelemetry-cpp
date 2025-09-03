@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stddef.h>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -27,6 +26,10 @@
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/version.h"
+
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+#  include "opentelemetry/sdk/common/thread_instrumentation.h"
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBufferRange;

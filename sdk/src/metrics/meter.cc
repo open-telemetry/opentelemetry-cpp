@@ -1,7 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <algorithm>
 #include <cstdint>
 #include <mutex>
 #include <ostream>
@@ -17,6 +16,7 @@
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -40,8 +40,47 @@
 #include "opentelemetry/version.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_utils.h"
 #endif
+
+namespace
+{
+
+struct InstrumentationScopeLogStreamable
+{
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope &scope;
+};
+
+struct InstrumentDescriptorLogStreamable
+{
+  const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument;
+};
+
+std::ostream &operator<<(std::ostream &os,
+                         const InstrumentationScopeLogStreamable &streamable) noexcept
+{
+  os << "\n  name=\"" << streamable.scope.GetName() << "\"" << "\n  schema_url=\""
+     << streamable.scope.GetSchemaURL() << "\"" << "\n  version=\"" << streamable.scope.GetVersion()
+     << "\"";
+  return os;
+}
+
+std::ostream &operator<<(std::ostream &os,
+                         const InstrumentDescriptorLogStreamable &streamable) noexcept
+{
+  os << "\n  name=\"" << streamable.instrument.name_ << "\"" << "\n  description=\""
+     << streamable.instrument.description_ << "\"" << "\n  unit=\"" << streamable.instrument.unit_
+     << "\"" << "\n  kind=\""
+     << opentelemetry::sdk::metrics::InstrumentDescriptorUtil::GetInstrumentValueTypeString(
+            streamable.instrument.value_type_)
+     << opentelemetry::sdk::metrics::InstrumentDescriptorUtil::GetInstrumentTypeString(
+            streamable.instrument.type_)
+     << "\"";
+  return os;
+}
+
+}  // namespace
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -486,18 +525,31 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
         {
           view_instr_desc.description_ = view.GetDescription();
         }
-        auto multi_storage = static_cast<SyncMultiMetricStorage *>(storages.get());
-
-        auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
-            view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
+        std::shared_ptr<SyncMetricStorage> sync_storage{};
+        auto storage_iter = storage_registry_.find(view_instr_desc);
+        if (storage_iter != storage_registry_.end())
+        {
+          WarnOnNameCaseConflict(GetInstrumentationScope(), storage_iter->first, view_instr_desc);
+          // static_pointer_cast is okay here. If storage_registry_.find is successful
+          // InstrumentEqualNameCaseInsensitive ensures that the
+          // instrument type and value type are the same for the existing and new instrument.
+          sync_storage = std::static_pointer_cast<SyncMetricStorage>(storage_iter->second);
+        }
+        else
+        {
+          WarnOnDuplicateInstrument(GetInstrumentationScope(), storage_registry_, view_instr_desc);
+          sync_storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
+              view_instr_desc, view.GetAggregationType(), view.GetAttributesProcessor(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-            exemplar_filter_type,
-            GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
-                                 instrument_descriptor),
+              exemplar_filter_type,
+              GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
+                                   view_instr_desc),
 #endif
-            view.GetAggregationConfig()));
-        storage_registry_[view_instr_desc.name_] = storage;
-        multi_storage->AddStorage(storage);
+              view.GetAggregationConfig()));
+          storage_registry_.insert({view_instr_desc, sync_storage});
+        }
+        auto sync_multi_storage = static_cast<SyncMultiMetricStorage *>(storages.get());
+        sync_multi_storage->AddStorage(sync_storage);
         return true;
       });
 
@@ -546,16 +598,37 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         {
           view_instr_desc.description_ = view.GetDescription();
         }
-        auto storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
-            view_instr_desc, view.GetAggregationType(),
+        std::shared_ptr<AsyncMetricStorage> async_storage{};
+        auto storage_iter = storage_registry_.find(view_instr_desc);
+        if (storage_iter != storage_registry_.end())
+        {
+          WarnOnNameCaseConflict(GetInstrumentationScope(), storage_iter->first, view_instr_desc);
+          // static_pointer_cast is okay here. If storage_registry_.find is successful
+          // InstrumentEqualNameCaseInsensitive ensures that the
+          // instrument type and value type are the same for the existing and new instrument.
+          async_storage = std::static_pointer_cast<AsyncMetricStorage>(storage_iter->second);
+        }
+        else
+        {
+          WarnOnDuplicateInstrument(GetInstrumentationScope(), storage_registry_, view_instr_desc);
+          async_storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
+              view_instr_desc, view.GetAggregationType(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-            exemplar_filter_type,
-            GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
-                                 instrument_descriptor),
+              exemplar_filter_type,
+              GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
+                                   view_instr_desc),
 #endif
+<<<<<<< HEAD
             view.GetAggregationConfig()));
         storage_registry_[view_instr_desc.name_] = storage;
         static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
+=======
+              view.GetAggregationConfig()));
+          storage_registry_.insert({view_instr_desc, async_storage});
+        }
+        auto async_multi_storage = static_cast<AsyncMultiMetricStorage *>(storages.get());
+        async_multi_storage->AddStorage(async_storage);
+>>>>>>> main
         return true;
       });
   if (!success)
@@ -594,6 +667,73 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
                                    });
   }
   return metric_data_list;
+}
+
+// Implementation of the log message recommended by the SDK specification for duplicate instruments.
+// See
+// https://github.com/open-telemetry/opentelemetry-specification/blob/9c8c30631b0e288de93df7452f91ed47f6fba330/specification/metrics/sdk.md?plain=1#L882
+void Meter::WarnOnDuplicateInstrument(const sdk::instrumentationscope::InstrumentationScope *scope,
+                                      const MetricStorageMap &storage_registry,
+                                      const InstrumentDescriptor &new_instrument)
+{
+  for (const auto &element : storage_registry)
+  {
+    const auto &existing_instrument = element.first;
+    if (InstrumentDescriptorUtil::IsDuplicate(existing_instrument, new_instrument))
+    {
+      std::string resolution_info{""};
+
+      if (existing_instrument.type_ != new_instrument.type_ ||
+          existing_instrument.value_type_ != new_instrument.value_type_)
+      {
+        resolution_info +=
+            "\nDifferent instrument kinds found. Consider configuring a View to change the name of "
+            "the duplicate instrument.";
+      }
+
+      if (existing_instrument.unit_ != new_instrument.unit_)
+      {
+        resolution_info += "\nDifferent instrument units found.";
+      }
+
+      if (existing_instrument.description_ != new_instrument.description_)
+      {
+        resolution_info +=
+            "\nDifferent instrument descriptions found. Consider configuring a View to change the "
+            "description of the duplicate instrument.";
+      }
+
+      OTEL_INTERNAL_LOG_WARN(
+          "[Meter::WarnOnDuplicateInstrument] Creating a duplicate instrument of the same "
+          "case-insensitive name. This may cause "
+          "semantic errors in the data exported from this meter."
+          << resolution_info << "\nScope: " << InstrumentationScopeLogStreamable{*scope}
+          << "\nExisting instrument: " << InstrumentDescriptorLogStreamable{existing_instrument}
+          << "\nDuplicate instrument: " << InstrumentDescriptorLogStreamable{new_instrument});
+      return;
+    }
+  }
+}
+
+// Implementation of the log message recommended by the SDK specification for name case conflicts.
+// See
+// https://github.com/open-telemetry/opentelemetry-specification/blob/9c8c30631b0e288de93df7452f91ed47f6fba330/specification/metrics/sdk.md?plain=1#L910
+void Meter::WarnOnNameCaseConflict(const sdk::instrumentationscope::InstrumentationScope *scope,
+                                   const InstrumentDescriptor &existing_instrument,
+                                   const InstrumentDescriptor &new_instrument)
+{
+  if (InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals(existing_instrument.name_,
+                                                           new_instrument.name_) &&
+      existing_instrument.name_ != new_instrument.name_)
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[Meter::WarnOnNameCaseConflict] Instrument name case conflict detected on creation. "
+        "Returning the existing instrument with the first-seen instrument name. To resolve this "
+        "warning consider configuring a View to rename the duplicate instrument."
+        << "\nScope: " << InstrumentationScopeLogStreamable{*scope}
+        << "\nExisting instrument: " << InstrumentDescriptorLogStreamable{existing_instrument}
+        << "\nDuplicate instrument: " << InstrumentDescriptorLogStreamable{new_instrument});
+  }
 }
 
 }  // namespace metrics

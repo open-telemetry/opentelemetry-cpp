@@ -17,6 +17,11 @@ public:
 
   ~A() { destructed_ = true; }
 
+  A(const A &)            = delete;
+  A(A &&)                 = delete;
+  A &operator=(const A &) = delete;
+  A &operator=(A &&)      = delete;
+
 private:
   bool &destructed_;
 };

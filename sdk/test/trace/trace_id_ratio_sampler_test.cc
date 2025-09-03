@@ -10,6 +10,7 @@
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio.h"
 #include "opentelemetry/trace/span_context.h"
@@ -98,7 +99,7 @@ TEST(TraceIdRatioBasedSampler, ShouldSampleWithoutContext)
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
 
-  constexpr uint8_t buf[] = {0, 0, 0, 0, 0, 0, 0, 0x80, 0, 0, 0, 0, 0, 0, 0, 0};
+  constexpr uint8_t buf[] = {0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   trace_api::TraceId valid_trace_id(buf);
 
   sampling_result = s1.ShouldSample(trace_api::SpanContext::GetInvalid(), valid_trace_id, "",

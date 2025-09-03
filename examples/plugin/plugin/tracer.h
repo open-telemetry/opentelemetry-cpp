@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <stdint.h>  // IWYU pragma: keep
 
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/shared_ptr.h"

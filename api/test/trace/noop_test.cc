@@ -12,6 +12,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/span.h"
@@ -70,6 +71,8 @@ TEST(NoopTest, UseNoopTracersAbiv2)
   s1->AddLink(target, {{"noop1", 1}});
 
   s1->AddLinks({{trace_api::SpanContext(false, false), {{"noop2", 2}}}});
+
+  EXPECT_FALSE(tracer->Enabled());
 }
 #endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 

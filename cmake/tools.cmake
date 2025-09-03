@@ -94,6 +94,17 @@ function(patch_protobuf_targets)
 endfunction()
 
 function(project_build_tools_get_imported_location OUTPUT_VAR_NAME TARGET_NAME)
+
+  # The following if statement was added to support cmake versions < 3.19
+  get_target_property(TARGET_TYPE ${TARGET_NAME} TYPE)
+  if(TARGET_TYPE STREQUAL "INTERFACE_LIBRARY")
+    # For interface libraries, do not attempt to retrieve imported location.
+    set(${OUTPUT_VAR_NAME}
+        ""
+        PARENT_SCOPE)
+    return()
+  endif()
+
   if(CMAKE_BUILD_TYPE)
     string(TOUPPER "IMPORTED_LOCATION_${CMAKE_BUILD_TYPE}"
                    TRY_SPECIFY_IMPORTED_LOCATION)

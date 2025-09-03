@@ -33,11 +33,14 @@ foreach(
   metric_reader_test
   observable_registry_test
   periodic_exporting_metric_reader_test
-  instrument_metadata_validator_test)
+  instrument_metadata_validator_test
+  metric_test_stress
+  instrument_descriptor_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
-    ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    ${testname} ${GTEST_BOTH_LIBRARIES} ${GMOCK_LIB} ${CMAKE_THREAD_LIBS_INIT}
     metrics_common_test_utils opentelemetry_resources)
+  target_compile_definitions(${testname} PRIVATE UNIT_TESTING)
   gtest_add_tests(
     TARGET ${testname}
     TEST_PREFIX metrics.

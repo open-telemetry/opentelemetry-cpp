@@ -20,88 +20,96 @@ namespace os
 {
 
 /**
- * Unique identifier for a particular build or compilation of the operating system.
+  Unique identifier for a particular build or compilation of the operating system.
  */
 static constexpr const char *kOsBuildId = "os.build_id";
 
 /**
- * Human readable (not intended to be parsed) OS version information, like e.g. reported by @code
- * ver @endcode or @code lsb_release -a @endcode commands.
+  Human readable (not intended to be parsed) OS version information, like e.g. reported by @code ver
+  @endcode or @code lsb_release -a @endcode commands.
  */
 static constexpr const char *kOsDescription = "os.description";
 
 /**
- * Human readable operating system name.
+  Human readable operating system name.
  */
 static constexpr const char *kOsName = "os.name";
 
 /**
- * The operating system type.
+  The operating system type.
  */
 static constexpr const char *kOsType = "os.type";
 
 /**
- * The version string of the operating system as defined in <a
- * href="/docs/resource/README.md#version-attributes">Version Attributes</a>.
+  The version string of the operating system as defined in <a
+  href="/docs/resource/README.md#version-attributes">Version Attributes</a>.
  */
 static constexpr const char *kOsVersion = "os.version";
 
 namespace OsTypeValues
 {
 /**
- * Microsoft Windows
+  Microsoft Windows
  */
 static constexpr const char *kWindows = "windows";
 
 /**
- * Linux
+  Linux
  */
 static constexpr const char *kLinux = "linux";
 
 /**
- * Apple Darwin
+  Apple Darwin
  */
 static constexpr const char *kDarwin = "darwin";
 
 /**
- * FreeBSD
+  FreeBSD
  */
 static constexpr const char *kFreebsd = "freebsd";
 
 /**
- * NetBSD
+  NetBSD
  */
 static constexpr const char *kNetbsd = "netbsd";
 
 /**
- * OpenBSD
+  OpenBSD
  */
 static constexpr const char *kOpenbsd = "openbsd";
 
 /**
- * DragonFly BSD
+  DragonFly BSD
  */
 static constexpr const char *kDragonflybsd = "dragonflybsd";
 
 /**
- * HP-UX (Hewlett Packard Unix)
+  HP-UX (Hewlett Packard Unix)
  */
 static constexpr const char *kHpux = "hpux";
 
 /**
- * AIX (Advanced Interactive eXecutive)
+  AIX (Advanced Interactive eXecutive)
  */
 static constexpr const char *kAix = "aix";
 
 /**
- * SunOS, Oracle Solaris
+  SunOS, Oracle Solaris
  */
 static constexpr const char *kSolaris = "solaris";
 
 /**
- * IBM z/OS
+  Deprecated. Use @code zos @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code zos @endcode.", "reason": "renamed", "renamed_to": "zos"}
  */
-static constexpr const char *kZOs = "z_os";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kZOs = "z_os";
+
+/**
+  IBM z/OS
+ */
+static constexpr const char *kZos = "zos";
 
 }  // namespace OsTypeValues
 

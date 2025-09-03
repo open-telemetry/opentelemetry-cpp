@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <string>
 #include <utility>
 #include "common.h"
 
@@ -18,6 +19,17 @@
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include <stdint.h>
+#  include <initializer_list>
+#  include <map>
+#  include <unordered_map>
+
+#  include "opentelemetry/common/attribute_value.h"
+#  include "opentelemetry/nostd/variant.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
 using namespace opentelemetry::sdk::metrics;
 

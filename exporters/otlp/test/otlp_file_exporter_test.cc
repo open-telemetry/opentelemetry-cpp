@@ -13,12 +13,14 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -41,6 +43,10 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include "opentelemetry/common/attribute_value.h"
+#endif
+
 using namespace testing;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -55,8 +61,12 @@ namespace resource  = opentelemetry::sdk::resource;
 class ProtobufGlobalSymbolGuard
 {
 public:
-  ProtobufGlobalSymbolGuard() {}
+  ProtobufGlobalSymbolGuard() = default;
   ~ProtobufGlobalSymbolGuard() { google::protobuf::ShutdownProtobufLibrary(); }
+  ProtobufGlobalSymbolGuard(const ProtobufGlobalSymbolGuard &)            = delete;
+  ProtobufGlobalSymbolGuard &operator=(const ProtobufGlobalSymbolGuard &) = delete;
+  ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
+  ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
 };
 
 template <class T, size_t N>
@@ -108,9 +118,9 @@ public:
     std::string report_trace_id;
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-    auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url",
-                                      {{ "scope_key",
-                                         "scope_value" }});
+    std::unordered_map<std::string, common::AttributeValue> scope_attributes;
+    scope_attributes["scope_key"] = common::AttributeValue("scope_value");
+    auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url", scope_attributes);
 #else
     auto tracer = provider->GetTracer("scope_name", "scope_version", "scope_url");
 #endif
@@ -139,6 +149,12 @@ public:
     auto check_json_text = output.str();
     if (!check_json_text.empty())
     {
+      // If the exporting is splited to two standalone resource_span, just checking the first one.
+      std::string::size_type eol = check_json_text.find('\n');
+      if (eol != std::string::npos)
+      {
+        check_json_text = check_json_text.substr(0, eol);
+      }
       auto check_json = nlohmann::json::parse(check_json_text, nullptr, false);
       if (!check_json.is_discarded())
       {

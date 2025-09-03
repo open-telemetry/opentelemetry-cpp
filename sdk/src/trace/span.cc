@@ -9,6 +9,7 @@
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/version.h"
 #include "src/trace/span.h"
 
@@ -171,7 +172,7 @@ void Span::AddLinks(const opentelemetry::trace::SpanContextKeyValueIterable &lin
     return;
   }
 
-  links.ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context,
+  links.ForEachKeyValue([&](const opentelemetry::trace::SpanContext &span_context,
                             const common::KeyValueIterable &attributes) {
     recordable_->AddLink(span_context, attributes);
     return true;
