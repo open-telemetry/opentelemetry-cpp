@@ -14,7 +14,10 @@ cc_library(
     srcs = [
         "container_detector.cc",
         "container_detector_utils.cc",
+        "process_detector.cc",
+        "process_detector_utils.cc",
     ],
+    copts = ["-fexceptions"],
     deps = [
         "//api",
         "//resource_detectors:headers",

@@ -4,7 +4,7 @@
 # This test uses CMake's FetchContent module to build opentelemetry-cpp from src
 # and make its targets available within an external project.
 
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.16)
 
 project(opentelemetry-cpp-fetch-content-test LANGUAGES CXX)
 
@@ -29,6 +29,27 @@ FetchContent_Declare(
   googletest SOURCE_DIR "${OPENTELEMETRY_CPP_SRC_DIR}/third_party/googletest")
 FetchContent_Declare(opentelemetry-cpp SOURCE_DIR ${OPENTELEMETRY_CPP_SRC_DIR})
 FetchContent_MakeAvailable(googletest opentelemetry-cpp)
+
+if(NOT DEFINED OPENTELEMETRY_VERSION OR OPENTELEMETRY_VERSION
+                                        VERSION_LESS_EQUAL 0.0.0)
+  message(
+    FATAL_ERROR
+      "OpenTelemetry C++ version not set after FetchContent_MakeAvailable(opentelemetry-cpp)."
+  )
+endif()
+
+if(NOT DEFINED OPENTELEMETRY_ABI_VERSION_NO OR OPENTELEMETRY_ABI_VERSION_NO
+                                               LESS 1)
+  message(
+    FATAL_ERROR
+      "OpenTelemetry C++ ABI version number not defined in the source directory"
+  )
+endif()
+
+message(
+  STATUS
+    "OpenTelemetry C++ version: ${OPENTELEMETRY_VERSION}, ABI version: ${OPENTELEMETRY_ABI_VERSION_NO}"
+)
 
 add_executable(
   fetch_content_src_test

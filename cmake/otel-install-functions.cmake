@@ -487,13 +487,11 @@ function(otel_install_cmake_config)
     "${PROJECT_SOURCE_DIR}/cmake/templates/opentelemetry-cpp-config.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config.cmake"
     INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-    PATH_VARS OPENTELEMETRY_ABI_VERSION_NO OPENTELEMETRY_VERSION PROJECT_NAME
-              INCLUDE_INSTALL_DIR CMAKE_INSTALL_LIBDIR)
+    PATH_VARS INCLUDE_INSTALL_DIR CMAKE_INSTALL_LIBDIR)
 
   # Write version file for find_package(opentelemetry-cpp CONFIG)
   write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config-version.cmake"
-    VERSION ${OPENTELEMETRY_VERSION}
     COMPATIBILITY ExactVersion)
 
   install(

@@ -205,14 +205,9 @@ static constexpr const char *kTlsServerSubject = "tls.server.subject";
 
 namespace TlsProtocolNameValues
 {
-/**
-  none
- */
+
 static constexpr const char *kSsl = "ssl";
 
-/**
-  none
- */
 static constexpr const char *kTls = "tls";
 
 }  // namespace TlsProtocolNameValues
