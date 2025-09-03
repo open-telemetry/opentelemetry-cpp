@@ -618,17 +618,11 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
               GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
                                    view_instr_desc),
 #endif
-<<<<<<< HEAD
-            view.GetAggregationConfig()));
-        storage_registry_[view_instr_desc.name_] = storage;
-        static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
-=======
               view.GetAggregationConfig()));
           storage_registry_.insert({view_instr_desc, async_storage});
         }
         auto async_multi_storage = static_cast<AsyncMultiMetricStorage *>(storages.get());
         async_multi_storage->AddStorage(async_storage);
->>>>>>> main
         return true;
       });
   if (!success)
