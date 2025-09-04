@@ -11,6 +11,7 @@
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
@@ -50,10 +51,14 @@ TEST(ParentBasedSampler, ShouldSample)
   opentelemetry::common::KeyValueIterableView<M> view{m1};
   trace_api::SpanContextKeyValueIterableView<L> links{l1};
   auto trace_state = trace_api::TraceState::FromHeader("congo=t61rcWkgMzE");
-  trace_api::SpanContext parent_context_sampled(trace_id, span_id, trace_api::TraceFlags{1}, false,
-                                                trace_state);
-  trace_api::SpanContext parent_context_nonsampled(trace_id, span_id, trace_api::TraceFlags{0},
-                                                   false, trace_state);
+  trace_api::SpanContext parent_context_sampled_local(trace_id, span_id, trace_api::TraceFlags{1},
+                                                      false, trace_state);
+  trace_api::SpanContext parent_context_nonsampled_local(
+      trace_id, span_id, trace_api::TraceFlags{0}, false, trace_state);
+  trace_api::SpanContext parent_context_sampled_remote(trace_id, span_id, trace_api::TraceFlags{1},
+                                                       true, trace_state);
+  trace_api::SpanContext parent_context_nonsampled_remote(
+      trace_id, span_id, trace_api::TraceFlags{0}, true, trace_state);
 
   // Case 1: Parent doesn't exist. Return result of delegateSampler()
   auto sampling_result  = sampler_off.ShouldSample(trace_api::SpanContext::GetInvalid(), trace_id,
@@ -66,17 +71,29 @@ TEST(ParentBasedSampler, ShouldSample)
   ASSERT_EQ("", sampling_result.trace_state->ToHeader());
   ASSERT_EQ("", sampling_result2.trace_state->ToHeader());
 
-  // Case 2: Parent exists and SampledFlag is true
+  // Case 2: Parent exists and SampledFlag is true and RemoteFlag is false
   auto sampling_result3 =
-      sampler_off.ShouldSample(parent_context_sampled, trace_id, "", span_kind, view, links);
+      sampler_off.ShouldSample(parent_context_sampled_local, trace_id, "", span_kind, view, links);
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result3.decision);
   ASSERT_EQ("congo=t61rcWkgMzE", sampling_result3.trace_state->ToHeader());
 
-  // Case 3: Parent exists and SampledFlag is false
-  auto sampling_result4 =
-      sampler_on.ShouldSample(parent_context_nonsampled, trace_id, "", span_kind, view, links);
+  // Case 3: Parent exists and SampledFlag is false and RemoteFlag is false
+  auto sampling_result4 = sampler_on.ShouldSample(parent_context_nonsampled_local, trace_id, "",
+                                                  span_kind, view, links);
   ASSERT_EQ(Decision::DROP, sampling_result4.decision);
   ASSERT_EQ("congo=t61rcWkgMzE", sampling_result4.trace_state->ToHeader());
+
+  // Case 4: Parent exists, SampledFlag is true and RemoteFlag is true
+  auto sampling_result5 =
+      sampler_off.ShouldSample(parent_context_sampled_remote, trace_id, "", span_kind, view, links);
+  ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result5.decision);
+  ASSERT_EQ("congo=t61rcWkgMzE", sampling_result5.trace_state->ToHeader());
+
+  // Case 5: Parent exists, SampledFlag is false and RemoteFlag is true
+  auto sampling_result6 = sampler_on.ShouldSample(parent_context_nonsampled_remote, trace_id, "",
+                                                  span_kind, view, links);
+  ASSERT_EQ(Decision::DROP, sampling_result6.decision);
+  ASSERT_EQ("congo=t61rcWkgMzE", sampling_result6.trace_state->ToHeader());
 }
 
 TEST(ParentBasedSampler, GetDescription)

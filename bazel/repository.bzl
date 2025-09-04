@@ -88,10 +88,10 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "com_github_opentelemetry_proto",
         build_file = "@io_opentelemetry_cpp//bazel:opentelemetry_proto.BUILD",
-        sha256 = "92682778affe8d00cd36f68308b49295db34fce379bef0a781c50837eccbc3c0",
-        strip_prefix = "opentelemetry-proto-1.6.0",
+        sha256 = "11330d850f5e24d34c4246bc8cb21fcd311e7565d219195713455a576bb11bed",
+        strip_prefix = "opentelemetry-proto-1.7.0",
         urls = [
-            "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.6.0.tar.gz",
+            "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.7.0.tar.gz",
         ],
     )
 
@@ -139,15 +139,6 @@ def opentelemetry_cpp_deps():
             "https://curl.haxx.se/download/curl-8.4.0.tar.gz",
             "https://github.com/curl/curl/releases/download/curl-8_4_0/curl-8.4.0.tar.gz",
         ],
-    )
-
-    # rules foreign cc
-    maybe(
-        http_archive,
-        name = "rules_foreign_cc",
-        sha256 = "69023642d5781c68911beda769f91fcbc8ca48711db935a75da7f6536b65047f",
-        strip_prefix = "rules_foreign_cc-0.6.0",
-        url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.6.0.tar.gz",
     )
 
     # bazel skylib

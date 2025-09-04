@@ -6,17 +6,18 @@
 #include <stdint.h>
 #include <atomic>
 #include <chrono>
+#include <initializer_list>  // IWYU pragma: keep
 #include <random>
 #include <thread>
 #include <utility>
 #include <vector>
-
 #include "common.h"
-#include "opentelemetry/context/context.h"
+
+#include "opentelemetry/context/context.h"  // IWYU pragma: keep
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"

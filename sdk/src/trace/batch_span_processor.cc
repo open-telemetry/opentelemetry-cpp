@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stddef.h>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -27,6 +26,10 @@
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/version.h"
+
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+#  include "opentelemetry/sdk/common/thread_instrumentation.h"
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBufferRange;
@@ -356,6 +359,19 @@ void BatchSpanProcessor::GetWaitAdjustedTime(
 
 bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  return InternalShutdown(timeout);
+}
+
+BatchSpanProcessor::~BatchSpanProcessor()
+{
+  if (synchronization_data_->is_shutdown.load() == false)
+  {
+    InternalShutdown();
+  }
+}
+
+bool BatchSpanProcessor::InternalShutdown(std::chrono::microseconds timeout) noexcept
+{
   auto start_time = std::chrono::system_clock::now();
   std::lock_guard<std::mutex> shutdown_guard{synchronization_data_->shutdown_m};
   bool already_shutdown = synchronization_data_->is_shutdown.exchange(true);
@@ -375,14 +391,6 @@ bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
   }
 
   return true;
-}
-
-BatchSpanProcessor::~BatchSpanProcessor()
-{
-  if (synchronization_data_->is_shutdown.load() == false)
-  {
-    Shutdown();
-  }
 }
 
 }  // namespace trace

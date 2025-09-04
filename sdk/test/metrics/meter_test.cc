@@ -6,42 +6,47 @@
 #include <stdint.h>
 #include <algorithm>
 #include <atomic>
+#include <chrono>
+#include <initializer_list>  // IWYU pragma: keep
 #include <iostream>
 #include <string>
 #include <thread>
+#include <type_traits>
 #include <utility>
 #include <vector>
 #include "common.h"
 
 #include <functional>
-#include "opentelemetry/context/context.h"
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/context/context.h"  // IWYU pragma: keep
 #include "opentelemetry/metrics/async_instruments.h"
 #include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/sdk/metrics/meter_config.h"
-#include "opentelemetry/sdk/metrics/view/view_registry.h"
-#include "opentelemetry/sdk/resource/resource.h"
-
-#include <opentelemetry/sdk/metrics/view/view_registry_factory.h>
-
 #include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/metrics/sync_instruments.h"  // IWYU pragma: keep
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/data/exemplar_data.h"  // IWYU pragma: keep
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
+#include "opentelemetry/sdk/metrics/view/view_registry_factory.h"
+#include "opentelemetry/sdk/resource/resource.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
@@ -106,7 +111,7 @@ public:
   {
     if (LogLevel::Warning == level)
     {
-      std::cout << msg << std::endl;
+      std::cout << msg << "\n";
       warnings.push_back(msg);
     }
   }
@@ -182,6 +187,21 @@ protected:
   opentelemetry::nostd::shared_ptr<opentelemetry::metrics::Meter> meter_{nullptr};
 
   std::shared_ptr<MetricReader> metric_reader_ptr_{new MockMetricReader()};
+};
+
+class TestProcessor : public sdk::metrics::AttributesProcessor
+{
+public:
+  explicit TestProcessor() = default;
+
+  sdk::metrics::MetricAttributes process(
+      const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
+  {
+    // Just forward attributes
+    return sdk::metrics::MetricAttributes(attributes);
+  }
+
+  bool isPresent(nostd::string_view /*key*/) const noexcept override { return true; }
 };
 
 }  // namespace
@@ -850,4 +870,47 @@ TEST_F(MeterCreateInstrumentTest, ViewCorrectedDuplicateAsyncInstrumentsByDescri
     EXPECT_FALSE(log_handler_->HasNameCaseConflictWarning());
     return true;
   });
+}
+
+TEST(MeterTest, RecordAfterProviderDestructionWithCustomProcessor_NoResetInMain)
+{
+  std::unique_ptr<AttributesProcessor> processor(new TestProcessor());
+
+  // MeterProvider is owned by unique_ptr for explicit control
+  std::unique_ptr<MeterProvider> provider(new MeterProvider());
+
+  // Register a View with custom processor
+  std::unique_ptr<View> view(
+      new View("my_counter", "", AggregationType::kSum, nullptr, std::move(processor)));
+  std::unique_ptr<InstrumentSelector> instr_selector(
+      new InstrumentSelector(InstrumentType::kCounter, "my_counter", ""));
+  std::unique_ptr<MeterSelector> meter_selector(new MeterSelector("test_meter", "", ""));
+  provider->AddView(std::move(instr_selector), std::move(meter_selector), std::move(view));
+
+  auto meter   = provider->GetMeter("test_meter");
+  auto counter = meter->CreateUInt64Counter("my_counter");
+
+  // Move the counter to the thread
+  std::atomic<bool> thread_ready{false};
+  std::atomic<bool> thread_done{false};
+
+  std::thread t([c = std::move(counter), &thread_ready, &thread_done]() mutable {
+    thread_ready = true;
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    // Safe after provider destruction
+    c->Add(12345, {{"thread", "after_provider_destruction"}});
+    thread_done = true;
+  });
+
+  // Wait for thread to be ready
+  while (!thread_ready.load())
+    std::this_thread::yield();
+
+  // Destroy the provider (and its storage etc)
+  provider.reset();
+
+  // Wait for thread to finish
+  while (!thread_done.load())
+    std::this_thread::yield();
+  t.join();
 }

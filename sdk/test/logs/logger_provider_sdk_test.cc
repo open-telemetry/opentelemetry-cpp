@@ -18,8 +18,8 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/logs/event_logger_provider.h"
-#include "opentelemetry/sdk/logs/event_logger_provider_factory.h"
+#include "opentelemetry/sdk/logs/event_logger_provider.h"          // IWYU pragma: keep
+#include "opentelemetry/sdk/logs/event_logger_provider_factory.h"  // IWYU pragma: keep
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/logger_context.h"
@@ -224,7 +224,10 @@ class DummyProcessor : public LogRecordProcessor
     return std::unique_ptr<Recordable>(new DummyLogRecordable());
   }
 
-  void OnEmit(std::unique_ptr<Recordable> && /* record */) noexcept override {}
+  void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override
+  {
+    auto record_ptr = std::move(record);
+  }
   bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 };

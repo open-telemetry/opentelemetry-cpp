@@ -517,87 +517,45 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kDbUser = "db.user";
 
 namespace DbCassandraConsistencyLevelValues
 {
-/**
-  none
- */
+
 static constexpr const char *kAll = "all";
 
-/**
-  none
- */
 static constexpr const char *kEachQuorum = "each_quorum";
 
-/**
-  none
- */
 static constexpr const char *kQuorum = "quorum";
 
-/**
-  none
- */
 static constexpr const char *kLocalQuorum = "local_quorum";
 
-/**
-  none
- */
 static constexpr const char *kOne = "one";
 
-/**
-  none
- */
 static constexpr const char *kTwo = "two";
 
-/**
-  none
- */
 static constexpr const char *kThree = "three";
 
-/**
-  none
- */
 static constexpr const char *kLocalOne = "local_one";
 
-/**
-  none
- */
 static constexpr const char *kAny = "any";
 
-/**
-  none
- */
 static constexpr const char *kSerial = "serial";
 
-/**
-  none
- */
 static constexpr const char *kLocalSerial = "local_serial";
 
 }  // namespace DbCassandraConsistencyLevelValues
 
 namespace DbClientConnectionStateValues
 {
-/**
-  none
- */
+
 static constexpr const char *kIdle = "idle";
 
-/**
-  none
- */
 static constexpr const char *kUsed = "used";
 
 }  // namespace DbClientConnectionStateValues
 
 namespace DbClientConnectionsStateValues
 {
-/**
-  none
- */
+
 static constexpr const char *kIdle = "idle";
 
-/**
-  none
- */
 static constexpr const char *kUsed = "used";
 
 }  // namespace DbClientConnectionsStateValues
@@ -618,108 +576,50 @@ static constexpr const char *kDirect = "direct";
 
 namespace DbCosmosdbConsistencyLevelValues
 {
-/**
-  none
- */
+
 static constexpr const char *kStrong = "Strong";
 
-/**
-  none
- */
 static constexpr const char *kBoundedStaleness = "BoundedStaleness";
 
-/**
-  none
- */
 static constexpr const char *kSession = "Session";
 
-/**
-  none
- */
 static constexpr const char *kEventual = "Eventual";
 
-/**
-  none
- */
 static constexpr const char *kConsistentPrefix = "ConsistentPrefix";
 
 }  // namespace DbCosmosdbConsistencyLevelValues
 
 namespace DbCosmosdbOperationTypeValues
 {
-/**
-  none
- */
+
 static constexpr const char *kBatch = "batch";
 
-/**
-  none
- */
 static constexpr const char *kCreate = "create";
 
-/**
-  none
- */
 static constexpr const char *kDelete = "delete";
 
-/**
-  none
- */
 static constexpr const char *kExecute = "execute";
 
-/**
-  none
- */
 static constexpr const char *kExecuteJavascript = "execute_javascript";
 
-/**
-  none
- */
 static constexpr const char *kInvalid = "invalid";
 
-/**
-  none
- */
 static constexpr const char *kHead = "head";
 
-/**
-  none
- */
 static constexpr const char *kHeadFeed = "head_feed";
 
-/**
-  none
- */
 static constexpr const char *kPatch = "patch";
 
-/**
-  none
- */
 static constexpr const char *kQuery = "query";
 
-/**
-  none
- */
 static constexpr const char *kQueryPlan = "query_plan";
 
-/**
-  none
- */
 static constexpr const char *kRead = "read";
 
-/**
-  none
- */
 static constexpr const char *kReadFeed = "read_feed";
 
-/**
-  none
- */
 static constexpr const char *kReplace = "replace";
 
-/**
-  none
- */
 static constexpr const char *kUpsert = "upsert";
 
 }  // namespace DbCosmosdbOperationTypeValues
@@ -738,8 +638,12 @@ static constexpr const char *kAdabas = "adabas";
 
 /**
   Deprecated, use @code intersystems_cache @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code intersystems_cache @endcode.", "reason": "renamed", "renamed_to":
+  "intersystems_cache"}
  */
-static constexpr const char *kCache = "cache";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kCache = "cache";
 
 /**
   InterSystems Caché
@@ -758,8 +662,11 @@ static constexpr const char *kClickhouse = "clickhouse";
 
 /**
   Deprecated, use @code other_sql @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code other_sql @endcode.", "reason": "renamed", "renamed_to": "other_sql"}
  */
-static constexpr const char *kCloudscape = "cloudscape";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kCloudscape = "cloudscape";
 
 /**
   CockroachDB
@@ -768,8 +675,11 @@ static constexpr const char *kCockroachdb = "cockroachdb";
 
 /**
   Deprecated, no replacement at this time.
+
+  @deprecated
+  {"note": "Obsoleted.", "reason": "obsoleted"}
  */
-static constexpr const char *kColdfusion = "coldfusion";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kColdfusion = "coldfusion";
 
 /**
   Microsoft Azure Cosmos DB
@@ -823,8 +733,11 @@ static constexpr const char *kFirebird = "firebird";
 
 /**
   Deprecated, use @code other_sql @endcode instead.
+
+  @deprecated
+  {"note": "Replaced by @code other_sql @endcode.", "reason": "renamed", "renamed_to": "other_sql"}
  */
-static constexpr const char *kFirstsql = "firstsql";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kFirstsql = "firstsql";
 
 /**
   Apache Geode
@@ -908,8 +821,11 @@ static constexpr const char *kMssql = "mssql";
 
 /**
   Deprecated, Microsoft SQL Server Compact is discontinued.
+
+  @deprecated
+  {"note": "Replaced by @code other_sql @endcode.", "reason": "renamed", "renamed_to": "other_sql"}
  */
-static constexpr const char *kMssqlcompact = "mssqlcompact";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMssqlcompact = "mssqlcompact";
 
 /**
   MySQL

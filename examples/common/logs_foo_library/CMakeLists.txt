@@ -3,8 +3,6 @@
 
 add_library(common_logs_foo_library foo_library.h foo_library.cc)
 
-set_target_version(common_logs_foo_library)
-
 if(DEFINED OPENTELEMETRY_BUILD_DLL)
   target_compile_definitions(common_logs_foo_library
                              PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)

@@ -13,6 +13,7 @@
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -93,7 +94,7 @@ private:
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
   // Meant exclusively to test force flush timeout
-  const std::chrono::milliseconds export_delay_;
+  std::chrono::milliseconds export_delay_;
 };
 
 /**

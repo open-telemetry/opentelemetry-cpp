@@ -24,8 +24,8 @@
 #include "opentelemetry/exporters/otlp/otlp_file_client_runtime_options.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
@@ -61,8 +61,12 @@ namespace resource = opentelemetry::sdk::resource;
 class ProtobufGlobalSymbolGuard
 {
 public:
-  ProtobufGlobalSymbolGuard() {}
+  ProtobufGlobalSymbolGuard() = default;
   ~ProtobufGlobalSymbolGuard() { google::protobuf::ShutdownProtobufLibrary(); }
+  ProtobufGlobalSymbolGuard(const ProtobufGlobalSymbolGuard &)            = delete;
+  ProtobufGlobalSymbolGuard &operator=(const ProtobufGlobalSymbolGuard &) = delete;
+  ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
+  ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
 };
 
 static std::tm GetLocalTime(std::chrono::system_clock::time_point tp)

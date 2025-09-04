@@ -70,9 +70,21 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kOtelLibraryVersion = "ote
 static constexpr const char *kOtelScopeName = "otel.scope.name";
 
 /**
+  The schema URL of the instrumentation scope.
+ */
+static constexpr const char *kOtelScopeSchemaUrl = "otel.scope.schema_url";
+
+/**
   The version of the instrumentation scope - (@code InstrumentationScope.Version @endcode in OTLP).
  */
 static constexpr const char *kOtelScopeVersion = "otel.scope.version";
+
+/**
+  Determines whether the span has a parent span, and if so, <a
+  href="https://opentelemetry.io/docs/specs/otel/trace/api/#isremote">whether it is a remote
+  parent</a>
+ */
+static constexpr const char *kOtelSpanParentOrigin = "otel.span.parent.origin";
 
 /**
   The result value of the sampler for this span
@@ -127,6 +139,11 @@ static constexpr const char *kOtlpHttpSpanExporter = "otlp_http_span_exporter";
 static constexpr const char *kOtlpHttpJsonSpanExporter = "otlp_http_json_span_exporter";
 
 /**
+  Zipkin span exporter over HTTP
+ */
+static constexpr const char *kZipkinHttpSpanExporter = "zipkin_http_span_exporter";
+
+/**
   OTLP log record exporter over gRPC with protobuf serialization
  */
 static constexpr const char *kOtlpGrpcLogExporter = "otlp_grpc_log_exporter";
@@ -161,7 +178,34 @@ static constexpr const char *kOtlpHttpMetricExporter = "otlp_http_metric_exporte
  */
 static constexpr const char *kOtlpHttpJsonMetricExporter = "otlp_http_json_metric_exporter";
 
+/**
+  Prometheus metric exporter over HTTP with the default text-based format
+ */
+static constexpr const char *kPrometheusHttpTextMetricExporter =
+    "prometheus_http_text_metric_exporter";
+
 }  // namespace OtelComponentTypeValues
+
+namespace OtelSpanParentOriginValues
+{
+/**
+  The span does not have a parent, it is a root span
+ */
+static constexpr const char *kNone = "none";
+
+/**
+  The span has a parent and the parent's span context <a
+  href="https://opentelemetry.io/docs/specs/otel/trace/api/#isremote">isRemote()</a> is false
+ */
+static constexpr const char *kLocal = "local";
+
+/**
+  The span has a parent and the parent's span context <a
+  href="https://opentelemetry.io/docs/specs/otel/trace/api/#isremote">isRemote()</a> is true
+ */
+static constexpr const char *kRemote = "remote";
+
+}  // namespace OtelSpanParentOriginValues
 
 namespace OtelSpanSamplingResultValues
 {

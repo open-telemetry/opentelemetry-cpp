@@ -70,9 +70,9 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kProcessCpuState = "proces
 static constexpr const char *kProcessCreationTime = "process.creation.time";
 
 /**
-  Process environment variables, <key> being the environment variable name, the value being the
-  environment variable value. <p> Examples: <ul> <li>an environment variable @code USER @endcode
-  with value @code "ubuntu" @endcode SHOULD be recorded as the @code
+  Process environment variables, @code <key> @endcode being the environment variable name, the value
+  being the environment variable value. <p> Examples: <ul> <li>an environment variable @code USER
+  @endcode with value @code "ubuntu" @endcode SHOULD be recorded as the @code
   process.environment_variable.USER @endcode attribute with value @code "ubuntu" @endcode.</li>
     <li>an environment variable @code PATH @endcode with value @code "/usr/local/bin:/usr/bin"
   @endcode SHOULD be recorded as the @code process.environment_variable.PATH @endcode attribute with
@@ -247,47 +247,29 @@ static constexpr const char *kProcessWorkingDirectory = "process.working_directo
 
 namespace ProcessContextSwitchTypeValues
 {
-/**
-  none
- */
+
 static constexpr const char *kVoluntary = "voluntary";
 
-/**
-  none
- */
 static constexpr const char *kInvoluntary = "involuntary";
 
 }  // namespace ProcessContextSwitchTypeValues
 
 namespace ProcessCpuStateValues
 {
-/**
-  none
- */
+
 static constexpr const char *kSystem = "system";
 
-/**
-  none
- */
 static constexpr const char *kUser = "user";
 
-/**
-  none
- */
 static constexpr const char *kWait = "wait";
 
 }  // namespace ProcessCpuStateValues
 
 namespace ProcessPagingFaultTypeValues
 {
-/**
-  none
- */
+
 static constexpr const char *kMajor = "major";
 
-/**
-  none
- */
 static constexpr const char *kMinor = "minor";
 
 }  // namespace ProcessPagingFaultTypeValues

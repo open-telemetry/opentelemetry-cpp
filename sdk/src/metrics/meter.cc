@@ -1,7 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <algorithm>
 #include <cstdint>
 #include <mutex>
 #include <ostream>
@@ -17,6 +16,7 @@
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -40,6 +40,7 @@
 #include "opentelemetry/version.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_utils.h"
 #endif
 
@@ -538,7 +539,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
         {
           WarnOnDuplicateInstrument(GetInstrumentationScope(), storage_registry_, view_instr_desc);
           sync_storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
-              view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
+              view_instr_desc, view.GetAggregationType(), view.GetAttributesProcessor(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
               exemplar_filter_type,
               GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),

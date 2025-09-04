@@ -21,7 +21,7 @@ namespace otel
 {
 
 /**
-  The number of log records for which the export has finished, either successful or failed
+  The number of log records for which the export has finished, either successful or failed.
   <p>
   For successful exports, @code error.type @endcode MUST NOT be set. For failed exports, @code
   error.type @endcode MUST contain the failure cause. For exporters with partial success semantics
@@ -31,7 +31,7 @@ namespace otel
  */
 static constexpr const char *kMetricOtelSdkExporterLogExported = "otel.sdk.exporter.log.exported";
 static constexpr const char *descrMetricOtelSdkExporterLogExported =
-    "The number of log records for which the export has finished, either successful or failed";
+    "The number of log records for which the export has finished, either successful or failed.";
 static constexpr const char *unitMetricOtelSdkExporterLogExported = "{log_record}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -68,14 +68,14 @@ CreateAsyncDoubleMetricOtelSdkExporterLogExported(metrics::Meter *meter)
 
 /**
   The number of log records which were passed to the exporter, but that have not been exported yet
-  (neither successful, nor failed) <p> For successful exports, @code error.type @endcode MUST NOT be
-  set. For failed exports, @code error.type @endcode MUST contain the failure cause. <p>
+  (neither successful, nor failed). <p> For successful exports, @code error.type @endcode MUST NOT
+  be set. For failed exports, @code error.type @endcode MUST contain the failure cause. <p>
   updowncounter
  */
 static constexpr const char *kMetricOtelSdkExporterLogInflight = "otel.sdk.exporter.log.inflight";
 static constexpr const char *descrMetricOtelSdkExporterLogInflight =
     "The number of log records which were passed to the exporter, but that have not been exported "
-    "yet (neither successful, nor failed)";
+    "yet (neither successful, nor failed).";
 static constexpr const char *unitMetricOtelSdkExporterLogInflight = "{log_record}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -111,7 +111,7 @@ CreateAsyncDoubleMetricOtelSdkExporterLogInflight(metrics::Meter *meter)
 }
 
 /**
-  The number of metric data points for which the export has finished, either successful or failed
+  The number of metric data points for which the export has finished, either successful or failed.
   <p>
   For successful exports, @code error.type @endcode MUST NOT be set. For failed exports, @code
   error.type @endcode MUST contain the failure cause. For exporters with partial success semantics
@@ -123,7 +123,7 @@ static constexpr const char *kMetricOtelSdkExporterMetricDataPointExported =
     "otel.sdk.exporter.metric_data_point.exported";
 static constexpr const char *descrMetricOtelSdkExporterMetricDataPointExported =
     "The number of metric data points for which the export has finished, either successful or "
-    "failed";
+    "failed.";
 static constexpr const char *unitMetricOtelSdkExporterMetricDataPointExported = "{data_point}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -160,7 +160,7 @@ CreateAsyncDoubleMetricOtelSdkExporterMetricDataPointExported(metrics::Meter *me
 
 /**
   The number of metric data points which were passed to the exporter, but that have not been
-  exported yet (neither successful, nor failed) <p> For successful exports, @code error.type
+  exported yet (neither successful, nor failed). <p> For successful exports, @code error.type
   @endcode MUST NOT be set. For failed exports, @code error.type @endcode MUST contain the failure
   cause. <p> updowncounter
  */
@@ -168,7 +168,7 @@ static constexpr const char *kMetricOtelSdkExporterMetricDataPointInflight =
     "otel.sdk.exporter.metric_data_point.inflight";
 static constexpr const char *descrMetricOtelSdkExporterMetricDataPointInflight =
     "The number of metric data points which were passed to the exporter, but that have not been "
-    "exported yet (neither successful, nor failed)";
+    "exported yet (neither successful, nor failed).";
 static constexpr const char *unitMetricOtelSdkExporterMetricDataPointInflight = "{data_point}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -239,7 +239,7 @@ CreateSyncDoubleMetricOtelSdkExporterOperationDuration(metrics::Meter *meter)
 }
 
 /**
-  The number of spans for which the export has finished, either successful or failed
+  The number of spans for which the export has finished, either successful or failed.
   <p>
   For successful exports, @code error.type @endcode MUST NOT be set. For failed exports, @code
   error.type @endcode MUST contain the failure cause. For exporters with partial success semantics
@@ -249,7 +249,7 @@ CreateSyncDoubleMetricOtelSdkExporterOperationDuration(metrics::Meter *meter)
  */
 static constexpr const char *kMetricOtelSdkExporterSpanExported = "otel.sdk.exporter.span.exported";
 static constexpr const char *descrMetricOtelSdkExporterSpanExported =
-    "The number of spans for which the export has finished, either successful or failed";
+    "The number of spans for which the export has finished, either successful or failed.";
 static constexpr const char *unitMetricOtelSdkExporterSpanExported = "{span}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -332,14 +332,14 @@ CreateAsyncDoubleMetricOtelSdkExporterSpanExportedCount(metrics::Meter *meter)
 
 /**
   The number of spans which were passed to the exporter, but that have not been exported yet
-  (neither successful, nor failed) <p> For successful exports, @code error.type @endcode MUST NOT be
-  set. For failed exports, @code error.type @endcode MUST contain the failure cause. <p>
+  (neither successful, nor failed). <p> For successful exports, @code error.type @endcode MUST NOT
+  be set. For failed exports, @code error.type @endcode MUST contain the failure cause. <p>
   updowncounter
  */
 static constexpr const char *kMetricOtelSdkExporterSpanInflight = "otel.sdk.exporter.span.inflight";
 static constexpr const char *descrMetricOtelSdkExporterSpanInflight =
     "The number of spans which were passed to the exporter, but that have not been exported yet "
-    "(neither successful, nor failed)";
+    "(neither successful, nor failed).";
 static constexpr const char *unitMetricOtelSdkExporterSpanInflight = "{span}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -421,13 +421,13 @@ CreateAsyncDoubleMetricOtelSdkExporterSpanInflightCount(metrics::Meter *meter)
 }
 
 /**
-  The number of logs submitted to enabled SDK Loggers
+  The number of logs submitted to enabled SDK Loggers.
   <p>
   counter
  */
 static constexpr const char *kMetricOtelSdkLogCreated = "otel.sdk.log.created";
 static constexpr const char *descrMetricOtelSdkLogCreated =
-    "The number of logs submitted to enabled SDK Loggers";
+    "The number of logs submitted to enabled SDK Loggers.";
 static constexpr const char *unitMetricOtelSdkLogCreated = "{log_record}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricOtelSdkLogCreated(
@@ -489,7 +489,7 @@ CreateSyncDoubleMetricOtelSdkMetricReaderCollectionDuration(metrics::Meter *mete
 }
 
 /**
-  The number of log records for which the processing has finished, either successful or failed
+  The number of log records for which the processing has finished, either successful or failed.
   <p>
   For successful processing, @code error.type @endcode MUST NOT be set. For failed processing, @code
   error.type @endcode MUST contain the failure cause. For the SDK Simple and Batching Log Record
@@ -499,7 +499,7 @@ CreateSyncDoubleMetricOtelSdkMetricReaderCollectionDuration(metrics::Meter *mete
 static constexpr const char *kMetricOtelSdkProcessorLogProcessed =
     "otel.sdk.processor.log.processed";
 static constexpr const char *descrMetricOtelSdkProcessorLogProcessed =
-    "The number of log records for which the processing has finished, either successful or failed";
+    "The number of log records for which the processing has finished, either successful or failed.";
 static constexpr const char *unitMetricOtelSdkProcessorLogProcessed = "{log_record}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -536,14 +536,14 @@ CreateAsyncDoubleMetricOtelSdkProcessorLogProcessed(metrics::Meter *meter)
 
 /**
   The maximum number of log records the queue of a given instance of an SDK Log Record processor can
-  hold <p> Only applies to Log Record processors which use a queue, e.g. the SDK Batching Log Record
-  Processor. <p> updowncounter
+  hold. <p> Only applies to Log Record processors which use a queue, e.g. the SDK Batching Log
+  Record Processor. <p> updowncounter
  */
 static constexpr const char *kMetricOtelSdkProcessorLogQueueCapacity =
     "otel.sdk.processor.log.queue.capacity";
 static constexpr const char *descrMetricOtelSdkProcessorLogQueueCapacity =
     "The maximum number of log records the queue of a given instance of an SDK Log Record "
-    "processor can hold";
+    "processor can hold.";
 static constexpr const char *unitMetricOtelSdkProcessorLogQueueCapacity = "{log_record}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -579,7 +579,7 @@ CreateAsyncDoubleMetricOtelSdkProcessorLogQueueCapacity(metrics::Meter *meter)
 }
 
 /**
-  The number of log records in the queue of a given instance of an SDK log processor
+  The number of log records in the queue of a given instance of an SDK log processor.
   <p>
   Only applies to log record processors which use a queue, e.g. the SDK Batching Log Record
   Processor. <p> updowncounter
@@ -587,7 +587,7 @@ CreateAsyncDoubleMetricOtelSdkProcessorLogQueueCapacity(metrics::Meter *meter)
 static constexpr const char *kMetricOtelSdkProcessorLogQueueSize =
     "otel.sdk.processor.log.queue.size";
 static constexpr const char *descrMetricOtelSdkProcessorLogQueueSize =
-    "The number of log records in the queue of a given instance of an SDK log processor";
+    "The number of log records in the queue of a given instance of an SDK log processor.";
 static constexpr const char *unitMetricOtelSdkProcessorLogQueueSize = "{log_record}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -623,7 +623,7 @@ CreateAsyncDoubleMetricOtelSdkProcessorLogQueueSize(metrics::Meter *meter)
 }
 
 /**
-  The number of spans for which the processing has finished, either successful or failed
+  The number of spans for which the processing has finished, either successful or failed.
   <p>
   For successful processing, @code error.type @endcode MUST NOT be set. For failed processing, @code
   error.type @endcode MUST contain the failure cause. For the SDK Simple and Batching Span Processor
@@ -633,7 +633,7 @@ CreateAsyncDoubleMetricOtelSdkProcessorLogQueueSize(metrics::Meter *meter)
 static constexpr const char *kMetricOtelSdkProcessorSpanProcessed =
     "otel.sdk.processor.span.processed";
 static constexpr const char *descrMetricOtelSdkProcessorSpanProcessed =
-    "The number of spans for which the processing has finished, either successful or failed";
+    "The number of spans for which the processing has finished, either successful or failed.";
 static constexpr const char *unitMetricOtelSdkProcessorSpanProcessed = "{span}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -716,7 +716,7 @@ CreateAsyncDoubleMetricOtelSdkProcessorSpanProcessedCount(metrics::Meter *meter)
 }
 
 /**
-  The maximum number of spans the queue of a given instance of an SDK span processor can hold
+  The maximum number of spans the queue of a given instance of an SDK span processor can hold.
   <p>
   Only applies to span processors which use a queue, e.g. the SDK Batching Span Processor.
   <p>
@@ -725,7 +725,7 @@ CreateAsyncDoubleMetricOtelSdkProcessorSpanProcessedCount(metrics::Meter *meter)
 static constexpr const char *kMetricOtelSdkProcessorSpanQueueCapacity =
     "otel.sdk.processor.span.queue.capacity";
 static constexpr const char *descrMetricOtelSdkProcessorSpanQueueCapacity =
-    "The maximum number of spans the queue of a given instance of an SDK span processor can hold";
+    "The maximum number of spans the queue of a given instance of an SDK span processor can hold.";
 static constexpr const char *unitMetricOtelSdkProcessorSpanQueueCapacity = "{span}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -761,7 +761,7 @@ CreateAsyncDoubleMetricOtelSdkProcessorSpanQueueCapacity(metrics::Meter *meter)
 }
 
 /**
-  The number of spans in the queue of a given instance of an SDK span processor
+  The number of spans in the queue of a given instance of an SDK span processor.
   <p>
   Only applies to span processors which use a queue, e.g. the SDK Batching Span Processor.
   <p>
@@ -770,7 +770,7 @@ CreateAsyncDoubleMetricOtelSdkProcessorSpanQueueCapacity(metrics::Meter *meter)
 static constexpr const char *kMetricOtelSdkProcessorSpanQueueSize =
     "otel.sdk.processor.span.queue.size";
 static constexpr const char *descrMetricOtelSdkProcessorSpanQueueSize =
-    "The number of spans in the queue of a given instance of an SDK span processor";
+    "The number of spans in the queue of a given instance of an SDK span processor.";
 static constexpr const char *unitMetricOtelSdkProcessorSpanQueueSize = "{span}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -806,40 +806,42 @@ CreateAsyncDoubleMetricOtelSdkProcessorSpanQueueSize(metrics::Meter *meter)
 }
 
 /**
-  The number of created spans for which the end operation was called
-  <p>
-  For spans with @code recording=true @endcode: Implementations MUST record both @code
-  otel.sdk.span.live @endcode and @code otel.sdk.span.ended @endcode. For spans with @code
-  recording=false @endcode: If implementations decide to record this metric, they MUST also record
-  @code otel.sdk.span.live @endcode. <p> counter
- */
-static constexpr const char *kMetricOtelSdkSpanEnded = "otel.sdk.span.ended";
-static constexpr const char *descrMetricOtelSdkSpanEnded =
-    "The number of created spans for which the end operation was called";
-static constexpr const char *unitMetricOtelSdkSpanEnded = "{span}";
+  Use @code otel.sdk.span.started @endcode minus @code otel.sdk.span.live @endcode to derive this
+  value.
 
-static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricOtelSdkSpanEnded(
-    metrics::Meter *meter)
+  @deprecated
+  {"note": "Obsoleted.", "reason": "obsoleted"}
+  <p>
+  counter
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricOtelSdkSpanEnded =
+    "otel.sdk.span.ended";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricOtelSdkSpanEnded =
+    "Use `otel.sdk.span.started` minus `otel.sdk.span.live` to derive this value.";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricOtelSdkSpanEnded = "{span}";
+
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
+CreateSyncInt64MetricOtelSdkSpanEnded(metrics::Meter *meter)
 {
   return meter->CreateUInt64Counter(kMetricOtelSdkSpanEnded, descrMetricOtelSdkSpanEnded,
                                     unitMetricOtelSdkSpanEnded);
 }
 
-static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricOtelSdkSpanEnded(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<double>>
+CreateSyncDoubleMetricOtelSdkSpanEnded(metrics::Meter *meter)
 {
   return meter->CreateDoubleCounter(kMetricOtelSdkSpanEnded, descrMetricOtelSdkSpanEnded,
                                     unitMetricOtelSdkSpanEnded);
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricOtelSdkSpanEnded(metrics::Meter *meter)
 {
   return meter->CreateInt64ObservableCounter(kMetricOtelSdkSpanEnded, descrMetricOtelSdkSpanEnded,
                                              unitMetricOtelSdkSpanEnded);
 }
 
-static inline nostd::shared_ptr<metrics::ObservableInstrument>
+OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricOtelSdkSpanEnded(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableCounter(kMetricOtelSdkSpanEnded, descrMetricOtelSdkSpanEnded,
@@ -847,16 +849,18 @@ CreateAsyncDoubleMetricOtelSdkSpanEnded(metrics::Meter *meter)
 }
 
 /**
-  Deprecated, use @code otel.sdk.span.ended @endcode instead.
+  Use @code otel.sdk.span.started @endcode minus @code otel.sdk.span.live @endcode to derive this
+  value.
 
   @deprecated
-  {"note": "Replaced by @code otel.sdk.span.ended @endcode.", "reason": "renamed", "renamed_to":
-  "otel.sdk.span.ended"} <p> counter
+  {"note": "Obsoleted.", "reason": "obsoleted"}
+  <p>
+  counter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricOtelSdkSpanEndedCount =
     "otel.sdk.span.ended.count";
 OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricOtelSdkSpanEndedCount =
-    "Deprecated, use `otel.sdk.span.ended` instead.";
+    "Use `otel.sdk.span.started` minus `otel.sdk.span.live` to derive this value.";
 OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricOtelSdkSpanEndedCount = "{span}";
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -890,16 +894,13 @@ CreateAsyncDoubleMetricOtelSdkSpanEndedCount(metrics::Meter *meter)
 }
 
 /**
-  The number of created spans for which the end operation has not been called yet
-  <p>
-  For spans with @code recording=true @endcode: Implementations MUST record both @code
-  otel.sdk.span.live @endcode and @code otel.sdk.span.ended @endcode. For spans with @code
-  recording=false @endcode: If implementations decide to record this metric, they MUST also record
-  @code otel.sdk.span.ended @endcode. <p> updowncounter
+  The number of created spans with @code recording=true @endcode for which the end operation has not
+  been called yet. <p> updowncounter
  */
 static constexpr const char *kMetricOtelSdkSpanLive = "otel.sdk.span.live";
 static constexpr const char *descrMetricOtelSdkSpanLive =
-    "The number of created spans for which the end operation has not been called yet";
+    "The number of created spans with `recording=true` for which the end operation has not been "
+    "called yet.";
 static constexpr const char *unitMetricOtelSdkSpanLive = "{span}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -969,6 +970,45 @@ CreateAsyncDoubleMetricOtelSdkSpanLiveCount(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableUpDownCounter(
       kMetricOtelSdkSpanLiveCount, descrMetricOtelSdkSpanLiveCount, unitMetricOtelSdkSpanLiveCount);
+}
+
+/**
+  The number of created spans.
+  <p>
+  Implementations MUST record this metric for all spans, even for non-recording ones.
+  <p>
+  counter
+ */
+static constexpr const char *kMetricOtelSdkSpanStarted     = "otel.sdk.span.started";
+static constexpr const char *descrMetricOtelSdkSpanStarted = "The number of created spans.";
+static constexpr const char *unitMetricOtelSdkSpanStarted  = "{span}";
+
+static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricOtelSdkSpanStarted(
+    metrics::Meter *meter)
+{
+  return meter->CreateUInt64Counter(kMetricOtelSdkSpanStarted, descrMetricOtelSdkSpanStarted,
+                                    unitMetricOtelSdkSpanStarted);
+}
+
+static inline nostd::unique_ptr<metrics::Counter<double>> CreateSyncDoubleMetricOtelSdkSpanStarted(
+    metrics::Meter *meter)
+{
+  return meter->CreateDoubleCounter(kMetricOtelSdkSpanStarted, descrMetricOtelSdkSpanStarted,
+                                    unitMetricOtelSdkSpanStarted);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricOtelSdkSpanStarted(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableCounter(
+      kMetricOtelSdkSpanStarted, descrMetricOtelSdkSpanStarted, unitMetricOtelSdkSpanStarted);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricOtelSdkSpanStarted(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableCounter(
+      kMetricOtelSdkSpanStarted, descrMetricOtelSdkSpanStarted, unitMetricOtelSdkSpanStarted);
 }
 
 }  // namespace otel

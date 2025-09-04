@@ -176,14 +176,9 @@ static constexpr const char *kUnix = "unix";
 
 namespace NetTransportValues
 {
-/**
-  none
- */
+
 static constexpr const char *kIpTcp = "ip_tcp";
 
-/**
-  none
- */
 static constexpr const char *kIpUdp = "ip_udp";
 
 /**

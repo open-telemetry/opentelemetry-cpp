@@ -149,84 +149,37 @@ static constexpr const char *kRpcSystem = "rpc.system";
 
 namespace RpcConnectRpcErrorCodeValues
 {
-/**
-  none
- */
+
 static constexpr const char *kCancelled = "cancelled";
 
-/**
-  none
- */
 static constexpr const char *kUnknown = "unknown";
 
-/**
-  none
- */
 static constexpr const char *kInvalidArgument = "invalid_argument";
 
-/**
-  none
- */
 static constexpr const char *kDeadlineExceeded = "deadline_exceeded";
 
-/**
-  none
- */
 static constexpr const char *kNotFound = "not_found";
 
-/**
-  none
- */
 static constexpr const char *kAlreadyExists = "already_exists";
 
-/**
-  none
- */
 static constexpr const char *kPermissionDenied = "permission_denied";
 
-/**
-  none
- */
 static constexpr const char *kResourceExhausted = "resource_exhausted";
 
-/**
-  none
- */
 static constexpr const char *kFailedPrecondition = "failed_precondition";
 
-/**
-  none
- */
 static constexpr const char *kAborted = "aborted";
 
-/**
-  none
- */
 static constexpr const char *kOutOfRange = "out_of_range";
 
-/**
-  none
- */
 static constexpr const char *kUnimplemented = "unimplemented";
 
-/**
-  none
- */
 static constexpr const char *kInternal = "internal";
 
-/**
-  none
- */
 static constexpr const char *kUnavailable = "unavailable";
 
-/**
-  none
- */
 static constexpr const char *kDataLoss = "data_loss";
 
-/**
-  none
- */
 static constexpr const char *kUnauthenticated = "unauthenticated";
 
 }  // namespace RpcConnectRpcErrorCodeValues
@@ -322,14 +275,9 @@ static constexpr int kUnauthenticated = 16;
 
 namespace RpcMessageTypeValues
 {
-/**
-  none
- */
+
 static constexpr const char *kSent = "SENT";
 
-/**
-  none
- */
 static constexpr const char *kReceived = "RECEIVED";
 
 }  // namespace RpcMessageTypeValues

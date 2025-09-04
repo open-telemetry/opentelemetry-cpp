@@ -12,8 +12,13 @@
 #include "opentelemetry/sdk/resource/resource.h"
 
 #include <gtest/gtest.h>
+#include <array>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <string>
+#include <utility>
+#include "nlohmann/json.hpp"
 
 namespace sdklogs       = opentelemetry::sdk::logs;
 namespace logs_api      = opentelemetry::logs;

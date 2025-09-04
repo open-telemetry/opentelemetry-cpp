@@ -192,7 +192,8 @@ static constexpr const char *kHttpResponseStatusCode = "http.response.status_cod
   Deprecated, use @code http.response.header.content-length @endcode instead.
 
   @deprecated
-  {"note": "hp.response.header.content-length", "reason": "uncategorized"}
+  {"note": "Replaced by @code http.response.header.content-length @endcode.", "reason":
+  "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kHttpResponseContentLength =
     "http.response_content_length";

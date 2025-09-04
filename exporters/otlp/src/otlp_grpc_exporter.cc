@@ -1,19 +1,40 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <google/protobuf/arena.h>
+#include <grpcpp/client_context.h>
+#include <grpcpp/support/status.h>
+#include <atomic>
+#include <chrono>
 #include <memory>
-#include <mutex>
-
-#include "opentelemetry/common/macros.h"
-#include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+#include <new>
+#include <ostream>
+#include <string>
+#include <utility>
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
-#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/version.h"
 
-#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
-#include "opentelemetry/exporters/otlp/otlp_grpc_utils.h"
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
+#include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
+
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <functional>
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

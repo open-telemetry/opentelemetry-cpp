@@ -409,12 +409,12 @@ static constexpr const char *kAwsStepFunctionsStateMachineArn =
 namespace AwsEcsLaunchtypeValues
 {
 /**
-  none
+  Amazon EC2
  */
 static constexpr const char *kEc2 = "ec2";
 
 /**
-  none
+  Amazon Fargate
  */
 static constexpr const char *kFargate = "fargate";
 

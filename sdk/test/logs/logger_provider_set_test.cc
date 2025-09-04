@@ -5,9 +5,9 @@
 #include <stdlib.h>
 
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/logs/event_logger.h"  // IWYU pragma: keep
-#include "opentelemetry/logs/event_logger_provider.h"
-#include "opentelemetry/logs/logger.h"  // IWYU pragma: keep
+#include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
+#include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
+#include "opentelemetry/logs/logger.h"                 // IWYU pragma: keep
 #include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -26,7 +26,6 @@ using opentelemetry::logs::EventLoggerProvider;
 #endif
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
-using opentelemetry::logs::Provider;
 using opentelemetry::nostd::shared_ptr;
 
 namespace nostd    = opentelemetry::nostd;

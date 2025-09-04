@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.16)
 project(opentelemetry-cpp-component-install-tests LANGUAGES CXX)
 
 if(NOT INSTALL_TEST_CMAKE_OPTIONS)
@@ -139,3 +139,25 @@ foreach(component ${INSTALL_TEST_COMPONENTS})
     NAME component-${component}-run-test
     COMMAND ${CMAKE_BINARY_DIR}/build-${component}-test/${component}_test)
 endforeach()
+
+set(OPENTELEMETRY_CPP_EXAMPLES_SRC_DIR "${CMAKE_SOURCE_DIR}/../../../examples")
+
+# Configure the examples with the installed package
+add_test(
+  NAME examples-config-test
+  COMMAND
+    ${CMAKE_COMMAND} --log-level=DEBUG -S ${CMAKE_SOURCE_DIR}/examples_test -B
+    examples-test "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+    ${INSTALL_TEST_CMAKE_OPTIONS}
+    "-DOPENTELEMETRY_CPP_EXAMPLES_SRC_DIR=${OPENTELEMETRY_CPP_EXAMPLES_SRC_DIR}"
+)
+
+# Build the examples with the installed package
+add_test(NAME examples-build-test
+         COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/examples-test
+                 --parallel)
+
+# Run the examples
+add_test(NAME examples-run-test
+         COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_BINARY_DIR}/examples-test
+                 ${CMAKE_CTEST_COMMAND} --output-on-failure -C $<CONFIG>)

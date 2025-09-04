@@ -16,23 +16,20 @@ jobs:
 #    name: CMake test arm64 (with modern protobuf,grpc and abseil)
 #    runs-on: actuated-arm64-4cpu-16gb
 #    steps:
-#    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+#    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 #      with:
 #        submodules: 'recursive'
 #    - name: setup
 #      env:
-#        PROTOBUF_VERSION: '23.3'
-#        ABSEIL_CPP_VERSION: '20230125.3'
 #        CXX_STANDARD: '14'
 #        CC: /usr/bin/gcc-10
 #        CXX: /usr/bin/g++-10
 #      run: |
 #        sudo -E ./ci/setup_gcc10.sh
 #        sudo -E ./ci/setup_ci_environment.sh
-#        sudo -E ./ci/setup_cmake.sh
-#        sudo -E ./ci/setup_googletest.sh
-#        sudo -E ./ci/install_abseil.sh
-#        sudo -E ./ci/install_protobuf.sh
+#    - name: install dependencies
+#      run: |
+#        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
 
   cmake_test:
     name: CMake test (prometheus, elasticsearch, zipkin)
@@ -41,18 +38,17 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
+        sudo -E apt-get install -y zlib1g-dev libcurl4-openssl-dev nlohmann-json3-dev
     - name: run cmake tests
       run: |
         ./ci/do_ci.sh cmake.test
@@ -62,24 +58,24 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       CXX_STANDARD: '17'
+      CMAKE_VERSION: '3.16.0'
       BUILD_TYPE: 'Debug'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
-    - name: Install abseil, protobuf, and grpc with apt
+    - name: install dependencies
       run: |
         sudo -E apt-get update
-        sudo -E apt-get install -y libabsl-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
+        sudo -E apt-get install -y zlib1g-dev
     - name: run fetch content cmake test
       run: |
         ./ci/do_ci.sh cmake.fetch_content.test
@@ -87,33 +83,25 @@ jobs:
   cmake_gcc_maintainer_sync_test:
     name: CMake gcc 14 (maintainer mode, sync)
     runs-on: ubuntu-24.04
+    env:
+      CC: /usr/bin/gcc-14
+      CXX: /usr/bin/g++-14
+      CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
-
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CC: /usr/bin/gcc-14
-        CXX: /usr/bin/g++-14
-        PROTOBUF_VERSION: 21.12
       run: |
-        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/install_protobuf.sh
-    - name: setup grpc
+    - name: install dependencies
       run: |
-        sudo ./ci/setup_grpc.sh
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake gcc (maintainer mode, sync)
-      env:
-        CC: /usr/bin/gcc-14
-        CXX: /usr/bin/g++-14
       run: |
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
@@ -129,33 +117,25 @@ jobs:
   cmake_gcc_maintainer_async_test:
     name: CMake gcc 14 (maintainer mode, async)
     runs-on: ubuntu-24.04
+    env:
+      CC: /usr/bin/gcc-14
+      CXX: /usr/bin/g++-14
+      CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
-
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CC: /usr/bin/gcc-14
-        CXX: /usr/bin/g++-14
-        PROTOBUF_VERSION: 21.12
       run: |
-        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/install_protobuf.sh
-    - name: setup grpc
+    - name: install dependencies
       run: |
-        sudo ./ci/setup_grpc.sh
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake gcc (maintainer mode, async)
-      env:
-        CC: /usr/bin/gcc-14
-        CXX: /usr/bin/g++-14
       run: |
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
@@ -171,33 +151,25 @@ jobs:
   cmake_clang_maintainer_sync_test:
     name: CMake clang 18 (maintainer mode, sync)
     runs-on: ubuntu-24.04
+    env:
+      CC: /usr/bin/clang-18
+      CXX: /usr/bin/clang++-18
+      CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
-
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CC: /usr/bin/clang-18
-        CXX: /usr/bin/clang++-18
-        PROTOBUF_VERSION: 21.12
       run: |
-        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/install_protobuf.sh
-    - name: setup grpc
+    - name: install dependencies
       run: |
-        sudo ./ci/setup_grpc.sh
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake clang (maintainer mode, sync)
-      env:
-        CC: /usr/bin/clang-18
-        CXX: /usr/bin/clang++-18
       run: |
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
@@ -213,33 +185,25 @@ jobs:
   cmake_clang_maintainer_async_test:
     name: CMake clang 18 (maintainer mode, async)
     runs-on: ubuntu-24.04
+    env:
+      CC: /usr/bin/clang-18
+      CXX: /usr/bin/clang++-18
+      CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
-
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CC: /usr/bin/clang-18
-        CXX: /usr/bin/clang++-18
-        PROTOBUF_VERSION: 21.12
       run: |
-        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/install_protobuf.sh
-    - name: setup grpc
+    - name: install dependencies
       run: |
-        sudo ./ci/setup_grpc.sh
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake clang (maintainer mode, async)
-      env:
-        CC: /usr/bin/clang-18
-        CXX: /usr/bin/clang++-18
       run: |
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
@@ -255,33 +219,25 @@ jobs:
   cmake_clang_maintainer_abiv2_test:
     name: CMake clang 18 (maintainer mode, abiv2)
     runs-on: ubuntu-24.04
+    env:
+      CC: /usr/bin/clang-18
+      CXX: /usr/bin/clang++-18
+      CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
-
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CC: /usr/bin/clang-18
-        CXX: /usr/bin/clang++-18
-        PROTOBUF_VERSION: 21.12
       run: |
-        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/install_protobuf.sh
-    - name: setup grpc
+    - name: install dependencies
       run: |
-        sudo ./ci/setup_grpc.sh
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run cmake clang (maintainer mode, abiv2)
-      env:
-        CC: /usr/bin/clang-18
-        CXX: /usr/bin/clang++-18
       run: |
         ./ci/do_ci.sh cmake.maintainer.abiv2.test
     - name: generate test cert
@@ -299,16 +255,15 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.maintainer.test
@@ -318,16 +273,15 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       env:
@@ -360,16 +314,15 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       env:
@@ -381,11 +334,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
@@ -394,8 +347,7 @@ jobs:
         CXX: /usr/bin/g++-12
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
+        sudo -E apt-get install -y zlib1g-dev libcurl4-openssl-dev
     - name: run cmake tests (without otlp-exporter)
       env:
         CC: /usr/bin/gcc-12
@@ -408,18 +360,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
     - name: run cmake tests (enable opentracing-shim)
       run: ./ci/do_ci.sh cmake.opentracing_shim.test
 
@@ -428,18 +378,16 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
     - name: run tests (enable stl)
       env:
         CXX_STANDARD: '14'
@@ -450,18 +398,16 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
     - name: run tests (enable stl)
       env:
         CXX_STANDARD: '17'
@@ -472,18 +418,16 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
         CXX_STANDARD: '20'
@@ -498,11 +442,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
@@ -512,8 +456,6 @@ jobs:
         CXXFLAGS: "-stdlib=libc++"
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
         CC: /usr/bin/clang
@@ -534,18 +476,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
         CXX_STANDARD: '23'
@@ -560,11 +500,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
@@ -574,8 +514,6 @@ jobs:
         CXXFLAGS: "-stdlib=libc++"
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
         CC: /usr/bin/clang
@@ -596,21 +534,21 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
+    - name: install dependencies
+      run: |
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run otlp exporter tests
       run: |
-        sudo ./ci/setup_grpc.sh
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
     - name: generate test cert
       env:
@@ -625,31 +563,24 @@ jobs:
   cmake_modern_protobuf_grpc_with_abseil_test:
     name: CMake test (with modern protobuf,grpc and abseil)
     runs-on: ubuntu-latest
+    env:
+      CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
-
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        PROTOBUF_VERSION: '23.3'
-        ABSEIL_CPP_VERSION: '20230125.3'
-        CXX_STANDARD: '14'
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
-        sudo -E ./ci/install_abseil.sh
-        sudo -E ./ci/install_protobuf.sh
-    - name: run otlp exporter tests
-      env:
-        CXX_STANDARD: '14'
+    - name: install dependencies
       run: |
-        sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_stable
+    - name: run otlp exporter tests
+      run: |
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   cmake_do_not_install_test:
@@ -657,21 +588,21 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
+    - name: install dependencies
+      run: |
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run otlp exporter tests
       run: |
-        sudo ./ci/setup_grpc.sh
         ./ci/do_ci.sh cmake.do_not_install.test
 
   cmake_otprotocol_shared_libs_with_static_grpc_test:
@@ -679,21 +610,21 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
+    - name: install dependencies
+      run: |
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run otlp exporter tests
       run: |
-        sudo ./ci/setup_grpc.sh -T
         ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
 
   plugin_test:
@@ -701,11 +632,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
@@ -714,8 +645,6 @@ jobs:
         CXX: /usr/bin/g++-12
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
         CC: /usr/bin/gcc-12
@@ -727,15 +656,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       env:
         cache-name: bazel_cache
       with:
@@ -744,7 +673,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
@@ -754,15 +682,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       env:
         cache-name: bazel_cache
       with:
@@ -771,7 +699,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.no_bzlmod.test
@@ -781,15 +708,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       env:
         cache-name: bazel_cache
       with:
@@ -798,7 +725,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.with_async_export.test
@@ -808,15 +734,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       env:
         cache-name: bazel_cache
       with:
@@ -825,7 +751,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.valgrind
@@ -835,15 +760,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       env:
         cache-name: bazel_cache
       with:
@@ -852,7 +777,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.noexcept
@@ -862,15 +786,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       env:
         cache-name: bazel_cache
       with:
@@ -879,7 +803,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.nortti
@@ -889,15 +812,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       env:
         cache-name: bazel_cache
       with:
@@ -906,7 +829,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.asan
@@ -916,15 +838,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       env:
         cache-name: bazel_cache
       with:
@@ -933,7 +855,6 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.tsan
@@ -943,15 +864,15 @@ jobs:
     runs-on: macos-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       env:
         cache-name: bazel_cache
       with:
@@ -965,15 +886,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       env:
         cache-name: bazel_cache
       with:
@@ -998,13 +919,13 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
     - name: setup
-      run: sudo apt remove needrestart && sudo ./ci/install_format_tools.sh #refer: https://github.com/actions/runner-images/issues/9937
+      run: sudo ./ci/install_format_tools.sh
     - name: run tests
       run: ./ci/do_ci.sh format
 
@@ -1013,29 +934,28 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
     - name: check copyright
       run: ./tools/check_copyright.sh
 
   windows:
     name: CMake -> exporter proto
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test
@@ -1045,19 +965,18 @@ jobs:
 
   windows-build-dll:
     name: CMake -> exporter proto (Build as DLL)
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test (DLL build)
@@ -1069,19 +988,18 @@ jobs:
 
   windows_with_async_export:
     name: CMake (With async export) -> exporter proto
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test
@@ -1091,14 +1009,14 @@ jobs:
 
   windows_bazel:
     name: Bazel Windows
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
@@ -1109,19 +1027,18 @@ jobs:
 
   windows_plugin_test:
     name: Plugin -> CMake Windows
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.test_example_plugin
@@ -1131,11 +1048,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
     - name: setup
@@ -1144,15 +1061,13 @@ jobs:
         CXX: /usr/bin/g++-10
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_googletest.sh
     - name: run tests and generate report
       env:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
-      uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
+      uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
       with:
         files: /home/runner/build/coverage.info
 
@@ -1161,12 +1076,12 @@ jobs:
 
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
     - name: check out code
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
     - name: install markdownlint-cli
       run: sudo npm install -g markdownlint-cli@0.44.0
@@ -1178,12 +1093,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
     - name: check out code
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
     - name: install shellcheck
       run: sudo apt install --assume-yes shellcheck
     - name: run shellcheck
@@ -1193,12 +1108,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
     - name: check out code
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
     - name: install misspell
       run: |
         curl -L -o ./install-misspell.sh https://git.io/misspell
@@ -1211,11 +1126,11 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
       with:
         egress-policy: audit
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
     - name: install docfx
       run: choco install docfx -y --version=2.58.5
     - name: run ./ci/docfx.cmd
@@ -1227,12 +1142,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with:
           egress-policy: audit
 
       - name: Checkout open-telemetry/opentelemetry-cpp
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           submodules: 'recursive'
       - name: setup
@@ -1241,8 +1156,7 @@ jobs:
           CXX: /usr/bin/g++-12
         run: |
           sudo -E ./ci/setup_ci_environment.sh
-          sudo -E ./ci/setup_cmake.sh
-          sudo -E ./ci/setup_googletest.sh
+          sudo -E apt-get install -y zlib1g-dev libcurl4-openssl-dev
       - name: run w3c trace-context test server (background)
         env:
           CXX_STANDARD: '14'
@@ -1251,7 +1165,7 @@ jobs:
           cd $HOME/build/ext/test/w3c_tracecontext_http_test_server
           ./w3c_tracecontext_http_test_server &
       - name: Checkout w3c/trace-context repo
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           repository: w3c/trace-context
           path: trace-context

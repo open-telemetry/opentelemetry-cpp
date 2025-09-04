@@ -9,15 +9,17 @@
 #  include "gmock/gmock.h"
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
+#ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
+#  include <numeric>
+#endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
+
 #include <string.h>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <map>
 #include <memory>
 #include <mutex>
-#include <numeric>
 #include <ratio>
 #include <sstream>
 #include <string>
@@ -33,7 +35,7 @@
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
 
-#define HTTP_PORT 19000
+constexpr int HTTP_PORT{19000};
 
 namespace curl        = opentelemetry::ext::http::client::curl;
 namespace http_client = opentelemetry::ext::http::client;
@@ -61,8 +63,6 @@ public:
   }
 
   CustomEventHandler() : is_called_(false), got_response_(false) {}
-
-  ~CustomEventHandler() override = default;
 
   std::atomic<bool> is_called_;
   std::atomic<bool> got_response_;
@@ -698,8 +698,6 @@ TEST_F(BasicCurlHttpTests, BackgroundThreadWaitMore)
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 struct GzipEventHandler : public CustomEventHandler
 {
-  ~GzipEventHandler() override = default;
-
   void OnResponse(http_client::Response & /* response */) noexcept override {}
 
   void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override

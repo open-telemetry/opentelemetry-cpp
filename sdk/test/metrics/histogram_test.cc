@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <algorithm>
 #include <cstdint>
 #include <initializer_list>
 #include <string>
@@ -11,11 +10,12 @@
 #include "common.h"
 
 #include "opentelemetry/common/macros.h"
-#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context.h"  // IWYU pragma: keep
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
@@ -103,7 +103,7 @@ TEST(Histogram, DoubleCustomBuckets)
   std::shared_ptr<HistogramAggregationConfig> config(new HistogramAggregationConfig());
   config->boundaries_ = {10, 20, 30, 40};
   std::unique_ptr<View> view{
-      new View("view1", "view1_description", instrument_unit, AggregationType::kHistogram, config)};
+      new View("view1", "view1_description", AggregationType::kHistogram, config)};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kHistogram, instrument_name, instrument_unit)};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
@@ -163,7 +163,7 @@ TEST(Histogram, DoubleEmptyBuckets)
   std::shared_ptr<HistogramAggregationConfig> config(new HistogramAggregationConfig());
   config->boundaries_ = {};
   std::unique_ptr<View> view{
-      new View("view1", "view1_description", instrument_unit, AggregationType::kHistogram, config)};
+      new View("view1", "view1_description", AggregationType::kHistogram, config)};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kHistogram, instrument_name, instrument_unit)};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
@@ -278,7 +278,7 @@ TEST(Histogram, UInt64CustomBuckets)
   std::shared_ptr<HistogramAggregationConfig> config(new HistogramAggregationConfig());
   config->boundaries_ = {10, 20, 30, 40};
   std::unique_ptr<View> view{
-      new View("view1", "view1_description", "ms", AggregationType::kHistogram, config)};
+      new View("view1", "view1_description", AggregationType::kHistogram, config)};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kHistogram, instrument_name, instrument_unit)};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
@@ -338,7 +338,7 @@ TEST(Histogram, UInt64EmptyBuckets)
   std::shared_ptr<HistogramAggregationConfig> config(new HistogramAggregationConfig());
   config->boundaries_ = {};
   std::unique_ptr<View> view{
-      new View("view1", "view1_description", "ms", AggregationType::kHistogram, config)};
+      new View("view1", "view1_description", AggregationType::kHistogram, config)};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kHistogram, instrument_name, instrument_unit)};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};

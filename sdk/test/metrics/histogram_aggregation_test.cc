@@ -2,18 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <algorithm>
 #include <initializer_list>
+#include <string>
 #include <utility>
 #include <vector>
 #include "common.h"
 
 #include "opentelemetry/common/macros.h"
-#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context.h"  // IWYU pragma: keep
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
@@ -86,8 +87,7 @@ TEST(CounterToHistogram, Double)
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
 
-  std::unique_ptr<View> view{
-      new View("view1", "view1_description", "unit", AggregationType::kHistogram)};
+  std::unique_ptr<View> view{new View("view1", "view1_description", AggregationType::kHistogram)};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kCounter, "counter1", "unit")};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};

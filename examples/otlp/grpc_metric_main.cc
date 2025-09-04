@@ -1,25 +1,34 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "grpcpp/grpcpp.h"
-#include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <thread>
+#include <utility>
 
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h"
-#include "opentelemetry/metrics/provider.h"
-#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
+#include "opentelemetry/metrics/meter_provider.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
-#include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/meter_context_factory.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/provider.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector_factory.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector_factory.h"
+#include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_factory.h"
-
-#include <memory>
-#include <thread>
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/metrics_foo_library/foo_library.h"
@@ -74,8 +83,7 @@ void InitMetrics(std::string &name)
       std::move(histogram_aggregation_config));
 
   auto histogram_view = metric_sdk::ViewFactory::Create(
-      name, "des", unit, metric_sdk::AggregationType::kBase2ExponentialHistogram,
-      aggregation_config);
+      name, "des", metric_sdk::AggregationType::kBase2ExponentialHistogram, aggregation_config);
 
   provider->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
                     std::move(histogram_view));
@@ -108,10 +116,10 @@ int main(int argc, char *argv[])
       }
     }
   }
-  std::cout << "Using endpoint: " << exporter_options.endpoint << std::endl;
-  std::cout << "Using example type: " << example_type << std::endl;
-  std::cout << "Using cacert path: " << exporter_options.ssl_credentials_cacert_path << std::endl;
-  std::cout << "Using ssl credentials: " << exporter_options.use_ssl_credentials << std::endl;
+  std::cout << "Using endpoint: " << exporter_options.endpoint << "\n";
+  std::cout << "Using example type: " << example_type << "\n";
+  std::cout << "Using cacert path: " << exporter_options.ssl_credentials_cacert_path << "\n";
+  std::cout << "Using ssl credentials: " << exporter_options.use_ssl_credentials << "\n";
 
   // Removing this line will leave the default noop MetricProvider in place.
 

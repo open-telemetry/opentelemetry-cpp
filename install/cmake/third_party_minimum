@@ -1,0 +1,20 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+# Minimum supported version git tags of third-party dependencies
+# Format: <dependency_name>=<release_git_tag>
+
+# Update docs/dependencies.md whenever the minimum version of a library is modified.
+
+abseil=20220623.2
+zlib=v1.2.11
+curl=curl-7_81_0
+protobuf=v3.21.6
+grpc=v1.49.2
+benchmark=v1.6.1
+googletest=v1.12.0
+ms-gsl=v3.1.0
+nlohmann-json=v3.10.5
+opentelemetry-proto=v1.6.0
+opentracing-cpp=v1.6.0
+prometheus-cpp=v1.1.0

@@ -12,6 +12,10 @@
 #include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
 #include "opentelemetry/version.h"
 
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <cstddef>
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -29,7 +33,14 @@ namespace otlp
  */
 struct OPENTELEMETRY_EXPORT OtlpHttpMetricExporterOptions
 {
+  /** Lookup environment variables. */
   OtlpHttpMetricExporterOptions();
+  /** No defaults. */
+  OtlpHttpMetricExporterOptions(void *);
+  OtlpHttpMetricExporterOptions(const OtlpHttpMetricExporterOptions &)            = default;
+  OtlpHttpMetricExporterOptions(OtlpHttpMetricExporterOptions &&)                 = default;
+  OtlpHttpMetricExporterOptions &operator=(const OtlpHttpMetricExporterOptions &) = default;
+  OtlpHttpMetricExporterOptions &operator=(OtlpHttpMetricExporterOptions &&)      = default;
   ~OtlpHttpMetricExporterOptions();
 
   /** The endpoint to export to. */

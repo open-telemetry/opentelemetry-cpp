@@ -22,11 +22,11 @@ namespace db
 
 /**
   The number of connections that are currently in state described by the @code state @endcode
-  attribute <p> updowncounter
+  attribute. <p> updowncounter
  */
 static constexpr const char *kMetricDbClientConnectionCount = "db.client.connection.count";
 static constexpr const char *descrMetricDbClientConnectionCount =
-    "The number of connections that are currently in state described by the `state` attribute";
+    "The number of connections that are currently in state described by the `state` attribute.";
 static constexpr const char *unitMetricDbClientConnectionCount = "{connection}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -62,14 +62,14 @@ CreateAsyncDoubleMetricDbClientConnectionCount(metrics::Meter *meter)
 }
 
 /**
-  The time it took to create a new connection
+  The time it took to create a new connection.
   <p>
   histogram
  */
 static constexpr const char *kMetricDbClientConnectionCreateTime =
     "db.client.connection.create_time";
 static constexpr const char *descrMetricDbClientConnectionCreateTime =
-    "The time it took to create a new connection";
+    "The time it took to create a new connection.";
 static constexpr const char *unitMetricDbClientConnectionCreateTime = "s";
 
 static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
@@ -89,13 +89,13 @@ CreateSyncDoubleMetricDbClientConnectionCreateTime(metrics::Meter *meter)
 }
 
 /**
-  The maximum number of idle open connections allowed
+  The maximum number of idle open connections allowed.
   <p>
   updowncounter
  */
 static constexpr const char *kMetricDbClientConnectionIdleMax = "db.client.connection.idle.max";
 static constexpr const char *descrMetricDbClientConnectionIdleMax =
-    "The maximum number of idle open connections allowed";
+    "The maximum number of idle open connections allowed.";
 static constexpr const char *unitMetricDbClientConnectionIdleMax = "{connection}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -131,13 +131,13 @@ CreateAsyncDoubleMetricDbClientConnectionIdleMax(metrics::Meter *meter)
 }
 
 /**
-  The minimum number of idle open connections allowed
+  The minimum number of idle open connections allowed.
   <p>
   updowncounter
  */
 static constexpr const char *kMetricDbClientConnectionIdleMin = "db.client.connection.idle.min";
 static constexpr const char *descrMetricDbClientConnectionIdleMin =
-    "The minimum number of idle open connections allowed";
+    "The minimum number of idle open connections allowed.";
 static constexpr const char *unitMetricDbClientConnectionIdleMin = "{connection}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -173,13 +173,13 @@ CreateAsyncDoubleMetricDbClientConnectionIdleMin(metrics::Meter *meter)
 }
 
 /**
-  The maximum number of open connections allowed
+  The maximum number of open connections allowed.
   <p>
   updowncounter
  */
 static constexpr const char *kMetricDbClientConnectionMax = "db.client.connection.max";
 static constexpr const char *descrMetricDbClientConnectionMax =
-    "The maximum number of open connections allowed";
+    "The maximum number of open connections allowed.";
 static constexpr const char *unitMetricDbClientConnectionMax = "{connection}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -215,14 +215,14 @@ CreateAsyncDoubleMetricDbClientConnectionMax(metrics::Meter *meter)
 }
 
 /**
-  The number of current pending requests for an open connection
+  The number of current pending requests for an open connection.
   <p>
   updowncounter
  */
 static constexpr const char *kMetricDbClientConnectionPendingRequests =
     "db.client.connection.pending_requests";
 static constexpr const char *descrMetricDbClientConnectionPendingRequests =
-    "The number of current pending requests for an open connection";
+    "The number of current pending requests for an open connection.";
 static constexpr const char *unitMetricDbClientConnectionPendingRequests = "{request}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -258,14 +258,14 @@ CreateAsyncDoubleMetricDbClientConnectionPendingRequests(metrics::Meter *meter)
 }
 
 /**
-  The number of connection timeouts that have occurred trying to obtain a connection from the pool
+  The number of connection timeouts that have occurred trying to obtain a connection from the pool.
   <p>
   counter
  */
 static constexpr const char *kMetricDbClientConnectionTimeouts = "db.client.connection.timeouts";
 static constexpr const char *descrMetricDbClientConnectionTimeouts =
     "The number of connection timeouts that have occurred trying to obtain a connection from the "
-    "pool";
+    "pool.";
 static constexpr const char *unitMetricDbClientConnectionTimeouts = "{timeout}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -301,13 +301,13 @@ CreateAsyncDoubleMetricDbClientConnectionTimeouts(metrics::Meter *meter)
 }
 
 /**
-  The time between borrowing a connection and returning it to the pool
+  The time between borrowing a connection and returning it to the pool.
   <p>
   histogram
  */
 static constexpr const char *kMetricDbClientConnectionUseTime = "db.client.connection.use_time";
 static constexpr const char *descrMetricDbClientConnectionUseTime =
-    "The time between borrowing a connection and returning it to the pool";
+    "The time between borrowing a connection and returning it to the pool.";
 static constexpr const char *unitMetricDbClientConnectionUseTime = "s";
 
 static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
@@ -327,13 +327,13 @@ CreateSyncDoubleMetricDbClientConnectionUseTime(metrics::Meter *meter)
 }
 
 /**
-  The time it took to obtain an open connection from the pool
+  The time it took to obtain an open connection from the pool.
   <p>
   histogram
  */
 static constexpr const char *kMetricDbClientConnectionWaitTime = "db.client.connection.wait_time";
 static constexpr const char *descrMetricDbClientConnectionWaitTime =
-    "The time it took to obtain an open connection from the pool";
+    "The time it took to obtain an open connection from the pool.";
 static constexpr const char *unitMetricDbClientConnectionWaitTime = "s";
 
 static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
