@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stddef.h>
 #include <initializer_list>
+#include <map>
 #include <string>
 #include <unordered_map>
 #include <utility>
