@@ -1,11 +1,10 @@
-
 name: cppcheck
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: read
@@ -66,12 +65,7 @@ jobs:
           set +e
           readonly WARNING_COUNT=`grep -c -E "\[.+\]" cppcheck.log`
           echo "cppcheck reported ${WARNING_COUNT} warning(s)"
-          # Acceptable limit, to decrease over time down to 0
-          readonly WARNING_LIMIT=10
-          # FAIL the build if WARNING_COUNT > WARNING_LIMIT
-          if [ $WARNING_COUNT -gt $WARNING_LIMIT ] ; then
-            exit 1
-          # WARN in annotations if WARNING_COUNT > 0
-          elif [ $WARNING_COUNT -gt 0 ] ; then
+          if [ $WARNING_COUNT -gt 0 ] ; then
             echo "::warning::cppcheck reported ${WARNING_COUNT} warning(s)"
+            exit 1
           fi
