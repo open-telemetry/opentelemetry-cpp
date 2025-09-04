@@ -266,6 +266,20 @@ double DocumentNode::DoubleFromString(const std::string &value) const
   return val;
 }
 
+std::string DocumentNodeLocation::ToString() const
+{
+  std::string where;
+  where.append("file: ");
+  where.append(filename);
+  where.append(", line: ");
+  where.append(std::to_string(line));
+  where.append(", col: ");
+  where.append(std::to_string(col));
+  where.append(", offset: ");
+  where.append(std::to_string(offset));
+  return where;
+}
+
 }  // namespace configuration
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
