@@ -29,11 +29,6 @@
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
-#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
-#endif
-
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::resource;
