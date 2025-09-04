@@ -35,7 +35,9 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
   {
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     delta_metrics = std::move(attributes_hashmap_);
-    attributes_hashmap_.reset(new AttributesHashMap(aggregation_config_ ? aggregation_config_->cardinality_limit_ : kAggregationCardinalityLimit));
+    attributes_hashmap_.reset(new AttributesHashMap(aggregation_config_
+                                                        ? aggregation_config_->cardinality_limit_
+                                                        : kAggregationCardinalityLimit));
   }
 
   return temporal_metric_storage_.buildMetrics(collector, collectors, sdk_start_ts, collection_ts,

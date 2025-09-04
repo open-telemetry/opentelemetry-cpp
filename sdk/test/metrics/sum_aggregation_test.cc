@@ -26,11 +26,11 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
-#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
 
@@ -150,7 +150,7 @@ TEST(HistogramToSumFilterAttributesWithCardinaityLimit, Double)
   std::string instrument_unit = "ms";
   std::string instrument_name = "historgram1";
   std::string instrument_desc = "histogram metrics";
-  size_t cardinality_limit   = 10000;
+  size_t cardinality_limit    = 10000;
 
   std::unordered_map<std::string, bool> allowedattr;
   allowedattr["attr1"] = true;
@@ -163,9 +163,8 @@ TEST(HistogramToSumFilterAttributesWithCardinaityLimit, Double)
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
 
-  std::unique_ptr<View> view{new View("view1", "view1_description",
-                                      AggregationType::kSum, dummy_aggregation_config,
-                                      std::move(attrproc))};
+  std::unique_ptr<View> view{new View("view1", "view1_description", AggregationType::kSum,
+                                      dummy_aggregation_config, std::move(attrproc))};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kHistogram, instrument_name, instrument_unit)};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
@@ -182,7 +181,8 @@ TEST(HistogramToSumFilterAttributesWithCardinaityLimit, Double)
     {
       for (size_t i = 0; i < 2 * cardinality_limit; i++)
       {
-        std::unordered_map<std::string, std::string> attr = {{"attr1", std::to_string(i)}, {"attr2", "val2"}};
+        std::unordered_map<std::string, std::string> attr = {{"attr1", std::to_string(i)},
+                                                             {"attr2", "val2"}};
         h->Record(1, attr, opentelemetry::context::Context{});
       }
     }
@@ -192,20 +192,27 @@ TEST(HistogramToSumFilterAttributesWithCardinaityLimit, Double)
       {
         for (const MetricData &md : smd.metric_data_)
         {
-          // Something weird about attributes hashmap. If cardinality is setup to n, it emits n-1 including overflow. Just making the logic generic here to succeed for n or n-1 total cardinality.
+          // Something weird about attributes hashmap. If cardinality is setup to n, it emits n-1
+          // including overflow. Just making the logic generic here to succeed for n or n-1 total
+          // cardinality.
           EXPECT_GE(cardinality_limit, md.point_data_attr_.size());
           EXPECT_LT(cardinality_limit / 2, md.point_data_attr_.size());
           for (size_t i = 0; i < md.point_data_attr_.size(); i++)
           {
             EXPECT_EQ(1, md.point_data_attr_[i].attributes.size());
-            if (md.point_data_attr_[i].attributes.end() != md.point_data_attr_[i].attributes.find("attr1"))
+            if (md.point_data_attr_[i].attributes.end() !=
+                md.point_data_attr_[i].attributes.find("attr1"))
             {
-              EXPECT_EQ(total_metrics_times * (repeat + 1), opentelemetry::nostd::get<double>(opentelemetry::nostd::get<SumPointData>(
-                                                                  md.point_data_attr_[i].point_data)
-                                                                  .value_));
-            } else {
+              EXPECT_EQ(total_metrics_times * (repeat + 1),
+                        opentelemetry::nostd::get<double>(opentelemetry::nostd::get<SumPointData>(
+                                                              md.point_data_attr_[i].point_data)
+                                                              .value_));
+            }
+            else
+            {
               EXPECT_NE(md.point_data_attr_[i].attributes.end(),
-                        md.point_data_attr_[i].attributes.find(sdk::metrics::kAttributesLimitOverflowKey));
+                        md.point_data_attr_[i].attributes.find(
+                            sdk::metrics::kAttributesLimitOverflowKey));
             }
           }
         }
@@ -324,7 +331,7 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
   std::string instrument_unit = "ms";
   std::string instrument_name = "counter1";
   std::string instrument_desc = "counter metrics";
-  size_t cardinality_limit       = 10000;
+  size_t cardinality_limit    = 10000;
 
   std::unordered_map<std::string, bool> allowedattr;
   allowedattr["attr1"] = true;
@@ -337,9 +344,8 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
 
-  std::unique_ptr<View> view{new View("view1", "view1_description",
-                                      AggregationType::kSum, dummy_aggregation_config,
-                                      std::move(attrproc))};
+  std::unique_ptr<View> view{new View("view1", "view1_description", AggregationType::kSum,
+                                      dummy_aggregation_config, std::move(attrproc))};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kCounter, instrument_name, instrument_unit)};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
@@ -356,7 +362,8 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
     {
       for (size_t i = 0; i < 2 * cardinality_limit; i++)
       {
-        std::unordered_map<std::string, std::string> attr = {{"attr1", std::to_string(i)}, {"attr2", "val2"}};
+        std::unordered_map<std::string, std::string> attr = {{"attr1", std::to_string(i)},
+                                                             {"attr2", "val2"}};
         c->Add(1, attr, opentelemetry::context::Context{});
       }
     }
@@ -366,20 +373,27 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
       {
         for (const MetricData &md : smd.metric_data_)
         {
-          // Something weird about attributes hashmap. If cardinality is setup to n, it emits n-1 including overflow. Just making the logic generic here to succeed for n or n-1 total cardinality.
+          // Something weird about attributes hashmap. If cardinality is setup to n, it emits n-1
+          // including overflow. Just making the logic generic here to succeed for n or n-1 total
+          // cardinality.
           EXPECT_GE(cardinality_limit, md.point_data_attr_.size());
           EXPECT_LT(cardinality_limit / 2, md.point_data_attr_.size());
           for (size_t i = 0; i < md.point_data_attr_.size(); i++)
           {
             EXPECT_EQ(1, md.point_data_attr_[i].attributes.size());
-            if (md.point_data_attr_[i].attributes.find("attr1") != md.point_data_attr_[i].attributes.end())
+            if (md.point_data_attr_[i].attributes.find("attr1") !=
+                md.point_data_attr_[i].attributes.end())
             {
-              EXPECT_EQ(total_metrics_times * (repeat + 1), opentelemetry::nostd::get<double>(opentelemetry::nostd::get<SumPointData>(
-                                                                        md.point_data_attr_[i].point_data)
-                                                                        .value_));
-            } else {
+              EXPECT_EQ(total_metrics_times * (repeat + 1),
+                        opentelemetry::nostd::get<double>(opentelemetry::nostd::get<SumPointData>(
+                                                              md.point_data_attr_[i].point_data)
+                                                              .value_));
+            }
+            else
+            {
               EXPECT_NE(md.point_data_attr_[i].attributes.end(),
-                md.point_data_attr_[i].attributes.find(sdk::metrics::kAttributesLimitOverflowKey));
+                        md.point_data_attr_[i].attributes.find(
+                            sdk::metrics::kAttributesLimitOverflowKey));
             }
           }
         }
@@ -388,7 +402,6 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
     });
   }
 }
-
 
 class UpDownCounterToSumFixture : public ::testing::TestWithParam<bool>
 {};

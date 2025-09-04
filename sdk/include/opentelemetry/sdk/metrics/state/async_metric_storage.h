@@ -43,8 +43,12 @@ public:
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         aggregation_config_{aggregation_config},
-        cumulative_hash_map_(new AttributesHashMap(aggregation_config ? aggregation_config->cardinality_limit_ : kAggregationCardinalityLimit)),
-        delta_hash_map_(new AttributesHashMap(aggregation_config ? aggregation_config->cardinality_limit_ : kAggregationCardinalityLimit)),
+        cumulative_hash_map_(new AttributesHashMap(aggregation_config
+                                                       ? aggregation_config->cardinality_limit_
+                                                       : kAggregationCardinalityLimit)),
+        delta_hash_map_(new AttributesHashMap(aggregation_config
+                                                  ? aggregation_config->cardinality_limit_
+                                                  : kAggregationCardinalityLimit)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_filter_type_(exempler_filter_type),
         exemplar_reservoir_(exemplar_reservoir),
@@ -125,7 +129,9 @@ public:
     {
       std::lock_guard<opentelemetry::common::SpinLockMutex> guard(hashmap_lock_);
       delta_metrics = std::move(delta_hash_map_);
-      delta_hash_map_.reset(new AttributesHashMap(aggregation_config_ ? aggregation_config_->cardinality_limit_ : kAggregationCardinalityLimit));
+      delta_hash_map_.reset(new AttributesHashMap(aggregation_config_
+                                                      ? aggregation_config_->cardinality_limit_
+                                                      : kAggregationCardinalityLimit));
     }
 
     auto status =
