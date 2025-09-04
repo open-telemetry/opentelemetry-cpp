@@ -595,19 +595,11 @@ static constexpr const char *kTerminating = "terminating";
 
 namespace K8sNodeConditionStatusValues
 {
-/**
-  none
- */
+
 static constexpr const char *kConditionTrue = "true";
 
-/**
-  none
- */
 static constexpr const char *kConditionFalse = "false";
 
-/**
-  none
- */
 static constexpr const char *kConditionUnknown = "unknown";
 
 }  // namespace K8sNodeConditionStatusValues

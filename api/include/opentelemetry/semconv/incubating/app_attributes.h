@@ -20,6 +20,11 @@ namespace app
 {
 
 /**
+  Unique identifier for a particular build or compilation of the application.
+ */
+static constexpr const char *kAppBuildId = "app.build_id";
+
+/**
   A unique identifier representing the installation of an application on a specific device
   <p>
   Its value SHOULD persist across launches of the same application installation, including through
@@ -42,10 +47,28 @@ namespace app
   Settings.getString(Settings.Secure.ANDROID_ID) @endcode</a>.</li>
   </ul>
   <p>
-  More information about Android identifier best practices can be found <a
-  href="https://developer.android.com/training/articles/user-data-ids">here</a>.
+  More information about Android identifier best practices can be found in the <a
+  href="https://developer.android.com/training/articles/user-data-ids">Android user data IDs
+  guide</a>.
  */
 static constexpr const char *kAppInstallationId = "app.installation.id";
+
+/**
+  A number of frame renders that experienced jank.
+  <p>
+  Depending on platform limitations, the value provided MAY be approximation.
+ */
+static constexpr const char *kAppJankFrameCount = "app.jank.frame_count";
+
+/**
+  The time period, in seconds, for which this jank is being reported.
+ */
+static constexpr const char *kAppJankPeriod = "app.jank.period";
+
+/**
+  The minimum rendering threshold for this jank, in seconds.
+ */
+static constexpr const char *kAppJankThreshold = "app.jank.threshold";
 
 /**
   The x (horizontal) coordinate of a screen coordinate, in screen pixels.
