@@ -163,7 +163,7 @@ TEST(HistogramToSumFilterAttributesWithCardinaityLimit, Double)
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
 
-  std::unique_ptr<View> view{new View("view1", "view1_description", instrument_unit,
+  std::unique_ptr<View> view{new View("view1", "view1_description",
                                       AggregationType::kSum, dummy_aggregation_config,
                                       std::move(attrproc))};
   std::unique_ptr<InstrumentSelector> instrument_selector{
@@ -337,7 +337,7 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
 
-  std::unique_ptr<View> view{new View("view1", "view1_description", instrument_unit,
+  std::unique_ptr<View> view{new View("view1", "view1_description",
                                       AggregationType::kSum, dummy_aggregation_config,
                                       std::move(attrproc))};
   std::unique_ptr<InstrumentSelector> instrument_selector{
