@@ -110,9 +110,8 @@ switch ($action) {
   "cmake.maintainer.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
-      -DWITH_OTLP_GRPC=ON `
-      -DWITH_OTLP_HTTP=ON `
-      -DWITH_OTLP_RETRY_PREVIEW=ON `
+      "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
+      -DWITH_OPENTRACING=OFF `
       -DOTELCPP_MAINTAINER_MODE=ON `
       -DWITH_NO_DEPRECATED_CODE=ON `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
@@ -135,11 +134,10 @@ switch ($action) {
   "cmake.maintainer.cxx20.stl.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
+      "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
+      -DWITH_OPENTRACING=OFF `
       -DWITH_STL=CXX20 `
       -DCMAKE_CXX_STANDARD=20 `
-      -DWITH_OTLP_GRPC=ON `
-      -DWITH_OTLP_HTTP=ON `
-      -DWITH_OTLP_RETRY_PREVIEW=ON `
       -DOTELCPP_MAINTAINER_MODE=ON `
       -DWITH_NO_DEPRECATED_CODE=ON `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
@@ -162,13 +160,10 @@ switch ($action) {
   "cmake.maintainer.abiv2.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
-      -DWITH_OTLP_GRPC=ON `
-      -DWITH_OTLP_HTTP=ON `
-      -DWITH_OTLP_RETRY_PREVIEW=ON `
+      "-C $SRC_DIR/test_common/cmake/all-options-abiv2-preview.cmake" `
+      -DWITH_OPENTRACING=OFF `
       -DOTELCPP_MAINTAINER_MODE=ON `
       -DWITH_NO_DEPRECATED_CODE=ON `
-      -DWITH_ABI_VERSION_1=OFF `
-      -DWITH_ABI_VERSION_2=ON `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
@@ -210,11 +205,9 @@ switch ($action) {
   "cmake.exporter.otprotocol.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
-      -DVCPKG_TARGET_TRIPLET=x64-windows `
-      -DWITH_OTLP_GRPC=ON `
-      -DWITH_OTLP_HTTP=ON `
-      -DWITH_OTLP_RETRY_PREVIEW=ON `
-      -DWITH_OTPROTCOL=ON `
+      "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
+      -DWITH_OPENTRACING=OFF `
+      -DVCPKG_TARGET_TRIPLET=x64-windows `      
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -257,9 +250,10 @@ switch ($action) {
   "cmake.exporter.otprotocol.with_async_export.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
+      "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
+      -DWITH_OPENTRACING=OFF `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       -DWITH_ASYNC_EXPORT_PREVIEW=ON `
-      -DWITH_OTPROTCOL=ON `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -342,26 +336,9 @@ switch ($action) {
     cmake $SRC_DIR `
       $CMAKE_OPTIONS `
       "-DCMAKE_INSTALL_PREFIX=$INSTALL_TEST_DIR" `
-      -DWITH_ABI_VERSION_1=OFF `
-      -DWITH_ABI_VERSION_2=ON `
-      -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON `
-      -DWITH_METRICS_EXEMPLAR_PREVIEW=ON `
-      -DWITH_ASYNC_EXPORT_PREVIEW=ON `
-      -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON `
-      -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON `
-      -DWITH_OTLP_RETRY_PREVIEW=ON `
-      -DWITH_OTLP_GRPC=ON `
-      -DWITH_OTLP_HTTP=ON `
-      -DWITH_OTLP_FILE=ON `
-      -DWITH_OTLP_HTTP_COMPRESSION=ON `
-      -DWITH_HTTP_CLIENT_CURL=ON `
-      -DWITH_PROMETHEUS=ON `
-      -DWITH_ZIPKIN=ON `
-      -DWITH_ELASTICSEARCH=ON `
-      -DWITH_ETW=ON `
-      -DWITH_EXAMPLES=ON `
-      -DWITH_EXAMPLES_HTTP=ON `
-      -DBUILD_W3CTRACECONTEXT_TEST=ON `
+      "-C $SRC_DIR/test_common/cmake/all-options-abiv2-preview.cmake" `
+      -DWITH_OPENTRACING=OFF `
+      -DWITH_GSL=ON `
       -DOPENTELEMETRY_INSTALL=ON
 
     $exit = $LASTEXITCODE
@@ -446,13 +423,9 @@ switch ($action) {
     cmake $SRC_DIR `
       $CMAKE_OPTIONS `
       "-DCMAKE_INSTALL_PREFIX=$INSTALL_TEST_DIR" `
-      -DWITH_ABI_VERSION_1=ON `
-      -DWITH_ABI_VERSION_2=OFF `
-      -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON `
-      -DWITH_METRICS_EXEMPLAR_PREVIEW=ON `
-      -DWITH_ASYNC_EXPORT_PREVIEW=ON `
-      -DWITH_ETW=ON `
+      "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
       -DOPENTELEMETRY_INSTALL=ON `
+      -DWITH_OPENTRACING=OFF `
       -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=OFF `
       -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=OFF `
       -DWITH_OTLP_RETRY_PREVIEW=OFF `
@@ -465,6 +438,7 @@ switch ($action) {
       -DWITH_ZIPKIN=OFF `
       -DWITH_ELASTICSEARCH=OFF `
       -DWITH_EXAMPLES=OFF `
+      -DWITH_EXAMPLES_HTTP=OFF
 
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {

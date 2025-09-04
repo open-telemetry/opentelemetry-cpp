@@ -1,13 +1,17 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.16)
 project(opentelemetry-cpp-shims_opentracing-install-test LANGUAGES CXX)
 
 find_package(opentelemetry-cpp REQUIRED COMPONENTS shims_opentracing)
 
-if(NOT TARGET OpenTracing::opentracing)
-  message(FATAL_ERROR "OpenTracing::opentracing target not found")
+if(NOT TARGET OpenTracing::opentracing AND NOT TARGET
+                                           OpenTracing::opentracing-static)
+  message(
+    FATAL_ERROR
+      "A required OpenTracing target (OpenTracing::opentracing or OpenTracing::opentracing-static) was not imported"
+  )
 endif()
 
 find_package(GTest CONFIG REQUIRED)

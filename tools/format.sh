@@ -23,8 +23,8 @@ fi
 # No CRLF line endings, except Windows files.
 "${SED[@]}" 's/\r$//' $($FIND -name '*.ps1' -prune -o \
   -name '*.cmd' -prune -o -type f -print)
-# No trailing spaces, except in patch.
-"${SED[@]}" 's/ \+$//' $($FIND -name "*.patch" -prune -o -type f -print)
+# No trailing spaces, except in patch, yaml and shelltest.
+"${SED[@]}" 's/ \+$//' $($FIND -name "*.patch" -prune -o -name "*.yaml" -prune -o -name "*.test" -prune -o -type f -print)
 
 # If not overridden, try to use clang-format-18 or clang-format.
 if [[ -z "$CLANG_FORMAT" ]]; then

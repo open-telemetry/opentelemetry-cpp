@@ -59,7 +59,7 @@ if(BUILD_TESTING)
     ${GMOCK_LIB}
     opentelemetry_exporter_zipkin_trace
     opentelemetry_resources
-    ${CURL_LIBRARIES})
+    CURL::libcurl)
 
   gtest_add_tests(
     TARGET zipkin_exporter_test
