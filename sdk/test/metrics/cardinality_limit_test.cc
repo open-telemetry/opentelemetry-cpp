@@ -36,7 +36,6 @@
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
-
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
 namespace nostd = opentelemetry::nostd;
