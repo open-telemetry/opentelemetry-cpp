@@ -30,8 +30,8 @@ MultiLogRecordProcessor::MultiLogRecordProcessor(
 
 MultiLogRecordProcessor::~MultiLogRecordProcessor()
 {
-  ForceFlush();
-  Shutdown();
+  InternalForceFlush();
+  InternalShutdown();
 }
 
 void MultiLogRecordProcessor::AddProcessor(std::unique_ptr<LogRecordProcessor> &&processor)
@@ -75,6 +75,16 @@ void MultiLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexc
 
 bool MultiLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
+  return InternalForceFlush(timeout);
+}
+
+bool MultiLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
+{
+  return InternalShutdown(timeout);
+}
+
+bool MultiLogRecordProcessor::InternalForceFlush(std::chrono::microseconds timeout) noexcept
+{
   bool result           = true;
   auto start_time       = std::chrono::system_clock::now();
   auto overflow_checker = std::chrono::system_clock::time_point::max();
@@ -108,7 +118,7 @@ bool MultiLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noex
   return result;
 }
 
-bool MultiLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
+bool MultiLogRecordProcessor::InternalShutdown(std::chrono::microseconds timeout) noexcept
 {
   bool result           = true;
   auto start_time       = std::chrono::system_clock::now();
