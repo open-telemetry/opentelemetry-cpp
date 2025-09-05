@@ -369,6 +369,19 @@ void BatchLogRecordProcessor::GetWaitAdjustedTime(
 
 bool BatchLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  return InternalShutdown(timeout);
+}
+
+BatchLogRecordProcessor::~BatchLogRecordProcessor()
+{
+  if (synchronization_data_->is_shutdown.load() == false)
+  {
+    InternalShutdown();
+  }
+}
+
+bool BatchLogRecordProcessor::InternalShutdown(std::chrono::microseconds timeout) noexcept
+{
   auto start_time = std::chrono::system_clock::now();
 
   std::lock_guard<std::mutex> shutdown_guard{synchronization_data_->shutdown_m};
@@ -389,14 +402,6 @@ bool BatchLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexce
   }
 
   return true;
-}
-
-BatchLogRecordProcessor::~BatchLogRecordProcessor()
-{
-  if (synchronization_data_->is_shutdown.load() == false)
-  {
-    Shutdown();
-  }
 }
 
 }  // namespace logs
