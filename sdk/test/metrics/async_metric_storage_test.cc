@@ -194,9 +194,10 @@ TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
         }
         return true;
       });
-  // Note: When the cardinality limit is set to n, the attributes hashmap emits n-1 distinct attribute sets,
-  // plus an overflow bucket for additional attributes. The test logic below is made generic to succeed for either
-  // n or n-1 total cardinality. If this behavior is unexpected, please investigate and file an issue.
+  // Note: When the cardinality limit is set to n, the attributes hashmap emits n-1 distinct
+  // attribute sets, plus an overflow bucket for additional attributes. The test logic below is made
+  // generic to succeed for either n or n-1 total cardinality. If this behavior is unexpected,
+  // please investigate and file an issue.
   int64_t get_count2 = -50;
   int64_t put_count2 = -70;
 
