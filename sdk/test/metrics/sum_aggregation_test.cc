@@ -45,7 +45,7 @@ TEST(HistogramToSum, Double)
   MeterProvider mp;
   auto m                      = mp.GetMeter("meter1", "version1", "schema1");
   std::string instrument_unit = "ms";
-  std::string instrument_name = "historgram1";
+  std::string instrument_name = "histogram1";
   std::string instrument_desc = "histogram metrics";
 
   std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
@@ -97,7 +97,7 @@ TEST(HistogramToSumFilterAttributes, Double)
   MeterProvider mp;
   auto m                      = mp.GetMeter("meter1", "version1", "schema1");
   std::string instrument_unit = "ms";
-  std::string instrument_name = "historgram1";
+  std::string instrument_name = "histogram1";
   std::string instrument_desc = "histogram metrics";
 
   std::unordered_map<std::string, bool> allowedattr;
@@ -150,7 +150,7 @@ TEST(HistogramToSumFilterAttributesWithCardinaityLimit, Double)
   MeterProvider mp;
   auto m                      = mp.GetMeter("meter1", "version1", "schema1");
   std::string instrument_unit = "ms";
-  std::string instrument_name = "historgram1";
+  std::string instrument_name = "histogram1";
   std::string instrument_desc = "histogram metrics";
   size_t cardinality_limit    = 10000;
 
@@ -375,9 +375,10 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
       {
         for (const MetricData &md : smd.metric_data_)
         {
-          // Something weird about attributes hashmap. If cardinality is setup to n, it emits n-1
-          // including overflow. Just making the logic generic here to succeed for n or n-1 total
-          // cardinality.
+          // When the number of unique attribute sets exceeds the cardinality limit, the implementation
+          // emits up to (cardinality_limit - 1) unique sets and one overflow set, resulting in a total
+          // of cardinality_limit sets. This test checks that the number of emitted attribute sets is
+          // within the expected range, accounting for the overflow behavior.
           EXPECT_GE(cardinality_limit, md.point_data_attr_.size());
           EXPECT_LT(cardinality_limit / 2, md.point_data_attr_.size());
           for (size_t i = 0; i < md.point_data_attr_.size(); i++)
