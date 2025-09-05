@@ -5,6 +5,7 @@
 
 #include <vector>
 
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -15,6 +16,10 @@ namespace metrics
 class AggregationConfig
 {
 public:
+  AggregationConfig(size_t cardinality_limit = kAggregationCardinalityLimit)
+      : cardinality_limit_(cardinality_limit)
+  {}
+  size_t cardinality_limit_;
   virtual ~AggregationConfig() = default;
 };
 
