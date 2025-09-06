@@ -21,7 +21,7 @@ namespace k8s
 {
 
 /**
-  Maximum CPU resource limit set for the container
+  Maximum CPU resource limit set for the container.
   <p>
   See
   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core
@@ -29,7 +29,7 @@ namespace k8s
  */
 static constexpr const char *kMetricK8sContainerCpuLimit = "k8s.container.cpu.limit";
 static constexpr const char *descrMetricK8sContainerCpuLimit =
-    "Maximum CPU resource limit set for the container";
+    "Maximum CPU resource limit set for the container.";
 static constexpr const char *unitMetricK8sContainerCpuLimit = "{cpu}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -61,7 +61,7 @@ CreateAsyncDoubleMetricK8sContainerCpuLimit(metrics::Meter *meter)
 }
 
 /**
-  CPU resource requested for the container
+  CPU resource requested for the container.
   <p>
   See
   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core
@@ -69,7 +69,7 @@ CreateAsyncDoubleMetricK8sContainerCpuLimit(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sContainerCpuRequest = "k8s.container.cpu.request";
 static constexpr const char *descrMetricK8sContainerCpuRequest =
-    "CPU resource requested for the container";
+    "CPU resource requested for the container.";
 static constexpr const char *unitMetricK8sContainerCpuRequest = "{cpu}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -105,7 +105,7 @@ CreateAsyncDoubleMetricK8sContainerCpuRequest(metrics::Meter *meter)
 }
 
 /**
-  Maximum ephemeral storage resource limit set for the container
+  Maximum ephemeral storage resource limit set for the container.
   <p>
   See
   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core
@@ -114,7 +114,7 @@ CreateAsyncDoubleMetricK8sContainerCpuRequest(metrics::Meter *meter)
 static constexpr const char *kMetricK8sContainerEphemeralStorageLimit =
     "k8s.container.ephemeral_storage.limit";
 static constexpr const char *descrMetricK8sContainerEphemeralStorageLimit =
-    "Maximum ephemeral storage resource limit set for the container";
+    "Maximum ephemeral storage resource limit set for the container.";
 static constexpr const char *unitMetricK8sContainerEphemeralStorageLimit = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -150,7 +150,7 @@ CreateAsyncDoubleMetricK8sContainerEphemeralStorageLimit(metrics::Meter *meter)
 }
 
 /**
-  Ephemeral storage resource requested for the container
+  Ephemeral storage resource requested for the container.
   <p>
   See
   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core
@@ -159,7 +159,7 @@ CreateAsyncDoubleMetricK8sContainerEphemeralStorageLimit(metrics::Meter *meter)
 static constexpr const char *kMetricK8sContainerEphemeralStorageRequest =
     "k8s.container.ephemeral_storage.request";
 static constexpr const char *descrMetricK8sContainerEphemeralStorageRequest =
-    "Ephemeral storage resource requested for the container";
+    "Ephemeral storage resource requested for the container.";
 static constexpr const char *unitMetricK8sContainerEphemeralStorageRequest = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -195,7 +195,7 @@ CreateAsyncDoubleMetricK8sContainerEphemeralStorageRequest(metrics::Meter *meter
 }
 
 /**
-  Maximum memory resource limit set for the container
+  Maximum memory resource limit set for the container.
   <p>
   See
   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core
@@ -203,7 +203,7 @@ CreateAsyncDoubleMetricK8sContainerEphemeralStorageRequest(metrics::Meter *meter
  */
 static constexpr const char *kMetricK8sContainerMemoryLimit = "k8s.container.memory.limit";
 static constexpr const char *descrMetricK8sContainerMemoryLimit =
-    "Maximum memory resource limit set for the container";
+    "Maximum memory resource limit set for the container.";
 static constexpr const char *unitMetricK8sContainerMemoryLimit = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -239,7 +239,7 @@ CreateAsyncDoubleMetricK8sContainerMemoryLimit(metrics::Meter *meter)
 }
 
 /**
-  Memory resource requested for the container
+  Memory resource requested for the container.
   <p>
   See
   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core
@@ -247,7 +247,7 @@ CreateAsyncDoubleMetricK8sContainerMemoryLimit(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sContainerMemoryRequest = "k8s.container.memory.request";
 static constexpr const char *descrMetricK8sContainerMemoryRequest =
-    "Memory resource requested for the container";
+    "Memory resource requested for the container.";
 static constexpr const char *unitMetricK8sContainerMemoryRequest = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -284,14 +284,14 @@ CreateAsyncDoubleMetricK8sContainerMemoryRequest(metrics::Meter *meter)
 
 /**
   Indicates whether the container is currently marked as ready to accept traffic, based on its
-  readiness probe (1 = ready, 0 = not ready) <p> This metric SHOULD reflect the value of the @code
+  readiness probe (1 = ready, 0 = not ready). <p> This metric SHOULD reflect the value of the @code
   ready @endcode field in the <a
   href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#containerstatus-v1-core">K8s
   ContainerStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sContainerReady = "k8s.container.ready";
 static constexpr const char *descrMetricK8sContainerReady =
-    "Indicates whether the container is currently marked as ready to accept traffic, based on its readiness probe (1 = ready, 0 = not ready)
+    "Indicates whether the container is currently marked as ready to accept traffic, based on its readiness probe (1 = ready, 0 = not ready).
     ";
     static constexpr const char *unitMetricK8sContainerReady = "{container}";
 
@@ -324,7 +324,7 @@ CreateAsyncDoubleMetricK8sContainerReady(metrics::Meter *meter)
 }
 
 /**
-  Describes how many times the container has restarted (since the last counter reset)
+  Describes how many times the container has restarted (since the last counter reset).
   <p>
   This value is pulled directly from the K8s API and the value can go indefinitely high and be reset
   to 0 at any time depending on how your kubelet is configured to prune dead containers. It is best
@@ -335,7 +335,7 @@ CreateAsyncDoubleMetricK8sContainerReady(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sContainerRestartCount = "k8s.container.restart.count";
 static constexpr const char *descrMetricK8sContainerRestartCount =
-    "Describes how many times the container has restarted (since the last counter reset)";
+    "Describes how many times the container has restarted (since the last counter reset).";
 static constexpr const char *unitMetricK8sContainerRestartCount = "{restart}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -371,7 +371,7 @@ CreateAsyncDoubleMetricK8sContainerRestartCount(metrics::Meter *meter)
 }
 
 /**
-  Describes the number of K8s containers that are currently in a state for a given reason
+  Describes the number of K8s containers that are currently in a state for a given reason.
   <p>
   All possible container state reasons will be reported at each time interval to avoid missing
   metrics. Only the value corresponding to the current state reason will be non-zero. <p>
@@ -379,7 +379,7 @@ CreateAsyncDoubleMetricK8sContainerRestartCount(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sContainerStatusReason = "k8s.container.status.reason";
 static constexpr const char *descrMetricK8sContainerStatusReason =
-    "Describes the number of K8s containers that are currently in a state for a given reason";
+    "Describes the number of K8s containers that are currently in a state for a given reason.";
 static constexpr const char *unitMetricK8sContainerStatusReason = "{container}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -415,7 +415,7 @@ CreateAsyncDoubleMetricK8sContainerStatusReason(metrics::Meter *meter)
 }
 
 /**
-  Describes the number of K8s containers that are currently in a given state
+  Describes the number of K8s containers that are currently in a given state.
   <p>
   All possible container states will be reported at each time interval to avoid missing metrics.
   Only the value corresponding to the current state will be non-zero.
@@ -424,7 +424,7 @@ CreateAsyncDoubleMetricK8sContainerStatusReason(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sContainerStatusState = "k8s.container.status.state";
 static constexpr const char *descrMetricK8sContainerStatusState =
-    "Describes the number of K8s containers that are currently in a given state";
+    "Describes the number of K8s containers that are currently in a given state.";
 static constexpr const char *unitMetricK8sContainerStatusState = "{container}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -460,7 +460,7 @@ CreateAsyncDoubleMetricK8sContainerStatusState(metrics::Meter *meter)
 }
 
 /**
-  Maximum storage resource limit set for the container
+  Maximum storage resource limit set for the container.
   <p>
   See
   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core
@@ -468,7 +468,7 @@ CreateAsyncDoubleMetricK8sContainerStatusState(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sContainerStorageLimit = "k8s.container.storage.limit";
 static constexpr const char *descrMetricK8sContainerStorageLimit =
-    "Maximum storage resource limit set for the container";
+    "Maximum storage resource limit set for the container.";
 static constexpr const char *unitMetricK8sContainerStorageLimit = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -504,7 +504,7 @@ CreateAsyncDoubleMetricK8sContainerStorageLimit(metrics::Meter *meter)
 }
 
 /**
-  Storage resource requested for the container
+  Storage resource requested for the container.
   <p>
   See
   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core
@@ -512,7 +512,7 @@ CreateAsyncDoubleMetricK8sContainerStorageLimit(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sContainerStorageRequest = "k8s.container.storage.request";
 static constexpr const char *descrMetricK8sContainerStorageRequest =
-    "Storage resource requested for the container";
+    "Storage resource requested for the container.";
 static constexpr const char *unitMetricK8sContainerStorageRequest = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -548,7 +548,7 @@ CreateAsyncDoubleMetricK8sContainerStorageRequest(metrics::Meter *meter)
 }
 
 /**
-  The number of actively running jobs for a cronjob
+  The number of actively running jobs for a cronjob.
   <p>
   This metric aligns with the @code active @endcode field of the
   <a
@@ -557,7 +557,7 @@ CreateAsyncDoubleMetricK8sContainerStorageRequest(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sCronjobActiveJobs = "k8s.cronjob.active_jobs";
 static constexpr const char *descrMetricK8sCronjobActiveJobs =
-    "The number of actively running jobs for a cronjob";
+    "The number of actively running jobs for a cronjob.";
 static constexpr const char *unitMetricK8sCronjobActiveJobs = "{job}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -589,7 +589,7 @@ CreateAsyncDoubleMetricK8sCronjobActiveJobs(metrics::Meter *meter)
 }
 
 /**
-  Number of nodes that are running at least 1 daemon pod and are supposed to run the daemon pod
+  Number of nodes that are running at least 1 daemon pod and are supposed to run the daemon pod.
   <p>
   This metric aligns with the @code currentNumberScheduled @endcode field of the
   <a
@@ -599,7 +599,8 @@ CreateAsyncDoubleMetricK8sCronjobActiveJobs(metrics::Meter *meter)
 static constexpr const char *kMetricK8sDaemonsetCurrentScheduledNodes =
     "k8s.daemonset.current_scheduled_nodes";
 static constexpr const char *descrMetricK8sDaemonsetCurrentScheduledNodes =
-    "Number of nodes that are running at least 1 daemon pod and are supposed to run the daemon pod";
+    "Number of nodes that are running at least 1 daemon pod and are supposed to run the daemon "
+    "pod.";
 static constexpr const char *unitMetricK8sDaemonsetCurrentScheduledNodes = "{node}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -636,7 +637,7 @@ CreateAsyncDoubleMetricK8sDaemonsetCurrentScheduledNodes(metrics::Meter *meter)
 
 /**
   Number of nodes that should be running the daemon pod (including nodes currently running the
-  daemon pod) <p> This metric aligns with the @code desiredNumberScheduled @endcode field of the <a
+  daemon pod). <p> This metric aligns with the @code desiredNumberScheduled @endcode field of the <a
   href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
   DaemonSetStatus</a>. <p> updowncounter
  */
@@ -644,7 +645,7 @@ static constexpr const char *kMetricK8sDaemonsetDesiredScheduledNodes =
     "k8s.daemonset.desired_scheduled_nodes";
 static constexpr const char *descrMetricK8sDaemonsetDesiredScheduledNodes =
     "Number of nodes that should be running the daemon pod (including nodes currently running the "
-    "daemon pod)";
+    "daemon pod).";
 static constexpr const char *unitMetricK8sDaemonsetDesiredScheduledNodes = "{node}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -680,7 +681,7 @@ CreateAsyncDoubleMetricK8sDaemonsetDesiredScheduledNodes(metrics::Meter *meter)
 }
 
 /**
-  Number of nodes that are running the daemon pod, but are not supposed to run the daemon pod
+  Number of nodes that are running the daemon pod, but are not supposed to run the daemon pod.
   <p>
   This metric aligns with the @code numberMisscheduled @endcode field of the
   <a
@@ -690,7 +691,7 @@ CreateAsyncDoubleMetricK8sDaemonsetDesiredScheduledNodes(metrics::Meter *meter)
 static constexpr const char *kMetricK8sDaemonsetMisscheduledNodes =
     "k8s.daemonset.misscheduled_nodes";
 static constexpr const char *descrMetricK8sDaemonsetMisscheduledNodes =
-    "Number of nodes that are running the daemon pod, but are not supposed to run the daemon pod";
+    "Number of nodes that are running the daemon pod, but are not supposed to run the daemon pod.";
 static constexpr const char *unitMetricK8sDaemonsetMisscheduledNodes = "{node}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -727,14 +728,14 @@ CreateAsyncDoubleMetricK8sDaemonsetMisscheduledNodes(metrics::Meter *meter)
 
 /**
   Number of nodes that should be running the daemon pod and have one or more of the daemon pod
-  running and ready <p> This metric aligns with the @code numberReady @endcode field of the <a
+  running and ready. <p> This metric aligns with the @code numberReady @endcode field of the <a
   href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
   DaemonSetStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sDaemonsetReadyNodes = "k8s.daemonset.ready_nodes";
 static constexpr const char *descrMetricK8sDaemonsetReadyNodes =
     "Number of nodes that should be running the daemon pod and have one or more of the daemon pod "
-    "running and ready";
+    "running and ready.";
 static constexpr const char *unitMetricK8sDaemonsetReadyNodes = "{node}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -771,14 +772,14 @@ CreateAsyncDoubleMetricK8sDaemonsetReadyNodes(metrics::Meter *meter)
 
 /**
   Total number of available replica pods (ready for at least minReadySeconds) targeted by this
-  deployment <p> This metric aligns with the @code availableReplicas @endcode field of the <a
+  deployment. <p> This metric aligns with the @code availableReplicas @endcode field of the <a
   href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentstatus-v1-apps">K8s
   DeploymentStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sDeploymentAvailablePods = "k8s.deployment.available_pods";
 static constexpr const char *descrMetricK8sDeploymentAvailablePods =
     "Total number of available replica pods (ready for at least minReadySeconds) targeted by this "
-    "deployment";
+    "deployment.";
 static constexpr const char *unitMetricK8sDeploymentAvailablePods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -814,7 +815,7 @@ CreateAsyncDoubleMetricK8sDeploymentAvailablePods(metrics::Meter *meter)
 }
 
 /**
-  Number of desired replica pods in this deployment
+  Number of desired replica pods in this deployment.
   <p>
   This metric aligns with the @code replicas @endcode field of the
   <a
@@ -823,7 +824,7 @@ CreateAsyncDoubleMetricK8sDeploymentAvailablePods(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sDeploymentDesiredPods = "k8s.deployment.desired_pods";
 static constexpr const char *descrMetricK8sDeploymentDesiredPods =
-    "Number of desired replica pods in this deployment";
+    "Number of desired replica pods in this deployment.";
 static constexpr const char *unitMetricK8sDeploymentDesiredPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -860,14 +861,14 @@ CreateAsyncDoubleMetricK8sDeploymentDesiredPods(metrics::Meter *meter)
 
 /**
   Current number of replica pods managed by this horizontal pod autoscaler, as last seen by the
-  autoscaler <p> This metric aligns with the @code currentReplicas @endcode field of the <a
+  autoscaler. <p> This metric aligns with the @code currentReplicas @endcode field of the <a
   href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling">K8s
   HorizontalPodAutoscalerStatus</a> <p> updowncounter
  */
 static constexpr const char *kMetricK8sHpaCurrentPods = "k8s.hpa.current_pods";
 static constexpr const char *descrMetricK8sHpaCurrentPods =
     "Current number of replica pods managed by this horizontal pod autoscaler, as last seen by the "
-    "autoscaler";
+    "autoscaler.";
 static constexpr const char *unitMetricK8sHpaCurrentPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -900,14 +901,14 @@ CreateAsyncDoubleMetricK8sHpaCurrentPods(metrics::Meter *meter)
 
 /**
   Desired number of replica pods managed by this horizontal pod autoscaler, as last calculated by
-  the autoscaler <p> This metric aligns with the @code desiredReplicas @endcode field of the <a
+  the autoscaler. <p> This metric aligns with the @code desiredReplicas @endcode field of the <a
   href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling">K8s
   HorizontalPodAutoscalerStatus</a> <p> updowncounter
  */
 static constexpr const char *kMetricK8sHpaDesiredPods = "k8s.hpa.desired_pods";
 static constexpr const char *descrMetricK8sHpaDesiredPods =
     "Desired number of replica pods managed by this horizontal pod autoscaler, as last calculated "
-    "by the autoscaler";
+    "by the autoscaler.";
 static constexpr const char *unitMetricK8sHpaDesiredPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -939,7 +940,7 @@ CreateAsyncDoubleMetricK8sHpaDesiredPods(metrics::Meter *meter)
 }
 
 /**
-  The upper limit for the number of replica pods to which the autoscaler can scale up
+  The upper limit for the number of replica pods to which the autoscaler can scale up.
   <p>
   This metric aligns with the @code maxReplicas @endcode field of the
   <a
@@ -948,7 +949,7 @@ CreateAsyncDoubleMetricK8sHpaDesiredPods(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sHpaMaxPods = "k8s.hpa.max_pods";
 static constexpr const char *descrMetricK8sHpaMaxPods =
-    "The upper limit for the number of replica pods to which the autoscaler can scale up";
+    "The upper limit for the number of replica pods to which the autoscaler can scale up.";
 static constexpr const char *unitMetricK8sHpaMaxPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>> CreateSyncInt64MetricK8sHpaMaxPods(
@@ -1135,7 +1136,7 @@ CreateAsyncDoubleMetricK8sHpaMetricTargetCpuValue(metrics::Meter *meter)
 }
 
 /**
-  The lower limit for the number of replica pods to which the autoscaler can scale down
+  The lower limit for the number of replica pods to which the autoscaler can scale down.
   <p>
   This metric aligns with the @code minReplicas @endcode field of the
   <a
@@ -1144,7 +1145,7 @@ CreateAsyncDoubleMetricK8sHpaMetricTargetCpuValue(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sHpaMinPods = "k8s.hpa.min_pods";
 static constexpr const char *descrMetricK8sHpaMinPods =
-    "The lower limit for the number of replica pods to which the autoscaler can scale down";
+    "The lower limit for the number of replica pods to which the autoscaler can scale down.";
 static constexpr const char *unitMetricK8sHpaMinPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>> CreateSyncInt64MetricK8sHpaMinPods(
@@ -1176,7 +1177,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
-  The number of pending and actively running pods for a job
+  The number of pending and actively running pods for a job.
   <p>
   This metric aligns with the @code active @endcode field of the
   <a
@@ -1185,7 +1186,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  */
 static constexpr const char *kMetricK8sJobActivePods = "k8s.job.active_pods";
 static constexpr const char *descrMetricK8sJobActivePods =
-    "The number of pending and actively running pods for a job";
+    "The number of pending and actively running pods for a job.";
 static constexpr const char *unitMetricK8sJobActivePods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -1217,7 +1218,7 @@ CreateAsyncDoubleMetricK8sJobActivePods(metrics::Meter *meter)
 }
 
 /**
-  The desired number of successfully finished pods the job should be run with
+  The desired number of successfully finished pods the job should be run with.
   <p>
   This metric aligns with the @code completions @endcode field of the
   <a
@@ -1226,7 +1227,7 @@ CreateAsyncDoubleMetricK8sJobActivePods(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sJobDesiredSuccessfulPods = "k8s.job.desired_successful_pods";
 static constexpr const char *descrMetricK8sJobDesiredSuccessfulPods =
-    "The desired number of successfully finished pods the job should be run with";
+    "The desired number of successfully finished pods the job should be run with.";
 static constexpr const char *unitMetricK8sJobDesiredSuccessfulPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -1262,7 +1263,7 @@ CreateAsyncDoubleMetricK8sJobDesiredSuccessfulPods(metrics::Meter *meter)
 }
 
 /**
-  The number of pods which reached phase Failed for a job
+  The number of pods which reached phase Failed for a job.
   <p>
   This metric aligns with the @code failed @endcode field of the
   <a
@@ -1271,7 +1272,7 @@ CreateAsyncDoubleMetricK8sJobDesiredSuccessfulPods(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sJobFailedPods = "k8s.job.failed_pods";
 static constexpr const char *descrMetricK8sJobFailedPods =
-    "The number of pods which reached phase Failed for a job";
+    "The number of pods which reached phase Failed for a job.";
 static constexpr const char *unitMetricK8sJobFailedPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -1303,7 +1304,7 @@ CreateAsyncDoubleMetricK8sJobFailedPods(metrics::Meter *meter)
 }
 
 /**
-  The max desired number of pods the job should run at any given time
+  The max desired number of pods the job should run at any given time.
   <p>
   This metric aligns with the @code parallelism @endcode field of the
   <a
@@ -1312,7 +1313,7 @@ CreateAsyncDoubleMetricK8sJobFailedPods(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sJobMaxParallelPods = "k8s.job.max_parallel_pods";
 static constexpr const char *descrMetricK8sJobMaxParallelPods =
-    "The max desired number of pods the job should run at any given time";
+    "The max desired number of pods the job should run at any given time.";
 static constexpr const char *unitMetricK8sJobMaxParallelPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -1348,7 +1349,7 @@ CreateAsyncDoubleMetricK8sJobMaxParallelPods(metrics::Meter *meter)
 }
 
 /**
-  The number of pods which reached phase Succeeded for a job
+  The number of pods which reached phase Succeeded for a job.
   <p>
   This metric aligns with the @code succeeded @endcode field of the
   <a
@@ -1357,7 +1358,7 @@ CreateAsyncDoubleMetricK8sJobMaxParallelPods(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sJobSuccessfulPods = "k8s.job.successful_pods";
 static constexpr const char *descrMetricK8sJobSuccessfulPods =
-    "The number of pods which reached phase Succeeded for a job";
+    "The number of pods which reached phase Succeeded for a job.";
 static constexpr const char *unitMetricK8sJobSuccessfulPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -1427,13 +1428,13 @@ CreateAsyncDoubleMetricK8sNamespacePhase(metrics::Meter *meter)
 }
 
 /**
-  Amount of cpu allocatable on the node
+  Amount of cpu allocatable on the node.
   <p>
   updowncounter
  */
 static constexpr const char *kMetricK8sNodeAllocatableCpu = "k8s.node.allocatable.cpu";
 static constexpr const char *descrMetricK8sNodeAllocatableCpu =
-    "Amount of cpu allocatable on the node";
+    "Amount of cpu allocatable on the node.";
 static constexpr const char *unitMetricK8sNodeAllocatableCpu = "{cpu}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -1469,14 +1470,14 @@ CreateAsyncDoubleMetricK8sNodeAllocatableCpu(metrics::Meter *meter)
 }
 
 /**
-  Amount of ephemeral-storage allocatable on the node
+  Amount of ephemeral-storage allocatable on the node.
   <p>
   updowncounter
  */
 static constexpr const char *kMetricK8sNodeAllocatableEphemeralStorage =
     "k8s.node.allocatable.ephemeral_storage";
 static constexpr const char *descrMetricK8sNodeAllocatableEphemeralStorage =
-    "Amount of ephemeral-storage allocatable on the node";
+    "Amount of ephemeral-storage allocatable on the node.";
 static constexpr const char *unitMetricK8sNodeAllocatableEphemeralStorage = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -1512,13 +1513,13 @@ CreateAsyncDoubleMetricK8sNodeAllocatableEphemeralStorage(metrics::Meter *meter)
 }
 
 /**
-  Amount of memory allocatable on the node
+  Amount of memory allocatable on the node.
   <p>
   updowncounter
  */
 static constexpr const char *kMetricK8sNodeAllocatableMemory = "k8s.node.allocatable.memory";
 static constexpr const char *descrMetricK8sNodeAllocatableMemory =
-    "Amount of memory allocatable on the node";
+    "Amount of memory allocatable on the node.";
 static constexpr const char *unitMetricK8sNodeAllocatableMemory = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -1554,13 +1555,13 @@ CreateAsyncDoubleMetricK8sNodeAllocatableMemory(metrics::Meter *meter)
 }
 
 /**
-  Amount of pods allocatable on the node
+  Amount of pods allocatable on the node.
   <p>
   updowncounter
  */
 static constexpr const char *kMetricK8sNodeAllocatablePods = "k8s.node.allocatable.pods";
 static constexpr const char *descrMetricK8sNodeAllocatablePods =
-    "Amount of pods allocatable on the node";
+    "Amount of pods allocatable on the node.";
 static constexpr const char *unitMetricK8sNodeAllocatablePods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -1640,14 +1641,14 @@ CreateAsyncDoubleMetricK8sNodeConditionStatus(metrics::Meter *meter)
 }
 
 /**
-  Total CPU time consumed
+  Total CPU time consumed.
   <p>
   Total CPU time consumed by the specific Node on all available CPU cores
   <p>
   counter
  */
 static constexpr const char *kMetricK8sNodeCpuTime     = "k8s.node.cpu.time";
-static constexpr const char *descrMetricK8sNodeCpuTime = "Total CPU time consumed";
+static constexpr const char *descrMetricK8sNodeCpuTime = "Total CPU time consumed.";
 static constexpr const char *unitMetricK8sNodeCpuTime  = "s";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricK8sNodeCpuTime(
@@ -1679,7 +1680,7 @@ CreateAsyncDoubleMetricK8sNodeCpuTime(metrics::Meter *meter)
 }
 
 /**
-  Node's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs
+  Node's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs.
   <p>
   CPU usage of the specific Node on all available CPU cores, averaged over the sample window
   <p>
@@ -1687,7 +1688,7 @@ CreateAsyncDoubleMetricK8sNodeCpuTime(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sNodeCpuUsage = "k8s.node.cpu.usage";
 static constexpr const char *descrMetricK8sNodeCpuUsage =
-    "Node's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs";
+    "Node's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs.";
 static constexpr const char *unitMetricK8sNodeCpuUsage = "{cpu}";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -1722,14 +1723,161 @@ CreateAsyncDoubleMetricK8sNodeCpuUsage(metrics::Meter *meter)
 }
 
 /**
-  Memory usage of the Node
+  Node filesystem available bytes.
+  <p>
+  This metric is derived from the
+  <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.AvailableBytes</a>
+  field of the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Fs</a>
+  of the Kubelet's stats API.
+  <p>
+  updowncounter
+ */
+static constexpr const char *kMetricK8sNodeFilesystemAvailable = "k8s.node.filesystem.available";
+static constexpr const char *descrMetricK8sNodeFilesystemAvailable =
+    "Node filesystem available bytes.";
+static constexpr const char *unitMetricK8sNodeFilesystemAvailable = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sNodeFilesystemAvailable(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sNodeFilesystemAvailable,
+                                         descrMetricK8sNodeFilesystemAvailable,
+                                         unitMetricK8sNodeFilesystemAvailable);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sNodeFilesystemAvailable(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sNodeFilesystemAvailable,
+                                          descrMetricK8sNodeFilesystemAvailable,
+                                          unitMetricK8sNodeFilesystemAvailable);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sNodeFilesystemAvailable(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sNodeFilesystemAvailable,
+                                                   descrMetricK8sNodeFilesystemAvailable,
+                                                   unitMetricK8sNodeFilesystemAvailable);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sNodeFilesystemAvailable(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sNodeFilesystemAvailable,
+                                                    descrMetricK8sNodeFilesystemAvailable,
+                                                    unitMetricK8sNodeFilesystemAvailable);
+}
+
+/**
+  Node filesystem capacity.
+  <p>
+  This metric is derived from the
+  <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.CapacityBytes</a>
+  field of the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Fs</a>
+  of the Kubelet's stats API.
+  <p>
+  updowncounter
+ */
+static constexpr const char *kMetricK8sNodeFilesystemCapacity     = "k8s.node.filesystem.capacity";
+static constexpr const char *descrMetricK8sNodeFilesystemCapacity = "Node filesystem capacity.";
+static constexpr const char *unitMetricK8sNodeFilesystemCapacity  = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sNodeFilesystemCapacity(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sNodeFilesystemCapacity,
+                                         descrMetricK8sNodeFilesystemCapacity,
+                                         unitMetricK8sNodeFilesystemCapacity);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sNodeFilesystemCapacity(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sNodeFilesystemCapacity,
+                                          descrMetricK8sNodeFilesystemCapacity,
+                                          unitMetricK8sNodeFilesystemCapacity);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sNodeFilesystemCapacity(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sNodeFilesystemCapacity,
+                                                   descrMetricK8sNodeFilesystemCapacity,
+                                                   unitMetricK8sNodeFilesystemCapacity);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sNodeFilesystemCapacity(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sNodeFilesystemCapacity,
+                                                    descrMetricK8sNodeFilesystemCapacity,
+                                                    unitMetricK8sNodeFilesystemCapacity);
+}
+
+/**
+  Node filesystem usage.
+  <p>
+  This may not equal capacity - available.
+  <p>
+  This metric is derived from the
+  <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.UsedBytes</a>
+  field of the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#NodeStats">NodeStats.Fs</a>
+  of the Kubelet's stats API.
+  <p>
+  updowncounter
+ */
+static constexpr const char *kMetricK8sNodeFilesystemUsage     = "k8s.node.filesystem.usage";
+static constexpr const char *descrMetricK8sNodeFilesystemUsage = "Node filesystem usage.";
+static constexpr const char *unitMetricK8sNodeFilesystemUsage  = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sNodeFilesystemUsage(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sNodeFilesystemUsage,
+                                         descrMetricK8sNodeFilesystemUsage,
+                                         unitMetricK8sNodeFilesystemUsage);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sNodeFilesystemUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sNodeFilesystemUsage,
+                                          descrMetricK8sNodeFilesystemUsage,
+                                          unitMetricK8sNodeFilesystemUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sNodeFilesystemUsage(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sNodeFilesystemUsage,
+                                                   descrMetricK8sNodeFilesystemUsage,
+                                                   unitMetricK8sNodeFilesystemUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sNodeFilesystemUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sNodeFilesystemUsage,
+                                                    descrMetricK8sNodeFilesystemUsage,
+                                                    unitMetricK8sNodeFilesystemUsage);
+}
+
+/**
+  Memory usage of the Node.
   <p>
   Total memory usage of the Node
   <p>
   gauge
  */
 static constexpr const char *kMetricK8sNodeMemoryUsage     = "k8s.node.memory.usage";
-static constexpr const char *descrMetricK8sNodeMemoryUsage = "Memory usage of the Node";
+static constexpr const char *descrMetricK8sNodeMemoryUsage = "Memory usage of the Node.";
 static constexpr const char *unitMetricK8sNodeMemoryUsage  = "By";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -1764,12 +1912,12 @@ CreateAsyncDoubleMetricK8sNodeMemoryUsage(metrics::Meter *meter)
 }
 
 /**
-  Node network errors
+  Node network errors.
   <p>
   counter
  */
 static constexpr const char *kMetricK8sNodeNetworkErrors     = "k8s.node.network.errors";
-static constexpr const char *descrMetricK8sNodeNetworkErrors = "Node network errors";
+static constexpr const char *descrMetricK8sNodeNetworkErrors = "Node network errors.";
 static constexpr const char *unitMetricK8sNodeNetworkErrors  = "{error}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -1801,12 +1949,12 @@ CreateAsyncDoubleMetricK8sNodeNetworkErrors(metrics::Meter *meter)
 }
 
 /**
-  Network bytes for the Node
+  Network bytes for the Node.
   <p>
   counter
  */
 static constexpr const char *kMetricK8sNodeNetworkIo     = "k8s.node.network.io";
-static constexpr const char *descrMetricK8sNodeNetworkIo = "Network bytes for the Node";
+static constexpr const char *descrMetricK8sNodeNetworkIo = "Network bytes for the Node.";
 static constexpr const char *unitMetricK8sNodeNetworkIo  = "By";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricK8sNodeNetworkIo(
@@ -1838,14 +1986,14 @@ CreateAsyncDoubleMetricK8sNodeNetworkIo(metrics::Meter *meter)
 }
 
 /**
-  The time the Node has been running
+  The time the Node has been running.
   <p>
   Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
   as a floating point number with the highest precision available. The actual accuracy would depend
   on the instrumentation and operating system. <p> gauge
  */
 static constexpr const char *kMetricK8sNodeUptime     = "k8s.node.uptime";
-static constexpr const char *descrMetricK8sNodeUptime = "The time the Node has been running";
+static constexpr const char *descrMetricK8sNodeUptime = "The time the Node has been running.";
 static constexpr const char *unitMetricK8sNodeUptime  = "s";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -1880,14 +2028,14 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
-  Total CPU time consumed
+  Total CPU time consumed.
   <p>
   Total CPU time consumed by the specific Pod on all available CPU cores
   <p>
   counter
  */
 static constexpr const char *kMetricK8sPodCpuTime     = "k8s.pod.cpu.time";
-static constexpr const char *descrMetricK8sPodCpuTime = "Total CPU time consumed";
+static constexpr const char *descrMetricK8sPodCpuTime = "Total CPU time consumed.";
 static constexpr const char *unitMetricK8sPodCpuTime  = "s";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricK8sPodCpuTime(
@@ -1919,7 +2067,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
-  Pod's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs
+  Pod's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs.
   <p>
   CPU usage of the specific Pod on all available CPU cores, averaged over the sample window
   <p>
@@ -1927,7 +2075,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
  */
 static constexpr const char *kMetricK8sPodCpuUsage = "k8s.pod.cpu.usage";
 static constexpr const char *descrMetricK8sPodCpuUsage =
-    "Pod's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs";
+    "Pod's CPU usage, measured in cpus. Range from 0 to the number of allocatable CPUs.";
 static constexpr const char *unitMetricK8sPodCpuUsage = "{cpu}";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -1962,14 +2110,161 @@ CreateAsyncDoubleMetricK8sPodCpuUsage(metrics::Meter *meter)
 }
 
 /**
-  Memory usage of the Pod
+  Pod filesystem available bytes.
+  <p>
+  This metric is derived from the
+  <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.AvailableBytes</a>
+  field of the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats.EphemeralStorage</a>
+  of the Kubelet's stats API.
+  <p>
+  updowncounter
+ */
+static constexpr const char *kMetricK8sPodFilesystemAvailable = "k8s.pod.filesystem.available";
+static constexpr const char *descrMetricK8sPodFilesystemAvailable =
+    "Pod filesystem available bytes.";
+static constexpr const char *unitMetricK8sPodFilesystemAvailable = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodFilesystemAvailable(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodFilesystemAvailable,
+                                         descrMetricK8sPodFilesystemAvailable,
+                                         unitMetricK8sPodFilesystemAvailable);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodFilesystemAvailable(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodFilesystemAvailable,
+                                          descrMetricK8sPodFilesystemAvailable,
+                                          unitMetricK8sPodFilesystemAvailable);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodFilesystemAvailable(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodFilesystemAvailable,
+                                                   descrMetricK8sPodFilesystemAvailable,
+                                                   unitMetricK8sPodFilesystemAvailable);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodFilesystemAvailable(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodFilesystemAvailable,
+                                                    descrMetricK8sPodFilesystemAvailable,
+                                                    unitMetricK8sPodFilesystemAvailable);
+}
+
+/**
+  Pod filesystem capacity.
+  <p>
+  This metric is derived from the
+  <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.CapacityBytes</a>
+  field of the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats.EphemeralStorage</a>
+  of the Kubelet's stats API.
+  <p>
+  updowncounter
+ */
+static constexpr const char *kMetricK8sPodFilesystemCapacity     = "k8s.pod.filesystem.capacity";
+static constexpr const char *descrMetricK8sPodFilesystemCapacity = "Pod filesystem capacity.";
+static constexpr const char *unitMetricK8sPodFilesystemCapacity  = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodFilesystemCapacity(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodFilesystemCapacity,
+                                         descrMetricK8sPodFilesystemCapacity,
+                                         unitMetricK8sPodFilesystemCapacity);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodFilesystemCapacity(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodFilesystemCapacity,
+                                          descrMetricK8sPodFilesystemCapacity,
+                                          unitMetricK8sPodFilesystemCapacity);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodFilesystemCapacity(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodFilesystemCapacity,
+                                                   descrMetricK8sPodFilesystemCapacity,
+                                                   unitMetricK8sPodFilesystemCapacity);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodFilesystemCapacity(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodFilesystemCapacity,
+                                                    descrMetricK8sPodFilesystemCapacity,
+                                                    unitMetricK8sPodFilesystemCapacity);
+}
+
+/**
+  Pod filesystem usage.
+  <p>
+  This may not equal capacity - available.
+  <p>
+  This metric is derived from the
+  <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#FsStats">FsStats.UsedBytes</a>
+  field of the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats.EphemeralStorage</a>
+  of the Kubelet's stats API.
+  <p>
+  updowncounter
+ */
+static constexpr const char *kMetricK8sPodFilesystemUsage     = "k8s.pod.filesystem.usage";
+static constexpr const char *descrMetricK8sPodFilesystemUsage = "Pod filesystem usage.";
+static constexpr const char *unitMetricK8sPodFilesystemUsage  = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodFilesystemUsage(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodFilesystemUsage,
+                                         descrMetricK8sPodFilesystemUsage,
+                                         unitMetricK8sPodFilesystemUsage);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodFilesystemUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodFilesystemUsage,
+                                          descrMetricK8sPodFilesystemUsage,
+                                          unitMetricK8sPodFilesystemUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodFilesystemUsage(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodFilesystemUsage,
+                                                   descrMetricK8sPodFilesystemUsage,
+                                                   unitMetricK8sPodFilesystemUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodFilesystemUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodFilesystemUsage,
+                                                    descrMetricK8sPodFilesystemUsage,
+                                                    unitMetricK8sPodFilesystemUsage);
+}
+
+/**
+  Memory usage of the Pod.
   <p>
   Total memory usage of the Pod
   <p>
   gauge
  */
 static constexpr const char *kMetricK8sPodMemoryUsage     = "k8s.pod.memory.usage";
-static constexpr const char *descrMetricK8sPodMemoryUsage = "Memory usage of the Pod";
+static constexpr const char *descrMetricK8sPodMemoryUsage = "Memory usage of the Pod.";
 static constexpr const char *unitMetricK8sPodMemoryUsage  = "By";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -2004,12 +2299,12 @@ CreateAsyncDoubleMetricK8sPodMemoryUsage(metrics::Meter *meter)
 }
 
 /**
-  Pod network errors
+  Pod network errors.
   <p>
   counter
  */
 static constexpr const char *kMetricK8sPodNetworkErrors     = "k8s.pod.network.errors";
-static constexpr const char *descrMetricK8sPodNetworkErrors = "Pod network errors";
+static constexpr const char *descrMetricK8sPodNetworkErrors = "Pod network errors.";
 static constexpr const char *unitMetricK8sPodNetworkErrors  = "{error}";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
@@ -2041,12 +2336,12 @@ CreateAsyncDoubleMetricK8sPodNetworkErrors(metrics::Meter *meter)
 }
 
 /**
-  Network bytes for the Pod
+  Network bytes for the Pod.
   <p>
   counter
  */
 static constexpr const char *kMetricK8sPodNetworkIo     = "k8s.pod.network.io";
-static constexpr const char *descrMetricK8sPodNetworkIo = "Network bytes for the Pod";
+static constexpr const char *descrMetricK8sPodNetworkIo = "Network bytes for the Pod.";
 static constexpr const char *unitMetricK8sPodNetworkIo  = "By";
 
 static inline nostd::unique_ptr<metrics::Counter<uint64_t>> CreateSyncInt64MetricK8sPodNetworkIo(
@@ -2078,14 +2373,14 @@ CreateAsyncDoubleMetricK8sPodNetworkIo(metrics::Meter *meter)
 }
 
 /**
-  The time the Pod has been running
+  The time the Pod has been running.
   <p>
   Instrumentations SHOULD use a gauge with type @code double @endcode and measure uptime in seconds
   as a floating point number with the highest precision available. The actual accuracy would depend
   on the instrumentation and operating system. <p> gauge
  */
 static constexpr const char *kMetricK8sPodUptime     = "k8s.pod.uptime";
-static constexpr const char *descrMetricK8sPodUptime = "The time the Pod has been running";
+static constexpr const char *descrMetricK8sPodUptime = "The time the Pod has been running.";
 static constexpr const char *unitMetricK8sPodUptime  = "s";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -2120,15 +2415,290 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
 }
 
 /**
+  Pod volume storage space available.
+  <p>
+  This metric is derived from the
+  <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.AvailableBytes</a>
+  field of the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
+  the Kubelet's stats API. <p> updowncounter
+ */
+static constexpr const char *kMetricK8sPodVolumeAvailable = "k8s.pod.volume.available";
+static constexpr const char *descrMetricK8sPodVolumeAvailable =
+    "Pod volume storage space available.";
+static constexpr const char *unitMetricK8sPodVolumeAvailable = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodVolumeAvailable(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodVolumeAvailable,
+                                         descrMetricK8sPodVolumeAvailable,
+                                         unitMetricK8sPodVolumeAvailable);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodVolumeAvailable(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodVolumeAvailable,
+                                          descrMetricK8sPodVolumeAvailable,
+                                          unitMetricK8sPodVolumeAvailable);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodVolumeAvailable(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodVolumeAvailable,
+                                                   descrMetricK8sPodVolumeAvailable,
+                                                   unitMetricK8sPodVolumeAvailable);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodVolumeAvailable(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodVolumeAvailable,
+                                                    descrMetricK8sPodVolumeAvailable,
+                                                    unitMetricK8sPodVolumeAvailable);
+}
+
+/**
+  Pod volume total capacity.
+  <p>
+  This metric is derived from the
+  <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.CapacityBytes</a>
+  field of the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
+  the Kubelet's stats API. <p> updowncounter
+ */
+static constexpr const char *kMetricK8sPodVolumeCapacity     = "k8s.pod.volume.capacity";
+static constexpr const char *descrMetricK8sPodVolumeCapacity = "Pod volume total capacity.";
+static constexpr const char *unitMetricK8sPodVolumeCapacity  = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodVolumeCapacity(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(
+      kMetricK8sPodVolumeCapacity, descrMetricK8sPodVolumeCapacity, unitMetricK8sPodVolumeCapacity);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodVolumeCapacity(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(
+      kMetricK8sPodVolumeCapacity, descrMetricK8sPodVolumeCapacity, unitMetricK8sPodVolumeCapacity);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodVolumeCapacity(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(
+      kMetricK8sPodVolumeCapacity, descrMetricK8sPodVolumeCapacity, unitMetricK8sPodVolumeCapacity);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodVolumeCapacity(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(
+      kMetricK8sPodVolumeCapacity, descrMetricK8sPodVolumeCapacity, unitMetricK8sPodVolumeCapacity);
+}
+
+/**
+  The total inodes in the filesystem of the Pod's volume.
+  <p>
+  This metric is derived from the
+  <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.Inodes</a>
+  field of the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
+  the Kubelet's stats API. <p> updowncounter
+ */
+static constexpr const char *kMetricK8sPodVolumeInodeCount = "k8s.pod.volume.inode.count";
+static constexpr const char *descrMetricK8sPodVolumeInodeCount =
+    "The total inodes in the filesystem of the Pod's volume.";
+static constexpr const char *unitMetricK8sPodVolumeInodeCount = "{inode}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodVolumeInodeCount(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodVolumeInodeCount,
+                                         descrMetricK8sPodVolumeInodeCount,
+                                         unitMetricK8sPodVolumeInodeCount);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodVolumeInodeCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodVolumeInodeCount,
+                                          descrMetricK8sPodVolumeInodeCount,
+                                          unitMetricK8sPodVolumeInodeCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodVolumeInodeCount(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodVolumeInodeCount,
+                                                   descrMetricK8sPodVolumeInodeCount,
+                                                   unitMetricK8sPodVolumeInodeCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodVolumeInodeCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodVolumeInodeCount,
+                                                    descrMetricK8sPodVolumeInodeCount,
+                                                    unitMetricK8sPodVolumeInodeCount);
+}
+
+/**
+  The free inodes in the filesystem of the Pod's volume.
+  <p>
+  This metric is derived from the
+  <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.InodesFree</a>
+  field of the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
+  the Kubelet's stats API. <p> updowncounter
+ */
+static constexpr const char *kMetricK8sPodVolumeInodeFree = "k8s.pod.volume.inode.free";
+static constexpr const char *descrMetricK8sPodVolumeInodeFree =
+    "The free inodes in the filesystem of the Pod's volume.";
+static constexpr const char *unitMetricK8sPodVolumeInodeFree = "{inode}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodVolumeInodeFree(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodVolumeInodeFree,
+                                         descrMetricK8sPodVolumeInodeFree,
+                                         unitMetricK8sPodVolumeInodeFree);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodVolumeInodeFree(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodVolumeInodeFree,
+                                          descrMetricK8sPodVolumeInodeFree,
+                                          unitMetricK8sPodVolumeInodeFree);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodVolumeInodeFree(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodVolumeInodeFree,
+                                                   descrMetricK8sPodVolumeInodeFree,
+                                                   unitMetricK8sPodVolumeInodeFree);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodVolumeInodeFree(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodVolumeInodeFree,
+                                                    descrMetricK8sPodVolumeInodeFree,
+                                                    unitMetricK8sPodVolumeInodeFree);
+}
+
+/**
+  The inodes used by the filesystem of the Pod's volume.
+  <p>
+  This metric is derived from the
+  <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.InodesUsed</a>
+  field of the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
+  the Kubelet's stats API. <p> This may not be equal to @code inodes - free @endcode because
+  filesystem may share inodes with other filesystems. <p> updowncounter
+ */
+static constexpr const char *kMetricK8sPodVolumeInodeUsed = "k8s.pod.volume.inode.used";
+static constexpr const char *descrMetricK8sPodVolumeInodeUsed =
+    "The inodes used by the filesystem of the Pod's volume.";
+static constexpr const char *unitMetricK8sPodVolumeInodeUsed = "{inode}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodVolumeInodeUsed(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodVolumeInodeUsed,
+                                         descrMetricK8sPodVolumeInodeUsed,
+                                         unitMetricK8sPodVolumeInodeUsed);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodVolumeInodeUsed(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodVolumeInodeUsed,
+                                          descrMetricK8sPodVolumeInodeUsed,
+                                          unitMetricK8sPodVolumeInodeUsed);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodVolumeInodeUsed(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sPodVolumeInodeUsed,
+                                                   descrMetricK8sPodVolumeInodeUsed,
+                                                   unitMetricK8sPodVolumeInodeUsed);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodVolumeInodeUsed(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sPodVolumeInodeUsed,
+                                                    descrMetricK8sPodVolumeInodeUsed,
+                                                    unitMetricK8sPodVolumeInodeUsed);
+}
+
+/**
+  Pod volume usage.
+  <p>
+  This may not equal capacity - available.
+  <p>
+  This metric is derived from the
+  <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#VolumeStats">VolumeStats.UsedBytes</a>
+  field of the <a
+  href="https://pkg.go.dev/k8s.io/kubelet@v0.33.0/pkg/apis/stats/v1alpha1#PodStats">PodStats</a> of
+  the Kubelet's stats API. <p> updowncounter
+ */
+static constexpr const char *kMetricK8sPodVolumeUsage     = "k8s.pod.volume.usage";
+static constexpr const char *descrMetricK8sPodVolumeUsage = "Pod volume usage.";
+static constexpr const char *unitMetricK8sPodVolumeUsage  = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sPodVolumeUsage(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sPodVolumeUsage, descrMetricK8sPodVolumeUsage,
+                                         unitMetricK8sPodVolumeUsage);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sPodVolumeUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sPodVolumeUsage, descrMetricK8sPodVolumeUsage,
+                                          unitMetricK8sPodVolumeUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sPodVolumeUsage(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(
+      kMetricK8sPodVolumeUsage, descrMetricK8sPodVolumeUsage, unitMetricK8sPodVolumeUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sPodVolumeUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(
+      kMetricK8sPodVolumeUsage, descrMetricK8sPodVolumeUsage, unitMetricK8sPodVolumeUsage);
+}
+
+/**
   Total number of available replica pods (ready for at least minReadySeconds) targeted by this
-  replicaset <p> This metric aligns with the @code availableReplicas @endcode field of the <a
+  replicaset. <p> This metric aligns with the @code availableReplicas @endcode field of the <a
   href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetstatus-v1-apps">K8s
   ReplicaSetStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sReplicasetAvailablePods = "k8s.replicaset.available_pods";
 static constexpr const char *descrMetricK8sReplicasetAvailablePods =
     "Total number of available replica pods (ready for at least minReadySeconds) targeted by this "
-    "replicaset";
+    "replicaset.";
 static constexpr const char *unitMetricK8sReplicasetAvailablePods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -2164,7 +2734,7 @@ CreateAsyncDoubleMetricK8sReplicasetAvailablePods(metrics::Meter *meter)
 }
 
 /**
-  Number of desired replica pods in this replicaset
+  Number of desired replica pods in this replicaset.
   <p>
   This metric aligns with the @code replicas @endcode field of the
   <a
@@ -2173,7 +2743,7 @@ CreateAsyncDoubleMetricK8sReplicasetAvailablePods(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sReplicasetDesiredPods = "k8s.replicaset.desired_pods";
 static constexpr const char *descrMetricK8sReplicasetDesiredPods =
-    "Number of desired replica pods in this replicaset";
+    "Number of desired replica pods in this replicaset.";
 static constexpr const char *unitMetricK8sReplicasetDesiredPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -2305,7 +2875,7 @@ CreateAsyncDoubleMetricK8sReplicationControllerDesiredPods(metrics::Meter *meter
 
 /**
   Total number of available replica pods (ready for at least minReadySeconds) targeted by this
-  replication controller <p> This metric aligns with the @code availableReplicas @endcode field of
+  replication controller. <p> This metric aligns with the @code availableReplicas @endcode field of
   the <a
   href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerstatus-v1-core">K8s
   ReplicationControllerStatus</a> <p> updowncounter
@@ -2314,7 +2884,7 @@ static constexpr const char *kMetricK8sReplicationcontrollerAvailablePods =
     "k8s.replicationcontroller.available_pods";
 static constexpr const char *descrMetricK8sReplicationcontrollerAvailablePods =
     "Total number of available replica pods (ready for at least minReadySeconds) targeted by this "
-    "replication controller";
+    "replication controller.";
 static constexpr const char *unitMetricK8sReplicationcontrollerAvailablePods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -2351,7 +2921,7 @@ CreateAsyncDoubleMetricK8sReplicationcontrollerAvailablePods(metrics::Meter *met
 }
 
 /**
-  Number of desired replica pods in this replication controller
+  Number of desired replica pods in this replication controller.
   <p>
   This metric aligns with the @code replicas @endcode field of the
   <a
@@ -2361,7 +2931,7 @@ CreateAsyncDoubleMetricK8sReplicationcontrollerAvailablePods(metrics::Meter *met
 static constexpr const char *kMetricK8sReplicationcontrollerDesiredPods =
     "k8s.replicationcontroller.desired_pods";
 static constexpr const char *descrMetricK8sReplicationcontrollerDesiredPods =
-    "Number of desired replica pods in this replication controller";
+    "Number of desired replica pods in this replication controller.";
 static constexpr const char *unitMetricK8sReplicationcontrollerDesiredPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -3380,7 +3950,7 @@ CreateAsyncDoubleMetricK8sResourcequotaStorageRequestUsed(metrics::Meter *meter)
 
 /**
   The number of replica pods created by the statefulset controller from the statefulset version
-  indicated by currentRevision <p> This metric aligns with the @code currentReplicas @endcode field
+  indicated by currentRevision. <p> This metric aligns with the @code currentReplicas @endcode field
   of the <a
   href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps">K8s
   StatefulSetStatus</a>. <p> updowncounter
@@ -3388,7 +3958,7 @@ CreateAsyncDoubleMetricK8sResourcequotaStorageRequestUsed(metrics::Meter *meter)
 static constexpr const char *kMetricK8sStatefulsetCurrentPods = "k8s.statefulset.current_pods";
 static constexpr const char *descrMetricK8sStatefulsetCurrentPods =
     "The number of replica pods created by the statefulset controller from the statefulset version "
-    "indicated by currentRevision";
+    "indicated by currentRevision.";
 static constexpr const char *unitMetricK8sStatefulsetCurrentPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -3424,7 +3994,7 @@ CreateAsyncDoubleMetricK8sStatefulsetCurrentPods(metrics::Meter *meter)
 }
 
 /**
-  Number of desired replica pods in this statefulset
+  Number of desired replica pods in this statefulset.
   <p>
   This metric aligns with the @code replicas @endcode field of the
   <a
@@ -3433,7 +4003,7 @@ CreateAsyncDoubleMetricK8sStatefulsetCurrentPods(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sStatefulsetDesiredPods = "k8s.statefulset.desired_pods";
 static constexpr const char *descrMetricK8sStatefulsetDesiredPods =
-    "Number of desired replica pods in this statefulset";
+    "Number of desired replica pods in this statefulset.";
 static constexpr const char *unitMetricK8sStatefulsetDesiredPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -3469,7 +4039,7 @@ CreateAsyncDoubleMetricK8sStatefulsetDesiredPods(metrics::Meter *meter)
 }
 
 /**
-  The number of replica pods created for this statefulset with a Ready Condition
+  The number of replica pods created for this statefulset with a Ready Condition.
   <p>
   This metric aligns with the @code readyReplicas @endcode field of the
   <a
@@ -3478,7 +4048,7 @@ CreateAsyncDoubleMetricK8sStatefulsetDesiredPods(metrics::Meter *meter)
  */
 static constexpr const char *kMetricK8sStatefulsetReadyPods = "k8s.statefulset.ready_pods";
 static constexpr const char *descrMetricK8sStatefulsetReadyPods =
-    "The number of replica pods created for this statefulset with a Ready Condition";
+    "The number of replica pods created for this statefulset with a Ready Condition.";
 static constexpr const char *unitMetricK8sStatefulsetReadyPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -3515,7 +4085,7 @@ CreateAsyncDoubleMetricK8sStatefulsetReadyPods(metrics::Meter *meter)
 
 /**
   Number of replica pods created by the statefulset controller from the statefulset version
-  indicated by updateRevision <p> This metric aligns with the @code updatedReplicas @endcode field
+  indicated by updateRevision. <p> This metric aligns with the @code updatedReplicas @endcode field
   of the <a
   href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps">K8s
   StatefulSetStatus</a>. <p> updowncounter
@@ -3523,7 +4093,7 @@ CreateAsyncDoubleMetricK8sStatefulsetReadyPods(metrics::Meter *meter)
 static constexpr const char *kMetricK8sStatefulsetUpdatedPods = "k8s.statefulset.updated_pods";
 static constexpr const char *descrMetricK8sStatefulsetUpdatedPods =
     "Number of replica pods created by the statefulset controller from the statefulset version "
-    "indicated by updateRevision";
+    "indicated by updateRevision.";
 static constexpr const char *unitMetricK8sStatefulsetUpdatedPods = "{pod}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
