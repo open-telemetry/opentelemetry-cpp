@@ -25,7 +25,7 @@ public:
     visitor->VisitInteger(this);
   }
 
-  std::size_t value;
+  long value;
 };
 
 }  // namespace configuration
