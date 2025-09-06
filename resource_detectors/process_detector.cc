@@ -55,11 +55,9 @@ opentelemetry::sdk::resource::Resource ProcessResourceDetector::Detect() noexcep
         opentelemetry::resource_detector::detail::GetCommandWithArgs(pid);
     if (!command_with_args.empty())
     {
-      std::string commandline_args =
-          opentelemetry::resource_detector::detail::ConvertCommandArgsToString(command_with_args);
-      attributes[semconv::process::kProcessCommandLine] = std::move(commandline_args);
-      attributes[semconv::process::kProcessCommand]     = command_with_args[0];
-      attributes[semconv::process::kProcessCommandArgs] = std::move(command_with_args);
+      // Commented until they are properly sanitized
+      // attributes[semconv::process::kProcessCommand]     = command_with_args[0];
+      // attributes[semconv::process::kProcessCommandArgs] = std::move(command_with_args);
     }
   }
   catch (const std::exception &ex)

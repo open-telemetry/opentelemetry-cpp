@@ -48,13 +48,6 @@ std::vector<std::string> ExtractCommandWithArgs(const std::string &command_line_
  */
 std::vector<std::string> GetCommandWithArgs(const int32_t &pid);
 
-/**
- * Converts a vector of command-line arguments and command into a single command-line string.
- * process.command_line is the string representation of the command line that we collected using
- * GetCommandWithArgs().
- */
-std::string ConvertCommandArgsToString(const std::vector<std::string> &command_args);
-
 }  // namespace detail
 }  // namespace resource_detector
 OPENTELEMETRY_END_NAMESPACE

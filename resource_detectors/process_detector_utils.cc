@@ -117,20 +117,6 @@ std::vector<std::string> GetCommandWithArgs(const int32_t &pid)
 #endif
 }
 
-std::string ConvertCommandArgsToString(const std::vector<std::string> &command_args)
-{
-  std::string command_line;
-  for (const auto &arg : command_args)
-  {
-    if (!command_line.empty())
-    {
-      command_line += " ";
-    }
-    command_line += arg;
-  }
-  return command_line;
-}
-
 std::string FormFilePath(const int32_t &pid, const char *process_type)
 {
   char buff[64];
