@@ -3,6 +3,6 @@
 
 $ example_yaml --test --yaml shelltests/empty.yaml
 >
-[ERROR] [Yaml Configuration Parser] Parse failed with exception: Yaml: not a map, looking for: file_format
+Error:  [Yaml Configuration Parser] Parse failed with exception: file: shelltests/empty.yaml, line: 0, col: 0, offset: 0Yaml: not a map, looking for: file_format
 FAILED TO PARSE MODEL
 >= 1
