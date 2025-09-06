@@ -10,6 +10,6 @@ cc_library(
     deps = [
         "//api",
         "//sdk:headers",
-        "@rapidyaml//:rapidyaml",
+        "@rapidyaml",
     ],
 )
