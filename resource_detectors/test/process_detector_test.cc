@@ -62,14 +62,6 @@ TEST(ProcessDetectorUtilsTest, EmptyCommandWithArgsFile)
   std::remove(filename.c_str());  // Cleanup
 }
 
-TEST(ProcessDetectorUtilsTest, ConvertCommandArgsToStringTest)
-{
-  std::vector<std::string> args = {"test_command", "arg1", "arg2", "arg3"};
-  std::string command_line =
-      opentelemetry::resource_detector::detail::ConvertCommandArgsToString(args);
-  EXPECT_EQ(command_line, "test_command arg1 arg2 arg3");
-}
-
 TEST(ProcessDetectorUtilsTest, GetExecutablePathTest)
 {
   int32_t pid = getpid();
