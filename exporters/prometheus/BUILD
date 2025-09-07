@@ -28,6 +28,21 @@ cc_library(
 )
 
 cc_library(
+    name = "prometheus_exporter_builder",
+    srcs = [
+        "src/prometheus_pull_builder.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/prometheus/prometheus_pull_builder.h",
+    ],
+    strip_include_prefix = "include",
+    tags = ["prometheus"],
+    deps = [
+        ":prometheus_exporter",
+    ],
+)
+
+cc_library(
     name = "prometheus_exporter_utils",
     srcs = [
         "src/exporter_utils.cc",
