@@ -16,6 +16,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #ifdef _MSC_VER
 #  include <process.h>
@@ -50,16 +51,19 @@ opentelemetry::sdk::resource::Resource ProcessResourceDetector::Detect() noexcep
 
   try
   {
-    std::string command = opentelemetry::resource_detector::detail::GetCommand(pid);
-    if (!command.empty())
+    std::vector<std::string> command_with_args =
+        opentelemetry::resource_detector::detail::GetCommandWithArgs(pid);
+    if (!command_with_args.empty())
     {
-      attributes[semconv::process::kProcessCommand] = std::move(command);
+      // Commented until they are properly sanitized
+      // attributes[semconv::process::kProcessCommand]     = command_with_args[0];
+      // attributes[semconv::process::kProcessCommandArgs] = std::move(command_with_args);
     }
   }
   catch (const std::exception &ex)
   {
-    OTEL_INTERNAL_LOG_ERROR("[Process Resource Detector] " << "Error extracting command: "
-                                                           << ex.what());
+    OTEL_INTERNAL_LOG_ERROR("[Process Resource Detector] "
+                            << "Error extracting command with arguments: " << ex.what());
   }
 
   return ResourceDetector::Create(attributes);

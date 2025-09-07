@@ -5,11 +5,14 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 
 #ifdef _MSC_VER
 // clang-format off
 #  include <windows.h>
 #  include <psapi.h>
+#  include <shellapi.h>
+#  pragma comment(lib, "shell32.lib")
 // clang-format on
 #else
 #  include <sys/types.h>
@@ -68,41 +71,50 @@ std::string GetExecutablePath(const int32_t &pid)
 #endif
 }
 
-std::string GetCommand(const int32_t &pid)
+std::vector<std::string> ExtractCommandWithArgs(const std::string &command_line_path)
 {
-#ifdef _MSC_VER
-  // On Windows, GetCommandLineW only works for the CURRENT process,
-  // so we ignore `pid` and just return the current process's command line.
-  LPCWSTR wcmd = GetCommandLineW();
-  if (!wcmd)
+  std::vector<std::string> commands;
+  std::ifstream command_line_file(command_line_path, std::ios::in | std::ios::binary);
+  std::string command;
+  while (std::getline(command_line_file, command, '\0'))
   {
-    return std::string();
+    if (!command.empty())
+    {
+      commands.push_back(command);
+    }
   }
-
-  // Convert UTF-16 to UTF-8
-  int size_needed = WideCharToMultiByte(CP_UTF8, 0, wcmd, -1, NULL, 0, NULL, NULL);
-  if (size_needed <= 0)
-  {
-    return std::string();
-  }
-
-  std::string utf8_command(size_needed - 1, 0);  // exclude null terminator
-  WideCharToMultiByte(CP_UTF8, 0, wcmd, -1, &utf8_command[0], size_needed, NULL, NULL);
-
-  return utf8_command;
-#else
-  // This is the path to get the command that was used to start the process
-  std::string command_line_path = FormFilePath(pid, kCmdlineName);
-  return ExtractCommand(command_line_path);
-#endif
+  return commands;
 }
 
-std::string ExtractCommand(const std::string &command_line_path)
+std::vector<std::string> GetCommandWithArgs(const int32_t &pid)
 {
-  std::string command;
-  std::ifstream command_line_file(command_line_path, std::ios::in | std::ios::binary);
-  std::getline(command_line_file, command, '\0');
-  return command;
+#ifdef _MSC_VER
+  int argc      = 0;
+  LPWSTR *argvW = CommandLineToArgvW(GetCommandLineW(), &argc);
+  if (!argvW)
+  {
+    return {};  // returns an empty vector if CommandLineToArgvW fails
+  }
+
+  std::vector<std::string> args;
+  for (int i = 0; i < argc; i++)
+  {
+    // Convert UTF-16 to UTF-8
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, NULL, 0, NULL, NULL);
+    if (size_needed > 0)
+    {
+      std::string arg(size_needed - 1, 0);
+      WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, &arg[0], size_needed, NULL, NULL);
+      args.push_back(arg);
+    }
+  }
+
+  LocalFree(argvW);
+  return args;
+#else
+  std::string command_line_path = FormFilePath(pid, kCmdlineName);
+  return ExtractCommandWithArgs(command_line_path);
+#endif
 }
 
 std::string FormFilePath(const int32_t &pid, const char *process_type)
