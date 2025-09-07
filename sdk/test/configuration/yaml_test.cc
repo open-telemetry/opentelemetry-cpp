@@ -12,6 +12,12 @@
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
 
+#if defined(_MSC_VER)
+#  include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
+#endif
+
 static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(
     const std::string &yaml)
 {
@@ -37,59 +43,120 @@ file_format:
   ASSERT_EQ(config, nullptr);
 }
 
-TEST(Yaml, just_format)
+TEST(Yaml, broken_format)
 {
   std::string yaml = R"(
 file_format: xx.yy
 )";
 
   auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(Yaml, broken_minor_format)
+{
+  std::string yaml = R"(
+file_format: 1.yy
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(Yaml, broken_patch_format)
+{
+  std::string yaml = R"(
+file_format: 1.0.zz
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(Yaml, unsupported_old_format)
+{
+  std::string yaml = R"(
+file_format: 0.99.99
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(Yaml, unsupported_new_format)
+{
+  std::string yaml = R"(
+file_format: 2.0.0
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(Yaml, supported_new_format)
+{
+  std::string yaml = R"(
+file_format: 1.9.9
+)";
+
+  auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
-  ASSERT_EQ(config->file_format, "xx.yy");
+  ASSERT_EQ(config->file_format, "1.9.9");
+}
+
+TEST(Yaml, just_format)
+{
+  std::string yaml = R"(
+file_format: 1.0.0-rc.1
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->file_format, "1.0.0-rc.1");
 }
 
 TEST(Yaml, disabled)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: 1.0.0
 disabled: true
 )";
 
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
-  ASSERT_EQ(config->file_format, "xx.yy");
+  ASSERT_EQ(config->file_format, "1.0.0");
   ASSERT_EQ(config->disabled, true);
 }
 
 TEST(Yaml, enabled)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: 1.0.0
 disabled: false
 )";
 
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
-  ASSERT_EQ(config->file_format, "xx.yy");
+  ASSERT_EQ(config->file_format, "1.0.0");
   ASSERT_EQ(config->disabled, false);
 }
 
 TEST(Yaml, enabled_by_default)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: 1.0.0
 )";
 
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
-  ASSERT_EQ(config->file_format, "xx.yy");
+  ASSERT_EQ(config->file_format, "1.0.0");
   ASSERT_EQ(config->disabled, false);
 }
 
 TEST(Yaml, no_attribute_limits)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: 1.0.0
 )";
 
   auto config = DoParse(yaml);
@@ -100,13 +167,13 @@ file_format: xx.yy
 TEST(Yaml, empty_attribute_limits)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: 1.0.0
 attribute_limits:
 )";
 
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
-  ASSERT_EQ(config->file_format, "xx.yy");
+  ASSERT_EQ(config->file_format, "1.0.0");
   ASSERT_NE(config->attribute_limits, nullptr);
   ASSERT_EQ(config->attribute_limits->attribute_value_length_limit, 4096);
   ASSERT_EQ(config->attribute_limits->attribute_count_limit, 128);
@@ -115,7 +182,7 @@ attribute_limits:
 TEST(Yaml, attribute_limits)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: 1.0.0
 attribute_limits:
   attribute_value_length_limit: 1234
   attribute_count_limit: 5678
@@ -123,7 +190,7 @@ attribute_limits:
 
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
-  ASSERT_EQ(config->file_format, "xx.yy");
+  ASSERT_EQ(config->file_format, "1.0.0");
   ASSERT_NE(config->attribute_limits, nullptr);
   ASSERT_EQ(config->attribute_limits->attribute_value_length_limit, 1234);
   ASSERT_EQ(config->attribute_limits->attribute_count_limit, 5678);
@@ -132,7 +199,7 @@ attribute_limits:
 TEST(Yaml, no_optional_boolean)
 {
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 disabled:
 )";
 
@@ -144,7 +211,7 @@ disabled:
 TEST(Yaml, illegal_boolean)
 {
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 disabled: illegal
 )";
 
@@ -157,7 +224,7 @@ TEST(Yaml, no_boolean_substitution)
   unsetenv("ENV_NAME");
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 disabled: ${ENV_NAME}
 )";
 
@@ -171,7 +238,7 @@ TEST(Yaml, no_boolean_substitution_env)
   unsetenv("ENV_NAME");
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 disabled: ${env:ENV_NAME}
 )";
 
@@ -185,7 +252,7 @@ TEST(Yaml, empty_boolean_substitution)
   setenv("ENV_NAME", "", 1);
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 disabled: ${ENV_NAME}
 )";
 
@@ -199,7 +266,7 @@ TEST(Yaml, empty_boolean_substitution_env)
   setenv("ENV_NAME", "", 1);
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 disabled: ${env:ENV_NAME}
 )";
 
@@ -213,7 +280,7 @@ TEST(Yaml, true_boolean_substitution)
   setenv("ENV_NAME", "true", 1);
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 disabled: ${ENV_NAME}
 )";
 
@@ -227,7 +294,7 @@ TEST(Yaml, false_boolean_substitution)
   setenv("ENV_NAME", "false", 1);
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 disabled: ${ENV_NAME}
 )";
 
@@ -241,7 +308,7 @@ TEST(Yaml, illegal_boolean_substitution)
   setenv("ENV_NAME", "illegal", 1);
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 disabled: ${ENV_NAME}
 )";
 
@@ -254,7 +321,7 @@ TEST(Yaml, empty_boolean_substitution_fallback)
   unsetenv("ENV_NAME");
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 disabled: ${ENV_NAME:-}
 )";
 
@@ -268,7 +335,7 @@ TEST(Yaml, true_boolean_substitution_fallback)
   unsetenv("ENV_NAME");
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 disabled: ${ENV_NAME:-true}
 )";
 
@@ -282,7 +349,7 @@ TEST(Yaml, false_boolean_substitution_fallback)
   unsetenv("ENV_NAME");
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 disabled: ${ENV_NAME:-false}
 )";
 
@@ -296,7 +363,7 @@ TEST(Yaml, illegal_boolean_substitution_fallback)
   unsetenv("ENV_NAME");
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 disabled: ${ENV_NAME:-illegal}
 )";
 
@@ -309,7 +376,7 @@ TEST(Yaml, torture_boolean_substitution_fallback)
   setenv("env", "true", 1);
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 disabled: ${env:-false}
 )";
 
@@ -378,7 +445,7 @@ file_format: ${env:ENV_NAME}
 
 TEST(Yaml, with_string_substitution)
 {
-  setenv("ENV_NAME", "foo.bar", 1);
+  setenv("ENV_NAME", "1.0.0-substitution", 1);
 
   std::string yaml = R"(
 file_format: ${ENV_NAME}
@@ -386,12 +453,12 @@ file_format: ${ENV_NAME}
 
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
-  ASSERT_EQ(config->file_format, "foo.bar");
+  ASSERT_EQ(config->file_format, "1.0.0-substitution");
 }
 
 TEST(Yaml, with_string_substitution_env)
 {
-  setenv("ENV_NAME", "foo.bar", 1);
+  setenv("ENV_NAME", "1.0.0-substitution", 1);
 
   std::string yaml = R"(
 file_format: ${env:ENV_NAME}
@@ -399,7 +466,7 @@ file_format: ${env:ENV_NAME}
 
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
-  ASSERT_EQ(config->file_format, "foo.bar");
+  ASSERT_EQ(config->file_format, "1.0.0-substitution");
 }
 
 TEST(Yaml, with_string_substitution_fallback)
@@ -407,19 +474,19 @@ TEST(Yaml, with_string_substitution_fallback)
   unsetenv("ENV_NAME");
 
   std::string yaml = R"(
-file_format: ${env:ENV_NAME:-foo.bar}
+file_format: ${env:ENV_NAME:-1.0.0-fallback}
 )";
 
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
-  ASSERT_EQ(config->file_format, "foo.bar");
+  ASSERT_EQ(config->file_format, "1.0.0-fallback");
 }
 
 TEST(Yaml, multiple_string_substitution)
 {
-  setenv("PREFIX", "foo", 1);
+  setenv("PREFIX", "1", 1);
   unsetenv("DOT");
-  setenv("SUFFIX", "bar", 1);
+  setenv("SUFFIX", "2.3", 1);
 
   std::string yaml = R"(
 file_format: ${env:PREFIX:-failed}${DOT:-.}${SUFFIX:-failed}
@@ -427,13 +494,13 @@ file_format: ${env:PREFIX:-failed}${DOT:-.}${SUFFIX:-failed}
 
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
-  ASSERT_EQ(config->file_format, "foo.bar");
+  ASSERT_EQ(config->file_format, "1.2.3");
 }
 
 TEST(Yaml, no_optional_integer)
 {
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 attribute_limits:
   attribute_count_limit:
 )";
@@ -447,7 +514,7 @@ attribute_limits:
 TEST(Yaml, illegal_integer)
 {
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 attribute_limits:
   attribute_count_limit: "just enough"
 )";
@@ -461,7 +528,7 @@ TEST(Yaml, no_integer_substitution)
   unsetenv("ENV_NAME");
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 attribute_limits:
   attribute_count_limit: ${ENV_NAME}
 )";
@@ -477,7 +544,7 @@ TEST(Yaml, empty_integer_substitution)
   setenv("ENV_NAME", "", 1);
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 attribute_limits:
   attribute_count_limit: ${ENV_NAME}
 )";
@@ -493,7 +560,7 @@ TEST(Yaml, with_integer_substitution)
   setenv("ENV_NAME", "7777", 1);
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 attribute_limits:
   attribute_count_limit: ${ENV_NAME}
 )";
@@ -509,7 +576,7 @@ TEST(Yaml, with_illegal_integer_substitution)
   setenv("ENV_NAME", "still not enough", 1);
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 attribute_limits:
   attribute_count_limit: ${ENV_NAME}
 )";
@@ -521,7 +588,7 @@ attribute_limits:
 TEST(Yaml, no_optional_double)
 {
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 tracer_provider:
   processors:
     - simple:
@@ -546,7 +613,7 @@ tracer_provider:
 TEST(Yaml, illegal_double)
 {
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 tracer_provider:
   processors:
     - simple:
@@ -566,7 +633,7 @@ TEST(Yaml, no_double_substitution)
   unsetenv("ENV_NAME");
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 tracer_provider:
   processors:
     - simple:
@@ -593,7 +660,7 @@ TEST(Yaml, empty_double_substitution)
   setenv("ENV_NAME", "", 1);
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 tracer_provider:
   processors:
     - simple:
@@ -620,7 +687,7 @@ TEST(Yaml, with_double_substitution)
   setenv("ENV_NAME", "3.14", 1);
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 tracer_provider:
   processors:
     - simple:
@@ -647,7 +714,7 @@ TEST(Yaml, with_illegal_double_substitution)
   setenv("ENV_NAME", "something else", 1);
 
   std::string yaml = R"(
-file_format: 0.0
+file_format: 1.0.0
 tracer_provider:
   processors:
     - simple:
