@@ -101,6 +101,49 @@ private:
   std::unordered_map<std::string, bool> allowed_attribute_keys_;
 };
 
+/**
+ * FilteringExcludeAttributeProcessor filters by exclude attribute list and drops names if they are
+ * present in the exclude list
+ */
+
+class FilteringExcludeAttributesProcessor : AttributesProcessor
+{
+public:
+  FilteringExcludeAttributesProcessor(std::unordered_map<std::string, bool> &&exclude_list = {})
+      : exclude_list_(std::move(exclude_list))
+  {}
+
+  FilteringExcludeAttributesProcessor(const std::unordered_map<std::string, bool> &exclude_list = {})
+      : exclude_list_(exclude_list)
+  {}
+
+  MetricAttributes process(
+      const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
+  {
+    MetricAttributes result;
+    attributes.ForEachKeyValue(
+        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+          if (exclude_list_.find(key.data()) == exclude_list_.end())
+          {
+            result.SetAttribute(key, value);
+            return true;
+          }
+          return true;
+        });
+
+    result.UpdateHash();
+    return result;
+  }
+
+  bool isPresent(nostd::string_view key) const noexcept override
+  {
+    return (exclude_list_.find(key.data()) == exclude_list_.end());
+  }
+
+private:
+  std::unordered_map<std::string, bool> exclude_list_;
+};
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
