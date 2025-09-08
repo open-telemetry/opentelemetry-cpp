@@ -73,7 +73,7 @@ TEST(AttributesProcessor, FilteringExcludeAttributesProcessor)
   EXPECT_EQ(filter.size(), kNumFilterAttributes);
 }
 
-TEST(AttributesProcessor, FilteringExcludeAllAtrributesProcessor)
+TEST(AttributesProcessor, FilteringExcludeAllAttributesProcessor)
 {
   const int kNumFilterAttributes               = 0;
   std::unordered_map<std::string, bool> filter = {};

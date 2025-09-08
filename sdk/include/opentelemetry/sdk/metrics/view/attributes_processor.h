@@ -80,7 +80,7 @@ public:
     MetricAttributes result;
     attributes.ForEachKeyValue(
         [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
-          if (allowed_attribute_keys_.find(key.data()) != allowed_attribute_keys_.end())
+          if (allowed_attribute_keys_.find(std::string(key)) != allowed_attribute_keys_.end())
           {
             result.SetAttribute(key, value);
             return true;
@@ -94,7 +94,7 @@ public:
 
   bool isPresent(nostd::string_view key) const noexcept override
   {
-    return (allowed_attribute_keys_.find(key.data()) != allowed_attribute_keys_.end());
+    return (allowed_attribute_keys_.find(std::string(key)) != allowed_attribute_keys_.end());
   }
 
 private:
@@ -106,7 +106,7 @@ private:
  * present in the exclude list
  */
 
-class FilteringExcludeAttributesProcessor : AttributesProcessor
+class FilteringExcludeAttributesProcessor : public AttributesProcessor
 {
 public:
   FilteringExcludeAttributesProcessor(std::unordered_map<std::string, bool> &&exclude_list = {})
@@ -124,7 +124,7 @@ public:
     MetricAttributes result;
     attributes.ForEachKeyValue(
         [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
-          if (exclude_list_.find(key.data()) == exclude_list_.end())
+          if (exclude_list_.find(std::string(key)) == exclude_list_.end())
           {
             result.SetAttribute(key, value);
             return true;
@@ -138,7 +138,7 @@ public:
 
   bool isPresent(nostd::string_view key) const noexcept override
   {
-    return (exclude_list_.find(key.data()) == exclude_list_.end());
+    return (exclude_list_.find(std::string(key)) == exclude_list_.end());
   }
 
 private:
