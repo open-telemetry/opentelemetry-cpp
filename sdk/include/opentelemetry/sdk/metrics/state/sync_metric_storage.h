@@ -66,7 +66,7 @@ public:
                     const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_config_(aggregation_config),
-        attributes_hashmap_(new AttributesHashMap(aggregation_config
+        attributes_hashmap_(std::make_unique<AttributesHashMap>(aggregation_config
                                                       ? aggregation_config->cardinality_limit_
                                                       : kAggregationCardinalityLimit)),
         attributes_processor_(std::move(attributes_processor)),

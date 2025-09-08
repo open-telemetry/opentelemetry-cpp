@@ -33,8 +33,7 @@ Increment the:
 * [BUILD] Use -dev versions in main branch
   [#3609](https://github.com/open-telemetry/opentelemetry-cpp/pull/3609)
 
-* [SDK] Implementing configurable aggregation cardinality limit and collector
-  emitting all views instead of last view
+* [SDK] Implementing configurable aggregation cardinality limit
   [#3624](https://github.com/open-telemetry/opentelemetry-cpp/pull/3624)
 
 Important changes:
