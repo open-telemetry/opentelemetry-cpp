@@ -113,7 +113,8 @@ public:
       : exclude_list_(std::move(exclude_list))
   {}
 
-  FilteringExcludeAttributesProcessor(const std::unordered_map<std::string, bool> &exclude_list = {})
+  FilteringExcludeAttributesProcessor(
+      const std::unordered_map<std::string, bool> &exclude_list = {})
       : exclude_list_(exclude_list)
   {}
 
