@@ -66,7 +66,7 @@ public:
 #endif
                     const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
-        aggregation_config_(aggregation_config ? aggregation_config : &default_aggregation_config_),
+        aggregation_config_(aggregation_config ? aggregation_config : &GetDefaultAggregationConfig()),
         attributes_hashmap_(
             std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
         attributes_processor_(std::move(attributes_processor)),
@@ -173,7 +173,10 @@ public:
                nostd::function_ref<bool(MetricData)> callback) noexcept override;
 
 private:
-  static inline const AggregationConfig default_aggregation_config_{};
+  static const AggregationConfig& GetDefaultAggregationConfig() {
+    static const AggregationConfig default_config{};
+    return default_config;
+  }
   InstrumentDescriptor instrument_descriptor_;
   // hashmap to maintain the metrics for delta collection (i.e, collection since last Collect call)
   const AggregationConfig *aggregation_config_;
