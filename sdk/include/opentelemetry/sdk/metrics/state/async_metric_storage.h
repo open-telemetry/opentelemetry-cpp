@@ -9,6 +9,7 @@
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -42,13 +43,11 @@ public:
                      const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
-        aggregation_config_{aggregation_config},
-        cumulative_hash_map_(new AttributesHashMap(aggregation_config
-                                                       ? aggregation_config->cardinality_limit_
-                                                       : kAggregationCardinalityLimit)),
-        delta_hash_map_(new AttributesHashMap(aggregation_config
-                                                  ? aggregation_config->cardinality_limit_
-                                                  : kAggregationCardinalityLimit)),
+        aggregation_config_{aggregation_config ? aggregation_config : &default_aggregation_config_},
+        cumulative_hash_map_(
+            std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
+        delta_hash_map_(
+            std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_filter_type_(exempler_filter_type),
         exemplar_reservoir_(exemplar_reservoir),
@@ -129,9 +128,8 @@ public:
     {
       std::lock_guard<opentelemetry::common::SpinLockMutex> guard(hashmap_lock_);
       delta_metrics = std::move(delta_hash_map_);
-      delta_hash_map_.reset(new AttributesHashMap(aggregation_config_
-                                                      ? aggregation_config_->cardinality_limit_
-                                                      : kAggregationCardinalityLimit));
+      delta_hash_map_ =
+          std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_);
     }
 
     auto status =
@@ -141,6 +139,7 @@ public:
   }
 
 private:
+  static inline const AggregationConfig default_aggregation_config_{};
   InstrumentDescriptor instrument_descriptor_;
   AggregationType aggregation_type_;
   const AggregationConfig *aggregation_config_;
