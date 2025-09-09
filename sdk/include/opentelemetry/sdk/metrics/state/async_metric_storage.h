@@ -43,7 +43,8 @@ public:
                      const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
-        aggregation_config_{aggregation_config ? aggregation_config : &GetDefaultAggregationConfig()},
+        aggregation_config_{aggregation_config ? aggregation_config
+                                               : &GetDefaultAggregationConfig()},
         cumulative_hash_map_(
             std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
         delta_hash_map_(
@@ -139,7 +140,8 @@ public:
   }
 
 private:
-  static const AggregationConfig& GetDefaultAggregationConfig() {
+  static const AggregationConfig &GetDefaultAggregationConfig()
+  {
     static const AggregationConfig default_config{};
     return default_config;
   }

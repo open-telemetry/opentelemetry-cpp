@@ -66,7 +66,8 @@ public:
 #endif
                     const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
-        aggregation_config_(aggregation_config ? aggregation_config : &GetDefaultAggregationConfig()),
+        aggregation_config_(aggregation_config ? aggregation_config
+                                               : &GetDefaultAggregationConfig()),
         attributes_hashmap_(
             std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
         attributes_processor_(std::move(attributes_processor)),
@@ -173,7 +174,8 @@ public:
                nostd::function_ref<bool(MetricData)> callback) noexcept override;
 
 private:
-  static const AggregationConfig& GetDefaultAggregationConfig() {
+  static const AggregationConfig &GetDefaultAggregationConfig()
+  {
     static const AggregationConfig default_config{};
     return default_config;
   }
