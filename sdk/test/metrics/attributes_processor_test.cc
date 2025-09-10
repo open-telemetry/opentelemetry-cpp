@@ -54,7 +54,6 @@ TEST(AttributesProcessor, FilteringAllAttributesProcessor)
 
 TEST(AttributesProcessor, FilteringExcludeAttributesProcessor)
 {
-  const int kNumFilterAttributes               = 3;
   std::unordered_map<std::string, bool> filter = {
       {"attr2", true}, {"attr4", true}, {"attr6", true}};
   const int kNumAttributes              = 7;
@@ -77,7 +76,6 @@ TEST(AttributesProcessor, FilteringExcludeAttributesProcessor)
 
 TEST(AttributesProcessor, FilteringExcludeAllAttributesProcessor)
 {
-  const int kNumFilterAttributes               = 0;
   std::unordered_map<std::string, bool> filter = {};
   const int kNumAttributes                     = 6;
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3", "attr4", "attr5", "attr6"};
