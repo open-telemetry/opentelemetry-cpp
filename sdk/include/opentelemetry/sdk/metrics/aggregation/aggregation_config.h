@@ -19,6 +19,17 @@ public:
   AggregationConfig(size_t cardinality_limit = kAggregationCardinalityLimit)
       : cardinality_limit_(cardinality_limit)
   {}
+
+  static const AggregationConfig *GetOrDefault(const AggregationConfig *config)
+  {
+    if (config)
+    {
+      return config;
+    }
+    static const AggregationConfig default_config{};
+    return &default_config;
+  }
+
   size_t cardinality_limit_;
   virtual ~AggregationConfig() = default;
 };
