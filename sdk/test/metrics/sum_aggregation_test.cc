@@ -197,7 +197,8 @@ TEST(HistogramToSumFilterAttributesWithCardinaityLimit, Double)
           // When the number of unique attribute sets exceeds the cardinality limit, the
           // implementation emits up to (cardinality_limit - 1) unique sets and one overflow set,
           // resulting in a total of cardinality_limit sets. This test checks that the number of
-          // emitted attribute sets is within the expected range, accounting for the overflow behavior.
+          // emitted attribute sets is within the expected range, accounting for the overflow
+          // behavior.
           EXPECT_EQ(cardinality_limit, md.point_data_attr_.size());
           for (size_t i = 0; i < md.point_data_attr_.size(); i++)
           {
