@@ -187,7 +187,9 @@ public:
   void VisitInteger(
       const opentelemetry::sdk::configuration::IntegerAttributeValueConfiguration *model) override
   {
-    opentelemetry::common::AttributeValue attribute_value(model->value);
+    /* Provide exact type to opentelemetry::common::AttributeValue variant. */
+    int64_t value = model->value;
+    opentelemetry::common::AttributeValue attribute_value(value);
     resource_attributes_.SetAttribute(name_, attribute_value);
   }
 
