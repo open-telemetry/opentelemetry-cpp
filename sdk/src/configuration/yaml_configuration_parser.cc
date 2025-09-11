@@ -66,6 +66,7 @@ std::unique_ptr<Configuration> YamlConfigurationParser::ParseString(const std::s
 {
   std::unique_ptr<Document> doc;
   std::unique_ptr<Configuration> config;
+  ConfigurationParser config_parser;
 
   doc = RymlDocument::Parse(source, content);
 
@@ -73,7 +74,7 @@ std::unique_ptr<Configuration> YamlConfigurationParser::ParseString(const std::s
   {
     if (doc)
     {
-      config = ConfigurationParser::Parse(std::move(doc));
+      config = config_parser.Parse(std::move(doc));
     }
   }
   catch (const std::exception &e)
