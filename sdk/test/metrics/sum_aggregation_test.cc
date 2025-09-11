@@ -145,7 +145,7 @@ TEST(HistogramToSumFilterAttributes, Double)
   });
 }
 
-TEST(HistogramToSumFilterAttributesWithCardinaityLimit, Double)
+TEST(HistogramToSumFilterAttributesWithCardinalityLimit, Double)
 {
   MeterProvider mp;
   auto m                      = mp.GetMeter("meter1", "version1", "schema1");
