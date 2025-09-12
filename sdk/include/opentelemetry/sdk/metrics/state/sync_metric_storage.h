@@ -18,6 +18,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
@@ -63,10 +64,11 @@ public:
                     ExemplarFilterType exempler_filter_type,
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
-                    const AggregationConfig *aggregation_config,
-                    size_t attributes_limit = kAggregationCardinalityLimit)
+                    const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
-        attributes_hashmap_(new AttributesHashMap(attributes_limit)),
+        aggregation_config_(AggregationConfig::GetOrDefault(aggregation_config)),
+        attributes_hashmap_(
+            std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
         attributes_processor_(std::move(attributes_processor)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_filter_type_(exempler_filter_type),
@@ -173,6 +175,7 @@ public:
 private:
   InstrumentDescriptor instrument_descriptor_;
   // hashmap to maintain the metrics for delta collection (i.e, collection since last Collect call)
+  const AggregationConfig *aggregation_config_;
   std::unique_ptr<AttributesHashMap> attributes_hashmap_;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
   std::shared_ptr<const AttributesProcessor> attributes_processor_;

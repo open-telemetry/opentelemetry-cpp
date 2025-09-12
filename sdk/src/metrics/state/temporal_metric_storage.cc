@@ -97,7 +97,9 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   }
   auto unreported_list = std::move(present->second);
   // Iterate over the unreporter metrics for `collector` and store result in `merged_metrics`
-  std::unique_ptr<AttributesHashMap> merged_metrics(new AttributesHashMap);
+  std::unique_ptr<AttributesHashMap> merged_metrics(
+      new AttributesHashMap(aggregation_config_ ? aggregation_config_->cardinality_limit_
+                                                : kAggregationCardinalityLimit));
   for (auto &agg_hashmap : unreported_list)
   {
     agg_hashmap->GetAllEnteries(
