@@ -18,7 +18,48 @@ namespace sdk
 {
 namespace metrics
 {
+
 using MetricAttributes = opentelemetry::sdk::metrics::FilteredOrderedAttributeMap;
+
+/**
+ * Hash and equality for nostd::string_view, enabling safe use in unordered_map
+ * without requiring null termination. Supports heterogeneous lookup with
+ * std::string and std::string_view as well.
+ */
+struct StringViewHash
+{
+  using is_transparent = void;
+  std::size_t operator()(opentelemetry::nostd::string_view sv) const noexcept
+  {
+    return std::hash<std::string_view>{}(
+        std::string_view{sv.data(), sv.size()});
+  }
+};
+
+struct StringViewEqual
+{
+  using is_transparent = void;
+  bool operator()(opentelemetry::nostd::string_view lhs,
+                  opentelemetry::nostd::string_view rhs) const noexcept
+  {
+    return lhs.size() == rhs.size() &&
+           std::memcmp(lhs.data(), rhs.data(), lhs.size()) == 0;
+  }
+
+  bool operator()(const std::string &lhs,
+                  opentelemetry::nostd::string_view rhs) const noexcept
+  {
+    return lhs.size() == rhs.size() &&
+           std::memcmp(lhs.data(), rhs.data(), lhs.size()) == 0;
+  }
+
+  bool operator()(opentelemetry::nostd::string_view lhs,
+                  const std::string &rhs) const noexcept
+  {
+    return rhs.size() == lhs.size() &&
+           std::memcmp(lhs.data(), rhs.data(), rhs.size()) == 0;
+  }
+};
 
 /**
  * The AttributesProcessor is responsible for customizing which
@@ -65,12 +106,12 @@ public:
 class FilteringAttributesProcessor : public AttributesProcessor
 {
 public:
-  FilteringAttributesProcessor(std::unordered_map<std::string, bool> &&allowed_attribute_keys = {})
+  FilteringAttributesProcessor(std::unordered_map<std::string, bool, StringViewHash, StringViewEqual> &&allowed_attribute_keys = {})
       : allowed_attribute_keys_(std::move(allowed_attribute_keys))
   {}
 
   FilteringAttributesProcessor(
-      const std::unordered_map<std::string, bool> &allowed_attribute_keys = {})
+      const std::unordered_map<std::string, bool, StringViewHash, StringViewEqual> &allowed_attribute_keys = {})
       : allowed_attribute_keys_(allowed_attribute_keys)
   {}
 
@@ -80,7 +121,7 @@ public:
     MetricAttributes result;
     attributes.ForEachKeyValue(
         [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
-          if (allowed_attribute_keys_.find(std::string(key)) != allowed_attribute_keys_.end())
+          if (allowed_attribute_keys_.find(key) != allowed_attribute_keys_.end())
           {
             result.SetAttribute(key, value);
             return true;
@@ -94,11 +135,11 @@ public:
 
   bool isPresent(nostd::string_view key) const noexcept override
   {
-    return (allowed_attribute_keys_.find(std::string(key)) != allowed_attribute_keys_.end());
+    return (allowed_attribute_keys_.find(key) != allowed_attribute_keys_.end());
   }
 
 private:
-  std::unordered_map<std::string, bool> allowed_attribute_keys_;
+  std::unordered_map<std::string, bool, StringViewHash, StringViewEqual> allowed_attribute_keys_;
 };
 
 /**
@@ -109,12 +150,12 @@ private:
 class FilteringExcludeAttributesProcessor : public AttributesProcessor
 {
 public:
-  FilteringExcludeAttributesProcessor(std::unordered_map<std::string, bool> &&exclude_list = {})
+  FilteringExcludeAttributesProcessor(std::unordered_map<std::string, bool, StringViewHash, StringViewEqual> &&exclude_list = {})
       : exclude_list_(std::move(exclude_list))
   {}
 
   FilteringExcludeAttributesProcessor(
-      const std::unordered_map<std::string, bool> &exclude_list = {})
+      const std::unordered_map<std::string, bool, StringViewHash, StringViewEqual> &exclude_list = {})
       : exclude_list_(exclude_list)
   {}
 
@@ -124,7 +165,7 @@ public:
     MetricAttributes result;
     attributes.ForEachKeyValue(
         [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
-          if (exclude_list_.find(std::string(key)) == exclude_list_.end())
+          if (exclude_list_.find(key) == exclude_list_.end())
           {
             result.SetAttribute(key, value);
             return true;
@@ -138,11 +179,11 @@ public:
 
   bool isPresent(nostd::string_view key) const noexcept override
   {
-    return (exclude_list_.find(std::string(key)) == exclude_list_.end());
+    return (exclude_list_.find(key) == exclude_list_.end());
   }
 
 private:
-  std::unordered_map<std::string, bool> exclude_list_;
+  std::unordered_map<std::string, bool, StringViewHash, StringViewEqual> exclude_list_;
 };
 
 }  // namespace metrics
