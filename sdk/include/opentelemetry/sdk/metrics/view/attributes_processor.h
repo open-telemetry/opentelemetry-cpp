@@ -73,7 +73,7 @@ struct StringViewEqual
 template <typename Map, typename Key>
 auto find_hetero(Map &map, Key &&key)
 {
-#if defined(_LIBCPP_VERSION) && !defined(_LIBCPP_HAS_UNORDERED_MAP_TRANSPARENT_LOOKUP)
+#if defined(_LIBCPP_VERSION)
   // libc++ (macOS) does not yet support heterogeneous lookup in unordered_map
   return map.find(std::string(key));
 #else
