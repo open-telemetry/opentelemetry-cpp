@@ -33,13 +33,13 @@ struct StringViewHash
   {
     return std::hash<std::string>{}(s);
   }
-  std::size_t operator()(std::string_view sv) const noexcept
+  std::size_t operator()(opentelemetry::nostd::string_view sv) const noexcept
   {
-    return std::hash<std::string_view>{}(sv);
+    return std::hash<opentelemetry::nostd::string_view>{}(sv);
   }
   std::size_t operator()(opentelemetry::nostd::string_view sv) const noexcept
   {
-    return std::hash<std::string_view>{}(std::string_view{sv.data(), sv.size()});
+    return std::hash<opentelemetry::nostd::string_view>{}(opentelemetry::nostd::string_view{sv.data(), sv.size()});
   }
 };
 
@@ -51,11 +51,11 @@ struct StringViewEqual
   {
     return lhs == rhs;
   }
-  bool operator()(const std::string &lhs, std::string_view rhs) const noexcept
+  bool operator()(const std::string &lhs, opentelemetry::nostd::string_view rhs) const noexcept
   {
     return lhs.size() == rhs.size() && std::memcmp(lhs.data(), rhs.data(), lhs.size()) == 0;
   }
-  bool operator()(std::string_view lhs, const std::string &rhs) const noexcept
+  bool operator()(opentelemetry::nostd::string_view lhs, const std::string &rhs) const noexcept
   {
     return lhs.size() == rhs.size() && std::memcmp(lhs.data(), rhs.data(), lhs.size()) == 0;
   }
