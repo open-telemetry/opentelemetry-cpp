@@ -100,7 +100,9 @@ TEST(HistogramToSumFilterAttributes, Double)
   std::string instrument_name = "histogram1";
   std::string instrument_desc = "histogram metrics";
 
-  std::unordered_map<std::string, bool> allowedattr;
+  std::unordered_map<std::string, bool, opentelemetry::sdk::metrics::StringViewHash,
+                     opentelemetry::sdk::metrics::StringViewEqual>
+      allowedattr;
   allowedattr["attr1"] = true;
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{
       new opentelemetry::sdk::metrics::FilteringAttributesProcessor(allowedattr)};
@@ -154,7 +156,9 @@ TEST(HistogramToSumFilterAttributesWithCardinalityLimit, Double)
   std::string instrument_desc = "histogram metrics";
   size_t cardinality_limit    = 10000;
 
-  std::unordered_map<std::string, bool> allowedattr;
+  std::unordered_map<std::string, bool, opentelemetry::sdk::metrics::StringViewHash,
+                     opentelemetry::sdk::metrics::StringViewEqual>
+      allowedattr;
   allowedattr["attr1"] = true;
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{
       new opentelemetry::sdk::metrics::FilteringAttributesProcessor(allowedattr)};
@@ -281,7 +285,9 @@ TEST(CounterToSumFilterAttributes, Double)
   std::string instrument_name = "counter1";
   std::string instrument_desc = "counter metrics";
 
-  std::unordered_map<std::string, bool> allowedattr;
+  std::unordered_map<std::string, bool, opentelemetry::sdk::metrics::StringViewHash,
+                     opentelemetry::sdk::metrics::StringViewEqual>
+      allowedattr;
   allowedattr["attr1"] = true;
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{
       new opentelemetry::sdk::metrics::FilteringAttributesProcessor(allowedattr)};
@@ -335,7 +341,9 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
   std::string instrument_desc = "counter metrics";
   size_t cardinality_limit    = 10000;
 
-  std::unordered_map<std::string, bool> allowedattr;
+  std::unordered_map<std::string, bool, opentelemetry::sdk::metrics::StringViewHash,
+                     opentelemetry::sdk::metrics::StringViewEqual>
+      allowedattr;
   allowedattr["attr1"] = true;
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{
       new opentelemetry::sdk::metrics::FilteringAttributesProcessor(allowedattr)};
