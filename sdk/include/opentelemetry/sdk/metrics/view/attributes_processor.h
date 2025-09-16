@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstring>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -81,6 +82,16 @@ inline auto find_hetero(
   return map.find(std::string(key));
 #else
   // libstdc++ supports heterogeneous lookup directly
+  return map.find(key);
+#endif
+}
+
+inline auto find_hetero(std::unordered_map<std::string, bool, StringViewHash, StringViewEqual> &map,
+                        opentelemetry::nostd::string_view key)
+{
+#if defined(_LIBCPP_VERSION)
+  return map.find(std::string(key));
+#else
   return map.find(key);
 #endif
 }
