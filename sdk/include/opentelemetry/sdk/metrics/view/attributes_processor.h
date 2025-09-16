@@ -28,7 +28,10 @@ using MetricAttributes = opentelemetry::sdk::metrics::FilteredOrderedAttributeMa
  */
 struct StringViewHash
 {
+#if __cplusplus >= 202002L
+  // enable heterogenous lookup in C++20+
   using is_transparent = void;
+#endif
 
   std::size_t operator()(const std::string &s) const noexcept
   {
@@ -37,14 +40,21 @@ struct StringViewHash
 
   std::size_t operator()(opentelemetry::nostd::string_view sv) const noexcept
   {
-    // hash the data without assuming null-termination
+#if __cplusplus >= 202002L
+    return std::hash<opentelemetry::nostd::string_view>{}(
+        opentelemetry::nostd::string_view{sv.data(), sv.size()});
+#else
+    // pre-C++20 fallback: materialize to std::string
     return std::hash<std::string>{}(std::string{sv.data(), sv.size()});
+#endif
   }
 };
 
 struct StringViewEqual
 {
+#if __cplusplus >= 202002L
   using is_transparent = void;
+#endif
 
   bool operator()(const std::string &lhs, const std::string &rhs) const noexcept
   {
@@ -70,18 +80,16 @@ struct StringViewEqual
 
 /**
  * Cross-platform heterogeneous lookup wrapper.
- * Falls back to std::string construction on libc++ (macOS),
+ * Falls back to std::string construction on libc++ (macOS) and pre-c++20,
  * but uses direct lookup on libstdc++ (Linux).
  */
 inline auto find_hetero(
     const std::unordered_map<std::string, bool, StringViewHash, StringViewEqual> &map,
     opentelemetry::nostd::string_view key)
 {
-#if defined(_LIBCPP_VERSION)
-  // libc++ (macOS) does not yet support heterogeneous lookup
+#if defined(_LIBCPP_VERSION) || __cplusplus < 202002L
   return map.find(std::string(key));
 #else
-  // libstdc++ supports heterogeneous lookup directly
   return map.find(key);
 #endif
 }
@@ -89,7 +97,7 @@ inline auto find_hetero(
 inline auto find_hetero(std::unordered_map<std::string, bool, StringViewHash, StringViewEqual> &map,
                         opentelemetry::nostd::string_view key)
 {
-#if defined(_LIBCPP_VERSION)
+#if defined(_LIBCPP_VERSION) || __cplusplus < 202002L
   return map.find(std::string(key));
 #else
   return map.find(key);
