@@ -33,13 +33,11 @@ struct StringViewHash
   {
     return std::hash<std::string>{}(s);
   }
+
   std::size_t operator()(opentelemetry::nostd::string_view sv) const noexcept
   {
-    return std::hash<opentelemetry::nostd::string_view>{}(sv);
-  }
-  std::size_t operator()(opentelemetry::nostd::string_view sv) const noexcept
-  {
-    return std::hash<opentelemetry::nostd::string_view>{}(opentelemetry::nostd::string_view{sv.data(), sv.size()});
+    // hash the data without assuming null-termination
+    return std::hash<std::string>{}(std::string{sv.data(), sv.size()});
   }
 };
 
@@ -51,15 +49,19 @@ struct StringViewEqual
   {
     return lhs == rhs;
   }
+
   bool operator()(const std::string &lhs, opentelemetry::nostd::string_view rhs) const noexcept
   {
     return lhs.size() == rhs.size() && std::memcmp(lhs.data(), rhs.data(), lhs.size()) == 0;
   }
+
   bool operator()(opentelemetry::nostd::string_view lhs, const std::string &rhs) const noexcept
   {
     return lhs.size() == rhs.size() && std::memcmp(lhs.data(), rhs.data(), lhs.size()) == 0;
   }
-  bool operator()(opentelemetry::nostd::string_view lhs, const std::string &rhs) const noexcept
+
+  bool operator()(opentelemetry::nostd::string_view lhs,
+                  opentelemetry::nostd::string_view rhs) const noexcept
   {
     return lhs.size() == rhs.size() && std::memcmp(lhs.data(), rhs.data(), lhs.size()) == 0;
   }
@@ -70,15 +72,16 @@ struct StringViewEqual
  * Falls back to std::string construction on libc++ (macOS),
  * but uses direct lookup on libstdc++ (Linux).
  */
-template <typename Map, typename Key>
-auto find_hetero(Map &map, Key &&key)
+inline auto find_hetero(
+    const std::unordered_map<std::string, bool, StringViewHash, StringViewEqual> &map,
+    opentelemetry::nostd::string_view key)
 {
 #if defined(_LIBCPP_VERSION)
-  // libc++ (macOS) does not yet support heterogeneous lookup in unordered_map
+  // libc++ (macOS) does not yet support heterogeneous lookup
   return map.find(std::string(key));
 #else
-  // libstdc++ (Linux, GCC/Clang) supports it
-  return map.find(std::forward<Key>(key));
+  // libstdc++ supports heterogeneous lookup directly
+  return map.find(key);
 #endif
 }
 
