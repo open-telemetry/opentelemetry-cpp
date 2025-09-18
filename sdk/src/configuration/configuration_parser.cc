@@ -1870,10 +1870,9 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
     int count;
     int major;
     int minor;
-    int patch;
 
-    count = sscanf(model->file_format.c_str(), "%d.%d.%d", &major, &minor, &patch);
-    if (count != 3)
+    count = sscanf(model->file_format.c_str(), "%d.%d", &major, &minor);
+    if (count != 2)
     {
       std::string message("Invalid file_format");
       throw InvalidSchemaException(message);
@@ -1886,9 +1885,17 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
       throw InvalidSchemaException(message);
     }
 
+    if (minor != 0)
+    {
+      std::string message("Unsupported file_format, major = ");
+      message.append(std::to_string(major));
+      message.append(", minor = ");
+      message.append(std::to_string(minor));
+      throw InvalidSchemaException(message);
+    }
+
     version_major_ = major;
     version_minor_ = minor;
-    version_patch_ = patch;
   }
 
   model->disabled = node->GetBoolean("disabled", false);
