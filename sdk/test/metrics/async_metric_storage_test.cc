@@ -25,11 +25,13 @@
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
-#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#else
+#  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #endif
 
 using namespace opentelemetry::sdk::metrics;
@@ -192,8 +194,10 @@ TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
         }
         return true;
       });
-  // subsequent recording after collection shouldn't fail
-  // monotonic increasing values;
+  // Note: When the cardinality limit is set to n, the attributes hashmap emits n-1 distinct
+  // attribute sets, plus an overflow bucket for additional attributes. The test logic below is made
+  // generic to succeed for either n or n-1 total cardinality. If this behavior is unexpected,
+  // please investigate and file an issue.
   int64_t get_count2 = -50;
   int64_t put_count2 = -70;
 
