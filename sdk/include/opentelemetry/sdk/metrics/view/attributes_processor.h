@@ -138,7 +138,7 @@ template <typename MapType>
 inline auto find_hetero(MapType &&map, opentelemetry::nostd::string_view key)
 {
 #if defined(_LIBCPP_VERSION) || \
-    (defined(OPENTELEMETRY_STL_VERSION) && OPENTELEMETRY_STL_VERSION < 2020)
+    (!defined(OPENTELEMETRY_STL_VERSION) || OPENTELEMETRY_STL_VERSION < 2020)
   return map.find(std::string(key));
 #else
   // libstdc++ + C++20: heterogeneous lookup works
