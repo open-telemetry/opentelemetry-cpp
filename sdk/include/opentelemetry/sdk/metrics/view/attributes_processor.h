@@ -23,58 +23,108 @@ namespace metrics
 using MetricAttributes = opentelemetry::sdk::metrics::FilteredOrderedAttributeMap;
 
 /**
+ * Generic FNV hash implementation
+ */
+
+template <typename Ty, size_t s>
+struct fnv_magic_prime_number
+{
+  static constexpr const Ty value = 0x01000193U;
+};
+
+template <typename Ty>
+struct fnv_magic_prime_number<Ty, 8>
+{
+  static constexpr const Ty value = 0x100000001b3ULL;
+};
+
+template <typename Ty, size_t s>
+struct fnv_magic_offset_basis
+{
+  static constexpr const Ty value = 0x811C9DC5U;
+
+  static constexpr Ty fix(Ty hval) { return hval; }
+};
+
+template <typename Ty>
+struct fnv_magic_offset_basis<Ty, 8>
+{
+  static constexpr const Ty value = 0xCBF29CE484222325ULL;
+
+  static constexpr Ty fix(Ty hval) { return hval ^ (hval >> 32); }
+};
+
+template <typename Ty>
+Ty fnv_n_buf(const void *buf, size_t len, Ty hval = fnv_magic_offset_basis<Ty, sizeof(Ty)>::value)
+{
+  const unsigned char *bp = reinterpret_cast<const unsigned char *>(buf);
+  const unsigned char *be = bp + len;
+  Ty mn                   = fnv_magic_prime_number<Ty, sizeof(Ty)>::value;
+
+  while (bp < be)
+  {
+    hval *= mn;
+    hval ^= static_cast<Ty>(*bp++);
+  }
+
+  return fnv_magic_offset_basis<Ty, sizeof(Ty)>::fix(hval);
+}
+
+template <typename Ty>
+Ty fnv_n_buf_a(const void *buf, size_t len, Ty hval = fnv_magic_offset_basis<Ty, sizeof(Ty)>::value)
+{
+  const unsigned char *bp = reinterpret_cast<const unsigned char *>(buf);
+  const unsigned char *be = bp + len;
+  Ty mn                   = fnv_magic_prime_number<Ty, sizeof(Ty)>::value;
+
+  while (bp < be)
+  {
+    hval ^= static_cast<Ty>(*bp++);
+    hval *= mn;
+  }
+
+  return fnv_magic_offset_basis<Ty, sizeof(Ty)>::fix(hval);
+}
+
+/**
  * Hash and equality for nostd::string_view, enabling safe use in unordered_map
  * without requiring null termination.
  */
+
 struct StringViewHash
 {
-#if __cplusplus >= 202002L
-  // enable heterogenous lookup in C++20+
+#if defined(OPENTELEMETRY_STL_VERSION)
+#  if OPENTELEMETRY_STL_VERSION >= 2020
   using is_transparent = void;
+#  endif
 #endif
 
   std::size_t operator()(const std::string &s) const noexcept
   {
-    return std::hash<std::string>{}(s);
+    return fnv_n_buf_a<std::size_t>(s.data(), s.size());
   }
 
   std::size_t operator()(opentelemetry::nostd::string_view sv) const noexcept
   {
-#if __cplusplus >= 202002L
-    return std::hash<opentelemetry::nostd::string_view>{}(
-        opentelemetry::nostd::string_view{sv.data(), sv.size()});
-#else
-    // pre-C++20 fallback: materialize to std::string
-    return std::hash<std::string>{}(std::string{sv.data(), sv.size()});
-#endif
+    return fnv_n_buf_a<std::size_t>(sv.data(), sv.size());
   }
 };
 
 struct StringViewEqual
 {
-#if __cplusplus >= 202002L
+#if defined(OPENTELEMETRY_STL_VERSION)
+#  if OPENTELEMETRY_STL_VERSION >= 2020
   using is_transparent = void;
+#  endif
 #endif
 
-  bool operator()(const std::string &lhs, const std::string &rhs) const noexcept
+  template <typename Lhs, typename Rhs>
+  bool operator()(const Lhs &lhs, const Rhs &rhs) const noexcept
   {
-    return lhs == rhs;
-  }
+    opentelemetry::nostd::string_view lsv(lhs.data(), lhs.size());
+    opentelemetry::nostd::string_view rsv(rhs.data(), rhs.size());
 
-  bool operator()(const std::string &lhs, opentelemetry::nostd::string_view rhs) const noexcept
-  {
-    return lhs.size() == rhs.size() && std::memcmp(lhs.data(), rhs.data(), lhs.size()) == 0;
-  }
-
-  bool operator()(opentelemetry::nostd::string_view lhs, const std::string &rhs) const noexcept
-  {
-    return lhs.size() == rhs.size() && std::memcmp(lhs.data(), rhs.data(), lhs.size()) == 0;
-  }
-
-  bool operator()(opentelemetry::nostd::string_view lhs,
-                  opentelemetry::nostd::string_view rhs) const noexcept
-  {
-    return lhs.size() == rhs.size() && std::memcmp(lhs.data(), rhs.data(), lhs.size()) == 0;
+    return lsv.size() == rsv.size() && std::memcmp(lsv.data(), rsv.data(), lsv.size()) == 0;
   }
 };
 
@@ -83,23 +133,15 @@ struct StringViewEqual
  * Falls back to std::string construction on libc++ (macOS) and pre-c++20,
  * but uses direct lookup on libstdc++ (Linux).
  */
-inline auto find_hetero(
-    const std::unordered_map<std::string, bool, StringViewHash, StringViewEqual> &map,
-    opentelemetry::nostd::string_view key)
-{
-#if defined(_LIBCPP_VERSION) || __cplusplus < 202002L
-  return map.find(std::string(key));
-#else
-  return map.find(key);
-#endif
-}
 
-inline auto find_hetero(std::unordered_map<std::string, bool, StringViewHash, StringViewEqual> &map,
-                        opentelemetry::nostd::string_view key)
+template <typename MapType>
+inline auto find_hetero(MapType &&map, opentelemetry::nostd::string_view key)
 {
-#if defined(_LIBCPP_VERSION) || __cplusplus < 202002L
+#if defined(_LIBCPP_VERSION) || \
+    (defined(OPENTELEMETRY_STL_VERSION) && OPENTELEMETRY_STL_VERSION < 2020)
   return map.find(std::string(key));
 #else
+  // libstdc++ + C++20: heterogeneous lookup works
   return map.find(key);
 #endif
 }
