@@ -26,64 +26,55 @@ using MetricAttributes = opentelemetry::sdk::metrics::FilteredOrderedAttributeMa
  * Generic FNV hash implementation
  */
 
-template <typename Ty, size_t s>
-struct fnv_magic_prime_number
+template <typename Ty, size_t Size>
+struct FnvPrime;
+
+template <typename Ty>
+struct FnvPrime<Ty, 4>
 {
-  static constexpr const Ty value = 0x01000193U;
+  static constexpr Ty value = static_cast<Ty>(0x01000193U);
 };
 
 template <typename Ty>
-struct fnv_magic_prime_number<Ty, 8>
+struct FnvPrime<Ty, 8>
 {
-  static constexpr const Ty value = 0x100000001b3ULL;
+  static constexpr Ty value = static_cast<Ty>(0x100000001b3ULL);
 };
 
-template <typename Ty, size_t s>
-struct fnv_magic_offset_basis
-{
-  static constexpr const Ty value = 0x811C9DC5U;
+// FNV offset basis values
+template <typename Ty, size_t Size>
+struct FnvOffset;
 
-  static constexpr Ty fix(Ty hval) { return hval; }
+template <typename Ty>
+struct FnvOffset<Ty, 4>
+{
+  static constexpr Ty value = static_cast<Ty>(0x811C9DC5U);
+
+  static constexpr Ty Fix(Ty hval) noexcept { return hval; }
 };
 
 template <typename Ty>
-struct fnv_magic_offset_basis<Ty, 8>
+struct FnvOffset<Ty, 8>
 {
-  static constexpr const Ty value = 0xCBF29CE484222325ULL;
+  static constexpr Ty value = static_cast<Ty>(0xCBF29CE484222325ULL);
 
-  static constexpr Ty fix(Ty hval) { return hval ^ (hval >> 32); }
+  static constexpr Ty Fix(Ty hval) noexcept { return hval ^ (hval >> 32); }
 };
 
+// FNV-1a
 template <typename Ty>
-Ty fnv_n_buf(const void *buf, size_t len, Ty hval = fnv_magic_offset_basis<Ty, sizeof(Ty)>::value)
+inline Ty Fnv1a(const void *buf, size_t len, Ty hval = FnvOffset<Ty, sizeof(Ty)>::value) noexcept
 {
   const unsigned char *bp = reinterpret_cast<const unsigned char *>(buf);
   const unsigned char *be = bp + len;
-  Ty mn                   = fnv_magic_prime_number<Ty, sizeof(Ty)>::value;
-
-  while (bp < be)
-  {
-    hval *= mn;
-    hval ^= static_cast<Ty>(*bp++);
-  }
-
-  return fnv_magic_offset_basis<Ty, sizeof(Ty)>::fix(hval);
-}
-
-template <typename Ty>
-Ty fnv_n_buf_a(const void *buf, size_t len, Ty hval = fnv_magic_offset_basis<Ty, sizeof(Ty)>::value)
-{
-  const unsigned char *bp = reinterpret_cast<const unsigned char *>(buf);
-  const unsigned char *be = bp + len;
-  Ty mn                   = fnv_magic_prime_number<Ty, sizeof(Ty)>::value;
+  Ty prime                = FnvPrime<Ty, sizeof(Ty)>::value;
 
   while (bp < be)
   {
     hval ^= static_cast<Ty>(*bp++);
-    hval *= mn;
+    hval *= prime;
   }
-
-  return fnv_magic_offset_basis<Ty, sizeof(Ty)>::fix(hval);
+  return FnvOffset<Ty, sizeof(Ty)>::Fix(hval);
 }
 
 /**
@@ -101,12 +92,12 @@ struct StringViewHash
 
   std::size_t operator()(const std::string &s) const noexcept
   {
-    return fnv_n_buf_a<std::size_t>(s.data(), s.size());
+    return Fnv1a<std::size_t>(s.data(), s.size());
   }
 
   std::size_t operator()(opentelemetry::nostd::string_view sv) const noexcept
   {
-    return fnv_n_buf_a<std::size_t>(sv.data(), sv.size());
+    return Fnv1a<std::size_t>(sv.data(), sv.size());
   }
 };
 
@@ -121,8 +112,10 @@ struct StringViewEqual
   template <typename Lhs, typename Rhs>
   bool operator()(const Lhs &lhs, const Rhs &rhs) const noexcept
   {
-    opentelemetry::nostd::string_view lsv(lhs.data(), lhs.size());
-    opentelemetry::nostd::string_view rsv(rhs.data(), rhs.size());
+    opentelemetry::nostd::string_view lsv(opentelemetry::nostd::data(lhs),
+                                          opentelemetry::nostd::size(lhs));
+    opentelemetry::nostd::string_view rsv(opentelemetry::nostd::data(rhs),
+                                          opentelemetry::nostd::size(rhs));
 
     return lsv.size() == rsv.size() && std::memcmp(lsv.data(), rsv.data(), lsv.size()) == 0;
   }
