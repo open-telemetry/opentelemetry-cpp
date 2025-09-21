@@ -204,8 +204,9 @@ jobs:
           pip install "conan==2.15.1"
           conan profile detect --force
       - name: Install or build all dependencies with Conan
+        # CMAKE_POLICY_VERSION_MINIMUM: '3.5' is required to build opentracing with CMake 4.x
         run: |
-          conan install install/conan/conanfile_stable.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
+          conan install install/conan/conanfile_stable.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD} -c "tools.cmake.cmaketoolchain:extra_variables={'CMAKE_POLICY_VERSION_MINIMUM': '3.5'}"
           conan cache clean --source --build
       - name: Run Tests (static libs)
         env:
@@ -241,8 +242,9 @@ jobs:
           pip install "conan==2.15.1"
           conan profile detect --force
       - name: Install or build all dependencies with Conan
+        # CMAKE_POLICY_VERSION_MINIMUM: '3.5' is required to build opentracing with CMake 4.x
         run: |
-          conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
+          conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD} -c "tools.cmake.cmaketoolchain:extra_variables={'CMAKE_POLICY_VERSION_MINIMUM': '3.5'}"
           conan cache clean --source --build
       - name: Run Tests (static libs)
         env:
@@ -277,8 +279,9 @@ jobs:
         brew install conan autoconf automake libtool coreutils
         conan profile detect --force
     - name: Install or build all dependencies with Conan
+      # CMAKE_POLICY_VERSION_MINIMUM: '3.5' is required to build opentracing with CMake 4.x
       run: |
-        conan install install/conan/conanfile_stable.txt --build=missing -of /Users/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
+        conan install install/conan/conanfile_stable.txt --build=missing -of /Users/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD} -c "tools.cmake.cmaketoolchain:extra_variables={'CMAKE_POLICY_VERSION_MINIMUM': '3.5'}"
         conan cache clean --source --build
     - name: Run Tests (static libs)
       env:
