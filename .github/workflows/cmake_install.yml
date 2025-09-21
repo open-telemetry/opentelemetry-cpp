@@ -275,7 +275,7 @@ jobs:
         submodules: 'recursive'
     - name: Install CMake
       run: |
-        sudo -E ./ci/setup_cmake_macos.sh
+        ./ci/setup_cmake_macos.sh
     - name: Install Conan and tools
       run: |
         brew install conan autoconf automake libtool coreutils
