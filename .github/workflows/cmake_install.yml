@@ -204,9 +204,8 @@ jobs:
           pip install "conan==2.15.1"
           conan profile detect --force
       - name: Install or build all dependencies with Conan
-        # CMAKE_POLICY_VERSION_MINIMUM: '3.5' is required to build opentracing with CMake 4.x
         run: |
-          conan install install/conan/conanfile_stable.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD} -c "tools.cmake.cmaketoolchain:extra_variables={'CMAKE_POLICY_VERSION_MINIMUM': '3.5'}"
+          conan install install/conan/conanfile_stable.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
           conan cache clean --source --build
       - name: Run Tests (static libs)
         env:
@@ -242,9 +241,8 @@ jobs:
           pip install "conan==2.15.1"
           conan profile detect --force
       - name: Install or build all dependencies with Conan
-        # CMAKE_POLICY_VERSION_MINIMUM: '3.5' is required to build opentracing with CMake 4.x
         run: |
-          conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD} -c "tools.cmake.cmaketoolchain:extra_variables={'CMAKE_POLICY_VERSION_MINIMUM': '3.5'}"
+          conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
           conan cache clean --source --build
       - name: Run Tests (static libs)
         env:
@@ -264,6 +262,7 @@ jobs:
       INSTALL_TEST_DIR: '/Users/runner/install_test'
       CXX_STANDARD: '17'
       CMAKE_TOOLCHAIN_FILE: '/Users/runner/conan/build/Debug/generators/conan_toolchain.cmake'
+      CMAKE_VERSION: 3.31.0 # building the conan "stable" versions requires CMake 3.x
       BUILD_TYPE: 'Debug'
     steps:
     - name: Harden the runner (Audit all outbound calls)
@@ -274,14 +273,16 @@ jobs:
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
+    - name: Install CMake
+      run: |
+        sudo -E ./ci/setup_cmake_macos.sh
     - name: Install Conan and tools
       run: |
         brew install conan autoconf automake libtool coreutils
         conan profile detect --force
     - name: Install or build all dependencies with Conan
-      # CMAKE_POLICY_VERSION_MINIMUM: '3.5' is required to build opentracing with CMake 4.x
       run: |
-        conan install install/conan/conanfile_stable.txt --build=missing -of /Users/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD} -c "tools.cmake.cmaketoolchain:extra_variables={'CMAKE_POLICY_VERSION_MINIMUM': '3.5'}"
+        conan install install/conan/conanfile_stable.txt --build=missing -of /Users/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
         conan cache clean --source --build
     - name: Run Tests (static libs)
       env:
