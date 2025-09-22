@@ -183,7 +183,7 @@ TEST(AttributesHashMap, OverflowCardinalityLimitBehavior)
   // Insert one more distinct attribute; this should not increase the real attributes count
   MetricAttributes overflow_trigger = {{"k", "overflow"}};
   map.GetOrSetDefault(overflow_trigger,
-                       []() { return std::unique_ptr<Aggregation>(new DropAggregation()); })
+                      []() { return std::unique_ptr<Aggregation>(new DropAggregation()); })
       ->Aggregate(static_cast<int64_t>(1));
 
   EXPECT_EQ(map.Size(), limit);
@@ -192,7 +192,8 @@ TEST(AttributesHashMap, OverflowCardinalityLimitBehavior)
   for (size_t i = 0; i < limit - 1; ++i)
   {
     MetricAttributes extra_attr = {{"k", std::string("extra") + std::to_string(i)}};
-    map.GetOrSetDefault(extra_attr, []() { return std::unique_ptr<Aggregation>(new DropAggregation()); })
+    map.GetOrSetDefault(extra_attr,
+                        []() { return std::unique_ptr<Aggregation>(new DropAggregation()); })
         ->Aggregate(static_cast<int64_t>(1));
   }
   EXPECT_EQ(map.Size(), limit);
