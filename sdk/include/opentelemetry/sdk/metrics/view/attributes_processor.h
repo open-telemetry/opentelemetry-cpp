@@ -112,10 +112,8 @@ struct StringViewEqual
   template <typename Lhs, typename Rhs>
   bool operator()(const Lhs &lhs, const Rhs &rhs) const noexcept
   {
-    opentelemetry::nostd::string_view lsv(opentelemetry::nostd::data(lhs),
-                                          opentelemetry::nostd::size(lhs));
-    opentelemetry::nostd::string_view rsv(opentelemetry::nostd::data(rhs),
-                                          opentelemetry::nostd::size(rhs));
+    opentelemetry::nostd::string_view lsv(lhs);
+    opentelemetry::nostd::string_view rsv(rhs);
 
     return lsv.size() == rsv.size() && std::memcmp(lsv.data(), rsv.data(), lsv.size()) == 0;
   }
