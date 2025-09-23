@@ -95,7 +95,7 @@ public:
       return it->second.get();
     }
 
-    if (IsOverflowAttributes())
+    if (IsOverflowAttributes(attr))
     {
       return GetOrSetOveflowAttributes(aggregation_callback);
     }
@@ -114,7 +114,7 @@ public:
       return it->second.get();
     }
 
-    if (IsOverflowAttributes())
+    if (IsOverflowAttributes(attributes))
     {
       return GetOrSetOveflowAttributes(aggregation_callback);
     }
@@ -133,7 +133,7 @@ public:
       return it->second.get();
     }
 
-    if (IsOverflowAttributes())
+    if (IsOverflowAttributes(attributes))
     {
       return GetOrSetOveflowAttributes(aggregation_callback);
     }
@@ -158,7 +158,7 @@ public:
     {
       it->second = std::move(aggr);
     }
-    else if (IsOverflowAttributes())
+    else if (IsOverflowAttributes(attributes))
     {
       hash_map_[kOverflowAttributes] = std::move(aggr);
     }
@@ -175,7 +175,7 @@ public:
     {
       it->second = std::move(aggr);
     }
-    else if (IsOverflowAttributes())
+    else if (IsOverflowAttributes(attributes))
     {
       hash_map_[kOverflowAttributes] = std::move(aggr);
     }
@@ -234,7 +234,15 @@ private:
     return result.first->second.get();
   }
 
-  bool IsOverflowAttributes() const { return (hash_map_.size() + 1 >= attributes_limit_); }
+  bool IsOverflowAttributes(const MetricAttributes &attributes) const
+  {
+    if (attributes == kOverflowAttributes)
+    {
+      return true;
+    }
+
+    return hash_map_.size() + 1 >= attributes_limit_;
+  }
 };
 
 using AttributesHashMap = AttributesHashMapWithCustomHash<>;
