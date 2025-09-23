@@ -210,7 +210,7 @@ TEST(AttributesHashMap, OverflowCardinalityLimitBehavior)
 
   // Copy the hash map to a new map in non-determistic order and verify all entries are present
   AttributesHashMapWithCustomHash<> map_copy(limit);
-  map.GetAllEnteries([&map_copy](const MetricAttributes &attributes, Aggregation &aggregation) {
+  map.GetAllEnteries([&map_copy](const MetricAttributes &attributes, Aggregation &) {
     map_copy.Set(attributes, std::unique_ptr<Aggregation>(new DropAggregation()));
     return true;
   });
