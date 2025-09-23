@@ -282,9 +282,7 @@ TEST(CounterToSumFilterAttributes, Double)
   std::string instrument_name = "counter1";
   std::string instrument_desc = "counter metrics";
 
-  std::unordered_map<std::string, bool, opentelemetry::sdk::common::StringViewHash,
-                     opentelemetry::sdk::common::StringViewEqual>
-      allowedattr;
+  opentelemetry::sdk::metrics::FilterAttributeMap  allowedattr;
   allowedattr["attr1"] = true;
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{
       new opentelemetry::sdk::metrics::FilteringAttributesProcessor(allowedattr)};
