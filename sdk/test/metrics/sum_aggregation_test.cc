@@ -19,6 +19,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/custom_hash_equality.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
@@ -100,8 +101,8 @@ TEST(HistogramToSumFilterAttributes, Double)
   std::string instrument_name = "histogram1";
   std::string instrument_desc = "histogram metrics";
 
-  std::unordered_map<std::string, bool, opentelemetry::sdk::metrics::StringViewHash,
-                     opentelemetry::sdk::metrics::StringViewEqual>
+  std::unordered_map<std::string, bool, opentelemetry::sdk::common::StringViewHash,
+                     opentelemetry::sdk::common::StringViewEqual>
       allowedattr;
   allowedattr["attr1"] = true;
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{
@@ -156,8 +157,8 @@ TEST(HistogramToSumFilterAttributesWithCardinalityLimit, Double)
   std::string instrument_desc = "histogram metrics";
   size_t cardinality_limit    = 10000;
 
-  std::unordered_map<std::string, bool, opentelemetry::sdk::metrics::StringViewHash,
-                     opentelemetry::sdk::metrics::StringViewEqual>
+  std::unordered_map<std::string, bool, opentelemetry::sdk::common::StringViewHash,
+                     opentelemetry::sdk::common::StringViewEqual>
       allowedattr;
   allowedattr["attr1"] = true;
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{
@@ -285,8 +286,8 @@ TEST(CounterToSumFilterAttributes, Double)
   std::string instrument_name = "counter1";
   std::string instrument_desc = "counter metrics";
 
-  std::unordered_map<std::string, bool, opentelemetry::sdk::metrics::StringViewHash,
-                     opentelemetry::sdk::metrics::StringViewEqual>
+  std::unordered_map<std::string, bool, opentelemetry::sdk::common::StringViewHash,
+                     opentelemetry::sdk::common::StringViewEqual>
       allowedattr;
   allowedattr["attr1"] = true;
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{
@@ -341,8 +342,8 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
   std::string instrument_desc = "counter metrics";
   size_t cardinality_limit    = 10000;
 
-  std::unordered_map<std::string, bool, opentelemetry::sdk::metrics::StringViewHash,
-                     opentelemetry::sdk::metrics::StringViewEqual>
+  std::unordered_map<std::string, bool, opentelemetry::sdk::common::StringViewHash,
+                     opentelemetry::sdk::common::StringViewEqual>
       allowedattr;
   allowedattr["attr1"] = true;
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{

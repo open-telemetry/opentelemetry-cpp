@@ -8,7 +8,6 @@
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
-#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 using namespace opentelemetry::sdk::metrics;
