@@ -4,11 +4,9 @@
 #include <benchmark/benchmark.h>
 #include <map>
 #include <string>
-#include <unordered_map>
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
-#include "opentelemetry/sdk/common/custom_hash_equality.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 using namespace opentelemetry::sdk::metrics;
