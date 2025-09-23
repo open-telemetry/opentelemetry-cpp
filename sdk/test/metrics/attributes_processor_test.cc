@@ -8,7 +8,7 @@
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
-#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/custom_hash_equality.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 using namespace opentelemetry::sdk::metrics;
@@ -17,8 +17,8 @@ using namespace opentelemetry::sdk::common;
 
 TEST(AttributesProcessor, FilteringAttributesProcessor)
 {
-  const int kNumFilterAttributes               = 3;
-  std::unordered_map<std::string, bool> filter = {
+  const int kNumFilterAttributes                         = 3;
+  opentelemetry::sdk::metrics::FilterAttributeMap filter = {
       {"attr2", true}, {"attr4", true}, {"attr6", true}};
   const int kNumAttributes              = 6;
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3", "attr4", "attr5", "attr6"};
@@ -38,9 +38,9 @@ TEST(AttributesProcessor, FilteringAttributesProcessor)
 
 TEST(AttributesProcessor, FilteringAllAttributesProcessor)
 {
-  const int kNumFilterAttributes               = 0;
-  std::unordered_map<std::string, bool> filter = {};
-  const int kNumAttributes                     = 6;
+  const int kNumFilterAttributes                         = 0;
+  opentelemetry::sdk::metrics::FilterAttributeMap filter = {};
+  const int kNumAttributes                               = 6;
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3", "attr4", "attr5", "attr6"};
   int values[kNumAttributes]            = {10, 20, 30, 40, 50, 60};
   std::map<std::string, int> attributes = {{keys[0], values[0]}, {keys[1], values[1]},
@@ -54,7 +54,7 @@ TEST(AttributesProcessor, FilteringAllAttributesProcessor)
 
 TEST(AttributesProcessor, FilteringExcludeAttributesProcessor)
 {
-  std::unordered_map<std::string, bool> filter = {
+  opentelemetry::sdk::metrics::FilterAttributeMap filter = {
       {"attr2", true}, {"attr4", true}, {"attr6", true}};
   const int kNumAttributes              = 7;
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3", "attr4",
@@ -76,8 +76,8 @@ TEST(AttributesProcessor, FilteringExcludeAttributesProcessor)
 
 TEST(AttributesProcessor, FilteringExcludeAllAttributesProcessor)
 {
-  std::unordered_map<std::string, bool> filter = {};
-  const int kNumAttributes                     = 6;
+  opentelemetry::sdk::metrics::FilterAttributeMap filter = {};
+  const int kNumAttributes                               = 6;
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3", "attr4", "attr5", "attr6"};
   int values[kNumAttributes]            = {10, 20, 30, 40, 50, 60};
   std::map<std::string, int> attributes = {{keys[0], values[0]}, {keys[1], values[1]},
