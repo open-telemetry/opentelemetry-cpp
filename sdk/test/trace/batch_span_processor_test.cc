@@ -364,4 +364,66 @@ TEST_F(BatchSpanProcessorTestPeer, TestScheduleDelayMillis)
   }
 }
 
+TEST(BatchSpanProcessorOptionsEnvTest, TestDefaultValues)
+{
+  sdk::trace::BatchSpanProcessorOptions options;
+
+  EXPECT_EQ(options.max_queue_size, sdk::trace::kDefaultMaxQueueSize);
+  EXPECT_EQ(options.schedule_delay_millis, sdk::trace::kDefaultScheduleDelayMillis);
+  EXPECT_EQ(options.export_timeout, sdk::trace::kDefaultExportTimeout);
+  EXPECT_EQ(options.max_export_batch_size, sdk::trace::kDefaultMaxExportBatchSize);
+}
+
+TEST(BatchSpanProcessorOptionsEnvTest, TestMaxQueueSizeFromEnv)
+{
+  setenv(sdk::trace::kMaxQueueSize, "1234", 1);
+  EXPECT_EQ(sdk::trace::GetMaxQueueSizeFromEnv(), static_cast<size_t>(1234));
+  unsetenv(sdk::trace::kMaxQueueSize);
+}
+
+TEST(BatchSpanProcessorOptionsEnvTest, TestScheduleDelayFromEnv)
+{
+  setenv(sdk::trace::kScheduleDelay, "7s", 1);
+  EXPECT_EQ(sdk::trace::GetDurationFromEnv(sdk::trace::kScheduleDelay,
+                                           sdk::trace::kDefaultScheduleDelayMillis),
+            std::chrono::milliseconds(7000));
+  unsetenv(sdk::trace::kScheduleDelay);
+}
+
+TEST(BatchSpanProcessorOptionsEnvTest, TestExportTimeoutFromEnv)
+{
+  setenv(sdk::trace::kExportTimeout, "250ms", 1);
+  EXPECT_EQ(
+      sdk::trace::GetDurationFromEnv(sdk::trace::kExportTimeout, sdk::trace::kDefaultExportTimeout),
+      std::chrono::milliseconds(250));
+  unsetenv(sdk::trace::kExportTimeout);
+}
+
+TEST(BatchSpanProcessorOptionsEnvTest, TestMaxExportBatchSizeFromEnv)
+{
+  setenv(sdk::trace::kMaxExportBatchSize, "42", 1);
+  EXPECT_EQ(sdk::trace::GetMaxExportBatchSizeFromEnv(), static_cast<size_t>(42));
+  unsetenv(sdk::trace::kMaxExportBatchSize);
+}
+
+TEST(BatchSpanProcessorOptionsEnvTest, TestOptionsReadFromEnv)
+{
+  setenv(sdk::trace::kMaxQueueSize, "3000", 1);
+  setenv(sdk::trace::kScheduleDelay, "2s", 1);
+  setenv(sdk::trace::kExportTimeout, "1s", 1);
+  setenv(sdk::trace::kMaxExportBatchSize, "256", 1);
+
+  sdk::trace::BatchSpanProcessorOptions options;
+
+  EXPECT_EQ(options.max_queue_size, static_cast<size_t>(3000));
+  EXPECT_EQ(options.schedule_delay_millis, std::chrono::milliseconds(2000));
+  EXPECT_EQ(options.export_timeout, std::chrono::milliseconds(1000));
+  EXPECT_EQ(options.max_export_batch_size, static_cast<size_t>(256));
+
+  unsetenv(sdk::trace::kMaxQueueSize);
+  unsetenv(sdk::trace::kScheduleDelay);
+  unsetenv(sdk::trace::kExportTimeout);
+  unsetenv(sdk::trace::kMaxExportBatchSize);
+}
+
 OPENTELEMETRY_END_NAMESPACE
