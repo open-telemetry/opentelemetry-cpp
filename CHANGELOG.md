@@ -215,6 +215,9 @@ Increment the:
 * Bump actions/cache from 4.2.4 to 4.3.0
   [#3658](https://github.com/open-telemetry/opentelemetry-cpp/pull/3658)
 
+* [SDK] Fix copying overflow attributes in metric AttributesHashMap
+  [#3651](https://github.com/open-telemetry/opentelemetry-cpp/pull/3651)
+
 Important changes:
 
 * [CMAKE] Upgrade CMake minimum version to 3.16
