@@ -36,6 +36,9 @@ Increment the:
 * [SDK] Implementing configurable aggregation cardinality limit
   [#3624](https://github.com/open-telemetry/opentelemetry-cpp/pull/3624)
 
+* [SDK] Fix copying overflow attributes in metric AttributesHashMap
+  [#3651](https://github.com/open-telemetry/opentelemetry-cpp/pull/3651)
+
 Important changes:
 
 * [CMAKE] Upgrade CMake minimum version to 3.16
