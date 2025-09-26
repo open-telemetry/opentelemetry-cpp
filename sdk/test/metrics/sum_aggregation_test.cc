@@ -194,11 +194,7 @@ TEST(HistogramToSumFilterAttributesWithCardinalityLimit, Double)
       {
         for (const MetricData &md : smd.metric_data_)
         {
-          // Something weird about attributes hashmap. If cardinality is setup to n, it emits n-1
-          // including overflow. Just making the logic generic here to succeed for n or n-1 total
-          // cardinality.
-          EXPECT_GE(cardinality_limit, md.point_data_attr_.size());
-          EXPECT_LT(cardinality_limit / 2, md.point_data_attr_.size());
+          EXPECT_EQ(cardinality_limit, md.point_data_attr_.size());
           for (size_t i = 0; i < md.point_data_attr_.size(); i++)
           {
             EXPECT_EQ(1, md.point_data_attr_[i].attributes.size());
@@ -380,8 +376,7 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
           // resulting in a total of cardinality_limit sets. This test checks that the number of
           // emitted attribute sets is within the expected range, accounting for the overflow
           // behavior.
-          EXPECT_GE(cardinality_limit, md.point_data_attr_.size());
-          EXPECT_LT(cardinality_limit / 2, md.point_data_attr_.size());
+          EXPECT_EQ(cardinality_limit, md.point_data_attr_.size());
           for (size_t i = 0; i < md.point_data_attr_.size(); i++)
           {
             EXPECT_EQ(1, md.point_data_attr_[i].attributes.size());

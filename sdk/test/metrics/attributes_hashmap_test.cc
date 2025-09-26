@@ -158,3 +158,67 @@ TEST(AttributesHashMap, HashConsistencyAcrossStringTypes)
   EXPECT_EQ(hash_c_str, hash_std_str_view);
 #endif
 }
+
+TEST(AttributesHashMap, OverflowCardinalityLimitBehavior)
+{
+  // Configure a very small limit to exercise overflow logic easily.
+  const size_t limit = 4;  // real attributes limit
+  AttributesHashMapWithCustomHash<> map(limit);
+
+  // We expect to be able to insert exactly 'limit' distinct real attribute sets.
+  // After that, further distinct attributes should route to the overflow bucket,
+  // which should appear only once regardless of how many additional unique sets arrive.
+
+  // Insert distinct attributes up to the limit.
+  for (size_t i = 0; i < limit; ++i)
+  {
+    MetricAttributes attr = {{"k", std::to_string(i)}};
+    map.GetOrSetDefault(attr, []() { return std::unique_ptr<Aggregation>(new DropAggregation()); })
+        ->Aggregate(static_cast<int64_t>(1));
+  }
+
+  // Size should be exactly 'limit' (no overflow yet)
+  EXPECT_EQ(map.Size(), limit);
+
+  // Insert one more distinct attribute; this should not increase the real attributes count
+  MetricAttributes overflow_trigger = {{"k", "overflow"}};
+  map.GetOrSetDefault(overflow_trigger,
+                      []() { return std::unique_ptr<Aggregation>(new DropAggregation()); })
+      ->Aggregate(static_cast<int64_t>(1));
+
+  EXPECT_EQ(map.Size(), limit);
+
+  // Insert several more unique attributes - size must remain constant (limit)
+  for (size_t i = 0; i < limit - 1; ++i)
+  {
+    MetricAttributes extra_attr = {{"k", std::string("extra") + std::to_string(i)}};
+    map.GetOrSetDefault(extra_attr,
+                        []() { return std::unique_ptr<Aggregation>(new DropAggregation()); })
+        ->Aggregate(static_cast<int64_t>(1));
+  }
+  EXPECT_EQ(map.Size(), limit);
+
+  // Ensure overflow key was actually created and accessible via Get
+  EXPECT_NE(map.Get(kOverflowAttributes), nullptr);
+
+  // Ensure original real attributes still present
+  for (size_t i = 0; i < limit - 1; ++i)
+  {
+    MetricAttributes attr = {{"k", std::to_string(i)}};
+    EXPECT_NE(map.Get(attr), nullptr);
+  }
+
+  // Copy the hash map to a new map in non-determistic order and verify all entries are present
+  AttributesHashMapWithCustomHash<> map_copy(limit);
+  map.GetAllEnteries([&map_copy](const MetricAttributes &attributes, Aggregation &) {
+    map_copy.Set(attributes, std::unique_ptr<Aggregation>(new DropAggregation()));
+    return true;
+  });
+  EXPECT_EQ(map_copy.Size(), map.Size());
+  EXPECT_NE(map_copy.Get(kOverflowAttributes), nullptr);
+  for (size_t i = 0; i < limit - 1; ++i)
+  {
+    MetricAttributes attr = {{"k", std::to_string(i)}};
+    EXPECT_NE(map_copy.Get(attr), nullptr);
+  }
+}
