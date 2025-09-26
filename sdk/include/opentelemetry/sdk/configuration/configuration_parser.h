@@ -99,248 +99,249 @@ namespace configuration
 class ConfigurationParser
 {
 public:
-  OtlpHttpEncoding ParseOtlpHttpEncoding(const std::string &name);
+  OtlpHttpEncoding ParseOtlpHttpEncoding(const std::string &name) const;
 
   std::unique_ptr<StringArrayConfiguration> ParseStringArrayConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<IncludeExcludeConfiguration> ParseIncludeExcludeConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<HeadersConfiguration> ParseHeadersConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<AttributeLimitsConfiguration> ParseAttributeLimitsConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<OtlpHttpLogRecordExporterConfiguration>
-  ParseOtlpHttpLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> &node);
+  ParseOtlpHttpLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<OtlpGrpcLogRecordExporterConfiguration>
-  ParseOtlpGrpcLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> &node);
+  ParseOtlpGrpcLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<OtlpFileLogRecordExporterConfiguration>
-  ParseOtlpFileLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> &node);
+  ParseOtlpFileLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ConsoleLogRecordExporterConfiguration> ParseConsoleLogRecordExporterConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ExtensionLogRecordExporterConfiguration>
   ParseExtensionLogRecordExporterConfiguration(const std::string &name,
-                                               std::unique_ptr<DocumentNode> node);
+                                               std::unique_ptr<DocumentNode> node) const;
 
   std::unique_ptr<LogRecordExporterConfiguration> ParseLogRecordExporterConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<BatchLogRecordProcessorConfiguration> ParseBatchLogRecordProcessorConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<SimpleLogRecordProcessorConfiguration> ParseSimpleLogRecordProcessorConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ExtensionLogRecordProcessorConfiguration>
   ParseExtensionLogRecordProcessorConfiguration(const std::string &name,
-                                                std::unique_ptr<DocumentNode> node);
+                                                std::unique_ptr<DocumentNode> node) const;
 
   std::unique_ptr<LogRecordProcessorConfiguration> ParseLogRecordProcessorConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<LogRecordLimitsConfiguration> ParseLogRecordLimitsConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<LoggerProviderConfiguration> ParseLoggerProviderConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
-  DefaultHistogramAggregation ParseDefaultHistogramAggregation(const std::string &name);
+  DefaultHistogramAggregation ParseDefaultHistogramAggregation(const std::string &name) const;
 
-  TemporalityPreference ParseTemporalityPreference(const std::string &name);
+  TemporalityPreference ParseTemporalityPreference(const std::string &name) const;
 
   std::unique_ptr<OtlpHttpPushMetricExporterConfiguration>
-  ParseOtlpHttpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node);
+  ParseOtlpHttpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<OtlpGrpcPushMetricExporterConfiguration>
-  ParseOtlpGrpcPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node);
+  ParseOtlpGrpcPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<OtlpFilePushMetricExporterConfiguration>
-  ParseOtlpFilePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node);
+  ParseOtlpFilePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ConsolePushMetricExporterConfiguration>
-  ParseConsolePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node);
+  ParseConsolePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<PrometheusPullMetricExporterConfiguration>
-  ParsePrometheusPullMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node);
+  ParsePrometheusPullMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ExtensionPushMetricExporterConfiguration>
   ParsePushMetricExporterExtensionConfiguration(const std::string &name,
-                                                std::unique_ptr<DocumentNode> node);
+                                                std::unique_ptr<DocumentNode> node) const;
 
   std::unique_ptr<ExtensionPullMetricExporterConfiguration>
   ParsePullMetricExporterExtensionConfiguration(const std::string &name,
-                                                std::unique_ptr<DocumentNode> node);
+                                                std::unique_ptr<DocumentNode> node) const;
 
   std::unique_ptr<PushMetricExporterConfiguration> ParsePushMetricExporterConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<PullMetricExporterConfiguration> ParsePullMetricExporterConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<OpenCensusMetricProducerConfiguration> ParseOpenCensusMetricProducerConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ExtensionMetricProducerConfiguration> ParseExtensionMetricProducerConfiguration(
       const std::string &name,
-      std::unique_ptr<DocumentNode> node);
+      std::unique_ptr<DocumentNode> node) const;
 
   std::unique_ptr<MetricProducerConfiguration> ParseMetricProducerConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<PeriodicMetricReaderConfiguration> ParsePeriodicMetricReaderConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<PullMetricReaderConfiguration> ParsePullMetricReaderConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<MetricReaderConfiguration> ParseMetricReaderConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
-  InstrumentType ParseInstrumentType(const std::string &name);
+  InstrumentType ParseInstrumentType(const std::string &name) const;
 
   std::unique_ptr<ViewSelectorConfiguration> ParseViewSelectorConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<DefaultAggregationConfiguration> ParseDefaultAggregationConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<DropAggregationConfiguration> ParseDropAggregationConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ExplicitBucketHistogramAggregationConfiguration>
-  ParseExplicitBucketHistogramAggregationConfiguration(const std::unique_ptr<DocumentNode> &node);
+  ParseExplicitBucketHistogramAggregationConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<Base2ExponentialBucketHistogramAggregationConfiguration>
   ParseBase2ExponentialBucketHistogramAggregationConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<LastValueAggregationConfiguration> ParseLastValueAggregationConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<SumAggregationConfiguration> ParseSumAggregationConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<AggregationConfiguration> ParseAggregationConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ViewStreamConfiguration> ParseViewStreamConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ViewConfiguration> ParseViewConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<SpanLimitsConfiguration> ParseSpanLimitsConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<AlwaysOffSamplerConfiguration> ParseAlwaysOffSamplerConfiguration(
       const std::unique_ptr<DocumentNode> &node,
-      size_t depth);
+      size_t depth) const;
 
   std::unique_ptr<AlwaysOnSamplerConfiguration> ParseAlwaysOnSamplerConfiguration(
       const std::unique_ptr<DocumentNode> &node,
-      size_t depth);
+      size_t depth) const;
 
   std::unique_ptr<JaegerRemoteSamplerConfiguration> ParseJaegerRemoteSamplerConfiguration(
       const std::unique_ptr<DocumentNode> &node,
-      size_t depth);
+      size_t depth) const;
 
   std::unique_ptr<ParentBasedSamplerConfiguration> ParseParentBasedSamplerConfiguration(
       const std::unique_ptr<DocumentNode> &node,
-      size_t depth);
+      size_t depth) const;
 
   std::unique_ptr<TraceIdRatioBasedSamplerConfiguration> ParseTraceIdRatioBasedSamplerConfiguration(
       const std::unique_ptr<DocumentNode> &node,
-      size_t depth);
+      size_t depth) const;
 
   std::unique_ptr<ExtensionSamplerConfiguration> ParseSamplerExtensionConfiguration(
       const std::string &name,
       std::unique_ptr<DocumentNode> node,
-      size_t depth);
+      size_t depth) const;
 
   std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
       const std::unique_ptr<DocumentNode> &node,
-      size_t depth);
+      size_t depth) const;
 
   std::unique_ptr<OtlpHttpSpanExporterConfiguration> ParseOtlpHttpSpanExporterConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<OtlpGrpcSpanExporterConfiguration> ParseOtlpGrpcSpanExporterConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<OtlpFileSpanExporterConfiguration> ParseOtlpFileSpanExporterConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ConsoleSpanExporterConfiguration> ParseConsoleSpanExporterConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ZipkinSpanExporterConfiguration> ParseZipkinSpanExporterConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ExtensionSpanExporterConfiguration> ParseExtensionSpanExporterConfiguration(
       const std::string &name,
-      std::unique_ptr<DocumentNode> node);
+      std::unique_ptr<DocumentNode> node) const;
 
   std::unique_ptr<SpanExporterConfiguration> ParseSpanExporterConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<BatchSpanProcessorConfiguration> ParseBatchSpanProcessorConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<SimpleSpanProcessorConfiguration> ParseSimpleSpanProcessorConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ExtensionSpanProcessorConfiguration> ParseExtensionSpanProcessorConfiguration(
       const std::string &name,
-      std::unique_ptr<DocumentNode> node);
+      std::unique_ptr<DocumentNode> node) const;
 
   std::unique_ptr<SpanProcessorConfiguration> ParseSpanProcessorConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<TracerProviderConfiguration> ParseTracerProviderConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<StringAttributeValueConfiguration> ParseStringAttributeValueConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<IntegerAttributeValueConfiguration> ParseIntegerAttributeValueConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<DoubleAttributeValueConfiguration> ParseDoubleAttributeValueConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<BooleanAttributeValueConfiguration> ParseBooleanAttributeValueConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<StringArrayAttributeValueConfiguration>
-  ParseStringArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node);
+  ParseStringArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<IntegerArrayAttributeValueConfiguration>
-  ParseIntegerArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node);
+  ParseIntegerArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<DoubleArrayAttributeValueConfiguration>
-  ParseDoubleArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node);
+  ParseDoubleArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<BooleanArrayAttributeValueConfiguration>
-  ParseBooleanArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node);
+  ParseBooleanArrayAttributeValueConfiguration(const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ResourceConfiguration> ParseResourceConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+      const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<Configuration> Parse(std::unique_ptr<Document> doc);
 
