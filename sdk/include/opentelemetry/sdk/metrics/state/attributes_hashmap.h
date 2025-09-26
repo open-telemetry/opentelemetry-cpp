@@ -95,7 +95,7 @@ public:
       return it->second.get();
     }
 
-    if (IsOverflowAttributes())
+    if (IsOverflowAttributes(attr))
     {
       return GetOrSetOveflowAttributes(aggregation_callback);
     }
@@ -114,7 +114,7 @@ public:
       return it->second.get();
     }
 
-    if (IsOverflowAttributes())
+    if (IsOverflowAttributes(attributes))
     {
       return GetOrSetOveflowAttributes(aggregation_callback);
     }
@@ -133,7 +133,7 @@ public:
       return it->second.get();
     }
 
-    if (IsOverflowAttributes())
+    if (IsOverflowAttributes(attributes))
     {
       return GetOrSetOveflowAttributes(aggregation_callback);
     }
@@ -158,7 +158,7 @@ public:
     {
       it->second = std::move(aggr);
     }
-    else if (IsOverflowAttributes())
+    else if (IsOverflowAttributes(attributes))
     {
       hash_map_[kOverflowAttributes] = std::move(aggr);
     }
@@ -175,7 +175,7 @@ public:
     {
       it->second = std::move(aggr);
     }
-    else if (IsOverflowAttributes())
+    else if (IsOverflowAttributes(attributes))
     {
       hash_map_[kOverflowAttributes] = std::move(aggr);
     }
@@ -234,7 +234,27 @@ private:
     return result.first->second.get();
   }
 
-  bool IsOverflowAttributes() const { return (hash_map_.size() + 1 >= attributes_limit_); }
+  bool IsOverflowAttributes(const MetricAttributes &attributes) const
+  {
+    // If the incoming attributes are exactly the overflow sentinel, route
+    // directly to the overflow entry.
+    if (attributes == kOverflowAttributes)
+    {
+      return true;
+    }
+    // Determine if overflow entry already exists.
+    bool has_overflow = (hash_map_.find(kOverflowAttributes) != hash_map_.end());
+    // If overflow already present, total size already includes it; trigger overflow
+    // when current size (including overflow) is >= limit.
+    if (has_overflow)
+    {
+      return hash_map_.size() >= attributes_limit_;
+    }
+    // If overflow not present yet, simulate adding a new distinct key. If that
+    // would exceed the limit, we redirect to overflow instead of creating a
+    // new real attribute entry.
+    return (hash_map_.size() + 1) >= attributes_limit_;
+  }
 };
 
 using AttributesHashMap = AttributesHashMapWithCustomHash<>;
