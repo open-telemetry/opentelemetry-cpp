@@ -21,7 +21,7 @@
 github_url = "https://github.com/open-telemetry/opentelemetry-cpp"
 
 [version]
-current = "1.23.0-dev"
+current = "1.24.0-dev"
 
 # Example of a semver regexp.
 # Make sure this matches current_version before
@@ -122,6 +122,10 @@ search = "short_version\\s*= [\"]{current_version}[\"]"
 [[file]]
 src = "sdk/src/version/version.cc"
 search = "full_version\\s*= ['\"]{current_version}['\"]"
+
+[[file]]
+src = "functional/configuration/shelltests/kitchen-sink.test"
+search = "telemetry.sdk.version: {current_version}"
 
 
 # You can specify a list of commands to
