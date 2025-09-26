@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stdlib.h>
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -24,6 +25,11 @@
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/version.h"
+
+#if defined(_MSC_VER)
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
