@@ -374,50 +374,62 @@ TEST(BatchSpanProcessorOptionsEnvTest, TestDefaultValues)
 {
   sdk::trace::BatchSpanProcessorOptions options;
 
-  EXPECT_EQ(options.max_queue_size, sdk::trace::kDefaultMaxQueueSize);
-  EXPECT_EQ(options.schedule_delay_millis, sdk::trace::kDefaultScheduleDelayMillis);
-  EXPECT_EQ(options.export_timeout, sdk::trace::kDefaultExportTimeout);
-  EXPECT_EQ(options.max_export_batch_size, sdk::trace::kDefaultMaxExportBatchSize);
+  EXPECT_EQ(options.max_queue_size, static_cast<size_t>(2084));
+  EXPECT_EQ(options.schedule_delay_millis, std::chrono::milliseconds(5000));
+  EXPECT_EQ(options.export_timeout, std::chrono::milliseconds(3000));
+  EXPECT_EQ(options.max_export_batch_size, static_cast<size_t>(512));
 }
 
 TEST(BatchSpanProcessorOptionsEnvTest, TestMaxQueueSizeFromEnv)
 {
-  setenv(sdk::trace::kMaxQueueSize, "1234", 1);
-  EXPECT_EQ(sdk::trace::GetMaxQueueSizeFromEnv(), static_cast<size_t>(1234));
-  unsetenv(sdk::trace::kMaxQueueSize);
+  setenv("OTEL_BSP_MAX_QUEUE_SIZE", "1234", 1);
+
+  sdk::trace::BatchSpanProcessorOptions options;
+
+  EXPECT_EQ(options.max_queue_size, static_cast<size_t>(1234));
+
+  unsetenv("OTEL_BSP_MAX_QUEUE_SIZE");
 }
 
 TEST(BatchSpanProcessorOptionsEnvTest, TestScheduleDelayFromEnv)
 {
-  setenv(sdk::trace::kScheduleDelay, "7s", 1);
-  EXPECT_EQ(sdk::trace::GetDurationFromEnv(sdk::trace::kScheduleDelay,
-                                           sdk::trace::kDefaultScheduleDelayMillis),
-            std::chrono::milliseconds(7000));
-  unsetenv(sdk::trace::kScheduleDelay);
+  setenv("OTEL_BSP_SCHEDULE_DELAY", "7s", 1);
+
+  sdk::trace::BatchSpanProcessorOptions options;
+
+  EXPECT_EQ(options.schedule_delay_millis, std::chrono::milliseconds(7000));
+
+  unsetenv("OTEL_BSP_SCHEDULE_DELAY");
 }
 
 TEST(BatchSpanProcessorOptionsEnvTest, TestExportTimeoutFromEnv)
 {
-  setenv(sdk::trace::kExportTimeout, "250ms", 1);
-  EXPECT_EQ(
-      sdk::trace::GetDurationFromEnv(sdk::trace::kExportTimeout, sdk::trace::kDefaultExportTimeout),
-      std::chrono::milliseconds(250));
-  unsetenv(sdk::trace::kExportTimeout);
+  setenv("OTEL_BSP_EXPORT_TIMEOUT", "250ms", 1);
+
+  sdk::trace::BatchSpanProcessorOptions options;
+
+  EXPECT_EQ(options.export_timeout, std::chrono::milliseconds(250));
+
+  unsetenv("OTEL_BSP_EXPORT_TIMEOUT");
 }
 
 TEST(BatchSpanProcessorOptionsEnvTest, TestMaxExportBatchSizeFromEnv)
 {
-  setenv(sdk::trace::kMaxExportBatchSize, "42", 1);
-  EXPECT_EQ(sdk::trace::GetMaxExportBatchSizeFromEnv(), static_cast<size_t>(42));
-  unsetenv(sdk::trace::kMaxExportBatchSize);
+  setenv("OTEL_BSP_MAX_EXPORT_BATCH_SIZE", "42", 1);
+
+  sdk::trace::BatchSpanProcessorOptions options;
+
+  EXPECT_EQ(options.max_export_batch_size, static_cast<size_t>(42));
+
+  unsetenv("OTEL_BSP_MAX_EXPORT_BATCH_SIZE");
 }
 
-TEST(BatchSpanProcessorOptionsEnvTest, TestOptionsReadFromEnv)
+TEST(BatchSpanProcessorOptionsEnvTest, TestOptionsReadFromMultipleEnvVars)
 {
-  setenv(sdk::trace::kMaxQueueSize, "3000", 1);
-  setenv(sdk::trace::kScheduleDelay, "2s", 1);
-  setenv(sdk::trace::kExportTimeout, "1s", 1);
-  setenv(sdk::trace::kMaxExportBatchSize, "256", 1);
+  setenv("OTEL_BSP_MAX_QUEUE_SIZE", "3000", 1);
+  setenv("OTEL_BSP_SCHEDULE_DELAY", "2s", 1);
+  setenv("OTEL_BSP_EXPORT_TIMEOUT", "1s", 1);
+  setenv("OTEL_BSP_MAX_EXPORT_BATCH_SIZE", "256", 1);
 
   sdk::trace::BatchSpanProcessorOptions options;
 
@@ -426,10 +438,10 @@ TEST(BatchSpanProcessorOptionsEnvTest, TestOptionsReadFromEnv)
   EXPECT_EQ(options.export_timeout, std::chrono::milliseconds(1000));
   EXPECT_EQ(options.max_export_batch_size, static_cast<size_t>(256));
 
-  unsetenv(sdk::trace::kMaxQueueSize);
-  unsetenv(sdk::trace::kScheduleDelay);
-  unsetenv(sdk::trace::kExportTimeout);
-  unsetenv(sdk::trace::kMaxExportBatchSize);
+  unsetenv("OTEL_BSP_MAX_QUEUE_SIZE");
+  unsetenv("OTEL_BSP_SCHEDULE_DELAY");
+  unsetenv("OTEL_BSP_EXPORT_TIMEOUT");
+  unsetenv("OTEL_BSP_MAX_EXPORT_BATCH_SIZE");
 }
 
 OPENTELEMETRY_END_NAMESPACE
