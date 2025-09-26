@@ -13,7 +13,8 @@ foreach(
   parent_sampler_test
   trace_id_ratio_sampler_test
   batch_span_processor_test
-  tracer_config_test)
+  tracer_config_test
+  unsampled_span_processor_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname}
