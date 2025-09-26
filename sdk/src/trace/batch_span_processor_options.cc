@@ -7,6 +7,7 @@
 
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
