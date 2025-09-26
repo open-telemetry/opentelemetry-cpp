@@ -1,7 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <stddef.h>
 #include <chrono>
+#include <cstdint>
 
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
