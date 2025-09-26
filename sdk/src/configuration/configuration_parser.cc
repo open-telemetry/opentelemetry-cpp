@@ -1338,8 +1338,7 @@ std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseSamplerConfigura
 
   if (count != 1)
   {
-    std::string message = node->Location().ToString();
-    message.append(", Illegal sampler, properties count: ");
+    std::string message("Illegal sampler, properties count: ");
     message.append(std::to_string(count));
     throw InvalidSchemaException(message);
   }
