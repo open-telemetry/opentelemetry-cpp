@@ -105,7 +105,7 @@ namespace configuration
 // FIXME: proper sizing
 constexpr size_t MAX_SAMPLER_DEPTH = 10;
 
-OtlpHttpEncoding ConfigurationParser::ParseOtlpHttpEncoding(const std::string &name)
+OtlpHttpEncoding ConfigurationParser::ParseOtlpHttpEncoding(const std::string &name) const
 {
   if (name == "protobuf")
   {
@@ -123,7 +123,7 @@ OtlpHttpEncoding ConfigurationParser::ParseOtlpHttpEncoding(const std::string &n
 }
 
 std::unique_ptr<StringArrayConfiguration> ConfigurationParser::ParseStringArrayConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<StringArrayConfiguration>();
 
@@ -140,7 +140,7 @@ std::unique_ptr<StringArrayConfiguration> ConfigurationParser::ParseStringArrayC
 }
 
 std::unique_ptr<IncludeExcludeConfiguration> ConfigurationParser::ParseIncludeExcludeConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<IncludeExcludeConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -161,7 +161,7 @@ std::unique_ptr<IncludeExcludeConfiguration> ConfigurationParser::ParseIncludeEx
 }
 
 std::unique_ptr<HeadersConfiguration> ConfigurationParser::ParseHeadersConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<HeadersConfiguration>();
   std::unique_ptr<DocumentNode> kv_pair;
@@ -189,7 +189,8 @@ std::unique_ptr<HeadersConfiguration> ConfigurationParser::ParseHeadersConfigura
 }
 
 std::unique_ptr<AttributeLimitsConfiguration>
-ConfigurationParser::ParseAttributeLimitsConfiguration(const std::unique_ptr<DocumentNode> &node)
+ConfigurationParser::ParseAttributeLimitsConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<AttributeLimitsConfiguration>();
 
@@ -201,7 +202,7 @@ ConfigurationParser::ParseAttributeLimitsConfiguration(const std::unique_ptr<Doc
 
 std::unique_ptr<OtlpHttpLogRecordExporterConfiguration>
 ConfigurationParser::ParseOtlpHttpLogRecordExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<OtlpHttpLogRecordExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -229,7 +230,7 @@ ConfigurationParser::ParseOtlpHttpLogRecordExporterConfiguration(
 
 std::unique_ptr<OtlpGrpcLogRecordExporterConfiguration>
 ConfigurationParser::ParseOtlpGrpcLogRecordExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<OtlpGrpcLogRecordExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -255,7 +256,7 @@ ConfigurationParser::ParseOtlpGrpcLogRecordExporterConfiguration(
 
 std::unique_ptr<OtlpFileLogRecordExporterConfiguration>
 ConfigurationParser::ParseOtlpFileLogRecordExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<OtlpFileLogRecordExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -267,7 +268,7 @@ ConfigurationParser::ParseOtlpFileLogRecordExporterConfiguration(
 
 std::unique_ptr<ConsoleLogRecordExporterConfiguration>
 ConfigurationParser::ParseConsoleLogRecordExporterConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+    const std::unique_ptr<DocumentNode> & /* node */) const
 {
   auto model = std::make_unique<ConsoleLogRecordExporterConfiguration>();
 
@@ -277,7 +278,7 @@ ConfigurationParser::ParseConsoleLogRecordExporterConfiguration(
 std::unique_ptr<ExtensionLogRecordExporterConfiguration>
 ConfigurationParser::ParseExtensionLogRecordExporterConfiguration(
     const std::string &name,
-    std::unique_ptr<DocumentNode> node)
+    std::unique_ptr<DocumentNode> node) const
 {
   auto model = std::make_unique<ExtensionLogRecordExporterConfiguration>();
 
@@ -288,7 +289,8 @@ ConfigurationParser::ParseExtensionLogRecordExporterConfiguration(
 }
 
 std::unique_ptr<LogRecordExporterConfiguration>
-ConfigurationParser::ParseLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
+ConfigurationParser::ParseLogRecordExporterConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
 {
   std::unique_ptr<LogRecordExporterConfiguration> model;
 
@@ -336,7 +338,7 @@ ConfigurationParser::ParseLogRecordExporterConfiguration(const std::unique_ptr<D
 
 std::unique_ptr<BatchLogRecordProcessorConfiguration>
 ConfigurationParser::ParseBatchLogRecordProcessorConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<BatchLogRecordProcessorConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -354,7 +356,7 @@ ConfigurationParser::ParseBatchLogRecordProcessorConfiguration(
 
 std::unique_ptr<SimpleLogRecordProcessorConfiguration>
 ConfigurationParser::ParseSimpleLogRecordProcessorConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<SimpleLogRecordProcessorConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -368,7 +370,7 @@ ConfigurationParser::ParseSimpleLogRecordProcessorConfiguration(
 std::unique_ptr<ExtensionLogRecordProcessorConfiguration>
 ConfigurationParser::ParseExtensionLogRecordProcessorConfiguration(
     const std::string &name,
-    std::unique_ptr<DocumentNode> node)
+    std::unique_ptr<DocumentNode> node) const
 {
   auto model = std::make_unique<ExtensionLogRecordProcessorConfiguration>();
 
@@ -379,7 +381,8 @@ ConfigurationParser::ParseExtensionLogRecordProcessorConfiguration(
 }
 
 std::unique_ptr<LogRecordProcessorConfiguration>
-ConfigurationParser::ParseLogRecordProcessorConfiguration(const std::unique_ptr<DocumentNode> &node)
+ConfigurationParser::ParseLogRecordProcessorConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
 {
   std::unique_ptr<LogRecordProcessorConfiguration> model;
 
@@ -418,7 +421,8 @@ ConfigurationParser::ParseLogRecordProcessorConfiguration(const std::unique_ptr<
 }
 
 std::unique_ptr<LogRecordLimitsConfiguration>
-ConfigurationParser::ParseLogRecordLimitsConfiguration(const std::unique_ptr<DocumentNode> &node)
+ConfigurationParser::ParseLogRecordLimitsConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<LogRecordLimitsConfiguration>();
 
@@ -429,7 +433,7 @@ ConfigurationParser::ParseLogRecordLimitsConfiguration(const std::unique_ptr<Doc
 }
 
 std::unique_ptr<LoggerProviderConfiguration> ConfigurationParser::ParseLoggerProviderConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<LoggerProviderConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -458,7 +462,7 @@ std::unique_ptr<LoggerProviderConfiguration> ConfigurationParser::ParseLoggerPro
 }
 
 DefaultHistogramAggregation ConfigurationParser::ParseDefaultHistogramAggregation(
-    const std::string &name)
+    const std::string &name) const
 {
   if (name == "explicit_bucket_histogram")
   {
@@ -475,7 +479,7 @@ DefaultHistogramAggregation ConfigurationParser::ParseDefaultHistogramAggregatio
   throw InvalidSchemaException(message);
 }
 
-TemporalityPreference ConfigurationParser::ParseTemporalityPreference(const std::string &name)
+TemporalityPreference ConfigurationParser::ParseTemporalityPreference(const std::string &name) const
 {
   if (name == "cumulative")
   {
@@ -499,7 +503,7 @@ TemporalityPreference ConfigurationParser::ParseTemporalityPreference(const std:
 
 std::unique_ptr<OtlpHttpPushMetricExporterConfiguration>
 ConfigurationParser::ParseOtlpHttpPushMetricExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<OtlpHttpPushMetricExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -535,7 +539,7 @@ ConfigurationParser::ParseOtlpHttpPushMetricExporterConfiguration(
 
 std::unique_ptr<OtlpGrpcPushMetricExporterConfiguration>
 ConfigurationParser::ParseOtlpGrpcPushMetricExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<OtlpGrpcPushMetricExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -570,7 +574,7 @@ ConfigurationParser::ParseOtlpGrpcPushMetricExporterConfiguration(
 
 std::unique_ptr<OtlpFilePushMetricExporterConfiguration>
 ConfigurationParser::ParseOtlpFilePushMetricExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<OtlpFilePushMetricExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -590,7 +594,7 @@ ConfigurationParser::ParseOtlpFilePushMetricExporterConfiguration(
 
 std::unique_ptr<ConsolePushMetricExporterConfiguration>
 ConfigurationParser::ParseConsolePushMetricExporterConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+    const std::unique_ptr<DocumentNode> & /* node */) const
 {
   auto model = std::make_unique<ConsolePushMetricExporterConfiguration>();
 
@@ -601,7 +605,7 @@ ConfigurationParser::ParseConsolePushMetricExporterConfiguration(
 
 std::unique_ptr<PrometheusPullMetricExporterConfiguration>
 ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<PrometheusPullMetricExporterConfiguration>();
 
@@ -617,7 +621,7 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
 std::unique_ptr<ExtensionPushMetricExporterConfiguration>
 ConfigurationParser::ParsePushMetricExporterExtensionConfiguration(
     const std::string &name,
-    std::unique_ptr<DocumentNode> node)
+    std::unique_ptr<DocumentNode> node) const
 {
   auto model = std::make_unique<ExtensionPushMetricExporterConfiguration>();
 
@@ -630,7 +634,7 @@ ConfigurationParser::ParsePushMetricExporterExtensionConfiguration(
 std::unique_ptr<ExtensionPullMetricExporterConfiguration>
 ConfigurationParser::ParsePullMetricExporterExtensionConfiguration(
     const std::string &name,
-    std::unique_ptr<DocumentNode> node)
+    std::unique_ptr<DocumentNode> node) const
 {
   auto model = std::make_unique<ExtensionPullMetricExporterConfiguration>();
 
@@ -641,7 +645,8 @@ ConfigurationParser::ParsePullMetricExporterExtensionConfiguration(
 }
 
 std::unique_ptr<PushMetricExporterConfiguration>
-ConfigurationParser::ParsePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
+ConfigurationParser::ParsePushMetricExporterConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
 {
   std::unique_ptr<PushMetricExporterConfiguration> model;
 
@@ -688,7 +693,8 @@ ConfigurationParser::ParsePushMetricExporterConfiguration(const std::unique_ptr<
 }
 
 std::unique_ptr<PullMetricExporterConfiguration>
-ConfigurationParser::ParsePullMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
+ConfigurationParser::ParsePullMetricExporterConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
 {
   std::unique_ptr<PullMetricExporterConfiguration> model;
 
@@ -724,7 +730,7 @@ ConfigurationParser::ParsePullMetricExporterConfiguration(const std::unique_ptr<
 
 std::unique_ptr<OpenCensusMetricProducerConfiguration>
 ConfigurationParser::ParseOpenCensusMetricProducerConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+    const std::unique_ptr<DocumentNode> & /* node */) const
 {
   auto model = std::make_unique<OpenCensusMetricProducerConfiguration>();
 
@@ -732,8 +738,9 @@ ConfigurationParser::ParseOpenCensusMetricProducerConfiguration(
 }
 
 std::unique_ptr<ExtensionMetricProducerConfiguration>
-ConfigurationParser::ParseExtensionMetricProducerConfiguration(const std::string &name,
-                                                               std::unique_ptr<DocumentNode> node)
+ConfigurationParser::ParseExtensionMetricProducerConfiguration(
+    const std::string &name,
+    std::unique_ptr<DocumentNode> node) const
 {
   auto model = std::make_unique<ExtensionMetricProducerConfiguration>();
 
@@ -744,7 +751,7 @@ ConfigurationParser::ParseExtensionMetricProducerConfiguration(const std::string
 }
 
 std::unique_ptr<MetricProducerConfiguration> ConfigurationParser::ParseMetricProducerConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   std::unique_ptr<MetricProducerConfiguration> model;
 
@@ -780,7 +787,7 @@ std::unique_ptr<MetricProducerConfiguration> ConfigurationParser::ParseMetricPro
 
 std::unique_ptr<PeriodicMetricReaderConfiguration>
 ConfigurationParser::ParsePeriodicMetricReaderConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<PeriodicMetricReaderConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -805,7 +812,8 @@ ConfigurationParser::ParsePeriodicMetricReaderConfiguration(
 }
 
 std::unique_ptr<PullMetricReaderConfiguration>
-ConfigurationParser::ParsePullMetricReaderConfiguration(const std::unique_ptr<DocumentNode> &node)
+ConfigurationParser::ParsePullMetricReaderConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<PullMetricReaderConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -827,7 +835,7 @@ ConfigurationParser::ParsePullMetricReaderConfiguration(const std::unique_ptr<Do
 }
 
 std::unique_ptr<MetricReaderConfiguration> ConfigurationParser::ParseMetricReaderConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   std::unique_ptr<MetricReaderConfiguration> model;
 
@@ -867,7 +875,7 @@ std::unique_ptr<MetricReaderConfiguration> ConfigurationParser::ParseMetricReade
   return model;
 }
 
-InstrumentType ConfigurationParser::ParseInstrumentType(const std::string &name)
+InstrumentType ConfigurationParser::ParseInstrumentType(const std::string &name) const
 {
   if (name == "")
   {
@@ -910,7 +918,7 @@ InstrumentType ConfigurationParser::ParseInstrumentType(const std::string &name)
 }
 
 std::unique_ptr<ViewSelectorConfiguration> ConfigurationParser::ParseViewSelectorConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<ViewSelectorConfiguration>();
 
@@ -929,7 +937,7 @@ std::unique_ptr<ViewSelectorConfiguration> ConfigurationParser::ParseViewSelecto
 
 std::unique_ptr<DefaultAggregationConfiguration>
 ConfigurationParser::ParseDefaultAggregationConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+    const std::unique_ptr<DocumentNode> & /* node */) const
 {
   auto model = std::make_unique<DefaultAggregationConfiguration>();
 
@@ -938,7 +946,7 @@ ConfigurationParser::ParseDefaultAggregationConfiguration(
 
 std::unique_ptr<DropAggregationConfiguration>
 ConfigurationParser::ParseDropAggregationConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+    const std::unique_ptr<DocumentNode> & /* node */) const
 {
   auto model = std::make_unique<DropAggregationConfiguration>();
 
@@ -947,7 +955,7 @@ ConfigurationParser::ParseDropAggregationConfiguration(
 
 std::unique_ptr<ExplicitBucketHistogramAggregationConfiguration>
 ConfigurationParser::ParseExplicitBucketHistogramAggregationConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<ExplicitBucketHistogramAggregationConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -973,7 +981,7 @@ ConfigurationParser::ParseExplicitBucketHistogramAggregationConfiguration(
 
 std::unique_ptr<Base2ExponentialBucketHistogramAggregationConfiguration>
 ConfigurationParser::ParseBase2ExponentialBucketHistogramAggregationConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<Base2ExponentialBucketHistogramAggregationConfiguration>();
 
@@ -986,7 +994,7 @@ ConfigurationParser::ParseBase2ExponentialBucketHistogramAggregationConfiguratio
 
 std::unique_ptr<LastValueAggregationConfiguration>
 ConfigurationParser::ParseLastValueAggregationConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+    const std::unique_ptr<DocumentNode> & /* node */) const
 {
   auto model = std::make_unique<LastValueAggregationConfiguration>();
 
@@ -994,7 +1002,7 @@ ConfigurationParser::ParseLastValueAggregationConfiguration(
 }
 
 std::unique_ptr<SumAggregationConfiguration> ConfigurationParser::ParseSumAggregationConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+    const std::unique_ptr<DocumentNode> & /* node */) const
 {
   auto model = std::make_unique<SumAggregationConfiguration>();
 
@@ -1002,7 +1010,7 @@ std::unique_ptr<SumAggregationConfiguration> ConfigurationParser::ParseSumAggreg
 }
 
 std::unique_ptr<AggregationConfiguration> ConfigurationParser::ParseAggregationConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   std::unique_ptr<AggregationConfiguration> model;
   std::unique_ptr<DocumentNode> child;
@@ -1054,7 +1062,7 @@ std::unique_ptr<AggregationConfiguration> ConfigurationParser::ParseAggregationC
 }
 
 std::unique_ptr<ViewStreamConfiguration> ConfigurationParser::ParseViewStreamConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<ViewStreamConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -1079,7 +1087,7 @@ std::unique_ptr<ViewStreamConfiguration> ConfigurationParser::ParseViewStreamCon
 }
 
 std::unique_ptr<ViewConfiguration> ConfigurationParser::ParseViewConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<ViewConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -1094,7 +1102,7 @@ std::unique_ptr<ViewConfiguration> ConfigurationParser::ParseViewConfiguration(
 }
 
 std::unique_ptr<MeterProviderConfiguration> ConfigurationParser::ParseMeterProviderConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<MeterProviderConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -1126,7 +1134,7 @@ std::unique_ptr<MeterProviderConfiguration> ConfigurationParser::ParseMeterProvi
 }
 
 std::unique_ptr<PropagatorConfiguration> ConfigurationParser::ParsePropagatorConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<PropagatorConfiguration>();
 
@@ -1170,7 +1178,7 @@ std::unique_ptr<PropagatorConfiguration> ConfigurationParser::ParsePropagatorCon
 }
 
 std::unique_ptr<SpanLimitsConfiguration> ConfigurationParser::ParseSpanLimitsConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<SpanLimitsConfiguration>();
 
@@ -1187,7 +1195,7 @@ std::unique_ptr<SpanLimitsConfiguration> ConfigurationParser::ParseSpanLimitsCon
 std::unique_ptr<AlwaysOffSamplerConfiguration>
 ConfigurationParser::ParseAlwaysOffSamplerConfiguration(
     const std::unique_ptr<DocumentNode> & /* node */,
-    size_t /* depth */)
+    size_t /* depth */) const
 {
   auto model = std::make_unique<AlwaysOffSamplerConfiguration>();
 
@@ -1197,7 +1205,7 @@ ConfigurationParser::ParseAlwaysOffSamplerConfiguration(
 std::unique_ptr<AlwaysOnSamplerConfiguration>
 ConfigurationParser::ParseAlwaysOnSamplerConfiguration(
     const std::unique_ptr<DocumentNode> & /* node */,
-    size_t /* depth */)
+    size_t /* depth */) const
 {
   auto model = std::make_unique<AlwaysOnSamplerConfiguration>();
 
@@ -1208,7 +1216,7 @@ ConfigurationParser::ParseAlwaysOnSamplerConfiguration(
 std::unique_ptr<JaegerRemoteSamplerConfiguration>
 ConfigurationParser::ParseJaegerRemoteSamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node,
-    size_t depth)
+    size_t depth) const
 {
   auto model = std::make_unique<JaegerRemoteSamplerConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -1233,7 +1241,7 @@ ConfigurationParser::ParseJaegerRemoteSamplerConfiguration(
 // NOLINTBEGIN(misc-no-recursion)
 std::unique_ptr<ParentBasedSamplerConfiguration>
 ConfigurationParser::ParseParentBasedSamplerConfiguration(const std::unique_ptr<DocumentNode> &node,
-                                                          size_t depth)
+                                                          size_t depth) const
 {
   auto model = std::make_unique<ParentBasedSamplerConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -1275,7 +1283,7 @@ ConfigurationParser::ParseParentBasedSamplerConfiguration(const std::unique_ptr<
 std::unique_ptr<TraceIdRatioBasedSamplerConfiguration>
 ConfigurationParser::ParseTraceIdRatioBasedSamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node,
-    size_t /* depth */)
+    size_t /* depth */) const
 {
   auto model = std::make_unique<TraceIdRatioBasedSamplerConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -1288,7 +1296,7 @@ ConfigurationParser::ParseTraceIdRatioBasedSamplerConfiguration(
 std::unique_ptr<ExtensionSamplerConfiguration>
 ConfigurationParser::ParseSamplerExtensionConfiguration(const std::string &name,
                                                         std::unique_ptr<DocumentNode> node,
-                                                        size_t depth)
+                                                        size_t depth) const
 {
   auto model = std::make_unique<ExtensionSamplerConfiguration>();
 
@@ -1302,7 +1310,7 @@ ConfigurationParser::ParseSamplerExtensionConfiguration(const std::string &name,
 // NOLINTBEGIN(misc-no-recursion)
 std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseSamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node,
-    size_t depth)
+    size_t depth) const
 {
   /*
    * ParseSamplerConfiguration() is recursive,
@@ -1367,7 +1375,7 @@ std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseSamplerConfigura
 
 std::unique_ptr<OtlpHttpSpanExporterConfiguration>
 ConfigurationParser::ParseOtlpHttpSpanExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<OtlpHttpSpanExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -1395,7 +1403,7 @@ ConfigurationParser::ParseOtlpHttpSpanExporterConfiguration(
 
 std::unique_ptr<OtlpGrpcSpanExporterConfiguration>
 ConfigurationParser::ParseOtlpGrpcSpanExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<OtlpGrpcSpanExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -1421,7 +1429,7 @@ ConfigurationParser::ParseOtlpGrpcSpanExporterConfiguration(
 
 std::unique_ptr<OtlpFileSpanExporterConfiguration>
 ConfigurationParser::ParseOtlpFileSpanExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<OtlpFileSpanExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -1433,7 +1441,7 @@ ConfigurationParser::ParseOtlpFileSpanExporterConfiguration(
 
 std::unique_ptr<ConsoleSpanExporterConfiguration>
 ConfigurationParser::ParseConsoleSpanExporterConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+    const std::unique_ptr<DocumentNode> & /* node */) const
 {
   auto model = std::make_unique<ConsoleSpanExporterConfiguration>();
 
@@ -1441,7 +1449,8 @@ ConfigurationParser::ParseConsoleSpanExporterConfiguration(
 }
 
 std::unique_ptr<ZipkinSpanExporterConfiguration>
-ConfigurationParser::ParseZipkinSpanExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
+ConfigurationParser::ParseZipkinSpanExporterConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<ZipkinSpanExporterConfiguration>();
 
@@ -1452,8 +1461,9 @@ ConfigurationParser::ParseZipkinSpanExporterConfiguration(const std::unique_ptr<
 }
 
 std::unique_ptr<ExtensionSpanExporterConfiguration>
-ConfigurationParser::ParseExtensionSpanExporterConfiguration(const std::string &name,
-                                                             std::unique_ptr<DocumentNode> node)
+ConfigurationParser::ParseExtensionSpanExporterConfiguration(
+    const std::string &name,
+    std::unique_ptr<DocumentNode> node) const
 {
   auto model = std::make_unique<ExtensionSpanExporterConfiguration>();
 
@@ -1464,7 +1474,7 @@ ConfigurationParser::ParseExtensionSpanExporterConfiguration(const std::string &
 }
 
 std::unique_ptr<SpanExporterConfiguration> ConfigurationParser::ParseSpanExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   std::unique_ptr<SpanExporterConfiguration> model;
 
@@ -1515,7 +1525,8 @@ std::unique_ptr<SpanExporterConfiguration> ConfigurationParser::ParseSpanExporte
 }
 
 std::unique_ptr<BatchSpanProcessorConfiguration>
-ConfigurationParser::ParseBatchSpanProcessorConfiguration(const std::unique_ptr<DocumentNode> &node)
+ConfigurationParser::ParseBatchSpanProcessorConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<BatchSpanProcessorConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -1533,7 +1544,7 @@ ConfigurationParser::ParseBatchSpanProcessorConfiguration(const std::unique_ptr<
 
 std::unique_ptr<SimpleSpanProcessorConfiguration>
 ConfigurationParser::ParseSimpleSpanProcessorConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<SimpleSpanProcessorConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -1545,8 +1556,9 @@ ConfigurationParser::ParseSimpleSpanProcessorConfiguration(
 }
 
 std::unique_ptr<ExtensionSpanProcessorConfiguration>
-ConfigurationParser::ParseExtensionSpanProcessorConfiguration(const std::string &name,
-                                                              std::unique_ptr<DocumentNode> node)
+ConfigurationParser::ParseExtensionSpanProcessorConfiguration(
+    const std::string &name,
+    std::unique_ptr<DocumentNode> node) const
 {
   auto model = std::make_unique<ExtensionSpanProcessorConfiguration>();
 
@@ -1557,7 +1569,7 @@ ConfigurationParser::ParseExtensionSpanProcessorConfiguration(const std::string 
 }
 
 std::unique_ptr<SpanProcessorConfiguration> ConfigurationParser::ParseSpanProcessorConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   std::unique_ptr<SpanProcessorConfiguration> model;
 
@@ -1596,7 +1608,7 @@ std::unique_ptr<SpanProcessorConfiguration> ConfigurationParser::ParseSpanProces
 }
 
 std::unique_ptr<TracerProviderConfiguration> ConfigurationParser::ParseTracerProviderConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<TracerProviderConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -1632,7 +1644,7 @@ std::unique_ptr<TracerProviderConfiguration> ConfigurationParser::ParseTracerPro
 
 std::unique_ptr<StringAttributeValueConfiguration>
 ConfigurationParser::ParseStringAttributeValueConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<StringAttributeValueConfiguration>();
 
@@ -1643,7 +1655,7 @@ ConfigurationParser::ParseStringAttributeValueConfiguration(
 
 std::unique_ptr<IntegerAttributeValueConfiguration>
 ConfigurationParser::ParseIntegerAttributeValueConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<IntegerAttributeValueConfiguration>();
 
@@ -1654,7 +1666,7 @@ ConfigurationParser::ParseIntegerAttributeValueConfiguration(
 
 std::unique_ptr<DoubleAttributeValueConfiguration>
 ConfigurationParser::ParseDoubleAttributeValueConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<DoubleAttributeValueConfiguration>();
 
@@ -1665,7 +1677,7 @@ ConfigurationParser::ParseDoubleAttributeValueConfiguration(
 
 std::unique_ptr<BooleanAttributeValueConfiguration>
 ConfigurationParser::ParseBooleanAttributeValueConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<BooleanAttributeValueConfiguration>();
 
@@ -1676,7 +1688,7 @@ ConfigurationParser::ParseBooleanAttributeValueConfiguration(
 
 std::unique_ptr<StringArrayAttributeValueConfiguration>
 ConfigurationParser::ParseStringArrayAttributeValueConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<StringArrayAttributeValueConfiguration>();
 
@@ -1694,7 +1706,7 @@ ConfigurationParser::ParseStringArrayAttributeValueConfiguration(
 
 std::unique_ptr<IntegerArrayAttributeValueConfiguration>
 ConfigurationParser::ParseIntegerArrayAttributeValueConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<IntegerArrayAttributeValueConfiguration>();
 
@@ -1712,7 +1724,7 @@ ConfigurationParser::ParseIntegerArrayAttributeValueConfiguration(
 
 std::unique_ptr<DoubleArrayAttributeValueConfiguration>
 ConfigurationParser::ParseDoubleArrayAttributeValueConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<DoubleArrayAttributeValueConfiguration>();
 
@@ -1730,7 +1742,7 @@ ConfigurationParser::ParseDoubleArrayAttributeValueConfiguration(
 
 std::unique_ptr<BooleanArrayAttributeValueConfiguration>
 ConfigurationParser::ParseBooleanArrayAttributeValueConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<BooleanArrayAttributeValueConfiguration>();
 
@@ -1747,7 +1759,7 @@ ConfigurationParser::ParseBooleanArrayAttributeValueConfiguration(
 }
 
 std::unique_ptr<AttributesConfiguration> ConfigurationParser::ParseAttributesConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<AttributesConfiguration>();
   std::unique_ptr<DocumentNode> child;
@@ -1835,7 +1847,7 @@ std::unique_ptr<AttributesConfiguration> ConfigurationParser::ParseAttributesCon
 }
 
 std::unique_ptr<ResourceConfiguration> ConfigurationParser::ParseResourceConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<ResourceConfiguration>();
   std::unique_ptr<DocumentNode> child;
