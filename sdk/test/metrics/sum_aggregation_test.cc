@@ -194,7 +194,7 @@ TEST(HistogramToSumFilterAttributesWithCardinalityLimit, Double)
       {
         for (const MetricData &md : smd.metric_data_)
         {
-          EXPECT_GE(cardinality_limit - 1, md.point_data_attr_.size());
+          EXPECT_EQ(cardinality_limit, md.point_data_attr_.size());
           for (size_t i = 0; i < md.point_data_attr_.size(); i++)
           {
             EXPECT_EQ(1, md.point_data_attr_[i].attributes.size());
@@ -376,7 +376,7 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
           // resulting in a total of cardinality_limit sets. This test checks that the number of
           // emitted attribute sets is within the expected range, accounting for the overflow
           // behavior.
-          EXPECT_GE(cardinality_limit - 1, md.point_data_attr_.size());
+          EXPECT_EQ(cardinality_limit, md.point_data_attr_.size());
           for (size_t i = 0; i < md.point_data_attr_.size(); i++)
           {
             EXPECT_EQ(1, md.point_data_attr_[i].attributes.size());
