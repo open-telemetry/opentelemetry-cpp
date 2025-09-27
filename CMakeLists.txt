@@ -66,6 +66,8 @@ endif()
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
 option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
 
+option(WITH_CONFIGURATION "EXPERIMENTAL: YAML configuration file" OFF)
+
 #
 # We do not want to have WITH_ABI_VERSION = "1" or "2", and instead prefer two
 # distinct flags, WITH_ABI_VERSION_1 and WITH_ABI_VERSION_2.
@@ -347,6 +349,18 @@ endif()
 
 if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/nlohmann-json.cmake")
+endif()
+
+#
+# Do we need RapidYaml ?
+#
+
+if((NOT WITH_API_ONLY) AND WITH_CONFIGURATION)
+  find_package(ryml 0.9.0 REQUIRED)
+  message(
+    STATUS
+      "Found ryml: include ${RYML_INCLUDE_DIR}, lib ${RYML_LIB_DIR}, version ${ryml_VERSION}"
+  )
 endif()
 
 #
