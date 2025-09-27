@@ -180,8 +180,8 @@ public:
   void VisitString(
       const opentelemetry::sdk::configuration::StringAttributeValueConfiguration *model) override
   {
-    opentelemetry::common::AttributeValue attribute_value(model->value);
-    resource_attributes_.SetAttribute(name_, attribute_value);
+    opentelemetry::common::AttributeValue attr_value(model->value);
+    resource_attributes_.SetAttribute(name_, attr_value);
   }
 
   void VisitInteger(
@@ -189,22 +189,22 @@ public:
   {
     /* Provide exact type to opentelemetry::common::AttributeValue variant. */
     int64_t value = model->value;
-    opentelemetry::common::AttributeValue attribute_value(value);
-    resource_attributes_.SetAttribute(name_, attribute_value);
+    opentelemetry::common::AttributeValue attr_value(value);
+    resource_attributes_.SetAttribute(name_, attr_value);
   }
 
   void VisitDouble(
       const opentelemetry::sdk::configuration::DoubleAttributeValueConfiguration *model) override
   {
-    opentelemetry::common::AttributeValue attribute_value(model->value);
-    resource_attributes_.SetAttribute(name_, attribute_value);
+    opentelemetry::common::AttributeValue attr_value(model->value);
+    resource_attributes_.SetAttribute(name_, attr_value);
   }
 
   void VisitBoolean(
       const opentelemetry::sdk::configuration::BooleanAttributeValueConfiguration *model) override
   {
-    opentelemetry::common::AttributeValue attribute_value(model->value);
-    resource_attributes_.SetAttribute(name_, attribute_value);
+    opentelemetry::common::AttributeValue attr_value(model->value);
+    resource_attributes_.SetAttribute(name_, attr_value);
   }
 
   void VisitStringArray(
@@ -224,8 +224,8 @@ public:
 
     nostd::span<const nostd::string_view> span(string_view_array.data(), string_view_array.size());
 
-    opentelemetry::common::AttributeValue attribute_value(span);
-    resource_attributes_.SetAttribute(name_, attribute_value);
+    opentelemetry::common::AttributeValue attr_value(span);
+    resource_attributes_.SetAttribute(name_, attr_value);
   }
 
   void VisitIntegerArray(
@@ -245,8 +245,8 @@ public:
 
     nostd::span<const int64_t> span(int_array.data(), int_array.size());
 
-    opentelemetry::common::AttributeValue attribute_value(span);
-    resource_attributes_.SetAttribute(name_, attribute_value);
+    opentelemetry::common::AttributeValue attr_value(span);
+    resource_attributes_.SetAttribute(name_, attr_value);
   }
 
   void VisitDoubleArray(
@@ -259,8 +259,8 @@ public:
 
     nostd::span<const double> span(model->value.data(), model->value.size());
 
-    opentelemetry::common::AttributeValue attribute_value(span);
-    resource_attributes_.SetAttribute(name_, attribute_value);
+    opentelemetry::common::AttributeValue attr_value(span);
+    resource_attributes_.SetAttribute(name_, attr_value);
   }
 
   void VisitBooleanArray(
@@ -283,8 +283,8 @@ public:
 
     nostd::span<const bool> span(&bool_array[0], length);
 
-    opentelemetry::common::AttributeValue attribute_value(span);
-    resource_attributes_.SetAttribute(name_, attribute_value);
+    opentelemetry::common::AttributeValue attr_value(span);
+    resource_attributes_.SetAttribute(name_, attr_value);
   }
 
   opentelemetry::common::AttributeValue attribute_value;
