@@ -20,8 +20,10 @@ target_include_directories(
   opentelemetry_configuration
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
-target_link_libraries(opentelemetry_configuration PUBLIC opentelemetry_api
-                                                         opentelemetry_common)
+target_link_libraries(
+  opentelemetry_configuration
+  PUBLIC opentelemetry_api opentelemetry_common opentelemetry_trace
+         opentelemetry_metrics opentelemetry_logs)
 
 target_link_libraries(opentelemetry_configuration PRIVATE ryml::ryml)
 
