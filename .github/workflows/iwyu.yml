@@ -56,7 +56,7 @@ jobs:
 
       - name: Install rapidyaml
         run: |
-          sudo ./ci/install_ryml.sh
+          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
 
       - name: Install include-what-you-use
         run: |

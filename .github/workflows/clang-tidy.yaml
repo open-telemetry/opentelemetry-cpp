@@ -48,8 +48,13 @@ jobs:
           libgmock-dev \
           libgtest-dev \
           libbenchmark-dev
-          sudo ./ci/install_ryml.sh
 
+      - name: Install rapidyaml
+        run: |
+          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
+
+      - name: Check clang-tidy
+        run: |
           if ! command -v clang-tidy &> /dev/null; then
             echo "clang-tidy could not be found"
             exit 1
