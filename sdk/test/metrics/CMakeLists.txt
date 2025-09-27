@@ -35,7 +35,8 @@ foreach(
   periodic_exporting_metric_reader_test
   instrument_metadata_validator_test
   metric_test_stress
-  instrument_descriptor_test)
+  instrument_descriptor_test
+  multi_observer_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${GMOCK_LIB} ${CMAKE_THREAD_LIBS_INIT}

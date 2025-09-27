@@ -12,6 +12,7 @@
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/metrics/async_instruments.h"
+#include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
@@ -662,6 +663,21 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
   }
   return metric_data_list;
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+uintptr_t Meter::RegisterCallback(
+    opentelemetry::metrics::MultiObservableCallbackPtr callback,
+    void *state,
+    nostd::span<opentelemetry::metrics::ObservableInstrument *> instruments) noexcept
+{
+  return observable_registry_->AddMultiCallback(callback, state, instruments);
+}
+
+void Meter::DeregisterCallback(uintptr_t callback_id) noexcept
+{
+  observable_registry_->RemoveMultiCallback(callback_id);
+}
+#endif
 
 // Implementation of the log message recommended by the SDK specification for duplicate instruments.
 // See
