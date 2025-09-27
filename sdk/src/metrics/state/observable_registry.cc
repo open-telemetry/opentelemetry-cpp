@@ -21,6 +21,14 @@
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #include "opentelemetry/version.h"
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include <unordered_map>
+
+#  include "opentelemetry/metrics/meter.h"
+#  include "opentelemetry/nostd/span.h"
+#  include "opentelemetry/sdk/metrics/multi_observer_result.h"
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -52,6 +60,32 @@ void ObservableRegistry::RemoveCallback(opentelemetry::metrics::ObservableCallba
   callbacks_.erase(new_end, callbacks_.end());
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+uintptr_t ObservableRegistry::AddMultiCallback(
+    opentelemetry::metrics::MultiObservableCallbackPtr callback,
+    void *state,
+    nostd::span<opentelemetry::metrics::ObservableInstrument *> instruments)
+{
+  std::lock_guard<std::mutex> lock_guard{callbacks_m_};
+  auto record      = std::make_unique<MultiObservableCallbackRecord>();
+  record->callback = callback;
+  record->state    = state;
+  for (auto *instrument : instruments)
+  {
+    record->observable_result.RegisterInstrument(static_cast<ObservableInstrument *>(instrument));
+  }
+  auto token = reinterpret_cast<uintptr_t>(record.get());
+  multi_callbacks_.insert({token, std::move(record)});
+  return token;
+}
+
+void ObservableRegistry::RemoveMultiCallback(uintptr_t id)
+{
+  std::lock_guard<std::mutex> lock_guard{callbacks_m_};
+  multi_callbacks_.erase(id);
+}
+#endif
+
 void ObservableRegistry::CleanupCallback(opentelemetry::metrics::ObservableInstrument *instrument)
 {
   std::lock_guard<std::mutex> lock_guard{callbacks_m_};
@@ -60,6 +94,25 @@ void ObservableRegistry::CleanupCallback(opentelemetry::metrics::ObservableInstr
                                return record->instrument == instrument;
                              });
   callbacks_.erase(iter, callbacks_.end());
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  auto sdk_instrument = static_cast<ObservableInstrument *>(instrument);
+  for (auto it = multi_callbacks_.begin(); it != multi_callbacks_.end();)
+  {
+    // Remove the instrument from the multi-callback when the instrument is destroyed
+    it->second->observable_result.DeregisterInstrument(sdk_instrument);
+
+    // If the multi-callback has no instruments left, remove it from the registry
+    if (it->second->observable_result.InstrumentCount() == 0)
+    {
+      it = multi_callbacks_.erase(it);
+    }
+    else
+    {
+      ++it;
+    }
+  }
+#endif
 }
 
 void ObservableRegistry::Observe(opentelemetry::common::SystemTimestamp collection_ts)
@@ -102,6 +155,16 @@ void ObservableRegistry::Observe(opentelemetry::common::SystemTimestamp collecti
           collection_ts);
     }
   }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  for (const auto &pair : multi_callbacks_)
+  {
+    auto &cb_record = pair.second;
+    cb_record->observable_result.Reset();
+    cb_record->callback(cb_record->observable_result, cb_record->state);
+    cb_record->observable_result.StoreResults(collection_ts);
+  }
+#endif
 }
 
 }  // namespace metrics
