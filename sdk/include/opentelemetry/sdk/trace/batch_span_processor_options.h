@@ -5,6 +5,7 @@
 
 #include <chrono>
 
+#include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -19,6 +20,7 @@ namespace trace
  */
 struct BatchSpanProcessorOptions
 {
+  BatchSpanProcessorOptions();
   /**
    * The maximum buffer/queue size. After the size is reached, spans are
    * dropped.
@@ -27,6 +29,11 @@ struct BatchSpanProcessorOptions
 
   /* The time interval between two consecutive exports. */
   std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(5000);
+
+  /**
+   * The maximum time allowed to to export data
+   */
+  std::chrono::milliseconds export_timeout = std::chrono::milliseconds(3000);
 
   /**
    * The maximum batch size of every export. It must be smaller or
