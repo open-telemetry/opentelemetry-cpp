@@ -42,7 +42,7 @@
 #include <vector>
 
 #ifdef HAVE_KRABS_TESTS
-// krabs.hpp requires this definition of min macro from Windows.h
+// krabs.hpp requires this definition of min macro from windows.h
 #  ifndef min
 #    define min(a, b) (((a) < (b)) ? (a) : (b))
 #  endif

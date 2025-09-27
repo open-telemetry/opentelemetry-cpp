@@ -6,7 +6,7 @@
 #include "opentelemetry/version.h"
 
 #ifdef _WIN32
-#  include "Windows.h"
+#  include "windows.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
