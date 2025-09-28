@@ -292,10 +292,10 @@ if(WITH_OTLP_HTTP)
                         PROPERTIES EXPORT_NAME otlp_http_exporter_builder)
   set_target_version(opentelemetry_exporter_otlp_http_builder)
 
-  target_link_libraries(opentelemetry_exporter_otlp_http_builder
-                        PUBLIC opentelemetry_exporter_otlp_http)
-  target_link_libraries(opentelemetry_exporter_otlp_http_builder
-                        PUBLIC opentelemetry_exporter_otlp_builder_utils)
+  target_link_libraries(
+    opentelemetry_exporter_otlp_http_builder
+    PUBLIC opentelemetry_exporter_otlp_http
+           opentelemetry_exporter_otlp_builder_utils)
 
   list(APPEND OPENTELEMETRY_OTLP_HTTP_BUILDER_TARGETS
        opentelemetry_exporter_otlp_http_builder)
@@ -335,10 +335,10 @@ if(WITH_OTLP_HTTP)
     PROPERTIES EXPORT_NAME otlp_http_log_record_exporter_builder)
   set_target_version(opentelemetry_exporter_otlp_http_log_builder)
 
-  target_link_libraries(opentelemetry_exporter_otlp_http_log_builder
-                        PUBLIC opentelemetry_exporter_otlp_http_log)
-  target_link_libraries(opentelemetry_exporter_otlp_http_log_builder
-                        PUBLIC opentelemetry_exporter_otlp_builder_utils)
+  target_link_libraries(
+    opentelemetry_exporter_otlp_http_log_builder
+    PUBLIC opentelemetry_exporter_otlp_http_log
+           opentelemetry_exporter_otlp_builder_utils)
 
   list(APPEND OPENTELEMETRY_OTLP_HTTP_BUILDER_TARGETS
        opentelemetry_exporter_otlp_http_log_builder)
@@ -378,10 +378,10 @@ if(WITH_OTLP_HTTP)
     PROPERTIES EXPORT_NAME otlp_http_metric_exporter_builder)
   set_target_version(opentelemetry_exporter_otlp_http_metric_builder)
 
-  target_link_libraries(opentelemetry_exporter_otlp_http_metric_builder
-                        PUBLIC opentelemetry_exporter_otlp_http_metric)
-  target_link_libraries(opentelemetry_exporter_otlp_http_metric_builder
-                        PUBLIC opentelemetry_exporter_otlp_builder_utils)
+  target_link_libraries(
+    opentelemetry_exporter_otlp_http_metric_builder
+    PUBLIC opentelemetry_exporter_otlp_http_metric
+           opentelemetry_exporter_otlp_builder_utils)
 
   list(APPEND OPENTELEMETRY_OTLP_HTTP_BUILDER_TARGETS
        opentelemetry_exporter_otlp_http_metric_builder)

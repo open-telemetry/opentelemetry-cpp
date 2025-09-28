@@ -18,23 +18,16 @@ set_target_version(opentelemetry_configuration)
 
 target_include_directories(
   opentelemetry_configuration
-  PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
+  PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>"
+         "$<INSTALL_INTERFACE:include>")
 
-target_link_libraries(opentelemetry_configuration PUBLIC opentelemetry_api
-                                                         opentelemetry_common)
-
-# target_link_libraries( opentelemetry_configuration PUBLIC yaml-cpp::yaml-cpp)
-
-target_link_libraries(opentelemetry_configuration PUBLIC ryml::ryml)
+target_link_libraries(
+  opentelemetry_configuration
+  PUBLIC opentelemetry_api opentelemetry_common opentelemetry_trace
+         opentelemetry_metrics opentelemetry_logs
+  PRIVATE ryml::ryml)
 
 if(OPENTELEMETRY_INSTALL)
-  install(
-    TARGETS opentelemetry_configuration
-    EXPORT "${PROJECT_NAME}-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
   opentelemetry_add_pkgconfig(
     configuration "OpenTelemetry SDK - Configuration"
     "Components for exporting traces in the OpenTelemetry SDK."

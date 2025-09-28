@@ -203,9 +203,6 @@ jobs:
     - name: install dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-    - name: install ryml
-      run: |
-        sudo -E ./ci/install_ryml.sh
     - name: run cmake clang (maintainer mode, sync)
       run: |
         ./ci/do_ci.sh cmake.maintainer.yaml.test
