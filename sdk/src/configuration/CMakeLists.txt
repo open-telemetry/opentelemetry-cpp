@@ -18,7 +18,8 @@ set_target_version(opentelemetry_configuration)
 
 target_include_directories(
   opentelemetry_configuration
-  PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
+  PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>"
+         "$<INSTALL_INTERFACE:include>")
 
 target_link_libraries(
   opentelemetry_configuration
