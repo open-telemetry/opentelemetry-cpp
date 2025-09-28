@@ -36,37 +36,31 @@ target_link_libraries(
 if(WITH_OTLP_HTTP)
   include_directories(${CMAKE_SOURCE_DIR}/exporters/otlp/include)
   add_definitions(-DOTEL_HAVE_OTLP_HTTP)
-  target_link_libraries(example_yaml
-                        PRIVATE opentelemetry-cpp::otlp_http_exporter_builder)
   target_link_libraries(
     example_yaml
-    PRIVATE opentelemetry-cpp::otlp_http_log_record_exporter_builder)
-  target_link_libraries(
-    example_yaml PRIVATE opentelemetry-cpp::otlp_http_metric_exporter_builder)
+    PRIVATE opentelemetry-cpp::otlp_http_exporter_builder
+            opentelemetry-cpp::otlp_http_log_record_exporter_builder
+            opentelemetry-cpp::otlp_http_metric_exporter_builder)
 endif()
 
 if(WITH_OTLP_GRPC)
   include_directories(${CMAKE_SOURCE_DIR}/exporters/otlp/include)
   add_definitions(-DOTEL_HAVE_OTLP_GRPC)
-  target_link_libraries(example_yaml
-                        PRIVATE opentelemetry-cpp::otlp_grpc_exporter_builder)
   target_link_libraries(
     example_yaml
-    PRIVATE opentelemetry-cpp::otlp_grpc_log_record_exporter_builder)
-  target_link_libraries(
-    example_yaml PRIVATE opentelemetry-cpp::otlp_grpc_metrics_exporter_builder)
+    PRIVATE opentelemetry-cpp::otlp_grpc_exporter_builder
+            opentelemetry-cpp::otlp_grpc_log_record_exporter_builder
+            opentelemetry-cpp::otlp_grpc_metrics_exporter_builder)
 endif()
 
 if(WITH_OTLP_FILE)
   include_directories(${CMAKE_SOURCE_DIR}/exporters/otlp/include)
   add_definitions(-DOTEL_HAVE_OTLP_FILE)
-  target_link_libraries(example_yaml
-                        PRIVATE opentelemetry-cpp::otlp_file_exporter_builder)
   target_link_libraries(
     example_yaml
-    PRIVATE opentelemetry-cpp::otlp_file_log_record_exporter_builder)
-  target_link_libraries(
-    example_yaml PRIVATE opentelemetry-cpp::otlp_file_metric_exporter_builder)
+    PRIVATE opentelemetry-cpp::otlp_file_exporter_builder
+            opentelemetry-cpp::otlp_file_log_record_exporter_builder
+            opentelemetry-cpp::otlp_file_metric_exporter_builder)
 endif()
 
 if(WITH_ZIPKIN)

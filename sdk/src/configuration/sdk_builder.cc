@@ -711,12 +711,8 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateAlwaysOnSa
 std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateJaegerRemoteSampler(
     const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration * /* model */) const
 {
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> sdk;
-
   static const std::string die("JaegerRemoteSampler not supported");
   throw UnsupportedException(die);
-
-  return sdk;
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateParentBasedSampler(
@@ -1155,7 +1151,6 @@ static opentelemetry::sdk::metrics::InstrumentType ConvertInstrumentType(
 
   switch (config)
   {
-    case opentelemetry::sdk::configuration::InstrumentType::none:
     case opentelemetry::sdk::configuration::InstrumentType::counter:
       sdk = opentelemetry::sdk::metrics::InstrumentType::kCounter;
       break;
@@ -1173,6 +1168,10 @@ static opentelemetry::sdk::metrics::InstrumentType ConvertInstrumentType(
       break;
     case opentelemetry::sdk::configuration::InstrumentType::up_down_counter:
       sdk = opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter;
+      break;
+    case opentelemetry::sdk::configuration::InstrumentType::none:
+    default:
+      sdk = opentelemetry::sdk::metrics::InstrumentType::kCounter;
       break;
   }
 

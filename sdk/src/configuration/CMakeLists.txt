@@ -23,9 +23,8 @@ target_include_directories(
 target_link_libraries(
   opentelemetry_configuration
   PUBLIC opentelemetry_api opentelemetry_common opentelemetry_trace
-         opentelemetry_metrics opentelemetry_logs)
-
-target_link_libraries(opentelemetry_configuration PRIVATE ryml::ryml)
+         opentelemetry_metrics opentelemetry_logs
+  PRIVATE ryml::ryml)
 
 if(OPENTELEMETRY_INSTALL)
   opentelemetry_add_pkgconfig(
