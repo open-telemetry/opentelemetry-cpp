@@ -31,23 +31,10 @@ otel_add_component(
   "include/opentelemetry"
   FILES_MATCHING
   PATTERN
-  "sdk_config.h"
+  "*.h"
   PATTERN
-  "sdk/common/*.h"
-  PATTERN
-  "sdk/instrumentationlibrary/*.h"
-  PATTERN
-  "sdk/instrumentationscope/*.h"
-  PATTERN
-  "sdk/logs/*.h"
-  PATTERN
-  "sdk/metrics/*.h"
-  PATTERN
-  "sdk/resource/*.h"
-  PATTERN
-  "sdk/trace/*.h"
-  PATTERN
-  "sdk/version/*.h")
+  "sdk/configuration/*.h"
+  EXCLUDE)
 
 if(WITH_CONFIGURATION)
   otel_add_component(
