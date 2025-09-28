@@ -49,18 +49,20 @@ otel_add_component(
   PATTERN
   "sdk/version/*.h")
 
-otel_add_component(
-  COMPONENT
-  configuration
-  TARGETS
-  opentelemetry_configuration
-  FILES_DIRECTORY
-  "include/opentelemetry/"
-  FILES_DESTINATION
-  "include/opentelemetry"
-  FILES_MATCHING
-  PATTERN
-  "sdk/configuration/*.h")
+if(WITH_CONFIGURATION)
+  otel_add_component(
+    COMPONENT
+    configuration
+    TARGETS
+    opentelemetry_configuration
+    FILES_DIRECTORY
+    "include/opentelemetry/"
+    FILES_DESTINATION
+    "include/opentelemetry"
+    FILES_MATCHING
+    PATTERN
+    "sdk/configuration/*.h")
+endif()
 
 if(BUILD_TESTING)
   add_subdirectory(test)
