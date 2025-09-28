@@ -17,12 +17,12 @@
 #include "opentelemetry/version.h"
 
 #ifdef _WIN32
-#  include <Windows.h>
 #  include <evntprov.h>
 #  include <wincrypt.h>
+#  include <windows.h>
 #  pragma comment(lib, "Advapi32.lib")
 #  pragma comment(lib, "Rpcrt4.lib")
-#  include <Objbase.h>
+#  include <objbase.h>
 #  pragma comment(lib, "Ole32.Lib")
 #else
 #  include <codecvt>
