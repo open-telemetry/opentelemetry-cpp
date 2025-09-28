@@ -27,3 +27,4 @@ opentelemetry-proto=v1.7.0
 opentracing-cpp=v1.6.0
 prometheus-cpp=v1.3.0
 vcpkg=2024.02.14
+ryml=v0.9.0

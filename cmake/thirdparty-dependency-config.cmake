@@ -16,6 +16,7 @@ set(OTEL_THIRDPARTY_DEPENDENCIES_SUPPORTED
      gRPC
      prometheus-cpp
      OpenTracing
+     ryml
 )
 
 #-----------------------------------------------------------------------
@@ -26,7 +27,7 @@ set(OTEL_THIRDPARTY_DEPENDENCIES_SUPPORTED
 set(OTEL_Protobuf_TARGET_NAMESPACE "protobuf")
 
 #-----------------------------------------------------------------------
-# Set the find_dependecy search mode - empty is default. Options: cmake default (empty string ""), "MODULE", or "CONFIG"
+# Set the find_dependency search mode - empty is default. Options: cmake default (empty string ""), "MODULE", or "CONFIG"
 # # set(OTEL_<dependency>_SEARCH_MODE "<search mode>")
 #-----------------------------------------------------------------------
 set(OTEL_Threads_SEARCH_MODE "")
@@ -37,6 +38,7 @@ set(OTEL_nlohmann_json_SEARCH_MODE "CONFIG")
 set(OTEL_gRPC_SEARCH_MODE "CONFIG")
 set(OTEL_prometheus-cpp_SEARCH_MODE "CONFIG")
 set(OTEL_OpenTracing_SEARCH_MODE "CONFIG")
+set(OTEL_ryml_SEARCH_MODE "")
 
 # The search mode is set to "CONFIG" for Protobuf versions >= 3.22.0
 # to find Protobuf's abseil dependency properly until the FindProtobuf module is updated support the upstream protobuf-config.cmake.
