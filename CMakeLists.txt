@@ -66,6 +66,8 @@ endif()
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
 option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
 
+option(WITH_CONFIGURATION "EXPERIMENTAL: YAML configuration file" OFF)
+
 #
 # We do not want to have WITH_ABI_VERSION = "1" or "2", and instead prefer two
 # distinct flags, WITH_ABI_VERSION_1 and WITH_ABI_VERSION_2.
@@ -350,6 +352,14 @@ if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
 endif()
 
 #
+# Do we need RapidYaml ?
+#
+
+if((NOT WITH_API_ONLY) AND WITH_CONFIGURATION)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/ryml.cmake")
+endif()
+
+#
 # Do we need OpenTracing ?
 #
 
@@ -499,6 +509,7 @@ message(STATUS "WITH_ELASTICSEARCH: ${WITH_ELASTICSEARCH}")
 message(STATUS "WITH_OPENTRACING: ${WITH_OPENTRACING}")
 message(STATUS "WITH_ETW: ${WITH_ETW}")
 message(STATUS "OPENTELEMETRY_BUILD_DLL: ${OPENTELEMETRY_BUILD_DLL}")
+message(STATUS "WITH_CONFIGURATION: ${WITH_CONFIGURATION}")
 
 message(STATUS "---------------------------------------------")
 message(STATUS "feature preview options")
@@ -579,6 +590,9 @@ endif()
 if(WITH_OPENTRACING)
   message(
     STATUS "opentracing-cpp: ${OpenTracing_VERSION} (${OpenTracing_PROVIDER})")
+endif()
+if(ryml_VERSION)
+  message(STATUS "ryml: ${ryml_VERSION} (${ryml_PROVIDER})")
 endif()
 message(STATUS "---------------------------------------------")
 

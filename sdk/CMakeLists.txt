@@ -14,17 +14,26 @@ target_link_libraries(opentelemetry_sdk INTERFACE opentelemetry_api)
 set(OTEL_SDK_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(src)
 
-otel_add_component(
-  COMPONENT
-  sdk
-  TARGETS
+list(
+  APPEND
+  OPENTELEMETRY_SDK_TARGETS
   opentelemetry_sdk
   opentelemetry_common
   opentelemetry_resources
   opentelemetry_version
   opentelemetry_logs
   opentelemetry_trace
-  opentelemetry_metrics
+  opentelemetry_metrics)
+
+if(WITH_CONFIGURATION)
+  list(APPEND OPENTELEMETRY_SDK_TARGETS opentelemetry_configuration)
+endif()
+
+otel_add_component(
+  COMPONENT
+  sdk
+  TARGETS
+  ${OPENTELEMETRY_SDK_TARGETS}
   FILES_DIRECTORY
   "include/opentelemetry/"
   FILES_DESTINATION

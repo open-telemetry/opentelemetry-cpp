@@ -171,6 +171,31 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
   eval "$MAKE_COMMAND"
   make test
   exit 0
+elif [[ "$1" == "cmake.maintainer.yaml.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_GRPC=ON \
+        -DWITH_OTLP_FILE=ON \
+        -DWITH_PROMETHEUS=ON \
+        -DWITH_EXAMPLES=ON \
+        -DWITH_EXAMPLES_HTTP=ON \
+        -DWITH_ZIPKIN=ON \
+        -DBUILD_W3CTRACECONTEXT_TEST=ON \
+        -DWITH_ELASTICSEARCH=ON \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
+        -DOTELCPP_MAINTAINER_MODE=ON \
+        -DWITH_NO_DEPRECATED_CODE=ON \
+        -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
+        -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
+        -DWITH_CONFIGURATION=ON \
+        "${SRC_DIR}"
+  eval "$MAKE_COMMAND"
+  make test
+  exit 0
 elif [[ "$1" == "cmake.with_async_export.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
@@ -511,8 +536,11 @@ EOF
   examples/plugin/load/load_plugin_example ${PLUGIN_DIR}/libexample_plugin.so /dev/null
   exit 0
 elif [[ "$1" == "bazel.no_bzlmod.test" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build --enable_bzlmod=false $BAZEL_OPTIONS //...
-  bazel $BAZEL_STARTUP_OPTIONS test --enable_bzlmod=false $BAZEL_TEST_OPTIONS //...
+  # Rapidyaml 0.9.0 as is does not support bazel,
+  # modules in bazel central repository required
+  # to build configuration.
+  bazel $BAZEL_STARTUP_OPTIONS build --enable_bzlmod=false $BAZEL_OPTIONS -- //... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
+  bazel $BAZEL_STARTUP_OPTIONS test --enable_bzlmod=false $BAZEL_TEST_OPTIONS -- //... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
   exit 0
 elif [[ "$1" == "bazel.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS $BAZEL_WITH_PREVIEW //...
@@ -539,8 +567,8 @@ elif [[ "$1" == "bazel.noexcept" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client
   # as well as Opentracing shim (due to some third party code in its Opentracing dependency)
   # that make this test always fail. Ignore these packages in the noexcept test here.
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/...
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/...
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
   exit 0
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client
