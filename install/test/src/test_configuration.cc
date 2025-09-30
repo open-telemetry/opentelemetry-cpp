@@ -4,16 +4,13 @@
 #include <gtest/gtest.h>
 
 #include <opentelemetry/sdk/version/version.h>
-#include "opentelemetry/sdk/configuration/registry.h"
-#include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
-#include "opentelemetry/sdk/configuration/configured_sdk.h"
-#include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/exporters/ostream/console_log_record_builder.h"
 #include "opentelemetry/exporters/ostream/console_push_metric_builder.h"
 #include "opentelemetry/exporters/ostream/console_span_builder.h"
-
-
-// TODO
+#include "opentelemetry/sdk/configuration/configuration.h"
+#include "opentelemetry/sdk/configuration/configured_sdk.h"
+#include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
 
 TEST(ConfigurationInstallTest, ConfigurationCheck)
 {
@@ -36,14 +33,14 @@ logger_provider:
           console:
 )";
 
-  auto model = opentelemetry::sdk::configuration::YamlConfigurationParser::ParseString(source, yaml);
+  auto model =
+      opentelemetry::sdk::configuration::YamlConfigurationParser::ParseString(source, yaml);
   EXPECT_NE(model, nullptr);
 
-  sdk = opentelemetry::sdk::configuration::ConfiguredSdk::Create(registry, model);
-  EXPECT_NE(sdk, nullptr);
+  auto test_sdk = opentelemetry::sdk::configuration::ConfiguredSdk::Create(registry, model);
+  EXPECT_NE(test_sdk, nullptr);
 
-  sdk->Install();
-  sdk->UnInstall();
-  sdk.reset(nullptr);
+  test_sdk->Install();
+  test_sdk->UnInstall();
+  test_sdk.reset(nullptr);
 }
-

@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 cmake_minimum_required(VERSION 3.16)
-project(opentelemetry-cpp-exporters-otlp-file-builder-install-test LANGUAGES CXX)
+project(opentelemetry-cpp-exporters-otlp-file-builder-install-test
+        LANGUAGES CXX)
 
 find_package(opentelemetry-cpp REQUIRED COMPONENTS exporters_otlp_file_builder)
 

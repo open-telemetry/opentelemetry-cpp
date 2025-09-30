@@ -16,8 +16,8 @@ include(GoogleTest)
 add_executable(exporters_zipkin_builder_test
                ${INSTALL_TEST_SRC_DIR}/test_exporters_zipkin_builder.cc)
 target_link_libraries(
-  exporters_zipkin_builder_test PRIVATE
-opentelemetry-cpp::zipkin_trace_exporter_builder
-                                GTest::gtest GTest::gtest_main)
+  exporters_zipkin_builder_test
+  PRIVATE opentelemetry-cpp::zipkin_trace_exporter_builder GTest::gtest
+          GTest::gtest_main)
 
 gtest_discover_tests(exporters_zipkin_builder_test)

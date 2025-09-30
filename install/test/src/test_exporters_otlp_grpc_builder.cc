@@ -3,9 +3,9 @@
 
 #include <gtest/gtest.h>
 
-#include "opentelemetry/exporters/otlp/otlp_grpc_span_builder.h"
-#include "opentelemetry/exporters/otlp/otlp_grpc_push_metric_builder.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_builder.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_push_metric_builder.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_span_builder.h"
 
 TEST(ExportersOtlpGrpcBuilderInstall, OtlpGrpcSpanBuilder)
 {
@@ -13,9 +13,9 @@ TEST(ExportersOtlpGrpcBuilderInstall, OtlpGrpcSpanBuilder)
   ASSERT_TRUE(builder != nullptr);
 
   opentelemetry::sdk::configuration::OtlpGrpcSpanExporterConfiguration model;
-  model.endpoint = "http://localhost:4317";
-  model.insecure = false;
-  model.timeout = 12;
+  model.endpoint    = "http://localhost:4317";
+  model.insecure    = false;
+  model.timeout     = 12;
   model.compression = "none";
 
   auto exporter = builder->Build(&model);
@@ -28,11 +28,12 @@ TEST(ExportersOtlpGrpcBuilderInstall, OtlpGrpcPushMetricBuilder)
   ASSERT_TRUE(builder != nullptr);
 
   opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration model;
-  model.endpoint = "http://localhost:4317";
-  model.insecure = false;
-  model.timeout = 12;
+  model.endpoint    = "http://localhost:4317";
+  model.insecure    = false;
+  model.timeout     = 12;
   model.compression = "none";
-  model.temporality_preference = opentelemetry::sdk::configuration::TemporalityPreference::cumulative;
+  model.temporality_preference =
+      opentelemetry::sdk::configuration::TemporalityPreference::cumulative;
 
   auto exporter = builder->Build(&model);
   ASSERT_TRUE(exporter != nullptr);
@@ -44,9 +45,9 @@ TEST(ExportersOtlpGrpcBuilderInstall, OtlpGrpcLogRecordBuilder)
   ASSERT_TRUE(builder != nullptr);
 
   opentelemetry::sdk::configuration::OtlpGrpcLogRecordExporterConfiguration model;
-  model.endpoint = "http://localhost:4317";
-  model.insecure = false;
-  model.timeout = 12;
+  model.endpoint    = "http://localhost:4317";
+  model.insecure    = false;
+  model.timeout     = 12;
   model.compression = "none";
 
   auto exporter = builder->Build(&model);

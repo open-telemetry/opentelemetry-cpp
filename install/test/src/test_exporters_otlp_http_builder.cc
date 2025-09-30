@@ -3,9 +3,9 @@
 
 #include <gtest/gtest.h>
 
-#include "opentelemetry/exporters/otlp/otlp_http_span_builder.h"
-#include "opentelemetry/exporters/otlp/otlp_http_push_metric_builder.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_builder.h"
+#include "opentelemetry/exporters/otlp/otlp_http_push_metric_builder.h"
+#include "opentelemetry/exporters/otlp/otlp_http_span_builder.h"
 
 TEST(ExportersOtlpHttpBuilderInstall, OtlpHttpSpanBuilder)
 {
@@ -13,9 +13,9 @@ TEST(ExportersOtlpHttpBuilderInstall, OtlpHttpSpanBuilder)
   ASSERT_TRUE(builder != nullptr);
 
   opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration model;
-  model.endpoint = "http://localhost:4318";
-  model.encoding = opentelemetry::sdk::configuration::OtlpHttpEncoding::json;
-  model.timeout = 12;
+  model.endpoint    = "http://localhost:4318";
+  model.encoding    = opentelemetry::sdk::configuration::OtlpHttpEncoding::json;
+  model.timeout     = 12;
   model.compression = "none";
 
   auto exporter = builder->Build(&model);
@@ -28,11 +28,12 @@ TEST(ExportersOtlpHttpBuilderInstall, OtlpHttpPushMetricBuilder)
   ASSERT_TRUE(builder != nullptr);
 
   opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration model;
-  model.endpoint = "http://localhost:4318";
-  model.encoding = opentelemetry::sdk::configuration::OtlpHttpEncoding::json;
-  model.timeout = 12;
+  model.endpoint    = "http://localhost:4318";
+  model.encoding    = opentelemetry::sdk::configuration::OtlpHttpEncoding::json;
+  model.timeout     = 12;
   model.compression = "none";
-  model.temporality_preference = opentelemetry::sdk::configuration::TemporalityPreference::cumulative;
+  model.temporality_preference =
+      opentelemetry::sdk::configuration::TemporalityPreference::cumulative;
 
   auto exporter = builder->Build(&model);
   ASSERT_TRUE(exporter != nullptr);
@@ -44,9 +45,9 @@ TEST(ExportersOtlpHttpBuilderInstall, OtlpHttpLogRecordBuilder)
   ASSERT_TRUE(builder != nullptr);
 
   opentelemetry::sdk::configuration::OtlpHttpLogRecordExporterConfiguration model;
-  model.endpoint = "http://localhost:4318";
-  model.encoding = opentelemetry::sdk::configuration::OtlpHttpEncoding::json;
-  model.timeout = 12;
+  model.endpoint    = "http://localhost:4318";
+  model.encoding    = opentelemetry::sdk::configuration::OtlpHttpEncoding::json;
+  model.timeout     = 12;
   model.compression = "none";
 
   auto exporter = builder->Build(&model);

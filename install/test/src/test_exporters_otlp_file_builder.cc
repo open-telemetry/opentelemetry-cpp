@@ -3,9 +3,9 @@
 
 #include <gtest/gtest.h>
 
-#include "opentelemetry/exporters/otlp/otlp_file_span_builder.h"
-#include "opentelemetry/exporters/otlp/otlp_file_push_metric_builder.h"
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_builder.h"
+#include "opentelemetry/exporters/otlp/otlp_file_push_metric_builder.h"
+#include "opentelemetry/exporters/otlp/otlp_file_span_builder.h"
 
 TEST(ExportersOtlpFileBuilderInstall, OtlpFileSpanBuilder)
 {
@@ -21,7 +21,8 @@ TEST(ExportersOtlpFileBuilderInstall, OtlpFilePushMetricBuilder)
   ASSERT_TRUE(builder != nullptr);
 
   opentelemetry::sdk::configuration::OtlpFilePushMetricExporterConfiguration model;
-  model.temporality_preference = opentelemetry::sdk::configuration::TemporalityPreference::cumulative;
+  model.temporality_preference =
+      opentelemetry::sdk::configuration::TemporalityPreference::cumulative;
 
   auto exporter = builder->Build(&model);
   ASSERT_TRUE(exporter != nullptr);
