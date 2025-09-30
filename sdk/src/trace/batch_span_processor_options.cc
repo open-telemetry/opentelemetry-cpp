@@ -15,10 +15,10 @@ namespace sdk
 namespace trace
 {
 
-constexpr const char *kMaxQueueSize       = "OTEL_BSP_MAX_QUEUE_SIZE";
-constexpr const char *kScheduleDelay      = "OTEL_BSP_SCHEDULE_DELAY";
-constexpr const char *kExportTimeout      = "OTEL_BSP_EXPORT_TIMEOUT";
-constexpr const char *kMaxExportBatchSize = "OTEL_BSP_MAX_EXPORT_BATCH_SIZE";
+constexpr const char *kMaxQueueSizeEnv       = "OTEL_BSP_MAX_QUEUE_SIZE";
+constexpr const char *kScheduleDelayEnv      = "OTEL_BSP_SCHEDULE_DELAY";
+constexpr const char *kExportTimeoutEnv      = "OTEL_BSP_EXPORT_TIMEOUT";
+constexpr const char *kMaxExportBatchSizeEnv = "OTEL_BSP_MAX_EXPORT_BATCH_SIZE";
 
 const size_t kDefaultMaxQueueSize                           = 2084;
 const std::chrono::milliseconds kDefaultScheduleDelayMillis = std::chrono::milliseconds(5000);
@@ -28,7 +28,7 @@ const size_t kDefaultMaxExportBatchSize                     = 512;
 inline size_t GetMaxQueueSizeFromEnv()
 {
   std::uint32_t value;
-  if (!opentelemetry::sdk::common::GetUintEnvironmentVariable(kMaxQueueSize, value))
+  if (!opentelemetry::sdk::common::GetUintEnvironmentVariable(kMaxQueueSizeEnv, value))
   {
     return kDefaultMaxQueueSize;
   }
@@ -50,7 +50,7 @@ inline std::chrono::milliseconds GetDurationFromEnv(
 inline size_t GetMaxExportBatchSizeFromEnv()
 {
   std::uint32_t value;
-  if (!opentelemetry::sdk::common::GetUintEnvironmentVariable(kMaxExportBatchSize, value))
+  if (!opentelemetry::sdk::common::GetUintEnvironmentVariable(kMaxExportBatchSizeEnv, value))
   {
     return kDefaultMaxExportBatchSize;
   }
@@ -59,8 +59,8 @@ inline size_t GetMaxExportBatchSizeFromEnv()
 
 BatchSpanProcessorOptions::BatchSpanProcessorOptions()
     : max_queue_size(GetMaxQueueSizeFromEnv()),
-      schedule_delay_millis(GetDurationFromEnv(kScheduleDelay, kDefaultScheduleDelayMillis)),
-      export_timeout(GetDurationFromEnv(kExportTimeout, kDefaultExportTimeout)),
+      schedule_delay_millis(GetDurationFromEnv(kScheduleDelayEnv, kDefaultScheduleDelayMillis)),
+      export_timeout(GetDurationFromEnv(kExportTimeoutEnv, kDefaultExportTimeout)),
       max_export_batch_size(GetMaxExportBatchSizeFromEnv())
 {}
 
