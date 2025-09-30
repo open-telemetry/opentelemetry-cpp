@@ -42,7 +42,7 @@ if(WITH_OTLP_GRPC)
     example_yaml
     PRIVATE opentelemetry-cpp::otlp_grpc_exporter_builder
             opentelemetry-cpp::otlp_grpc_log_record_exporter_builder
-            opentelemetry-cpp::otlp_grpc_metrics_exporter_builder)
+            opentelemetry-cpp::otlp_grpc_metric_exporter_builder)
 endif()
 
 if(WITH_OTLP_FILE)
