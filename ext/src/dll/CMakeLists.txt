@@ -15,31 +15,10 @@ add_library(opentelemetry_cpp SHARED dllmain.cc ${OPENTELEMETRY_EXPORT_DEF})
 set_target_properties(opentelemetry_cpp PROPERTIES EXPORT_NAME
                                                    opentelemetry_cpp)
 
-if(WITH_ABI_VERSION_1)
-  target_compile_definitions(opentelemetry_cpp PRIVATE WITH_ABI_VERSION_1)
-endif()
-
-if(WITH_ABI_VERSION_2)
-  target_compile_definitions(opentelemetry_cpp PRIVATE WITH_ABI_VERSION_2)
-endif()
-
-if(WITH_CONFIGURATION)
-  target_compile_definitions(opentelemetry_cpp PRIVATE WITH_CONFIGURATION)
-endif()
-
 target_link_libraries(
   opentelemetry_cpp
   PUBLIC opentelemetry_api
   PRIVATE opentelemetry_trace opentelemetry_exporter_ostream_span)
-
-if(WITH_CONFIGURATION)
-  target_link_libraries(
-    opentelemetry_cpp
-    PUBLIC opentelemetry_api
-    PRIVATE opentelemetry_exporter_ostream_span_builder
-            opentelemetry_exporter_ostream_metrics_builder
-            opentelemetry_exporter_ostream_logs_builder)
-endif()
 
 target_include_directories(
   opentelemetry_cpp
