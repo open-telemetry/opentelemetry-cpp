@@ -28,6 +28,7 @@
 #include "opentelemetry/version.h"
 
 #if defined(_MSC_VER)
+#  include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
 #endif
