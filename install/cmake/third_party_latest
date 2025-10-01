@@ -6,9 +6,9 @@
 
 abseil=20240722.1
 zlib=v1.3.1
-curl=curl-8_14_1
-protobuf=v6.30.2
-grpc=v1.72.1
+curl=curl-8_16_0
+protobuf=v6.32.1
+grpc=v1.75.0
 benchmark=v1.9.4
 googletest=v1.17.0
 ms-gsl=v4.2.0
