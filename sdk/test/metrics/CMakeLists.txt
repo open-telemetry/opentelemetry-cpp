@@ -81,4 +81,6 @@ if(WITH_BENCHMARK)
     metrics_common_test_utils opentelemetry_common opentelemetry_resources)
 endif()
 
-add_subdirectory(exemplar)
+if(WITH_METRICS_EXEMPLAR_PREVIEW)
+  add_subdirectory(exemplar)
+endif()

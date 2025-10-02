@@ -138,8 +138,10 @@ if(WITH_OTLP_GRPC)
                         PROPERTIES EXPORT_NAME otlp_grpc_exporter_builder)
   set_target_version(opentelemetry_exporter_otlp_grpc_builder)
 
-  target_link_libraries(opentelemetry_exporter_otlp_grpc_builder
-                        PUBLIC opentelemetry_exporter_otlp_grpc)
+  target_link_libraries(
+    opentelemetry_exporter_otlp_grpc_builder
+    PUBLIC opentelemetry_exporter_otlp_grpc
+           opentelemetry_exporter_otlp_builder_utils)
 
   list(APPEND OPENTELEMETRY_OTLP_GRPC_BUILDER_TARGETS
        opentelemetry_exporter_otlp_grpc_builder)
@@ -179,8 +181,10 @@ if(WITH_OTLP_GRPC)
     PROPERTIES EXPORT_NAME otlp_grpc_log_record_exporter_builder)
   set_target_version(opentelemetry_exporter_otlp_grpc_log_builder)
 
-  target_link_libraries(opentelemetry_exporter_otlp_grpc_log_builder
-                        PUBLIC opentelemetry_exporter_otlp_grpc_log)
+  target_link_libraries(
+    opentelemetry_exporter_otlp_grpc_log_builder
+    PUBLIC opentelemetry_exporter_otlp_grpc_log
+           opentelemetry_exporter_otlp_builder_utils)
 
   list(APPEND OPENTELEMETRY_OTLP_GRPC_BUILDER_TARGETS
        opentelemetry_exporter_otlp_grpc_log_builder)
@@ -208,23 +212,25 @@ if(WITH_OTLP_GRPC)
        opentelemetry_exporter_otlp_grpc_metrics)
 
   #
-  # opentelemetry_exporter_otlp_grpc_metrics_builder
+  # opentelemetry_exporter_otlp_grpc_metric_builder
   #
 
   add_library(
-    opentelemetry_exporter_otlp_grpc_metrics_builder
+    opentelemetry_exporter_otlp_grpc_metric_builder
     ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE} src/otlp_grpc_push_metric_builder.cc)
 
   set_target_properties(
-    opentelemetry_exporter_otlp_grpc_metrics_builder
-    PROPERTIES EXPORT_NAME otlp_grpc_metrics_exporter_builder)
-  set_target_version(opentelemetry_exporter_otlp_grpc_metrics_builder)
+    opentelemetry_exporter_otlp_grpc_metric_builder
+    PROPERTIES EXPORT_NAME otlp_grpc_metric_exporter_builder)
+  set_target_version(opentelemetry_exporter_otlp_grpc_metric_builder)
 
-  target_link_libraries(opentelemetry_exporter_otlp_grpc_metrics_builder
-                        PUBLIC opentelemetry_exporter_otlp_grpc_metrics)
+  target_link_libraries(
+    opentelemetry_exporter_otlp_grpc_metric_builder
+    PUBLIC opentelemetry_exporter_otlp_grpc_metrics
+           opentelemetry_exporter_otlp_builder_utils)
 
   list(APPEND OPENTELEMETRY_OTLP_GRPC_BUILDER_TARGETS
-       opentelemetry_exporter_otlp_grpc_metrics_builder)
+       opentelemetry_exporter_otlp_grpc_metric_builder)
 
 endif()
 
@@ -445,8 +451,10 @@ if(WITH_OTLP_FILE)
                         PROPERTIES EXPORT_NAME otlp_file_exporter_builder)
   set_target_version(opentelemetry_exporter_otlp_file_builder)
 
-  target_link_libraries(opentelemetry_exporter_otlp_file_builder
-                        PUBLIC opentelemetry_exporter_otlp_file)
+  target_link_libraries(
+    opentelemetry_exporter_otlp_file_builder
+    PUBLIC opentelemetry_exporter_otlp_file
+           opentelemetry_exporter_otlp_builder_utils)
 
   list(APPEND OPENTELEMETRY_OTLP_FILE_BUILDER_TARGETS
        opentelemetry_exporter_otlp_file_builder)
@@ -486,8 +494,10 @@ if(WITH_OTLP_FILE)
     PROPERTIES EXPORT_NAME otlp_file_log_record_exporter_builder)
   set_target_version(opentelemetry_exporter_otlp_file_log_builder)
 
-  target_link_libraries(opentelemetry_exporter_otlp_file_log_builder
-                        PUBLIC opentelemetry_exporter_otlp_file_log)
+  target_link_libraries(
+    opentelemetry_exporter_otlp_file_log_builder
+    PUBLIC opentelemetry_exporter_otlp_file_log
+           opentelemetry_exporter_otlp_builder_utils)
 
   list(APPEND OPENTELEMETRY_OTLP_FILE_BUILDER_TARGETS
        opentelemetry_exporter_otlp_file_log_builder)
@@ -527,8 +537,10 @@ if(WITH_OTLP_FILE)
     PROPERTIES EXPORT_NAME otlp_file_metric_exporter_builder)
   set_target_version(opentelemetry_exporter_otlp_file_metric_builder)
 
-  target_link_libraries(opentelemetry_exporter_otlp_file_metric_builder
-                        PUBLIC opentelemetry_exporter_otlp_file_metric)
+  target_link_libraries(
+    opentelemetry_exporter_otlp_file_metric_builder
+    PUBLIC opentelemetry_exporter_otlp_file_metric
+           opentelemetry_exporter_otlp_builder_utils)
 
   list(APPEND OPENTELEMETRY_OTLP_FILE_BUILDER_TARGETS
        opentelemetry_exporter_otlp_file_metric_builder)

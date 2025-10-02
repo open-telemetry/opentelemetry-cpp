@@ -1,10 +1,6 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-if(DEFINED OPENTELEMETRY_BUILD_DLL)
-  add_definitions(-DOPENTELEMETRY_BUILD_IMPORT_DLL)
-endif()
-
 add_executable(
   example_yaml
   main.cc
@@ -32,7 +28,7 @@ target_link_libraries(
           opentelemetry-cpp::ostream_log_record_exporter_builder)
 
 if(WITH_OTLP_HTTP)
-  add_definitions(-DOTEL_HAVE_OTLP_HTTP)
+  target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_OTLP_HTTP)
   target_link_libraries(
     example_yaml
     PRIVATE opentelemetry-cpp::otlp_http_exporter_builder
@@ -41,16 +37,16 @@ if(WITH_OTLP_HTTP)
 endif()
 
 if(WITH_OTLP_GRPC)
-  add_definitions(-DOTEL_HAVE_OTLP_GRPC)
+  target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_OTLP_GRPC)
   target_link_libraries(
     example_yaml
     PRIVATE opentelemetry-cpp::otlp_grpc_exporter_builder
             opentelemetry-cpp::otlp_grpc_log_record_exporter_builder
-            opentelemetry-cpp::otlp_grpc_metrics_exporter_builder)
+            opentelemetry-cpp::otlp_grpc_metric_exporter_builder)
 endif()
 
 if(WITH_OTLP_FILE)
-  add_definitions(-DOTEL_HAVE_OTLP_FILE)
+  target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_OTLP_FILE)
   target_link_libraries(
     example_yaml
     PRIVATE opentelemetry-cpp::otlp_file_exporter_builder
@@ -59,18 +55,20 @@ if(WITH_OTLP_FILE)
 endif()
 
 if(WITH_ZIPKIN)
-  add_definitions(-DOTEL_HAVE_ZIPKIN)
+  target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_ZIPKIN)
   target_link_libraries(
     example_yaml PRIVATE opentelemetry-cpp::zipkin_trace_exporter_builder)
 endif()
 
 if(WITH_PROMETHEUS)
-  add_definitions(-DOTEL_HAVE_PROMETHEUS)
+  target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_PROMETHEUS)
   target_link_libraries(example_yaml
                         PRIVATE opentelemetry-cpp::prometheus_exporter_builder)
 endif()
 
 if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  target_compile_definitions(example_yaml
+                             PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
   target_link_libraries(example_yaml
                         PRIVATE opentelemetry-cpp::opentelemetry_cpp)
 else()
@@ -78,4 +76,8 @@ else()
     example_yaml
     PRIVATE opentelemetry-cpp::configuration opentelemetry-cpp::common
             opentelemetry-cpp::trace opentelemetry-cpp::logs)
+endif()
+
+if(BUILD_TESTING)
+  add_test(NAME examples.example_yaml COMMAND "$<TARGET_FILE:example_yaml>")
 endif()

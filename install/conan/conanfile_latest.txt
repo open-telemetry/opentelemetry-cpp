@@ -3,13 +3,14 @@
 
 [requires]
 zlib/1.3.1
-libcurl/8.12.1
-abseil/20240116.2
+libcurl/8.15.0
+abseil/20250127.0
 protobuf/5.27.0
-grpc/1.67.1
+grpc/1.72.0
 nlohmann_json/3.12.0
 prometheus-cpp/1.3.0
 opentracing-cpp/1.6.0
+rapidyaml/0.9.0
 
 [options]
 grpc/*:fPIC=True

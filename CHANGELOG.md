@@ -20,6 +20,9 @@ Increment the:
 * [METRICS] Allow registering one callback for multiple instruments
   [#3667](https://github.com/open-telemetry/opentelemetry-cpp/pull/3667)
 
+* [SDK] Fix typo in hashmap method GetEnteries
+  [#3680](https://github.com/open-telemetry/opentelemetry-cpp/pull/3680)
+
 ## [1.23 2025-09-25]
 
 * [CodeHealth] Fix clang-tidy warnings part 6
