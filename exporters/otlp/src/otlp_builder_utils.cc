@@ -79,16 +79,19 @@ OtlpHeaders OtlpBuilderUtils::ConvertHeadersConfigurationModel(
     }
   }
 
-  // Second, scan headers, which has high priority.
-  for (const auto &kv : model->kv_map)
+  if (model != nullptr)
   {
-    const auto &search = headers.find(kv.first);
-    if (search != headers.end())
+    // Second, scan headers, which has high priority.
+    for (const auto &kv : model->kv_map)
     {
-      headers.erase(search);
-    }
+      const auto &search = headers.find(kv.first);
+      if (search != headers.end())
+      {
+        headers.erase(search);
+      }
 
-    headers.emplace(std::make_pair(kv.first, kv.second));
+      headers.emplace(std::make_pair(kv.first, kv.second));
+    }
   }
 
   return headers;
