@@ -19,7 +19,14 @@ namespace configuration
 class InvalidSchemaException : public std::runtime_error
 {
 public:
-  InvalidSchemaException(const std::string &msg) : std::runtime_error(msg) {}
+  InvalidSchemaException(const DocumentNodeLocation &location, const std::string &msg)
+      : location_(location), std::runtime_error(msg)
+  {}
+
+  std::string Where() const { return location_.ToString(); }
+
+private:
+  DocumentNodeLocation location_;
 };
 
 }  // namespace configuration

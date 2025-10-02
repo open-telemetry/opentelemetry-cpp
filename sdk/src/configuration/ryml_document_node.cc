@@ -60,7 +60,7 @@ std::string RymlDocumentNode::Key() const
 
   if (!node_.has_key())
   {
-    throw InvalidSchemaException("Yaml: no key");
+    throw InvalidSchemaException(Location(), "Yaml: no key");
   }
 
   ryml::csubstr k = node_.key();
@@ -74,7 +74,7 @@ bool RymlDocumentNode::AsBoolean() const
 
   if (!node_.is_val() && !node_.is_keyval())
   {
-    throw InvalidSchemaException("Yaml: not scalar");
+    throw InvalidSchemaException(Location(), "Yaml: not scalar");
   }
   ryml::csubstr view = node_.val();
   std::string value(view.str, view.len);
@@ -87,7 +87,7 @@ size_t RymlDocumentNode::AsInteger() const
 
   if (!node_.is_val() && !node_.is_keyval())
   {
-    throw InvalidSchemaException("Yaml: not scalar");
+    throw InvalidSchemaException(Location(), "Yaml: not scalar");
   }
   ryml::csubstr view = node_.val();
   std::string value(view.str, view.len);
@@ -100,7 +100,7 @@ double RymlDocumentNode::AsDouble() const
 
   if (!node_.is_val() && !node_.is_keyval())
   {
-    throw InvalidSchemaException("Yaml: not scalar");
+    throw InvalidSchemaException(Location(), "Yaml: not scalar");
   }
   ryml::csubstr view = node_.val();
   std::string value(view.str, view.len);
@@ -113,7 +113,7 @@ std::string RymlDocumentNode::AsString() const
 
   if (!node_.is_val() && !node_.is_keyval())
   {
-    throw InvalidSchemaException("Yaml: not scalar");
+    throw InvalidSchemaException(Location(), "Yaml: not scalar");
   }
   ryml::csubstr view = node_.val();
   std::string value(view.str, view.len);
@@ -124,19 +124,17 @@ ryml::ConstNodeRef RymlDocumentNode::GetRequiredRymlChildNode(const std::string 
 {
   if (!node_.is_map())
   {
-    std::string message = Location().ToString();
-    message.append("Yaml: not a map, looking for: ");
+    std::string message("Yaml: not a map, looking for: ");
     message.append(name);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   const char *name_str = name.c_str();
   if (!node_.has_child(name_str))
   {
-    std::string message = Location().ToString();
-    message.append("Yaml: required node: ");
+    std::string message("Yaml: required node: ");
     message.append(name);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   ryml::ConstNodeRef ryml_child = node_[name_str];
@@ -169,7 +167,7 @@ std::unique_ptr<DocumentNode> RymlDocumentNode::GetRequiredChildNode(const std::
   {
     std::string message("Yaml nested too deeply: ");
     message.append(name);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   auto ryml_child = GetRequiredRymlChildNode(name);
@@ -185,7 +183,7 @@ std::unique_ptr<DocumentNode> RymlDocumentNode::GetChildNode(const std::string &
   {
     std::string message("Yaml nested too deeply: ");
     message.append(name);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   std::unique_ptr<DocumentNode> child;
@@ -334,7 +332,7 @@ std::string RymlDocumentNode::GetRequiredString(const std::string &name) const
   {
     std::string message("Yaml: string value is empty: ");
     message.append(name);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   return value;
@@ -449,8 +447,7 @@ std::unique_ptr<DocumentNode> RymlDocumentNodeConstIteratorImpl::Item() const
   ryml::ConstNodeRef ryml_item = parent_[index_];
   if (ryml_item.invalid())
   {
-    // FIXME: runtime exception really
-    throw InvalidSchemaException("iterator is lost");
+    throw std::runtime_error("iterator is lost");
   }
   item = std::make_unique<RymlDocumentNode>(doc_, ryml_item, depth_ + 1);
   return item;
