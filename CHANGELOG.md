@@ -18,6 +18,9 @@ Increment the:
 * [TEST] Remove workaround for metrics cardinality limit test
   [#3663](https://github.com/open-telemetry/opentelemetry-cpp/pull/3663)
 
+* [SDK] Fix typo in hashmap method GetEnteries
+  [#3680](https://github.com/open-telemetry/opentelemetry-cpp/pull/3680)
+
 ## [1.23 2025-09-25]
 
 * [CodeHealth] Fix clang-tidy warnings part 6
