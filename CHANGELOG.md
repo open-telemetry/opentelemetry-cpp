@@ -17,6 +17,8 @@ Increment the:
 
 * [TEST] Remove workaround for metrics cardinality limit test
   [#3663](https://github.com/open-telemetry/opentelemetry-cpp/pull/3663)
+* [METRICS] Allow registering one callback for multiple instruments
+  [#3667](https://github.com/open-telemetry/opentelemetry-cpp/pull/3667)
 
 * [SDK] Fix typo in hashmap method GetEnteries
   [#3680](https://github.com/open-telemetry/opentelemetry-cpp/pull/3680)
