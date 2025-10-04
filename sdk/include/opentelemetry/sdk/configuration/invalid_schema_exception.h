@@ -20,7 +20,7 @@ class InvalidSchemaException : public std::runtime_error
 {
 public:
   InvalidSchemaException(const DocumentNodeLocation &location, const std::string &msg)
-      : location_(location), std::runtime_error(msg)
+      : std::runtime_error(msg), location_(location)
   {}
 
   std::string Where() const { return location_.ToString(); }
