@@ -59,7 +59,7 @@ jobs:
     env:
       CXX_STANDARD: '17'
       CMAKE_VERSION: '3.16.0'
-      BUILD_TYPE: 'Debug'
+      BUILD_TYPE: 'Release'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
@@ -67,7 +67,7 @@ jobs:
         egress-policy: audit
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
-        submodules: 'recursive'
+        submodules: 'none'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
@@ -926,6 +926,11 @@ jobs:
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
+    - name: Install CMake
+      env: 
+        CMAKE_VERSION: 3.31.6 # the macos runner installs CMake 4.x and is not compatible with opentracing
+      run: |
+        ./ci/setup_cmake_macos.sh
     - name: Mount Bazel Cache
       uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       env:
