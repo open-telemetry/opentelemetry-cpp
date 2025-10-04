@@ -70,8 +70,8 @@ jobs:
           TOPDIR=`pwd`
           cmake -B build-${{ matrix.cmake_options }} \
             -C ./test_common/cmake/${{ matrix.cmake_options }}.cmake \
-            -DCMAKE_CXX_STANDARD=14 \
-            -DWITH_STL=CXX14 \
+            -DCMAKE_CXX_STANDARD=17 \
+            -DWITH_STL=CXX17 \
             -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
             -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;"
 
