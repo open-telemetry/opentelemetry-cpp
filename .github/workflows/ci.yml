@@ -67,7 +67,7 @@ jobs:
         egress-policy: audit
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
-        submodules: 'none'
+        submodules: 'false'
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
@@ -927,7 +927,7 @@ jobs:
       with:
         submodules: 'recursive'
     - name: Install CMake
-      env: 
+      env:
         CMAKE_VERSION: 3.31.6 # the macos runner installs CMake 4.x and is not compatible with opentracing
       run: |
         ./ci/setup_cmake_macos.sh

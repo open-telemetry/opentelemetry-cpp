@@ -578,7 +578,7 @@ elif [[ "$1" == "bazel.noexcept" ]]; then
   # as well as Opentracing shim (due to some third party code in its Opentracing dependency)
   # that make this test always fail. Ignore these packages in the noexcept test here.
   # Set the api:with_cxx_stdlib=none because C++17 std::variant::get<> throws
-  
+
   bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
   bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
   exit 0
