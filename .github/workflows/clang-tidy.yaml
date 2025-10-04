@@ -70,8 +70,8 @@ jobs:
           echo "Running cmake..."
           cmake -B build-${{ matrix.cmake_options }} \
             -C ./test_common/cmake/${{ matrix.cmake_options }}.cmake \
-            -DCMAKE_CXX_STANDARD=17 \
-            -DWITH_STL=CXX17 \
+            -DCMAKE_CXX_STANDARD=14 \
+            -DWITH_STL=CXX14 \
             -DWITH_OPENTRACING=OFF \
             -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
