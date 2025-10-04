@@ -1172,7 +1172,7 @@ std::unique_ptr<PropagatorConfiguration> ConfigurationParser::ParsePropagatorCon
         message.append(std::to_string(num_child));
         message.append(", properties count: ");
         message.append(std::to_string(count));
-        throw InvalidSchemaException(child->Location(), message);
+        throw InvalidSchemaException(element->Location(), message);
       }
 
       model->composite.push_back(name);

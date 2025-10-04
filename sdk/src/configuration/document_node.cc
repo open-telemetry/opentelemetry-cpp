@@ -268,15 +268,17 @@ double DocumentNode::DoubleFromString(const std::string &value) const
 
 std::string DocumentNodeLocation::ToString() const
 {
+  // Format: <filename>:line-number[column-number](offset)
   std::string where;
-  where.append("file: ");
+  where.append("<");
   where.append(filename);
-  where.append(", line: ");
+  where.append(">:");
   where.append(std::to_string(line));
-  where.append(", col: ");
+  where.append("[");
   where.append(std::to_string(col));
-  where.append(", offset: ");
+  where.append("](");
   where.append(std::to_string(offset));
+  where.append(")");
   return where;
 }
 

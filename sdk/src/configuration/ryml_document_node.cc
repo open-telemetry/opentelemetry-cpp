@@ -5,6 +5,7 @@
 #include <memory>
 #include <ostream>
 #include <ryml.hpp>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
