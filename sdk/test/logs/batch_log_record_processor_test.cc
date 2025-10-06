@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <atomic>
 #include <chrono>
 #include <cstddef>
