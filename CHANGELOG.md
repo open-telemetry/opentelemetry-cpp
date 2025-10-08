@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add bundle version of utf8_range to validate attributes
+  [#3512](https://github.com/open-telemetry/opentelemetry-cpp/pull/3512)
+
 * [TEST] Remove workaround for metrics cardinality limit test
   [#3663](https://github.com/open-telemetry/opentelemetry-cpp/pull/3663)
 
