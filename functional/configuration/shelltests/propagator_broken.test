@@ -3,6 +3,6 @@
 
 $ example_yaml --test --yaml shelltests/propagator_broken.yaml
 >
-[ERROR] [Yaml Configuration Parser] Parse failed with exception: Illegal composite child 2, properties count: 3
+[ERROR] <shelltests/propagator_broken.yaml>:10[6](206): Illegal composite child 2, properties count: 3
 FAILED TO PARSE MODEL
 >= 1
