@@ -12,6 +12,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+#include "opentelemetry/sdk/metrics/state/measurement_attributes_map.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #include "opentelemetry/version.h"
@@ -80,9 +81,8 @@ public:
     storages_.push_back(storage);
   }
 
-  void RecordLong(
-      const std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> &measurements,
-      opentelemetry::common::SystemTimestamp observation_time) noexcept override
+  void RecordLong(const opentelemetry::sdk::metrics::MeasurementAttributes<int64_t> &measurements,
+                  opentelemetry::common::SystemTimestamp observation_time) noexcept override
   {
     for (auto &s : storages_)
     {
@@ -90,9 +90,8 @@ public:
     }
   }
 
-  void RecordDouble(
-      const std::unordered_map<MetricAttributes, double, AttributeHashGenerator> &measurements,
-      opentelemetry::common::SystemTimestamp observation_time) noexcept override
+  void RecordDouble(const opentelemetry::sdk::metrics::MeasurementAttributes<double> &measurements,
+                    opentelemetry::common::SystemTimestamp observation_time) noexcept override
   {
     for (auto &s : storages_)
     {

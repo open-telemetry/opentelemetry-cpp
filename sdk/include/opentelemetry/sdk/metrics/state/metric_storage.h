@@ -13,6 +13,7 @@
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+#include "opentelemetry/sdk/metrics/state/measurement_attributes_map.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -73,11 +74,11 @@ public:
 
   /* Records a batch of measurements */
   virtual void RecordLong(
-      const std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> &measurements,
+      const opentelemetry::sdk::metrics::MeasurementAttributes<int64_t> &measurements,
       opentelemetry::common::SystemTimestamp observation_time) noexcept = 0;
 
   virtual void RecordDouble(
-      const std::unordered_map<MetricAttributes, double, AttributeHashGenerator> &measurements,
+      const opentelemetry::sdk::metrics::MeasurementAttributes<double> &measurements,
       opentelemetry::common::SystemTimestamp observation_time) noexcept = 0;
 };
 
@@ -119,14 +120,14 @@ public:
 class NoopAsyncWritableMetricStorage : public AsyncWritableMetricStorage
 {
 public:
-  void RecordLong(const std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator>
-                      & /* measurements */,
-                  opentelemetry::common::SystemTimestamp /* observation_time */) noexcept override
+  void RecordLong(
+      const opentelemetry::sdk::metrics::MeasurementAttributes<int64_t> & /* measurements */,
+      opentelemetry::common::SystemTimestamp /* observation_time */) noexcept override
   {}
 
-  void RecordDouble(const std::unordered_map<MetricAttributes, double, AttributeHashGenerator>
-                        & /* measurements */,
-                    opentelemetry::common::SystemTimestamp /* observation_time */) noexcept override
+  void RecordDouble(
+      const opentelemetry::sdk::metrics::MeasurementAttributes<double> & /* measurements */,
+      opentelemetry::common::SystemTimestamp /* observation_time */) noexcept override
   {}
 };
 
