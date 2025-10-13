@@ -3,10 +3,10 @@
 
 #include <gtest/gtest.h>
 #include <stddef.h>
+#include <cstdint>
 #include <initializer_list>
 #include <map>
 #include <string>
-#include <stdint.h>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -14,9 +14,10 @@
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/metrics/async_instruments.h"
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/metrics/observer_result.h"
+#include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -29,7 +30,6 @@
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
-#include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"

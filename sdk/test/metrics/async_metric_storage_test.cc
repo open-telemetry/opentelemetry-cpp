@@ -96,8 +96,6 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
           {
             EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count1);
           }
-          // EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count1 + put_count1);
-          // EXPECT_EQ(data_attr.attributes.size(), 10);
         }
         return true;
       });
