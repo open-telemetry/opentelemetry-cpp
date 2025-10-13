@@ -42,10 +42,10 @@ public:
     data_[attr_map] += value;
   }
 
-  const MeasurementAttributes<T> &GetMeasurements() { return data_; }
+  const Measurements<T> &GetMeasurements() { return data_; }
 
 private:
-  MeasurementAttributes<T> data_;
+  Measurements<T> data_;
 };
 
 }  // namespace metrics

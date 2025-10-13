@@ -99,7 +99,7 @@ public:
     }
   }
 
-  void RecordLong(const opentelemetry::sdk::metrics::MeasurementAttributes<int64_t> &measurements,
+  void RecordLong(const opentelemetry::sdk::metrics::Measurements<int64_t> &measurements,
                   opentelemetry::common::SystemTimestamp observation_time) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
@@ -111,7 +111,7 @@ public:
     Record<int64_t>(mp, observation_time);
   }
 
-  void RecordDouble(const opentelemetry::sdk::metrics::MeasurementAttributes<double> &measurements,
+  void RecordDouble(const opentelemetry::sdk::metrics::Measurements<double> &measurements,
                     opentelemetry::common::SystemTimestamp observation_time) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
@@ -126,7 +126,7 @@ public:
   template <class T>
   std::unordered_map<MetricAttributes, T, AttributeHashGenerator>
   ConvertMeasurementsToMetricAttributes(
-      const opentelemetry::sdk::metrics::MeasurementAttributes<T> &measurements,
+      const opentelemetry::sdk::metrics::Measurements<T> &measurements,
       opentelemetry::common::SystemTimestamp /* observation_time */) noexcept
   {
     std::unordered_map<MetricAttributes, T, AttributeHashGenerator> mp;

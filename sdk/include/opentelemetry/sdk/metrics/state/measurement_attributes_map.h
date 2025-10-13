@@ -146,7 +146,7 @@ struct AttributeMapEqual
 };
 
 template <class T>
-using MeasurementAttributes = std::unordered_map<
+using Measurements = std::unordered_map<
     std::unordered_map<nostd::string_view, opentelemetry::common::AttributeValue>,
     T,
     AttributeMapHash,

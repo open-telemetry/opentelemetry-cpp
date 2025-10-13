@@ -73,13 +73,11 @@ public:
   virtual ~AsyncWritableMetricStorage() = default;
 
   /* Records a batch of measurements */
-  virtual void RecordLong(
-      const opentelemetry::sdk::metrics::MeasurementAttributes<int64_t> &measurements,
-      opentelemetry::common::SystemTimestamp observation_time) noexcept = 0;
+  virtual void RecordLong(const opentelemetry::sdk::metrics::Measurements<int64_t> &measurements,
+                          opentelemetry::common::SystemTimestamp observation_time) noexcept = 0;
 
-  virtual void RecordDouble(
-      const opentelemetry::sdk::metrics::MeasurementAttributes<double> &measurements,
-      opentelemetry::common::SystemTimestamp observation_time) noexcept = 0;
+  virtual void RecordDouble(const opentelemetry::sdk::metrics::Measurements<double> &measurements,
+                            opentelemetry::common::SystemTimestamp observation_time) noexcept = 0;
 };
 
 class NoopMetricStorage : public MetricStorage
@@ -120,14 +118,12 @@ public:
 class NoopAsyncWritableMetricStorage : public AsyncWritableMetricStorage
 {
 public:
-  void RecordLong(
-      const opentelemetry::sdk::metrics::MeasurementAttributes<int64_t> & /* measurements */,
-      opentelemetry::common::SystemTimestamp /* observation_time */) noexcept override
+  void RecordLong(const opentelemetry::sdk::metrics::Measurements<int64_t> & /* measurements */,
+                  opentelemetry::common::SystemTimestamp /* observation_time */) noexcept override
   {}
 
-  void RecordDouble(
-      const opentelemetry::sdk::metrics::MeasurementAttributes<double> & /* measurements */,
-      opentelemetry::common::SystemTimestamp /* observation_time */) noexcept override
+  void RecordDouble(const opentelemetry::sdk::metrics::Measurements<double> & /* measurements */,
+                    opentelemetry::common::SystemTimestamp /* observation_time */) noexcept override
   {}
 };
 

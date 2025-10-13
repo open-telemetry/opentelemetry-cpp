@@ -81,7 +81,7 @@ public:
     storages_.push_back(storage);
   }
 
-  void RecordLong(const opentelemetry::sdk::metrics::MeasurementAttributes<int64_t> &measurements,
+  void RecordLong(const opentelemetry::sdk::metrics::Measurements<int64_t> &measurements,
                   opentelemetry::common::SystemTimestamp observation_time) noexcept override
   {
     for (auto &s : storages_)
@@ -90,7 +90,7 @@ public:
     }
   }
 
-  void RecordDouble(const opentelemetry::sdk::metrics::MeasurementAttributes<double> &measurements,
+  void RecordDouble(const opentelemetry::sdk::metrics::Measurements<double> &measurements,
                     opentelemetry::common::SystemTimestamp observation_time) noexcept override
   {
     for (auto &s : storages_)

@@ -73,9 +73,9 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
-  int64_t get_count1                                                        = 20;
-  int64_t put_count1                                                        = 10;
-  opentelemetry::sdk::metrics::MeasurementAttributes<int64_t> measurements1 = {
+  int64_t get_count1                                               = 20;
+  int64_t put_count1                                               = 10;
+  opentelemetry::sdk::metrics::Measurements<int64_t> measurements1 = {
       {{{"RequestType", "GET"}}, get_count1}, {{{"RequestType", "PUT"}}, put_count1}};
   storage.RecordLong(measurements1,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
@@ -104,7 +104,7 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   int64_t get_count2 = 50;
   int64_t put_count2 = 70;
 
-  opentelemetry::sdk::metrics::MeasurementAttributes<int64_t> measurements2 = {
+  opentelemetry::sdk::metrics::Measurements<int64_t> measurements2 = {
       {{{"RequestType", "GET"}}, get_count2}, {{{"RequestType", "PUT"}}, put_count2}};
   storage.RecordLong(measurements2,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
@@ -172,9 +172,9 @@ TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
-  int64_t get_count1                                                        = 20;
-  int64_t put_count1                                                        = 10;
-  opentelemetry::sdk::metrics::MeasurementAttributes<int64_t> measurements1 = {
+  int64_t get_count1                                               = 20;
+  int64_t put_count1                                               = 10;
+  opentelemetry::sdk::metrics::Measurements<int64_t> measurements1 = {
       {{{"RequestType", "GET"}}, get_count1}, {{{"RequestType", "PUT"}}, put_count1}};
   storage.RecordLong(measurements1,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
@@ -204,7 +204,7 @@ TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
   int64_t get_count2 = -50;
   int64_t put_count2 = -70;
 
-  opentelemetry::sdk::metrics::MeasurementAttributes<int64_t> measurements2 = {
+  opentelemetry::sdk::metrics::Measurements<int64_t> measurements2 = {
       {{{"RequestType", "GET"}}, get_count2}, {{{"RequestType", "PUT"}}, put_count2}};
   storage.RecordLong(measurements2,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
@@ -271,10 +271,10 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
-  int64_t freq_cpu0                                                         = 3;
-  int64_t freq_cpu1                                                         = 5;
-  opentelemetry::sdk::metrics::MeasurementAttributes<int64_t> measurements1 = {
-      {{{"CPU", "0"}}, freq_cpu0}, {{{"CPU", "1"}}, freq_cpu1}};
+  int64_t freq_cpu0                                                = 3;
+  int64_t freq_cpu1                                                = 5;
+  opentelemetry::sdk::metrics::Measurements<int64_t> measurements1 = {{{{"CPU", "0"}}, freq_cpu0},
+                                                                      {{{"CPU", "1"}}, freq_cpu1}};
   storage.RecordLong(measurements1,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
@@ -300,8 +300,8 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
   freq_cpu0 = 6;
   freq_cpu1 = 8;
 
-  opentelemetry::sdk::metrics::MeasurementAttributes<int64_t> measurements2 = {
-      {{{"CPU", "0"}}, freq_cpu0}, {{{"CPU", "1"}}, freq_cpu1}};
+  opentelemetry::sdk::metrics::Measurements<int64_t> measurements2 = {{{{"CPU", "0"}}, freq_cpu0},
+                                                                      {{{"CPU", "1"}}, freq_cpu1}};
   storage.RecordLong(measurements2,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
   storage.Collect(
