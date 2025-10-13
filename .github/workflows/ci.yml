@@ -21,7 +21,7 @@ jobs:
 #        submodules: 'recursive'
 #    - name: setup
 #      env:
-#        CXX_STANDARD: '14'
+#        CXX_STANDARD: '17'
 #        CC: /usr/bin/gcc-10
 #        CXX: /usr/bin/g++-10
 #      run: |
@@ -59,7 +59,7 @@ jobs:
     env:
       CXX_STANDARD: '17'
       CMAKE_VERSION: '3.16.0'
-      BUILD_TYPE: 'Debug'
+      BUILD_TYPE: 'Release'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
@@ -67,7 +67,10 @@ jobs:
         egress-policy: audit
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
-        submodules: 'recursive'
+        submodules: 'false'
+    - name: checkout googletest
+      run: |
+        git submodule update --init --recursive ./third_party/googletest
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
@@ -86,7 +89,7 @@ jobs:
     env:
       CC: /usr/bin/gcc-14
       CXX: /usr/bin/g++-14
-      CXX_STANDARD: '14'
+      CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
@@ -120,7 +123,7 @@ jobs:
     env:
       CC: /usr/bin/gcc-14
       CXX: /usr/bin/g++-14
-      CXX_STANDARD: '14'
+      CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
@@ -154,7 +157,7 @@ jobs:
     env:
       CC: /usr/bin/clang-18
       CXX: /usr/bin/clang++-18
-      CXX_STANDARD: '14'
+      CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
@@ -182,13 +185,47 @@ jobs:
       run: |
         (cd ./functional/otlp; ./run_test.sh)
 
+  cmake_clang_maintainer_cxx14_async_test:
+    name: CMake clang 18 with C++14 (maintainer mode, async)
+    runs-on: ubuntu-24.04
+    env:
+      CC: /usr/bin/clang-18
+      CXX: /usr/bin/clang++-18
+      CXX_STANDARD: '14'
+    steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+      with:
+        egress-policy: audit
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: install dependencies
+      run: | # install c++14 compatible third-party versions
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file ./install/cmake/third_party_stable
+    - name: run cmake clang (maintainer mode, async)
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.async.test
+    - name: generate test cert
+      env:
+        CFSSL_VERSION: 1.6.3
+      run: |
+        sudo -E ./tools/setup-cfssl.sh
+        (cd ./functional/cert; ./generate_cert.sh)
+    - name: run func test
+      run: |
+        (cd ./functional/otlp; ./run_test.sh)
+
   cmake_clang_yaml_config:
     name: CMake clang 18 (maintainer mode, yaml config)
     runs-on: ubuntu-24.04
     env:
       CC: /usr/bin/clang-18
       CXX: /usr/bin/clang++-18
-      CXX_STANDARD: '14'
+      CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
@@ -227,7 +264,7 @@ jobs:
     env:
       CC: /usr/bin/clang-18
       CXX: /usr/bin/clang++-18
-      CXX_STANDARD: '14'
+      CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
@@ -261,7 +298,7 @@ jobs:
     env:
       CC: /usr/bin/clang-18
       CXX: /usr/bin/clang++-18
-      CXX_STANDARD: '14'
+      CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
@@ -406,6 +443,9 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+    - name: install dependencies
+      run: |
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file ./install/cmake/third_party_stable --packages "googletest;benchmark"
     - name: run tests (enable stl)
       env:
         CXX_STANDARD: '14'
@@ -889,6 +929,11 @@ jobs:
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         submodules: 'recursive'
+    - name: Install CMake
+      env:
+        CMAKE_VERSION: 3.31.6 # the macos runner installs CMake 4.x and is not compatible with opentracing
+      run: |
+        ./ci/setup_cmake_macos.sh
     - name: Mount Bazel Cache
       uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       env:
@@ -1177,7 +1222,7 @@ jobs:
           sudo -E apt-get install -y zlib1g-dev libcurl4-openssl-dev
       - name: run w3c trace-context test server (background)
         env:
-          CXX_STANDARD: '14'
+          CXX_STANDARD: '17'
         run: |
           ./ci/do_ci.sh cmake.w3c.trace-context.build-server
           cd $HOME/build/ext/test/w3c_tracecontext_http_test_server
