@@ -10,16 +10,11 @@
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/sdk/metrics/observer_result.h"
-#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
-#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 using namespace opentelemetry::sdk::metrics;
 TEST(ObserverResult, BasicTests)
 {
-  std::shared_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{
-      new opentelemetry::sdk::metrics::DefaultAttributesProcessor()};
-
-  ObserverResultT<int64_t> observer_result(attrproc);
+  ObserverResultT<int64_t> observer_result;
 
   observer_result.Observe(10);
   observer_result.Observe(20);

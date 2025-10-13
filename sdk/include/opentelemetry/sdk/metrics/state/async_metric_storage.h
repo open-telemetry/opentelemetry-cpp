@@ -107,7 +107,7 @@ public:
       return;
     }
     std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> mp =
-        std::move(ConvertMeasurementsToMetricAttributes<int64_t>(measurements, observation_time));
+        ConvertMeasurementsToMetricAttributes<int64_t>(measurements, observation_time);
     Record<int64_t>(mp, observation_time);
   }
 
@@ -119,7 +119,7 @@ public:
       return;
     }
     std::unordered_map<MetricAttributes, double, AttributeHashGenerator> mp =
-        std::move(ConvertMeasurementsToMetricAttributes<double>(measurements, observation_time));
+        ConvertMeasurementsToMetricAttributes<double>(measurements, observation_time);
     Record<double>(mp, observation_time);
   }
 
@@ -127,7 +127,7 @@ public:
   std::unordered_map<MetricAttributes, T, AttributeHashGenerator>
   ConvertMeasurementsToMetricAttributes(
       const opentelemetry::sdk::metrics::MeasurementAttributes<T> &measurements,
-      opentelemetry::common::SystemTimestamp observation_time) noexcept
+      opentelemetry::common::SystemTimestamp /* observation_time */) noexcept
   {
     std::unordered_map<MetricAttributes, T, AttributeHashGenerator> mp;
     for (auto &measurement : measurements)
