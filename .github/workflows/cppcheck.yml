@@ -36,7 +36,7 @@ jobs:
             --inline-suppr \
             --suppress=unknownMacro:exporters/etw/include/opentelemetry/exporters/etw/TraceLoggingDynamic.h \
             --language=c++ \
-            --std=c++14 \
+            --std=c++17 \
             -I api/include \
             -I exporters/elasticsearch/include \
             -I exporters/etw/include \

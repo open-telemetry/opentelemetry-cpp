@@ -495,6 +495,7 @@ message(STATUS "OTELCPP_MAINTAINER_MODE: ${OTELCPP_MAINTAINER_MODE}")
 message(STATUS "WITH_STL: ${WITH_STL}")
 message(STATUS "WITH_GSL: ${WITH_GSL}")
 message(STATUS "WITH_NO_GETENV: ${WITH_NO_GETENV}")
+message(STATUS "OPENTELEMETRY_INSTALL: ${OPENTELEMETRY_INSTALL}")
 
 message(STATUS "---------------------------------------------")
 message(STATUS "opentelemetry-cpp cmake component options")

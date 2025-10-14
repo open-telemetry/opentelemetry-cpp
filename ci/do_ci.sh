@@ -69,6 +69,9 @@ MAKE_COMMAND="make -k -j \$(nproc)"
 
 echo "make command: ${MAKE_COMMAND}"
 
+export BAZEL_CXXOPTS="-std=c++17"
+
+
 BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW --//exporters/otlp:with_otlp_grpc_credential_preview=true"
 BAZEL_OPTIONS="$BAZEL_OPTIONS_DEFAULT"
 
@@ -92,7 +95,7 @@ fi
 if [ -n "${CXX_STANDARD}" ]; then
   CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
 else
-  CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD=14")
+  CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD=17")
 fi
 
 CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD_REQUIRED=ON")
@@ -574,8 +577,10 @@ elif [[ "$1" == "bazel.noexcept" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client
   # as well as Opentracing shim (due to some third party code in its Opentracing dependency)
   # that make this test always fail. Ignore these packages in the noexcept test here.
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
+  # Set the api:with_cxx_stdlib=none because C++17 std::variant::get<> throws
+
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
   exit 0
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client

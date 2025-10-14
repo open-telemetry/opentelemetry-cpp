@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <atomic>
 #include <chrono>
 #include <cstddef>
@@ -21,9 +22,16 @@
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
+
+#if defined(_MSC_VER)
+#  include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
+#endif
 
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::common;
@@ -354,4 +362,78 @@ TEST_F(BatchLogRecordProcessorTest, TestScheduledDelayMillis)
   {
     EXPECT_EQ("Log" + std::to_string(i), logs_received->at(i)->GetBody());
   }
+}
+
+TEST_F(BatchLogRecordProcessorTest, TestDefaultValues)
+{
+  BatchLogRecordProcessorOptions options;
+
+  EXPECT_EQ(options.max_queue_size, static_cast<size_t>(2048));
+  EXPECT_EQ(options.schedule_delay_millis, std::chrono::milliseconds(1000));
+  EXPECT_EQ(options.export_timeout_millis, std::chrono::milliseconds(30000));
+  EXPECT_EQ(options.max_export_batch_size, static_cast<size_t>(512));
+}
+
+TEST_F(BatchLogRecordProcessorTest, TestMaxQueueSizeFromEnv)
+{
+  setenv("OTEL_BLRP_MAX_QUEUE_SIZE", "1234", 1);
+
+  BatchLogRecordProcessorOptions options;
+
+  EXPECT_EQ(options.max_queue_size, static_cast<size_t>(1234));
+
+  unsetenv("OTEL_BLRP_MAX_QUEUE_SIZE");
+}
+
+TEST_F(BatchLogRecordProcessorTest, TestScheduleDelayFromEnv)
+{
+  setenv("OTEL_BLRP_SCHEDULE_DELAY", "7s", 1);
+
+  BatchLogRecordProcessorOptions options;
+
+  EXPECT_EQ(options.schedule_delay_millis, std::chrono::milliseconds(7000));
+
+  unsetenv("OTEL_BLRP_SCHEDULE_DELAY");
+}
+
+TEST_F(BatchLogRecordProcessorTest, TestExportTimeoutFromEnv)
+{
+  setenv("OTEL_BLRP_EXPORT_TIMEOUT", "250ms", 1);
+
+  BatchLogRecordProcessorOptions options;
+
+  EXPECT_EQ(options.export_timeout_millis, std::chrono::milliseconds(250));
+
+  unsetenv("OTEL_BLRP_EXPORT_TIMEOUT");
+}
+
+TEST_F(BatchLogRecordProcessorTest, TestMaxExportBatchSizeFromEnv)
+{
+  setenv("OTEL_BLRP_MAX_EXPORT_BATCH_SIZE", "42", 1);
+
+  BatchLogRecordProcessorOptions options;
+
+  EXPECT_EQ(options.max_export_batch_size, static_cast<size_t>(42));
+
+  unsetenv("OTEL_BLRP_MAX_EXPORT_BATCH_SIZE");
+}
+
+TEST_F(BatchLogRecordProcessorTest, TestOptionsReadFromMultipleEnvVars)
+{
+  setenv("OTEL_BLRP_MAX_QUEUE_SIZE", "3000", 1);
+  setenv("OTEL_BLRP_SCHEDULE_DELAY", "2s", 1);
+  setenv("OTEL_BLRP_EXPORT_TIMEOUT", "1s", 1);
+  setenv("OTEL_BLRP_MAX_EXPORT_BATCH_SIZE", "256", 1);
+
+  BatchLogRecordProcessorOptions options;
+
+  EXPECT_EQ(options.max_queue_size, static_cast<size_t>(3000));
+  EXPECT_EQ(options.schedule_delay_millis, std::chrono::milliseconds(2000));
+  EXPECT_EQ(options.export_timeout_millis, std::chrono::milliseconds(1000));
+  EXPECT_EQ(options.max_export_batch_size, static_cast<size_t>(256));
+
+  unsetenv("OTEL_BLRP_MAX_QUEUE_SIZE");
+  unsetenv("OTEL_BLRP_SCHEDULE_DELAY");
+  unsetenv("OTEL_BLRP_EXPORT_TIMEOUT");
+  unsetenv("OTEL_BLRP_MAX_EXPORT_BATCH_SIZE");
 }
