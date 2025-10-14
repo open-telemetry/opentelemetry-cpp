@@ -106,7 +106,9 @@ namespace configuration
 // FIXME: proper sizing
 constexpr size_t MAX_SAMPLER_DEPTH = 10;
 
-OtlpHttpEncoding ConfigurationParser::ParseOtlpHttpEncoding(const std::string &name) const
+OtlpHttpEncoding ConfigurationParser::ParseOtlpHttpEncoding(
+    const std::unique_ptr<DocumentNode> &node,
+    const std::string &name) const
 {
   if (name == "protobuf")
   {
@@ -120,7 +122,7 @@ OtlpHttpEncoding ConfigurationParser::ParseOtlpHttpEncoding(const std::string &n
 
   std::string message("Illegal OtlpHttpEncoding: ");
   message.append(name);
-  throw InvalidSchemaException(message);
+  throw InvalidSchemaException(node->Location(), message);
 }
 
 std::unique_ptr<StringArrayConfiguration> ConfigurationParser::ParseStringArrayConfiguration(
@@ -224,7 +226,7 @@ ConfigurationParser::ParseOtlpHttpLogRecordExporterConfiguration(
   model->timeout      = node->GetInteger("timeout", 10000);
 
   std::string encoding = node->GetString("encoding", "protobuf");
-  model->encoding      = ParseOtlpHttpEncoding(encoding);
+  model->encoding      = ParseOtlpHttpEncoding(node, encoding);
 
   return model;
 }
@@ -310,7 +312,7 @@ ConfigurationParser::ParseLogRecordExporterConfiguration(
   {
     std::string message("Illegal log record exporter, count: ");
     message.append(std::to_string(count));
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(node->Location(), message);
   }
 
   if (name == "otlp_http")
@@ -402,7 +404,7 @@ ConfigurationParser::ParseLogRecordProcessorConfiguration(
   {
     std::string message("Illegal log record processor, count: ");
     message.append(std::to_string(count));
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(node->Location(), message);
   }
 
   if (name == "batch")
@@ -450,7 +452,7 @@ std::unique_ptr<LoggerProviderConfiguration> ConfigurationParser::ParseLoggerPro
   if (count == 0)
   {
     std::string message("Illegal logger provider, 0 processors");
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(child->Location(), message);
   }
 
   child = node->GetChildNode("limits");
@@ -463,6 +465,7 @@ std::unique_ptr<LoggerProviderConfiguration> ConfigurationParser::ParseLoggerPro
 }
 
 DefaultHistogramAggregation ConfigurationParser::ParseDefaultHistogramAggregation(
+    const std::unique_ptr<DocumentNode> &node,
     const std::string &name) const
 {
   if (name == "explicit_bucket_histogram")
@@ -477,10 +480,12 @@ DefaultHistogramAggregation ConfigurationParser::ParseDefaultHistogramAggregatio
 
   std::string message("Illegal default_histogram_aggregation: ");
   message.append(name);
-  throw InvalidSchemaException(message);
+  throw InvalidSchemaException(node->Location(), message);
 }
 
-TemporalityPreference ConfigurationParser::ParseTemporalityPreference(const std::string &name) const
+TemporalityPreference ConfigurationParser::ParseTemporalityPreference(
+    const std::unique_ptr<DocumentNode> &node,
+    const std::string &name) const
 {
   if (name == "cumulative")
   {
@@ -499,7 +504,7 @@ TemporalityPreference ConfigurationParser::ParseTemporalityPreference(const std:
 
   std::string message("Illegal temporality preference: ");
   message.append(name);
-  throw InvalidSchemaException(message);
+  throw InvalidSchemaException(node->Location(), message);
 }
 
 std::unique_ptr<OtlpHttpPushMetricExporterConfiguration>
@@ -525,15 +530,15 @@ ConfigurationParser::ParseOtlpHttpPushMetricExporterConfiguration(
   model->timeout      = node->GetInteger("timeout", 10000);
 
   std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
-  model->temporality_preference      = ParseTemporalityPreference(temporality_preference);
+  model->temporality_preference      = ParseTemporalityPreference(node, temporality_preference);
 
   std::string default_histogram_aggregation =
       node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
-      ParseDefaultHistogramAggregation(default_histogram_aggregation);
+      ParseDefaultHistogramAggregation(node, default_histogram_aggregation);
 
   std::string encoding = node->GetString("encoding", "protobuf");
-  model->encoding      = ParseOtlpHttpEncoding(encoding);
+  model->encoding      = ParseOtlpHttpEncoding(node, encoding);
 
   return model;
 }
@@ -561,12 +566,12 @@ ConfigurationParser::ParseOtlpGrpcPushMetricExporterConfiguration(
   model->timeout      = node->GetInteger("timeout", 10000);
 
   std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
-  model->temporality_preference      = ParseTemporalityPreference(temporality_preference);
+  model->temporality_preference      = ParseTemporalityPreference(node, temporality_preference);
 
   std::string default_histogram_aggregation =
       node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
-      ParseDefaultHistogramAggregation(default_histogram_aggregation);
+      ParseDefaultHistogramAggregation(node, default_histogram_aggregation);
 
   model->insecure = node->GetBoolean("insecure", false);
 
@@ -583,12 +588,12 @@ ConfigurationParser::ParseOtlpFilePushMetricExporterConfiguration(
   model->output_stream = node->GetString("output_stream", "");
 
   std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
-  model->temporality_preference      = ParseTemporalityPreference(temporality_preference);
+  model->temporality_preference      = ParseTemporalityPreference(node, temporality_preference);
 
   std::string default_histogram_aggregation =
       node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
-      ParseDefaultHistogramAggregation(default_histogram_aggregation);
+      ParseDefaultHistogramAggregation(node, default_histogram_aggregation);
 
   return model;
 }
@@ -666,7 +671,7 @@ ConfigurationParser::ParsePushMetricExporterConfiguration(
   {
     std::string message("Illegal push metric exporter, count: ");
     message.append(std::to_string(count));
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(node->Location(), message);
   }
 
   if (name == "otlp_http")
@@ -714,7 +719,7 @@ ConfigurationParser::ParsePullMetricExporterConfiguration(
   {
     std::string message("Illegal pull metric exporter, count: ");
     message.append(std::to_string(count));
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(node->Location(), message);
   }
 
   if (name == "prometheus/development")
@@ -771,7 +776,7 @@ std::unique_ptr<MetricProducerConfiguration> ConfigurationParser::ParseMetricPro
   {
     std::string message("Illegal metric producer, properties count: ");
     message.append(std::to_string(count));
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(node->Location(), message);
   }
 
   if (name == "opencensus")
@@ -855,7 +860,7 @@ std::unique_ptr<MetricReaderConfiguration> ConfigurationParser::ParseMetricReade
   {
     std::string message("Illegal metric reader, count: ");
     message.append(std::to_string(count));
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(node->Location(), message);
   }
 
   if (name == "periodic")
@@ -870,13 +875,14 @@ std::unique_ptr<MetricReaderConfiguration> ConfigurationParser::ParseMetricReade
   {
     std::string message("Illegal metric reader: ");
     message.append(name);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(node->Location(), message);
   }
 
   return model;
 }
 
-InstrumentType ConfigurationParser::ParseInstrumentType(const std::string &name) const
+InstrumentType ConfigurationParser::ParseInstrumentType(const std::unique_ptr<DocumentNode> &node,
+                                                        const std::string &name) const
 {
   if (name == "")
   {
@@ -915,7 +921,7 @@ InstrumentType ConfigurationParser::ParseInstrumentType(const std::string &name)
 
   std::string message("Illegal instrument type: ");
   message.append(name);
-  throw InvalidSchemaException(message);
+  throw InvalidSchemaException(node->Location(), message);
 }
 
 std::unique_ptr<ViewSelectorConfiguration> ConfigurationParser::ParseViewSelectorConfiguration(
@@ -926,7 +932,7 @@ std::unique_ptr<ViewSelectorConfiguration> ConfigurationParser::ParseViewSelecto
   model->instrument_name = node->GetString("instrument_name", "");
 
   std::string instrument_type = node->GetString("instrument_type", "");
-  model->instrument_type      = ParseInstrumentType(instrument_type);
+  model->instrument_type      = ParseInstrumentType(node, instrument_type);
 
   model->unit             = node->GetString("unit", "");
   model->meter_name       = node->GetString("meter_name", "");
@@ -1022,7 +1028,7 @@ std::unique_ptr<AggregationConfiguration> ConfigurationParser::ParseAggregationC
   {
     std::string message("Illegal aggregation, children: ");
     message.append(std::to_string(count));
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(node->Location(), message);
   }
 
   child            = node->GetChild(0);
@@ -1056,7 +1062,7 @@ std::unique_ptr<AggregationConfiguration> ConfigurationParser::ParseAggregationC
   {
     std::string message("Illegal aggregation: ");
     message.append(name);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(node->Location(), message);
   }
 
   return model;
@@ -1118,7 +1124,7 @@ std::unique_ptr<MeterProviderConfiguration> ConfigurationParser::ParseMeterProvi
   if (model->readers.size() == 0)
   {
     std::string message("Illegal meter provider, 0 readers");
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(child->Location(), message);
   }
 
   child = node->GetChildNode("views");
@@ -1166,7 +1172,7 @@ std::unique_ptr<PropagatorConfiguration> ConfigurationParser::ParsePropagatorCon
         message.append(std::to_string(num_child));
         message.append(", properties count: ");
         message.append(std::to_string(count));
-        throw InvalidSchemaException(message);
+        throw InvalidSchemaException(element->Location(), message);
       }
 
       model->composite.push_back(name);
@@ -1321,7 +1327,7 @@ std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseSamplerConfigura
   {
     std::string message("Samplers nested too deeply: ");
     message.append(std::to_string(depth));
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(node->Location(), message);
   }
 
   std::unique_ptr<SamplerConfiguration> model;
@@ -1341,7 +1347,7 @@ std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseSamplerConfigura
   {
     std::string message("Illegal sampler, properties count: ");
     message.append(std::to_string(count));
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(node->Location(), message);
   }
 
   if (name == "always_off")
@@ -1396,7 +1402,7 @@ ConfigurationParser::ParseOtlpHttpSpanExporterConfiguration(
   model->timeout      = node->GetInteger("timeout", 10000);
 
   std::string encoding = node->GetString("encoding", "protobuf");
-  model->encoding      = ParseOtlpHttpEncoding(encoding);
+  model->encoding      = ParseOtlpHttpEncoding(node, encoding);
 
   return model;
 }
@@ -1493,7 +1499,7 @@ std::unique_ptr<SpanExporterConfiguration> ConfigurationParser::ParseSpanExporte
   {
     std::string message("Illegal span exporter, properties count: ");
     message.append(std::to_string(count));
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(node->Location(), message);
   }
 
   if (name == "otlp_http")
@@ -1588,7 +1594,7 @@ std::unique_ptr<SpanProcessorConfiguration> ConfigurationParser::ParseSpanProces
   {
     std::string message("Illegal span processor, properties count: ");
     message.append(std::to_string(count));
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(node->Location(), message);
   }
 
   if (name == "batch")
@@ -1624,7 +1630,7 @@ std::unique_ptr<TracerProviderConfiguration> ConfigurationParser::ParseTracerPro
   if (count == 0)
   {
     std::string message("Illegal tracer provider, 0 processors");
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(node->Location(), message);
   }
 
   child = node->GetChildNode("limits");
@@ -1835,7 +1841,7 @@ std::unique_ptr<AttributesConfiguration> ConfigurationParser::ParseAttributesCon
     {
       std::string message("Illegal attribute type: ");
       message.append(type);
-      throw InvalidSchemaException(message);
+      throw InvalidSchemaException(node->Location(), message);
     }
 
     std::pair<std::string, std::unique_ptr<AttributeValueConfiguration>> entry(
@@ -1887,14 +1893,14 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
     if (count != 2)
     {
       std::string message("Invalid file_format");
-      throw InvalidSchemaException(message);
+      throw InvalidSchemaException(node->Location(), message);
     }
 
     if (major != 1)
     {
       std::string message("Unsupported file_format, major = ");
       message.append(std::to_string(major));
-      throw InvalidSchemaException(message);
+      throw InvalidSchemaException(node->Location(), message);
     }
 
     if (minor != 0)
@@ -1903,7 +1909,7 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
       message.append(std::to_string(major));
       message.append(", minor = ");
       message.append(std::to_string(minor));
-      throw InvalidSchemaException(message);
+      throw InvalidSchemaException(node->Location(), message);
     }
 
     version_major_ = major;

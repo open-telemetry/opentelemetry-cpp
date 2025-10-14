@@ -14,6 +14,7 @@
   # Work around for ryml
   { "include": ["<c4/std/string.hpp>", "private", "<ryml_std.hpp>", "public"] },
 
+  { "include": ["<c4/yml/common.hpp>", "private", "<ryml.hpp>", "public"] },
   { "include": ["<c4/yml/node.hpp>", "private", "<ryml.hpp>", "public"] },
   { "include": ["<c4/yml/parse.hpp>", "private", "<ryml.hpp>", "public"] },
   { "include": ["<c4/yml/parse_engine.hpp>", "private", "<ryml.hpp>", "public"] },

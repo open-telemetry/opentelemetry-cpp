@@ -112,7 +112,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
   {
     std::string message = illegal_msg;
     message.append(text);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   c = text[0];
@@ -120,7 +120,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
   {
     std::string message = illegal_msg;
     message.append(text);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   c = text[1];
@@ -128,7 +128,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
   {
     std::string message = illegal_msg;
     message.append(text);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   c = text[len - 1];
@@ -136,7 +136,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
   {
     std::string message = illegal_msg;
     message.append(text);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   begin_name = 2;
@@ -160,7 +160,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
   {
     std::string message = illegal_msg;
     message.append(text);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   end_name = begin_name + 1;
@@ -195,7 +195,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
     {
       std::string message = illegal_msg;
       message.append(text);
-      throw InvalidSchemaException(message);
+      throw InvalidSchemaException(Location(), message);
     }
     // text is of the form ${ENV_NAME:-fallback}
     begin_fallback = pos + replacement_token.length();
@@ -233,7 +233,7 @@ bool DocumentNode::BooleanFromString(const std::string &value) const
 
   std::string message("Illegal boolean value: ");
   message.append(value);
-  throw InvalidSchemaException(message);
+  throw InvalidSchemaException(Location(), message);
 }
 
 size_t DocumentNode::IntegerFromString(const std::string &value) const
@@ -246,7 +246,7 @@ size_t DocumentNode::IntegerFromString(const std::string &value) const
   {
     std::string message("Illegal integer value: ");
     message.append(value);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
   return val;
 }
@@ -261,9 +261,25 @@ double DocumentNode::DoubleFromString(const std::string &value) const
   {
     std::string message("Illegal double value: ");
     message.append(value);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
   return val;
+}
+
+std::string DocumentNodeLocation::ToString() const
+{
+  // Format: <filename>:line-number[column-number](offset)
+  std::string where;
+  where.append("<");
+  where.append(filename);
+  where.append(">:");
+  where.append(std::to_string(line));
+  where.append("[");
+  where.append(std::to_string(col));
+  where.append("](");
+  where.append(std::to_string(offset));
+  where.append(")");
+  return where;
 }
 
 }  // namespace configuration
