@@ -126,13 +126,6 @@ void ObservableRegistry::CleanupCallback(opentelemetry::metrics::ObservableInstr
     }
     else
     {
-      nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>> ob_res(
-          new opentelemetry::sdk::metrics::ObserverResultT<double>());
-      callback_wrap->callback(ob_res, callback_wrap->state);
-      storage->RecordDouble(
-          static_cast<opentelemetry::sdk::metrics::ObserverResultT<double> *>(ob_res.get())
-              ->GetMeasurements(),
-          collection_ts);
       ++it;
     }
   }
@@ -151,13 +144,6 @@ public:
   {
     if (inner)
     {
-      nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>> ob_res(
-          new opentelemetry::sdk::metrics::ObserverResultT<int64_t>());
-      callback_wrap->callback(ob_res, callback_wrap->state);
-      storage->RecordLong(
-          static_cast<opentelemetry::sdk::metrics::ObserverResultT<int64_t> *>(ob_res.get())
-              ->GetMeasurements(),
-          collection_ts);
       inner->Observe(value);
     }
   }
