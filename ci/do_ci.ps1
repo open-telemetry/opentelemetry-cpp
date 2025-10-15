@@ -318,10 +318,10 @@ switch ($action) {
     if (Test-Path Env:\CXX_STANDARD) {
         $CXX_STANDARD = [int](Get-Item Env:\CXX_STANDARD).Value
     } else {
-        $CXX_STANDARD = 14
+        $CXX_STANDARD = 17
     }
     if (-not $CXX_STANDARD) {
-        $CXX_STANDARD = 14
+        $CXX_STANDARD = 17
     }
     Write-Host "Using CXX_STANDARD: $CXX_STANDARD"
       
