@@ -23,6 +23,9 @@ Increment the:
 * [SDK] Fix typo in hashmap method GetEnteries
   [#3680](https://github.com/open-telemetry/opentelemetry-cpp/pull/3680)
 
+* [CI] Upgrade tools/vcpkg to 2025.09.17
+  [#3701](https://github.com/open-telemetry/opentelemetry-cpp/pull/3701)
+
 ## [1.23 2025-09-25]
 
 * [CodeHealth] Fix clang-tidy warnings part 6
