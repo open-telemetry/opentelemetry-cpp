@@ -545,13 +545,6 @@ EOF
   make load_plugin_example
   examples/plugin/load/load_plugin_example ${PLUGIN_DIR}/libexample_plugin.so /dev/null
   exit 0
-elif [[ "$1" == "bazel.no_bzlmod.test" ]]; then
-  # Rapidyaml 0.9.0 as is does not support bazel,
-  # modules in bazel central repository required
-  # to build configuration.
-  bazel $BAZEL_STARTUP_OPTIONS build --enable_bzlmod=false $BAZEL_OPTIONS -- //... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
-  bazel $BAZEL_STARTUP_OPTIONS test --enable_bzlmod=false $BAZEL_TEST_OPTIONS -- //... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
-  exit 0
 elif [[ "$1" == "bazel.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS $BAZEL_WITH_PREVIEW //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS $BAZEL_WITH_PREVIEW //...

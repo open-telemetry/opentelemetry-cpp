@@ -12,7 +12,6 @@
 #  - update the matching git submodule to the new tag.
 #  - update the Bazel build files
 #     - opentelemetry-cpp/MODULE.bazel
-#     - opentelemetry-cpp/bazel/repository.bzl
 
 abseil=20250127.0
 zlib=v1.3.1
