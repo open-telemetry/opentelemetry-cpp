@@ -51,6 +51,7 @@ jobs:
             -i build \
             -i test \
             -i third_party \
+            -i tools \
             -j $(nproc) \
             . 2>&1 | tee --append cppcheck.log
 
