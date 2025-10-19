@@ -24,9 +24,7 @@ namespace configuration
 std::unique_ptr<Document> RymlDocument::Parse(const std::string &source, const std::string &content)
 {
   auto doc = std::make_unique<RymlDocument>();
-  int rc;
-
-  rc = doc->ParseDocument(source, content);
+  const int rc = doc->ParseDocument(source, content);
   if (rc == 0)
   {
     return doc;
