@@ -82,8 +82,7 @@ public:
    */
   bool try_lock() noexcept
   {
-    return !flag_.load(std::memory_order_relaxed) &&
-           !flag_.exchange(true, std::memory_order_acquire);
+    return !flag_.exchange(true, std::memory_order_acquire);
   }
 
   /**
@@ -95,13 +94,9 @@ public:
    */
   void lock() noexcept
   {
-    for (;;)
+    // Try once
+    while (!try_lock())
     {
-      // Try once
-      if (!flag_.exchange(true, std::memory_order_acquire))
-      {
-        return;
-      }
       // Spin-Fast (goal ~10ns)
       for (std::size_t i = 0; i < SPINLOCK_FAST_ITERATIONS; ++i)
       {
