@@ -99,7 +99,8 @@ namespace configuration
 class ConfigurationParser
 {
 public:
-  OtlpHttpEncoding ParseOtlpHttpEncoding(const std::string &name) const;
+  OtlpHttpEncoding ParseOtlpHttpEncoding(const std::unique_ptr<DocumentNode> &node,
+                                         const std::string &name) const;
 
   std::unique_ptr<StringArrayConfiguration> ParseStringArrayConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
@@ -151,9 +152,12 @@ public:
   std::unique_ptr<LoggerProviderConfiguration> ParseLoggerProviderConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
 
-  DefaultHistogramAggregation ParseDefaultHistogramAggregation(const std::string &name) const;
+  DefaultHistogramAggregation ParseDefaultHistogramAggregation(
+      const std::unique_ptr<DocumentNode> &node,
+      const std::string &name) const;
 
-  TemporalityPreference ParseTemporalityPreference(const std::string &name) const;
+  TemporalityPreference ParseTemporalityPreference(const std::unique_ptr<DocumentNode> &node,
+                                                   const std::string &name) const;
 
   std::unique_ptr<OtlpHttpPushMetricExporterConfiguration>
   ParseOtlpHttpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node) const;
@@ -203,7 +207,8 @@ public:
   std::unique_ptr<MetricReaderConfiguration> ParseMetricReaderConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
 
-  InstrumentType ParseInstrumentType(const std::string &name) const;
+  InstrumentType ParseInstrumentType(const std::unique_ptr<DocumentNode> &node,
+                                     const std::string &name) const;
 
   std::unique_ptr<ViewSelectorConfiguration> ParseViewSelectorConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;

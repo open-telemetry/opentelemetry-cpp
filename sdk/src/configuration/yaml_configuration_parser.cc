@@ -13,6 +13,7 @@
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_parser.h"
 #include "opentelemetry/sdk/configuration/document.h"
+#include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/sdk/configuration/ryml_document.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
 #include "opentelemetry/version.h"
@@ -76,6 +77,10 @@ std::unique_ptr<Configuration> YamlConfigurationParser::ParseString(const std::s
     {
       config = config_parser.Parse(std::move(doc));
     }
+  }
+  catch (const InvalidSchemaException &e)
+  {
+    OTEL_INTERNAL_LOG_ERROR(e.Where() << ": " << e.what());
   }
   catch (const std::exception &e)
   {
