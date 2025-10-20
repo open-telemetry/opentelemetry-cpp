@@ -3,6 +3,6 @@
 
 $ example_yaml --test --yaml shelltests/format_empty.yaml
 >
-[ERROR] [Yaml Configuration Parser] Parse failed with exception: Yaml: string value is empty: file_format
+[ERROR] <shelltests/format_empty.yaml>:4[0](94): Yaml: string value is empty: file_format
 FAILED TO PARSE MODEL
 >= 1
