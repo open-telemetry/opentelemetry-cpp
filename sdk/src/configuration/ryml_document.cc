@@ -23,44 +23,62 @@ namespace configuration
 
 std::unique_ptr<Document> RymlDocument::Parse(const std::string &source, const std::string &content)
 {
-  ryml::ParserOptions opts;
-  opts.locations(true);
+  auto doc     = std::make_unique<RymlDocument>();
+  const int rc = doc->ParseDocument(source, content);
+  if (rc == 0)
+  {
+    return doc;
+  }
 
-  ryml::Parser::handler_type event_handler;
-  ryml::Parser parser(&event_handler, opts);
+  return nullptr;
+}
 
-  ryml::Tree tree;
+int RymlDocument::ParseDocument(const std::string &source, const std::string &content)
+{
+  opts_.locations(true);
+  parser_ = std::make_unique<ryml::Parser>(&event_handler_, opts_);
+
   ryml::csubstr filename;
   ryml::csubstr csubstr_content;
-  std::unique_ptr<Document> doc;
 
   filename        = ryml::to_csubstr(source);
   csubstr_content = ryml::to_csubstr(content);
 
   try
   {
-    tree = parse_in_arena(&parser, filename, csubstr_content);
-    tree.resolve();
+    tree_ = parse_in_arena(parser_.get(), filename, csubstr_content);
+    tree_.resolve();
   }
   catch (const std::exception &e)
   {
     OTEL_INTERNAL_LOG_ERROR("[Ryml Document] Parse failed with exception: " << e.what());
-    return doc;
+    return 1;
   }
   catch (...)
   {
     OTEL_INTERNAL_LOG_ERROR("[Ryml Document] Parse failed with unknown exception.");
-    return doc;
+    return 2;
   }
 
-  doc = std::make_unique<RymlDocument>(tree);
-  return doc;
+  return 0;
 }
 
 std::unique_ptr<DocumentNode> RymlDocument::GetRootNode()
 {
-  auto node = std::make_unique<RymlDocumentNode>(tree_.rootref(), 0);
+  auto node = std::make_unique<RymlDocumentNode>(this, tree_.rootref(), 0);
   return node;
+}
+
+DocumentNodeLocation RymlDocument::Location(ryml::ConstNodeRef node) const
+{
+  DocumentNodeLocation loc;
+  auto ryml_loc = parser_->location(node);
+  loc.offset    = ryml_loc.offset;
+  loc.line      = ryml_loc.line;
+  loc.col       = ryml_loc.col;
+  loc.filename  = std::string(ryml_loc.name.str, ryml_loc.name.len);
+
+  return loc;
 }
 
 }  // namespace configuration
