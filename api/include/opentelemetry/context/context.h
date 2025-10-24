@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <cstring>
+#include <string>
 #include <utility>
 
 #include "opentelemetry/context/context_value.h"
@@ -34,7 +34,7 @@ public:
 
   // Creates a context object from a key and value, this will
   // hold a shared_ptr to the head of the DataList linked list
-  Context(nostd::string_view key, ContextValue value) noexcept
+  Context(nostd::string_view key, const ContextValue &value) noexcept
       : head_{nostd::shared_ptr<DataList>{new DataList(key, value)}}
   {}
 
@@ -42,7 +42,7 @@ public:
   // contains the new key and value data. It attaches the
   // exisiting list to the end of the new list.
   template <class T>
-  Context SetValues(T &values) noexcept
+  Context SetValues(T &values) const noexcept
   {
     Context context(values);
     auto last = context.head_;
@@ -57,9 +57,9 @@ public:
   // Accepts a new iterable and then returns a new context that
   // contains the new key and value data. It attaches the
   // exisiting list to the end of the new list.
-  Context SetValue(nostd::string_view key, const ContextValue& value) noexcept
+  Context SetValue(nostd::string_view key, const ContextValue& value) const noexcept
   {
-    Context context      = Context(key, value);
+    Context context(key, value);
     context.head_->next_ = head_;
     return context;
   }
@@ -101,12 +101,14 @@ private:
     template <class T>
     DataList(const T &keys_and_vals)
     {
-      auto *node = this;
       auto iter = std::begin(keys_and_vals);
-      *node = DataList(iter.first, iter.second);
+      if (iter == std::end(keys_and_vals))
+        return;
+      auto *node = this;
+      *node = DataList(iter->first, iter->second);
       for (++iter; iter != std::end(keys_and_vals); ++iter)
       {
-        node->next_ = nostd::shared_ptr<DataList>(new DataList(iter.first, iter.second));
+        node->next_ = nostd::shared_ptr<DataList>(new DataList(iter->first, iter->second));
         node        = node->next_.get();
       }
     }
@@ -114,10 +116,9 @@ private:
     // Builds a data list with just a key and value, so it will just be the head
     // and returns that head.
     DataList(nostd::string_view key, const ContextValue &value)
+      : key_(key.begin(), key.end())
+      , value_( value)
     {
-      key_.assign(key.begin(), key.end());
-      next_  = nostd::shared_ptr<DataList>{nullptr};
-      value_ = value;
     }
   };
 
