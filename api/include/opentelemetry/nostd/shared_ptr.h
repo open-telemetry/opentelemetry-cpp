@@ -11,7 +11,6 @@
 #endif
 
 #if !defined(OPENTELEMETRY_HAVE_STD_SHARED_PTR)
-#  include <cstdlib>
 #  include <memory>
 #  include <utility>
 
@@ -32,13 +31,9 @@ public:
   using pointer      = element_type *;
 
 private:
-  static constexpr size_t kMaxSize   = 32;
   static constexpr size_t kAlignment = 8;
 
-  struct alignas(kAlignment) PlacementBuffer
-  {
-    char data[kMaxSize]{};
-  };
+  struct alignas(kAlignment) PlacementBuffer; // fwd.
 
   class shared_ptr_wrapper
   {
@@ -47,14 +42,12 @@ private:
 
     shared_ptr_wrapper(std::shared_ptr<T> &&ptr) noexcept : ptr_{std::move(ptr)} {}
 
-    virtual ~shared_ptr_wrapper() {}
-
-    virtual void CopyTo(PlacementBuffer &buffer) const noexcept
+    void CopyTo(PlacementBuffer &buffer) const noexcept
     {
       new (buffer.data) shared_ptr_wrapper{*this};
     }
 
-    virtual void MoveTo(PlacementBuffer &buffer) noexcept
+    void MoveTo(PlacementBuffer &buffer) noexcept
     {
       new (buffer.data) shared_ptr_wrapper{std::move(this->ptr_)};
     }
@@ -67,15 +60,19 @@ private:
       new (buffer.data) other_shared_ptr_wrapper{std::move(this->ptr_)};
     }
 
-    virtual pointer Get() const noexcept { return ptr_.get(); }
+    pointer Get() const noexcept { return ptr_.get(); }
 
-    virtual void Reset() noexcept { ptr_.reset(); }
+    void Reset() noexcept { ptr_.reset(); }
 
   private:
     std::shared_ptr<T> ptr_;
   };
 
-  static_assert(sizeof(shared_ptr_wrapper) <= kMaxSize, "Placement buffer is too small");
+  struct alignas(kAlignment) PlacementBuffer
+  {
+    char data[sizeof(shared_ptr_wrapper)]{};
+  };
+
   static_assert(alignof(shared_ptr_wrapper) <= kAlignment, "Placement buffer not properly aligned");
 
 public:
@@ -105,13 +102,13 @@ public:
 
   shared_ptr(unique_ptr<T> &&other) noexcept
   {
-    std::shared_ptr<T> ptr_(other.release());
+    std::shared_ptr<T> ptr_(std::move(other));
     new (buffer_.data) shared_ptr_wrapper{std::move(ptr_)};
   }
 
   shared_ptr(std::unique_ptr<T> &&other) noexcept
   {
-    std::shared_ptr<T> ptr_(other.release());
+    std::shared_ptr<T> ptr_(std::move(other));
     new (buffer_.data) shared_ptr_wrapper{std::move(ptr_)};
   }
 
@@ -119,6 +116,10 @@ public:
 
   shared_ptr &operator=(shared_ptr &&other) noexcept
   {
+    if (this == &other)
+    {
+      return *this;
+    }
     wrapper().~shared_ptr_wrapper();
     other.wrapper().MoveTo(buffer_);
     return *this;
@@ -132,6 +133,10 @@ public:
 
   shared_ptr &operator=(const shared_ptr &other) noexcept
   {
+    if (this == &other)
+    {
+      return *this;
+    }
     wrapper().~shared_ptr_wrapper();
     other.wrapper().CopyTo(buffer_);
     return *this;
