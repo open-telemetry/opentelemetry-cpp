@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 package(default_visibility = ["//visibility:public"])
