@@ -33,7 +33,7 @@ public:
 private:
   static constexpr size_t kAlignment = 8;
 
-  struct alignas(kAlignment) PlacementBuffer; // fwd.
+  struct alignas(kAlignment) PlacementBuffer;  // fwd.
 
   class shared_ptr_wrapper
   {
