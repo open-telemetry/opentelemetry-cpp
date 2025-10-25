@@ -609,17 +609,55 @@ ConfigurationParser::ParseConsolePushMetricExporterConfiguration(
   return model;
 }
 
+TranslationStrategy ConfigurationParser::ParseTranslationStrategy(
+    const std::unique_ptr<DocumentNode> &node,
+    const std::string &name) const
+{
+  if (name == "UnderscoreEscapingWithSuffixes")
+  {
+    return TranslationStrategy::UnderscoreEscapingWithSuffixes;
+  }
+
+  if (name == "UnderscoreEscapingWithoutSuffixes")
+  {
+    return TranslationStrategy::UnderscoreEscapingWithoutSuffixes;
+  }
+
+  if (name == "NoUTF8EscapingWithSuffixes")
+  {
+    return TranslationStrategy::NoUTF8EscapingWithSuffixes;
+  }
+
+  if (name == "NoTranslation")
+  {
+    return TranslationStrategy::NoTranslation;
+  }
+
+  std::string message("Illegal TranslationStrategy: ");
+  message.append(name);
+  throw InvalidSchemaException(node->Location(), message);
+}
+
 std::unique_ptr<PrometheusPullMetricExporterConfiguration>
 ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<PrometheusPullMetricExporterConfiguration>();
+  std::unique_ptr<DocumentNode> child;
 
-  model->host                = node->GetString("host", "localhost");
-  model->port                = node->GetInteger("port", 9464);
-  model->without_units       = node->GetBoolean("without_units", false);
-  model->without_type_suffix = node->GetBoolean("without_type_suffix", false);
-  model->without_scope_info  = node->GetBoolean("without_scope_info", false);
+  model->host               = node->GetString("host", "localhost");
+  model->port               = node->GetInteger("port", 9464);
+  model->without_scope_info = node->GetBoolean("without_scope_info", false);
+
+  child = node->GetChildNode("with_resource_constant_labels");
+  if (child)
+  {
+    model->with_resource_constant_labels = ParseIncludeExcludeConfiguration(child);
+  }
+
+  std::string translation_strategy =
+      node->GetString("translation_strategy", "UnderscoreEscapingWithSuffixes");
+  model->translation_strategy = ParseTranslationStrategy(node, translation_strategy);
 
   return model;
 }

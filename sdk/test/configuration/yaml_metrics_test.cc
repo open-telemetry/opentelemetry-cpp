@@ -537,9 +537,10 @@ meter_provider:
       opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(prometheus->host, "localhost");
   ASSERT_EQ(prometheus->port, 9464);
-  ASSERT_EQ(prometheus->without_units, false);
-  ASSERT_EQ(prometheus->without_type_suffix, false);
   ASSERT_EQ(prometheus->without_scope_info, false);
+  ASSERT_EQ(prometheus->translation_strategy,
+            opentelemetry::sdk::configuration::TranslationStrategy::UnderscoreEscapingWithSuffixes);
+  ASSERT_EQ(prometheus->with_resource_constant_labels, nullptr);
 }
 
 TEST(YamlMetrics, prometheus)
@@ -553,9 +554,14 @@ meter_provider:
           prometheus/development:
             host: "prometheus"
             port: 1234
-            without_units: true
-            without_type_suffix: true
             without_scope_info: true
+            translation_strategy: NoUTF8EscapingWithSuffixes
+            with_resource_constant_labels:
+              included:
+                - "foo.in"
+                - "bar.in"
+              excluded:
+                - "baz.ex"
 )";
 
   auto config = DoParse(yaml);
@@ -573,9 +579,17 @@ meter_provider:
       opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(prometheus->host, "prometheus");
   ASSERT_EQ(prometheus->port, 1234);
-  ASSERT_EQ(prometheus->without_units, true);
-  ASSERT_EQ(prometheus->without_type_suffix, true);
   ASSERT_EQ(prometheus->without_scope_info, true);
+  ASSERT_EQ(prometheus->translation_strategy,
+            opentelemetry::sdk::configuration::TranslationStrategy::NoUTF8EscapingWithSuffixes);
+  ASSERT_NE(prometheus->with_resource_constant_labels, nullptr);
+  ASSERT_NE(prometheus->with_resource_constant_labels->included, nullptr);
+  ASSERT_EQ(prometheus->with_resource_constant_labels->included->string_array.size(), 2);
+  ASSERT_EQ(prometheus->with_resource_constant_labels->included->string_array[0], "foo.in");
+  ASSERT_EQ(prometheus->with_resource_constant_labels->included->string_array[1], "bar.in");
+  ASSERT_NE(prometheus->with_resource_constant_labels->excluded, nullptr);
+  ASSERT_EQ(prometheus->with_resource_constant_labels->excluded->string_array.size(), 1);
+  ASSERT_EQ(prometheus->with_resource_constant_labels->excluded->string_array[0], "baz.ex");
 }
 
 TEST(YamlMetrics, empty_views)
