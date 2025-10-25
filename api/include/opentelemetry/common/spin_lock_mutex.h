@@ -80,11 +80,7 @@ public:
   /**
    * Attempts to lock the mutex.  Return immediately with `true` (success) or `false` (failure).
    */
-  bool try_lock() noexcept
-  {
-    return !flag_.exchange(true, std::memory_order_acquire);
-  }
-
+  bool try_lock() noexcept { return !flag_.exchange(true, std::memory_order_acquire); }
   /**
    * Blocks until a lock can be obtained for the current thread.
    *
