@@ -238,7 +238,7 @@ jobs:
       - name: Install Conan
         run: |
           python3 -m pip install pip==25.0.1
-          pip install "conan==2.15.1"
+          pip install "conan==2.21.0"
           conan profile detect --force
       - name: Install or build all dependencies with Conan
         run: |

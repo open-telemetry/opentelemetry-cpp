@@ -43,9 +43,9 @@
 #    define NOMINMAX
 #  endif
 
-#  include <Windows.h>
 #  include <direct.h>
 #  include <io.h>
+#  include <windows.h>
 
 #  ifdef UNICODE
 #    include <atlconv.h>

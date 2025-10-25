@@ -12,18 +12,18 @@
 #  - update the matching git submodule to the new tag.
 #  - update the Bazel build files
 #     - opentelemetry-cpp/MODULE.bazel
-#     - opentelemetry-cpp/bazel/repository.bzl
 
-abseil=20220623.2
+abseil=20250127.0
 zlib=v1.3.1
-curl=curl-8_12_0
-protobuf=v3.21.6
-grpc=v1.49.2
-benchmark=v1.8.3
-googletest=v1.14.0
-ms-gsl=v3.1.0
+curl=curl-8_16_0
+protobuf=v6.31.1
+grpc=v1.75.1
+benchmark=v1.9.4
+googletest=v1.17.0
+ms-gsl=v4.2.0
 nlohmann-json=v3.12.0
 opentelemetry-proto=v1.7.0
 opentracing-cpp=v1.6.0
 prometheus-cpp=v1.3.0
+ryml=v0.9.0
 vcpkg=2024.02.14

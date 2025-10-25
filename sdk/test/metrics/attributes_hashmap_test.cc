@@ -71,9 +71,9 @@ TEST(AttributesHashMap, BasicTests)
   MetricAttributes m6 = {{"k1", "v2"}, {"k2", "v1"}};
   EXPECT_EQ(hash_map.Has(m6), false);
 
-  // GetAllEnteries
+  // GetAllEntries
   size_t count = 0;
-  hash_map.GetAllEnteries(
+  hash_map.GetAllEntries(
       [&count](const MetricAttributes & /* attributes */, Aggregation & /* aggregation */) {
         count++;
         return true;
@@ -210,7 +210,7 @@ TEST(AttributesHashMap, OverflowCardinalityLimitBehavior)
 
   // Copy the hash map to a new map in non-determistic order and verify all entries are present
   AttributesHashMapWithCustomHash<> map_copy(limit);
-  map.GetAllEnteries([&map_copy](const MetricAttributes &attributes, Aggregation &) {
+  map.GetAllEntries([&map_copy](const MetricAttributes &attributes, Aggregation &) {
     map_copy.Set(attributes, std::unique_ptr<Aggregation>(new DropAggregation()));
     return true;
   });

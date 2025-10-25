@@ -1,6 +1,10 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+#
+# opentelemetry_exporter_ostream_span
+#
+
 add_library(opentelemetry_exporter_ostream_span src/span_exporter.cc
                                                 src/span_exporter_factory.cc)
 
@@ -26,6 +30,32 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.
     TEST_LIST ostream_span_test)
 endif() # BUILD_TESTING
+
+#
+# opentelemetry_exporter_ostream_span_builder
+#
+
+add_library(opentelemetry_exporter_ostream_span_builder
+            src/console_span_builder.cc)
+
+set_target_properties(opentelemetry_exporter_ostream_span_builder
+                      PROPERTIES EXPORT_NAME ostream_span_exporter_builder)
+set_target_version(opentelemetry_exporter_ostream_span_builder)
+
+target_include_directories(
+  opentelemetry_exporter_ostream_span_builder
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
+
+target_link_libraries(opentelemetry_exporter_ostream_span_builder
+                      PUBLIC opentelemetry_exporter_ostream_span)
+
+list(APPEND OPENTELEMETRY_OSTREAM_BUILDER_TARGETS
+     opentelemetry_exporter_ostream_span_builder)
+
+#
+# opentelemetry_exporter_ostream_metrics
+#
 
 add_library(opentelemetry_exporter_ostream_metrics
             src/metric_exporter.cc src/metric_exporter_factory.cc)
@@ -53,6 +83,30 @@ if(BUILD_TESTING)
     TEST_LIST ostream_metric_test)
 endif()
 
+#
+# opentelemetry_exporter_ostream_metrics_builder
+#
+
+add_library(opentelemetry_exporter_ostream_metrics_builder
+            src/console_push_metric_builder.cc)
+set_target_properties(opentelemetry_exporter_ostream_metrics_builder
+                      PROPERTIES EXPORT_NAME ostream_metrics_exporter_builder)
+set_target_version(opentelemetry_exporter_ostream_metrics_builder)
+
+target_include_directories(
+  opentelemetry_exporter_ostream_metrics_builder
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
+target_link_libraries(opentelemetry_exporter_ostream_metrics_builder
+                      PUBLIC opentelemetry_exporter_ostream_metrics)
+
+list(APPEND OPENTELEMETRY_OSTREAM_BUILDER_TARGETS
+     opentelemetry_exporter_ostream_metrics_builder)
+
+#
+# opentelemetry_exporter_ostream_logs
+#
+
 add_library(opentelemetry_exporter_ostream_logs
             src/log_record_exporter.cc src/log_record_exporter_factory.cc)
 set_target_properties(opentelemetry_exporter_ostream_logs
@@ -66,6 +120,36 @@ target_link_libraries(opentelemetry_exporter_ostream_logs
                       PUBLIC opentelemetry_logs)
 list(APPEND OPENTELEMETRY_OSTREAM_TARGETS opentelemetry_exporter_ostream_logs)
 
+if(BUILD_TESTING)
+  add_executable(ostream_log_test test/ostream_log_test.cc)
+  target_link_libraries(ostream_log_test ${GTEST_BOTH_LIBRARIES}
+                        opentelemetry_exporter_ostream_logs)
+  gtest_add_tests(
+    TARGET ostream_log_test
+    TEST_PREFIX exporter.
+    TEST_LIST ostream_log_test)
+endif()
+
+#
+# opentelemetry_exporter_ostream_logs_builder
+#
+
+add_library(opentelemetry_exporter_ostream_logs_builder
+            src/console_log_record_builder.cc)
+set_target_properties(
+  opentelemetry_exporter_ostream_logs_builder
+  PROPERTIES EXPORT_NAME ostream_log_record_exporter_builder)
+set_target_version(opentelemetry_exporter_ostream_logs_builder)
+
+target_include_directories(
+  opentelemetry_exporter_ostream_logs_builder
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
+target_link_libraries(opentelemetry_exporter_ostream_logs_builder
+                      PUBLIC opentelemetry_exporter_ostream_logs)
+list(APPEND OPENTELEMETRY_OSTREAM_BUILDER_TARGETS
+     opentelemetry_exporter_ostream_logs_builder)
+
 otel_add_component(
   COMPONENT
   exporters_ostream
@@ -77,14 +161,30 @@ otel_add_component(
   "include/opentelemetry/exporters"
   FILES_MATCHING
   PATTERN
-  "*.h")
+  "*.h"
+  PATTERN
+  "console_log_record_builder.h"
+  EXCLUDE
+  PATTERN
+  "console_push_metric_builder.h"
+  EXCLUDE
+  PATTERN
+  "console_span_builder.h"
+  EXCLUDE)
 
-if(BUILD_TESTING)
-  add_executable(ostream_log_test test/ostream_log_test.cc)
-  target_link_libraries(ostream_log_test ${GTEST_BOTH_LIBRARIES}
-                        opentelemetry_exporter_ostream_logs)
-  gtest_add_tests(
-    TARGET ostream_log_test
-    TEST_PREFIX exporter.
-    TEST_LIST ostream_log_test)
-endif()
+otel_add_component(
+  COMPONENT
+  exporters_ostream_builder
+  TARGETS
+  ${OPENTELEMETRY_OSTREAM_BUILDER_TARGETS}
+  FILES_DIRECTORY
+  "include/opentelemetry/exporters/ostream"
+  FILES_DESTINATION
+  "include/opentelemetry/exporters"
+  FILES_MATCHING
+  PATTERN
+  "console_log_record_builder.h"
+  PATTERN
+  "console_push_metric_builder.h"
+  PATTERN
+  "console_span_builder.h")

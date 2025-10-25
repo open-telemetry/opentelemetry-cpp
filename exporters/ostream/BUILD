@@ -1,6 +1,9 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -18,6 +21,21 @@ cc_library(
     tags = ["ostream"],
     deps = [
         "//sdk/src/logs",
+    ],
+)
+
+cc_library(
+    name = "ostream_log_record_exporter_builder",
+    srcs = [
+        "src/console_log_record_builder.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/ostream/console_log_record_builder.h",
+    ],
+    strip_include_prefix = "include",
+    tags = ["ostream"],
+    deps = [
+        ":ostream_log_record_exporter",
     ],
 )
 
@@ -55,6 +73,24 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "ostream_metric_exporter_builder",
+    srcs = [
+        "src/console_push_metric_builder.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/ostream/console_push_metric_builder.h",
+    ],
+    strip_include_prefix = "include",
+    tags = [
+        "metrics",
+        "ostream",
+    ],
+    deps = [
+        ":ostream_metric_exporter",
+    ],
+)
+
 cc_test(
     name = "ostream_metric_test",
     srcs = ["test/ostream_metric_test.cc"],
@@ -83,6 +119,21 @@ cc_library(
     tags = ["ostream"],
     deps = [
         "//sdk/src/trace",
+    ],
+)
+
+cc_library(
+    name = "ostream_span_exporter_builder",
+    srcs = [
+        "src/console_span_builder.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/ostream/console_span_builder.h",
+    ],
+    strip_include_prefix = "include",
+    tags = ["ostream"],
+    deps = [
+        ":ostream_span_exporter",
     ],
 )
 

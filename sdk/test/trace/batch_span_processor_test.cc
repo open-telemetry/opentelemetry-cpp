@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stdlib.h>
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -24,6 +25,12 @@
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/version.h"
+
+#if defined(_MSC_VER)
+#  include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -362,6 +369,80 @@ TEST_F(BatchSpanProcessorTestPeer, TestScheduleDelayMillis)
   {
     EXPECT_EQ("Span " + std::to_string(i), spans_received->at(i)->GetName());
   }
+}
+
+TEST(BatchSpanProcessorOptionsEnvTest, TestDefaultValues)
+{
+  sdk::trace::BatchSpanProcessorOptions options;
+
+  EXPECT_EQ(options.max_queue_size, static_cast<size_t>(2084));
+  EXPECT_EQ(options.schedule_delay_millis, std::chrono::milliseconds(5000));
+  EXPECT_EQ(options.export_timeout, std::chrono::milliseconds(3000));
+  EXPECT_EQ(options.max_export_batch_size, static_cast<size_t>(512));
+}
+
+TEST(BatchSpanProcessorOptionsEnvTest, TestMaxQueueSizeFromEnv)
+{
+  setenv("OTEL_BSP_MAX_QUEUE_SIZE", "1234", 1);
+
+  sdk::trace::BatchSpanProcessorOptions options;
+
+  EXPECT_EQ(options.max_queue_size, static_cast<size_t>(1234));
+
+  unsetenv("OTEL_BSP_MAX_QUEUE_SIZE");
+}
+
+TEST(BatchSpanProcessorOptionsEnvTest, TestScheduleDelayFromEnv)
+{
+  setenv("OTEL_BSP_SCHEDULE_DELAY", "7s", 1);
+
+  sdk::trace::BatchSpanProcessorOptions options;
+
+  EXPECT_EQ(options.schedule_delay_millis, std::chrono::milliseconds(7000));
+
+  unsetenv("OTEL_BSP_SCHEDULE_DELAY");
+}
+
+TEST(BatchSpanProcessorOptionsEnvTest, TestExportTimeoutFromEnv)
+{
+  setenv("OTEL_BSP_EXPORT_TIMEOUT", "250ms", 1);
+
+  sdk::trace::BatchSpanProcessorOptions options;
+
+  EXPECT_EQ(options.export_timeout, std::chrono::milliseconds(250));
+
+  unsetenv("OTEL_BSP_EXPORT_TIMEOUT");
+}
+
+TEST(BatchSpanProcessorOptionsEnvTest, TestMaxExportBatchSizeFromEnv)
+{
+  setenv("OTEL_BSP_MAX_EXPORT_BATCH_SIZE", "42", 1);
+
+  sdk::trace::BatchSpanProcessorOptions options;
+
+  EXPECT_EQ(options.max_export_batch_size, static_cast<size_t>(42));
+
+  unsetenv("OTEL_BSP_MAX_EXPORT_BATCH_SIZE");
+}
+
+TEST(BatchSpanProcessorOptionsEnvTest, TestOptionsReadFromMultipleEnvVars)
+{
+  setenv("OTEL_BSP_MAX_QUEUE_SIZE", "3000", 1);
+  setenv("OTEL_BSP_SCHEDULE_DELAY", "2s", 1);
+  setenv("OTEL_BSP_EXPORT_TIMEOUT", "1s", 1);
+  setenv("OTEL_BSP_MAX_EXPORT_BATCH_SIZE", "256", 1);
+
+  sdk::trace::BatchSpanProcessorOptions options;
+
+  EXPECT_EQ(options.max_queue_size, static_cast<size_t>(3000));
+  EXPECT_EQ(options.schedule_delay_millis, std::chrono::milliseconds(2000));
+  EXPECT_EQ(options.export_timeout, std::chrono::milliseconds(1000));
+  EXPECT_EQ(options.max_export_batch_size, static_cast<size_t>(256));
+
+  unsetenv("OTEL_BSP_MAX_QUEUE_SIZE");
+  unsetenv("OTEL_BSP_SCHEDULE_DELAY");
+  unsetenv("OTEL_BSP_EXPORT_TIMEOUT");
+  unsetenv("OTEL_BSP_MAX_EXPORT_BATCH_SIZE");
 }
 
 OPENTELEMETRY_END_NAMESPACE

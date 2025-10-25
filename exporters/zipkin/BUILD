@@ -1,6 +1,9 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -39,6 +42,21 @@ cc_library(
     deps = [
         ":zipkin_recordable",
         "//ext/src/http/client/curl:http_client_curl",
+    ],
+)
+
+cc_library(
+    name = "zipkin_exporter_builder",
+    srcs = [
+        "src/zipkin_builder.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/zipkin/zipkin_builder.h",
+    ],
+    strip_include_prefix = "include",
+    tags = ["zipkin"],
+    deps = [
+        ":zipkin_exporter",
     ],
 )
 

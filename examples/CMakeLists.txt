@@ -31,3 +31,7 @@ add_subdirectory(multi_processor)
 if(WITH_EXAMPLES_HTTP)
   add_subdirectory(http)
 endif()
+
+if(WITH_CONFIGURATION)
+  add_subdirectory(configuration)
+endif()

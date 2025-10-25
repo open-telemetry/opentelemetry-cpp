@@ -34,7 +34,7 @@ static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse
 TEST(YamlTrace, no_processors)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
 )";
 
@@ -45,7 +45,7 @@ tracer_provider:
 TEST(YamlTrace, empty_processors)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
 )";
@@ -57,7 +57,7 @@ tracer_provider:
 TEST(YamlTrace, many_processors)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -77,7 +77,7 @@ tracer_provider:
 TEST(YamlTrace, simple_processor)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -102,7 +102,7 @@ tracer_provider:
 TEST(YamlTrace, default_batch_processor)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - batch:
@@ -131,7 +131,7 @@ tracer_provider:
 TEST(YamlTrace, batch_processor)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - batch:
@@ -164,7 +164,7 @@ tracer_provider:
 TEST(YamlTrace, default_otlp_http)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -202,7 +202,7 @@ tracer_provider:
 TEST(YamlTrace, otlp_http)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -255,7 +255,7 @@ tracer_provider:
 TEST(YamlTrace, default_otlp_grpc)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -293,7 +293,7 @@ tracer_provider:
 TEST(YamlTrace, otlp_grpc)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -346,7 +346,7 @@ tracer_provider:
 TEST(YamlTrace, default_otlp_file)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -375,7 +375,7 @@ tracer_provider:
 TEST(YamlTrace, otlp_file)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -405,7 +405,7 @@ tracer_provider:
 TEST(YamlTrace, otlp_console)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -430,7 +430,7 @@ tracer_provider:
 TEST(YamlTrace, default_otlp_zipkin)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -461,7 +461,7 @@ tracer_provider:
 TEST(YamlTrace, otlp_zipkin)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -493,7 +493,7 @@ tracer_provider:
 TEST(YamlTrace, no_limits)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -510,7 +510,7 @@ tracer_provider:
 TEST(YamlTrace, default_limits)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -534,7 +534,7 @@ tracer_provider:
 TEST(YamlTrace, limits)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -564,7 +564,7 @@ tracer_provider:
 TEST(YamlTrace, no_sampler)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -581,7 +581,7 @@ tracer_provider:
 TEST(YamlTrace, empty_sampler)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -597,7 +597,7 @@ tracer_provider:
 TEST(YamlTrace, many_sampler)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -615,7 +615,7 @@ tracer_provider:
 TEST(YamlTrace, always_off_sampler)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -634,7 +634,7 @@ tracer_provider:
 TEST(YamlTrace, always_on_sampler)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -653,7 +653,7 @@ tracer_provider:
 TEST(YamlTrace, jaeger_remote_sampler)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -683,7 +683,7 @@ tracer_provider:
 TEST(YamlTrace, default_parent_based_sampler)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -711,7 +711,7 @@ tracer_provider:
 TEST(YamlTrace, parent_based_sampler)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -749,7 +749,7 @@ tracer_provider:
 TEST(YamlTrace, default_trace_id_ratio_based_sampler)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:
@@ -773,7 +773,7 @@ tracer_provider:
 TEST(YamlTrace, trace_id_ratio_based_sampler)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-trace"
 tracer_provider:
   processors:
     - simple:

@@ -66,7 +66,7 @@ if [ -z "${THIRDPARTY_INSTALL_DIR}" ]; then
 fi
 
 if [ -z "${CXX_STANDARD}" ]; then
-    CXX_STANDARD=14
+    CXX_STANDARD=17
 fi
 
 THIRDPARTY_BUILD_DIR="/tmp/otel-cpp-third-party-build"

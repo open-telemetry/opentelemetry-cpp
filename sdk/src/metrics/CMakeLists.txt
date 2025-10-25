@@ -12,6 +12,7 @@ add_library(
   meter_context.cc
   meter_context_factory.cc
   metric_reader.cc
+  multi_observer_result.cc
   instrument_metadata_validator.cc
   export/periodic_exporting_metric_reader.cc
   export/periodic_exporting_metric_reader_factory.cc

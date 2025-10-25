@@ -53,9 +53,15 @@ jobs:
             llvm-dev \
             libclang-dev \
             cmake
+
+      - name: Install rapidyaml
+        run: |
+          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
+
       - name: Install include-what-you-use
         run: |
           sudo ./ci/install_iwyu.sh
+
       - name: Prepare CMake
         env:
           CC: clang

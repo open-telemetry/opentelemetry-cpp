@@ -69,6 +69,9 @@ MAKE_COMMAND="make -k -j \$(nproc)"
 
 echo "make command: ${MAKE_COMMAND}"
 
+export BAZEL_CXXOPTS="-std=c++17"
+
+
 BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW --//exporters/otlp:with_otlp_grpc_credential_preview=true"
 BAZEL_OPTIONS="$BAZEL_OPTIONS_DEFAULT"
 
@@ -92,7 +95,7 @@ fi
 if [ -n "${CXX_STANDARD}" ]; then
   CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
 else
-  CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD=14")
+  CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD=17")
 fi
 
 CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD_REQUIRED=ON")
@@ -167,6 +170,31 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
+        "${SRC_DIR}"
+  eval "$MAKE_COMMAND"
+  make test
+  exit 0
+elif [[ "$1" == "cmake.maintainer.yaml.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_GRPC=ON \
+        -DWITH_OTLP_FILE=ON \
+        -DWITH_PROMETHEUS=ON \
+        -DWITH_EXAMPLES=ON \
+        -DWITH_EXAMPLES_HTTP=ON \
+        -DWITH_ZIPKIN=ON \
+        -DBUILD_W3CTRACECONTEXT_TEST=ON \
+        -DWITH_ELASTICSEARCH=ON \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
+        -DOTELCPP_MAINTAINER_MODE=ON \
+        -DWITH_NO_DEPRECATED_CODE=ON \
+        -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=ON \
+        -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
+        -DWITH_CONFIGURATION=ON \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
   make test
@@ -432,17 +460,24 @@ elif [[ "$1" == "cmake.install.test" ]]; then
   EXPECTED_COMPONENTS=(
     "api"
     "sdk"
+    "configuration"
     "ext_common"
     "ext_http_curl"
     "exporters_in_memory"
     "exporters_ostream"
+    "exporters_ostream_builder"
     "exporters_otlp_common"
     "exporters_otlp_file"
+    "exporters_otlp_file_builder"
     "exporters_otlp_grpc"
+    "exporters_otlp_grpc_builder"
     "exporters_otlp_http"
+    "exporters_otlp_http_builder"
     "exporters_prometheus"
+    "exporters_prometheus_builder"
     "exporters_elasticsearch"
     "exporters_zipkin"
+    "exporters_zipkin_builder"
   )
   EXPECTED_COMPONENTS_STRING=$(IFS=\;; echo "${EXPECTED_COMPONENTS[*]}")
   mkdir -p "${BUILD_DIR}/install_test"
@@ -510,10 +545,6 @@ EOF
   make load_plugin_example
   examples/plugin/load/load_plugin_example ${PLUGIN_DIR}/libexample_plugin.so /dev/null
   exit 0
-elif [[ "$1" == "bazel.no_bzlmod.test" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build --enable_bzlmod=false $BAZEL_OPTIONS //...
-  bazel $BAZEL_STARTUP_OPTIONS test --enable_bzlmod=false $BAZEL_TEST_OPTIONS //...
-  exit 0
 elif [[ "$1" == "bazel.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS $BAZEL_WITH_PREVIEW //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS $BAZEL_WITH_PREVIEW //...
@@ -539,8 +570,10 @@ elif [[ "$1" == "bazel.noexcept" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client
   # as well as Opentracing shim (due to some third party code in its Opentracing dependency)
   # that make this test always fail. Ignore these packages in the noexcept test here.
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/...
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/...
+  # Set the api:with_cxx_stdlib=none because C++17 std::variant::get<> throws
+
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
   exit 0
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client

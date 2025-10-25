@@ -7,3 +7,7 @@ add_subdirectory(metrics)
 add_subdirectory(logs)
 add_subdirectory(version)
 add_subdirectory(resource)
+
+if(WITH_CONFIGURATION)
+  add_subdirectory(configuration)
+endif()

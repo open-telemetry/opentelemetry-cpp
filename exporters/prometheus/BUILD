@@ -1,6 +1,9 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -24,6 +27,21 @@ cc_library(
         "//sdk:headers",
         "@com_github_jupp0r_prometheus_cpp//core",
         "@com_github_jupp0r_prometheus_cpp//pull",
+    ],
+)
+
+cc_library(
+    name = "prometheus_exporter_builder",
+    srcs = [
+        "src/prometheus_pull_builder.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/prometheus/prometheus_pull_builder.h",
+    ],
+    strip_include_prefix = "include",
+    tags = ["prometheus"],
+    deps = [
+        ":prometheus_exporter",
     ],
 )
 

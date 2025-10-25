@@ -13,6 +13,7 @@ add_library(
   provider.cc
   batch_span_processor.cc
   batch_span_processor_factory.cc
+  batch_span_processor_options.cc
   simple_processor_factory.cc
   samplers/always_on_factory.cc
   samplers/always_off_factory.cc

@@ -318,10 +318,10 @@ switch ($action) {
     if (Test-Path Env:\CXX_STANDARD) {
         $CXX_STANDARD = [int](Get-Item Env:\CXX_STANDARD).Value
     } else {
-        $CXX_STANDARD = 14
+        $CXX_STANDARD = 17
     }
     if (-not $CXX_STANDARD) {
-        $CXX_STANDARD = 14
+        $CXX_STANDARD = 17
     }
     Write-Host "Using CXX_STANDARD: $CXX_STANDARD"
       
@@ -425,6 +425,7 @@ switch ($action) {
       "-DCMAKE_INSTALL_PREFIX=$INSTALL_TEST_DIR" `
       "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
       -DOPENTELEMETRY_INSTALL=ON `
+      -DWITH_CONFIGURATION=OFF `
       -DWITH_OPENTRACING=OFF `
       -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=OFF `
       -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=OFF `
