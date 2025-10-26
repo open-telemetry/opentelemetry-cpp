@@ -10,17 +10,17 @@ set -o pipefail
 Help()
 {
    # Display Help
-   echo "Add description of the script functions here."
+   echo "Build opentelemetry-cpp and its third-party dependenciesn in the selected base image"
+   echo "Script options [-b|o|g|j]"
    echo
-   echo "Syntax: scriptTemplate [-b|o|g|j]"
-   echo "options:"
-   echo "b     Base image"
+   echo "b     Base image <alpine-latest, ubuntu-latest>"
    echo "o     OpenTelemetry-cpp git tag"
    echo "h     Print Help."
-   echo "g     gRPC git tag"
    echo "j     Parallel jobs"
    echo
    echo "how to use:"
+   echo
+   echo "bash build.sh -b <base_image> -j ${nproc} -o <otel cpp git branch or tag>"
    echo
    echo "docker create -ti --name otel otel-cpp-<base_image> bash"
    echo "docker cp otel:/ ./"
@@ -31,12 +31,11 @@ Help()
    echo "COPY --from=otel-cpp-<base_image> /usr"
 }
 
-base_image=${base_image:="alpine"}
-grpc_git_tag=${grpc_git_tag:="v1.43.2"}
-otel_git_tag=${otel_git_tag:="v1.3.0"}
+base_image=${base_image:="alpine-latest"}
+otel_git_tag=${otel_git_tag:="main"}
 cores=${cores:=1}
 
-while getopts ":h:b:o:g:j:" option; do
+while getopts ":h:b:o:j:" option; do
    case $option in
     h) # display Help
          Help
@@ -46,9 +45,6 @@ while getopts ":h:b:o:g:j:" option; do
         ;;
     o) # OpenTelemetry-cpp git tag
         otel_git_tag=$OPTARG
-        ;;
-    g) # gRPC git tag
-        grpc_git_tag=$OPTARG
         ;;
     j) # number of cores
         cores=$OPTARG
@@ -60,13 +56,6 @@ while getopts ":h:b:o:g:j:" option; do
 done
 
 docker build -t base-${base_image}-dev -f Dockerfile.${base_image}.base .
-
-pushd grpc/
-docker build --build-arg BASE_IMAGE=base-${base_image}-dev \
-    --build-arg GRPC_GIT_TAG=${grpc_git_tag} \
-    --build-arg CORES=${cores} \
-    -t grpc-${base_image} -f Dockerfile .
-popd
 
 docker build --build-arg BASE_IMAGE=${base_image} \
     --build-arg CORES=${cores} \
