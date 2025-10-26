@@ -102,7 +102,7 @@ public:
 
   shared_ptr(unique_ptr<T> &&other) noexcept
   {
-    std::shared_ptr<T> ptr_(std::move(other));
+    std::shared_ptr<T> ptr_(other.release());
     new (buffer_.data) shared_ptr_wrapper{std::move(ptr_)};
   }
 

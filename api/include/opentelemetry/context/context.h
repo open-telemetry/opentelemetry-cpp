@@ -105,7 +105,7 @@ private:
       if (iter == std::end(keys_and_vals))
         return;
       auto *node = this;
-      *node =      DataList(iter->first, iter->second);
+      *node      = DataList(iter->first, iter->second);
       for (++iter; iter != std::end(keys_and_vals); ++iter)
       {
         node->next_ = nostd::shared_ptr<DataList>(new DataList(iter->first, iter->second));
@@ -116,7 +116,7 @@ private:
     // Builds a data list with just a key and value, so it will just be the head
     // and returns that head.
     DataList(nostd::string_view key, const ContextValue &value)
-      : key_(key.begin(), key.end()), value_(value)
+        : key_(key.begin(), key.end()), value_(value)
     {}
   };
 
