@@ -12,6 +12,7 @@
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/translation_strategy.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/version.h"
 
