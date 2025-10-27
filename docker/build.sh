@@ -10,7 +10,7 @@ set -o pipefail
 Help()
 {
    # Display Help
-   echo "Build opentelemetry-cpp and its third-party dependenciesn in the selected base image"
+   echo "Build opentelemetry-cpp and its third-party dependencies in the selected base image"
    echo "Script options [-b|o|g|j]"
    echo
    echo "b     Base image <alpine-latest, ubuntu-latest>"
@@ -23,7 +23,7 @@ Help()
    echo "bash build.sh -b <base_image> -j ${nproc} -o <otel cpp git branch or tag>"
    echo
    echo "docker create -ti --name otel otel-cpp-<base_image> bash"
-   echo "docker cp otel:/ ./"
+   echo "docker cp otel:/opt/opentelemetry-cpp-install ./"
    echo "docker rm -f otel"
    echo
    echo "or:"
