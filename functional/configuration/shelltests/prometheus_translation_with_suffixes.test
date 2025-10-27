@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-$ example_yaml --test --yaml shelltests/prometheus_translation_1.yaml
+$ example_yaml --test --yaml shelltests/prometheus_translation_with_suffixes.yaml
 >
 MODEL PARSED
 SDK CREATED
