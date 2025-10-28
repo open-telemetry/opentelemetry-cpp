@@ -35,6 +35,18 @@ MetricCollector::MetricCollector(opentelemetry::sdk::metrics::MeterContext *cont
       metric_reader_{std::move(metric_reader)},
       metric_filter_(std::move(metric_filter))
 {
+  if (!meter_context_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[MetricCollector::MetricCollector] - Error during creation."
+                            << "The metric context is invalid");
+    throw std::invalid_argument("MeterContext cannot be null");
+  }
+  if (!metric_reader_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[MetricCollector::MetricCollector] - Error during creation."
+                            << "The metric reader is invalid");
+    throw std::invalid_argument("MetricReader cannot be null");
+  }
   metric_reader_->SetMetricProducer(this);
 }
 
@@ -57,12 +69,6 @@ AggregationTemporality MetricCollector::GetAggregationTemporality(
 
 MetricProducer::Result MetricCollector::Produce() noexcept
 {
-  if (!meter_context_)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[MetricCollector::Collect] - Error during collecting."
-                            << "The metric context is invalid");
-    return {{}, MetricProducer::Status::kFailure};
-  }
   ResourceMetrics resource_metrics;
   meter_context_->ForEachMeter([&](const std::shared_ptr<Meter> &meter) noexcept {
     auto collection_ts = std::chrono::system_clock::now();
