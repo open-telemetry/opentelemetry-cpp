@@ -1,0 +1,14 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+file_format: "1.0"
+
+meter_provider:
+  readers:
+    - pull:
+        exporter:
+          prometheus/development:
+            host: localhost
+            port: 9464
+            without_scope_info: false
+            translation_strategy: UnderscoreEscapingWithoutSuffixes
