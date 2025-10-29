@@ -188,9 +188,7 @@ meter_provider:
   auto *otlp_http = reinterpret_cast<
       opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(otlp_http->endpoint, "somewhere");
-  ASSERT_EQ(otlp_http->certificate_file, "");
-  ASSERT_EQ(otlp_http->client_key_file, "");
-  ASSERT_EQ(otlp_http->client_certificate_file, "");
+  ASSERT_EQ(otlp_http->tls, nullptr);
   ASSERT_EQ(otlp_http->headers, nullptr);
   ASSERT_EQ(otlp_http->headers_list, "");
   ASSERT_EQ(otlp_http->compression, "");
@@ -213,9 +211,10 @@ meter_provider:
         exporter:
           otlp_http:
             endpoint: "somewhere"
-            certificate_file: "certificate_file"
-            client_key_file: "client_key_file"
-            client_certificate_file: "client_certificate_file"
+            tls:
+              certificate_file: "certificate_file"
+              client_key_file: "client_key_file"
+              client_certificate_file: "client_certificate_file"
             headers:
               - name: foo
                 value: "123"
@@ -244,9 +243,10 @@ meter_provider:
   auto *otlp_http = reinterpret_cast<
       opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(otlp_http->endpoint, "somewhere");
-  ASSERT_EQ(otlp_http->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_http->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_http->client_certificate_file, "client_certificate_file");
+  ASSERT_NE(otlp_http->tls, nullptr);
+  ASSERT_EQ(otlp_http->tls->certificate_file, "certificate_file");
+  ASSERT_EQ(otlp_http->tls->client_key_file, "client_key_file");
+  ASSERT_EQ(otlp_http->tls->client_certificate_file, "client_certificate_file");
   ASSERT_NE(otlp_http->headers, nullptr);
   ASSERT_EQ(otlp_http->headers->kv_map.size(), 2);
   ASSERT_EQ(otlp_http->headers->kv_map["foo"], "123");
@@ -289,9 +289,7 @@ meter_provider:
   auto *otlp_grpc = reinterpret_cast<
       opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(otlp_grpc->endpoint, "somewhere");
-  ASSERT_EQ(otlp_grpc->certificate_file, "");
-  ASSERT_EQ(otlp_grpc->client_key_file, "");
-  ASSERT_EQ(otlp_grpc->client_certificate_file, "");
+  ASSERT_EQ(otlp_grpc->tls, nullptr);
   ASSERT_EQ(otlp_grpc->headers, nullptr);
   ASSERT_EQ(otlp_grpc->headers_list, "");
   ASSERT_EQ(otlp_grpc->compression, "");
@@ -301,7 +299,6 @@ meter_provider:
   ASSERT_EQ(
       otlp_grpc->default_histogram_aggregation,
       opentelemetry::sdk::configuration::DefaultHistogramAggregation::explicit_bucket_histogram);
-  ASSERT_EQ(otlp_grpc->insecure, false);
 }
 
 TEST(YamlMetrics, otlp_grpc)
@@ -314,9 +311,11 @@ meter_provider:
         exporter:
           otlp_grpc:
             endpoint: "somewhere"
-            certificate_file: "certificate_file"
-            client_key_file: "client_key_file"
-            client_certificate_file: "client_certificate_file"
+            tls:
+              certificate_file: "certificate_file"
+              client_key_file: "client_key_file"
+              client_certificate_file: "client_certificate_file"
+              insecure: true
             headers:
               - name: foo
                 value: "123"
@@ -327,7 +326,6 @@ meter_provider:
             timeout: 5000
             temporality_preference: delta
             default_histogram_aggregation: base2_exponential_bucket_histogram
-            insecure: true
 )";
 
   auto config = DoParse(yaml);
@@ -345,9 +343,11 @@ meter_provider:
   auto *otlp_grpc = reinterpret_cast<
       opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(otlp_grpc->endpoint, "somewhere");
-  ASSERT_EQ(otlp_grpc->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_grpc->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_grpc->client_certificate_file, "client_certificate_file");
+  ASSERT_NE(otlp_grpc->tls, nullptr);
+  ASSERT_EQ(otlp_grpc->tls->certificate_file, "certificate_file");
+  ASSERT_EQ(otlp_grpc->tls->client_key_file, "client_key_file");
+  ASSERT_EQ(otlp_grpc->tls->client_certificate_file, "client_certificate_file");
+  ASSERT_EQ(otlp_grpc->tls->insecure, true);
   ASSERT_NE(otlp_grpc->headers, nullptr);
   ASSERT_EQ(otlp_grpc->headers->kv_map.size(), 2);
   ASSERT_EQ(otlp_grpc->headers->kv_map["foo"], "123");
@@ -360,7 +360,6 @@ meter_provider:
   ASSERT_EQ(otlp_grpc->default_histogram_aggregation,
             opentelemetry::sdk::configuration::DefaultHistogramAggregation::
                 base2_exponential_bucket_histogram);
-  ASSERT_EQ(otlp_grpc->insecure, true);
 }
 
 TEST(YamlMetrics, default_otlp_file)
