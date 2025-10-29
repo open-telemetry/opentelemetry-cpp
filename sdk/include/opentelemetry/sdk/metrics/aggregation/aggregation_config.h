@@ -48,7 +48,8 @@ public:
 class Base2ExponentialHistogramAggregationConfig : public AggregationConfig
 {
 public:
-  Base2ExponentialHistogramAggregationConfig(size_t cardinality_limit = kAggregationCardinalityLimit)
+  Base2ExponentialHistogramAggregationConfig(
+      size_t cardinality_limit = kAggregationCardinalityLimit)
       : AggregationConfig(cardinality_limit)
   {}
 
