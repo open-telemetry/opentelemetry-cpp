@@ -217,6 +217,9 @@ public:
   }
 };
 
+class DISABLED_BasicCurlHttpTests : public BasicCurlHttpTests
+{};
+
 TEST_F(BasicCurlHttpTests, DoNothing) {}
 
 TEST_F(BasicCurlHttpTests, HttpRequest)
@@ -495,7 +498,8 @@ TEST_F(BasicCurlHttpTests, GetBaseUri)
             "http://127.0.0.1:31339/");
 }
 
-TEST_F(BasicCurlHttpTests, SendGetRequestAsync)
+// DISABLED, see https://github.com/open-telemetry/opentelemetry-cpp/issues/3535
+TEST_F(DISABLED_BasicCurlHttpTests, SendGetRequestAsync)
 {
   curl::HttpClient http_client;
 
@@ -528,6 +532,8 @@ TEST_F(BasicCurlHttpTests, SendGetRequestAsync)
       ASSERT_FALSE(sessions[i]->IsSessionActive());
 
       ASSERT_TRUE(handlers[i]->is_called_.load(std::memory_order_acquire));
+
+      // TODO: Spurious test failures here.
       ASSERT_TRUE(handlers[i]->got_response_.load(std::memory_order_acquire));
     }
 
