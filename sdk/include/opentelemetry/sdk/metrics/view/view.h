@@ -4,6 +4,7 @@
 #pragma once
 
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
@@ -36,7 +37,35 @@ public:
         aggregation_type_{aggregation_type},
         aggregation_config_{aggregation_config},
         attributes_processor_{std::move(attributes_processor)}
-  {}
+  {
+    // Validate that aggregation_type and aggregation_config match
+    if (aggregation_config_)
+    {
+      AggregationConfigType config_type = aggregation_config_->GetType();
+      bool valid = false;
+      
+      switch (aggregation_type_)
+      {
+        case AggregationType::kHistogram:
+          valid = (config_type == AggregationConfigType::kHistogram);
+          break;
+        case AggregationType::kBase2ExponentialHistogram:
+          valid = (config_type == AggregationConfigType::kBase2ExponentialHistogram);
+          break;
+        case AggregationType::kDefault:
+        case AggregationType::kDrop:
+        case AggregationType::kLastValue:
+        case AggregationType::kSum:
+          valid = (config_type == AggregationConfigType::kDefault);
+          break;
+      }
+      
+      if (!valid)
+      {
+        throw std::invalid_argument("AggregationType and AggregationConfig type mismatch");
+      }
+    }
+  }
 
   virtual ~View() = default;
 

@@ -13,12 +13,22 @@ namespace sdk
 {
 namespace metrics
 {
+
+enum class AggregationConfigType
+{
+  kDefault,
+  kHistogram,
+  kBase2ExponentialHistogram
+};
+
 class AggregationConfig
 {
 public:
   AggregationConfig(size_t cardinality_limit = kAggregationCardinalityLimit)
       : cardinality_limit_(cardinality_limit)
   {}
+
+  virtual AggregationConfigType GetType() const { return AggregationConfigType::kDefault; }
 
   static const AggregationConfig *GetOrDefault(const AggregationConfig *config)
   {
@@ -41,6 +51,8 @@ public:
       : AggregationConfig(cardinality_limit)
   {}
 
+  AggregationConfigType GetType() const override { return AggregationConfigType::kHistogram; }
+
   std::vector<double> boundaries_;
   bool record_min_max_ = true;
 };
@@ -52,6 +64,8 @@ public:
       size_t cardinality_limit = kAggregationCardinalityLimit)
       : AggregationConfig(cardinality_limit)
   {}
+
+  AggregationConfigType GetType() const override { return AggregationConfigType::kBase2ExponentialHistogram; }
 
   size_t max_buckets_  = 160;
   int32_t max_scale_   = 20;
