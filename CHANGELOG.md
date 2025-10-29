@@ -26,6 +26,9 @@ Increment the:
 * [CI] Upgrade tools/vcpkg to 2025.09.17
   [#3701](https://github.com/open-telemetry/opentelemetry-cpp/pull/3701)
 
+* [CONFIGURATION] File configuration - prometheus translation
+  [#3715](https://github.com/open-telemetry/opentelemetry-cpp/pull/3715)
+
 ## [1.23 2025-09-25]
 
 * [CodeHealth] Fix clang-tidy warnings part 6
