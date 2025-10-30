@@ -36,7 +36,7 @@ New Features:
 
   * Configuration for opentelemetry-cpp can now be done using a config.yaml
     file, instead of using environment variables.
-  * See https://github.com/open-telemetry/opentelemetry-configuration
+  * See [opentelemetry-configuration](https://github.com/open-telemetry/opentelemetry-configuration)
 
 ## [1.23 2025-09-25]
 
