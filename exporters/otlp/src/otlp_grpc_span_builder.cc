@@ -38,13 +38,20 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcSpanBuilder::Bu
 
   options.endpoint = model->endpoint;
 
-  if (options.endpoint.substr(0, 6) == "https:") {
+  if (options.endpoint.substr(0, 6) == "https:")
+  {
     options.use_ssl_credentials = true;
-  } else if (options.endpoint.substr(0, 5) == "http:") {
+  }
+  else if (options.endpoint.substr(0, 5) == "http:")
+  {
     options.use_ssl_credentials = false;
-  } else if (tls != nullptr) {
+  }
+  else if (tls != nullptr)
+  {
     options.use_ssl_credentials = !tls->insecure;
-  } else {
+  }
+  else
+  {
     options.use_ssl_credentials = true;
   }
 

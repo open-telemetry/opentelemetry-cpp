@@ -9,7 +9,9 @@
 
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
+#include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
+#include "opentelemetry/sdk/configuration/http_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
