@@ -29,6 +29,15 @@ Increment the:
 * [CONFIGURATION] File configuration - prometheus translation
   [#3715](https://github.com/open-telemetry/opentelemetry-cpp/pull/3715)
 
+New Features:
+
+* [CONFIGURATION] Implement declarative configuration (config.yaml)
+  [#2518](https://github.com/open-telemetry/opentelemetry-cpp/pull/2518)
+
+  * Configuration for opentelemetry-cpp can now be done using a config.yaml
+    file, instead of using environment variables.
+  * See https://github.com/open-telemetry/opentelemetry-configuration
+
 ## [1.23 2025-09-25]
 
 * [CodeHealth] Fix clang-tidy warnings part 6
