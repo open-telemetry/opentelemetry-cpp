@@ -29,6 +29,9 @@ Increment the:
 * [CONFIGURATION] File configuration - prometheus translation
   [#3715](https://github.com/open-telemetry/opentelemetry-cpp/pull/3715)
 
+* [CONFIGURATION] File configuration - tls
+  [#3726](https://github.com/open-telemetry/opentelemetry-cpp/pull/3726)
+
 ## [1.23 2025-09-25]
 
 * [CodeHealth] Fix clang-tidy warnings part 6

@@ -38,22 +38,7 @@ std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpGrpcPushMet
 
   options.endpoint = model->endpoint;
 
-  if (options.endpoint.substr(0, 6) == "https:")
-  {
-    options.use_ssl_credentials = true;
-  }
-  else if (options.endpoint.substr(0, 5) == "http:")
-  {
-    options.use_ssl_credentials = false;
-  }
-  else if (tls != nullptr)
-  {
-    options.use_ssl_credentials = !tls->insecure;
-  }
-  else
-  {
-    options.use_ssl_credentials = true;
-  }
+  options.use_ssl_credentials = OtlpBuilderUtils::GrpcUseSsl(options.endpoint, tls);
 
   if (tls != nullptr)
   {
