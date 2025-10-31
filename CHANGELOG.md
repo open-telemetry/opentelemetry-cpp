@@ -35,6 +35,15 @@ Increment the:
 * [BUILD] Upgrade to opentelemetry-proto 1.8.0
   [#3730](https://github.com/open-telemetry/opentelemetry-cpp/pull/3730)
 
+New Features:
+
+* [CONFIGURATION] Implement declarative configuration (config.yaml)
+  [#2518](https://github.com/open-telemetry/opentelemetry-cpp/pull/2518)
+
+  * Configuration for opentelemetry-cpp can now be done using a config.yaml
+    file, instead of using environment variables.
+  * See [opentelemetry-configuration](https://github.com/open-telemetry/opentelemetry-configuration)
+
 ## [1.23 2025-09-25]
 
 * [CodeHealth] Fix clang-tidy warnings part 6
