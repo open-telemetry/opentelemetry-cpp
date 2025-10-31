@@ -5,6 +5,7 @@
 
 #include <vector>
 
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/version.h"
 
@@ -14,13 +15,6 @@ namespace sdk
 namespace metrics
 {
 
-enum class AggregationConfigType
-{
-  kDefault,
-  kHistogram,
-  kBase2ExponentialHistogram
-};
-
 class AggregationConfig
 {
 public:
@@ -28,7 +22,7 @@ public:
       : cardinality_limit_(cardinality_limit)
   {}
 
-  virtual AggregationConfigType GetType() const { return AggregationConfigType::kDefault; }
+  virtual AggregationType GetType() const { return AggregationType::kDefault; }
 
   static const AggregationConfig *GetOrDefault(const AggregationConfig *config)
   {
@@ -51,7 +45,7 @@ public:
       : AggregationConfig(cardinality_limit)
   {}
 
-  AggregationConfigType GetType() const override { return AggregationConfigType::kHistogram; }
+  AggregationType GetType() const override { return AggregationType::kHistogram; }
 
   std::vector<double> boundaries_;
   bool record_min_max_ = true;
@@ -65,10 +59,7 @@ public:
       : AggregationConfig(cardinality_limit)
   {}
 
-  AggregationConfigType GetType() const override
-  {
-    return AggregationConfigType::kBase2ExponentialHistogram;
-  }
+  AggregationType GetType() const override { return AggregationType::kBase2ExponentialHistogram; }
 
   size_t max_buckets_  = 160;
   int32_t max_scale_   = 20;

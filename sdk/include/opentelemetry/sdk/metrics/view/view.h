@@ -41,22 +41,22 @@ public:
     // Validate that aggregation_type and aggregation_config match
     if (aggregation_config_)
     {
-      AggregationConfigType config_type = aggregation_config_->GetType();
-      bool valid                        = false;
+      AggregationType config_type = aggregation_config_->GetType();
+      bool valid                  = false;
 
       switch (aggregation_type_)
       {
         case AggregationType::kHistogram:
-          valid = (config_type == AggregationConfigType::kHistogram);
+          valid = (config_type == AggregationType::kHistogram);
           break;
         case AggregationType::kBase2ExponentialHistogram:
-          valid = (config_type == AggregationConfigType::kBase2ExponentialHistogram);
+          valid = (config_type == AggregationType::kBase2ExponentialHistogram);
           break;
         case AggregationType::kDefault:
         case AggregationType::kDrop:
         case AggregationType::kLastValue:
         case AggregationType::kSum:
-          valid = (config_type == AggregationConfigType::kDefault);
+          valid = (config_type == AggregationType::kDefault);
           break;
       }
 
