@@ -17,9 +17,11 @@
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
+#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/observer_result.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+#include "opentelemetry/sdk/metrics/state/measurement_attributes_map.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
@@ -36,6 +38,7 @@ class AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStora
 public:
   AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                      const AggregationType aggregation_type,
+                     std::shared_ptr<const AttributesProcessor> attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
                      ExemplarFilterType exempler_filter_type,
                      nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
@@ -48,6 +51,7 @@ public:
             std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
         delta_hash_map_(
             std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
+        attributes_processor_(std::move(attributes_processor)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_filter_type_(exempler_filter_type),
         exemplar_reservoir_(exemplar_reservoir),
@@ -95,26 +99,45 @@ public:
     }
   }
 
-  void RecordLong(
-      const std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> &measurements,
-      opentelemetry::common::SystemTimestamp observation_time) noexcept override
+  void RecordLong(const opentelemetry::sdk::metrics::Measurements<int64_t> &measurements,
+                  opentelemetry::common::SystemTimestamp observation_time) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
       return;
     }
-    Record<int64_t>(measurements, observation_time);
+    std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> mp =
+        ConvertMeasurementsToMetricAttributes<int64_t>(measurements, observation_time);
+    Record<int64_t>(mp, observation_time);
   }
 
-  void RecordDouble(
-      const std::unordered_map<MetricAttributes, double, AttributeHashGenerator> &measurements,
-      opentelemetry::common::SystemTimestamp observation_time) noexcept override
+  void RecordDouble(const opentelemetry::sdk::metrics::Measurements<double> &measurements,
+                    opentelemetry::common::SystemTimestamp observation_time) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
       return;
     }
-    Record<double>(measurements, observation_time);
+    std::unordered_map<MetricAttributes, double, AttributeHashGenerator> mp =
+        ConvertMeasurementsToMetricAttributes<double>(measurements, observation_time);
+    Record<double>(mp, observation_time);
+  }
+
+  template <class T>
+  std::unordered_map<MetricAttributes, T, AttributeHashGenerator>
+  ConvertMeasurementsToMetricAttributes(
+      const opentelemetry::sdk::metrics::Measurements<T> &measurements,
+      opentelemetry::common::SystemTimestamp /* observation_time */) noexcept
+  {
+    std::unordered_map<MetricAttributes, T, AttributeHashGenerator> mp;
+    for (auto &measurement : measurements)
+    {
+      opentelemetry::common::KeyValueIterableView<
+          std::unordered_map<nostd::string_view, opentelemetry::common::AttributeValue>>
+          kv_view{measurement.first};
+      mp[MetricAttributes{kv_view, attributes_processor_.get()}] += measurement.second;
+    }
+    return mp;
   }
 
   bool Collect(CollectorHandle *collector,
@@ -144,6 +167,7 @@ private:
   const AggregationConfig *aggregation_config_;
   std::unique_ptr<AttributesHashMap> cumulative_hash_map_;
   std::unique_ptr<AttributesHashMap> delta_hash_map_;
+  std::shared_ptr<const AttributesProcessor> attributes_processor_;
   opentelemetry::common::SpinLockMutex hashmap_lock_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
   ExemplarFilterType exemplar_filter_type_;
