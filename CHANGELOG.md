@@ -29,6 +29,9 @@ Increment the:
 * [CONFIGURATION] File configuration - prometheus translation
   [#3715](https://github.com/open-telemetry/opentelemetry-cpp/pull/3715)
 
+* [BUILD] Upgrade to opentelemetry-proto 1.8.0
+  [#3730](https://github.com/open-telemetry/opentelemetry-cpp/pull/3730)
+
 New Features:
 
 * [CONFIGURATION] Implement declarative configuration (config.yaml)
