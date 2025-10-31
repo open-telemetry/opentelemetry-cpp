@@ -42,7 +42,7 @@ public:
     if (aggregation_config_)
     {
       AggregationConfigType config_type = aggregation_config_->GetType();
-      bool valid = false;
+      bool valid                        = false;
 
       switch (aggregation_type_)
       {

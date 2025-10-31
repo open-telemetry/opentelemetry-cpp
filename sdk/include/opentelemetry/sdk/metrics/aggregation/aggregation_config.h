@@ -65,7 +65,10 @@ public:
       : AggregationConfig(cardinality_limit)
   {}
 
-  AggregationConfigType GetType() const override { return AggregationConfigType::kBase2ExponentialHistogram; }
+  AggregationConfigType GetType() const override
+  {
+    return AggregationConfigType::kBase2ExponentialHistogram;
+  }
 
   size_t max_buckets_  = 160;
   int32_t max_scale_   = 20;
