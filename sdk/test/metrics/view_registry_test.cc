@@ -10,6 +10,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
@@ -92,4 +93,69 @@ TEST(ViewRegistry, FindNonExistingView)
   EXPECT_EQ(count, 1);
   EXPECT_EQ(status, true);
 #endif
+}
+
+// Tests for View class AggregationType and AggregationConfig consistency validation
+
+TEST(View, ValidHistogramConfigWithHistogramType)
+{
+  // Valid: Histogram aggregation type with HistogramAggregationConfig
+  auto histogram_config = std::make_shared<HistogramAggregationConfig>();
+  histogram_config->boundaries_ = {0.0, 10.0, 100.0};
+
+  EXPECT_NO_THROW({
+    View view("test_histogram", "description", AggregationType::kHistogram, histogram_config);
+  });
+}
+
+TEST(View, InvalidHistogramConfigWithSumType)
+{
+  // Invalid: Sum aggregation type with HistogramAggregationConfig
+  auto histogram_config = std::make_shared<HistogramAggregationConfig>();
+  histogram_config->boundaries_ = {0.0, 10.0, 100.0};
+
+  EXPECT_THROW(
+    {
+      View view("test_sum", "description", AggregationType::kSum, histogram_config);
+    },
+    std::invalid_argument
+  );
+}
+
+TEST(View, InvalidHistogramConfigWithDefaultType)
+{
+  // Invalid: Default aggregation type with HistogramAggregationConfig
+  auto histogram_config = std::make_shared<HistogramAggregationConfig>();
+
+  EXPECT_THROW(
+    {
+      View view("test_default", "description", AggregationType::kDefault, histogram_config);
+    },
+    std::invalid_argument
+  );
+}
+
+TEST(View, ValidNullConfig)
+{
+  // Valid: Null config should work with any aggregation type
+  EXPECT_NO_THROW({
+    View view("test_null_config", "description", AggregationType::kHistogram, nullptr);
+  });
+
+  EXPECT_NO_THROW({
+    View view("test_null_config2", "description", AggregationType::kSum, nullptr);
+  });
+}
+
+TEST(View, InvalidDefaultConfigWithHistogramType)
+{
+  // Invalid: Histogram aggregation type with default AggregationConfig (not HistogramAggregationConfig)
+  auto default_config = std::make_shared<AggregationConfig>();
+
+  EXPECT_THROW(
+    {
+      View view("test_histogram", "description", AggregationType::kHistogram, default_config);
+    },
+    std::invalid_argument
+  );
 }

@@ -43,7 +43,7 @@ public:
     {
       AggregationConfigType config_type = aggregation_config_->GetType();
       bool valid = false;
-      
+
       switch (aggregation_type_)
       {
         case AggregationType::kHistogram:
@@ -59,7 +59,7 @@ public:
           valid = (config_type == AggregationConfigType::kDefault);
           break;
       }
-      
+
       if (!valid)
       {
         throw std::invalid_argument("AggregationType and AggregationConfig type mismatch");
