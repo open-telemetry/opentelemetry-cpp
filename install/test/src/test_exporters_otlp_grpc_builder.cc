@@ -13,10 +13,12 @@ TEST(ExportersOtlpGrpcBuilderInstall, OtlpGrpcSpanBuilder)
   ASSERT_TRUE(builder != nullptr);
 
   opentelemetry::sdk::configuration::OtlpGrpcSpanExporterConfiguration model;
-  model.endpoint    = "http://localhost:4317";
-  model.insecure    = false;
-  model.timeout     = 12;
-  model.compression = "none";
+  model.tls = std::make_unique<opentelemetry::sdk::configuration::GrpcTlsConfiguration>();
+
+  model.endpoint      = "http://localhost:4317";
+  model.tls->insecure = false;
+  model.timeout       = 12;
+  model.compression   = "none";
 
   auto exporter = builder->Build(&model);
   ASSERT_TRUE(exporter != nullptr);
@@ -28,10 +30,12 @@ TEST(ExportersOtlpGrpcBuilderInstall, OtlpGrpcPushMetricBuilder)
   ASSERT_TRUE(builder != nullptr);
 
   opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration model;
-  model.endpoint    = "http://localhost:4317";
-  model.insecure    = false;
-  model.timeout     = 12;
-  model.compression = "none";
+  model.tls = std::make_unique<opentelemetry::sdk::configuration::GrpcTlsConfiguration>();
+
+  model.endpoint      = "http://localhost:4317";
+  model.tls->insecure = false;
+  model.timeout       = 12;
+  model.compression   = "none";
   model.temporality_preference =
       opentelemetry::sdk::configuration::TemporalityPreference::cumulative;
 
@@ -45,10 +49,12 @@ TEST(ExportersOtlpGrpcBuilderInstall, OtlpGrpcLogRecordBuilder)
   ASSERT_TRUE(builder != nullptr);
 
   opentelemetry::sdk::configuration::OtlpGrpcLogRecordExporterConfiguration model;
-  model.endpoint    = "http://localhost:4317";
-  model.insecure    = false;
-  model.timeout     = 12;
-  model.compression = "none";
+  model.tls = std::make_unique<opentelemetry::sdk::configuration::GrpcTlsConfiguration>();
+
+  model.endpoint      = "http://localhost:4317";
+  model.tls->insecure = false;
+  model.timeout       = 12;
+  model.compression   = "none";
 
   auto exporter = builder->Build(&model);
   ASSERT_TRUE(exporter != nullptr);

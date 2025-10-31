@@ -32,6 +32,9 @@ Increment the:
 * [BUILD] Upgrade to opentelemetry-proto 1.8.0
   [#3730](https://github.com/open-telemetry/opentelemetry-cpp/pull/3730)
 
+* [CONFIGURATION] File configuration - tls
+  [#3726](https://github.com/open-telemetry/opentelemetry-cpp/pull/3726)
+
 New Features:
 
 * [CONFIGURATION] Implement declarative configuration (config.yaml)
