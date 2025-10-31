@@ -16,22 +16,19 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace semconv
 {
-namespace dns
+namespace openshift
 {
 
 /**
-  The list of IPv4 or IPv6 addresses resolved during DNS lookup.
+  The name of the cluster quota.
  */
-static constexpr const char *kDnsAnswers = "dns.answers";
+static constexpr const char *kOpenshiftClusterquotaName = "openshift.clusterquota.name";
 
 /**
-  The name being queried.
-  <p>
-  The name represents the queried domain name as it appears in the DNS query without any additional
-  normalization.
+  The UID of the cluster quota.
  */
-static constexpr const char *kDnsQuestionName = "dns.question.name";
+static constexpr const char *kOpenshiftClusterquotaUid = "openshift.clusterquota.uid";
 
-}  // namespace dns
+}  // namespace openshift
 }  // namespace semconv
 OPENTELEMETRY_END_NAMESPACE
