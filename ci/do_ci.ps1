@@ -401,6 +401,13 @@ switch ($action) {
       exit $exit
     }
 
+    $ALL_DLL_FILES = Get-ChildItem -Path "./*.dll" -Recurse
+    $ALL_DLL_DIRS = $(foreach ($dll_file in $ALL_DLL_FILES) {
+        $dll_file.Directory.FullName
+      }) | Sort-Object | Get-Unique
+    $env:PATH = ($ALL_DLL_DIRS -Join [IO.Path]::PathSeparator) + [IO.Path]::PathSeparator + $env:PATH
+    Write-Output "PATH=$env:PATH"
+
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -500,6 +507,13 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
+
+    $ALL_DLL_FILES = Get-ChildItem -Path "./*.dll" -Recurse
+    $ALL_DLL_DIRS = $(foreach ($dll_file in $ALL_DLL_FILES) {
+        $dll_file.Directory.FullName
+      }) | Sort-Object | Get-Unique
+    $env:PATH = ($ALL_DLL_DIRS -Join [IO.Path]::PathSeparator) + [IO.Path]::PathSeparator + $env:PATH
+    Write-Output "PATH=$env:PATH"
 
     ctest -C Debug
     $exit = $LASTEXITCODE
