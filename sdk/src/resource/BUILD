@@ -12,6 +12,7 @@ cc_library(
     deps = [
         "//api",
         "//sdk:headers",
+        "//sdk/src/common:attribute_validity",
         "//sdk/src/common:env_variables",
     ],
 )
