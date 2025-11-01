@@ -34,7 +34,7 @@ std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpGrpcPushMet
 {
   OtlpGrpcMetricExporterOptions options(nullptr);
 
-  auto *tls = model->tls.get();
+  const auto *tls = model->tls.get();
 
   options.endpoint = model->endpoint;
 

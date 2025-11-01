@@ -35,7 +35,7 @@ std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpHttpPushMet
 {
   OtlpHttpMetricExporterOptions options(nullptr);
 
-  auto *tls = model->tls.get();
+  const auto *tls = model->tls.get();
 
   options.url                = model->endpoint;
   options.content_type       = OtlpBuilderUtils::ConvertOtlpHttpEncoding(model->encoding);

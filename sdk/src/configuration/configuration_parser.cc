@@ -210,7 +210,6 @@ std::unique_ptr<HttpTlsConfiguration> ConfigurationParser::ParseHttpTlsConfigura
     const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<HttpTlsConfiguration>();
-  std::unique_ptr<DocumentNode> child;
 
   model->certificate_file        = node->GetString("certificate_file", "");
   model->client_key_file         = node->GetString("client_key_file", "");
@@ -223,7 +222,6 @@ std::unique_ptr<GrpcTlsConfiguration> ConfigurationParser::ParseGrpcTlsConfigura
     const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<GrpcTlsConfiguration>();
-  std::unique_ptr<DocumentNode> child;
 
   model->certificate_file        = node->GetString("certificate_file", "");
   model->client_key_file         = node->GetString("client_key_file", "");
