@@ -37,6 +37,10 @@ public:
 class HistogramAggregationConfig : public AggregationConfig
 {
 public:
+  HistogramAggregationConfig(size_t cardinality_limit = kAggregationCardinalityLimit)
+      : AggregationConfig(cardinality_limit)
+  {}
+
   std::vector<double> boundaries_;
   bool record_min_max_ = true;
 };
@@ -44,6 +48,11 @@ public:
 class Base2ExponentialHistogramAggregationConfig : public AggregationConfig
 {
 public:
+  Base2ExponentialHistogramAggregationConfig(
+      size_t cardinality_limit = kAggregationCardinalityLimit)
+      : AggregationConfig(cardinality_limit)
+  {}
+
   size_t max_buckets_  = 160;
   int32_t max_scale_   = 20;
   bool record_min_max_ = true;

@@ -1,0 +1,9 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+$ example_yaml --test --yaml shelltests/prometheus_translation_no_utf8.yaml
+>
+MODEL PARSED
+[WARNING] [Prometheus Exporter] NoUTF8EscapingWithSuffixes not supported
+SDK CREATED
+>= 0

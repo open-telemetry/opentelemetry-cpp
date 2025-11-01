@@ -16,22 +16,20 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace semconv
 {
-namespace dns
+namespace nfs
 {
 
 /**
-  The list of IPv4 or IPv6 addresses resolved during DNS lookup.
+  NFSv4+ operation name.
  */
-static constexpr const char *kDnsAnswers = "dns.answers";
+static constexpr const char *kNfsOperationName = "nfs.operation.name";
 
 /**
-  The name being queried.
-  <p>
-  The name represents the queried domain name as it appears in the DNS query without any additional
-  normalization.
+  Linux: one of "hit" (NFSD_STATS_RC_HITS), "miss" (NFSD_STATS_RC_MISSES), or "nocache"
+  (NFSD_STATS_RC_NOCACHE -- uncacheable)
  */
-static constexpr const char *kDnsQuestionName = "dns.question.name";
+static constexpr const char *kNfsServerRepcacheStatus = "nfs.server.repcache.status";
 
-}  // namespace dns
+}  // namespace nfs
 }  // namespace semconv
 OPENTELEMETRY_END_NAMESPACE

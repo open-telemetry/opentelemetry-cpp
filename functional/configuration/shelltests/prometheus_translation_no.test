@@ -1,0 +1,10 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+$ example_yaml --test --yaml shelltests/prometheus_translation_no.yaml
+>
+MODEL PARSED
+[WARNING] [Prometheus Exporter] NoTranslation not supported
+[WARNING] [Prometheus Exporter] with_resource_constant_labels not supported
+SDK CREATED
+>= 0
