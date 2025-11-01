@@ -32,6 +32,9 @@ Increment the:
 * [BUILD] Upgrade to opentelemetry-proto 1.8.0
   [#3730](https://github.com/open-telemetry/opentelemetry-cpp/pull/3730)
 
+* [CONFIGURATION] File configuration - console metric exporter
+  [#3734](https://github.com/open-telemetry/opentelemetry-cpp/pull/3734)
+
 New Features:
 
 * [CONFIGURATION] Implement declarative configuration (config.yaml)

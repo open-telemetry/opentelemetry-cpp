@@ -601,11 +601,17 @@ ConfigurationParser::ParseOtlpFilePushMetricExporterConfiguration(
 
 std::unique_ptr<ConsolePushMetricExporterConfiguration>
 ConfigurationParser::ParseConsolePushMetricExporterConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */) const
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<ConsolePushMetricExporterConfiguration>();
 
-  // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/242
+  std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
+  model->temporality_preference      = ParseTemporalityPreference(node, temporality_preference);
+
+  std::string default_histogram_aggregation =
+      node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
+  model->default_histogram_aggregation =
+      ParseDefaultHistogramAggregation(node, default_histogram_aggregation);
 
   return model;
 }

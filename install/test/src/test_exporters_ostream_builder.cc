@@ -19,7 +19,14 @@ TEST(ExportersOstreamBuilderInstall, ConsolePushMetricBuilder)
 {
   auto builder = std::make_unique<opentelemetry::exporter::metrics::ConsolePushMetricBuilder>();
   ASSERT_TRUE(builder != nullptr);
-  auto exporter = builder->Build(nullptr);
+
+  opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration model;
+  model.temporality_preference =
+      opentelemetry::sdk::configuration::TemporalityPreference::cumulative;
+  model.default_histogram_aggregation =
+      opentelemetry::sdk::configuration::DefaultHistogramAggregation::explicit_bucket_histogram;
+
+  auto exporter = builder->Build(&model);
   ASSERT_TRUE(exporter != nullptr);
 }
 
