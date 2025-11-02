@@ -35,6 +35,9 @@ Increment the:
 * [CONFIGURATION] File configuration - tls
   [#3726](https://github.com/open-telemetry/opentelemetry-cpp/pull/3726)
 
+* [CONFIGURATION] File configuration - console metric exporter
+  [#3734](https://github.com/open-telemetry/opentelemetry-cpp/pull/3734)
+
 New Features:
 
 * [CONFIGURATION] Implement declarative configuration (config.yaml)
