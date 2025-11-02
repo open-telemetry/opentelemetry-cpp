@@ -11,7 +11,7 @@
 # The file format version.
 # The yaml format is documented at
 # https://github.com/open-telemetry/opentelemetry-configuration/tree/main/schema
-file_format: "1.0-rc.1"
+file_format: "1.0-rc.2"
 # Configure if the SDK is disabled or not.
 # If omitted or null, false is used.
 disabled: false
@@ -53,23 +53,29 @@ logger_provider:
         exporter:
           # Configure exporter to be OTLP with HTTP transport.
           otlp_http:
+            # Configure endpoint, including the signal specific path.
+            # If omitted or null, the http://localhost:4318/v1/{signal} (where signal is 'traces', 'logs', or 'metrics') is used.
             endpoint: http://localhost:4318/v1/logs
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            # Configure TLS settings for the exporter.
+            tls:
+              # Configure certificate used to verify a server's TLS credentials.
+              # Absolute path to certificate file in PEM format.
+              # If omitted or null, system default certificate verification is used for secure connections.
+              certificate_file: /app/cert.pem
+              # Configure mTLS private client key.
+              # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
+              # If omitted or null, mTLS is not used.
+              client_key_file: /app/cert.pem
+              # Configure mTLS client certificate.
+              # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
+              # If omitted or null, mTLS is not used.
+              client_certificate_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
-              - name: api-key
+              - # The name of the pair.
+                name: api-key
+                # The value of the pair.
                 value: "1234"
             # Configure headers. Entries have lower priority than entries from .headers.
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
@@ -96,22 +102,30 @@ logger_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            # Configure TLS settings for the exporter.
+            tls:
+              # Configure certificate used to verify a server's TLS credentials.
+              # Absolute path to certificate file in PEM format.
+              # If omitted or null, system default certificate verification is used for secure connections.
+              certificate_file: /app/cert.pem
+              # Configure mTLS private client key.
+              # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
+              # If omitted or null, mTLS is not used.
+              client_key_file: /app/cert.pem
+              # Configure mTLS client certificate.
+              # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
+              # If omitted or null, mTLS is not used.
+              client_certificate_file: /app/cert.pem
+              # Configure client transport security for the exporter's connection.
+              # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+              # If omitted or null, false is used.
+              insecure: false
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
-              - name: api-key
+              - # The name of the pair.
+                name: api-key
+                # The value of the pair.
                 value: "1234"
             # Configure headers. Entries have lower priority than entries from .headers.
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
@@ -125,10 +139,6 @@ logger_provider:
             # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection.
-            # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-            # If omitted or null, false is used.
-            insecure: false
     - # Configure a batch log record processor.
       batch:
         # Configure exporter.
@@ -203,31 +213,34 @@ meter_provider:
             # Configure port.
             # If omitted or null, 9464 is used.
             port: 9464
-            # Configure Prometheus Exporter to produce metrics without a unit suffix or UNIT metadata.
-            # If omitted or null, false is used.
-            without_units: false
-            # Configure Prometheus Exporter to produce metrics without a type suffix.
-            # If omitted or null, false is used.
-            without_type_suffix: false
             # Configure Prometheus Exporter to produce metrics without a scope info metric.
             # If omitted or null, false is used.
             without_scope_info: false
-            # Configure Prometheus Exporter to add resource attributes as metrics attributes.
+            # Configure Prometheus Exporter to add resource attributes as metrics attributes, where the resource attribute keys match the patterns.
             with_resource_constant_labels:
-              # Configure resource attributes to be included.
-              # Attribute keys from resources are evaluated to match as follows:
-              #  * If the value of the attribute key exactly matches.
-              #  * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
-              # If omitted, no resource attributes are included.
+              # Configure list of value patterns to include.
+              # Values are evaluated to match as follows:
+              #  * If the value exactly matches.
+              #  * If the value matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+              # If omitted, all values are included.
               included:
                 - "service*"
-              # Configure resource attributes to be excluded. Applies after .with_resource_constant_labels.included (i.e. excluded has higher priority than included).
-              # Attribute keys from resources are evaluated to match as follows:
-              #  * If the value of the attribute key exactly matches.
-              #  * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
-              # If omitted, .included resource attributes are included.
+              # Configure list of value patterns to exclude. Applies after .included (i.e. excluded has higher priority than included).
+              # Values are evaluated to match as follows:
+              #  * If the value exactly matches.
+              #  * If the value matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+              # If omitted, .included attributes are included.
               excluded:
                 - "service.attr1"
+            # Configure how Prometheus metrics are exposed. Values include:
+            #
+            #  * UnderscoreEscapingWithSuffixes, the default. This fully escapes metric names for classic Prometheus metric name compatibility, and includes appending type and unit suffixes.
+            #  * UnderscoreEscapingWithoutSuffixes, metric names will continue to escape special characters to _, but suffixes won't be attached.
+            #  * NoUTF8EscapingWithSuffixes will disable changing special characters to _. Special suffixes like units and _total for counters will be attached.
+            #  * NoTranslation. This strategy bypasses all metric and label name translation, passing them through unaltered.
+            #
+            # If omitted or null, UnderscoreEscapingWithSuffixes is used.
+            translation_strategy: UnderscoreEscapingWithSuffixes
         # Configure metric producers.
         producers:
           - # Configure metric producer to be opencensus.
@@ -273,25 +286,29 @@ meter_provider:
         exporter:
           # Configure exporter to be OTLP with HTTP transport.
           otlp_http:
-            # Configure endpoint, including the metric specific path.
-            # If omitted or null, http://localhost:4318/v1/metrics is used.
+            # Configure endpoint, including the signal specific path.
+            # If omitted or null, the http://localhost:4318/v1/{signal} (where signal is 'traces', 'logs', or 'metrics') is used.
             endpoint: http://localhost:4318/v1/metrics
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            # Configure TLS settings for the exporter.
+            tls:
+              # Configure certificate used to verify a server's TLS credentials.
+              # Absolute path to certificate file in PEM format.
+              # If omitted or null, system default certificate verification is used for secure connections.
+              certificate_file: /app/cert.pem
+              # Configure mTLS private client key.
+              # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
+              # If omitted or null, mTLS is not used.
+              client_key_file: /app/cert.pem
+              # Configure mTLS client certificate.
+              # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
+              # If omitted or null, mTLS is not used.
+              client_certificate_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
-              - name: api-key
+              - # The name of the pair.
+                name: api-key
+                # The value of the pair.
                 value: "1234"
             # Configure headers. Entries have lower priority than entries from .headers.
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
@@ -319,8 +336,8 @@ meter_provider:
             default_histogram_aggregation: base2_exponential_bucket_histogram
         # Configure metric producers.
         producers:
-          - # Configure metric producer to be prometheus.
-            prometheus:
+          - # Configure metric producer to be opencensus.
+            opencensus:
         # Configure cardinality limits.
         cardinality_limits:
           # Configure default cardinality limit for all instrument types.
@@ -357,22 +374,30 @@ meter_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            # Configure TLS settings for the exporter.
+            tls:
+              # Configure certificate used to verify a server's TLS credentials.
+              # Absolute path to certificate file in PEM format.
+              # If omitted or null, system default certificate verification is used for secure connections.
+              certificate_file: /app/cert.pem
+              # Configure mTLS private client key.
+              # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
+              # If omitted or null, mTLS is not used.
+              client_key_file: /app/cert.pem
+              # Configure mTLS client certificate.
+              # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
+              # If omitted or null, mTLS is not used.
+              client_certificate_file: /app/cert.pem
+              # Configure client transport security for the exporter's connection.
+              # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+              # If omitted or null, false is used.
+              insecure: false
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
-              - name: api-key
+              - # The name of the pair.
+                name: api-key
+                # The value of the pair.
                 value: "1234"
             # Configure headers. Entries have lower priority than entries from .headers.
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
@@ -386,10 +411,6 @@ meter_provider:
             # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection.
-            # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-            # If omitted or null, false is used.
-            insecure: false
             # Configure temporality preference.
             # Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
             # If omitted or null, cumulative is used.
@@ -409,10 +430,12 @@ meter_provider:
             # Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
             # If omitted or null, stdout is used.
             output_stream: file:///var/log/metrics.jsonl
-            # Configure temporality preference. Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+            # Configure temporality preference.
+            # Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
             # If omitted or null, cumulative is used.
             temporality_preference: delta
-            # Configure default histogram aggregation. Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+            # Configure default histogram aggregation.
+            # Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
             # If omitted or null, explicit_bucket_histogram is used.
             default_histogram_aggregation: base2_exponential_bucket_histogram
     - # Configure a periodic metric reader.
@@ -426,10 +449,12 @@ meter_provider:
             # Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
             # If omitted or null, stdout is used.
             output_stream: stdout
-            # Configure temporality preference. Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+            # Configure temporality preference.
+            # Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
             # If omitted or null, cumulative is used.
             temporality_preference: delta
-            # Configure default histogram aggregation. Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+            # Configure default histogram aggregation.
+            # Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
             # If omitted or null, explicit_bucket_histogram is used.
             default_histogram_aggregation: base2_exponential_bucket_histogram
     - # Configure a periodic metric reader.
@@ -505,13 +530,19 @@ meter_provider:
         aggregation_cardinality_limit: 2000
         # Configure attribute keys retained in the resulting stream(s).
         attribute_keys:
-          # Configure list of attribute keys to include in the resulting stream(s). All other attributes are dropped.
-          # If omitted, all attributes are included.
+          # Configure list of value patterns to include.
+          # Values are evaluated to match as follows:
+          #  * If the value exactly matches.
+          #  * If the value matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+          # If omitted, all values are included.
           included:
             - key1
             - key2
-          # Configure list of attribute keys to exclude from the resulting stream(s). Applies after .attribute_keys.included (i.e. excluded has higher priority than included).
-          # If omitted, .attribute_keys.included are included.
+          # Configure list of value patterns to exclude. Applies after .included (i.e. excluded has higher priority than included).
+          # Values are evaluated to match as follows:
+          #  * If the value exactly matches.
+          #  * If the value matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+          # If omitted, .included attributes are included.
           excluded:
             - key3
   # Configure the exemplar filter.
@@ -592,25 +623,29 @@ tracer_provider:
         exporter:
           # Configure exporter to be OTLP with HTTP transport.
           otlp_http:
-            # Configure endpoint, including the trace specific path.
-            # If omitted or null, http://localhost:4318/v1/traces is used.
+            # Configure endpoint, including the signal specific path.
+            # If omitted or null, the http://localhost:4318/v1/{signal} (where signal is 'traces', 'logs', or 'metrics') is used.
             endpoint: http://localhost:4318/v1/traces
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            # Configure TLS settings for the exporter.
+            tls:
+              # Configure certificate used to verify a server's TLS credentials.
+              # Absolute path to certificate file in PEM format.
+              # If omitted or null, system default certificate verification is used for secure connections.
+              certificate_file: /app/cert.pem
+              # Configure mTLS private client key.
+              # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
+              # If omitted or null, mTLS is not used.
+              client_key_file: /app/cert.pem
+              # Configure mTLS client certificate.
+              # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
+              # If omitted or null, mTLS is not used.
+              client_certificate_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
-              - name: api-key
+              - # The name of the pair.
+                name: api-key
+                # The value of the pair.
                 value: "1234"
             # Configure headers. Entries have lower priority than entries from .headers.
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
@@ -637,22 +672,30 @@ tracer_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            # Configure TLS settings for the exporter.
+            tls:
+              # Configure certificate used to verify a server's TLS credentials.
+              # Absolute path to certificate file in PEM format.
+              # If omitted or null, system default certificate verification is used for secure connections.
+              certificate_file: /app/cert.pem
+              # Configure mTLS private client key.
+              # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
+              # If omitted or null, mTLS is not used.
+              client_key_file: /app/cert.pem
+              # Configure mTLS client certificate.
+              # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
+              # If omitted or null, mTLS is not used.
+              client_certificate_file: /app/cert.pem
+              # Configure client transport security for the exporter's connection.
+              # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+              # If omitted or null, false is used.
+              insecure: false
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
-              - name: api-key
+              - # The name of the pair.
+                name: api-key
+                # The value of the pair.
                 value: "1234"
             # Configure headers. Entries have lower priority than entries from .headers.
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
@@ -666,10 +709,6 @@ tracer_provider:
             # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection.
-            # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-            # If omitted or null, false is used.
-            insecure: false
     - # Configure a batch span processor.
       batch:
         # Configure exporter.
@@ -792,34 +831,83 @@ tracer_provider:
 # If omitted, the default resource is used.
 resource:
   # Configure resource attributes. Entries have higher priority than entries from .resource.attributes_list.
-  # Entries must contain .name and .value, and may optionally include .type. If an entry's .type omitted or null, string is used.
-  # The .value's type must match the .type. Values for .type include: string, bool, int, double, string_array, bool_array, int_array, double_array.
   attributes:
-    - name: service.name
+    - # The attribute name.
+      name: service.name
+      # The attribute value.
+      # The type of value must match .type.
       value: unknown_service
-    - name: string_key
+    - # The attribute name.
+      name: string_key
+      # The attribute value.
+      # The type of value must match .type.
       value: value
+      # The attribute type.
+      # Values include: string, bool, int, double, string_array, bool_array, int_array, double_array.
+      # If omitted or null, string is used.
       type: string
-    - name: bool_key
+    - # The attribute name.
+      name: bool_key
+      # The attribute value.
+      # The type of value must match .type.
       value: true
+      # The attribute type.
+      # Values include: string, bool, int, double, string_array, bool_array, int_array, double_array.
+      # If omitted or null, string is used.
       type: bool
-    - name: int_key
+    - # The attribute name.
+      name: int_key
+      # The attribute value.
+      # The type of value must match .type.
       value: 1
+      # The attribute type.
+      # Values include: string, bool, int, double, string_array, bool_array, int_array, double_array.
+      # If omitted or null, string is used.
       type: int
-    - name: double_key
+    - # The attribute name.
+      name: double_key
+      # The attribute value.
+      # The type of value must match .type.
       value: 1.1
+      # The attribute type.
+      # Values include: string, bool, int, double, string_array, bool_array, int_array, double_array.
+      # If omitted or null, string is used.
       type: double
-    - name: string_array_key
+    - # The attribute name.
+      name: string_array_key
+      # The attribute value.
+      # The type of value must match .type.
       value: [ "value1", "value2" ]
+      # The attribute type.
+      # Values include: string, bool, int, double, string_array, bool_array, int_array, double_array.
+      # If omitted or null, string is used.
       type: string_array
-    - name: bool_array_key
+    - # The attribute name.
+      name: bool_array_key
+      # The attribute value.
+      # The type of value must match .type.
       value: [ true, false ]
+      # The attribute type.
+      # Values include: string, bool, int, double, string_array, bool_array, int_array, double_array.
+      # If omitted or null, string is used.
       type: bool_array
-    - name: int_array_key
+    - # The attribute name.
+      name: int_array_key
+      # The attribute value.
+      # The type of value must match .type.
       value: [ 1, 2 ]
+      # The attribute type.
+      # Values include: string, bool, int, double, string_array, bool_array, int_array, double_array.
+      # If omitted or null, string is used.
       type: int_array
-    - name: double_array_key
+    - # The attribute name.
+      name: double_array_key
+      # The attribute value.
+      # The type of value must match .type.
       value: [ 1.1, 2.2 ]
+      # The attribute type.
+      # Values include: string, bool, int, double, string_array, bool_array, int_array, double_array.
+      # If omitted or null, string is used.
       type: double_array
   # Configure resource attributes. Entries have lower priority than entries from .resource.attributes.
   # The value is a list of comma separated key-value pairs matching the format of OTEL_RESOURCE_ATTRIBUTES. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.
@@ -831,17 +919,17 @@ resource:
   detection/development:
     # Configure attributes provided by resource detectors.
     attributes:
-      # Configure list of attribute key patterns to include from resource detectors.
-      # Attribute keys from resource detectors are evaluated to match as follows:
-      #  * If the value of the attribute key exactly matches.
-      #  * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
-      # If omitted, all attributes are included.
+      # Configure list of value patterns to include.
+      # Values are evaluated to match as follows:
+      #  * If the value exactly matches.
+      #  * If the value matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+      # If omitted, all values are included.
       included:
         - process.*
-      # Configure list of attribute key patterns to exclude from resource detectors. Applies after .resource.detectors.attributes.included (i.e. excluded has higher priority than included).
-      # Attribute keys from resource detectors are evaluated to match as follows:
-      #  * If the value of the attribute key exactly matches.
-      #  * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+      # Configure list of value patterns to exclude. Applies after .included (i.e. excluded has higher priority than included).
+      # Values are evaluated to match as follows:
+      #  * If the value exactly matches.
+      #  * If the value matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
       # If omitted, .included attributes are included.
       excluded:
         - process.command_args
@@ -870,12 +958,15 @@ instrumentation/development:
     # See peer semantic conventions: https://opentelemetry.io/docs/specs/semconv/attributes-registry/peer/
     peer:
       # Configure the service mapping for instrumentations following peer.service semantic conventions.
-      # Each entry is a key value pair where "peer" defines the IP address and "service" defines the corresponding logical name of the service.
       # See peer.service semantic conventions: https://opentelemetry.io/docs/specs/semconv/general/attributes/#general-remote-service-attributes
       service_mapping:
-        - peer: 1.2.3.4
+        - # The IP address to map.
+          peer: 1.2.3.4
+          # The logical name corresponding to the IP address of .peer.
           service: FooService
-        - peer: 2.3.4.5
+        - # The IP address to map.
+          peer: 2.3.4.5
+          # The logical name corresponding to the IP address of .peer.
           service: BarService
     # Configure instrumentations following the http semantic conventions.
     # See http semantic conventions: https://opentelemetry.io/docs/specs/semconv/http/
@@ -886,7 +977,7 @@ instrumentation/development:
         request_captured_headers:
           - Content-Type
           - Accept
-        # Configure headers to capture for outbound http responses.
+        # Configure headers to capture for inbound http responses.
         response_captured_headers:
           - Content-Type
           - Content-Encoding
@@ -902,56 +993,55 @@ instrumentation/development:
           - Content-Encoding
   # Configure C++ language-specific instrumentation libraries.
   cpp:
-    # Configure the instrumentation corresponding to key "example".
     example:
       property: "value"
   # Configure .NET language-specific instrumentation libraries.
+  # Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
   dotnet:
-    # Configure the instrumentation corresponding to key "example".
     example:
       property: "value"
   # Configure Erlang language-specific instrumentation libraries.
+  # Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
   erlang:
-    # Configure the instrumentation corresponding to key "example".
     example:
       property: "value"
   # Configure Go language-specific instrumentation libraries.
+  # Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
   go:
-    # Configure the instrumentation corresponding to key "example".
     example:
       property: "value"
   # Configure Java language-specific instrumentation libraries.
+  # Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
   java:
-    # Configure the instrumentation corresponding to key "example".
     example:
       property: "value"
   # Configure JavaScript language-specific instrumentation libraries.
+  # Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
   js:
-    # Configure the instrumentation corresponding to key "example".
     example:
       property: "value"
   # Configure PHP language-specific instrumentation libraries.
+  # Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
   php:
-    # Configure the instrumentation corresponding to key "example".
     example:
       property: "value"
   # Configure Python language-specific instrumentation libraries.
+  # Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
   python:
-    # Configure the instrumentation corresponding to key "example".
     example:
       property: "value"
   # Configure Ruby language-specific instrumentation libraries.
+  # Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
   ruby:
-    # Configure the instrumentation corresponding to key "example".
     example:
       property: "value"
   # Configure Rust language-specific instrumentation libraries.
+  # Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
   rust:
-    # Configure the instrumentation corresponding to key "example".
     example:
       property: "value"
   # Configure Swift language-specific instrumentation libraries.
+  # Each entry's key identifies a particular instrumentation library. The corresponding value configures it.
   swift:
-    # Configure the instrumentation corresponding to key "example".
     example:
       property: "value"
