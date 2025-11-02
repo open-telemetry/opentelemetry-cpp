@@ -226,8 +226,8 @@ ConfigurationParser::ParseOtlpHttpLogRecordExporterConfiguration(
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
 
-  std::string encoding = node->GetString("encoding", "protobuf");
-  model->encoding      = ParseOtlpHttpEncoding(node, encoding);
+  const std::string encoding = node->GetString("encoding", "protobuf");
+  model->encoding            = ParseOtlpHttpEncoding(node, encoding);
 
   return model;
 }
@@ -530,16 +530,17 @@ ConfigurationParser::ParseOtlpHttpPushMetricExporterConfiguration(
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
 
-  std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
-  model->temporality_preference      = ParseTemporalityPreference(node, temporality_preference);
+  const std::string temporality_preference =
+      node->GetString("temporality_preference", "cumulative");
+  model->temporality_preference = ParseTemporalityPreference(node, temporality_preference);
 
-  std::string default_histogram_aggregation =
+  const std::string default_histogram_aggregation =
       node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(node, default_histogram_aggregation);
 
-  std::string encoding = node->GetString("encoding", "protobuf");
-  model->encoding      = ParseOtlpHttpEncoding(node, encoding);
+  const std::string encoding = node->GetString("encoding", "protobuf");
+  model->encoding            = ParseOtlpHttpEncoding(node, encoding);
 
   return model;
 }
@@ -566,10 +567,11 @@ ConfigurationParser::ParseOtlpGrpcPushMetricExporterConfiguration(
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
 
-  std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
-  model->temporality_preference      = ParseTemporalityPreference(node, temporality_preference);
+  const std::string temporality_preference =
+      node->GetString("temporality_preference", "cumulative");
+  model->temporality_preference = ParseTemporalityPreference(node, temporality_preference);
 
-  std::string default_histogram_aggregation =
+  const std::string default_histogram_aggregation =
       node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(node, default_histogram_aggregation);
@@ -588,10 +590,11 @@ ConfigurationParser::ParseOtlpFilePushMetricExporterConfiguration(
 
   model->output_stream = node->GetString("output_stream", "");
 
-  std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
-  model->temporality_preference      = ParseTemporalityPreference(node, temporality_preference);
+  const std::string temporality_preference =
+      node->GetString("temporality_preference", "cumulative");
+  model->temporality_preference = ParseTemporalityPreference(node, temporality_preference);
 
-  std::string default_histogram_aggregation =
+  const std::string default_histogram_aggregation =
       node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(node, default_histogram_aggregation);
@@ -605,10 +608,11 @@ ConfigurationParser::ParseConsolePushMetricExporterConfiguration(
 {
   auto model = std::make_unique<ConsolePushMetricExporterConfiguration>();
 
-  std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
-  model->temporality_preference      = ParseTemporalityPreference(node, temporality_preference);
+  const std::string temporality_preference =
+      node->GetString("temporality_preference", "cumulative");
+  model->temporality_preference = ParseTemporalityPreference(node, temporality_preference);
 
-  std::string default_histogram_aggregation =
+  const std::string default_histogram_aggregation =
       node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(node, default_histogram_aggregation);
@@ -1446,8 +1450,8 @@ ConfigurationParser::ParseOtlpHttpSpanExporterConfiguration(
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
 
-  std::string encoding = node->GetString("encoding", "protobuf");
-  model->encoding      = ParseOtlpHttpEncoding(node, encoding);
+  const std::string encoding = node->GetString("encoding", "protobuf");
+  model->encoding            = ParseOtlpHttpEncoding(node, encoding);
 
   return model;
 }
