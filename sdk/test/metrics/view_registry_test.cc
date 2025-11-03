@@ -114,9 +114,14 @@ TEST(View, InvalidHistogramConfigWithSumType)
   auto histogram_config         = std::make_shared<HistogramAggregationConfig>();
   histogram_config->boundaries_ = {0.0, 10.0, 100.0};
 
+#if defined(__cpp_exceptions)
   EXPECT_THROW(
       { View view("test_sum", "description", AggregationType::kSum, histogram_config); },
       std::invalid_argument);
+#else
+  EXPECT_DEATH(
+      { View view("test_sum", "description", AggregationType::kSum, histogram_config); }, "");
+#endif
 }
 
 TEST(View, InvalidHistogramConfigWithDefaultType)
@@ -124,9 +129,15 @@ TEST(View, InvalidHistogramConfigWithDefaultType)
   // Invalid: Default aggregation type with HistogramAggregationConfig
   auto histogram_config = std::make_shared<HistogramAggregationConfig>();
 
+#if defined(__cpp_exceptions)
   EXPECT_THROW(
       { View view("test_default", "description", AggregationType::kDefault, histogram_config); },
       std::invalid_argument);
+#else
+  EXPECT_DEATH(
+      { View view("test_default", "description", AggregationType::kDefault, histogram_config); },
+      "");
+#endif
 }
 
 TEST(View, ValidNullConfig)
@@ -145,7 +156,13 @@ TEST(View, InvalidDefaultConfigWithHistogramType)
   // HistogramAggregationConfig)
   auto default_config = std::make_shared<AggregationConfig>();
 
+#if defined(__cpp_exceptions)
   EXPECT_THROW(
       { View view("test_histogram", "description", AggregationType::kHistogram, default_config); },
       std::invalid_argument);
+#else
+  EXPECT_DEATH(
+      { View view("test_histogram", "description", AggregationType::kHistogram, default_config); },
+      "");
+#endif
 }
