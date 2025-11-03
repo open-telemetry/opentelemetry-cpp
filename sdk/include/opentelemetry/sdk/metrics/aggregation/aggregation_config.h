@@ -22,7 +22,7 @@ public:
       : cardinality_limit_(cardinality_limit)
   {}
 
-  virtual AggregationType GetType() const { return AggregationType::kDefault; }
+  virtual AggregationType GetType() const noexcept { return AggregationType::kDefault; }
 
   static const AggregationConfig *GetOrDefault(const AggregationConfig *config)
   {
@@ -45,7 +45,7 @@ public:
       : AggregationConfig(cardinality_limit)
   {}
 
-  AggregationType GetType() const override { return AggregationType::kHistogram; }
+  AggregationType GetType() const noexcept override { return AggregationType::kHistogram; }
 
   std::vector<double> boundaries_;
   bool record_min_max_ = true;
@@ -59,7 +59,10 @@ public:
       : AggregationConfig(cardinality_limit)
   {}
 
-  AggregationType GetType() const override { return AggregationType::kBase2ExponentialHistogram; }
+  AggregationType GetType() const noexcept override
+  {
+    return AggregationType::kBase2ExponentialHistogram;
+  }
 
   size_t max_buckets_  = 160;
   int32_t max_scale_   = 20;
