@@ -115,6 +115,12 @@ public:
   std::unique_ptr<AttributeLimitsConfiguration> ParseAttributeLimitsConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
 
+  std::unique_ptr<HttpTlsConfiguration> ParseHttpTlsConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  std::unique_ptr<GrpcTlsConfiguration> ParseGrpcTlsConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
   std::unique_ptr<OtlpHttpLogRecordExporterConfiguration>
   ParseOtlpHttpLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> &node) const;
 
