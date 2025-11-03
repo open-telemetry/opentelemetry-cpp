@@ -65,7 +65,6 @@ public:
 #if defined(__cpp_exceptions)
         throw std::invalid_argument("AggregationType and AggregationConfig type mismatch");
 #else
-        std::cerr << "AggregationType and AggregationConfig type mismatch" << std::endl;
         std::abort();
 #endif
       }
