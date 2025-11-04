@@ -103,9 +103,13 @@ TEST(View, ValidHistogramConfigWithHistogramType)
   auto histogram_config         = std::make_shared<HistogramAggregationConfig>();
   histogram_config->boundaries_ = {0.0, 10.0, 100.0};
 
+#if defined(__cpp_exceptions)
   EXPECT_NO_THROW({
     View view("test_histogram", "description", AggregationType::kHistogram, histogram_config);
   });
+#else
+  View view("test_histogram", "description", AggregationType::kHistogram, histogram_config);
+#endif
 }
 
 TEST(View, InvalidHistogramConfigWithSumType)
@@ -143,11 +147,16 @@ TEST(View, InvalidHistogramConfigWithDefaultType)
 TEST(View, ValidNullConfig)
 {
   // Valid: Null config should work with any aggregation type
+#if defined(__cpp_exceptions)
   EXPECT_NO_THROW(
       { View view("test_null_config", "description", AggregationType::kHistogram, nullptr); });
 
   EXPECT_NO_THROW(
       { View view("test_null_config2", "description", AggregationType::kSum, nullptr); });
+#else
+  View view("test_null_config", "description", AggregationType::kHistogram, nullptr);
+  View view2("test_null_config2", "description", AggregationType::kSum, nullptr);
+#endif
 }
 
 TEST(View, InvalidDefaultConfigWithHistogramType)
