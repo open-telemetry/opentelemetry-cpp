@@ -76,20 +76,6 @@ Overlay triplets specific to various products must be maintained by product
 teams. Product teams may optionally decide to integrate their triplets in the
 mainline OpenTelemetry C++ SDK repo as-needed.
 
-## Using Feature Packages
-
-To install opentelemetry built with standard library API surface classes:
-
-```console
-vcpkg install opentelemetry[stdlib]
-```
-
-To install opentelemetry built with Abseil API surface classes:
-
-```console
-vcpkg install opentelemetry[abseil]
-```
-
 ## Build with vcpkg dependencies
 
 `CMakeLists.txt` in top-level directory lists the following package
@@ -102,7 +88,7 @@ dependencies:
   C++14 or C++17 compiler.
 - `nlohmann-json` - required when building with zPages module.
 - `prometheus-cpp` - required for Prometheus exporter.
-- `gRPC` and `Protobuf` - required for OTLP exporter
+- `gRPC` and `Protobuf` - required for OTLP/gRPC exporter.
 
 It is possible to adjust the build system to use either vcpkg-installed
 dependencies or OS-provided dependencies, e.g. `brew` or `deb` packages.
