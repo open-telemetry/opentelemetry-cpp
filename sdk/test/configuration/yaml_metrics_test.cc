@@ -11,7 +11,9 @@
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
+#include "opentelemetry/sdk/configuration/http_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
 #include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
@@ -25,6 +27,7 @@
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/string_array_configuration.h"
 #include "opentelemetry/sdk/configuration/temporality_preference.h"
+#include "opentelemetry/sdk/configuration/translation_strategy.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
@@ -187,9 +190,7 @@ meter_provider:
   auto *otlp_http = reinterpret_cast<
       opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(otlp_http->endpoint, "somewhere");
-  ASSERT_EQ(otlp_http->certificate_file, "");
-  ASSERT_EQ(otlp_http->client_key_file, "");
-  ASSERT_EQ(otlp_http->client_certificate_file, "");
+  ASSERT_EQ(otlp_http->tls, nullptr);
   ASSERT_EQ(otlp_http->headers, nullptr);
   ASSERT_EQ(otlp_http->headers_list, "");
   ASSERT_EQ(otlp_http->compression, "");
@@ -212,9 +213,10 @@ meter_provider:
         exporter:
           otlp_http:
             endpoint: "somewhere"
-            certificate_file: "certificate_file"
-            client_key_file: "client_key_file"
-            client_certificate_file: "client_certificate_file"
+            tls:
+              certificate_file: "certificate_file"
+              client_key_file: "client_key_file"
+              client_certificate_file: "client_certificate_file"
             headers:
               - name: foo
                 value: "123"
@@ -243,9 +245,10 @@ meter_provider:
   auto *otlp_http = reinterpret_cast<
       opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(otlp_http->endpoint, "somewhere");
-  ASSERT_EQ(otlp_http->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_http->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_http->client_certificate_file, "client_certificate_file");
+  ASSERT_NE(otlp_http->tls, nullptr);
+  ASSERT_EQ(otlp_http->tls->certificate_file, "certificate_file");
+  ASSERT_EQ(otlp_http->tls->client_key_file, "client_key_file");
+  ASSERT_EQ(otlp_http->tls->client_certificate_file, "client_certificate_file");
   ASSERT_NE(otlp_http->headers, nullptr);
   ASSERT_EQ(otlp_http->headers->kv_map.size(), 2);
   ASSERT_EQ(otlp_http->headers->kv_map["foo"], "123");
@@ -288,9 +291,7 @@ meter_provider:
   auto *otlp_grpc = reinterpret_cast<
       opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(otlp_grpc->endpoint, "somewhere");
-  ASSERT_EQ(otlp_grpc->certificate_file, "");
-  ASSERT_EQ(otlp_grpc->client_key_file, "");
-  ASSERT_EQ(otlp_grpc->client_certificate_file, "");
+  ASSERT_EQ(otlp_grpc->tls, nullptr);
   ASSERT_EQ(otlp_grpc->headers, nullptr);
   ASSERT_EQ(otlp_grpc->headers_list, "");
   ASSERT_EQ(otlp_grpc->compression, "");
@@ -300,7 +301,6 @@ meter_provider:
   ASSERT_EQ(
       otlp_grpc->default_histogram_aggregation,
       opentelemetry::sdk::configuration::DefaultHistogramAggregation::explicit_bucket_histogram);
-  ASSERT_EQ(otlp_grpc->insecure, false);
 }
 
 TEST(YamlMetrics, otlp_grpc)
@@ -313,9 +313,11 @@ meter_provider:
         exporter:
           otlp_grpc:
             endpoint: "somewhere"
-            certificate_file: "certificate_file"
-            client_key_file: "client_key_file"
-            client_certificate_file: "client_certificate_file"
+            tls:
+              certificate_file: "certificate_file"
+              client_key_file: "client_key_file"
+              client_certificate_file: "client_certificate_file"
+              insecure: true
             headers:
               - name: foo
                 value: "123"
@@ -326,7 +328,6 @@ meter_provider:
             timeout: 5000
             temporality_preference: delta
             default_histogram_aggregation: base2_exponential_bucket_histogram
-            insecure: true
 )";
 
   auto config = DoParse(yaml);
@@ -344,9 +345,11 @@ meter_provider:
   auto *otlp_grpc = reinterpret_cast<
       opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(otlp_grpc->endpoint, "somewhere");
-  ASSERT_EQ(otlp_grpc->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_grpc->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_grpc->client_certificate_file, "client_certificate_file");
+  ASSERT_NE(otlp_grpc->tls, nullptr);
+  ASSERT_EQ(otlp_grpc->tls->certificate_file, "certificate_file");
+  ASSERT_EQ(otlp_grpc->tls->client_key_file, "client_key_file");
+  ASSERT_EQ(otlp_grpc->tls->client_certificate_file, "client_certificate_file");
+  ASSERT_EQ(otlp_grpc->tls->insecure, true);
   ASSERT_NE(otlp_grpc->headers, nullptr);
   ASSERT_EQ(otlp_grpc->headers->kv_map.size(), 2);
   ASSERT_EQ(otlp_grpc->headers->kv_map["foo"], "123");
@@ -359,7 +362,6 @@ meter_provider:
   ASSERT_EQ(otlp_grpc->default_histogram_aggregation,
             opentelemetry::sdk::configuration::DefaultHistogramAggregation::
                 base2_exponential_bucket_histogram);
-  ASSERT_EQ(otlp_grpc->insecure, true);
 }
 
 TEST(YamlMetrics, default_otlp_file)
@@ -537,9 +539,10 @@ meter_provider:
       opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(prometheus->host, "localhost");
   ASSERT_EQ(prometheus->port, 9464);
-  ASSERT_EQ(prometheus->without_units, false);
-  ASSERT_EQ(prometheus->without_type_suffix, false);
   ASSERT_EQ(prometheus->without_scope_info, false);
+  ASSERT_EQ(prometheus->translation_strategy,
+            opentelemetry::sdk::configuration::TranslationStrategy::UnderscoreEscapingWithSuffixes);
+  ASSERT_EQ(prometheus->with_resource_constant_labels, nullptr);
 }
 
 TEST(YamlMetrics, prometheus)
@@ -553,9 +556,14 @@ meter_provider:
           prometheus/development:
             host: "prometheus"
             port: 1234
-            without_units: true
-            without_type_suffix: true
             without_scope_info: true
+            translation_strategy: NoUTF8EscapingWithSuffixes
+            with_resource_constant_labels:
+              included:
+                - "foo.in"
+                - "bar.in"
+              excluded:
+                - "baz.ex"
 )";
 
   auto config = DoParse(yaml);
@@ -573,9 +581,17 @@ meter_provider:
       opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(prometheus->host, "prometheus");
   ASSERT_EQ(prometheus->port, 1234);
-  ASSERT_EQ(prometheus->without_units, true);
-  ASSERT_EQ(prometheus->without_type_suffix, true);
   ASSERT_EQ(prometheus->without_scope_info, true);
+  ASSERT_EQ(prometheus->translation_strategy,
+            opentelemetry::sdk::configuration::TranslationStrategy::NoUTF8EscapingWithSuffixes);
+  ASSERT_NE(prometheus->with_resource_constant_labels, nullptr);
+  ASSERT_NE(prometheus->with_resource_constant_labels->included, nullptr);
+  ASSERT_EQ(prometheus->with_resource_constant_labels->included->string_array.size(), 2);
+  ASSERT_EQ(prometheus->with_resource_constant_labels->included->string_array[0], "foo.in");
+  ASSERT_EQ(prometheus->with_resource_constant_labels->included->string_array[1], "bar.in");
+  ASSERT_NE(prometheus->with_resource_constant_labels->excluded, nullptr);
+  ASSERT_EQ(prometheus->with_resource_constant_labels->excluded->string_array.size(), 1);
+  ASSERT_EQ(prometheus->with_resource_constant_labels->excluded->string_array[0], "baz.ex");
 }
 
 TEST(YamlMetrics, empty_views)
