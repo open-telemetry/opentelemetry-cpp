@@ -97,83 +97,64 @@ TEST(ViewRegistry, FindNonExistingView)
 #endif
 }
 
-// Tests for View class AggregationType and AggregationConfig consistency validation
+// Tests for ViewRegistry::AddView null parameter validation
 
-TEST(View, ValidHistogramConfigWithHistogramType)
+TEST(ViewRegistry, AddViewWithNullInstrumentSelector)
 {
-  // Valid: Histogram aggregation type with HistogramAggregationConfig
-  auto histogram_config         = std::make_shared<HistogramAggregationConfig>();
-  histogram_config->boundaries_ = {0.0, 10.0, 100.0};
-
-#if defined(__cpp_exceptions)
-  EXPECT_NO_THROW({
-    View view("test_histogram", "description", AggregationType::kHistogram, histogram_config);
-  });
-#else
-  View view("test_histogram", "description", AggregationType::kHistogram, histogram_config);
-#endif
-}
-
-TEST(View, InvalidHistogramConfigWithSumType)
-{
-  // Invalid: Sum aggregation type with HistogramAggregationConfig
-  auto histogram_config         = std::make_shared<HistogramAggregationConfig>();
-  histogram_config->boundaries_ = {0.0, 10.0, 100.0};
+  ViewRegistry registry;
+  std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("name", "version", "schema")};
+  std::unique_ptr<View> view{new View("test_view")};
 
 #if defined(__cpp_exceptions)
   EXPECT_THROW(
-      { View view("test_sum", "description", AggregationType::kSum, histogram_config); },
+      { registry.AddView(nullptr, std::move(meter_selector), std::move(view)); },
       std::invalid_argument);
 #else
-  EXPECT_DEATH(
-      { View view("test_sum", "description", AggregationType::kSum, histogram_config); }, "");
+  EXPECT_DEATH({ registry.AddView(nullptr, std::move(meter_selector), std::move(view)); }, "");
 #endif
 }
 
-TEST(View, InvalidHistogramConfigWithDefaultType)
+TEST(ViewRegistry, AddViewWithNullMeterSelector)
 {
-  // Invalid: Default aggregation type with HistogramAggregationConfig
-  auto histogram_config = std::make_shared<HistogramAggregationConfig>();
+  ViewRegistry registry;
+  std::unique_ptr<InstrumentSelector> instrument_selector{
+      new InstrumentSelector(InstrumentType::kCounter, "instrument_name", "unit")};
+  std::unique_ptr<View> view{new View("test_view")};
 
 #if defined(__cpp_exceptions)
   EXPECT_THROW(
-      { View view("test_default", "description", AggregationType::kDefault, histogram_config); },
+      { registry.AddView(std::move(instrument_selector), nullptr, std::move(view)); },
+      std::invalid_argument);
+#else
+  EXPECT_DEATH({ registry.AddView(std::move(instrument_selector), nullptr, std::move(view)); }, "");
+#endif
+}
+
+TEST(ViewRegistry, AddViewWithNullView)
+{
+  ViewRegistry registry;
+  std::unique_ptr<InstrumentSelector> instrument_selector{
+      new InstrumentSelector(InstrumentType::kCounter, "instrument_name", "unit")};
+  std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("name", "version", "schema")};
+
+#if defined(__cpp_exceptions)
+  EXPECT_THROW(
+      { registry.AddView(std::move(instrument_selector), std::move(meter_selector), nullptr); },
       std::invalid_argument);
 #else
   EXPECT_DEATH(
-      { View view("test_default", "description", AggregationType::kDefault, histogram_config); },
+      { registry.AddView(std::move(instrument_selector), std::move(meter_selector), nullptr); },
       "");
 #endif
 }
 
-TEST(View, ValidNullConfig)
+TEST(ViewRegistry, AddViewWithAllNullParameters)
 {
-  // Valid: Null config should work with any aggregation type
-#if defined(__cpp_exceptions)
-  EXPECT_NO_THROW(
-      { View view("test_null_config", "description", AggregationType::kHistogram, nullptr); });
-
-  EXPECT_NO_THROW(
-      { View view("test_null_config2", "description", AggregationType::kSum, nullptr); });
-#else
-  View view("test_null_config", "description", AggregationType::kHistogram, nullptr);
-  View view2("test_null_config2", "description", AggregationType::kSum, nullptr);
-#endif
-}
-
-TEST(View, InvalidDefaultConfigWithHistogramType)
-{
-  // Invalid: Histogram aggregation type with default AggregationConfig (not
-  // HistogramAggregationConfig)
-  auto default_config = std::make_shared<AggregationConfig>();
+  ViewRegistry registry;
 
 #if defined(__cpp_exceptions)
-  EXPECT_THROW(
-      { View view("test_histogram", "description", AggregationType::kHistogram, default_config); },
-      std::invalid_argument);
+  EXPECT_THROW({ registry.AddView(nullptr, nullptr, nullptr); }, std::invalid_argument);
 #else
-  EXPECT_DEATH(
-      { View view("test_histogram", "description", AggregationType::kHistogram, default_config); },
-      "");
+  EXPECT_DEATH({ registry.AddView(nullptr, nullptr, nullptr); }, "");
 #endif
 }

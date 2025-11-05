@@ -5,12 +5,14 @@
 
 #include <algorithm>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
@@ -46,6 +48,55 @@ public:
                std::unique_ptr<opentelemetry::sdk::metrics::View> view)
   {
     // TBD - thread-safe ?
+
+    // Validate parameters
+    if (!instrument_selector || !meter_selector || !view)
+    {
+#if defined(__cpp_exceptions)
+      throw std::invalid_argument("instrument_selector, meter_selector, and view cannot be null");
+#else
+      std::abort();
+#endif
+    }
+
+    auto aggregation_config = view->GetAggregationConfig();
+    if (aggregation_config)
+    {
+      bool valid                   = false;
+      auto aggregation_config_type = aggregation_config->GetType();
+      auto aggregation_type        = view->GetAggregationType();
+
+      if (aggregation_type == AggregationType::kDefault)
+      {
+        bool is_monotonic;
+        aggregation_type = DefaultAggregation::GetDefaultAggregationType(
+            instrument_selector->GetInstrumentType(), is_monotonic);
+      }
+
+      switch (aggregation_type)
+      {
+        case AggregationType::kHistogram:
+          valid = (aggregation_config_type == AggregationType::kHistogram);
+          break;
+        case AggregationType::kBase2ExponentialHistogram:
+          valid = (aggregation_config_type == AggregationType::kBase2ExponentialHistogram);
+          break;
+        case AggregationType::kDrop:
+        case AggregationType::kLastValue:
+        case AggregationType::kSum:
+          valid = (aggregation_config_type == AggregationType::kDefault);
+          break;
+      }
+
+      if (!valid)
+      {
+#if defined(__cpp_exceptions)
+        throw std::invalid_argument("AggregationType and AggregationConfig type mismatch");
+#else
+        std::abort();
+#endif
+      }
+    }
 
     auto registered_view = std::unique_ptr<RegisteredView>(new RegisteredView{
         std::move(instrument_selector), std::move(meter_selector), std::move(view)});

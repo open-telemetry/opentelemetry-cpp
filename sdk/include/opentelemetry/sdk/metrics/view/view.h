@@ -37,39 +37,7 @@ public:
         aggregation_type_{aggregation_type},
         aggregation_config_{aggregation_config},
         attributes_processor_{std::move(attributes_processor)}
-  {
-    // Validate that aggregation_type and aggregation_config match
-    if (aggregation_config_)
-    {
-      AggregationType config_type = aggregation_config_->GetType();
-      bool valid                  = false;
-
-      switch (aggregation_type_)
-      {
-        case AggregationType::kHistogram:
-          valid = (config_type == AggregationType::kHistogram);
-          break;
-        case AggregationType::kBase2ExponentialHistogram:
-          valid = (config_type == AggregationType::kBase2ExponentialHistogram);
-          break;
-        case AggregationType::kDefault:
-        case AggregationType::kDrop:
-        case AggregationType::kLastValue:
-        case AggregationType::kSum:
-          valid = (config_type == AggregationType::kDefault);
-          break;
-      }
-
-      if (!valid)
-      {
-#if defined(__cpp_exceptions)
-        throw std::invalid_argument("AggregationType and AggregationConfig type mismatch");
-#else
-        std::abort();
-#endif
-      }
-    }
-  }
+  {}
 
   virtual ~View() = default;
 
