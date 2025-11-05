@@ -78,14 +78,20 @@ public:
         case AggregationType::kHistogram:
           valid = (aggregation_config_type == AggregationType::kHistogram);
           break;
+
         case AggregationType::kBase2ExponentialHistogram:
           valid = (aggregation_config_type == AggregationType::kBase2ExponentialHistogram);
           break;
+
         case AggregationType::kDrop:
         case AggregationType::kLastValue:
         case AggregationType::kSum:
           valid = (aggregation_config_type == AggregationType::kDefault);
           break;
+
+        default:
+          // Unreachable: all AggregationType enum values are handled above
+          std::abort();
       }
 
       if (!valid)
