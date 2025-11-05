@@ -36,8 +36,6 @@ using namespace opentelemetry::sdk::metrics;
 TEST(MeterProvider, GetMeter)
 {
   MeterProvider mp1;
-  //   std::unique_ptr<View> view{std::unique_ptr<View>()};
-  // MeterProvider mp1(std::move(exporters), std::move(readers), std::move(views);
   auto m1 = mp1.GetMeter("test");
   auto m2 = mp1.GetMeter("test");
   auto m3 = mp1.GetMeter("different", "1.0.0");
@@ -66,7 +64,7 @@ TEST(MeterProvider, GetMeter)
   std::unique_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp1.AddMetricReader(std::move(reader));
 
-  std::unique_ptr<View> view{std::unique_ptr<View>()};
+  std::unique_ptr<View> view{new View("test_view")};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kCounter, "instru1", "unit1")};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("name1", "version1", "schema1")};
