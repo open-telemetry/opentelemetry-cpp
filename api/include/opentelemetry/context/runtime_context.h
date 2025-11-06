@@ -26,13 +26,15 @@ class Token
 public:
   bool operator==(const Context &other) const noexcept { return context_ == other; }
 
+  virtual ~Token() noexcept;
+
+  friend class RuntimeContextStorage;
+
+protected:
   // A constructor that sets the token's Context object to the
   // one that was passed in.
   Token(const Context &context) : context_(context) {}
 
-  ~Token() noexcept;
-
-protected:
   const Context context_;
 };
 
