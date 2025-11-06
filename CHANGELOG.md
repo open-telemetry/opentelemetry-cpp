@@ -15,21 +15,25 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS] Add tag to AggregationConfig for aggregation type validation
+  [#3732](https://github.com/open-telemetry/opentelemetry-cpp/pull/3732)
+
 * [TEST] Remove workaround for metrics cardinality limit test
   [#3663](https://github.com/open-telemetry/opentelemetry-cpp/pull/3663)
-* [METRICS] Allow registering one callback for multiple instruments
-  [#3667](https://github.com/open-telemetry/opentelemetry-cpp/pull/3667)
 
 * [SDK] Fix typo in hashmap method GetEnteries
   [#3680](https://github.com/open-telemetry/opentelemetry-cpp/pull/3680)
 
-* [CI] Upgrade tools/vcpkg to 2025.09.17
-  [#3701](https://github.com/open-telemetry/opentelemetry-cpp/pull/3701)
+## [1.23 2025-09-25]
 
-* [CONFIGURATION] File configuration - prometheus translation
-  [#3715](https://github.com/open-telemetry/opentelemetry-cpp/pull/3715)
+* [CodeHealth] Fix clang-tidy warnings part 6
+  [#3507](https://github.com/open-telemetry/opentelemetry-cpp/pull/3507)
 
-* [BUILD] Upgrade to opentelemetry-proto 1.8.0
+* [CMAKE] Add CMake scripts to find or fetch curl and find zlib
+  [#3526](https://github.com/open-telemetry/opentelemetry-cpp/pull/3526)
+
+* [REMOVAL] remove unused ci bash scripts
+  [#3541](https://github.com/open-telemetry/opentelemetry-cpp/pull/354* [BUILD] Upgrade to opentelemetry-proto 1.8.0
   [#3730](https://github.com/open-telemetry/opentelemetry-cpp/pull/3730)
 
 * [CONFIGURATION] File configuration - tls
@@ -47,16 +51,7 @@ New Features:
     file, instead of using environment variables.
   * See [opentelemetry-configuration](https://github.com/open-telemetry/opentelemetry-configuration)
 
-## [1.23 2025-09-25]
-
-* [CodeHealth] Fix clang-tidy warnings part 6
-  [#3507](https://github.com/open-telemetry/opentelemetry-cpp/pull/3507)
-
-* [CMAKE] Add CMake scripts to find or fetch curl and find zlib
-  [#3526](https://github.com/open-telemetry/opentelemetry-cpp/pull/3526)
-
-* [REMOVAL] remove unused ci bash scripts
-  [#3541](https://github.com/open-telemetry/opentelemetry-cpp/pull/3541)
+1)
 
 * Bump step-security/harden-runner from 2.12.2 to 2.13.0
   [#3542](https://github.com/open-telemetry/opentelemetry-cpp/pull/3542)
