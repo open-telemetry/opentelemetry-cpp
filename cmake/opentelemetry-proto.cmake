@@ -289,9 +289,23 @@ if((NOT protobuf_lib_type STREQUAL "STATIC_LIBRARY")
    AND (NOT DEFINED BUILD_SHARED_LIBS OR BUILD_SHARED_LIBS))
   list(APPEND OTELCPP_PROTO_TARGET_OPTIONS SHARED)
   set(OTELCPP_PROTO_LIB_TYPE "SHARED_LIBRARY")
+
+  if(DEFINED BUILD_SHARED_LIBS AND NOT BUILD_SHARED_LIBS)
+    message(
+      WARNING
+        "Static protobuf libraries found, we force to building opentelemetry-proto as a static library to keep compatibility"
+    )
+  endif()
 else()
   list(APPEND OTELCPP_PROTO_TARGET_OPTIONS STATIC)
   set(OTELCPP_PROTO_LIB_TYPE "STATIC_LIBRARY")
+
+  if(DEFINED BUILD_SHARED_LIBS AND BUILD_SHARED_LIBS)
+    message(
+      WARNING
+        "Shared protobuf libraries found, we force to building opentelemetry-proto as a shared library to keep compatibility"
+    )
+  endif()
 endif()
 
 set(OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto)
