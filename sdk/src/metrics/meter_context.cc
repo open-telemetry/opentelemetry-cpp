@@ -106,7 +106,7 @@ void MeterContext::AddMetricReader(std::shared_ptr<MetricReader> reader,
 
 void MeterContext::AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
                            std::unique_ptr<MeterSelector> meter_selector,
-                           std::unique_ptr<View> view)
+                           std::unique_ptr<View> view) noexcept
 {
   views_->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 }
