@@ -136,7 +136,7 @@ public:
    */
   void AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
                std::unique_ptr<MeterSelector> meter_selector,
-               std::unique_ptr<View> view);
+               std::unique_ptr<View> view) noexcept;
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
