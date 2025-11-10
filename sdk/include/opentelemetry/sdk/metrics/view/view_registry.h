@@ -5,12 +5,12 @@
 
 #include <algorithm>
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -52,11 +52,10 @@ public:
     // Validate parameters
     if (!instrument_selector || !meter_selector || !view)
     {
-#if defined(__cpp_exceptions)
-      throw std::invalid_argument("instrument_selector, meter_selector, and view cannot be null");
-#else
-      std::abort();
-#endif
+      OTEL_INTERNAL_LOG_ERROR(
+          "[ViewRegistry::AddView] Invalid parameters: instrument_selector, meter_selector, and "
+          "view cannot be null. Ignoring AddView call.");
+      return;
     }
 
     auto aggregation_config = view->GetAggregationConfig();
@@ -96,11 +95,10 @@ public:
 
       if (!valid)
       {
-#if defined(__cpp_exceptions)
-        throw std::invalid_argument("AggregationType and AggregationConfig type mismatch");
-#else
-        std::abort();
-#endif
+        OTEL_INTERNAL_LOG_ERROR(
+            "[ViewRegistry::AddView] AggregationType and AggregationConfig type mismatch. "
+            "Ignoring AddView call.");
+        return;
       }
     }
 
