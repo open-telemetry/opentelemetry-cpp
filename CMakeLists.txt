@@ -3,12 +3,6 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-if(POLICY CMP0092)
-  # https://cmake.org/cmake/help/latest/policy/CMP0092.html#policy:CMP0092 Make
-  # sure the /W3 is not removed from CMAKE_CXX_FLAGS since CMake 3.15
-  cmake_policy(SET CMP0092 OLD)
-endif()
-
 # MSVC RTTI flag /GR should not be added to CMAKE_CXX_FLAGS by default. @see
 # https://cmake.org/cmake/help/latest/policy/CMP0117.html
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.20.0")
