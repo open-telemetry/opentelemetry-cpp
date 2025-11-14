@@ -38,6 +38,9 @@ Increment the:
 * [CONFIGURATION] File configuration - console metric exporter
   [#3734](https://github.com/open-telemetry/opentelemetry-cpp/pull/3734)
 
+* [SDK] Reset TraceFlags::IsSampled bit on sampler Decision::DROP
+  [#3745](https://github.com/open-telemetry/opentelemetry-cpp/pull/3745)
+
 New Features:
 
 * [CONFIGURATION] Implement declarative configuration (config.yaml)
