@@ -20,20 +20,20 @@ SDK CREATED
   severity_text      : DEBUG
   body               : body
   resource           : 
-    telemetry.sdk.version: 1.24.0-dev
-    service.version: 1.0.0
-    double_array_key: [1.1,2.2]
-    double_key: 1.1
-    bool_key: 1
-    int_array_key: [1,2]
-    int_key: 1
-    string_array_key: [value1,value2]
-    string_key: value
-    service.namespace: my-namespace
     telemetry.sdk.language: cpp
-    bool_array_key: [1,0]
-    service.name: unknown_service
+    string_key: value
     telemetry.sdk.name: opentelemetry
+    double_key: 1.1
+    service.namespace: my-namespace
+    string_array_key: [value1,value2]
+    int_array_key: [1,2]
+    service.version: 1.0.0
+    int_key: 1
+    service.name: unknown_service
+    telemetry.sdk.version: 1.24.0-dev
+    bool_array_key: [1,0]
+    bool_key: 1
+    double_array_key: [1.1,2.2]
   attributes         : 
   event_id           : 0
   event_name         : 
