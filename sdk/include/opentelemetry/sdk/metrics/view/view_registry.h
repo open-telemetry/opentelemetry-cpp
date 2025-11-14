@@ -4,6 +4,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cassert>
 #include <memory>
 #include <string>
 #include <utility>
@@ -90,7 +91,8 @@ public:
 
         default:
           // Unreachable: all AggregationType enum values are handled above
-          std::abort();
+          assert(false && "Unreachable: unhandled AggregationType");
+          valid = false;
       }
 
       if (!valid)

@@ -4,7 +4,6 @@
 #pragma once
 
 #include <memory>
-#include <stdexcept>
 #include <string>
 
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
