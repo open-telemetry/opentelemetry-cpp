@@ -42,6 +42,9 @@ Increment the:
 * [CONFIGURATION] File configuration - console metric exporter
   [#3734](https://github.com/open-telemetry/opentelemetry-cpp/pull/3734)
 
+* [CMAKE] Support build proto as shared lib on Windows
+  [#3714](https://github.com/open-telemetry/opentelemetry-cpp/pull/3714)
+
 New Features:
 
 * [CONFIGURATION] Implement declarative configuration (config.yaml)
