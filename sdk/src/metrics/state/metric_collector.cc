@@ -45,8 +45,8 @@ AggregationTemporality MetricCollector::GetAggregationTemporality(
   if (aggregation_temporality == AggregationTemporality::kDelta &&
       instrument_type == InstrumentType::kGauge)
   {
-    OTEL_INTERNAL_LOG_ERROR(
-        "[MetricCollector::GetAggregationTemporality] - Error getting aggregation temporality."
+    OTEL_INTERNAL_LOG_WARN(
+        "[MetricCollector::GetAggregationTemporality] - "
         << "Delta temporality for Synchronous Gauge is currently not supported, using cumulative "
            "temporality");
 
@@ -57,6 +57,7 @@ AggregationTemporality MetricCollector::GetAggregationTemporality(
 
 MetricProducer::Result MetricCollector::Produce() noexcept
 {
+  OTEL_INTERNAL_LOG_DEBUG("[MetricCollector::Produce] Starting metrics collection.");
   if (!meter_context_)
   {
     OTEL_INTERNAL_LOG_ERROR("[MetricCollector::Collect] - Error during collecting."
@@ -126,6 +127,8 @@ MetricProducer::Result MetricCollector::Produce() noexcept
     return true;
   });
   resource_metrics.resource_ = &meter_context_->GetResource();
+  OTEL_INTERNAL_LOG_DEBUG("[MetricCollector::Produce] Collected "
+                          << resource_metrics.scope_metric_data_.size() << " scope metric(s).");
   return {resource_metrics, MetricProducer::Status::kSuccess};
 }
 

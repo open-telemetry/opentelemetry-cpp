@@ -83,6 +83,9 @@ AggregationTemporality PeriodicExportingMetricReader::GetAggregationTemporality(
 }
 void PeriodicExportingMetricReader::OnInitialized() noexcept
 {
+  OTEL_INTERNAL_LOG_INFO("[Periodic Exporting Metric Reader] Started with export interval: "
+                         << export_interval_millis_.count() << " ms, export timeout: "
+                         << export_timeout_millis_.count() << " ms");
   worker_thread_ = std::thread(&PeriodicExportingMetricReader::DoBackgroundWork, this);
 }
 
@@ -178,7 +181,15 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
             << this->export_timeout_millis_.count() << " ms, and timed out");
         return false;
       }
-      this->exporter_->Export(metric_data);
+      OTEL_INTERNAL_LOG_DEBUG("[Periodic Exporting Metric Reader] Exporting "
+                              << metric_data.scope_metric_data_.size() << " scope metric(s).");
+      auto export_start = std::chrono::steady_clock::now();
+      auto result       = this->exporter_->Export(metric_data);
+      auto export_end   = std::chrono::steady_clock::now();
+      auto export_duration_ms =
+          std::chrono::duration_cast<std::chrono::milliseconds>(export_end - export_start);
+      OTEL_INTERNAL_LOG_DEBUG("[Periodic Exporting Metric Reader] Export completed in "
+                              << export_duration_ms.count() << " ms.");
       return true;
     });
 
@@ -291,12 +302,22 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
 
 bool PeriodicExportingMetricReader::OnShutDown(std::chrono::microseconds timeout) noexcept
 {
+  OTEL_INTERNAL_LOG_INFO("[Periodic Exporting Metric Reader] Shutdown initiated.");
   if (worker_thread_.joinable())
   {
     cv_.notify_all();
     worker_thread_.join();
   }
-  return exporter_->Shutdown(timeout);
+  bool result = exporter_->Shutdown(timeout);
+  if (result)
+  {
+    OTEL_INTERNAL_LOG_INFO("[Periodic Exporting Metric Reader] Shutdown completed successfully.");
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_WARN("[Periodic Exporting Metric Reader] Shutdown completed with failures.");
+  }
+  return result;
 }
 
 }  // namespace metrics

@@ -49,7 +49,7 @@ MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
     : context_(
           std::make_shared<MeterContext>(std::move(views), resource, std::move(meter_configurator)))
 {
-  OTEL_INTERNAL_LOG_DEBUG("[MeterProvider] MeterProvider created.");
+  OTEL_INTERNAL_LOG_INFO("[MeterProvider] MeterProvider created.");
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -120,6 +120,7 @@ const resource::Resource &MeterProvider::GetResource() const noexcept
 void MeterProvider::AddMetricReader(std::shared_ptr<MetricReader> reader,
                                     std::unique_ptr<MetricFilter> metric_filter) noexcept
 {
+  OTEL_INTERNAL_LOG_INFO("[MeterProvider] Adding MetricReader.");
   context_->AddMetricReader(std::move(reader), std::move(metric_filter));
 }
 
@@ -144,7 +145,17 @@ void MeterProvider::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filte
  */
 bool MeterProvider::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  return context_->Shutdown(timeout);
+  OTEL_INTERNAL_LOG_INFO("[MeterProvider] Shutdown initiated.");
+  bool result = context_->Shutdown(timeout);
+  if (result)
+  {
+    OTEL_INTERNAL_LOG_INFO("[MeterProvider] Shutdown completed successfully.");
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_WARN("[MeterProvider] Shutdown completed with failures.");
+  }
+  return result;
 }
 
 /**
@@ -152,7 +163,17 @@ bool MeterProvider::Shutdown(std::chrono::microseconds timeout) noexcept
  */
 bool MeterProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  return context_->ForceFlush(timeout);
+  OTEL_INTERNAL_LOG_INFO("[MeterProvider] ForceFlush initiated.");
+  bool result = context_->ForceFlush(timeout);
+  if (result)
+  {
+    OTEL_INTERNAL_LOG_INFO("[MeterProvider] ForceFlush completed successfully.");
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_WARN("[MeterProvider] ForceFlush completed with failures.");
+  }
+  return result;
 }
 
 /**

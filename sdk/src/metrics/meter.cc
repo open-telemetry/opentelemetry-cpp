@@ -664,6 +664,8 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
                                      return true;
                                    });
   }
+  OTEL_INTERNAL_LOG_DEBUG("[Meter::Collect] Collected " << metric_data_list.size()
+                                                         << " metric(s) from meter.");
   return metric_data_list;
 }
 
