@@ -108,6 +108,48 @@ public:
 };
 
 /**
+ * A mock sampler with ShouldSample returning
+ * a decision based on the span name.
+ */
+class MockDecisionSampler final : public Sampler
+{
+public:
+  SamplingResult ShouldSample(
+      const SpanContext & /*parent_context*/,
+      trace_api::TraceId /*trace_id*/,
+      nostd::string_view name,
+      trace_api::SpanKind /*span_kind*/,
+      const opentelemetry::common::KeyValueIterable & /*attributes*/,
+      const opentelemetry::trace::SpanContextKeyValueIterable & /*links*/) noexcept override
+  {
+    std::string span_name{name};
+
+    if (span_name.find("DROP-") != std::string::npos)
+    {
+      return {Decision::DROP,
+              nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
+                  nullptr),
+              nostd::shared_ptr<opentelemetry::trace::TraceState>(nullptr)};
+    }
+
+    if (span_name.find("RECORD_ONLY-") != std::string::npos)
+    {
+      return {Decision::RECORD_ONLY,
+              nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
+                  nullptr),
+              nostd::shared_ptr<opentelemetry::trace::TraceState>(nullptr)};
+    }
+
+    return {Decision::RECORD_AND_SAMPLE,
+            nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
+                nullptr),
+            nostd::shared_ptr<opentelemetry::trace::TraceState>(nullptr)};
+  }
+
+  nostd::string_view GetDescription() const noexcept override { return "MockDecisionSampler"; }
+};
+
+/**
  * A Mock Custom ID Generator
  */
 class MockIdGenerator : public IdGenerator
@@ -1330,4 +1372,33 @@ TEST(Tracer, SpanCleanupWithScope)
     }
   }
   EXPECT_EQ(4, span_data->GetSpans().size());
+}
+
+TEST(Tracer, SpanSamplerDecision)
+{
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer = initTracer(std::unique_ptr<SpanExporter>{exporter}, new MockDecisionSampler());
+  {
+    auto span0    = tracer->StartSpan("Span0");
+    auto span1    = tracer->StartSpan("span1");
+    auto context1 = span1->GetContext();
+    EXPECT_TRUE(context1.IsValid());
+    EXPECT_TRUE(context1.IsSampled());
+    {
+      trace_api::Scope scope1(span1);
+      auto span2    = tracer->StartSpan("RECORD_ONLY-span2");
+      auto context2 = span2->GetContext();
+      EXPECT_TRUE(context2.IsValid());
+      EXPECT_FALSE(context2.IsSampled());
+      {
+        trace_api::Scope scope2(span2);
+        auto span3    = tracer->StartSpan("DROP-span3");
+        auto context3 = span3->GetContext();
+        EXPECT_TRUE(context3.IsValid());
+        EXPECT_FALSE(context3.IsSampled());
+      }
+    }
+  }
+  EXPECT_EQ(3, span_data->GetSpans().size());
 }
