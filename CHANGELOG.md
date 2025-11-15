@@ -42,6 +42,9 @@ Increment the:
 * [CONFIGURATION] File configuration - console metric exporter
   [#3734](https://github.com/open-telemetry/opentelemetry-cpp/pull/3734)
 
+* [CI] Free disk space
+  [#3749](https://github.com/open-telemetry/opentelemetry-cpp/pull/3749)
+
 New Features:
 
 * [CONFIGURATION] Implement declarative configuration (config.yaml)
