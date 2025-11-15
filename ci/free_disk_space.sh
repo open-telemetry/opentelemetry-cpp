@@ -31,8 +31,8 @@ sudo rm -rf /usr/local/lib/node_modules
 
 # AFTER:
 # Size: 72G
-# Used: 29
-# Available: 44
+# Used: 29G
+# Available: 44G
 
 df -h
 
