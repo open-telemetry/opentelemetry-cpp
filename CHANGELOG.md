@@ -15,8 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS] Add tag to AggregationConfig for aggregation type validation
+  [#3732](https://github.com/open-telemetry/opentelemetry-cpp/pull/3732)
+
 * [TEST] Remove workaround for metrics cardinality limit test
   [#3663](https://github.com/open-telemetry/opentelemetry-cpp/pull/3663)
+
 * [METRICS] Allow registering one callback for multiple instruments
   [#3667](https://github.com/open-telemetry/opentelemetry-cpp/pull/3667)
 
@@ -37,6 +41,9 @@ Increment the:
 
 * [CONFIGURATION] File configuration - console metric exporter
   [#3734](https://github.com/open-telemetry/opentelemetry-cpp/pull/3734)
+
+* [CI] Free disk space
+  [#3749](https://github.com/open-telemetry/opentelemetry-cpp/pull/3749)
 
 * [SDK] Reset TraceFlags::IsSampled bit on sampler Decision::DROP
   [#3745](https://github.com/open-telemetry/opentelemetry-cpp/pull/3745)
