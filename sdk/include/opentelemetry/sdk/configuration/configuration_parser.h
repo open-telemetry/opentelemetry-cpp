@@ -84,6 +84,7 @@
 #include "opentelemetry/sdk/configuration/temporality_preference.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
+#include "opentelemetry/sdk/configuration/translation_strategy.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
@@ -112,6 +113,12 @@ public:
       const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<AttributeLimitsConfiguration> ParseAttributeLimitsConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  std::unique_ptr<HttpTlsConfiguration> ParseHttpTlsConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  std::unique_ptr<GrpcTlsConfiguration> ParseGrpcTlsConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<OtlpHttpLogRecordExporterConfiguration>
@@ -170,6 +177,9 @@ public:
 
   std::unique_ptr<ConsolePushMetricExporterConfiguration>
   ParseConsolePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node) const;
+
+  TranslationStrategy ParseTranslationStrategy(const std::unique_ptr<DocumentNode> &node,
+                                               const std::string &name) const;
 
   std::unique_ptr<PrometheusPullMetricExporterConfiguration>
   ParsePrometheusPullMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node) const;

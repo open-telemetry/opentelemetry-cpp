@@ -44,7 +44,9 @@
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
+#include "opentelemetry/sdk/configuration/http_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
 #include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/integer_array_attribute_value_configuration.h"
@@ -91,6 +93,7 @@
 #include "opentelemetry/sdk/configuration/temporality_preference.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
+#include "opentelemetry/sdk/configuration/translation_strategy.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
@@ -203,6 +206,31 @@ ConfigurationParser::ParseAttributeLimitsConfiguration(
   return model;
 }
 
+std::unique_ptr<HttpTlsConfiguration> ConfigurationParser::ParseHttpTlsConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<HttpTlsConfiguration>();
+
+  model->certificate_file        = node->GetString("certificate_file", "");
+  model->client_key_file         = node->GetString("client_key_file", "");
+  model->client_certificate_file = node->GetString("client_certificate_file", "");
+
+  return model;
+}
+
+std::unique_ptr<GrpcTlsConfiguration> ConfigurationParser::ParseGrpcTlsConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<GrpcTlsConfiguration>();
+
+  model->certificate_file        = node->GetString("certificate_file", "");
+  model->client_key_file         = node->GetString("client_key_file", "");
+  model->client_certificate_file = node->GetString("client_certificate_file", "");
+  model->insecure                = node->GetBoolean("insecure", false);
+
+  return model;
+}
+
 std::unique_ptr<OtlpHttpLogRecordExporterConfiguration>
 ConfigurationParser::ParseOtlpHttpLogRecordExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
@@ -210,10 +238,13 @@ ConfigurationParser::ParseOtlpHttpLogRecordExporterConfiguration(
   auto model = std::make_unique<OtlpHttpLogRecordExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->endpoint                = node->GetRequiredString("endpoint");
-  model->certificate_file        = node->GetString("certificate_file", "");
-  model->client_key_file         = node->GetString("client_key_file", "");
-  model->client_certificate_file = node->GetString("client_certificate_file", "");
+  model->endpoint = node->GetRequiredString("endpoint");
+
+  child = node->GetChildNode("tls");
+  if (child)
+  {
+    model->tls = ParseHttpTlsConfiguration(child);
+  }
 
   child = node->GetChildNode("headers");
   if (child)
@@ -225,8 +256,8 @@ ConfigurationParser::ParseOtlpHttpLogRecordExporterConfiguration(
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
 
-  std::string encoding = node->GetString("encoding", "protobuf");
-  model->encoding      = ParseOtlpHttpEncoding(node, encoding);
+  const std::string encoding = node->GetString("encoding", "protobuf");
+  model->encoding            = ParseOtlpHttpEncoding(node, encoding);
 
   return model;
 }
@@ -238,10 +269,13 @@ ConfigurationParser::ParseOtlpGrpcLogRecordExporterConfiguration(
   auto model = std::make_unique<OtlpGrpcLogRecordExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->endpoint                = node->GetRequiredString("endpoint");
-  model->certificate_file        = node->GetString("certificate_file", "");
-  model->client_key_file         = node->GetString("client_key_file", "");
-  model->client_certificate_file = node->GetString("client_certificate_file", "");
+  model->endpoint = node->GetRequiredString("endpoint");
+
+  child = node->GetChildNode("tls");
+  if (child)
+  {
+    model->tls = ParseGrpcTlsConfiguration(child);
+  }
 
   child = node->GetChildNode("headers");
   if (child)
@@ -252,7 +286,6 @@ ConfigurationParser::ParseOtlpGrpcLogRecordExporterConfiguration(
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
-  model->insecure     = node->GetBoolean("insecure", false);
 
   return model;
 }
@@ -514,10 +547,13 @@ ConfigurationParser::ParseOtlpHttpPushMetricExporterConfiguration(
   auto model = std::make_unique<OtlpHttpPushMetricExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->endpoint                = node->GetRequiredString("endpoint");
-  model->certificate_file        = node->GetString("certificate_file", "");
-  model->client_key_file         = node->GetString("client_key_file", "");
-  model->client_certificate_file = node->GetString("client_certificate_file", "");
+  model->endpoint = node->GetRequiredString("endpoint");
+
+  child = node->GetChildNode("tls");
+  if (child)
+  {
+    model->tls = ParseHttpTlsConfiguration(child);
+  }
 
   child = node->GetChildNode("headers");
   if (child)
@@ -529,16 +565,17 @@ ConfigurationParser::ParseOtlpHttpPushMetricExporterConfiguration(
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
 
-  std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
-  model->temporality_preference      = ParseTemporalityPreference(node, temporality_preference);
+  const std::string temporality_preference =
+      node->GetString("temporality_preference", "cumulative");
+  model->temporality_preference = ParseTemporalityPreference(node, temporality_preference);
 
-  std::string default_histogram_aggregation =
+  const std::string default_histogram_aggregation =
       node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(node, default_histogram_aggregation);
 
-  std::string encoding = node->GetString("encoding", "protobuf");
-  model->encoding      = ParseOtlpHttpEncoding(node, encoding);
+  const std::string encoding = node->GetString("encoding", "protobuf");
+  model->encoding            = ParseOtlpHttpEncoding(node, encoding);
 
   return model;
 }
@@ -550,10 +587,13 @@ ConfigurationParser::ParseOtlpGrpcPushMetricExporterConfiguration(
   auto model = std::make_unique<OtlpGrpcPushMetricExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->endpoint                = node->GetRequiredString("endpoint");
-  model->certificate_file        = node->GetString("certificate_file", "");
-  model->client_key_file         = node->GetString("client_key_file", "");
-  model->client_certificate_file = node->GetString("client_certificate_file", "");
+  model->endpoint = node->GetRequiredString("endpoint");
+
+  child = node->GetChildNode("tls");
+  if (child)
+  {
+    model->tls = ParseGrpcTlsConfiguration(child);
+  }
 
   child = node->GetChildNode("headers");
   if (child)
@@ -565,15 +605,14 @@ ConfigurationParser::ParseOtlpGrpcPushMetricExporterConfiguration(
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
 
-  std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
-  model->temporality_preference      = ParseTemporalityPreference(node, temporality_preference);
+  const std::string temporality_preference =
+      node->GetString("temporality_preference", "cumulative");
+  model->temporality_preference = ParseTemporalityPreference(node, temporality_preference);
 
-  std::string default_histogram_aggregation =
+  const std::string default_histogram_aggregation =
       node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(node, default_histogram_aggregation);
-
-  model->insecure = node->GetBoolean("insecure", false);
 
   return model;
 }
@@ -587,10 +626,11 @@ ConfigurationParser::ParseOtlpFilePushMetricExporterConfiguration(
 
   model->output_stream = node->GetString("output_stream", "");
 
-  std::string temporality_preference = node->GetString("temporality_preference", "cumulative");
-  model->temporality_preference      = ParseTemporalityPreference(node, temporality_preference);
+  const std::string temporality_preference =
+      node->GetString("temporality_preference", "cumulative");
+  model->temporality_preference = ParseTemporalityPreference(node, temporality_preference);
 
-  std::string default_histogram_aggregation =
+  const std::string default_histogram_aggregation =
       node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
   model->default_histogram_aggregation =
       ParseDefaultHistogramAggregation(node, default_histogram_aggregation);
@@ -600,13 +640,49 @@ ConfigurationParser::ParseOtlpFilePushMetricExporterConfiguration(
 
 std::unique_ptr<ConsolePushMetricExporterConfiguration>
 ConfigurationParser::ParseConsolePushMetricExporterConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */) const
+    const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<ConsolePushMetricExporterConfiguration>();
 
-  // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/242
+  const std::string temporality_preference =
+      node->GetString("temporality_preference", "cumulative");
+  model->temporality_preference = ParseTemporalityPreference(node, temporality_preference);
+
+  const std::string default_histogram_aggregation =
+      node->GetString("default_histogram_aggregation", "explicit_bucket_histogram");
+  model->default_histogram_aggregation =
+      ParseDefaultHistogramAggregation(node, default_histogram_aggregation);
 
   return model;
+}
+
+TranslationStrategy ConfigurationParser::ParseTranslationStrategy(
+    const std::unique_ptr<DocumentNode> &node,
+    const std::string &name) const
+{
+  if (name == "UnderscoreEscapingWithSuffixes")
+  {
+    return TranslationStrategy::UnderscoreEscapingWithSuffixes;
+  }
+
+  if (name == "UnderscoreEscapingWithoutSuffixes")
+  {
+    return TranslationStrategy::UnderscoreEscapingWithoutSuffixes;
+  }
+
+  if (name == "NoUTF8EscapingWithSuffixes")
+  {
+    return TranslationStrategy::NoUTF8EscapingWithSuffixes;
+  }
+
+  if (name == "NoTranslation")
+  {
+    return TranslationStrategy::NoTranslation;
+  }
+
+  std::string message("Illegal TranslationStrategy: ");
+  message.append(name);
+  throw InvalidSchemaException(node->Location(), message);
 }
 
 std::unique_ptr<PrometheusPullMetricExporterConfiguration>
@@ -614,12 +690,21 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<PrometheusPullMetricExporterConfiguration>();
+  std::unique_ptr<DocumentNode> child;
 
-  model->host                = node->GetString("host", "localhost");
-  model->port                = node->GetInteger("port", 9464);
-  model->without_units       = node->GetBoolean("without_units", false);
-  model->without_type_suffix = node->GetBoolean("without_type_suffix", false);
-  model->without_scope_info  = node->GetBoolean("without_scope_info", false);
+  model->host               = node->GetString("host", "localhost");
+  model->port               = node->GetInteger("port", 9464);
+  model->without_scope_info = node->GetBoolean("without_scope_info", false);
+
+  child = node->GetChildNode("with_resource_constant_labels");
+  if (child)
+  {
+    model->with_resource_constant_labels = ParseIncludeExcludeConfiguration(child);
+  }
+
+  std::string translation_strategy =
+      node->GetString("translation_strategy", "UnderscoreEscapingWithSuffixes");
+  model->translation_strategy = ParseTranslationStrategy(node, translation_strategy);
 
   return model;
 }
@@ -1386,10 +1471,13 @@ ConfigurationParser::ParseOtlpHttpSpanExporterConfiguration(
   auto model = std::make_unique<OtlpHttpSpanExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->endpoint                = node->GetRequiredString("endpoint");
-  model->certificate_file        = node->GetString("certificate_file", "");
-  model->client_key_file         = node->GetString("client_key_file", "");
-  model->client_certificate_file = node->GetString("client_certificate_file", "");
+  model->endpoint = node->GetRequiredString("endpoint");
+
+  child = node->GetChildNode("tls");
+  if (child)
+  {
+    model->tls = ParseHttpTlsConfiguration(child);
+  }
 
   child = node->GetChildNode("headers");
   if (child)
@@ -1401,8 +1489,8 @@ ConfigurationParser::ParseOtlpHttpSpanExporterConfiguration(
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
 
-  std::string encoding = node->GetString("encoding", "protobuf");
-  model->encoding      = ParseOtlpHttpEncoding(node, encoding);
+  const std::string encoding = node->GetString("encoding", "protobuf");
+  model->encoding            = ParseOtlpHttpEncoding(node, encoding);
 
   return model;
 }
@@ -1414,10 +1502,13 @@ ConfigurationParser::ParseOtlpGrpcSpanExporterConfiguration(
   auto model = std::make_unique<OtlpGrpcSpanExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->endpoint                = node->GetRequiredString("endpoint");
-  model->certificate_file        = node->GetString("certificate_file", "");
-  model->client_key_file         = node->GetString("client_key_file", "");
-  model->client_certificate_file = node->GetString("client_certificate_file", "");
+  model->endpoint = node->GetRequiredString("endpoint");
+
+  child = node->GetChildNode("tls");
+  if (child)
+  {
+    model->tls = ParseGrpcTlsConfiguration(child);
+  }
 
   child = node->GetChildNode("headers");
   if (child)
@@ -1428,7 +1519,6 @@ ConfigurationParser::ParseOtlpGrpcSpanExporterConfiguration(
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
   model->timeout      = node->GetInteger("timeout", 10000);
-  model->insecure     = node->GetBoolean("insecure", false);
 
   return model;
 }

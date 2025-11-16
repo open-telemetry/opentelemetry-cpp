@@ -9,7 +9,9 @@
 
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
+#include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
+#include "opentelemetry/sdk/configuration/http_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_configuration.h"
@@ -189,9 +191,7 @@ tracer_provider:
       reinterpret_cast<opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *>(
           exporter);
   ASSERT_EQ(otlp_http->endpoint, "somewhere");
-  ASSERT_EQ(otlp_http->certificate_file, "");
-  ASSERT_EQ(otlp_http->client_key_file, "");
-  ASSERT_EQ(otlp_http->client_certificate_file, "");
+  ASSERT_EQ(otlp_http->tls, nullptr);
   ASSERT_EQ(otlp_http->headers, nullptr);
   ASSERT_EQ(otlp_http->headers_list, "");
   ASSERT_EQ(otlp_http->compression, "");
@@ -209,9 +209,10 @@ tracer_provider:
         exporter:
           otlp_http:
             endpoint: "somewhere"
-            certificate_file: "certificate_file"
-            client_key_file: "client_key_file"
-            client_certificate_file: "client_certificate_file"
+            tls:
+              certificate_file: "certificate_file"
+              client_key_file: "client_key_file"
+              client_certificate_file: "client_certificate_file"
             headers:
               - name: foo
                 value: "123"
@@ -239,9 +240,10 @@ tracer_provider:
       reinterpret_cast<opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *>(
           exporter);
   ASSERT_EQ(otlp_http->endpoint, "somewhere");
-  ASSERT_EQ(otlp_http->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_http->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_http->client_certificate_file, "client_certificate_file");
+  ASSERT_NE(otlp_http->tls, nullptr);
+  ASSERT_EQ(otlp_http->tls->certificate_file, "certificate_file");
+  ASSERT_EQ(otlp_http->tls->client_key_file, "client_key_file");
+  ASSERT_EQ(otlp_http->tls->client_certificate_file, "client_certificate_file");
   ASSERT_NE(otlp_http->headers, nullptr);
   ASSERT_EQ(otlp_http->headers->kv_map.size(), 2);
   ASSERT_EQ(otlp_http->headers->kv_map["foo"], "123");
@@ -280,14 +282,11 @@ tracer_provider:
       reinterpret_cast<opentelemetry::sdk::configuration::OtlpGrpcSpanExporterConfiguration *>(
           exporter);
   ASSERT_EQ(otlp_grpc->endpoint, "somewhere");
-  ASSERT_EQ(otlp_grpc->certificate_file, "");
-  ASSERT_EQ(otlp_grpc->client_key_file, "");
-  ASSERT_EQ(otlp_grpc->client_certificate_file, "");
+  ASSERT_EQ(otlp_grpc->tls, nullptr);
   ASSERT_EQ(otlp_grpc->headers, nullptr);
   ASSERT_EQ(otlp_grpc->headers_list, "");
   ASSERT_EQ(otlp_grpc->compression, "");
   ASSERT_EQ(otlp_grpc->timeout, 10000);
-  ASSERT_EQ(otlp_grpc->insecure, false);
 }
 
 TEST(YamlTrace, otlp_grpc)
@@ -300,9 +299,11 @@ tracer_provider:
         exporter:
           otlp_grpc:
             endpoint: "somewhere"
-            certificate_file: "certificate_file"
-            client_key_file: "client_key_file"
-            client_certificate_file: "client_certificate_file"
+            tls:
+              certificate_file: "certificate_file"
+              client_key_file: "client_key_file"
+              client_certificate_file: "client_certificate_file"
+              insecure: true
             headers:
               - name: foo
                 value: "123"
@@ -311,7 +312,6 @@ tracer_provider:
             headers_list: "baz=789"
             compression: "compression"
             timeout: 5000
-            insecure: true
 )";
 
   auto config = DoParse(yaml);
@@ -330,9 +330,11 @@ tracer_provider:
       reinterpret_cast<opentelemetry::sdk::configuration::OtlpGrpcSpanExporterConfiguration *>(
           exporter);
   ASSERT_EQ(otlp_grpc->endpoint, "somewhere");
-  ASSERT_EQ(otlp_grpc->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_grpc->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_grpc->client_certificate_file, "client_certificate_file");
+  ASSERT_NE(otlp_grpc->tls, nullptr);
+  ASSERT_EQ(otlp_grpc->tls->certificate_file, "certificate_file");
+  ASSERT_EQ(otlp_grpc->tls->client_key_file, "client_key_file");
+  ASSERT_EQ(otlp_grpc->tls->client_certificate_file, "client_certificate_file");
+  ASSERT_EQ(otlp_grpc->tls->insecure, true);
   ASSERT_NE(otlp_grpc->headers, nullptr);
   ASSERT_EQ(otlp_grpc->headers->kv_map.size(), 2);
   ASSERT_EQ(otlp_grpc->headers->kv_map["foo"], "123");
@@ -340,7 +342,6 @@ tracer_provider:
   ASSERT_EQ(otlp_grpc->headers_list, "baz=789");
   ASSERT_EQ(otlp_grpc->compression, "compression");
   ASSERT_EQ(otlp_grpc->timeout, 5000);
-  ASSERT_EQ(otlp_grpc->insecure, true);
 }
 
 TEST(YamlTrace, default_otlp_file)
