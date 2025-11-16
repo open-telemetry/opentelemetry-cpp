@@ -196,14 +196,14 @@ The custom log handler can be defined by inheriting from `opentelemetry::sdk::co
     class CustomLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
     {
         void Handle(opentelemetry::sdk::common::internal_log::LogLevel level,
-                    const char \*file,
+                    const char *file,
                     int line,
-                    const char \*msg,
+                    const char *msg,
                     const opentelemetry::sdk::common::AttributeMap &attributes) noexcept override
 
         {
             // add implementation here
         }
     };
-    opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(CustomLogHandler());
+    opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(std::make_shared<CustomLogHandler>());
     opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogLevel(opentelemetry::sdk::common::internal_log::LogLevel::Debug);
