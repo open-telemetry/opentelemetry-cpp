@@ -338,6 +338,21 @@ elif [[ "$1" == "cmake.legacy.test" ]]; then
   make -j $(nproc)
   make test
   exit 0
+elif [[ "$1" == "cmake.clang_tidy.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  export BUILD_ROOT="${BUILD_DIR}"
+  cmake -S ${SRC_DIR} \
+    -B ${BUILD_DIR} \
+    -C ${SRC_DIR}/test_common/cmake/all-options-abiv2-preview.cmake  \
+    "${CMAKE_OPTIONS[@]}" \
+    -DWITH_OPENTRACING=OFF \
+    -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+    -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--quiet;-p;${BUILD_DIR}"
+  make -j $(nproc)
+  make test
+  exit 0
 elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
