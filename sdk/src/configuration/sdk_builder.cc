@@ -1141,7 +1141,8 @@ SdkBuilder::CreatePropagator(
 static opentelemetry::sdk::metrics::InstrumentType ConvertInstrumentType(
     enum opentelemetry::sdk::configuration::InstrumentType config)
 {
-  opentelemetry::sdk::metrics::InstrumentType sdk{opentelemetry::sdk::metrics::InstrumentType::kCounter};
+  opentelemetry::sdk::metrics::InstrumentType sdk{
+      opentelemetry::sdk::metrics::InstrumentType::kCounter};
 
   switch (config)
   {
