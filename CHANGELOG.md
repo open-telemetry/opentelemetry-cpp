@@ -45,6 +45,9 @@ Increment the:
 * [CI] Free disk space
   [#3749](https://github.com/open-telemetry/opentelemetry-cpp/pull/3749)
 
+* [SDK] Reset TraceFlags::IsSampled bit on sampler Decision::DROP
+  [#3745](https://github.com/open-telemetry/opentelemetry-cpp/pull/3745)
+
 New Features:
 
 * [CONFIGURATION] Implement declarative configuration (config.yaml)
