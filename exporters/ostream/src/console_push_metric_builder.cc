@@ -31,7 +31,8 @@ void ConsolePushMetricBuilder::Register(opentelemetry::sdk::configuration::Regis
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> ConsolePushMetricBuilder::Build(
     const opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration *model) const
 {
-  sdk::metrics::AggregationTemporality aggregation_temporality;
+  sdk::metrics::AggregationTemporality aggregation_temporality{
+      sdk::metrics::AggregationTemporality::kUnspecified};
 
   switch (model->temporality_preference)
   {

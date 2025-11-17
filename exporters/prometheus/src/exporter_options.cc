@@ -29,7 +29,7 @@ inline bool GetPrometheusWithoutOtelScope()
 {
   constexpr char kPrometheusWithoutOtelScope[] = "OTEL_CPP_PROMETHEUS_EXPORTER_WITHOUT_OTEL_SCOPE";
 
-  bool setting;
+  bool setting{};
   auto exists =
       opentelemetry::sdk::common::GetBoolEnvironmentVariable(kPrometheusWithoutOtelScope, setting);
 
@@ -41,7 +41,7 @@ inline bool GetPrometheusPopulateTargetInfo()
   constexpr char kPrometheusPopulateTargetInfo[] =
       "OTEL_CPP_PROMETHEUS_EXPORTER_POPULATE_TARGET_INFO";
 
-  bool setting;
+  bool setting{};
   auto exists = opentelemetry::sdk::common::GetBoolEnvironmentVariable(
       kPrometheusPopulateTargetInfo, setting);
 
@@ -51,7 +51,7 @@ inline bool GetPrometheusPopulateTargetInfo()
 inline bool GetPrometheusWithoutUnits()
 {
   constexpr char kPrometheusWithoutUnits[] = "OTEL_CPP_PROMETHEUS_EXPORTER_WITHOUT_UNITS";
-  bool setting;
+  bool setting{};
   const auto exists =
       opentelemetry::sdk::common::GetBoolEnvironmentVariable(kPrometheusWithoutUnits, setting);
 
@@ -62,7 +62,7 @@ inline bool GetPrometheusWithoutTypeSuffix()
 {
   constexpr char kPrometheusWithoutTypeSuffix[] =
       "OTEL_CPP_PROMETHEUS_EXPORTER_WITHOUT_TYPE_SUFFIX";
-  bool setting;
+  bool setting{};
   const auto exists =
       opentelemetry::sdk::common::GetBoolEnvironmentVariable(kPrometheusWithoutTypeSuffix, setting);
 

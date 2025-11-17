@@ -766,7 +766,7 @@ bool OtlpGrpcClient::Shutdown(OtlpGrpcClientReferenceGuard &guard,
   }
 
   bool last_reference_removed = RemoveReference(guard);
-  bool force_flush_result;
+  bool force_flush_result{};
   if (last_reference_removed && false == is_shutdown_.exchange(true, std::memory_order_acq_rel))
   {
     OTEL_INTERNAL_LOG_DEBUG("[OTLP GRPC Client] DEBUG: OtlpGrpcClient start to shutdown");

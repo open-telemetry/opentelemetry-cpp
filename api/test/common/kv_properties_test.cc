@@ -66,7 +66,7 @@ using opentelemetry::common::KeyValueStringTokenizerOptions;
 
 TEST(KVStringTokenizer, SinglePair)
 {
-  bool valid_kv;
+  bool valid_kv{};
   nostd::string_view key, value;
   opentelemetry::nostd::string_view str = "k1=v1";
   KeyValueStringTokenizerOptions opts;
@@ -80,7 +80,7 @@ TEST(KVStringTokenizer, SinglePair)
 
 TEST(KVStringTokenizer, AcceptEmptyEntries)
 {
-  bool valid_kv;
+  bool valid_kv{};
   nostd::string_view key, value;
   opentelemetry::nostd::string_view str = ":k1=v1::k2=v2: ";
   KeyValueStringTokenizerOptions opts;
@@ -104,7 +104,7 @@ TEST(KVStringTokenizer, AcceptEmptyEntries)
 TEST(KVStringTokenizer, ValidPairsWithEmptyEntries)
 {
   opentelemetry::nostd::string_view str = "k1:v1===k2:v2==";
-  bool valid_kv;
+  bool valid_kv{};
   nostd::string_view key, value;
   KeyValueStringTokenizerOptions opts;
   opts.member_separator    = '=';
@@ -128,7 +128,7 @@ TEST(KVStringTokenizer, InvalidPairs)
 {
   opentelemetry::nostd::string_view str = "k1=v1,invalid  ,,  k2=v2   ,invalid";
   KeyValueStringTokenizer tk(str);
-  bool valid_kv;
+  bool valid_kv{};
   nostd::string_view key, value;
   EXPECT_TRUE(tk.next(valid_kv, key, value));
 
