@@ -81,7 +81,7 @@ TEST(UniquePtrTest, MoveConstructionFromStdUniquePtr)
 
 TEST(UniquePtrTest, Destruction)
 {
-  bool was_destructed;
+  bool was_destructed{};
   unique_ptr<A>{new A{was_destructed}};  // NOLINT
   EXPECT_TRUE(was_destructed);
 }
@@ -127,7 +127,7 @@ TEST(UniquePtrTest, PointerOperators)
 
 TEST(UniquePtrTest, Reset)
 {
-  bool was_destructed1;
+  bool was_destructed1{};
   unique_ptr<A> ptr{new A{was_destructed1}};
   bool was_destructed2 = true;
   ptr.reset(new A{was_destructed2});

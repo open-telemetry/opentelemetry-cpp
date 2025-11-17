@@ -98,7 +98,7 @@ TEST(SharedPtrTest, MoveConstructionFromStdSharedPtr)
 
 TEST(SharedPtrTest, Destruction)
 {
-  bool was_destructed;
+  bool was_destructed{};
   shared_ptr<A>{new A{was_destructed}};  // NOLINT
   EXPECT_TRUE(was_destructed);
 }
