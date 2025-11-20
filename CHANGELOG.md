@@ -152,7 +152,8 @@ Increment the:
 * [DOCS] Remove out-of-date vcpkg docs
   [#3735](https://github.com/open-telemetry/opentelemetry-cpp/pull/3735)
 
-* [DOCKER] Update docker files to build all third party dependencies from the tags file
+* [DOCKER] Update docker files to build all third party dependencies
+  from the tags file
   [#3718](https://github.com/open-telemetry/opentelemetry-cpp/pull/3718)
 
 * Bump docker/setup-qemu-action from 3.6.0 to 3.7.0
