@@ -195,6 +195,9 @@ Increment the:
 * Bump github/codeql-action from 4.31.3 to 4.31.4
   [#3755](https://github.com/open-telemetry/opentelemetry-cpp/pull/3755)
 
+* Bump actions/checkout from 5.0.1 to 6.0.0
+  [#3757](https://github.com/open-telemetry/opentelemetry-cpp/pull/3757)
+
 New Features:
 
 * [CONFIGURATION] Implement declarative configuration (config.yaml)
