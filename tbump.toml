@@ -21,7 +21,7 @@
 github_url = "https://github.com/open-telemetry/opentelemetry-cpp"
 
 [version]
-current = "1.24.0-dev"
+current = "1.24.0"
 
 # Example of a semver regexp.
 # Make sure this matches current_version before
