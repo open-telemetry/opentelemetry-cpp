@@ -20,7 +20,7 @@ SDK CREATED
   severity_text      : DEBUG
   body               : body
   resource           : 
-    telemetry.sdk.version: 1.24.0
+    telemetry.sdk.version: 1.25.0-dev
     service.version: 1.0.0
     double_array_key: [1.1,2.2]
     double_key: 1.1
