@@ -158,7 +158,7 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
 
   EXPECT_CALL(*mock_http_client, Post(expected_url, _, IsValidMessage(report_trace_id), _, _))
 
-      .Times(Exactly(1))
+      .Times(Exactly(2))
       .WillOnce(Return(ByMove(ext::http::client::Result{
           std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},
           ext::http::client::SessionState::Response})));
