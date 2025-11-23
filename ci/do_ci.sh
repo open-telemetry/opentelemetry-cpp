@@ -342,6 +342,8 @@ elif [[ "$1" == "cmake.clang_tidy.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   export BUILD_ROOT="${BUILD_DIR}"
+  clang-tidy --version
+
   cmake -S ${SRC_DIR} \
     -B ${BUILD_DIR} \
     -C ${SRC_DIR}/test_common/cmake/all-options-abiv2-preview.cmake  \
@@ -349,7 +351,7 @@ elif [[ "$1" == "cmake.clang_tidy.test" ]]; then
     -DWITH_OPENTRACING=OFF \
     -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-    -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--quiet;-p;${BUILD_DIR}"
+    -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--header-filter=.*;--exclude-header-filter=.*internal/absl/.*;--quiet"
   make -j $(nproc)
   make test
   exit 0

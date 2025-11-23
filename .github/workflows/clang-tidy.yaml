@@ -53,12 +53,11 @@ jobs:
         run: |
           sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
 
-      - name: Check clang-tidy
+      - name: Install clang-tidy-20
         run: |
-          if ! command -v clang-tidy &> /dev/null; then
-            echo "clang-tidy could not be found"
-            exit 1
-          fi
+          sudo apt install -y clang-tidy-20
+          sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-20 200
+          sudo update-alternatives --config clang-tidy
           echo "Using clang-tidy version: $(clang-tidy --version)"
           echo "clang-tidy installed at: $(which clang-tidy)"
 
@@ -75,7 +74,7 @@ jobs:
             -DWITH_OPENTRACING=OFF \
             -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-            -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--quiet;-p;build-${{ matrix.cmake_options }}"
+            -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--header-filter=.*;--exclude-header-filter=.*internal/absl/.*;--quiet" 
 
       - name: Run clang-tidy
         run: |
