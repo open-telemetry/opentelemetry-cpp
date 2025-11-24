@@ -67,7 +67,7 @@ jobs:
           CXX: clang++
         run: |
           echo "Running cmake..."
-          cmake
+          cmake \
             -S . \
             -B build-${{ matrix.cmake_options }} \
             -C ./test_common/cmake/${{ matrix.cmake_options }}.cmake \
