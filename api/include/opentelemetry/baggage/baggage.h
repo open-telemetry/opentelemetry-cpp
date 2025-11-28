@@ -274,8 +274,8 @@ private:
       {
         ret.push_back(' ');
       }
-      else if (std::isalnum(str[i]) || str[i] == '-' || str[i] == '_' || str[i] == '.' ||
-               str[i] == '~')
+      else if (str[i] >= ' ' && str[i] <= '~' && str[i] != '"' && str[i] != ',' && str[i] != ';' &&
+               str[i] != '\\')
       {
         ret.push_back(str[i]);
       }
