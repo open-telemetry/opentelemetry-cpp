@@ -12,6 +12,8 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/attribute_validity.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -42,6 +44,7 @@ public:
       nostd::string_view schema_url               = "",
       InstrumentationScopeAttributes &&attributes = {})
   {
+    common::AttributeValidator::Filter(attributes, "[InstrumentationScope]");
     return nostd::unique_ptr<InstrumentationScope>(
         new InstrumentationScope{name, version, schema_url, std::move(attributes)});
   }
@@ -60,8 +63,19 @@ public:
       nostd::string_view schema_url,
       const InstrumentationScopeAttributes &attributes)
   {
-    return nostd::unique_ptr<InstrumentationScope>(new InstrumentationScope{
-        name, version, schema_url, InstrumentationScopeAttributes(attributes)});
+    // Copy attributes only when we find some invalid attributes and try to remove them.
+    if (common::AttributeValidator::IsAllValid(attributes))
+    {
+      return nostd::unique_ptr<InstrumentationScope>(new InstrumentationScope{
+          name, version, schema_url, InstrumentationScopeAttributes(attributes)});
+    }
+    else
+    {
+      InstrumentationScopeAttributes copy_attributes = attributes;
+      common::AttributeValidator::Filter(copy_attributes, "[InstrumentationScope]");
+      return nostd::unique_ptr<InstrumentationScope>(new InstrumentationScope{
+          name, version, schema_url, InstrumentationScopeAttributes(copy_attributes)});
+    }
   }
 
   /**
@@ -88,6 +102,19 @@ public:
     result->attributes_.reserve(opentelemetry::nostd::size(arg));
     for (auto &argv : arg)
     {
+      if (!common::AttributeValidator::IsValid(argv.first))
+      {
+        OTEL_INTERNAL_LOG_WARN("[InstrumentationScope] Invalid attribute key "
+                               << std::string{argv.first} << ". This attribute will be ignored.");
+        continue;
+      }
+
+      if (!common::AttributeValidator::IsValid(argv.second))
+      {
+        OTEL_INTERNAL_LOG_WARN("[InstrumentationScope] Invalid attribute value for "
+                               << std::string{argv.first} << ". This attribute will be ignored.");
+        continue;
+      }
       result->SetAttribute(argv.first, argv.second);
     }
 
@@ -148,6 +175,19 @@ public:
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept
   {
+    if (!common::AttributeValidator::IsValid(key))
+    {
+      OTEL_INTERNAL_LOG_WARN("[InstrumentationScope] Invalid attribute key "
+                             << std::string{key} << ". This attribute will be ignored.");
+      return;
+    }
+
+    if (!common::AttributeValidator::IsValid(value))
+    {
+      OTEL_INTERNAL_LOG_WARN("[InstrumentationScope] Invalid attribute value for "
+                             << std::string{key} << ". This attribute will be ignored.");
+      return;
+    }
     attributes_[std::string(key)] =
         nostd::visit(opentelemetry::sdk::common::AttributeConverter(), value);
   }
