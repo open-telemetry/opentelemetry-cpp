@@ -240,7 +240,7 @@ public:
 
     provider->ForceFlush();
 
-    // Exporting can be retryed
+    // Exporting can be retried
     EXPECT_GE(received_record_counter, 1);
   }
 
@@ -387,7 +387,7 @@ public:
 
     provider->ForceFlush();
 
-    // Exporting can be retryed
+    // Exporting can be retried
     EXPECT_GE(received_record_counter, 1);
   }
 #  endif
@@ -514,7 +514,7 @@ public:
 
     provider->ForceFlush();
 
-    // Exporting can be retryed
+    // Exporting can be retried
     EXPECT_GE(received_record_counter, 1);
   }
 
@@ -645,7 +645,7 @@ public:
         std::chrono::system_clock::now());
 
     provider->ForceFlush();
-    // Exporting can be retryed
+    // Exporting can be retried
     EXPECT_GE(received_record_counter, 1);
   }
 #  endif

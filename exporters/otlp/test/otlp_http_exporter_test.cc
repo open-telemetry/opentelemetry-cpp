@@ -223,7 +223,7 @@ public:
 
     provider->ForceFlush();
 
-    // Exporting can be retryed
+    // Exporting can be retried
     EXPECT_GE(received_trace_id_counter, 1);
   }
 
@@ -339,7 +339,7 @@ public:
 
     provider->ForceFlush();
 
-    // Exporting can be retryed
+    // Exporting can be retried
     EXPECT_GE(received_trace_id_counter, 1);
   }
 #  endif
@@ -436,7 +436,7 @@ public:
 
     provider->ForceFlush();
 
-    // Exporting can be retryed
+    // Exporting can be retried
     EXPECT_GE(received_trace_id_counter, 1);
   }
 
@@ -537,7 +537,7 @@ public:
     parent_span->End();
 
     provider->ForceFlush();
-    // Exporting can be retryed
+    // Exporting can be retried
     EXPECT_GE(received_trace_id_counter, 1);
   }
 #  endif

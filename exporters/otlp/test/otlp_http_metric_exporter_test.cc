@@ -228,7 +228,7 @@ public:
 
     exporter->ForceFlush();
 
-    // Exporting can be retryed
+    // Exporting can be retried
     EXPECT_GE(received_record_counter, 1);
   }
 
@@ -335,7 +335,7 @@ public:
 
     exporter->ForceFlush();
 
-    // Exporting can be retryed
+    // Exporting can be retried
     EXPECT_GE(received_record_counter, 1);
   }
 
@@ -440,7 +440,7 @@ public:
 
     exporter->ForceFlush();
 
-    // Exporting can be retryed
+    // Exporting can be retried
     EXPECT_GE(received_record_counter, 1);
   }
 
@@ -557,7 +557,7 @@ public:
 
     exporter->ForceFlush();
 
-    // Exporting can be retryed
+    // Exporting can be retried
     EXPECT_GE(received_record_counter, 1);
   }
 
@@ -702,7 +702,7 @@ public:
 
     exporter->ForceFlush();
 
-    // Exporting can be retryed
+    // Exporting can be retried
     EXPECT_GE(received_record_counter, 1);
   }
 
@@ -856,7 +856,7 @@ public:
 
     exporter->ForceFlush();
 
-    // Exporting can be retryed
+    // Exporting can be retried
     EXPECT_GE(received_record_counter, 1);
   }
 };
