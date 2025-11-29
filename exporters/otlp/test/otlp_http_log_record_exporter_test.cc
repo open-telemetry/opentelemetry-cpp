@@ -158,20 +158,35 @@ public:
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+    auto received_record_counter = 0;
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce(
-            [&mock_session, report_trace_id, report_span_id](
+        .WillRepeatedly(
+            [&mock_session, report_trace_id, report_span_id, &received_record_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               auto check_json =
                   nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-              auto resource_logs     = *check_json["resourceLogs"].begin();
-              auto scope_logs        = *resource_logs["scopeLogs"].begin();
+              if (check_json["resourceLogs"].size() == 0)
+              {
+                return;
+              }
+              auto resource_logs = *check_json["resourceLogs"].begin();
+              if (resource_logs["scopeLogs"].size() == 0)
+              {
+                return;
+              }
+              auto scope_logs = *resource_logs["scopeLogs"].begin();
+              if (scope_logs["logRecords"].size() == 0)
+              {
+                return;
+              }
               auto scope             = scope_logs["scope"];
               auto log               = *scope_logs["logRecords"].begin();
               auto received_trace_id = log["traceId"].get<std::string>();
               auto received_span_id  = log["spanId"].get<std::string>();
-              EXPECT_EQ(received_trace_id, report_trace_id);
-              EXPECT_EQ(received_span_id, report_span_id);
+              if (received_trace_id == report_trace_id && received_span_id == report_span_id)
+              {
+                ++received_record_counter;
+              }
               EXPECT_EQ("Log message", log["body"]["stringValue"].get<std::string>());
               EXPECT_LE(15, log["attributes"].size());
               auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
@@ -224,6 +239,9 @@ public:
         std::chrono::system_clock::now());
 
     provider->ForceFlush();
+
+    // Exporting can be retried
+    EXPECT_GE(received_record_counter, 1);
   }
 
 #  ifdef ENABLE_ASYNC_EXPORT
@@ -276,14 +294,27 @@ public:
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+    auto received_record_counter = 0;
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce(
-            [&mock_session, report_trace_id, report_span_id](
+        .WillRepeatedly(
+            [&mock_session, report_trace_id, report_span_id, &received_record_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               auto check_json =
                   nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-              auto resource_logs     = *check_json["resourceLogs"].begin();
-              auto scope_logs        = *resource_logs["scopeLogs"].begin();
+              if (check_json["resourceLogs"].size() == 0)
+              {
+                return;
+              }
+              auto resource_logs = *check_json["resourceLogs"].begin();
+              if (resource_logs["scopeLogs"].size() == 0)
+              {
+                return;
+              }
+              auto scope_logs = *resource_logs["scopeLogs"].begin();
+              if (scope_logs["logRecords"].size() == 0)
+              {
+                return;
+              }
               auto schema_url        = scope_logs["schemaUrl"].get<std::string>();
               auto scope             = scope_logs["scope"];
               auto scope_name        = scope["name"];
@@ -291,11 +322,13 @@ public:
               auto log               = *scope_logs["logRecords"].begin();
               auto received_trace_id = log["traceId"].get<std::string>();
               auto received_span_id  = log["spanId"].get<std::string>();
+              if (received_trace_id == report_trace_id && received_span_id == report_span_id)
+              {
+                ++received_record_counter;
+              }
               EXPECT_EQ(schema_url, "https://opentelemetry.io/schemas/1.2.0");
               EXPECT_EQ(scope_name, "opentelelemtry_library");
               EXPECT_EQ(scope_version, "1.2.0");
-              EXPECT_EQ(received_trace_id, report_trace_id);
-              EXPECT_EQ(received_span_id, report_span_id);
               EXPECT_EQ("Log message", log["body"]["stringValue"].get<std::string>());
               EXPECT_LE(15, log["attributes"].size());
               auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
@@ -353,6 +386,9 @@ public:
         std::chrono::system_clock::now());
 
     provider->ForceFlush();
+
+    // Exporting can be retried
+    EXPECT_GE(received_record_counter, 1);
   }
 #  endif
 
@@ -399,21 +435,31 @@ public:
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+    auto received_record_counter = 0;
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce(
-            [&mock_session, report_trace_id, report_span_id](
+        .WillRepeatedly(
+            [&mock_session, report_trace_id, report_span_id, &received_record_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
               request_body.ParseFromArray(
                   &mock_session->GetRequest()->body_[0],
                   static_cast<int>(mock_session->GetRequest()->body_.size()));
+              if (request_body.resource_logs_size() == 0 ||
+                  request_body.resource_logs(0).scope_logs_size() == 0 ||
+                  request_body.resource_logs(0).scope_logs(0).log_records_size() == 0)
+              {
+                return;
+              }
               auto scope_log = request_body.resource_logs(0).scope_logs(0);
               EXPECT_EQ(scope_log.schema_url(), "https://opentelemetry.io/schemas/1.2.0");
               EXPECT_EQ(scope_log.scope().name(), "opentelelemtry_library");
               EXPECT_EQ(scope_log.scope().version(), "1.2.0");
               const auto &received_log = scope_log.log_records(0);
-              EXPECT_EQ(received_log.trace_id(), report_trace_id);
-              EXPECT_EQ(received_log.span_id(), report_span_id);
+              if (received_log.trace_id() == report_trace_id &&
+                  received_log.span_id() == report_span_id)
+              {
+                ++received_record_counter;
+              }
               EXPECT_EQ("Log message", received_log.body().string_value());
               EXPECT_LE(15, received_log.attributes_size());
               bool check_service_name = false;
@@ -467,6 +513,9 @@ public:
         std::chrono::system_clock::now());
 
     provider->ForceFlush();
+
+    // Exporting can be retried
+    EXPECT_GE(received_record_counter, 1);
   }
 
 #  ifdef ENABLE_ASYNC_EXPORT
@@ -514,18 +563,28 @@ public:
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+    auto received_record_counter = 0;
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce(
-            [&mock_session, report_trace_id, report_span_id, schema_url](
+        .WillRepeatedly(
+            [&mock_session, report_trace_id, report_span_id, schema_url, &received_record_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
               request_body.ParseFromArray(
                   &mock_session->GetRequest()->body_[0],
                   static_cast<int>(mock_session->GetRequest()->body_.size()));
+              if (request_body.resource_logs_size() == 0 ||
+                  request_body.resource_logs(0).scope_logs_size() == 0 ||
+                  request_body.resource_logs(0).scope_logs(0).log_records_size() == 0)
+              {
+                return;
+              }
               auto &scope_log   = request_body.resource_logs(0).scope_logs(0);
               auto received_log = scope_log.log_records(0);
-              EXPECT_EQ(received_log.trace_id(), report_trace_id);
-              EXPECT_EQ(received_log.span_id(), report_span_id);
+              if (received_log.trace_id() == report_trace_id &&
+                  received_log.span_id() == report_span_id)
+              {
+                ++received_record_counter;
+              }
               EXPECT_EQ("Log message", received_log.body().string_value());
               EXPECT_LE(15, received_log.attributes_size());
               bool check_service_name = false;
@@ -586,6 +645,8 @@ public:
         std::chrono::system_clock::now());
 
     provider->ForceFlush();
+    // Exporting can be retried
+    EXPECT_GE(received_record_counter, 1);
   }
 #  endif
 };
