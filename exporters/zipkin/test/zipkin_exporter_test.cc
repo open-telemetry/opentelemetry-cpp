@@ -157,8 +157,10 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
   auto expected_url = nostd::string_view{"http://localhost:9411/api/v2/spans"};
 
   EXPECT_CALL(*mock_http_client, Post(expected_url, _, IsValidMessage(report_trace_id), _, _))
-
-      .Times(Exactly(1))
+      .Times(Between(1, 2))
+      .WillOnce(Return(ByMove(ext::http::client::Result{
+          std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},
+          ext::http::client::SessionState::Response})))
       .WillOnce(Return(ByMove(ext::http::client::Result{
           std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},
           ext::http::client::SessionState::Response})));

@@ -34,7 +34,7 @@ TEST(EnvVarTest, BoolEnvVar)
   setenv("BOOL_ENV_VAR_F3", "FaLsE", 1);
   setenv("BOOL_ENV_VAR_BROKEN", "Maybe ?", 1);
 
-  bool exists;
+  bool exists{};
   bool value = true;
 
   exists = GetBoolEnvironmentVariable("BOOL_ENV_VAR_NONE", value);
@@ -97,7 +97,7 @@ TEST(EnvVarTest, StringEnvVar)
   setenv("STRING_ENV_VAR_EMPTY", "", 1);
   setenv("STRING_ENV_VAR", "my string", 1);
 
-  bool exists;
+  bool exists{};
   std::string value;
 
   exists = GetStringEnvironmentVariable("STRING_ENV_VAR_NONE", value);
@@ -130,7 +130,7 @@ TEST(EnvVarTest, DurationEnvVar)
   setenv("DURATION_ENV_VAR_BROKEN_1", "123 ms", 1);
   setenv("DURATION_ENV_VAR_BROKEN_2", "1mississippi", 1);
 
-  bool exists;
+  bool exists{};
   std::chrono::system_clock::duration poison;
   std::chrono::system_clock::duration value;
   std::chrono::system_clock::duration expected;
@@ -231,7 +231,7 @@ TEST(EnvVarTest, UintEnvVar)
   setenv("UINT_ENV_VAR_WITH_NOISE", "   \t \n 9.12345678.9", 1);
   setenv("UINT_ENV_VAR_ONLY_SPACES", "   ", 1);
 
-  std::uint32_t value;
+  std::uint32_t value{};
 
   ASSERT_FALSE(GetUintEnvironmentVariable("UINT_ENV_VAR_NONE", value));
 
@@ -295,7 +295,7 @@ TEST(EnvVarTest, FloatEnvVar)
   setenv("FLOAT_ENV_VAR_WITH_NOISE", "   \t \n 9.12345678.9", 1);
   setenv("FLOAT_ENV_VAR_ONLY_SPACES", "   ", 1);
 
-  float value;
+  float value{};
 
   ASSERT_FALSE(GetFloatEnvironmentVariable("FLOAT_ENV_VAR_NONE", value));
 

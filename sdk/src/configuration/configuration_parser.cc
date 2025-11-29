@@ -1975,9 +1975,9 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
   model->file_format = node->GetRequiredString("file_format");
 
   {
-    int count;
-    int major;
-    int minor;
+    int count{};
+    int major{};
+    int minor{};
 
     count = sscanf(model->file_format.c_str(), "%d.%d", &major, &minor);
     if (count != 2)

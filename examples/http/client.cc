@@ -99,16 +99,12 @@ int main(int argc, char *argv[])
   constexpr char default_host[]   = "localhost";
   constexpr char default_path[]   = "/helloworld";
   constexpr uint16_t default_port = 8800;
-  uint16_t port;
+  uint16_t port{default_port};
 
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
   {
     port = static_cast<uint16_t>(atoi(argv[1]));
-  }
-  else
-  {
-    port = default_port;
   }
 
   std::string url = "http://" + std::string(default_host) + ":" + std::to_string(port) +

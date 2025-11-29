@@ -30,7 +30,7 @@ SDK CREATED
     service.version: 1.0.0
     int_key: 1
     service.name: unknown_service
-    telemetry.sdk.version: 1.24.0-dev
+    telemetry.sdk.version: 1.25.0-dev
     bool_array_key: [1,0]
     bool_key: 1
     double_array_key: [1.1,2.2]

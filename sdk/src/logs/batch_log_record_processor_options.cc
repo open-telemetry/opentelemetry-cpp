@@ -27,7 +27,7 @@ const size_t kDefaultMaxExportBatchSize                     = 512;
 
 inline size_t GetMaxQueueSizeFromEnv()
 {
-  std::uint32_t value;
+  std::uint32_t value{};
   if (!opentelemetry::sdk::common::GetUintEnvironmentVariable(kMaxQueueSizeEnv, value))
   {
     return kDefaultMaxQueueSize;
@@ -49,7 +49,7 @@ inline std::chrono::milliseconds GetDurationFromEnv(
 
 inline size_t GetMaxExportBatchSizeFromEnv()
 {
-  std::uint32_t value;
+  std::uint32_t value{};
   if (!opentelemetry::sdk::common::GetUintEnvironmentVariable(kMaxExportBatchSizeEnv, value))
   {
     return kDefaultMaxExportBatchSize;
