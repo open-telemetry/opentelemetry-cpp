@@ -406,6 +406,10 @@ switch ($action) {
       exit $exit
     }
 
+    $env:PATH = FindAndMergeDllPath "."
+
+    Write-Output "PATH=$env:PATH"
+
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -418,7 +422,9 @@ switch ($action) {
       exit $exit
     }
 
-    $env:PATH = FindAndMergeDllPath "." "$INSTALL_TEST_DIR\bin"
+    $env:PATH = FindAndMergeDllPath "$INSTALL_TEST_DIR\bin"
+
+    Write-Output "PATH=$env:PATH"
 
     $CMAKE_OPTIONS_STRING = $CMAKE_OPTIONS -join " "
    
@@ -509,7 +515,12 @@ switch ($action) {
       exit $exit
     }
 
+    $env:PATH = FindAndMergeDllPath "."
+
+    Write-Output "PATH=$env:PATH"
+
     ctest -C Debug
+
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -521,7 +532,7 @@ switch ($action) {
       exit $exit
     }
 
-    $env:PATH = FindAndMergeDllPath "." "$INSTALL_TEST_DIR\bin"
+    $env:PATH = FindAndMergeDllPath "$INSTALL_TEST_DIR\bin"
 
     Write-Output "PATH=$env:PATH"
 
@@ -542,6 +553,7 @@ switch ($action) {
     cd "$BUILD_DIR\install_test"
 
     $env:PATH = FindAndMergeDllPath "."
+
     Write-Output "PATH=$env:PATH"
 
     cmake $CMAKE_OPTIONS `
