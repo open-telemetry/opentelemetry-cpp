@@ -46,7 +46,6 @@
 
 ./.bazelignore
 ./.bazelversion
-./.clomonitor.yml
 ./docker/.gitignore
 .markdownlintignore
 ./ci/toc.yml
