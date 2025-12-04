@@ -14,6 +14,7 @@
 #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 #include "opentelemetry/sdk/common/circular_buffer_range.h"
 #include "opentelemetry/version.h"
+#include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -21,14 +22,14 @@ namespace sdk
 namespace common
 {
 /*
- * A lock-free circular buffer that supports multiple concurrent producers
- * and a single consumer.
+ * An optimized lock-free circular buffer that supports multiple concurrent producers
+ * and a single consumer. Uses FAA (Fetch-And-Add) for better performance.
  */
 template <class T>
-class CircularBuffer
+class OptimizedCircularBuffer
 {
 public:
-  explicit CircularBuffer(size_t max_size)
+  explicit OptimizedCircularBuffer(size_t max_size)
       : data_{new AtomicUniquePtr<T>[max_size + 1]}, capacity_{max_size + 1}
   {}
 
@@ -39,7 +40,7 @@ public:
    */
   CircularBufferRange<const AtomicUniquePtr<T>> Peek() const noexcept
   {
-    return const_cast<CircularBuffer *>(this)->PeekImpl();
+    return const_cast<OptimizedCircularBuffer *>(this)->PeekImpl();
   }
 
   /**
@@ -55,13 +56,15 @@ public:
   template <class Callback>
   void Consume(size_t n, Callback callback) noexcept
   {
-    assert(n <= static_cast<size_t>(head_ - tail_));
+    // comsume max(n, available) elements
     auto range = PeekImpl().Take(n);
     static_assert(noexcept(callback(range)), "callback not allowed to throw");
-    tail_ += n;
-    // why not call back after tail_ += n
+    // consume elements
     callback(range);
-    // tail_ += n;
+    // free elements to let producers add new elements
+    tail_ += range.size();
+    tail_ %= capacity_;
+    count_.fetch_sub(range.size(), std::memory_order_release);
   }
 
   /**
@@ -87,37 +90,24 @@ public:
    */
   bool Add(std::unique_ptr<T> &ptr) noexcept
   {
-    while (true)
+    uint64_t count = count_.fetch_add(1, std::memory_order_acquire);
+    if (count >= capacity_ - 1)
     {
-      uint64_t tail = tail_;
-      uint64_t head = head_;
-
-      // The circular buffer is full, so return false.
-      if (head - tail >= capacity_ - 1)
-      {
-        return false;
-      }
-
-      uint64_t head_index = head % capacity_;
-      if (data_[head_index].SwapIfNull(ptr))
-      {
-        auto new_head      = head + 1;
-        auto expected_head = head;
-        if (head_.compare_exchange_weak(expected_head, new_head, std::memory_order_release,
-                                        std::memory_order_relaxed))
-        {
-          // free the swapped out value
-          ptr.reset();
-
-          return true;
-        }
-
-        // If we reached this point (unlikely), it means that between the last
-        // iteration elements were added and then consumed from the circular
-        // buffer, so we undo the swap and attempt to add again.
-        data_[head_index].Swap(ptr);
-      }
+      // queue is full, rollback
+      count_.fetch_sub(1, std::memory_order_release);
+      return false;
     }
+
+    uint64_t head_pos = head_.fetch_add(1, std::memory_order_acquire);
+    uint64_t head_index = head_pos % capacity_;
+    // It should be a valid pos to add an element
+    assert(data_[head_index].Get() == nullptr);
+    
+    // set the element must be sucess
+    bool success = data_[head_index].SwapIfNull(ptr);
+    assert(success); 
+    ptr.reset();
+    return true;
   }
 
   bool Add(std::unique_ptr<T> &&ptr) noexcept
@@ -143,7 +133,7 @@ public:
   /**
    * @return true if the buffer is empty.
    */
-  bool empty() const noexcept { return head_ == tail_; }
+  bool empty() const noexcept { return count_.load(std::memory_order_relaxed) == 0; }
 
   /**
    * @return the number of bytes stored in the circular buffer.
@@ -153,10 +143,7 @@ public:
    */
   size_t size() const noexcept
   {
-    uint64_t tail = tail_;
-    uint64_t head = head_;
-    assert(tail <= head);
-    return head - tail;
+    return count_.load(std::memory_order_relaxed);
   }
 
   /**
@@ -172,26 +159,53 @@ public:
 private:
   std::unique_ptr<AtomicUniquePtr<T>[]> data_;
   size_t capacity_;
-  std::atomic<uint64_t> head_{0};
-  std::atomic<uint64_t> tail_{0};
+  std::atomic<uint64_t> count_{0};  
+  std::atomic<uint64_t> head_{0}; 
+  uint64_t tail_{0};
 
   CircularBufferRange<AtomicUniquePtr<T>> PeekImpl() noexcept
   {
-    uint64_t tail_index = tail_ % capacity_;
-    uint64_t head_index = head_ % capacity_;
-    if (head_index == tail_index)
+    uint64_t current_count = count_.load(std::memory_order_relaxed);
+    if (current_count == 0)
     {
       return {};
     }
-    AtomicUniquePtr<T> *data = data_.get();
-    if (tail_index < head_index)
+    
+    auto data = data_.get();
+    uint64_t available_count = 0;
+    uint64_t max_check = std::min(current_count, capacity_);
+    
+    for (uint64_t i = 0; i < max_check; ++i)
+    {
+      uint64_t index = (tail_ + i) % capacity_;
+      if (data[index].Get() != nullptr)
+      {
+        available_count++;
+      }
+      else
+      {
+        // Find the first null pointer, it's a element currently being added by producer 
+        break;
+      }
+    }
+    
+    if (available_count == 0)
+    {
+      return {};
+    }
+
+    if (tail_ + available_count <= capacity_)
     {
       return CircularBufferRange<AtomicUniquePtr<T>>{nostd::span<AtomicUniquePtr<T>>{
-          data + tail_index, static_cast<std::size_t>(head_index - tail_index)}};
+          data + tail_, static_cast<std::size_t>(available_count)}};
+    } else {
+      // the elements are split into two parts
+      uint64_t first_part_size = capacity_ - tail_;
+      uint64_t second_part_size = available_count - first_part_size;
+      
+      return {nostd::span<AtomicUniquePtr<T>>{data + tail_, static_cast<std::size_t>(first_part_size)},
+              nostd::span<AtomicUniquePtr<T>>{data, static_cast<std::size_t>(second_part_size)}};
     }
-    return {nostd::span<AtomicUniquePtr<T>>{data + tail_index,
-                                            static_cast<std::size_t>(capacity_ - tail_index)},
-            nostd::span<AtomicUniquePtr<T>>{data, static_cast<std::size_t>(head_index)}};
   }
 };
 }  // namespace common
