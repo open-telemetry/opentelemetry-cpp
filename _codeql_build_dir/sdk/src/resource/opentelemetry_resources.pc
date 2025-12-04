@@ -1,0 +1,15 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: OpenTelemetry SDK - Resources
+Description: Components for resource detection in the OpenTelemetry SDK.
+Requires: opentelemetry_common
+Version: 1.25.0-dev
+
+Libs: -L${libdir} -lopentelemetry_resources
+Cflags: -I${includedir} 

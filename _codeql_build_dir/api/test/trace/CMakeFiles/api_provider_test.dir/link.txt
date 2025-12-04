@@ -1,0 +1,1 @@
+/home/runner/work/opentelemetry-cpp/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/api_provider_test.dir/link.d CMakeFiles/api_provider_test.dir/provider_test.cc.o -o api_provider_test  ../../../lib/libgtest.a ../../../lib/libgtest_main.a ../../../lib/libgtest.a

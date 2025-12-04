@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcommon_foo_library.a CMakeFiles/common_foo_library.dir/foo_library.cc.o
+/usr/bin/ranlib libcommon_foo_library.a

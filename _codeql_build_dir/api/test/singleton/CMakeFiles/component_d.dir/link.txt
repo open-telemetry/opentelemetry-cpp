@@ -1,0 +1,1 @@
+/home/runner/work/opentelemetry-cpp/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -fPIC -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/component_d.dir/link.d -shared -Wl,-soname,libcomponent_d.so -o libcomponent_d.so CMakeFiles/component_d.dir/component_d.cc.o

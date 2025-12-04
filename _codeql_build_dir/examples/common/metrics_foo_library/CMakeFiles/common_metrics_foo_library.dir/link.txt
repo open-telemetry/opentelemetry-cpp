@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcommon_metrics_foo_library.a CMakeFiles/common_metrics_foo_library.dir/foo_library.cc.o
+/usr/bin/ranlib libcommon_metrics_foo_library.a

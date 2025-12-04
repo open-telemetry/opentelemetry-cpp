@@ -1,0 +1,1 @@
+/home/runner/work/opentelemetry-cpp/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/baggage_benchmark.dir/link.d CMakeFiles/baggage_benchmark.dir/baggage_benchmark.cc.o -o baggage_benchmark  ../../../_deps/benchmark-build/src/libbenchmark.a -lrt

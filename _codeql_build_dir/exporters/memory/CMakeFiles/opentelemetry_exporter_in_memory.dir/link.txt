@@ -1,0 +1,2 @@
+/usr/bin/ar qc libopentelemetry_exporter_in_memory.a CMakeFiles/opentelemetry_exporter_in_memory.dir/src/in_memory_span_exporter_factory.cc.o
+/usr/bin/ranlib libopentelemetry_exporter_in_memory.a

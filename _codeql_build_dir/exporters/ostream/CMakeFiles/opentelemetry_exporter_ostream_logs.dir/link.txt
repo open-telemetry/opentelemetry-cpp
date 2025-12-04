@@ -1,0 +1,2 @@
+/usr/bin/ar qc libopentelemetry_exporter_ostream_logs.a CMakeFiles/opentelemetry_exporter_ostream_logs.dir/src/log_record_exporter.cc.o CMakeFiles/opentelemetry_exporter_ostream_logs.dir/src/log_record_exporter_factory.cc.o
+/usr/bin/ranlib libopentelemetry_exporter_ostream_logs.a

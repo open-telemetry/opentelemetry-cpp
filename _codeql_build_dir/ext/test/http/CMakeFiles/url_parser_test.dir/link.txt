@@ -1,0 +1,1 @@
+/home/runner/work/opentelemetry-cpp/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/url_parser_test.dir/link.d CMakeFiles/url_parser_test.dir/url_parser_test.cc.o -o url_parser_test  ../../../lib/libgmock.a ../../../lib/libgtest.a ../../../lib/libgtest_main.a ../../../lib/libgtest.a

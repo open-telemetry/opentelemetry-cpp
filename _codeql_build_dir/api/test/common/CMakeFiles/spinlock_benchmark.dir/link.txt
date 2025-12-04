@@ -1,0 +1,1 @@
+/home/runner/work/opentelemetry-cpp/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/spinlock_benchmark.dir/link.d CMakeFiles/spinlock_benchmark.dir/spinlock_benchmark.cc.o -o spinlock_benchmark  ../../../_deps/benchmark-build/src/libbenchmark.a -lrt
