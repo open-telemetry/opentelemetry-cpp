@@ -1,1 +1,0 @@
-/home/runner/work/opentelemetry-cpp/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/shared_ptr_test.dir/link.d CMakeFiles/shared_ptr_test.dir/shared_ptr_test.cc.o -o shared_ptr_test  ../../../lib/libgtest.a ../../../lib/libgtest_main.a ../../../lib/libgtest.a

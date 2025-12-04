@@ -1,2 +1,0 @@
-/usr/bin/ar qc libopentelemetry_version.a CMakeFiles/opentelemetry_version.dir/version.cc.o
-/usr/bin/ranlib libopentelemetry_version.a

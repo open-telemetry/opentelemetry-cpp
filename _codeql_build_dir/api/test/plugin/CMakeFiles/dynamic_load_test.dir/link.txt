@@ -1,1 +1,0 @@
-/home/runner/work/opentelemetry-cpp/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/dynamic_load_test.dir/link.d CMakeFiles/dynamic_load_test.dir/dynamic_load_test.cc.o -o dynamic_load_test  ../../../lib/libgtest.a ../../../lib/libgtest_main.a -ldl ../../../lib/libgtest.a

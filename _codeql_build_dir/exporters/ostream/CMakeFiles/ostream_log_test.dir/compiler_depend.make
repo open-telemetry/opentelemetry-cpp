@@ -1,2 +1,0 @@
-# Empty compiler generated dependencies file for ostream_log_test.
-# This may be replaced when dependencies are built.

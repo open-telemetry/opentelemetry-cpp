@@ -1,1 +1,0 @@
-/home/runner/work/opentelemetry-cpp/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/span_id_benchmark.dir/link.d CMakeFiles/span_id_benchmark.dir/span_id_benchmark.cc.o -o span_id_benchmark  ../../../_deps/benchmark-build/src/libbenchmark.a -lrt

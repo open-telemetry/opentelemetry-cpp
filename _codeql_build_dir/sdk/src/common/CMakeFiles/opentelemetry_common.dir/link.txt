@@ -1,2 +1,0 @@
-/usr/bin/ar qc libopentelemetry_common.a CMakeFiles/opentelemetry_common.dir/random.cc.o CMakeFiles/opentelemetry_common.dir/global_log_handler.cc.o CMakeFiles/opentelemetry_common.dir/env_variables.cc.o CMakeFiles/opentelemetry_common.dir/base64.cc.o CMakeFiles/opentelemetry_common.dir/disabled.cc.o CMakeFiles/opentelemetry_common.dir/platform/fork_unix.cc.o
-/usr/bin/ranlib libopentelemetry_common.a

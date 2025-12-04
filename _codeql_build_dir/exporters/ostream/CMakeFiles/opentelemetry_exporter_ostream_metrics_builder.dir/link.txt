@@ -1,2 +1,0 @@
-/usr/bin/ar qc libopentelemetry_exporter_ostream_metrics_builder.a CMakeFiles/opentelemetry_exporter_ostream_metrics_builder.dir/src/console_push_metric_builder.cc.o
-/usr/bin/ranlib libopentelemetry_exporter_ostream_metrics_builder.a

@@ -1,1 +1,0 @@
-/home/runner/work/opentelemetry-cpp/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/random_benchmark.dir/link.d CMakeFiles/random_benchmark.dir/random_benchmark.cc.o -o random_benchmark  ../../../_deps/benchmark-build/src/libbenchmark.a ../../src/common/libopentelemetry_common.a -lrt

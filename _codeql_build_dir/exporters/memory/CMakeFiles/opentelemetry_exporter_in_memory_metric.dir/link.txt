@@ -1,2 +1,0 @@
-/usr/bin/ar qc libopentelemetry_exporter_in_memory_metric.a CMakeFiles/opentelemetry_exporter_in_memory_metric.dir/src/in_memory_metric_exporter_factory.cc.o CMakeFiles/opentelemetry_exporter_in_memory_metric.dir/src/in_memory_metric_data.cc.o
-/usr/bin/ranlib libopentelemetry_exporter_in_memory_metric.a

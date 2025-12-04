@@ -1,2 +1,0 @@
-/usr/bin/ar qc libcomponent_a.a CMakeFiles/component_a.dir/component_a.cc.o
-/usr/bin/ranlib libcomponent_a.a

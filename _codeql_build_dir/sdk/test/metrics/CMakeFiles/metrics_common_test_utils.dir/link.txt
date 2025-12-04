@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmetrics_common_test_utils.a CMakeFiles/metrics_common_test_utils.dir/common.cc.o
-/usr/bin/ranlib libmetrics_common_test_utils.a

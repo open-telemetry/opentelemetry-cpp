@@ -1,1 +1,0 @@
-/home/runner/work/opentelemetry-cpp/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/load_plugin_example.dir/link.d CMakeFiles/load_plugin_example.dir/main.cc.o -o load_plugin_example  -ldl

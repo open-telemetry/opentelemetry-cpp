@@ -1,1 +1,0 @@
-/home/runner/work/opentelemetry-cpp/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/api_trace_id_test.dir/link.d CMakeFiles/api_trace_id_test.dir/trace_id_test.cc.o -o api_trace_id_test  ../../../lib/libgtest.a ../../../lib/libgtest_main.a ../../../lib/libgtest.a

@@ -1,1 +1,0 @@
-/home/runner/work/opentelemetry-cpp/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/base64_test.dir/link.d CMakeFiles/base64_test.dir/base64_test.cc.o -o base64_test  ../../../lib/libgtest.a ../../../lib/libgtest_main.a ../../src/common/libopentelemetry_common.a ../../../lib/libgtest.a

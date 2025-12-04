@@ -1,2 +1,0 @@
-/usr/bin/ar qc libopentelemetry_exporter_ostream_metrics.a CMakeFiles/opentelemetry_exporter_ostream_metrics.dir/src/metric_exporter.cc.o CMakeFiles/opentelemetry_exporter_ostream_metrics.dir/src/metric_exporter_factory.cc.o
-/usr/bin/ranlib libopentelemetry_exporter_ostream_metrics.a

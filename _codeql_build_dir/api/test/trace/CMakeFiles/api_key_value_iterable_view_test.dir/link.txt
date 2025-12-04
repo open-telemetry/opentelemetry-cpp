@@ -1,1 +1,0 @@
-/home/runner/work/opentelemetry-cpp/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/api_key_value_iterable_view_test.dir/link.d CMakeFiles/api_key_value_iterable_view_test.dir/key_value_iterable_view_test.cc.o -o api_key_value_iterable_view_test  ../../../lib/libgtest.a ../../../lib/libgtest_main.a ../../../lib/libgtest.a

@@ -1,2 +1,0 @@
-# Empty compiler generated dependencies file for simple_log_record_processor_test.
-# This may be replaced when dependencies are built.

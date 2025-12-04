@@ -1,1 +1,0 @@
-/home/runner/work/opentelemetry-cpp/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/composite_propagator_test.dir/link.d CMakeFiles/composite_propagator_test.dir/composite_propagator_test.cc.o -o composite_propagator_test  ../../../../lib/libgtest.a ../../../../lib/libgtest_main.a ../../../../lib/libgtest.a
