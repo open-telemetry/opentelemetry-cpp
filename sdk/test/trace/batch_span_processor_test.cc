@@ -375,9 +375,9 @@ TEST(BatchSpanProcessorOptionsEnvTest, TestDefaultValues)
 {
   sdk::trace::BatchSpanProcessorOptions options;
 
-  EXPECT_EQ(options.max_queue_size, static_cast<size_t>(2084));
+  EXPECT_EQ(options.max_queue_size, static_cast<size_t>(2048));
   EXPECT_EQ(options.schedule_delay_millis, std::chrono::milliseconds(5000));
-  EXPECT_EQ(options.export_timeout, std::chrono::milliseconds(3000));
+  EXPECT_EQ(options.export_timeout, std::chrono::milliseconds(30000));
   EXPECT_EQ(options.max_export_batch_size, static_cast<size_t>(512));
 }
 
@@ -444,5 +444,61 @@ TEST(BatchSpanProcessorOptionsEnvTest, TestOptionsReadFromMultipleEnvVars)
   unsetenv("OTEL_BSP_EXPORT_TIMEOUT");
   unsetenv("OTEL_BSP_MAX_EXPORT_BATCH_SIZE");
 }
+
+TEST(BatchSpanProcessorOptionsEnvTest, TestAggregateInitialization)
+{
+  // Test aggregate initialization (brace initialization with partial fields)
+  // This validates that BatchSpanProcessorOptions is an aggregate type,
+  // which is required for C++20 designated initializers like:
+  // BatchSpanProcessorOptions{.max_queue_size = 100, .schedule_delay_millis = ...}
+
+  // Test default initialization
+  sdk::trace::BatchSpanProcessorOptions default_options{};
+  EXPECT_EQ(default_options.max_queue_size, static_cast<size_t>(2048));
+  EXPECT_EQ(default_options.schedule_delay_millis, std::chrono::milliseconds(5000));
+  EXPECT_EQ(default_options.export_timeout, std::chrono::milliseconds(30000));
+  EXPECT_EQ(default_options.max_export_batch_size, static_cast<size_t>(512));
+
+  // Test aggregate initialization with all fields explicitly set
+  sdk::trace::BatchSpanProcessorOptions custom_options{
+      100,                             // max_queue_size
+      std::chrono::milliseconds(200),  // schedule_delay_millis
+      std::chrono::milliseconds(300),  // export_timeout
+      50                               // max_export_batch_size
+  };
+  EXPECT_EQ(custom_options.max_queue_size, static_cast<size_t>(100));
+  EXPECT_EQ(custom_options.schedule_delay_millis, std::chrono::milliseconds(200));
+  EXPECT_EQ(custom_options.export_timeout, std::chrono::milliseconds(300));
+  EXPECT_EQ(custom_options.max_export_batch_size, static_cast<size_t>(50));
+}
+
+#if __cplusplus >= 202002L
+TEST(BatchSpanProcessorOptionsEnvTest, TestDesignatedInitializers)
+{
+  // Test C++20 designated initializers
+  // This is the main use case that was broken by the constructor
+
+  sdk::trace::BatchSpanProcessorOptions options{
+      .max_queue_size        = 1000,
+      .schedule_delay_millis = std::chrono::milliseconds(2000),
+      .export_timeout        = std::chrono::milliseconds(3000),
+      .max_export_batch_size = 100};
+
+  EXPECT_EQ(options.max_queue_size, static_cast<size_t>(1000));
+  EXPECT_EQ(options.schedule_delay_millis, std::chrono::milliseconds(2000));
+  EXPECT_EQ(options.export_timeout, std::chrono::milliseconds(3000));
+  EXPECT_EQ(options.max_export_batch_size, static_cast<size_t>(100));
+
+  // Test partial designated initializers (only some fields)
+  sdk::trace::BatchSpanProcessorOptions partial_options{.max_queue_size        = 500,
+                                                        .max_export_batch_size = 50};
+
+  EXPECT_EQ(partial_options.max_queue_size, static_cast<size_t>(500));
+  // Default from env (or hardcoded default)
+  EXPECT_EQ(partial_options.schedule_delay_millis, std::chrono::milliseconds(5000));
+  EXPECT_EQ(partial_options.export_timeout, std::chrono::milliseconds(30000));
+  EXPECT_EQ(partial_options.max_export_batch_size, static_cast<size_t>(50));
+}
+#endif
 
 OPENTELEMETRY_END_NAMESPACE
