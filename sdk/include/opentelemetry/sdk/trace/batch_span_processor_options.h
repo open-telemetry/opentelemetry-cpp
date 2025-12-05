@@ -19,22 +19,12 @@ namespace trace
 
 namespace batch_span_processor_options_env
 {
-// Environment variable names
-inline constexpr const char *kMaxQueueSizeEnv       = "OTEL_BSP_MAX_QUEUE_SIZE";
-inline constexpr const char *kScheduleDelayEnv      = "OTEL_BSP_SCHEDULE_DELAY";
-inline constexpr const char *kExportTimeoutEnv      = "OTEL_BSP_EXPORT_TIMEOUT";
-inline constexpr const char *kMaxExportBatchSizeEnv = "OTEL_BSP_MAX_EXPORT_BATCH_SIZE";
-
-// Default values - preserving original values for backward compatibility
-inline constexpr size_t kDefaultMaxQueueSize                     = 2048;
-inline constexpr std::chrono::milliseconds kDefaultScheduleDelay = std::chrono::milliseconds(5000);
-inline constexpr std::chrono::milliseconds kDefaultExportTimeout = std::chrono::milliseconds(30000);
-inline constexpr size_t kDefaultMaxExportBatchSize               = 512;
 
 inline size_t GetMaxQueueSizeFromEnv()
 {
+  constexpr size_t kDefaultMaxQueueSize = 2048;
   std::uint32_t value{};
-  if (!opentelemetry::sdk::common::GetUintEnvironmentVariable(kMaxQueueSizeEnv, value))
+  if (!opentelemetry::sdk::common::GetUintEnvironmentVariable("OTEL_BSP_MAX_QUEUE_SIZE", value))
   {
     return kDefaultMaxQueueSize;
   }
@@ -43,8 +33,10 @@ inline size_t GetMaxQueueSizeFromEnv()
 
 inline std::chrono::milliseconds GetScheduleDelayFromEnv()
 {
+  const std::chrono::milliseconds kDefaultScheduleDelay{5000};
   std::chrono::system_clock::duration duration{0};
-  if (!opentelemetry::sdk::common::GetDurationEnvironmentVariable(kScheduleDelayEnv, duration))
+  if (!opentelemetry::sdk::common::GetDurationEnvironmentVariable("OTEL_BSP_SCHEDULE_DELAY",
+                                                                  duration))
   {
     return kDefaultScheduleDelay;
   }
@@ -53,8 +45,10 @@ inline std::chrono::milliseconds GetScheduleDelayFromEnv()
 
 inline std::chrono::milliseconds GetExportTimeoutFromEnv()
 {
+  const std::chrono::milliseconds kDefaultExportTimeout{30000};
   std::chrono::system_clock::duration duration{0};
-  if (!opentelemetry::sdk::common::GetDurationEnvironmentVariable(kExportTimeoutEnv, duration))
+  if (!opentelemetry::sdk::common::GetDurationEnvironmentVariable("OTEL_BSP_EXPORT_TIMEOUT",
+                                                                  duration))
   {
     return kDefaultExportTimeout;
   }
@@ -63,8 +57,10 @@ inline std::chrono::milliseconds GetExportTimeoutFromEnv()
 
 inline size_t GetMaxExportBatchSizeFromEnv()
 {
+  constexpr size_t kDefaultMaxExportBatchSize = 512;
   std::uint32_t value{};
-  if (!opentelemetry::sdk::common::GetUintEnvironmentVariable(kMaxExportBatchSizeEnv, value))
+  if (!opentelemetry::sdk::common::GetUintEnvironmentVariable("OTEL_BSP_MAX_EXPORT_BATCH_SIZE",
+                                                              value))
   {
     return kDefaultMaxExportBatchSize;
   }
