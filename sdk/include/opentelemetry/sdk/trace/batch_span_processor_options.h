@@ -5,9 +5,7 @@
 
 #include <chrono>
 #include <cstddef>
-#include <cstdint>
 
-#include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -20,57 +18,48 @@ namespace trace
 namespace batch_span_processor_options_env
 {
 
-inline size_t GetMaxQueueSizeFromEnv()
-{
-  constexpr size_t kDefaultMaxQueueSize = 2048;
-  std::uint32_t value{};
-  if (!opentelemetry::sdk::common::GetUintEnvironmentVariable("OTEL_BSP_MAX_QUEUE_SIZE", value))
-  {
-    return kDefaultMaxQueueSize;
-  }
-  return static_cast<size_t>(value);
-}
+/// @brief Returns the max queue size from the OTEL_BSP_MAX_QUEUE_SIZE environment variable
+/// or the default value (2048) if not set.
+OPENTELEMETRY_EXPORT size_t GetMaxQueueSizeFromEnv();
 
-inline std::chrono::milliseconds GetScheduleDelayFromEnv()
-{
-  const std::chrono::milliseconds kDefaultScheduleDelay{5000};
-  std::chrono::system_clock::duration duration{0};
-  if (!opentelemetry::sdk::common::GetDurationEnvironmentVariable("OTEL_BSP_SCHEDULE_DELAY",
-                                                                  duration))
-  {
-    return kDefaultScheduleDelay;
-  }
-  return std::chrono::duration_cast<std::chrono::milliseconds>(duration);
-}
+/// @brief Returns the schedule delay from the OTEL_BSP_SCHEDULE_DELAY environment variable
+/// or the default value (5000ms) if not set.
+OPENTELEMETRY_EXPORT std::chrono::milliseconds GetScheduleDelayFromEnv();
 
-inline std::chrono::milliseconds GetExportTimeoutFromEnv()
-{
-  const std::chrono::milliseconds kDefaultExportTimeout{30000};
-  std::chrono::system_clock::duration duration{0};
-  if (!opentelemetry::sdk::common::GetDurationEnvironmentVariable("OTEL_BSP_EXPORT_TIMEOUT",
-                                                                  duration))
-  {
-    return kDefaultExportTimeout;
-  }
-  return std::chrono::duration_cast<std::chrono::milliseconds>(duration);
-}
+/// @brief Returns the export timeout from the OTEL_BSP_EXPORT_TIMEOUT environment variable
+/// or the default value (30000ms) if not set.
+OPENTELEMETRY_EXPORT std::chrono::milliseconds GetExportTimeoutFromEnv();
 
-inline size_t GetMaxExportBatchSizeFromEnv()
-{
-  constexpr size_t kDefaultMaxExportBatchSize = 512;
-  std::uint32_t value{};
-  if (!opentelemetry::sdk::common::GetUintEnvironmentVariable("OTEL_BSP_MAX_EXPORT_BATCH_SIZE",
-                                                              value))
-  {
-    return kDefaultMaxExportBatchSize;
-  }
-  return static_cast<size_t>(value);
-}
+/// @brief Returns the max export batch size from the OTEL_BSP_MAX_EXPORT_BATCH_SIZE environment
+/// variable or the default value (512) if not set.
+OPENTELEMETRY_EXPORT size_t GetMaxExportBatchSizeFromEnv();
 
 }  // namespace batch_span_processor_options_env
 
 /**
  * Struct to hold batch SpanProcessor options.
+ *
+ * This is an aggregate type that supports C++20 designated initializers.
+ * Default values are read from environment variables when an instance is created:
+ * - OTEL_BSP_MAX_QUEUE_SIZE (default: 2048)
+ * - OTEL_BSP_SCHEDULE_DELAY (default: 5000ms)
+ * - OTEL_BSP_EXPORT_TIMEOUT (default: 30000ms)
+ * - OTEL_BSP_MAX_EXPORT_BATCH_SIZE (default: 512)
+ *
+ * Usage notes:
+ * - If you use default initialization (e.g., `BatchSpanProcessorOptions opts{}`), all fields
+ *   are set by reading the environment variables (or hardcoded defaults if unset).
+ * - If you use aggregate initialization with explicit values (positional or designated),
+ *   those values override the environment variable defaults for the specified fields.
+ * - With C++20 designated initializers, you can override only specific fields; unspecified
+ *   fields will use environment variables or hardcoded defaults.
+ *
+ * Examples:
+ *   // All fields use env vars or hardcoded defaults
+ *   BatchSpanProcessorOptions opts1{};
+ *
+ *   // C++20: Only max_queue_size overridden, other fields read from env vars/defaults
+ *   BatchSpanProcessorOptions opts3{.max_queue_size = 100};
  */
 struct OPENTELEMETRY_EXPORT BatchSpanProcessorOptions
 {
@@ -85,8 +74,8 @@ struct OPENTELEMETRY_EXPORT BatchSpanProcessorOptions
       batch_span_processor_options_env::GetScheduleDelayFromEnv();
 
   /**
-   * The maximum time allowed to to export data
-   * It is not currently used by the SDK and the parameter is ignored
+   * The maximum time allowed to export data.
+   * It is not currently used by the SDK and the parameter is ignored.
    * TODO: Implement the parameter in BatchSpanProcessor
    */
   std::chrono::milliseconds export_timeout =
