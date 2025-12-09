@@ -1,0 +1,24 @@
+name: Publish to BCR
+
+on:
+  # Allow manual triggering for testing and recovery
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name to publish (e.g., v1.24.0)'
+        required: true
+        type: string
+  # Automatically trigger after a release is created
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    permissions:
+      contents: write
+    uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@v1.0.0
+    with:
+      tag_name: ${{ inputs.tag_name || github.event.release.tag_name }}
+      attest: false
+    secrets:
+      publish_token: ${{ secrets.BCR_PUBLISH_TOKEN }}

@@ -60,6 +60,17 @@ license requirements.
 
 Please refer to [INSTALL.md](./INSTALL.md).
 
+### Bazel Central Registry
+
+This project is available in the [Bazel Central Registry (BCR)](https://github.com/bazelbuild/bazel-central-registry/tree/main/modules/opentelemetry-cpp).
+To use it with Bazel, add the following to your `MODULE.bazel` file:
+
+```python
+bazel_dep(name = "opentelemetry-cpp", version = "x.y.z")
+```
+
+For the latest version, see [BCR: opentelemetry-cpp](https://github.com/bazelbuild/bazel-central-registry/tree/main/modules/opentelemetry-cpp).
+
 ## Getting Started
 
 As an application owner or the library author, you can find the getting started
