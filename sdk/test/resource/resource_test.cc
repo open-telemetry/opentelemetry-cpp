@@ -145,6 +145,36 @@ TEST(ResourceTest, create_with_schemaurl)
   EXPECT_EQ(received_schema_url, schema_url);
 }
 
+TEST(ResourceTest, create_with_invalid_attributes)
+{
+  ResourceAttributes expected_attributes = {
+      {semconv::telemetry::kTelemetrySdkLanguage, "cpp"},
+      {semconv::telemetry::kTelemetrySdkName, "opentelemetry"},
+      {semconv::telemetry::kTelemetrySdkVersion, OPENTELEMETRY_SDK_VERSION},
+      {semconv::service::kServiceName, "unknown_service"},
+  };
+  ResourceAttributes attributes = {
+      {semconv::telemetry::kTelemetrySdkLanguage, "cpp"},
+      {semconv::telemetry::kTelemetrySdkName, "opentelemetry"},
+      {semconv::telemetry::kTelemetrySdkVersion, OPENTELEMETRY_SDK_VERSION},
+      {semconv::service::kServiceName, "unknown_service"},
+      {"invalid_key\xff", "valid_value"},
+      {"valid_key", "invalid_value\xff"},
+  };
+  auto resource            = Resource::Create(attributes);
+  auto received_attributes = resource.GetAttributes();
+  for (auto &e : received_attributes)
+  {
+    EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
+    if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
+      EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
+                opentelemetry::nostd::get<std::string>(e.second));
+    }
+  }
+  EXPECT_EQ(received_attributes.size(), expected_attributes.size());
+}
+
 TEST(ResourceTest, Merge)
 {
   TestResource resource1(ResourceAttributes({{"service", "backend"}}));
