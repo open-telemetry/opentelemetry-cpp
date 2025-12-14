@@ -17,9 +17,13 @@ jobs:
       matrix:
         include:
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 63
+            warning_limit: 581
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 63
+            warning_limit: 583
+    env:
+      CC: /usr/bin/clang-18
+      CXX: /usr/bin/clang++-18
+      CXX_STANDARD: '14' # Run clang-tidy on the minimum supported c++ standard
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
@@ -61,38 +65,20 @@ jobs:
           echo "Using clang-tidy version: $(clang-tidy --version)"
           echo "clang-tidy installed at: $(which clang-tidy)"
 
-      # Note - if the --header-filter or --exclude-header-filter are modified please also modify the ci/do_ci.sh cmake.clang_tidy command to match
-      - name: Prepare CMake
-        env:
-          CC: clang
-          CXX: clang++
-        run: |
-          echo "Running cmake..."
-          cmake \
-            -S . \
-            -B build-${{ matrix.cmake_options }} \
-            -C ./test_common/cmake/${{ matrix.cmake_options }}.cmake \
-            -DCMAKE_CXX_STANDARD=14 \
-            -DWITH_STL=CXX14 \
-            -DWITH_OPENTRACING=OFF \
-            -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-            -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--header-filter=.*/opentelemetry-cpp/.*;--exclude-header-filter=.*(internal/absl|third_party|third-party|/usr/|/opt/|.*\.pb\.h|.*\.pb\.cc)/.*;--quiet"
-
-      - name: Run clang-tidy and Build
+      - name: Build and run clang-tidy
         id: build
+        env:
+          OTELCPP_CMAKE_CACHE_FILE: ${{ matrix.cmake_options }}.cmake
+          BUILD_DIR: build-${{ matrix.cmake_options }}
         run: |
-          BUILD_LOG=clang-tidy-${{ matrix.cmake_options }}.log
-          set -o pipefail
-          cmake --build build-${{ matrix.cmake_options }} -- -j$(nproc) 2>&1 | tee $BUILD_LOG
-          echo "build_log=$BUILD_LOG" >> "$GITHUB_OUTPUT"
+          ./ci/do_ci.sh cmake.clang_tidy.test
+          echo "build_log=${BUILD_DIR}/opentelemetry-cpp-clang-tidy.log" >> "$GITHUB_OUTPUT"
 
-      - name: Analyze clang-tidy build log
+      - name: Analyze clang-tidy output
         id: analyze
         run: |
           SCRIPT_OUTPUT=$(python3 ./ci/create_clang_tidy_report.py \
-            --job_name ${{ matrix.cmake_options }} \
-            --build_log clang-tidy-${{ matrix.cmake_options }}.log \
+            --build_log ${{ steps.build.outputs.build_log }} \
             --output ./clang_tidy_report-${{ matrix.cmake_options }}.md)
           export $SCRIPT_OUTPUT
           echo "Found $TOTAL_WARNINGS unique warnings"

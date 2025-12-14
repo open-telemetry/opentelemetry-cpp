@@ -68,7 +68,6 @@ def parse_log(log_path: Path) -> Set[ClangTidyWarning]:
 def generate_report(
     warnings: Set[ClangTidyWarning],
     output_path: Path,
-    job_name: Optional[str] = None,
 ):
     by_check: Dict[str, List[ClangTidyWarning]] = defaultdict(list)
     by_file: Dict[str, List[ClangTidyWarning]] = defaultdict(list)
@@ -78,13 +77,13 @@ def generate_report(
         by_file[w.file].append(w)
 
     with output_path.open("w", encoding="utf-8") as md:
-        title = "### "
-        if job_name:
-            title += f"{job_name}"
-
+        title = "#### "
         md.write(
-            f"{title} `clang-tidy` job \t[**{len(warnings)} warnings**]\n\n"
+            f"{title} `clang-tidy` job reported {len(warnings)} warnings\n\n"
         )
+
+        if not warnings:
+            return
 
         def write_section(
             title,
@@ -170,16 +169,10 @@ def main():
         default="clang_tidy_report.md",
         help="Output report path",
     )
-    parser.add_argument(
-        "-j",
-        "--job_name",
-        type=str,
-        help="Job name to include in the report title",
-    )
     args = parser.parse_args()
 
     warnings = parse_log(args.build_log)
-    generate_report(warnings, args.output, args.job_name)
+    generate_report(warnings, args.output)
 
     sys.stdout.write(f"{OutputKeys.TOTAL_WARNINGS.value}={len(warnings)}\n")
     if args.output.exists():
