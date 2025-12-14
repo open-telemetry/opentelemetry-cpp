@@ -339,6 +339,7 @@ elif [[ "$1" == "cmake.legacy.test" ]]; then
   make test
   exit 0
 elif [[ "$1" == "cmake.clang_tidy.test" ]]; then
+  # Note - if the --header-filter or --exclude-header-filter are modified please also modify the clang-tidy github workflow file (.github/workflows/clang-tidy.yaml) to match
   cd "${BUILD_DIR}"
   rm -rf *
   clang-tidy --version
@@ -350,7 +351,7 @@ elif [[ "$1" == "cmake.clang_tidy.test" ]]; then
     -DWITH_OPENTRACING=OFF \
     -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-    -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--header-filter=.*/opentelemetry-cpp/.*;--exclude-header-filter=.*(internal/absl|third_party|third-party)/.*;--quiet"
+    -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--header-filter=.*/opentelemetry-cpp/.*;--exclude-header-filter=.*(internal/absl|third_party|third-party|/usr/|/opt/|.*\.pb\.h|.*\.pb\.cc)/.*;--quiet"
   make -j $(nproc) 2>&1 | tee "$LOG_FILE"
   make test
   SCRIPT_OUTPUT=$(python3 ${SRC_DIR}/ci/create_clang_tidy_report.py \

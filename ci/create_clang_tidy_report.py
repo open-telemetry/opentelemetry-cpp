@@ -78,26 +78,43 @@ def generate_report(
         by_file[w.file].append(w)
 
     with output_path.open("w", encoding="utf-8") as md:
-        title = "# "
+        title = "### "
         if job_name:
             title += f"{job_name}"
 
         md.write(
             f"{title} `clang-tidy` job \t[**{len(warnings)} warnings**]\n\n"
         )
-        md.write(f"<details><summary><b>{'Warnings breakdown'}</b><i>  - Click to expand</i></summary>\n\n")
 
         def write_section(
-            title, data, item_sort_key, header, row_fmt, group_key, reverse
+            title,
+            data,
+            item_sort_key,
+            header,
+            row_fmt,
+            group_key,
+            reverse,
+            summary_col_name,
         ):
-            md.write(f"## {title}\n")
+            md.write(f"<details><summary><b>{title}</b><i> - Click to expand </i></summary>\n\n")
             sorted_groups = sorted(
                 data.items(), key=group_key, reverse=reverse
             )
+
+            # Summary Table (Sorted by Count Descending)
+            summary_groups = sorted(
+                data.items(), key=lambda x: len(x[1]), reverse=True
+            )
+            md.write("#### Summary\n\n")
+            md.write(f"| {summary_col_name} | Count |\n|---|---|\n")
+            for key, items in summary_groups:
+                md.write(f"| {key} | {len(items)} |\n")
+            md.write("\n")
+
+            md.write("#### Details\n\n")
             for key, items in sorted_groups:
                 md.write(
-                    f"<details><summary><b>{key} ({len(items)})</b></summary>"
-                    f"\n\n{header}\n"
+                    f"\n----\n\n**{key}** ({len(items)} warnings)\n\n{header}\n"
                 )
                 for i, w in enumerate(sorted(items, key=item_sort_key)):
                     if i >= MAX_ROWS:
@@ -107,7 +124,8 @@ def generate_report(
                         )
                         break
                     md.write(row_fmt(w) + "\n")
-                md.write("\n</details>\n\n")
+                md.write("\n")
+            md.write("</details>\n\n")
 
         # Warnings by File: Sorted Alphabetically
         write_section(
@@ -118,20 +136,21 @@ def generate_report(
             row_fmt=lambda w: f"| {w.line} | `{w.check}` | {w.msg} |",
             group_key=lambda x: x[0],
             reverse=False,
+            summary_col_name="File",
         )
 
         # Warnings by clang-tidy check: Sort by Warning count
         write_section(
-            "Warnings by `clang-tidy` Check",
+            "Warnings by clang-tidy Check",
             by_check,
             item_sort_key=lambda w: (w.file, w.line),
             header="| File | Line | Message |\n|---|---|---|",
             row_fmt=lambda w: f"| `{w.file}` | {w.line} | {w.msg} |",
             group_key=lambda x: len(x[1]),
             reverse=True,
+            summary_col_name="Check",
         )
 
-        md.write(f"</details>\n")
         md.write("\n----\n")
 
 

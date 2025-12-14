@@ -61,6 +61,7 @@ jobs:
           echo "Using clang-tidy version: $(clang-tidy --version)"
           echo "clang-tidy installed at: $(which clang-tidy)"
 
+      # Note - if the --header-filter or --exclude-header-filter are modified please also modify the ci/do_ci.sh cmake.clang_tidy command to match
       - name: Prepare CMake
         env:
           CC: clang
@@ -76,7 +77,7 @@ jobs:
             -DWITH_OPENTRACING=OFF \
             -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-            -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--header-filter=.*/opentelemetry-cpp/.*;--exclude-header-filter=.*(internal/absl|third_party|third-party)/.*;--quiet"
+            -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--header-filter=.*/opentelemetry-cpp/.*;--exclude-header-filter=.*(internal/absl|third_party|third-party|/usr/|/opt/|.*\.pb\.h|.*\.pb\.cc)/.*;--quiet"
 
       - name: Run clang-tidy and Build
         id: build
