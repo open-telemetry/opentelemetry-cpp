@@ -106,6 +106,12 @@ if [ -n "$CMAKE_TOOLCHAIN_FILE" ]; then
   CMAKE_OPTIONS+=("-DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE")
 fi
 
+if [ -n "$OTELCPP_CMAKE_CACHE_FILE" ]; then
+  OTELCPP_CMAKE_CACHE_FILE_PATH="${SRC_DIR}/test_common/cmake/${OTELCPP_CMAKE_CACHE_FILE}"
+else
+  OTELCPP_CMAKE_CACHE_FILE_PATH="${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake"
+fi
+
 echo "CMAKE_OPTIONS:" "${CMAKE_OPTIONS[@]}"
 
 export CTEST_OUTPUT_ON_FAILURE=1
@@ -339,19 +345,26 @@ elif [[ "$1" == "cmake.legacy.test" ]]; then
   make test
   exit 0
 elif [[ "$1" == "cmake.clang_tidy.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  export BUILD_ROOT="${BUILD_DIR}"
-  cmake -S ${SRC_DIR} \
+  rm -rf "${BUILD_DIR}"
+  mkdir -p "${BUILD_DIR}"
+  clang-tidy --version
+  LOG_FILE="${BUILD_DIR}/opentelemetry-cpp-clang-tidy.log"
+  cmake "${CMAKE_OPTIONS[@]}"  \
+    -S ${SRC_DIR} \
     -B ${BUILD_DIR} \
-    -C ${SRC_DIR}/test_common/cmake/all-options-abiv2-preview.cmake  \
-    "${CMAKE_OPTIONS[@]}" \
+    -C ${OTELCPP_CMAKE_CACHE_FILE_PATH} \
     -DWITH_OPENTRACING=OFF \
     -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-    -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--quiet;-p;${BUILD_DIR}"
-  make -j $(nproc)
-  make test
+    -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--header-filter=.*/opentelemetry-cpp/.*;--exclude-header-filter=.*(internal/absl|third_party|third-party|build.*|/usr|/opt)/.*|.*\.pb\.h;--quiet"
+  cmake --build "${BUILD_DIR}" -- -j $(nproc) 2>&1 | tee "$LOG_FILE"
+  if [ ! -s "$LOG_FILE" ]; then
+    echo "Error: Build log was not created at $LOG_FILE"
+    exit 1
+  fi
+  echo "Build log written to: $LOG_FILE"
+  echo "To generate a clang-tidy report, use the following command:"
+  echo "  python3 ./ci/create_clang_tidy_report.py --build_log $LOG_FILE"
   exit 0
 elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
