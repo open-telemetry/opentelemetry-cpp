@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] Parse baggage value as spec compliant
+  [#3758](https://github.com/open-telemetry/opentelemetry-cpp/pull/3758)
+
 ## [1.24 2025-11-20]
 
 * [RELEASE] Bump main branch to 1.24-dev
