@@ -299,13 +299,13 @@ TEST(ResourceTest, EnvEntityDetectorBasic)
   setenv("OTEL_ENTITIES", "service{service.name=my-app,service.instance.id=instance-1}", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   EXPECT_TRUE(received_attributes.find("service.name") != received_attributes.end());
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "my-app");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "my-app");
   EXPECT_TRUE(received_attributes.find("service.instance.id") != received_attributes.end());
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.instance.id"]), "instance-1");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.instance.id")), "instance-1");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -316,12 +316,12 @@ TEST(ResourceTest, EnvEntityDetectorWithDescriptiveAttributes)
          "service{service.name=my-app,service.instance.id=instance-1}[service.version=1.0.0]", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "my-app");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.instance.id"]), "instance-1");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.version"]), "1.0.0");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "my-app");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.instance.id")), "instance-1");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.version")), "1.0.0");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -334,14 +334,14 @@ TEST(ResourceTest, EnvEntityDetectorMultipleEntities)
          1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "my-app");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.instance.id"]), "instance-1");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.version"]), "1.0.0");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["host.id"]), "host-123");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["host.name"]), "web-server-01");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "my-app");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.instance.id")), "instance-1");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.version")), "1.0.0");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("host.id")), "host-123");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("host.name")), "web-server-01");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -351,11 +351,11 @@ TEST(ResourceTest, EnvEntityDetectorPercentEncoding)
   setenv("OTEL_ENTITIES", "service{service.name=my%2Capp,service.instance.id=inst-1}", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "my,app");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.instance.id"]), "inst-1");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "my,app");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.instance.id")), "inst-1");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -366,12 +366,12 @@ TEST(ResourceTest, EnvEntityDetectorDuplicateEntities)
          "service{service.name=app1}[version=1.0];service{service.name=app1}[version=2.0]", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   // Last occurrence should win
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "app1");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["version"]), "2.0");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app1");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("version")), "2.0");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -380,8 +380,8 @@ TEST(ResourceTest, EnvEntityDetectorEmptyEnv)
 {
   unsetenv("OTEL_ENTITIES");
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   EXPECT_TRUE(received_attributes.empty());
 }
@@ -391,8 +391,8 @@ TEST(ResourceTest, EnvEntityDetectorEmptyString)
   setenv("OTEL_ENTITIES", "", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   EXPECT_TRUE(received_attributes.empty());
 
@@ -405,12 +405,12 @@ TEST(ResourceTest, EnvEntityDetectorMalformedEntity)
          1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   // Should process valid entities and skip malformed ones
   EXPECT_TRUE(received_attributes.find("service.name") != received_attributes.end());
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "app2");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app2");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -420,10 +420,10 @@ TEST(ResourceTest, EnvEntityDetectorWhitespaceHandling)
   setenv("OTEL_ENTITIES", " ; service { service.name = app1 } ; ", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "app1");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app1");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -434,11 +434,11 @@ TEST(ResourceTest, EnvEntityDetectorEmptySemicolons)
   setenv("OTEL_ENTITIES", ";service{service.name=app1};;host{host.id=host-123};", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "app1");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["host.id"]), "host-123");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app1");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("host.id")), "host-123");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -449,11 +449,11 @@ TEST(ResourceTest, EnvEntityDetectorMissingRequiredFields)
   setenv("OTEL_ENTITIES", "service{};host{host.id=123}", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   EXPECT_TRUE(received_attributes.find("service.name") == received_attributes.end());
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["host.id"]), "123");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("host.id")), "123");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -464,11 +464,11 @@ TEST(ResourceTest, EnvEntityDetectorConflictingIdentifyingAttributes)
   setenv("OTEL_ENTITIES", "service{service.name=app1};service{service.name=app2}", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   // Last entity should win
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "app2");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app2");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -480,11 +480,11 @@ TEST(ResourceTest, EnvEntityDetectorConflictingDescriptiveAttributes)
          "service{service.name=app1}[version=1.0];service{service.name=app2}[version=2.0]", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "app2");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["version"]), "2.0");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app2");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("version")), "2.0");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -496,12 +496,12 @@ TEST(ResourceTest, EnvEntityDetectorKubernetesPod)
          "k8s.pod{k8s.pod.uid=pod-abc123}[k8s.pod.name=my-pod,k8s.pod.label.app=my-app]", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["k8s.pod.uid"]), "pod-abc123");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["k8s.pod.name"]), "my-pod");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["k8s.pod.label.app"]), "my-app");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("k8s.pod.uid")), "pod-abc123");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("k8s.pod.name")), "my-pod");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("k8s.pod.label.app")), "my-app");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -513,12 +513,12 @@ TEST(ResourceTest, EnvEntityDetectorContainerWithHost)
          "container{container.id=cont-456};host{host.id=host-789}[host.name=docker-host]", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["container.id"]), "cont-456");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["host.id"]), "host-789");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["host.name"]), "docker-host");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("container.id")), "cont-456");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("host.id")), "host-789");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("host.name")), "docker-host");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -529,10 +529,10 @@ TEST(ResourceTest, EnvEntityDetectorMinimalEntity)
   setenv("OTEL_ENTITIES", "service{service.name=minimal-app}", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "minimal-app");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "minimal-app");
   EXPECT_EQ(received_attributes.size(), 1);
 
   unsetenv("OTEL_ENTITIES");
@@ -546,11 +546,11 @@ TEST(ResourceTest, EnvEntityDetectorPercentEncodingMultiple)
          1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "my,app");
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["config"]), "key=value[prod]");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "my,app");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("config")), "key=value[prod]");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -561,11 +561,11 @@ TEST(ResourceTest, EnvEntityDetectorInvalidSchemaUrl)
   setenv("OTEL_ENTITIES", "service{service.name=app1}@invalid-url", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   // Entity should be processed but schema URL ignored
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "app1");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app1");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -576,8 +576,8 @@ TEST(ResourceTest, EnvEntityDetectorAllMalformedEntities)
   setenv("OTEL_ENTITIES", "invalid{syntax};{missing-type};123{invalid-type}", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   // All entities are invalid, so parsed_entities.empty() is true, should return empty resource
   EXPECT_TRUE(received_attributes.empty());
@@ -591,11 +591,11 @@ TEST(ResourceTest, EnvEntityDetectorEmptySchemaUrl)
   setenv("OTEL_ENTITIES", "service{service.name=app1}@", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   // Entity should be processed but empty schema URL ignored
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "app1");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app1");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -606,11 +606,11 @@ TEST(ResourceTest, EnvEntityDetectorValidSchemaUrl)
   setenv("OTEL_ENTITIES", "service{service.name=app1}@https://opentelemetry.io/schemas/1.0.0", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   // Entity should be processed and schema URL should be valid (not cleared)
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "app1");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app1");
   EXPECT_EQ(resource.GetSchemaURL(), "https://opentelemetry.io/schemas/1.0.0");
   unsetenv("OTEL_ENTITIES");
 }
@@ -621,11 +621,11 @@ TEST(ResourceTest, EnvEntityDetectorSchemaUrlWithWhitespace)
   setenv("OTEL_ENTITIES", "service{service.name=app1}@   ", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   // Entity should be processed but whitespace-only schema URL should be ignored
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "app1");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app1");
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -636,8 +636,8 @@ TEST(ResourceTest, EnvEntityDetectorMissingClosingBracket)
   setenv("OTEL_ENTITIES", "service{service.name=app1}[version=1.0", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   // Entity with missing closing bracket should be rejected
   EXPECT_TRUE(received_attributes.empty());
@@ -651,8 +651,8 @@ TEST(ResourceTest, EnvEntityDetectorMissingClosingBrace)
   setenv("OTEL_ENTITIES", "service{service.name=app1", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   // Entity with missing closing brace should be rejected
   EXPECT_TRUE(received_attributes.empty());
@@ -666,8 +666,8 @@ TEST(ResourceTest, EnvEntityDetectorInvalidTypeCharacters)
   setenv("OTEL_ENTITIES", "service@name{service.name=app1}", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   // Entity with invalid type characters should be rejected
   EXPECT_TRUE(received_attributes.empty());
@@ -681,10 +681,10 @@ TEST(ResourceTest, EnvEntityDetectorEmptyKeyInAttributes)
   setenv("OTEL_ENTITIES", "service{=value,service.name=app1, =another}", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
-  EXPECT_EQ(nostd::get<std::string>(received_attributes["service.name"]), "app1");
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app1");
   // Empty key entries should not appear in attributes
   EXPECT_EQ(received_attributes.size(), 1);
 
@@ -697,8 +697,8 @@ TEST(ResourceTest, EnvEntityDetectorEmptyEntityString)
   setenv("OTEL_ENTITIES", ";;;", 1);
 
   EnvEntityDetector detector;
-  auto resource            = detector.Detect();
-  auto received_attributes = resource.GetAttributes();
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
 
   // All empty strings should be skipped, resulting in empty resource
   EXPECT_TRUE(received_attributes.empty());
