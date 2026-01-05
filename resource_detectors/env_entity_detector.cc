@@ -61,7 +61,11 @@ std::string BuildEntityIdentityKey(const std::string &type,
     }
     key += items[i]->first;
     key += "=";
-    key += opentelemetry::nostd::get<std::string>(items[i]->second);
+    const auto *str_val = opentelemetry::nostd::get_if<std::string>(&items[i]->second);
+    if (str_val != nullptr)
+    {
+      key += *str_val;
+    }
   }
   return key;
 }
@@ -335,9 +339,7 @@ opentelemetry::sdk::resource::Resource EnvEntityDetector::Detect() noexcept
     for (const auto &attr : entity.id_attrs)
     {
       auto existing = resource_attrs.find(attr.first);
-      if (existing != resource_attrs.end() &&
-          opentelemetry::nostd::get<std::string>(existing->second) !=
-              opentelemetry::nostd::get<std::string>(attr.second))
+      if (existing != resource_attrs.end() && existing->second != attr.second)
       {
         OTEL_INTERNAL_LOG_WARN(
             "[EnvEntityDetector] Conflicting identifying attribute in OTEL_ENTITIES, "
@@ -350,9 +352,7 @@ opentelemetry::sdk::resource::Resource EnvEntityDetector::Detect() noexcept
     for (const auto &attr : entity.desc_attrs)
     {
       auto existing = resource_attrs.find(attr.first);
-      if (existing != resource_attrs.end() &&
-          opentelemetry::nostd::get<std::string>(existing->second) !=
-              opentelemetry::nostd::get<std::string>(attr.second))
+      if (existing != resource_attrs.end() && existing->second != attr.second)
       {
         OTEL_INTERNAL_LOG_WARN(
             "[EnvEntityDetector] Conflicting descriptive attribute in OTEL_ENTITIES, "
