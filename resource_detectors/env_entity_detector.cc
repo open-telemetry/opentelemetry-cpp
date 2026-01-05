@@ -13,6 +13,7 @@
 #include "opentelemetry/common/string_util.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/resource_detectors/env_entity_detector.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -21,9 +22,7 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
-{
-namespace resource
+namespace resource_detector
 {
 
 namespace
@@ -34,13 +33,14 @@ constexpr const char *kOtelEntities = "OTEL_ENTITIES";
 struct ParsedEntity
 {
   std::string type;
-  ResourceAttributes id_attrs;
-  ResourceAttributes desc_attrs;
+  opentelemetry::sdk::resource::ResourceAttributes id_attrs;
+  opentelemetry::sdk::resource::ResourceAttributes desc_attrs;
   std::string schema_url;
   std::string identity_key;  // Pre-computed identity key for duplicate detection
 };
 
-std::string BuildEntityIdentityKey(const std::string &type, const ResourceAttributes &id_attrs)
+std::string BuildEntityIdentityKey(const std::string &type,
+                                   const opentelemetry::sdk::resource::ResourceAttributes &id_attrs)
 {
   using AttrPtr =
       const std::pair<const std::string, opentelemetry::sdk::common::OwnedAttributeValue> *;
@@ -61,14 +61,14 @@ std::string BuildEntityIdentityKey(const std::string &type, const ResourceAttrib
     }
     key += items[i]->first;
     key += "=";
-    key += nostd::get<std::string>(items[i]->second);
+    key += opentelemetry::nostd::get<std::string>(items[i]->second);
   }
   return key;
 }
 
-std::string PercentDecode(nostd::string_view value) noexcept
+std::string PercentDecode(opentelemetry::nostd::string_view value) noexcept
 {
-  if (value.find('%') == nostd::string_view::npos)
+  if (value.find('%') == opentelemetry::nostd::string_view::npos)
   {
     return std::string(value);
   }
@@ -103,7 +103,8 @@ std::string PercentDecode(nostd::string_view value) noexcept
   return result;
 }
 
-void ParseKeyValueList(const std::string &input, ResourceAttributes &out)
+void ParseKeyValueList(const std::string &input,
+                       opentelemetry::sdk::resource::ResourceAttributes &out)
 {
   std::istringstream iss(input);
   std::string token;
@@ -244,7 +245,7 @@ std::vector<ParsedEntity> ParseEntities(const std::string &entities_str)
 
 }  // namespace
 
-Resource EnvEntityDetector::Detect() noexcept
+opentelemetry::sdk::resource::Resource EnvEntityDetector::Detect() noexcept
 {
   std::string entities_str;
   bool exists =
@@ -252,16 +253,16 @@ Resource EnvEntityDetector::Detect() noexcept
 
   if (!exists || entities_str.empty())
   {
-    return ResourceDetector::Create({});
+    return opentelemetry::sdk::resource::ResourceDetector::Create({});
   }
 
   auto parsed_entities = ParseEntities(entities_str);
   if (parsed_entities.empty())
   {
-    return ResourceDetector::Create({});
+    return opentelemetry::sdk::resource::ResourceDetector::Create({});
   }
 
-  ResourceAttributes resource_attrs;
+  opentelemetry::sdk::resource::ResourceAttributes resource_attrs;
   std::string schema_url;
 
   std::unordered_map<std::string, size_t> entity_index_by_identity;
@@ -299,7 +300,8 @@ Resource EnvEntityDetector::Detect() noexcept
     {
       auto existing = resource_attrs.find(attr.first);
       if (existing != resource_attrs.end() &&
-          nostd::get<std::string>(existing->second) != nostd::get<std::string>(attr.second))
+          opentelemetry::nostd::get<std::string>(existing->second) !=
+              opentelemetry::nostd::get<std::string>(attr.second))
       {
         OTEL_INTERNAL_LOG_WARN(
             "[EnvEntityDetector] Conflicting identifying attribute in OTEL_ENTITIES, "
@@ -313,7 +315,8 @@ Resource EnvEntityDetector::Detect() noexcept
     {
       auto existing = resource_attrs.find(attr.first);
       if (existing != resource_attrs.end() &&
-          nostd::get<std::string>(existing->second) != nostd::get<std::string>(attr.second))
+          opentelemetry::nostd::get<std::string>(existing->second) !=
+              opentelemetry::nostd::get<std::string>(attr.second))
       {
         OTEL_INTERNAL_LOG_WARN(
             "[EnvEntityDetector] Conflicting descriptive attribute in OTEL_ENTITIES, "
@@ -328,9 +331,8 @@ Resource EnvEntityDetector::Detect() noexcept
     }
   }
 
-  return ResourceDetector::Create(resource_attrs, schema_url);
+  return opentelemetry::sdk::resource::ResourceDetector::Create(resource_attrs, schema_url);
 }
 
-}  // namespace resource
-}  // namespace sdk
+}  // namespace resource_detector
 OPENTELEMETRY_END_NAMESPACE

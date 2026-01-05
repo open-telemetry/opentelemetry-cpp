@@ -39,17 +39,6 @@ public:
   Resource Detect() noexcept override;
 };
 
-/**
- * EnvEntityDetector detects entities defined in the OTEL_ENTITIES environment
- * variable as specified in the Entity Propagation spec:
- * https://opentelemetry.io/docs/specs/otel/entities/entity-propagation/
- */
-class EnvEntityDetector : public ResourceDetector
-{
-public:
-  Resource Detect() noexcept override;
-};
-
 }  // namespace resource
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
