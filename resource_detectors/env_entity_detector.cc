@@ -103,6 +103,42 @@ std::string PercentDecode(opentelemetry::nostd::string_view value) noexcept
   return result;
 }
 
+bool IsValidSchemaUrl(const std::string &url) noexcept
+{
+  if (url.empty())
+  {
+    return false;
+  }
+
+  // If absolute URI (has ://), validate scheme
+  size_t scheme_end = url.find("://");
+  if (scheme_end != std::string::npos)
+  {
+    if (scheme_end == 0 || scheme_end + 3 >= url.size())
+    {
+      return false;  // Empty scheme or no content after ://
+    }
+    // Scheme must start with letter
+    if (!std::isalpha(static_cast<unsigned char>(url[0])))
+    {
+      return false;
+    }
+    // Scheme can contain letters, digits, +, -, .
+    for (size_t i = 1; i < scheme_end; ++i)
+    {
+      char c = url[i];
+      if (!(std::isalnum(static_cast<unsigned char>(c)) || c == '+' || c == '-' || c == '.'))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Relative URI - accept any non-empty string
+  return true;
+}
+
 void ParseKeyValueList(const std::string &input,
                        opentelemetry::sdk::resource::ResourceAttributes &out)
 {
@@ -204,7 +240,7 @@ bool ParseSingleEntity(const std::string &entity_str, ParsedEntity &out)
         std::string{opentelemetry::common::StringUtil::Trim(entity_str.substr(cursor + 1))};
 
     // TODO: Use a proper Schema URL validator when available.
-    if (out.schema_url.empty() || out.schema_url.find("://") == std::string::npos)
+    if (!IsValidSchemaUrl(out.schema_url))
     {
       OTEL_INTERNAL_LOG_WARN(
           "[EnvEntityDetector] Invalid schema URL in OTEL_ENTITIES, ignoring schema URL.");

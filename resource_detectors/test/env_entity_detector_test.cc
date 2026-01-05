@@ -279,17 +279,48 @@ TEST(EnvEntityDetectorTest, PercentEncodingMultiple)
   unsetenv("OTEL_ENTITIES");
 }
 
-TEST(EnvEntityDetectorTest, InvalidSchemaUrl)
+TEST(EnvEntityDetectorTest, SchemaUrlRelativePath)
 {
-  // Test: Invalid schema URL - should log warning and ignore URL
-  setenv("OTEL_ENTITIES", "service{service.name=app1}@invalid-url", 1);
+  // Test: Relative path schema URL should be accepted
+  setenv("OTEL_ENTITIES", "service{service.name=app1}@schemas/1.21.0", 1);
 
   EnvEntityDetector detector;
   auto resource                   = detector.Detect();
   const auto &received_attributes = resource.GetAttributes();
 
-  // Entity should be processed but schema URL ignored
+  // Entity should be processed and relative schema URL accepted
   EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app1");
+  EXPECT_EQ(resource.GetSchemaURL(), "schemas/1.21.0");
+
+  unsetenv("OTEL_ENTITIES");
+}
+
+TEST(EnvEntityDetectorTest, InvalidSchemaUrlEmptyScheme)
+{
+  setenv("OTEL_ENTITIES", "service{service.name=app1}@://example.com/schemas/1.0.0", 1);
+
+  EnvEntityDetector detector;
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
+
+  // Entity should be processed but schema URL ignored (invalid scheme)
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app1");
+  EXPECT_TRUE(resource.GetSchemaURL().empty());
+
+  unsetenv("OTEL_ENTITIES");
+}
+
+TEST(EnvEntityDetectorTest, InvalidSchemaUrlInvalidScheme)
+{
+  setenv("OTEL_ENTITIES", "service{service.name=app1}@123://example.com/schemas/1.0.0", 1);
+
+  EnvEntityDetector detector;
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
+
+  // Entity should be processed but schema URL ignored (scheme must start with letter)
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app1");
+  EXPECT_TRUE(resource.GetSchemaURL().empty());
 
   unsetenv("OTEL_ENTITIES");
 }
@@ -324,9 +355,9 @@ TEST(EnvEntityDetectorTest, EmptySchemaUrl)
   unsetenv("OTEL_ENTITIES");
 }
 
-TEST(EnvEntityDetectorTest, ValidSchemaUrl)
+TEST(EnvEntityDetectorTest, ValidSchemaUrlAbsolute)
 {
-  // Test: Valid schema URL with "://" - should be accepted
+  // Test: Valid absolute schema URL with "://" - should be accepted
   setenv("OTEL_ENTITIES", "service{service.name=app1}@https://opentelemetry.io/schemas/1.0.0", 1);
 
   EnvEntityDetector detector;
@@ -336,6 +367,32 @@ TEST(EnvEntityDetectorTest, ValidSchemaUrl)
   // Entity should be processed and schema URL should be valid (not cleared)
   EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app1");
   EXPECT_EQ(resource.GetSchemaURL(), "https://opentelemetry.io/schemas/1.0.0");
+  unsetenv("OTEL_ENTITIES");
+}
+
+TEST(EnvEntityDetectorTest, ValidSchemaUrlRelative)
+{
+  setenv("OTEL_ENTITIES", "service{service.name=app1}@/schemas/1.21.0", 1);
+
+  EnvEntityDetector detector;
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
+
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app1");
+  EXPECT_EQ(resource.GetSchemaURL(), "/schemas/1.21.0");
+  unsetenv("OTEL_ENTITIES");
+}
+
+TEST(EnvEntityDetectorTest, ValidSchemaUrlHttp)
+{
+  setenv("OTEL_ENTITIES", "service{service.name=app1}@http://example.com/schemas/1.0.0", 1);
+
+  EnvEntityDetector detector;
+  auto resource                   = detector.Detect();
+  const auto &received_attributes = resource.GetAttributes();
+
+  EXPECT_EQ(nostd::get<std::string>(received_attributes.at("service.name")), "app1");
+  EXPECT_EQ(resource.GetSchemaURL(), "http://example.com/schemas/1.0.0");
   unsetenv("OTEL_ENTITIES");
 }
 
