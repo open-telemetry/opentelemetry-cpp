@@ -270,6 +270,33 @@ switch ($action) {
       exit $exit
     }
   }
+  "cmake.different_std.test" {
+    cd "$BUILD_DIR"
+    cmake $SRC_DIR `
+      "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
+      -DWITH_ASYNC_EXPORT_PREVIEW=ON `
+      -DWITH_STL=CXX20 `
+      -DCMAKE_CXX_STANDARD=20 `
+      -DOTELCPP_MAINTAINER_MODE=ON `
+      -DWITH_NO_DEPRECATED_CODE=ON `
+      -DVCPKG_TARGET_TRIPLET=x64-windows `
+      -DWITH_OTLP_FILE=ON `
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    cmake --build . -j $nproc
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    ctest -C Debug
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+  }
   "cmake.build_example_plugin" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
