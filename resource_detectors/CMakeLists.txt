@@ -3,8 +3,8 @@
 
 add_library(
   opentelemetry_resource_detectors
-  container_detector_utils.cc container_detector.cc process_detector.cc
-  process_detector_utils.cc)
+  container_detector_utils.cc container_detector.cc env_entity_detector.cc
+  process_detector.cc process_detector_utils.cc)
 
 set_target_properties(opentelemetry_resource_detectors
                       PROPERTIES EXPORT_NAME resource_detectors)
