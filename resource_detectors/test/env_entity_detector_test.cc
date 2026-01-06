@@ -4,9 +4,11 @@
 #include <gtest/gtest.h>
 #include <cstdlib>
 #include <string>
+#include <unordered_map>
 
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/resource_detectors/env_entity_detector.h"
+#include "opentelemetry/sdk/resource/resource.h"
 
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
