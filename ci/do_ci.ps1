@@ -67,7 +67,7 @@ switch ($action) {
     cmake $SRC_DIR `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       -DOPENTELEMETRY_BUILD_DLL=1 `
-     "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -90,7 +90,7 @@ switch ($action) {
       -DCMAKE_CXX_STANDARD=20 `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       -DOPENTELEMETRY_BUILD_DLL=1 `
-     "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -208,7 +208,7 @@ switch ($action) {
       "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
       -DWITH_OPENTRACING=OFF `
       -DVCPKG_TARGET_TRIPLET=x64-windows `      
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+    "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -277,8 +277,6 @@ switch ($action) {
       -DWITH_ASYNC_EXPORT_PREVIEW=ON `
       -DWITH_STL=CXX20 `
       -DCMAKE_CXX_STANDARD=20 `
-      -DOTELCPP_MAINTAINER_MODE=ON `
-      -DWITH_NO_DEPRECATED_CODE=ON `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       -DWITH_OTLP_FILE=ON `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
@@ -343,21 +341,22 @@ switch ($action) {
     cd "$BUILD_DIR"
 
     if (Test-Path Env:\CXX_STANDARD) {
-        $CXX_STANDARD = [int](Get-Item Env:\CXX_STANDARD).Value
-    } else {
-        $CXX_STANDARD = 17
+      $CXX_STANDARD = [int](Get-Item Env:\CXX_STANDARD).Value
+    }
+    else {
+      $CXX_STANDARD = 17
     }
     if (-not $CXX_STANDARD) {
-        $CXX_STANDARD = 17
+      $CXX_STANDARD = 17
     }
     Write-Host "Using CXX_STANDARD: $CXX_STANDARD"
       
     $CMAKE_OPTIONS = @(
-    "-DCMAKE_CXX_STANDARD=$CXX_STANDARD",
-    "-DCMAKE_CXX_STANDARD_REQUIRED=ON",
-    "-DCMAKE_CXX_EXTENSIONS=OFF",
-    "-DVCPKG_TARGET_TRIPLET=x64-windows",
-    "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      "-DCMAKE_CXX_STANDARD=$CXX_STANDARD",
+      "-DCMAKE_CXX_STANDARD_REQUIRED=ON",
+      "-DCMAKE_CXX_EXTENSIONS=OFF",
+      "-DVCPKG_TARGET_TRIPLET=x64-windows",
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     )
 
     cmake $SRC_DIR `
@@ -417,10 +416,10 @@ switch ($action) {
     cd "$BUILD_DIR\install_test"
 
     cmake $CMAKE_OPTIONS `
-          "-DCMAKE_PREFIX_PATH=$INSTALL_TEST_DIR" `
-          "-DINSTALL_TEST_CMAKE_OPTIONS=$CMAKE_OPTIONS_STRING" `
-          "-DINSTALL_TEST_COMPONENTS=$EXPECTED_COMPONENTS_STRING" `
-          -S "$SRC_DIR\install\test\cmake"
+      "-DCMAKE_PREFIX_PATH=$INSTALL_TEST_DIR" `
+      "-DINSTALL_TEST_CMAKE_OPTIONS=$CMAKE_OPTIONS_STRING" `
+      "-DINSTALL_TEST_COMPONENTS=$EXPECTED_COMPONENTS_STRING" `
+      -S "$SRC_DIR\install\test\cmake"
           
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -441,10 +440,10 @@ switch ($action) {
     Remove-Item -Recurse -Force "$INSTALL_TEST_DIR\*"
 
     $CMAKE_OPTIONS = @(
-    "-DCMAKE_CXX_STANDARD=17",
-    "-DVCPKG_TARGET_TRIPLET=x64-windows",
-    "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake",
-    "-DOPENTELEMETRY_BUILD_DLL=1"
+      "-DCMAKE_CXX_STANDARD=17",
+      "-DVCPKG_TARGET_TRIPLET=x64-windows",
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake",
+      "-DOPENTELEMETRY_BUILD_DLL=1"
     )
 
     cmake $SRC_DIR `
@@ -512,10 +511,10 @@ switch ($action) {
     cd "$BUILD_DIR\install_test"
 
     cmake $CMAKE_OPTIONS `
-          "-DCMAKE_PREFIX_PATH=$INSTALL_TEST_DIR" `
-          "-DINSTALL_TEST_CMAKE_OPTIONS=$CMAKE_OPTIONS_STRING" `
-          "-DINSTALL_TEST_COMPONENTS=$EXPECTED_COMPONENTS_STRING" `
-          -S "$SRC_DIR\install\test\cmake"
+      "-DCMAKE_PREFIX_PATH=$INSTALL_TEST_DIR" `
+      "-DINSTALL_TEST_CMAKE_OPTIONS=$CMAKE_OPTIONS_STRING" `
+      "-DINSTALL_TEST_COMPONENTS=$EXPECTED_COMPONENTS_STRING" `
+      -S "$SRC_DIR\install\test\cmake"
           
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
