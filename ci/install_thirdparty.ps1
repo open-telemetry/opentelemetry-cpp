@@ -1,4 +1,7 @@
 <#
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 .SYNOPSIS
 	Install OpenTelemetry C++ third-party dependencies using CMake.
 
@@ -23,9 +26,6 @@
 .EXAMPLE
 	./ci/install_thirdparty.ps1 --install-dir C:/third_party --tags-file C:/tags.txt --packages "grpc;protobuf"
 #>
-
-# Copyright The OpenTelemetry Authors
-# SPDX-License-Identifier: Apache-2.0
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -164,6 +164,8 @@ $CmakeConfigureArgs = @(
   "-DOTELCPP_THIRDPARTY_INSTALL_LIST=$ThirdpartyPackages"
 )
 
+$parallel = [Math]::Max([Environment]::ProcessorCount, 1)
+
 $CmakeBuildArgs = @(
   '--build', $ThirdpartyBuildDir,
   '--clean-first',
@@ -175,9 +177,7 @@ if (-not [string]::IsNullOrWhiteSpace($CmakeBuildType)) {
   $CmakeBuildArgs += @('--config', $CmakeBuildType)
 }
 
-Invoke-External -FilePath 'cmake' -Arguments $CmakeArgs
-
-$parallel = [Math]::Max([Environment]::ProcessorCount, 1)
+Invoke-External -FilePath 'cmake' -Arguments $CmakeConfigureArgs
 
 # Use CMake's cross-generator parallel flag.
 Invoke-External -FilePath 'cmake' -Arguments $CmakeBuildArgs
