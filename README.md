@@ -91,8 +91,9 @@ contributors' availability. Check the [OpenTelemetry community
 calendar](https://github.com/open-telemetry/community#calendar)
 for specific dates and Zoom meeting links.
 
-Meeting notes are available as a public [Google
-doc](https://docs.google.com/document/d/1i1E4-_y4uJ083lCutKGDhkpi3n4_e774SBLi9hPLocw/edit?usp=sharing).
+Meeting notes are available as a public
+[Google doc](https://docs.google.com/document/d/1rdF6GZcCqH9huo3oqur5x_McsPS_qQ9OPSRFjIqndm8/edit?usp=sharing).
+
 For edit access, get in touch on
 [Slack](https://cloud-native.slack.com/archives/C01N3AT62SJ).
 
