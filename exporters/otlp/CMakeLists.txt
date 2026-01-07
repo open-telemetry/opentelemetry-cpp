@@ -999,3 +999,14 @@ if(BUILD_TESTING)
       TEST_LIST otlp_file_metric_exporter_factory_test)
   endif()
 endif() # BUILD_TESTING
+
+if(WITH_BENCHMARK AND WITH_OTLP_HTTP)
+  add_executable(otlp_http_metric_exporter_benchmark
+                 benchmark/otlp_http_metric_exporter_benchmark.cc)
+
+  target_link_libraries(
+    otlp_http_metric_exporter_benchmark
+    PRIVATE opentelemetry_exporter_otlp_http_metric opentelemetry_metrics
+            opentelemetry_resources benchmark::benchmark
+            ${CMAKE_THREAD_LIBS_INIT})
+endif()
