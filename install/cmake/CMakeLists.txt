@@ -104,6 +104,10 @@ set(CMAKE_OPTIONS
     "-DCMAKE_CXX_EXTENSIONS=OFF"
     "-DCMAKE_POSITION_INDEPENDENT_CODE=ON")
 
+if(DEFINED CACHE{BUILD_SHARED_LIBS})
+  list(APPEND CMAKE_OPTIONS "-DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}")
+endif()
+
 message(STATUS "Installing third-party packages....")
 message(STATUS "  opentelemetry-cpp_SOURCE_DIR = ${OTELCPP_SOURCE_DIR}")
 message(STATUS "  third-party packages = ${_THIRDPARTY_PACKAGE_LIST}")
