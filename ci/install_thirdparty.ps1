@@ -37,6 +37,7 @@ function Show-Usage {
   Write-Host "  --tags-file <file>               File containing tags for third-party packages (optional)"
   Write-Host '  --packages "<pkg1>;<pkg2>;..."   Semicolon-separated list of packages to build (optional). Default installs all third-party packages.'
   Write-Host '  --build-type <build type>        CMake build type (optional)'
+  Write-Host '  --build-shared-libs <ON|OFF>     Build shared libraries (optional)'
   Write-Host "  -h, --help                       Show this help message"
 }
 
@@ -60,6 +61,7 @@ $ThirdpartyTagsFile = ''
 $ThirdpartyPackages = ''
 $ThirdpartyInstallDir = ''
 $CmakeBuildType = ''
+$CmakeBuildSharedLibs = ''
 
 # Match install_thirdparty.sh behavior: parse GNU-style args from $args.
 for ($i = 0; $i -lt $args.Count; ) {
@@ -103,6 +105,16 @@ for ($i = 0; $i -lt $args.Count; ) {
         exit 1
       }
       $CmakeBuildType = [string]$args[$i + 1]
+      $i += 2
+      continue
+    }
+    '--build-shared-libs' {
+      if (($i + 1) -ge $args.Count -or ([string]$args[$i + 1]).StartsWith('--')) {
+        [Console]::Error.WriteLine('Error: --build-shared-libs requires a value')
+        Show-Usage
+        exit 1
+      }
+      $CmakeBuildSharedLibs = [string]$args[$i + 1]
       $i += 2
       continue
     }
@@ -175,6 +187,10 @@ $CmakeBuildArgs = @(
 if (-not [string]::IsNullOrWhiteSpace($CmakeBuildType)) {
   $CmakeConfigureArgs += "-DCMAKE_BUILD_TYPE=$CmakeBuildType"
   $CmakeBuildArgs += @('--config', $CmakeBuildType)
+}
+
+if (-not [string]::IsNullOrWhiteSpace($CmakeBuildSharedLibs)) {
+  $CmakeConfigureArgs += "-DBUILD_SHARED_LIBS=$CmakeBuildSharedLibs"
 }
 
 Invoke-External -FilePath 'cmake' -Arguments $CmakeConfigureArgs

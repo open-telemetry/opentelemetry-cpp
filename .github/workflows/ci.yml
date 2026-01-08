@@ -606,7 +606,7 @@ jobs:
       env:
         CXX_STANDARD: '17'
       run: |
-        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_latest --packages "zlib;abseil;protobuf;nlohmann-json;googletest;benchmark"
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_latest --build-shared-libs "ON" --packages "zlib;abseil;protobuf;nlohmann-json;curl;grpc;googletest;benchmark"
     - name: run tests
       env:
         CXX_STANDARD: '23'
@@ -1069,6 +1069,8 @@ jobs:
     - name: run otprotocol test
       run: ./ci/do_ci.ps1 cmake.exporter.otprotocol.with_async_export.test
 
+  # Test case where protobuf is built with C++17 and OpenTelemetry with C++20 on MSVC will trigger a Internal compiler error
+  # We can enable this test case when MSVC on github runner is upgraded.
   cmake_test_different_std_for_protobuf_and_otel_msvc:
     name: CMake C++20 test with protobuf built with C++17 (MSVC)
     runs-on: windows-2022
@@ -1088,7 +1090,7 @@ jobs:
       env:
         CXX_STANDARD: '17'
       run: |
-        pwsh -File ./ci/install_thirdparty.ps1 --install-dir "$HOME/otel-third_party" --tags-file install/cmake/third_party_latest --build-type Debug --packages "zlib;abseil;protobuf;nlohmann-json;googletest;benchmark"
+        pwsh -File ./ci/install_thirdparty.ps1 --install-dir "$HOME/otel-third_party" --tags-file install/cmake/third_party_latest --build-type Debug --build-shared-libs "ON" --packages "zlib;abseil;protobuf;nlohmann-json;curl;grpc;googletest;benchmark"
     - name: run cmake test
       run: ./ci/do_ci.ps1 cmake.different_std.test
 
