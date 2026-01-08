@@ -51,10 +51,6 @@
 #  include "opentelemetry/exporters/otlp/otlp_file_span_builder.h"
 #endif
 
-#ifdef OTEL_HAVE_ZIPKIN
-#  include "opentelemetry/exporters/zipkin/zipkin_builder.h"
-#endif
-
 #ifdef OTEL_HAVE_PROMETHEUS
 #  include "opentelemetry/exporters/prometheus/prometheus_pull_builder.h"
 #endif
@@ -213,10 +209,6 @@ void InitOtel(const std::string &config_file)
     opentelemetry::exporter::otlp::OtlpFileSpanBuilder::Register(registry.get());
     opentelemetry::exporter::otlp::OtlpFilePushMetricBuilder::Register(registry.get());
     opentelemetry::exporter::otlp::OtlpFileLogRecordBuilder::Register(registry.get());
-#endif
-
-#ifdef OTEL_HAVE_ZIPKIN
-    opentelemetry::exporter::zipkin::ZipkinBuilder::Register(registry.get());
 #endif
 
 #ifdef OTEL_HAVE_PROMETHEUS

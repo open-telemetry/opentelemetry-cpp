@@ -24,7 +24,6 @@
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
-#include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 
 static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(
     const std::string &yaml)
@@ -426,69 +425,6 @@ tracer_provider:
   ASSERT_NE(simple->exporter, nullptr);
   auto *exporter = simple->exporter.get();
   ASSERT_NE(exporter, nullptr);
-}
-
-TEST(YamlTrace, default_otlp_zipkin)
-{
-  std::string yaml = R"(
-file_format: "1.0-trace"
-tracer_provider:
-  processors:
-    - simple:
-        exporter:
-          zipkin:
-            endpoint: "zipkin"
-)";
-
-  auto config = DoParse(yaml);
-  ASSERT_NE(config, nullptr);
-  ASSERT_NE(config->tracer_provider, nullptr);
-  ASSERT_EQ(config->tracer_provider->processors.size(), 1);
-  auto *processor = config->tracer_provider->processors[0].get();
-  ASSERT_NE(processor, nullptr);
-  auto *simple =
-      reinterpret_cast<opentelemetry::sdk::configuration::SimpleSpanProcessorConfiguration *>(
-          processor);
-  ASSERT_NE(simple->exporter, nullptr);
-  auto *exporter = simple->exporter.get();
-  ASSERT_NE(exporter, nullptr);
-  auto *zipkin =
-      reinterpret_cast<opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *>(
-          exporter);
-  ASSERT_EQ(zipkin->endpoint, "zipkin");
-  ASSERT_EQ(zipkin->timeout, 10000);
-}
-
-TEST(YamlTrace, otlp_zipkin)
-{
-  std::string yaml = R"(
-file_format: "1.0-trace"
-tracer_provider:
-  processors:
-    - simple:
-        exporter:
-          zipkin:
-            endpoint: "zipkin"
-            timeout: 5000
-)";
-
-  auto config = DoParse(yaml);
-  ASSERT_NE(config, nullptr);
-  ASSERT_NE(config->tracer_provider, nullptr);
-  ASSERT_EQ(config->tracer_provider->processors.size(), 1);
-  auto *processor = config->tracer_provider->processors[0].get();
-  ASSERT_NE(processor, nullptr);
-  auto *simple =
-      reinterpret_cast<opentelemetry::sdk::configuration::SimpleSpanProcessorConfiguration *>(
-          processor);
-  ASSERT_NE(simple->exporter, nullptr);
-  auto *exporter = simple->exporter.get();
-  ASSERT_NE(exporter, nullptr);
-  auto *zipkin =
-      reinterpret_cast<opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *>(
-          exporter);
-  ASSERT_EQ(zipkin->endpoint, "zipkin");
-  ASSERT_EQ(zipkin->timeout, 5000);
 }
 
 TEST(YamlTrace, no_limits)

@@ -15,6 +15,16 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] File configuration - remove zipkin
+  [#3804](https://github.com/open-telemetry/opentelemetry-cpp/pull/3804)
+
+Breaking changes:
+
+* [CONFIGURATION] File configuration - remove zipkin
+  [#3804](https://github.com/open-telemetry/opentelemetry-cpp/pull/3804)
+  * The zipkin trace exporter is no longer supported
+    by declarative configuration, due to an upstream schema change.
+
 ## [1.24 2025-11-20]
 
 * [RELEASE] Bump main branch to 1.24-dev

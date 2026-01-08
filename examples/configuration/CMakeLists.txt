@@ -54,12 +54,6 @@ if(WITH_OTLP_FILE)
             opentelemetry-cpp::otlp_file_metric_exporter_builder)
 endif()
 
-if(WITH_ZIPKIN)
-  target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_ZIPKIN)
-  target_link_libraries(
-    example_yaml PRIVATE opentelemetry-cpp::zipkin_trace_exporter_builder)
-endif()
-
 if(WITH_PROMETHEUS)
   target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_PROMETHEUS)
   target_link_libraries(example_yaml
