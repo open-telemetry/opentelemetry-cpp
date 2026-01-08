@@ -440,6 +440,27 @@ TEST(Tracer, StartSpanWithAttributesCopy)
   ASSERT_EQ("c", strings[2]);
 }
 
+TEST(Tracer, StartSpanWithInvalidAttributes)
+{
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::unique_ptr<SpanExporter>{exporter});
+
+  {
+    tracer
+        ->StartSpan("span 1",
+                    {
+                        {"attr1", "value1"},
+                        {"invalid_key\xff", "valid_value"},
+                        {"valid_key", "invalid_value\xff"},
+                    })
+        ->End();
+  }
+
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
+}
+
 TEST(Tracer, GetSampler)
 {
   auto resource = Resource::Create({});
@@ -628,6 +649,30 @@ TEST(Tracer, StartSpanWithCustomConfig)
 #endif
 }
 
+TEST(Tracer, SpanSetEventsWithInvalidAttributes)
+{
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::unique_ptr<SpanExporter>{exporter});
+
+  auto span = tracer->StartSpan("span 1");
+  span->AddEvent("event 3", std::chrono::system_clock::now(),
+                 {
+                     {"attr1", 1},
+                     {"invalid_key\xff", "valid_value"},
+                     {"valid_key", "invalid_value\xff"},
+                 });
+  span->End();
+
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
+
+  auto &span_data_events = spans.at(0)->GetEvents();
+  ASSERT_EQ(1, span_data_events.size());
+  ASSERT_EQ("event 3", span_data_events[0].GetName());
+  ASSERT_EQ(1, span_data_events[0].GetAttributes().size());
+}
+
 TEST(Tracer, StartSpanWithCustomConfigDifferingConditionOrder)
 {
   std::shared_ptr<opentelemetry::trace::Tracer> noop_tracer =
@@ -748,6 +793,27 @@ TEST(Tracer, SpanSetLinks)
     auto link2 = span_data_links.at(1);
     ASSERT_EQ(nostd::get<std::string>(link2.GetAttributes().at("attr3")), "3");
     ASSERT_EQ(nostd::get<std::string>(link2.GetAttributes().at("attr4")), "4");
+  }
+
+  {
+
+    // Span link with invalid attributes
+    tracer
+        ->StartSpan("efg", {{"attr1", 1}},
+                    {{SpanContext(false, false),
+                      {
+                          {"attr2", 2},
+                          {"invalid_key\xff", "valid_value"},
+                          {"valid_key", "invalid_value\xff"},
+                      }}})
+        ->End();
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(1, span_data_links.size());
+    auto link = span_data_links.at(0);
+    ASSERT_EQ(nostd::get<int>(link.GetAttributes().at("attr2")), 2);
   }
 }
 

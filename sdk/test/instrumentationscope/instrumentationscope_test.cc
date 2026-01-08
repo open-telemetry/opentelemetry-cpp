@@ -61,6 +61,20 @@ TEST(InstrumentationScope, CreateInstrumentationScope)
   }
 }
 
+TEST(InstrumentationScope, CreateInstrumentationScopeWithInvalidAttributes)
+{
+  std::string library_name    = "opentelemetry-cpp";
+  std::string library_version = "0.1.0";
+  std::string schema_url      = "https://opentelemetry.io/schemas/1.2.0";
+  auto instrumentation_scope =
+      InstrumentationScope::Create(library_name, library_version, schema_url,
+                                   {{"attribute-key1", "attribute-value"},
+                                    {"invalid-key\xff", "valid-value"},
+                                    {"valid-key", "invalid-value\xff"}});
+
+  EXPECT_EQ(instrumentation_scope->GetAttributes().size(), 1);
+}
+
 TEST(InstrumentationScope, CreateInstrumentationScopeWithLoopForAttributes)
 {
   std::string library_name    = "opentelemetry-cpp";
@@ -193,6 +207,25 @@ TEST(InstrumentationScope, SetAttribute)
   {
     EXPECT_EQ(attribute3_values[i], attrubite_value3[i]);
   }
+}
+
+TEST(InstrumentationScope, SetInvalidAttribute)
+{
+  std::string library_name    = "opentelemetry-cpp";
+  std::string library_version = "0.1.0";
+  std::string schema_url      = "https://opentelemetry.io/schemas/1.2.0";
+  auto instrumentation_scope =
+      InstrumentationScope::Create(library_name, library_version, schema_url);
+
+  EXPECT_EQ(instrumentation_scope->GetName(), library_name);
+  EXPECT_EQ(instrumentation_scope->GetVersion(), library_version);
+  EXPECT_EQ(instrumentation_scope->GetSchemaURL(), schema_url);
+  EXPECT_EQ(instrumentation_scope->GetAttributes().size(), 0);
+
+  instrumentation_scope->SetAttribute("attribute-key1", "attribute-value");
+  instrumentation_scope->SetAttribute("invalid-key\xff", "valid-value");
+  instrumentation_scope->SetAttribute("valid-key", "invalid-value\xff");
+  EXPECT_EQ(instrumentation_scope->GetAttributes().size(), 1);
 }
 
 TEST(InstrumentationScope, LegacyInstrumentationLibrary)

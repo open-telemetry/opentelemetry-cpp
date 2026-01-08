@@ -12,6 +12,7 @@ cc_test(
     deps = [
         "//api",
         "//sdk:headers",
+        "//sdk/src/common:attribute_validity",
         "@com_google_googletest//:gtest_main",
     ],
 )

@@ -1,11 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <ostream>
 #include <string>
 #include <unordered_map>
 #include <utility>
 
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/attribute_validity.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/version/version.h"
@@ -27,8 +30,28 @@ Resource::Resource(const ResourceAttributes &attributes) noexcept
 {}
 
 Resource::Resource(const ResourceAttributes &attributes, const std::string &schema_url) noexcept
-    : attributes_(attributes), schema_url_(schema_url)
-{}
+    : schema_url_(schema_url)
+{
+  attributes_.reserve(attributes.size());
+  for (auto &kv : attributes)
+  {
+    if (!common::AttributeValidator::IsValid(kv.first))
+    {
+      OTEL_INTERNAL_LOG_WARN("[Resource] Invalid attribute key "
+                             << kv.first << ". This attribute will be ignored.");
+      continue;
+    }
+
+    if (!common::AttributeValidator::IsValid(kv.second))
+    {
+      OTEL_INTERNAL_LOG_WARN("[Resource] Invalid attribute value for "
+                             << kv.first << ". This attribute will be ignored.");
+      continue;
+    }
+
+    attributes_[kv.first] = kv.second;
+  }
+}
 
 Resource Resource::Merge(const Resource &other) const noexcept
 {
@@ -49,7 +72,8 @@ Resource Resource::Create(const ResourceAttributes &attributes, const std::strin
     std::string default_service_name = "unknown_service";
     auto it_process_executable_name =
         resource.attributes_.find(semconv::process::kProcessExecutableName);
-    if (it_process_executable_name != resource.attributes_.end())
+    if (it_process_executable_name != resource.attributes_.end() &&
+        nostd::holds_alternative<std::string>(it_process_executable_name->second))
     {
       default_service_name += ":" + nostd::get<std::string>(it_process_executable_name->second);
     }

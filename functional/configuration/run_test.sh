@@ -15,5 +15,5 @@ export EXAMPLE_BIN_DIR="${BUILD_DIR}/examples/configuration/"
 # Make sure `example_yaml` is in the path
 export PATH=${PATH}:${EXAMPLE_BIN_DIR}
 
-shelltest ./shelltests
+shelltest --all --color ./shelltests
 

@@ -13,6 +13,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/attribute_validity.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
@@ -85,8 +86,18 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   }
   else if (nostd::holds_alternative<nostd::string_view>(value))
   {
-    proto_value->set_string_value(nostd::get<nostd::string_view>(value).data(),
-                                  nostd::get<nostd::string_view>(value).size());
+    if (allow_bytes &&
+        !opentelemetry::sdk::common::AttributeIsValidString(nostd::get<nostd::string_view>(value)))
+    {
+      proto_value->set_bytes_value(
+          reinterpret_cast<const void *>(nostd::get<nostd::string_view>(value).data()),
+          nostd::get<nostd::string_view>(value).size());
+    }
+    else
+    {
+      proto_value->set_string_value(nostd::get<nostd::string_view>(value).data(),
+                                    nostd::get<nostd::string_view>(value).size());
+    }
   }
   else if (nostd::holds_alternative<nostd::span<const uint8_t>>(value))
   {
@@ -159,7 +170,15 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<nostd::span<const nostd::string_view>>(value))
     {
-      array_value->add_values()->set_string_value(val.data(), val.size());
+      if (allow_bytes && !opentelemetry::sdk::common::AttributeIsValidString(val))
+      {
+        array_value->add_values()->set_bytes_value(reinterpret_cast<const void *>(val.data()),
+                                                   val.size());
+      }
+      else
+      {
+        array_value->add_values()->set_string_value(val.data(), val.size());
+      }
     }
   }
 }
@@ -224,7 +243,17 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   }
   else if (nostd::holds_alternative<std::string>(value))
   {
-    proto_value->set_string_value(nostd::get<std::string>(value));
+    if (allow_bytes &&
+        !opentelemetry::sdk::common::AttributeIsValidString(nostd::get<std::string>(value)))
+    {
+      proto_value->set_bytes_value(
+          reinterpret_cast<const void *>(nostd::get<std::string>(value).data()),
+          nostd::get<std::string>(value).size());
+    }
+    else
+    {
+      proto_value->set_string_value(nostd::get<std::string>(value));
+    }
   }
   else if (nostd::holds_alternative<std::vector<bool>>(value))
   {
@@ -281,7 +310,15 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<std::vector<std::string>>(value))
     {
-      array_value->add_values()->set_string_value(val);
+      if (allow_bytes && !opentelemetry::sdk::common::AttributeIsValidString(val))
+      {
+        array_value->add_values()->set_bytes_value(reinterpret_cast<const void *>(val.data()),
+                                                   val.size());
+      }
+      else
+      {
+        array_value->add_values()->set_string_value(val);
+      }
     }
   }
 }
