@@ -33,7 +33,6 @@ cc_binary(
         "//exporters/otlp:otlp_http_metric_exporter_builder",
         "//exporters/otlp:otlp_http_span_exporter_builder",
         "//exporters/prometheus:prometheus_exporter_builder",
-        "//exporters/zipkin:zipkin_exporter_builder",
         "//sdk:headers",
         "//sdk/src/configuration",
         "//sdk/src/logs",
