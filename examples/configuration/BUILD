@@ -10,7 +10,6 @@ cc_binary(
         "OTEL_HAVE_OTLP_HTTP",
         "OTEL_HAVE_OTLP_GRPC",
         "OTEL_HAVE_OTLP_FILE",
-        "OTEL_HAVE_ZIPKIN",
         "OTEL_HAVE_PROMETHEUS",
     ],
     tags = [

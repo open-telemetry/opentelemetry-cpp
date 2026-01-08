@@ -45,21 +45,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "zipkin_exporter_builder",
-    srcs = [
-        "src/zipkin_builder.cc",
-    ],
-    hdrs = [
-        "include/opentelemetry/exporters/zipkin/zipkin_builder.h",
-    ],
-    strip_include_prefix = "include",
-    tags = ["zipkin"],
-    deps = [
-        ":zipkin_exporter",
-    ],
-)
-
 cc_test(
     name = "zipkin_recordable_test",
     srcs = ["test/zipkin_recordable_test.cc"],
