@@ -281,12 +281,14 @@ switch ($action) {
       -DWITH_STL=CXX20 `
       -DCMAKE_CXX_STANDARD=23 `
       -DCMAKE_CXX_STANDARD_REQUIRED=ON `
+      -DWITH_OTLP_GRPC=ON `
+      -DWITH_OTLP_HTTP=ON `
       -DWITH_OTLP_FILE=ON
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build . -j $nproc
+    cmake --build . -j $nproc --config Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
