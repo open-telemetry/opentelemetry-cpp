@@ -1071,28 +1071,28 @@ jobs:
 
   # Test case where protobuf is built with C++17 and OpenTelemetry with C++20 on MSVC will trigger a Internal compiler error
   # We can enable this test case when MSVC on github runner is upgraded.
-  cmake_test_different_std_for_protobuf_and_otel_msvc:
-    name: CMake C++20 test with protobuf built with C++17 (MSVC)
-    runs-on: windows-2022
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
-      with:
-        egress-policy: audit
-
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-      with:
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        ./ci/setup_windows_ci_environment.ps1
-    - name: install dependencies
-      env:
-        CXX_STANDARD: '17'
-      run: |
-        pwsh -File ./ci/install_thirdparty.ps1 --install-dir "$HOME/otel-third_party" --tags-file install/cmake/third_party_latest --build-type Debug --build-shared-libs "ON" --packages "zlib;abseil;protobuf;nlohmann-json;curl;grpc;googletest;benchmark"
-    - name: run cmake test
-      run: ./ci/do_ci.ps1 cmake.different_std.test
+  # cmake_test_different_std_for_protobuf_and_otel_msvc:
+  #   name: CMake C++20 test with protobuf built with C++17 (MSVC)
+  #   runs-on: windows-2022
+  #   steps:
+  #   - name: Harden the runner (Audit all outbound calls)
+  #     uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
+  #     with:
+  #       egress-policy: audit
+  #
+  #   - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+  #     with:
+  #       submodules: 'recursive'
+  #   - name: setup
+  #     run: |
+  #       ./ci/setup_windows_ci_environment.ps1
+  #   - name: install dependencies
+  #     env:
+  #       CXX_STANDARD: '17'
+  #     run: |
+  #       pwsh -File ./ci/install_thirdparty.ps1 --install-dir "$HOME/otel-third_party" --tags-file install/cmake/third_party_latest --build-type Debug --build-shared-libs "ON" --packages "zlib;abseil;protobuf;nlohmann-json;curl;grpc;googletest;benchmark"
+  #   - name: run cmake test
+  #     run: ./ci/do_ci.ps1 cmake.different_std.test
 
   windows_bazel:
     name: Bazel Windows
