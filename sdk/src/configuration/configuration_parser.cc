@@ -210,9 +210,9 @@ std::unique_ptr<HttpTlsConfiguration> ConfigurationParser::ParseHttpTlsConfigura
 {
   auto model = std::make_unique<HttpTlsConfiguration>();
 
-  model->certificate_file        = node->GetString("certificate_file", "");
-  model->client_key_file         = node->GetString("client_key_file", "");
-  model->client_certificate_file = node->GetString("client_certificate_file", "");
+  model->ca_file   = node->GetString("ca_file", "");
+  model->key_file  = node->GetString("key_file", "");
+  model->cert_file = node->GetString("cert_file", "");
 
   return model;
 }
@@ -222,10 +222,10 @@ std::unique_ptr<GrpcTlsConfiguration> ConfigurationParser::ParseGrpcTlsConfigura
 {
   auto model = std::make_unique<GrpcTlsConfiguration>();
 
-  model->certificate_file        = node->GetString("certificate_file", "");
-  model->client_key_file         = node->GetString("client_key_file", "");
-  model->client_certificate_file = node->GetString("client_certificate_file", "");
-  model->insecure                = node->GetBoolean("insecure", false);
+  model->ca_file   = node->GetString("ca_file", "");
+  model->key_file  = node->GetString("key_file", "");
+  model->cert_file = node->GetString("cert_file", "");
+  model->insecure  = node->GetBoolean("insecure", false);
 
   return model;
 }

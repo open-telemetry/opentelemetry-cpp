@@ -18,12 +18,20 @@ Increment the:
 * [CONFIGURATION] File configuration - remove zipkin
   [#3804](https://github.com/open-telemetry/opentelemetry-cpp/pull/3804)
 
+* [CONFIGURATION] File configuration - rename tls properties
+  [#3805](https://github.com/open-telemetry/opentelemetry-cpp/pull/3805)
+
 Breaking changes:
 
 * [CONFIGURATION] File configuration - remove zipkin
   [#3804](https://github.com/open-telemetry/opentelemetry-cpp/pull/3804)
   * The zipkin trace exporter is no longer supported
     by declarative configuration, due to an upstream schema change.
+
+* [CONFIGURATION] File configuration - rename tls properties
+  [#3805](https://github.com/open-telemetry/opentelemetry-cpp/pull/3805)
+  * The Tls properties for Grpc and Http are renamed,
+    due to an upstream schema change.
 
 ## [1.24 2025-11-20]
 
