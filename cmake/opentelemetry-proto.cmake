@@ -203,7 +203,7 @@ if(TARGET protobuf::libprotobuf)
   # On Windows, protobuf and abseil-cpp are built with C++17 by default, which
   # will cause unresolved external symbol of GlobalEmptyStringConstexpr errors
   # when proto is built with C++20 or higher. We need to align the C++ standard
-  # between protobuf and proto targets to keep ABI compatiblity. But on
+  # between protobuf and proto targets to keep ABI compatibility. But on
   # unix-like systems, protobuf and abseil-cpp may be built with C++20 or
   # higher, and the default visibility will keep both GlobalEmptyStringConstexpr
   # and GlobalEmptyStringDynamicInit in library. If we change the C++ standard
