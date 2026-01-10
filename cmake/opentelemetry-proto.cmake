@@ -200,19 +200,33 @@ if(TARGET protobuf::libprotobuf)
   get_target_property(protobuf_lib_type protobuf::libprotobuf TYPE)
   get_target_property(protobuf_lib_compile_features protobuf::libprotobuf
                       INTERFACE_COMPILE_FEATURES)
-  if(DEFINED CMAKE_CXX_STANDARD AND protobuf_lib_compile_features MATCHES
-                                    "(^|\\s)cxx_std_([0-9]+)(|$\\s)")
-    # Wether the protobuf library using C++20 or higher may have different ABI.
-    # We need to make sure our proto targets are using the same C++ standard.
-    if(${CMAKE_MATCH_2} LESS 20 AND CMAKE_CXX_STANDARD GREATER_EQUAL 20)
-      set(protobuf_lib_compile_features_cxx_std ${CMAKE_MATCH_2})
-    elseif(${CMAKE_MATCH_2} GREATER_EQUAL 20 AND CMAKE_CXX_STANDARD LESS 20)
-      set(protobuf_lib_compile_features_cxx_std ${CMAKE_MATCH_2})
+  # On Windows, protobuf and abseil-cpp are built with C++17 by default, which
+  # will cause unresolved external symbol of GlobalEmptyStringConstexpr errors
+  # when proto is built with C++20 or higher. We need to align the C++ standard
+  # between protobuf and proto targets to keep ABI compatiblity. But on
+  # unix-like systems, protobuf and abseil-cpp may be built with C++20 or
+  # higher, and the default visibility will keep both GlobalEmptyStringConstexpr
+  # and GlobalEmptyStringDynamicInit in library. If we change the C++ standard
+  # of proto targets to C++17, the three-way comparison can't work between
+  # abseil-cpp and protobuf. So we only do this on MSVC.
+  if(MSVC)
+    if(DEFINED CMAKE_CXX_STANDARD AND protobuf_lib_compile_features MATCHES
+                                      "(^|\\s)cxx_std_([0-9]+)(|$\\s)")
+      # Wether the protobuf library using C++20 or higher may have different
+      # ABI. We need to make sure our proto targets are using the same C++
+      # standard.
+      if(${CMAKE_MATCH_2} LESS 20 AND CMAKE_CXX_STANDARD GREATER_EQUAL 20)
+        # Some versions of protobuf will set cxx_std_14, but qctually require
+        # c++17
+        set(protobuf_lib_compile_features_cxx_std 17)
+      elseif(${CMAKE_MATCH_2} GREATER_EQUAL 20 AND CMAKE_CXX_STANDARD LESS 20)
+        set(protobuf_lib_compile_features_cxx_std ${CMAKE_MATCH_2})
+      endif()
+      message(
+        STATUS
+          "protobuf::libprotobuf detected compile features cxx_std_${CMAKE_MATCH_2}."
+      )
     endif()
-    message(
-      STATUS
-        "protobuf::libprotobuf detected compile features cxx_std_${CMAKE_MATCH_2}."
-    )
   endif()
 else()
   set(protobuf_lib_type "SHARED_LIBRARY")
