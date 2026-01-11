@@ -198,33 +198,19 @@ endif()
 # opentelemetry_exporter_otlp_grpc_client as a static library.
 if(TARGET protobuf::libprotobuf)
   get_target_property(protobuf_lib_type protobuf::libprotobuf TYPE)
-  get_target_property(protobuf_lib_compile_features protobuf::libprotobuf
-                      INTERFACE_COMPILE_FEATURES)
-  # On Windows, protobuf and abseil-cpp are built with C++17 by default, which
-  # will cause unresolved external symbol of GlobalEmptyStringConstexpr errors
-  # when proto is built with C++20 or higher. We need to align the C++ standard
-  # between protobuf and proto targets to keep ABI compatibility. But on
-  # unix-like systems, protobuf and abseil-cpp may be built with C++20 or
-  # higher, and the default visibility will keep both GlobalEmptyStringConstexpr
-  # and GlobalEmptyStringDynamicInit in library. If we change the C++ standard
-  # of proto targets to C++17, the three-way comparison can't work between
-  # abseil-cpp and protobuf. So we only do this on MSVC.
+  # On Windows, protobuf and abseil-cpp are built with C++17 by default, and the
+  # protobuf v31/v6.31 have a ABI compatibility issue for GlobalEmptyString when
+  # .pb.cc files are built with C++20 or higher. See
+  # https://github.com/open-telemetry/opentelemetry-cpp/pull/3800 for details.
   if(MSVC)
-    if(DEFINED CMAKE_CXX_STANDARD AND protobuf_lib_compile_features MATCHES
-                                      "(^|\\s)cxx_std_([0-9]+)(|$\\s)")
-      # Wether the protobuf library using C++20 or higher may have different
-      # ABI. We need to make sure our proto targets are using the same C++
-      # standard.
-      if(${CMAKE_MATCH_2} LESS 20 AND CMAKE_CXX_STANDARD GREATER_EQUAL 20)
-        # Some versions of protobuf will set cxx_std_14, but qctually require
-        # c++17
-        set(protobuf_lib_compile_features_cxx_std 17)
-      elseif(${CMAKE_MATCH_2} GREATER_EQUAL 20 AND CMAKE_CXX_STANDARD LESS 20)
-        set(protobuf_lib_compile_features_cxx_std ${CMAKE_MATCH_2})
-      endif()
+    if(DEFINED CMAKE_CXX_STANDARD
+       AND CMAKE_CXX_STANDARD GREATER_EQUAL 20
+       AND (Protobuf_VERSION_MAJOR EQUAL 31 OR Protobuf_VERSION MATCHES
+                                               "31\\..*"))
+      set(protobuf_lib_compile_features_cxx_std 17)
       message(
         STATUS
-          "protobuf::libprotobuf detected compile features cxx_std_${CMAKE_MATCH_2}."
+          "protobuf::libprotobuf $(Protobuf_VERSION) detected and we force set CXX_STANDARD to 17 for .pb.cc files."
       )
     endif()
   endif()
