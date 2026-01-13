@@ -214,9 +214,9 @@ meter_provider:
           otlp_http:
             endpoint: "somewhere"
             tls:
-              certificate_file: "certificate_file"
-              client_key_file: "client_key_file"
-              client_certificate_file: "client_certificate_file"
+              ca_file: "ca_file"
+              key_file: "key_file"
+              cert_file: "cert_file"
             headers:
               - name: foo
                 value: "123"
@@ -246,9 +246,9 @@ meter_provider:
       opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(otlp_http->endpoint, "somewhere");
   ASSERT_NE(otlp_http->tls, nullptr);
-  ASSERT_EQ(otlp_http->tls->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_http->tls->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_http->tls->client_certificate_file, "client_certificate_file");
+  ASSERT_EQ(otlp_http->tls->ca_file, "ca_file");
+  ASSERT_EQ(otlp_http->tls->key_file, "key_file");
+  ASSERT_EQ(otlp_http->tls->cert_file, "cert_file");
   ASSERT_NE(otlp_http->headers, nullptr);
   ASSERT_EQ(otlp_http->headers->kv_map.size(), 2);
   ASSERT_EQ(otlp_http->headers->kv_map["foo"], "123");
@@ -314,9 +314,9 @@ meter_provider:
           otlp_grpc:
             endpoint: "somewhere"
             tls:
-              certificate_file: "certificate_file"
-              client_key_file: "client_key_file"
-              client_certificate_file: "client_certificate_file"
+              ca_file: "ca_file"
+              key_file: "key_file"
+              cert_file: "cert_file"
               insecure: true
             headers:
               - name: foo
@@ -346,9 +346,9 @@ meter_provider:
       opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(otlp_grpc->endpoint, "somewhere");
   ASSERT_NE(otlp_grpc->tls, nullptr);
-  ASSERT_EQ(otlp_grpc->tls->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_grpc->tls->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_grpc->tls->client_certificate_file, "client_certificate_file");
+  ASSERT_EQ(otlp_grpc->tls->ca_file, "ca_file");
+  ASSERT_EQ(otlp_grpc->tls->key_file, "key_file");
+  ASSERT_EQ(otlp_grpc->tls->cert_file, "cert_file");
   ASSERT_EQ(otlp_grpc->tls->insecure, true);
   ASSERT_NE(otlp_grpc->headers, nullptr);
   ASSERT_EQ(otlp_grpc->headers->kv_map.size(), 2);

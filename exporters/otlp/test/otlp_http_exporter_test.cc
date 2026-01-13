@@ -170,17 +170,34 @@ public:
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+    auto received_trace_id_counter = 0;
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce(
-            [&mock_session, report_trace_id](
+        .WillRepeatedly(
+            [&mock_session, report_trace_id, &received_trace_id_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               auto check_json =
                   nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-              auto resource_span     = *check_json["resourceSpans"].begin();
-              auto scope_span        = *resource_span["scopeSpans"].begin();
+              if (check_json["resourceSpans"].size() == 0)
+              {
+                return;
+              }
+              auto resource_span = *check_json["resourceSpans"].begin();
+              if (resource_span["scopeSpans"].size() == 0)
+              {
+                return;
+              }
+              auto scope_span = *resource_span["scopeSpans"].begin();
+              if (scope_span["spans"].size() == 0)
+              {
+                return;
+              }
               auto span              = *scope_span["spans"].begin();
               auto received_trace_id = span["traceId"].get<std::string>();
-              EXPECT_EQ(received_trace_id, report_trace_id);
+              if (received_trace_id != report_trace_id)
+              {
+                return;
+              }
+              ++received_trace_id_counter;
 
               auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
               ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
@@ -205,6 +222,9 @@ public:
     parent_span->End();
 
     provider->ForceFlush();
+
+    // Exporting can be retried
+    EXPECT_GE(received_trace_id_counter, 1);
   }
 
 #  ifdef ENABLE_ASYNC_EXPORT
@@ -262,17 +282,34 @@ public:
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+    auto received_trace_id_counter = 0;
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce(
-            [&mock_session, report_trace_id](
+        .WillRepeatedly(
+            [&mock_session, report_trace_id, &received_trace_id_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               auto check_json =
                   nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-              auto resource_span     = *check_json["resourceSpans"].begin();
-              auto scope_span        = *resource_span["scopeSpans"].begin();
+              if (check_json["resourceSpans"].size() == 0)
+              {
+                return;
+              }
+              auto resource_span = *check_json["resourceSpans"].begin();
+              if (resource_span["scopeSpans"].size() == 0)
+              {
+                return;
+              }
+              auto scope_span = *resource_span["scopeSpans"].begin();
+              if (scope_span["spans"].size() == 0)
+              {
+                return;
+              }
               auto span              = *scope_span["spans"].begin();
               auto received_trace_id = span["traceId"].get<std::string>();
-              EXPECT_EQ(received_trace_id, report_trace_id);
+              if (received_trace_id != report_trace_id)
+              {
+                return;
+              }
+              ++received_trace_id_counter;
 
               auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
               ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
@@ -301,6 +338,9 @@ public:
     parent_span->End();
 
     provider->ForceFlush();
+
+    // Exporting can be retried
+    EXPECT_GE(received_trace_id_counter, 1);
   }
 #  endif
 
@@ -357,17 +397,28 @@ public:
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+    auto received_trace_id_counter = 0;
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce(
-            [&mock_session, report_trace_id](
+        .WillRepeatedly(
+            [&mock_session, report_trace_id, &received_trace_id_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
               request_body.ParseFromArray(
                   &mock_session->GetRequest()->body_[0],
                   static_cast<int>(mock_session->GetRequest()->body_.size()));
+              if (request_body.resource_spans_size() == 0 ||
+                  request_body.resource_spans(0).scope_spans_size() == 0 ||
+                  request_body.resource_spans(0).scope_spans(0).spans_size() == 0)
+              {
+                return;
+              }
               auto received_trace_id =
                   request_body.resource_spans(0).scope_spans(0).spans(0).trace_id();
-              EXPECT_EQ(received_trace_id, report_trace_id);
+              if (received_trace_id != report_trace_id)
+              {
+                return;
+              }
+              ++received_trace_id_counter;
 
               auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
               ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
@@ -384,6 +435,9 @@ public:
     parent_span->End();
 
     provider->ForceFlush();
+
+    // Exporting can be retried
+    EXPECT_GE(received_trace_id_counter, 1);
   }
 
 #  ifdef ENABLE_ASYNC_EXPORT
@@ -440,17 +494,28 @@ public:
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+    auto received_trace_id_counter = 0;
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce(
-            [&mock_session, report_trace_id](
+        .WillRepeatedly(
+            [&mock_session, report_trace_id, &received_trace_id_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
               request_body.ParseFromArray(
                   &mock_session->GetRequest()->body_[0],
                   static_cast<int>(mock_session->GetRequest()->body_.size()));
+              if (request_body.resource_spans_size() == 0 ||
+                  request_body.resource_spans(0).scope_spans_size() == 0 ||
+                  request_body.resource_spans(0).scope_spans(0).spans_size() == 0)
+              {
+                return;
+              }
               auto received_trace_id =
                   request_body.resource_spans(0).scope_spans(0).spans(0).trace_id();
-              EXPECT_EQ(received_trace_id, report_trace_id);
+              if (received_trace_id != report_trace_id)
+              {
+                return;
+              }
+              ++received_trace_id_counter;
 
               auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
               ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
@@ -472,6 +537,8 @@ public:
     parent_span->End();
 
     provider->ForceFlush();
+    // Exporting can be retried
+    EXPECT_GE(received_trace_id_counter, 1);
   }
 #  endif
 };

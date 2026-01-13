@@ -116,8 +116,6 @@
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
-#include "opentelemetry/sdk/configuration/zipkin_span_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_factory.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
@@ -415,12 +413,6 @@ public:
       const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) override
   {
     exporter = sdk_builder_->CreateConsoleSpanExporter(model);
-  }
-
-  void VisitZipkin(
-      const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) override
-  {
-    exporter = sdk_builder_->CreateZipkinSpanExporter(model);
   }
 
   void VisitExtension(
@@ -883,23 +875,6 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateConso
   }
 
   static const std::string die("No builder for ConsoleSpanExporter");
-  throw UnsupportedException(die);
-}
-
-std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateZipkinSpanExporter(
-    const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) const
-{
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
-  const ZipkinSpanExporterBuilder *builder = registry_->GetZipkinSpanBuilder();
-
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG("CreateZipkinSpanExporter() using registered builder");
-    sdk = builder->Build(model);
-    return sdk;
-  }
-
-  static const std::string die("No builder for ZipkinSpanExporter");
   throw UnsupportedException(die);
 }
 

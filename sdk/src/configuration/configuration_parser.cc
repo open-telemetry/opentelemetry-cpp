@@ -97,7 +97,6 @@
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
-#include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -211,9 +210,9 @@ std::unique_ptr<HttpTlsConfiguration> ConfigurationParser::ParseHttpTlsConfigura
 {
   auto model = std::make_unique<HttpTlsConfiguration>();
 
-  model->certificate_file        = node->GetString("certificate_file", "");
-  model->client_key_file         = node->GetString("client_key_file", "");
-  model->client_certificate_file = node->GetString("client_certificate_file", "");
+  model->ca_file   = node->GetString("ca_file", "");
+  model->key_file  = node->GetString("key_file", "");
+  model->cert_file = node->GetString("cert_file", "");
 
   return model;
 }
@@ -223,10 +222,10 @@ std::unique_ptr<GrpcTlsConfiguration> ConfigurationParser::ParseGrpcTlsConfigura
 {
   auto model = std::make_unique<GrpcTlsConfiguration>();
 
-  model->certificate_file        = node->GetString("certificate_file", "");
-  model->client_key_file         = node->GetString("client_key_file", "");
-  model->client_certificate_file = node->GetString("client_certificate_file", "");
-  model->insecure                = node->GetBoolean("insecure", false);
+  model->ca_file   = node->GetString("ca_file", "");
+  model->key_file  = node->GetString("key_file", "");
+  model->cert_file = node->GetString("cert_file", "");
+  model->insecure  = node->GetBoolean("insecure", false);
 
   return model;
 }
@@ -1544,18 +1543,6 @@ ConfigurationParser::ParseConsoleSpanExporterConfiguration(
   return model;
 }
 
-std::unique_ptr<ZipkinSpanExporterConfiguration>
-ConfigurationParser::ParseZipkinSpanExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node) const
-{
-  auto model = std::make_unique<ZipkinSpanExporterConfiguration>();
-
-  model->endpoint = node->GetRequiredString("endpoint");
-  model->timeout  = node->GetInteger("timeout", 10000);
-
-  return model;
-}
-
 std::unique_ptr<ExtensionSpanExporterConfiguration>
 ConfigurationParser::ParseExtensionSpanExporterConfiguration(
     const std::string &name,
@@ -1607,10 +1594,6 @@ std::unique_ptr<SpanExporterConfiguration> ConfigurationParser::ParseSpanExporte
   else if (name == "console")
   {
     model = ParseConsoleSpanExporterConfiguration(child);
-  }
-  else if (name == "zipkin")
-  {
-    model = ParseZipkinSpanExporterConfiguration(child);
   }
   else
   {
