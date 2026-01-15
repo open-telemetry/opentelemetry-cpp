@@ -72,6 +72,7 @@
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
@@ -101,6 +102,9 @@ class ConfigurationParser
 public:
   OtlpHttpEncoding ParseOtlpHttpEncoding(const std::unique_ptr<DocumentNode> &node,
                                          const std::string &name) const;
+
+  SeverityNumber ParseSeverityNumber(const std::unique_ptr<DocumentNode> &node,
+                                     const std::string &name) const;
 
   std::unique_ptr<StringArrayConfiguration> ParseStringArrayConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
