@@ -12,8 +12,8 @@
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
-#include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
+#include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/version.h"
 
 /*
@@ -66,7 +66,7 @@ public:
 
   std::string file_format;
   bool disabled{false};
-  enum SeverityNumber log_level{SeverityNumber::info};
+  enum SeverityNumber log_level = SeverityNumber::info;
 
   std::unique_ptr<AttributeLimitsConfiguration> attribute_limits;
   std::unique_ptr<LoggerProviderConfiguration> logger_provider;

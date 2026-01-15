@@ -24,6 +24,9 @@ Increment the:
 * [API] Parse baggage value as spec compliant
   [#3758](https://github.com/open-telemetry/opentelemetry-cpp/pull/3758)
 
+* [CONFIGURATION] File configuration - implement log_level
+  [#3810](https://github.com/open-telemetry/opentelemetry-cpp/pull/3810)
+
 Breaking changes:
 
 * [CONFIGURATION] File configuration - remove zipkin
