@@ -429,8 +429,7 @@ TEST_F(BatchLogRecordProcessorTest, TestScheduleDelayInvalidEdgeCasesFromEnv)
     BatchLogRecordProcessorOptions options;
 
     EXPECT_EQ(options.schedule_delay_millis, std::chrono::milliseconds(1000))
-        << "Failed for case: " << tc.description
-        << " (value='" << tc.value << "')";
+        << "Failed for case: " << tc.description << " (value='" << tc.value << "')";
 
     unsetenv("OTEL_BLRP_SCHEDULE_DELAY");
   }
