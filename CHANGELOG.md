@@ -27,6 +27,9 @@ Increment the:
 * [CONFIGURATION] File configuration - implement log_level
   [#3810](https://github.com/open-telemetry/opentelemetry-cpp/pull/3810)
 
+* [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.39.0
+  [#3813](https://github.com/open-telemetry/opentelemetry-cpp/pull/3813)
+
 Breaking changes:
 
 * [CONFIGURATION] File configuration - remove zipkin
