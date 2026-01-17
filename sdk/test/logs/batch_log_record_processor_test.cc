@@ -396,6 +396,17 @@ TEST_F(BatchLogRecordProcessorTest, TestScheduleDelayFromEnv)
   unsetenv("OTEL_BLRP_SCHEDULE_DELAY");
 }
 
+TEST_F(BatchLogRecordProcessorTest, TestScheduleDelayInvalidValueFromEnv)
+{
+  setenv("OTEL_BLRP_SCHEDULE_DELAY", "invalid_value", 1);
+
+  BatchLogRecordProcessorOptions options;
+
+  EXPECT_EQ(options.schedule_delay_millis, std::chrono::milliseconds(1000));
+
+  unsetenv("OTEL_BLRP_SCHEDULE_DELAY");
+}
+
 TEST_F(BatchLogRecordProcessorTest, TestExportTimeoutFromEnv)
 {
   setenv("OTEL_BLRP_EXPORT_TIMEOUT", "250ms", 1);

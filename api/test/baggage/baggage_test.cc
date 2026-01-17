@@ -71,6 +71,8 @@ TEST(BaggageTest, ValidateExtractHeader)
       {"1a-2f%40foo=bar%251,a%2A%2Ffoo-_%2Fbar=bar+4",
        {"1a-2f@foo", "a*/foo-_/bar"},
        {"bar%1", "bar 4"}},                                       // decoding is done properly
+      {"field=foo:bar", {"field"}, {"foo:bar"}},                  // colon in value
+      {"mixed=a/b:c?d=e", {"mixed"}, {"a/b:c?d=e"}},              // mixed special characters
       {"k1=v1,invalidmember,k2=v2", {"k1", "k2"}, {"v1", "v2"}},  // invalid member is skipped
       {",", {}, {}},
       {",=,", {}, {}},

@@ -81,6 +81,7 @@
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
@@ -123,6 +124,134 @@ OtlpHttpEncoding ConfigurationParser::ParseOtlpHttpEncoding(
   }
 
   std::string message("Illegal OtlpHttpEncoding: ");
+  message.append(name);
+  throw InvalidSchemaException(node->Location(), message);
+}
+
+SeverityNumber ConfigurationParser::ParseSeverityNumber(const std::unique_ptr<DocumentNode> &node,
+                                                        const std::string &name) const
+{
+  if (name == "trace")
+  {
+    return SeverityNumber::trace;
+  }
+
+  if (name == "trace2")
+  {
+    return SeverityNumber::trace2;
+  }
+
+  if (name == "trace3")
+  {
+    return SeverityNumber::trace3;
+  }
+
+  if (name == "trace4")
+  {
+    return SeverityNumber::trace4;
+  }
+
+  if (name == "debug")
+  {
+    return SeverityNumber::debug;
+  }
+
+  if (name == "debug2")
+  {
+    return SeverityNumber::debug2;
+  }
+
+  if (name == "debug3")
+  {
+    return SeverityNumber::debug3;
+  }
+
+  if (name == "debug4")
+  {
+    return SeverityNumber::debug4;
+  }
+
+  if (name == "info")
+  {
+    return SeverityNumber::info;
+  }
+
+  if (name == "info2")
+  {
+    return SeverityNumber::info2;
+  }
+
+  if (name == "info3")
+  {
+    return SeverityNumber::info3;
+  }
+
+  if (name == "info4")
+  {
+    return SeverityNumber::info4;
+  }
+
+  if (name == "warn")
+  {
+    return SeverityNumber::warn;
+  }
+
+  if (name == "warn2")
+  {
+    return SeverityNumber::warn2;
+  }
+
+  if (name == "warn3")
+  {
+    return SeverityNumber::warn3;
+  }
+
+  if (name == "warn4")
+  {
+    return SeverityNumber::warn4;
+  }
+
+  if (name == "error")
+  {
+    return SeverityNumber::error;
+  }
+
+  if (name == "error2")
+  {
+    return SeverityNumber::error2;
+  }
+
+  if (name == "error3")
+  {
+    return SeverityNumber::error3;
+  }
+
+  if (name == "error4")
+  {
+    return SeverityNumber::error4;
+  }
+
+  if (name == "fatal")
+  {
+    return SeverityNumber::fatal;
+  }
+
+  if (name == "fatal2")
+  {
+    return SeverityNumber::fatal2;
+  }
+
+  if (name == "fatal3")
+  {
+    return SeverityNumber::fatal3;
+  }
+
+  if (name == "fatal4")
+  {
+    return SeverityNumber::fatal4;
+  }
+
+  std::string message("Illegal SeverityNumber: ");
   message.append(name);
   throw InvalidSchemaException(node->Location(), message);
 }
@@ -695,6 +824,8 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
   model->port               = node->GetInteger("port", 9464);
   model->without_scope_info = node->GetBoolean("without_scope_info", false);
 
+  // FIXME: without_target_info
+
   child = node->GetChildNode("with_resource_constant_labels");
   if (child)
   {
@@ -920,6 +1051,8 @@ ConfigurationParser::ParsePullMetricReaderConfiguration(
       model->producers.push_back(ParseMetricProducerConfiguration(*it));
     }
   }
+
+  // FIXME: cardinality_limits
 
   return model;
 }
@@ -1220,6 +1353,10 @@ std::unique_ptr<MeterProviderConfiguration> ConfigurationParser::ParseMeterProvi
       model->views.push_back(ParseViewConfiguration(*it));
     }
   }
+
+  // FIXME: exemplar_filter
+
+  // FIXME: meter_configurator/development
 
   return model;
 }
@@ -1991,6 +2128,9 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
 
   model->disabled = node->GetBoolean("disabled", false);
 
+  const std::string log_level = node->GetString("log_level", "info");
+  model->log_level            = ParseSeverityNumber(node, log_level);
+
   std::unique_ptr<DocumentNode> child;
 
   child = node->GetChildNode("attribute_limits");
@@ -2028,6 +2168,10 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
   {
     model->resource = ParseResourceConfiguration(child);
   }
+
+  // FIXME: instrumentation/development
+
+  // FIXME: distribution
 
   return model;
 }
