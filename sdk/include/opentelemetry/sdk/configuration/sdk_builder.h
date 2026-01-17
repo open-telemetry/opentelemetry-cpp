@@ -255,6 +255,9 @@ public:
                    const std::unique_ptr<opentelemetry::sdk::configuration::ResourceConfiguration>
                        &opt_model) const;
 
+  void SetLogLevel(opentelemetry::sdk::common::internal_log::LogLevel &sdk_log_level,
+                   opentelemetry::sdk::configuration::SeverityNumber model_log_level) const;
+
   std::unique_ptr<ConfiguredSdk> CreateConfiguredSdk(
       const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model) const;
 
