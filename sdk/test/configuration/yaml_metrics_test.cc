@@ -108,6 +108,8 @@ meter_provider:
   ASSERT_NE(periodic->exporter, nullptr);
   auto *exporter = periodic->exporter.get();
   ASSERT_NE(exporter, nullptr);
+  auto *cardinality_limits = periodic->cardinality_limits.get();
+  ASSERT_EQ(cardinality_limits, nullptr);
 }
 
 TEST(YamlMetrics, periodic_reader)
@@ -121,6 +123,15 @@ meter_provider:
         timeout: 15000
         exporter:
           console:
+        cardinality_limits:
+          default: 100
+          counter: 200
+          gauge: 300
+          histogram: 400
+          observable_counter: 500
+          observable_gauge: 600
+          observable_up_down_counter: 700
+          up_down_counter: 800
 )";
 
   auto config = DoParse(yaml);
@@ -137,9 +148,19 @@ meter_provider:
   ASSERT_NE(periodic->exporter, nullptr);
   auto *exporter = periodic->exporter.get();
   ASSERT_NE(exporter, nullptr);
+  auto *cardinality_limits = periodic->cardinality_limits.get();
+  ASSERT_NE(cardinality_limits, nullptr);
+  ASSERT_EQ(cardinality_limits->default_limit, 100);
+  ASSERT_EQ(cardinality_limits->counter, 200);
+  ASSERT_EQ(cardinality_limits->gauge, 300);
+  ASSERT_EQ(cardinality_limits->histogram, 400);
+  ASSERT_EQ(cardinality_limits->observable_counter, 500);
+  ASSERT_EQ(cardinality_limits->observable_gauge, 600);
+  ASSERT_EQ(cardinality_limits->observable_up_down_counter, 700);
+  ASSERT_EQ(cardinality_limits->up_down_counter, 800);
 }
 
-TEST(YamlMetrics, pull_reader)
+TEST(YamlMetrics, default_pull_reader)
 {
   std::string yaml = R"(
 file_format: "1.0-metrics"
@@ -161,6 +182,51 @@ meter_provider:
   ASSERT_NE(pull->exporter, nullptr);
   auto *exporter = pull->exporter.get();
   ASSERT_NE(exporter, nullptr);
+  auto *cardinality_limits = pull->cardinality_limits.get();
+  ASSERT_EQ(cardinality_limits, nullptr);
+}
+
+TEST(YamlMetrics, pull_reader)
+{
+  std::string yaml = R"(
+file_format: "1.0-metrics"
+meter_provider:
+  readers:
+    - pull:
+        exporter:
+          prometheus/development:
+        cardinality_limits:
+          default: 100
+          counter: 200
+          gauge: 300
+          histogram: 400
+          observable_counter: 500
+          observable_gauge: 600
+          observable_up_down_counter: 700
+          up_down_counter: 800
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->readers.size(), 1);
+  auto *reader = config->meter_provider->readers[0].get();
+  ASSERT_NE(reader, nullptr);
+  auto *pull =
+      reinterpret_cast<opentelemetry::sdk::configuration::PullMetricReaderConfiguration *>(reader);
+  ASSERT_NE(pull->exporter, nullptr);
+  auto *exporter = pull->exporter.get();
+  ASSERT_NE(exporter, nullptr);
+  auto *cardinality_limits = pull->cardinality_limits.get();
+  ASSERT_NE(cardinality_limits, nullptr);
+  ASSERT_EQ(cardinality_limits->default_limit, 100);
+  ASSERT_EQ(cardinality_limits->counter, 200);
+  ASSERT_EQ(cardinality_limits->gauge, 300);
+  ASSERT_EQ(cardinality_limits->histogram, 400);
+  ASSERT_EQ(cardinality_limits->observable_counter, 500);
+  ASSERT_EQ(cardinality_limits->observable_gauge, 600);
+  ASSERT_EQ(cardinality_limits->observable_up_down_counter, 700);
+  ASSERT_EQ(cardinality_limits->up_down_counter, 800);
 }
 
 TEST(YamlMetrics, default_otlp_http)

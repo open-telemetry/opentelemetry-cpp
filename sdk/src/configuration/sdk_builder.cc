@@ -1333,6 +1333,11 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
     OTEL_INTERNAL_LOG_WARN("metric producer not supported, ignoring");
   }
 
+  if (model->cardinality_limits != nullptr)
+  {
+    OTEL_INTERNAL_LOG_WARN("cardinality limits not supported, ignoring");
+  }
+
   sdk = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
       std::move(exporter_sdk), options);
 
@@ -1349,6 +1354,11 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePul
   if (model->producers.size() > 0)
   {
     OTEL_INTERNAL_LOG_WARN("metric producer not supported, ignoring");
+  }
+
+  if (model->cardinality_limits != nullptr)
+  {
+    OTEL_INTERNAL_LOG_WARN("cardinality limits not supported, ignoring");
   }
 
   return sdk;
