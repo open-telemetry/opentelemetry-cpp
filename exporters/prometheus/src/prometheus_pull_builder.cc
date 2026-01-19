@@ -38,7 +38,7 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> PrometheusPullBuilder
   url.append(std::to_string(model->port));
 
   options.url                  = url;
-  options.populate_target_info = true;
+  options.populate_target_info = !model->without_target_info;
   options.without_otel_scope   = model->without_scope_info;
 
   switch (model->translation_strategy)

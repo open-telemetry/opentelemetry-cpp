@@ -540,6 +540,7 @@ meter_provider:
   ASSERT_EQ(prometheus->host, "localhost");
   ASSERT_EQ(prometheus->port, 9464);
   ASSERT_EQ(prometheus->without_scope_info, false);
+  ASSERT_EQ(prometheus->without_target_info, false);
   ASSERT_EQ(prometheus->translation_strategy,
             opentelemetry::sdk::configuration::TranslationStrategy::UnderscoreEscapingWithSuffixes);
   ASSERT_EQ(prometheus->with_resource_constant_labels, nullptr);
@@ -557,6 +558,7 @@ meter_provider:
             host: "prometheus"
             port: 1234
             without_scope_info: true
+            without_target_info: true
             translation_strategy: NoUTF8EscapingWithSuffixes
             with_resource_constant_labels:
               included:
@@ -582,6 +584,7 @@ meter_provider:
   ASSERT_EQ(prometheus->host, "prometheus");
   ASSERT_EQ(prometheus->port, 1234);
   ASSERT_EQ(prometheus->without_scope_info, true);
+  ASSERT_EQ(prometheus->without_target_info, true);
   ASSERT_EQ(prometheus->translation_strategy,
             opentelemetry::sdk::configuration::TranslationStrategy::NoUTF8EscapingWithSuffixes);
   ASSERT_NE(prometheus->with_resource_constant_labels, nullptr);
