@@ -30,6 +30,9 @@ Increment the:
 * [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.39.0
   [#3813](https://github.com/open-telemetry/opentelemetry-cpp/pull/3813)
 
+* [CONFIGURATION] File configuration - prometheus without_target_info
+  [#3818](https://github.com/open-telemetry/opentelemetry-cpp/pull/3818)
+
 Breaking changes:
 
 * [CONFIGURATION] File configuration - remove zipkin
