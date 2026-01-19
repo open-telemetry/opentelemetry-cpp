@@ -125,6 +125,13 @@ struct OPENTELEMETRY_EXPORT OtlpHttpExporterOptions
 
   /** The backoff will be multiplied by this value after each retry attempt. */
   float retry_policy_backoff_multiplier{};
+
+  /** Collection Limits. No limit by default. */
+  std::uint32_t max_attributes           = UINT32_MAX;
+  std::uint32_t max_events               = UINT32_MAX;
+  std::uint32_t max_links                = UINT32_MAX;
+  std::uint32_t max_attributes_per_event = UINT32_MAX;
+  std::uint32_t max_attributes_per_link  = UINT32_MAX;
 };
 
 }  // namespace otlp
