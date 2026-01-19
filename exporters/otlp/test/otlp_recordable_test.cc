@@ -598,6 +598,47 @@ TYPED_TEST(IntAttributeTest, SetIntArrayAttribute)
     EXPECT_EQ(rec.span().attributes(0).value().array_value().values(i).int_value(), int_span[i]);
   }
 }
+
+TEST(OtlpRecordableTest, TestCollectionLimits)
+{
+  // Initialize recordable with strict limits:
+  // Max Attributes: 2, Max Events: 2, Max Links: 2
+  // Max Attributes Per Event: 1, Max Attributes Per Link: 1
+  OtlpRecordable recordable(2, 2, 2, 1, 1);
+
+  // Test Attribute Limits
+  recordable.SetAttribute("attr1", 1);
+  recordable.SetAttribute("attr2", 2);
+  recordable.SetAttribute("attr3", 3);  // Should be dropped
+
+  EXPECT_EQ(recordable.span().attributes_size(), 2);
+  EXPECT_EQ(recordable.span().dropped_attributes_count(), 1);
+
+  // Test Event Limits
+  std::map<std::string, int> empty_map;
+  common::KeyValueIterableView<std::map<std::string, int>> empty_attrs(empty_map);
+
+  recordable.AddEvent("event1", std::chrono::system_clock::now(), empty_attrs);
+  recordable.AddEvent("event2", std::chrono::system_clock::now(), empty_attrs);
+  recordable.AddEvent("event3", std::chrono::system_clock::now(),
+                      empty_attrs);  // Should be dropped
+
+  EXPECT_EQ(recordable.span().events_size(), 2);
+  EXPECT_EQ(recordable.span().dropped_events_count(), 1);
+
+  // Test Per-Event Attribute Limits
+  std::map<std::string, int> attr_map = {{"e_attr1", 1}, {"e_attr2", 2}};
+  common::KeyValueIterableView<std::map<std::string, int>> event_attrs(attr_map);
+
+  OtlpRecordable event_recordable(10, 10, 10, 1, 1);
+  event_recordable.AddEvent("event_with_attrs", std::chrono::system_clock::now(), event_attrs);
+
+  auto &event_list = event_recordable.span().events();
+  ASSERT_EQ(event_list.size(), 1);
+  // The event itself should have 1 attribute, and 1 dropped
+  EXPECT_EQ(event_list[0].attributes_size(), 1);
+  EXPECT_EQ(event_list[0].dropped_attributes_count(), 1);
+}
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
