@@ -35,6 +35,18 @@ namespace otlp
 class OtlpRecordable final : public opentelemetry::sdk::trace::Recordable
 {
 public:
+  explicit OtlpRecordable(uint32_t max_attributes           = UINT32_MAX,
+                          uint32_t max_events               = UINT32_MAX,
+                          uint32_t max_links                = UINT32_MAX,
+                          uint32_t max_attributes_per_event = UINT32_MAX,
+                          uint32_t max_attributes_per_link  = UINT32_MAX)
+      : max_attributes_(max_attributes),
+        max_events_(max_events),
+        max_links_(max_links),
+        max_attributes_per_event_(max_attributes_per_event),
+        max_attributes_per_link_(max_attributes_per_link)
+  {}
+
   proto::trace::v1::Span &span() noexcept { return span_; }
   const proto::trace::v1::Span &span() const noexcept { return span_; }
 
@@ -85,6 +97,11 @@ private:
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
       nullptr;
+  uint32_t max_attributes_;
+  uint32_t max_events_;
+  uint32_t max_links_;
+  uint32_t max_attributes_per_event_;
+  uint32_t max_attributes_per_link_;
 };
 }  // namespace otlp
 }  // namespace exporter
