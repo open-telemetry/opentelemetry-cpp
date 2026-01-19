@@ -4,6 +4,8 @@
 #pragma once
 
 #include <chrono>
+#include <cstdint>  // For uint32_t
+#include <limits>   // For UINT32_MAX
 #include <string>
 
 // clang-format off
