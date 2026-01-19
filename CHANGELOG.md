@@ -30,6 +30,9 @@ Increment the:
 * [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.39.0
   [#3813](https://github.com/open-telemetry/opentelemetry-cpp/pull/3813)
 
+* [CONFIGURATION] File configuration - implement cardinality_limits
+  [#3820](https://github.com/open-telemetry/opentelemetry-cpp/pull/3820)
+
 Breaking changes:
 
 * [CONFIGURATION] File configuration - remove zipkin
