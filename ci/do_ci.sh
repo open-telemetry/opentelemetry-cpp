@@ -72,6 +72,7 @@ echo "make command: ${MAKE_COMMAND}"
 export BAZEL_CXXOPTS="-std=c++17"
 
 echo "== DEBUGGING BROKEN BAZEL =="
+export USE_BAZEL_VERSION="8.5.0"
 env
 which bazel
 file /usr/local/bin/bazel
