@@ -71,6 +71,11 @@ echo "make command: ${MAKE_COMMAND}"
 
 export BAZEL_CXXOPTS="-std=c++17"
 
+echo "== DEBUGGING BROKEN BAZEL =="
+env
+which bazel
+file /usr/local/bin/bazel
+bazel --version
 
 BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW --//exporters/otlp:with_otlp_grpc_credential_preview=true"
 BAZEL_OPTIONS="$BAZEL_OPTIONS_DEFAULT"
@@ -573,8 +578,6 @@ EOF
   examples/plugin/load/load_plugin_example ${PLUGIN_DIR}/libexample_plugin.so /dev/null
   exit 0
 elif [[ "$1" == "bazel.test" ]]; then
-  which bazel
-  bazel --version
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS $BAZEL_WITH_PREVIEW //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS $BAZEL_WITH_PREVIEW //...
   exit 0
