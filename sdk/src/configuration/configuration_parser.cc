@@ -23,6 +23,7 @@
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_parser.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
