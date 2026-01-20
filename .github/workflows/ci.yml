@@ -722,7 +722,7 @@ jobs:
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       env:
         cache-name: bazel_cache
       with:
@@ -748,7 +748,7 @@ jobs:
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       env:
         cache-name: bazel_cache
       with:
@@ -774,7 +774,7 @@ jobs:
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       env:
         cache-name: bazel_cache
       with:
@@ -800,7 +800,7 @@ jobs:
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       env:
         cache-name: bazel_cache
       with:
@@ -826,7 +826,7 @@ jobs:
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       env:
         cache-name: bazel_cache
       with:
@@ -852,7 +852,7 @@ jobs:
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       env:
         cache-name: bazel_cache
       with:
@@ -878,7 +878,7 @@ jobs:
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       env:
         cache-name: bazel_cache
       with:
@@ -909,7 +909,7 @@ jobs:
       run: |
         ./ci/setup_cmake_macos.sh
     - name: Mount Bazel Cache
-      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       env:
         cache-name: bazel_cache
       with:
@@ -931,7 +931,7 @@ jobs:
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       env:
         cache-name: bazel_cache
       with:
