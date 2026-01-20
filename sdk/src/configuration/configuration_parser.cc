@@ -1012,7 +1012,6 @@ ConfigurationParser::ParseCardinalityLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<CardinalityLimitsConfiguration>();
-  std::unique_ptr<DocumentNode> child;
 
   model->default_limit              = node->GetInteger("default", 2000);
   model->counter                    = node->GetInteger("counter", 0);
