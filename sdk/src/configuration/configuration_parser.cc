@@ -820,11 +820,10 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
   auto model = std::make_unique<PrometheusPullMetricExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->host               = node->GetString("host", "localhost");
-  model->port               = node->GetInteger("port", 9464);
-  model->without_scope_info = node->GetBoolean("without_scope_info", false);
-
-  // FIXME: without_target_info
+  model->host                = node->GetString("host", "localhost");
+  model->port                = node->GetInteger("port", 9464);
+  model->without_scope_info  = node->GetBoolean("without_scope_info", false);
+  model->without_target_info = node->GetBoolean("without_target_info", false);
 
   child = node->GetChildNode("with_resource_constant_labels");
   if (child)
