@@ -23,6 +23,7 @@
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_parser.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
@@ -81,6 +82,7 @@
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
@@ -97,7 +99,6 @@
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
-#include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -124,6 +125,134 @@ OtlpHttpEncoding ConfigurationParser::ParseOtlpHttpEncoding(
   }
 
   std::string message("Illegal OtlpHttpEncoding: ");
+  message.append(name);
+  throw InvalidSchemaException(node->Location(), message);
+}
+
+SeverityNumber ConfigurationParser::ParseSeverityNumber(const std::unique_ptr<DocumentNode> &node,
+                                                        const std::string &name) const
+{
+  if (name == "trace")
+  {
+    return SeverityNumber::trace;
+  }
+
+  if (name == "trace2")
+  {
+    return SeverityNumber::trace2;
+  }
+
+  if (name == "trace3")
+  {
+    return SeverityNumber::trace3;
+  }
+
+  if (name == "trace4")
+  {
+    return SeverityNumber::trace4;
+  }
+
+  if (name == "debug")
+  {
+    return SeverityNumber::debug;
+  }
+
+  if (name == "debug2")
+  {
+    return SeverityNumber::debug2;
+  }
+
+  if (name == "debug3")
+  {
+    return SeverityNumber::debug3;
+  }
+
+  if (name == "debug4")
+  {
+    return SeverityNumber::debug4;
+  }
+
+  if (name == "info")
+  {
+    return SeverityNumber::info;
+  }
+
+  if (name == "info2")
+  {
+    return SeverityNumber::info2;
+  }
+
+  if (name == "info3")
+  {
+    return SeverityNumber::info3;
+  }
+
+  if (name == "info4")
+  {
+    return SeverityNumber::info4;
+  }
+
+  if (name == "warn")
+  {
+    return SeverityNumber::warn;
+  }
+
+  if (name == "warn2")
+  {
+    return SeverityNumber::warn2;
+  }
+
+  if (name == "warn3")
+  {
+    return SeverityNumber::warn3;
+  }
+
+  if (name == "warn4")
+  {
+    return SeverityNumber::warn4;
+  }
+
+  if (name == "error")
+  {
+    return SeverityNumber::error;
+  }
+
+  if (name == "error2")
+  {
+    return SeverityNumber::error2;
+  }
+
+  if (name == "error3")
+  {
+    return SeverityNumber::error3;
+  }
+
+  if (name == "error4")
+  {
+    return SeverityNumber::error4;
+  }
+
+  if (name == "fatal")
+  {
+    return SeverityNumber::fatal;
+  }
+
+  if (name == "fatal2")
+  {
+    return SeverityNumber::fatal2;
+  }
+
+  if (name == "fatal3")
+  {
+    return SeverityNumber::fatal3;
+  }
+
+  if (name == "fatal4")
+  {
+    return SeverityNumber::fatal4;
+  }
+
+  std::string message("Illegal SeverityNumber: ");
   message.append(name);
   throw InvalidSchemaException(node->Location(), message);
 }
@@ -211,9 +340,9 @@ std::unique_ptr<HttpTlsConfiguration> ConfigurationParser::ParseHttpTlsConfigura
 {
   auto model = std::make_unique<HttpTlsConfiguration>();
 
-  model->certificate_file        = node->GetString("certificate_file", "");
-  model->client_key_file         = node->GetString("client_key_file", "");
-  model->client_certificate_file = node->GetString("client_certificate_file", "");
+  model->ca_file   = node->GetString("ca_file", "");
+  model->key_file  = node->GetString("key_file", "");
+  model->cert_file = node->GetString("cert_file", "");
 
   return model;
 }
@@ -223,10 +352,10 @@ std::unique_ptr<GrpcTlsConfiguration> ConfigurationParser::ParseGrpcTlsConfigura
 {
   auto model = std::make_unique<GrpcTlsConfiguration>();
 
-  model->certificate_file        = node->GetString("certificate_file", "");
-  model->client_key_file         = node->GetString("client_key_file", "");
-  model->client_certificate_file = node->GetString("client_certificate_file", "");
-  model->insecure                = node->GetBoolean("insecure", false);
+  model->ca_file   = node->GetString("ca_file", "");
+  model->key_file  = node->GetString("key_file", "");
+  model->cert_file = node->GetString("cert_file", "");
+  model->insecure  = node->GetBoolean("insecure", false);
 
   return model;
 }
@@ -692,9 +821,10 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
   auto model = std::make_unique<PrometheusPullMetricExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->host               = node->GetString("host", "localhost");
-  model->port               = node->GetInteger("port", 9464);
-  model->without_scope_info = node->GetBoolean("without_scope_info", false);
+  model->host                = node->GetString("host", "localhost");
+  model->port                = node->GetInteger("port", 9464);
+  model->without_scope_info  = node->GetBoolean("without_scope_info", false);
+  model->without_target_info = node->GetBoolean("without_target_info", false);
 
   child = node->GetChildNode("with_resource_constant_labels");
   if (child)
@@ -876,6 +1006,24 @@ std::unique_ptr<MetricProducerConfiguration> ConfigurationParser::ParseMetricPro
   return model;
 }
 
+std::unique_ptr<CardinalityLimitsConfiguration>
+ConfigurationParser::ParseCardinalityLimitsConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<CardinalityLimitsConfiguration>();
+
+  model->default_limit              = node->GetInteger("default", 2000);
+  model->counter                    = node->GetInteger("counter", 0);
+  model->gauge                      = node->GetInteger("gauge", 0);
+  model->histogram                  = node->GetInteger("histogram", 0);
+  model->observable_counter         = node->GetInteger("observable_counter", 0);
+  model->observable_gauge           = node->GetInteger("observable_gauge", 0);
+  model->observable_up_down_counter = node->GetInteger("observable_up_down_counter", 0);
+  model->up_down_counter            = node->GetInteger("up_down_counter", 0);
+
+  return model;
+}
+
 std::unique_ptr<PeriodicMetricReaderConfiguration>
 ConfigurationParser::ParsePeriodicMetricReaderConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
@@ -899,6 +1047,12 @@ ConfigurationParser::ParsePeriodicMetricReaderConfiguration(
     }
   }
 
+  child = node->GetChildNode("cardinality_limits");
+  if (child)
+  {
+    model->cardinality_limits = ParseCardinalityLimitsConfiguration(child);
+  }
+
   return model;
 }
 
@@ -920,6 +1074,12 @@ ConfigurationParser::ParsePullMetricReaderConfiguration(
     {
       model->producers.push_back(ParseMetricProducerConfiguration(*it));
     }
+  }
+
+  child = node->GetChildNode("cardinality_limits");
+  if (child)
+  {
+    model->cardinality_limits = ParseCardinalityLimitsConfiguration(child);
   }
 
   return model;
@@ -1221,6 +1381,10 @@ std::unique_ptr<MeterProviderConfiguration> ConfigurationParser::ParseMeterProvi
       model->views.push_back(ParseViewConfiguration(*it));
     }
   }
+
+  // FIXME: exemplar_filter
+
+  // FIXME: meter_configurator/development
 
   return model;
 }
@@ -1544,18 +1708,6 @@ ConfigurationParser::ParseConsoleSpanExporterConfiguration(
   return model;
 }
 
-std::unique_ptr<ZipkinSpanExporterConfiguration>
-ConfigurationParser::ParseZipkinSpanExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node) const
-{
-  auto model = std::make_unique<ZipkinSpanExporterConfiguration>();
-
-  model->endpoint = node->GetRequiredString("endpoint");
-  model->timeout  = node->GetInteger("timeout", 10000);
-
-  return model;
-}
-
 std::unique_ptr<ExtensionSpanExporterConfiguration>
 ConfigurationParser::ParseExtensionSpanExporterConfiguration(
     const std::string &name,
@@ -1607,10 +1759,6 @@ std::unique_ptr<SpanExporterConfiguration> ConfigurationParser::ParseSpanExporte
   else if (name == "console")
   {
     model = ParseConsoleSpanExporterConfiguration(child);
-  }
-  else if (name == "zipkin")
-  {
-    model = ParseZipkinSpanExporterConfiguration(child);
   }
   else
   {
@@ -2008,6 +2156,9 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
 
   model->disabled = node->GetBoolean("disabled", false);
 
+  const std::string log_level = node->GetString("log_level", "info");
+  model->log_level            = ParseSeverityNumber(node, log_level);
+
   std::unique_ptr<DocumentNode> child;
 
   child = node->GetChildNode("attribute_limits");
@@ -2045,6 +2196,10 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
   {
     model->resource = ParseResourceConfiguration(child);
   }
+
+  // FIXME: instrumentation/development
+
+  // FIXME: distribution
 
   return model;
 }

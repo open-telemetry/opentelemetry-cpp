@@ -24,7 +24,6 @@
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
-#include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 
 static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(
     const std::string &yaml)
@@ -210,9 +209,9 @@ tracer_provider:
           otlp_http:
             endpoint: "somewhere"
             tls:
-              certificate_file: "certificate_file"
-              client_key_file: "client_key_file"
-              client_certificate_file: "client_certificate_file"
+              ca_file: "ca_file"
+              key_file: "key_file"
+              cert_file: "cert_file"
             headers:
               - name: foo
                 value: "123"
@@ -241,9 +240,9 @@ tracer_provider:
           exporter);
   ASSERT_EQ(otlp_http->endpoint, "somewhere");
   ASSERT_NE(otlp_http->tls, nullptr);
-  ASSERT_EQ(otlp_http->tls->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_http->tls->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_http->tls->client_certificate_file, "client_certificate_file");
+  ASSERT_EQ(otlp_http->tls->ca_file, "ca_file");
+  ASSERT_EQ(otlp_http->tls->key_file, "key_file");
+  ASSERT_EQ(otlp_http->tls->cert_file, "cert_file");
   ASSERT_NE(otlp_http->headers, nullptr);
   ASSERT_EQ(otlp_http->headers->kv_map.size(), 2);
   ASSERT_EQ(otlp_http->headers->kv_map["foo"], "123");
@@ -300,9 +299,9 @@ tracer_provider:
           otlp_grpc:
             endpoint: "somewhere"
             tls:
-              certificate_file: "certificate_file"
-              client_key_file: "client_key_file"
-              client_certificate_file: "client_certificate_file"
+              ca_file: "ca_file"
+              key_file: "key_file"
+              cert_file: "cert_file"
               insecure: true
             headers:
               - name: foo
@@ -331,9 +330,9 @@ tracer_provider:
           exporter);
   ASSERT_EQ(otlp_grpc->endpoint, "somewhere");
   ASSERT_NE(otlp_grpc->tls, nullptr);
-  ASSERT_EQ(otlp_grpc->tls->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_grpc->tls->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_grpc->tls->client_certificate_file, "client_certificate_file");
+  ASSERT_EQ(otlp_grpc->tls->ca_file, "ca_file");
+  ASSERT_EQ(otlp_grpc->tls->key_file, "key_file");
+  ASSERT_EQ(otlp_grpc->tls->cert_file, "cert_file");
   ASSERT_EQ(otlp_grpc->tls->insecure, true);
   ASSERT_NE(otlp_grpc->headers, nullptr);
   ASSERT_EQ(otlp_grpc->headers->kv_map.size(), 2);
@@ -426,69 +425,6 @@ tracer_provider:
   ASSERT_NE(simple->exporter, nullptr);
   auto *exporter = simple->exporter.get();
   ASSERT_NE(exporter, nullptr);
-}
-
-TEST(YamlTrace, default_otlp_zipkin)
-{
-  std::string yaml = R"(
-file_format: "1.0-trace"
-tracer_provider:
-  processors:
-    - simple:
-        exporter:
-          zipkin:
-            endpoint: "zipkin"
-)";
-
-  auto config = DoParse(yaml);
-  ASSERT_NE(config, nullptr);
-  ASSERT_NE(config->tracer_provider, nullptr);
-  ASSERT_EQ(config->tracer_provider->processors.size(), 1);
-  auto *processor = config->tracer_provider->processors[0].get();
-  ASSERT_NE(processor, nullptr);
-  auto *simple =
-      reinterpret_cast<opentelemetry::sdk::configuration::SimpleSpanProcessorConfiguration *>(
-          processor);
-  ASSERT_NE(simple->exporter, nullptr);
-  auto *exporter = simple->exporter.get();
-  ASSERT_NE(exporter, nullptr);
-  auto *zipkin =
-      reinterpret_cast<opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *>(
-          exporter);
-  ASSERT_EQ(zipkin->endpoint, "zipkin");
-  ASSERT_EQ(zipkin->timeout, 10000);
-}
-
-TEST(YamlTrace, otlp_zipkin)
-{
-  std::string yaml = R"(
-file_format: "1.0-trace"
-tracer_provider:
-  processors:
-    - simple:
-        exporter:
-          zipkin:
-            endpoint: "zipkin"
-            timeout: 5000
-)";
-
-  auto config = DoParse(yaml);
-  ASSERT_NE(config, nullptr);
-  ASSERT_NE(config->tracer_provider, nullptr);
-  ASSERT_EQ(config->tracer_provider->processors.size(), 1);
-  auto *processor = config->tracer_provider->processors[0].get();
-  ASSERT_NE(processor, nullptr);
-  auto *simple =
-      reinterpret_cast<opentelemetry::sdk::configuration::SimpleSpanProcessorConfiguration *>(
-          processor);
-  ASSERT_NE(simple->exporter, nullptr);
-  auto *exporter = simple->exporter.get();
-  ASSERT_NE(exporter, nullptr);
-  auto *zipkin =
-      reinterpret_cast<opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *>(
-          exporter);
-  ASSERT_EQ(zipkin->endpoint, "zipkin");
-  ASSERT_EQ(zipkin->timeout, 5000);
 }
 
 TEST(YamlTrace, no_limits)

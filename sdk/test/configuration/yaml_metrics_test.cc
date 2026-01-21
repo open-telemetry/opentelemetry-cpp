@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
@@ -108,6 +109,8 @@ meter_provider:
   ASSERT_NE(periodic->exporter, nullptr);
   auto *exporter = periodic->exporter.get();
   ASSERT_NE(exporter, nullptr);
+  auto *cardinality_limits = periodic->cardinality_limits.get();
+  ASSERT_EQ(cardinality_limits, nullptr);
 }
 
 TEST(YamlMetrics, periodic_reader)
@@ -121,6 +124,15 @@ meter_provider:
         timeout: 15000
         exporter:
           console:
+        cardinality_limits:
+          default: 100
+          counter: 200
+          gauge: 300
+          histogram: 400
+          observable_counter: 500
+          observable_gauge: 600
+          observable_up_down_counter: 700
+          up_down_counter: 800
 )";
 
   auto config = DoParse(yaml);
@@ -137,9 +149,19 @@ meter_provider:
   ASSERT_NE(periodic->exporter, nullptr);
   auto *exporter = periodic->exporter.get();
   ASSERT_NE(exporter, nullptr);
+  auto *cardinality_limits = periodic->cardinality_limits.get();
+  ASSERT_NE(cardinality_limits, nullptr);
+  ASSERT_EQ(cardinality_limits->default_limit, 100);
+  ASSERT_EQ(cardinality_limits->counter, 200);
+  ASSERT_EQ(cardinality_limits->gauge, 300);
+  ASSERT_EQ(cardinality_limits->histogram, 400);
+  ASSERT_EQ(cardinality_limits->observable_counter, 500);
+  ASSERT_EQ(cardinality_limits->observable_gauge, 600);
+  ASSERT_EQ(cardinality_limits->observable_up_down_counter, 700);
+  ASSERT_EQ(cardinality_limits->up_down_counter, 800);
 }
 
-TEST(YamlMetrics, pull_reader)
+TEST(YamlMetrics, default_pull_reader)
 {
   std::string yaml = R"(
 file_format: "1.0-metrics"
@@ -161,6 +183,51 @@ meter_provider:
   ASSERT_NE(pull->exporter, nullptr);
   auto *exporter = pull->exporter.get();
   ASSERT_NE(exporter, nullptr);
+  auto *cardinality_limits = pull->cardinality_limits.get();
+  ASSERT_EQ(cardinality_limits, nullptr);
+}
+
+TEST(YamlMetrics, pull_reader)
+{
+  std::string yaml = R"(
+file_format: "1.0-metrics"
+meter_provider:
+  readers:
+    - pull:
+        exporter:
+          prometheus/development:
+        cardinality_limits:
+          default: 100
+          counter: 200
+          gauge: 300
+          histogram: 400
+          observable_counter: 500
+          observable_gauge: 600
+          observable_up_down_counter: 700
+          up_down_counter: 800
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->readers.size(), 1);
+  auto *reader = config->meter_provider->readers[0].get();
+  ASSERT_NE(reader, nullptr);
+  auto *pull =
+      reinterpret_cast<opentelemetry::sdk::configuration::PullMetricReaderConfiguration *>(reader);
+  ASSERT_NE(pull->exporter, nullptr);
+  auto *exporter = pull->exporter.get();
+  ASSERT_NE(exporter, nullptr);
+  auto *cardinality_limits = pull->cardinality_limits.get();
+  ASSERT_NE(cardinality_limits, nullptr);
+  ASSERT_EQ(cardinality_limits->default_limit, 100);
+  ASSERT_EQ(cardinality_limits->counter, 200);
+  ASSERT_EQ(cardinality_limits->gauge, 300);
+  ASSERT_EQ(cardinality_limits->histogram, 400);
+  ASSERT_EQ(cardinality_limits->observable_counter, 500);
+  ASSERT_EQ(cardinality_limits->observable_gauge, 600);
+  ASSERT_EQ(cardinality_limits->observable_up_down_counter, 700);
+  ASSERT_EQ(cardinality_limits->up_down_counter, 800);
 }
 
 TEST(YamlMetrics, default_otlp_http)
@@ -214,9 +281,9 @@ meter_provider:
           otlp_http:
             endpoint: "somewhere"
             tls:
-              certificate_file: "certificate_file"
-              client_key_file: "client_key_file"
-              client_certificate_file: "client_certificate_file"
+              ca_file: "ca_file"
+              key_file: "key_file"
+              cert_file: "cert_file"
             headers:
               - name: foo
                 value: "123"
@@ -246,9 +313,9 @@ meter_provider:
       opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(otlp_http->endpoint, "somewhere");
   ASSERT_NE(otlp_http->tls, nullptr);
-  ASSERT_EQ(otlp_http->tls->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_http->tls->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_http->tls->client_certificate_file, "client_certificate_file");
+  ASSERT_EQ(otlp_http->tls->ca_file, "ca_file");
+  ASSERT_EQ(otlp_http->tls->key_file, "key_file");
+  ASSERT_EQ(otlp_http->tls->cert_file, "cert_file");
   ASSERT_NE(otlp_http->headers, nullptr);
   ASSERT_EQ(otlp_http->headers->kv_map.size(), 2);
   ASSERT_EQ(otlp_http->headers->kv_map["foo"], "123");
@@ -314,9 +381,9 @@ meter_provider:
           otlp_grpc:
             endpoint: "somewhere"
             tls:
-              certificate_file: "certificate_file"
-              client_key_file: "client_key_file"
-              client_certificate_file: "client_certificate_file"
+              ca_file: "ca_file"
+              key_file: "key_file"
+              cert_file: "cert_file"
               insecure: true
             headers:
               - name: foo
@@ -346,9 +413,9 @@ meter_provider:
       opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(otlp_grpc->endpoint, "somewhere");
   ASSERT_NE(otlp_grpc->tls, nullptr);
-  ASSERT_EQ(otlp_grpc->tls->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_grpc->tls->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_grpc->tls->client_certificate_file, "client_certificate_file");
+  ASSERT_EQ(otlp_grpc->tls->ca_file, "ca_file");
+  ASSERT_EQ(otlp_grpc->tls->key_file, "key_file");
+  ASSERT_EQ(otlp_grpc->tls->cert_file, "cert_file");
   ASSERT_EQ(otlp_grpc->tls->insecure, true);
   ASSERT_NE(otlp_grpc->headers, nullptr);
   ASSERT_EQ(otlp_grpc->headers->kv_map.size(), 2);
@@ -540,6 +607,7 @@ meter_provider:
   ASSERT_EQ(prometheus->host, "localhost");
   ASSERT_EQ(prometheus->port, 9464);
   ASSERT_EQ(prometheus->without_scope_info, false);
+  ASSERT_EQ(prometheus->without_target_info, false);
   ASSERT_EQ(prometheus->translation_strategy,
             opentelemetry::sdk::configuration::TranslationStrategy::UnderscoreEscapingWithSuffixes);
   ASSERT_EQ(prometheus->with_resource_constant_labels, nullptr);
@@ -557,6 +625,7 @@ meter_provider:
             host: "prometheus"
             port: 1234
             without_scope_info: true
+            without_target_info: true
             translation_strategy: NoUTF8EscapingWithSuffixes
             with_resource_constant_labels:
               included:
@@ -582,6 +651,7 @@ meter_provider:
   ASSERT_EQ(prometheus->host, "prometheus");
   ASSERT_EQ(prometheus->port, 1234);
   ASSERT_EQ(prometheus->without_scope_info, true);
+  ASSERT_EQ(prometheus->without_target_info, true);
   ASSERT_EQ(prometheus->translation_strategy,
             opentelemetry::sdk::configuration::TranslationStrategy::NoUTF8EscapingWithSuffixes);
   ASSERT_NE(prometheus->with_resource_constant_labels, nullptr);

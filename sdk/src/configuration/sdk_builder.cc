@@ -101,6 +101,7 @@
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
+#include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
@@ -116,8 +117,6 @@
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
-#include "opentelemetry/sdk/configuration/zipkin_span_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_factory.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
@@ -415,12 +414,6 @@ public:
       const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) override
   {
     exporter = sdk_builder_->CreateConsoleSpanExporter(model);
-  }
-
-  void VisitZipkin(
-      const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) override
-  {
-    exporter = sdk_builder_->CreateZipkinSpanExporter(model);
   }
 
   void VisitExtension(
@@ -886,23 +879,6 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateConso
   throw UnsupportedException(die);
 }
 
-std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateZipkinSpanExporter(
-    const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) const
-{
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
-  const ZipkinSpanExporterBuilder *builder = registry_->GetZipkinSpanBuilder();
-
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG("CreateZipkinSpanExporter() using registered builder");
-    sdk = builder->Build(model);
-    return sdk;
-  }
-
-  static const std::string die("No builder for ZipkinSpanExporter");
-  throw UnsupportedException(die);
-}
-
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateExtensionSpanExporter(
     const opentelemetry::sdk::configuration::ExtensionSpanExporterConfiguration *model) const
 {
@@ -1357,6 +1333,11 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
     OTEL_INTERNAL_LOG_WARN("metric producer not supported, ignoring");
   }
 
+  if (model->cardinality_limits != nullptr)
+  {
+    OTEL_INTERNAL_LOG_WARN("cardinality limits not supported, ignoring");
+  }
+
   sdk = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
       std::move(exporter_sdk), options);
 
@@ -1373,6 +1354,11 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePul
   if (model->producers.size() > 0)
   {
     OTEL_INTERNAL_LOG_WARN("metric producer not supported, ignoring");
+  }
+
+  if (model->cardinality_limits != nullptr)
+  {
+    OTEL_INTERNAL_LOG_WARN("cardinality limits not supported, ignoring");
   }
 
   return sdk;
@@ -1780,10 +1766,55 @@ void SdkBuilder::SetResource(
   }
 }
 
+void SdkBuilder::SetLogLevel(
+    opentelemetry::sdk::common::internal_log::LogLevel &sdk_log_level,
+    opentelemetry::sdk::configuration::SeverityNumber model_log_level) const
+{
+  sdk_log_level = opentelemetry::sdk::common::internal_log::LogLevel::Info;
+
+  switch (model_log_level)
+  {
+    case SeverityNumber::trace:
+    case SeverityNumber::trace2:
+    case SeverityNumber::trace3:
+    case SeverityNumber::trace4:
+    case SeverityNumber::debug:
+    case SeverityNumber::debug2:
+    case SeverityNumber::debug3:
+    case SeverityNumber::debug4:
+      sdk_log_level = opentelemetry::sdk::common::internal_log::LogLevel::Debug;
+      break;
+    case SeverityNumber::info:
+    case SeverityNumber::info2:
+    case SeverityNumber::info3:
+    case SeverityNumber::info4:
+      sdk_log_level = opentelemetry::sdk::common::internal_log::LogLevel::Info;
+      break;
+    case SeverityNumber::warn:
+    case SeverityNumber::warn2:
+    case SeverityNumber::warn3:
+    case SeverityNumber::warn4:
+      sdk_log_level = opentelemetry::sdk::common::internal_log::LogLevel::Warning;
+      break;
+    case SeverityNumber::error:
+    case SeverityNumber::error2:
+    case SeverityNumber::error3:
+    case SeverityNumber::error4:
+    case SeverityNumber::fatal:
+    case SeverityNumber::fatal2:
+    case SeverityNumber::fatal3:
+    case SeverityNumber::fatal4:
+      sdk_log_level = opentelemetry::sdk::common::internal_log::LogLevel::Error;
+      break;
+  }
+}
+
 std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
     const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model) const
 {
   auto sdk = std::make_unique<ConfiguredSdk>();
+
+  SetLogLevel(sdk->log_level, model->log_level);
 
   if (!model->disabled)
   {

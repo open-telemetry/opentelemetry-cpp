@@ -16,8 +16,8 @@
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
-#include "opentelemetry/sdk/configuration/configuration_parser.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
@@ -72,6 +72,7 @@
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
@@ -88,7 +89,6 @@
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
-#include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -102,6 +102,9 @@ class ConfigurationParser
 public:
   OtlpHttpEncoding ParseOtlpHttpEncoding(const std::unique_ptr<DocumentNode> &node,
                                          const std::string &name) const;
+
+  SeverityNumber ParseSeverityNumber(const std::unique_ptr<DocumentNode> &node,
+                                     const std::string &name) const;
 
   std::unique_ptr<StringArrayConfiguration> ParseStringArrayConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
@@ -208,6 +211,9 @@ public:
   std::unique_ptr<MetricProducerConfiguration> ParseMetricProducerConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
 
+  std::unique_ptr<CardinalityLimitsConfiguration> ParseCardinalityLimitsConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
   std::unique_ptr<PeriodicMetricReaderConfiguration> ParsePeriodicMetricReaderConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
 
@@ -300,9 +306,6 @@ public:
       const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ConsoleSpanExporterConfiguration> ParseConsoleSpanExporterConfiguration(
-      const std::unique_ptr<DocumentNode> &node) const;
-
-  std::unique_ptr<ZipkinSpanExporterConfiguration> ParseZipkinSpanExporterConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ExtensionSpanExporterConfiguration> ParseExtensionSpanExporterConfiguration(
