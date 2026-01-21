@@ -71,6 +71,8 @@ echo "make command: ${MAKE_COMMAND}"
 
 export BAZEL_CXXOPTS="-std=c++17"
 
+# Work around for https://github.com/actions/runner-images/issues/13564
+export USE_BAZEL_VERSION="8.5.0"
 
 BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW --//exporters/otlp:with_otlp_grpc_credential_preview=true"
 BAZEL_OPTIONS="$BAZEL_OPTIONS_DEFAULT"
