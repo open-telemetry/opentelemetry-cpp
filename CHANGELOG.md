@@ -36,6 +36,9 @@ Increment the:
 * [BAZEL] Fix CI after bazel 9.0.0 release
   [#3823](https://github.com/open-telemetry/opentelemetry-cpp/pull/3823)
 
+* [CONFIGURATION] File configuration - implement cardinality_limits
+  [#3820](https://github.com/open-telemetry/opentelemetry-cpp/pull/3820)
+
 Breaking changes:
 
 * [CONFIGURATION] File configuration - remove zipkin

@@ -36,7 +36,7 @@ namespace tld
       the set of events is not known at compile-time. For example,
       TraceLoggingDynamic.h might be used to implement a library providing
       manifest-free ETW to a scripting language like JavaScript or Perl.
-    - This header is not optimized for direct use by developers adding events
+    - This header is not intended for direct use by developers adding events
       to their code. There is no way to make an optimal solution that
       works for all of the intended target users. Instead, this header
       provides various pieces that you can build upon to create a user-friendly
@@ -55,16 +55,16 @@ namespace tld
 
     Basic usage:
     - Create a Provider object.
-    - Check provider.IsEnabled(...) so that you don't do the remaining steps
-      if nobody is listening for your event.
+    - Check provider.IsEnabled(level, keyword) so that you don't do the
+      remaining steps if nobody is listening for your event.
     - Create an Event<std::vector<BYTE>> object.
     - Add fields definitions (metadata) and values (data) using methods on
       Event. (You are responsible for making sure that the metadata you add
       matches the data you add -- the Event object does not validate this.)
     - Some methods on the Event object return EventBuilder objects, which are
-      used to build the fields of nested structures. Note that Event inherits
-      from EventBuilder, so if you write a function that accepts an
-      EventBuilder&, it will also accept an Event&.
+      used to build the fields of nested structures. Event inherits from
+      EventBuilder, so if you write a function that accepts an EventBuilder&,
+      it will also accept an Event&.
     - Once you've added all data and metadata, call event.Write() to send the
       event to ETW.
 
@@ -139,8 +139,8 @@ namespace tld
 
     Low-level event management:
     - Use tld::EventMetadataBuilder to build an event metadata blob.
-      - Use tld::Type values to define field types, or create non-standard
-        types using tld::MakeType, tld::InType, and tld::OutType.
+      - Use tld::Type values to define field types, or use tld::MakeType to
+        combine tld::InType and tld::OutType to make tld::Type values.
     - Use tld::EventDataBuilder to build an event data blob.
     - Create an EVENT_DESCRIPTOR for your event.
       - Optionally use the tld::EventDescriptor wrapper class to simplify
@@ -160,24 +160,25 @@ namespace tld
     - Constructor creates the provider metadata blob and registers the provider.
       Note that this includes configuring ETW callbacks.
     - Destructor unregisters the provider and frees the metadata blob.
-    - IsEnabled APIs provide very efficient checks for whether an event needs
-      to be written.
+    - IsEnabled APIs provide efficient checks for whether an event needs to be
+      written.
     - Write APIs call WriteEvent, automatically providing the correct REGHANDLE
       and provider metadata blobs.
 
     Typical usage:
 
     tld::Provider provider("ProviderName", ...);
-    if (provider.IsEnabled(eventLevel, eventKeywords))
+    if (provider.IsEnabled(eventLevel, eventKeyword))
     {
-        (prepare event);
-        provider.Write(...);
+        Event event(provider, szEventName, eventLevel, eventKeyword);
+        (add fields definitions and values);
+        event.Write();
     }
 
     It is not a problem to call provider.Write without checking
-    provider.IsEnabled(...), but it is more efficient to check
-    provider.IsEnabled(...) so that you can skip the process of preparing the
-    event if the event is not enabled.
+    provider.IsEnabled(...), but it is much more efficient to check
+    provider.IsEnabled(...) so that you can skip the process of preparing and
+    writing the event when the event is not enabled.
     */
     class Provider;
 
@@ -193,14 +194,15 @@ namespace tld
 
     Typical usage:
 
-    if (provider.IsEnabled(eventLevel, eventKeywords))
+    if (provider.IsEnabled(eventLevel, eventKeyword))
     {
-        Event event(provider, szEventName, eventLevel, eventKeywords);
+        Event event(provider, szEventName, eventLevel, eventKeyword);
         (add fields definitions and values);
         event.Write();
     }
 
-    You can reuse an Event object by calling event.Reset(...).
+    You can reuse an Event object by calling event.Reset(...), which might
+    reduce heap allocation overhead.
     */
     template<class ByteVectorTy>
     class Event;
@@ -212,12 +214,12 @@ namespace tld
     The Event class inherits from EventBuilder so that it can expose this
     interface. In addition, each call to eventBuilder.AddStruct(...) returns a
     new EventBuilder that can be used to add fields to a nested structure.
-    You won't directly create instances of this type -- you'll use instances
-    returned by Event.AddStruct or by EventBuilder.AddStruct.
+    You won't directly create instances of this type. Instead, you'll use
+    instances returned by event.AddStruct or eventBuilder.AddStruct.
 
-    You can use EventBuilder& as the type of a parameter to a function, and
-    then pass either an Event or an EventBuilder to that function (allowing
-    for recursive processing of event fields).
+    You can use EventBuilder& as the type of a parameter to a function and
+    then pass either an Event or an EventBuilder to that function, allowing
+    for recursive processing of event fields.
 
     Note that order is important but not checked when using multiple Event or
     EventBuilder objects. Fields are always added to the end of the overall
@@ -228,7 +230,7 @@ namespace tld
     Assume that you have obtained EventBuilder object b from object a, i.e.
     EventBuilder b = a.AddStruct(...). You must complete all operations using
     b before resuming any operations using a. If this rule is not followed,
-    fields may end up nesting in unexpected ways.
+    structures will not nest correctly.
     */
     template<class ByteVectorTy>
     class EventBuilder;
@@ -238,15 +240,15 @@ namespace tld
 
     Types for event fields, corresponding to a combination of TDH_INTYPE and
     TDH_OUTTYPE values. The Type enumeration contains predefined combinations
-    of InType and OutType that are known to work well and are recognized by
+    of InType and OutType that are defined by winmeta.xml and supported by
     decoders such as TDH and xperf.
 
     Advanced use: It is possible to create other Type values by combining
     values from the InType and OutType enumerations using the tld::MakeType
-    function. (Valid Type values consist of one InType combined with one
-    OutType.) However, custom combinations not already present in the Type
+    function (valid Type values consist of one InType combined with one
+    OutType). However, custom combinations not already present in the Type
     enumeration are unlikely to be recognized by xperf or other decoders,
-    and will usually end up being decoded as if they had used OutTypeDefault.
+    and will usually end up being decoded as if they used OutTypeDefault.
 
     When providing payload for a field, the payload data must match the InType.
     Payload is always packed tightly with no alignment or padding.
@@ -254,18 +256,18 @@ namespace tld
     ****
 
     How to pack single values:
-    
-    Primitive values (int, GUID) are packed directly, with no padding or
-    alignment. Just reserve sizeof(value) bytes in the buffer, then memcpy the
-    value into the buffer. Note that there should be no alignment or padding
-    between items -- the payload is always tightly-packed.
+
+    Primitive values (int, GUID) are packed directly. Just reserve
+    sizeof(value) bytes in the buffer, then memcpy the value into the buffer.
+    Note that there should be no alignment or padding between items -- the
+    payload is always tightly-packed.
 
     NUL-terminated strings are also simply memcpy'ed into the buffer. Be sure
     to include the NUL termination when reserving space and copying the value.
-    There is no special encoding reserved for a NULL string. The encoding
-    helpers in this header simply treat a NULL string the same as an empty
-    string, i.e. AddString((char*)NULL) is the same as AppendString("").
-    
+    There is no way to represent NULL. The encoding helpers in this header
+    treat a NULL string the same as an empty string, i.e.
+    AddString((char*)NULL) is the same as AddString("").
+
     Binary, CountedString, and CountedAnsiString scalars are all encoded as a
     UINT16 byte-count followed by the string data. In this case, no NUL
     termination should be included. Remember that the size is a byte count,
@@ -278,21 +280,17 @@ namespace tld
     Assume you have a function Pack(payloadVec, item) that correctly appends an
     item to the end of payloadVec.
 
-    Packing a variable-length array of N items is done by appending N (encoded
-    as UINT16) to payloadVec followed by calling Pack(...) N times.
+    Packing a variable-length array of N items is done by appending the UINT16
+    value of N to payloadVec, followed by calling Pack(...) N times.
 
     Packing a constant-length array of N items is done by calling Pack(...) N
     times. The value of N is encoded in the metadata (it was provided in the
     field's declaration) so it does not need to be provided in the payload.
 
     Note: while this header allows you to create arrays of anything, you
-    should avoid creating arrays of the following, as they might not decode
-    correctly:
-    - TypeNone (or anything based on InTypeNull).
-    - TypeBinary (or anything based on InTypeBinary).
-
-    It is ok to create an array of nested structures where fields in the
-    structure have TypeNone or TypeBinary.
+    should avoid creating arrays of InTypeBinary as they will not decode
+    correctly. (It is ok to create an array of nested structures where fields
+    in the structure have InTypeBinary.)
     */
     enum Type : UINT16;
 
@@ -322,14 +320,11 @@ namespace tld
     may use to override the InType's default formatting behavior. If no
     OutType is specified (i.e. if OutTypeDefault is used) or if the trace
     consumer does not recognize the specified InType+OutType combination, the
-    trace consumer will perform default formatting based solely on InType.
+    trace consumer will typically perform default formatting based solely on
+    InType.
 
-    The comments for each OutType indicate the InTypes for which the OutType
-    might have valid semantics. However, most trace consumer only recognize a
-    small subset of the "valid" InType+OutType combinations, so even if the
-    semantics are valid, the OutType might still be ignored by the trace
-    consumer. The most commonly-supported combinations are the combinations
-    with corresponding precomposed Type... values.
+    The valid combinations of InType + OutType are defined in the Windows SDK
+    in winmeta.xml (each inType has a list of valid outType under it).
     */
     enum OutType : UINT8;
 
@@ -345,13 +340,14 @@ namespace tld
 
     Configuration macro for controlling the behavior of SetInformation.
 
-    Not all versions of Windows support the EventSetInformation API. The
-    tld::SetInformation wrapper provides default behavior that works well in
-    most cases, but may not meet the needs of all users. The configuration
-    macros can be used to control how the tld::SetInformation function invokes
-    the EventSetInformation API. (Note that tld::SetInformation is called
-    automatically by the Provider class's constructor to register the
-    provider's traits with ETW.)
+    Not all versions of Windows support the EventSetInformation API.
+    TraceLogging requires EventSetInformation for full functionality, but can
+    operate in a degraded mode without it. The tld::SetInformation wrapper
+    provides default behavior that works well in most cases, but may not meet
+    the needs of all users. The configuration macros can be used to control how
+    the tld::SetInformation function invokes the EventSetInformation API. Note
+    that tld::SetInformation is called automatically by the Provider class's
+    constructor to register the provider's traits with ETW.
 
     When TLD_HAVE_EVENT_SET_INFORMATION is not defined and WINVER < 0x0602:
     SetInformation uses GetModuleHandleExW+GetProcAddress to find the
@@ -365,11 +361,12 @@ namespace tld
 
     If you set TLD_HAVE_EVENT_SET_INFORMATION:
     - If TLD_HAVE_EVENT_SET_INFORMATION == 0, SetInformation always returns an
-      error.
+      error (does not attempt to call EventSetInformation).
     - If TLD_HAVE_EVENT_SET_INFORMATION == 1, SetInformation calls
-      EventSetInformation.
+      EventSetInformation directly.
     - If TLD_HAVE_EVENT_SET_INFORMATION == 2, SetInformation locates
-      EventSetInformation via GetProcAddress.
+      EventSetInformation via GetProcAddress, calls it if found, or returns an
+      error if not found.
     */
 #ifndef TLD_HAVE_EVENT_SET_INFORMATION
   #if WINVER < 0x0602 // If targeting Windows before Windows 8
@@ -457,7 +454,7 @@ namespace tld
 
     Derives from EVENT_DESCRIPTOR. Adds convenient constructor and Reset
     members. Contains an event's Id/Version/Level/Opcode/Task/Keyword
-    settings. Use of this class is optional - you can use this class if you
+    settings. Use of this class is optional: you can use this class if you
     want to use the constructor or Reset methods, or you can use
     EVENT_DESCRIPTOR directly if you don't need the convenience methods.
     */
@@ -536,7 +533,7 @@ namespace tld
             level,
             opcode,
             task,
-            keywords);
+            keyword);
         EVENT_DATA_DESCRIPTOR pDataDescriptors[cFields + 2];
         for (int i = 0; i < cFields; i++)
         {
@@ -584,14 +581,14 @@ namespace tld
     function SetInformation (low-level API):
 
     Wrapper for ETW API EventSetInformation.
-    If TraceLoggingDynamic.cpp was compiled to require Win8 or later (as
+    If TraceLoggingDynamic.h was compiled to require Win8 or later (as
     determined by WINVER), this directly calls EventSetInformation. Otherwise,
     this attempts to dynamically load the EventSetInformation API via
     GetModuleHandleExW.
 
     The behavior of this function (e.g. to override the WINVER check) can be
     adjusted by setting the TLD_HAVE_EVENT_SET_INFORMATION macro as described
-    below.
+    above.
     */
     inline HRESULT SetInformation(
         _In_ REGHANDLE hProvider,
@@ -603,8 +600,9 @@ namespace tld
     function GetGuidForName (low-level API):
 
     Hashes a provider name to generate a GUID. Uses the same GUID generation
-    algorithm as System.Diagnostics.Tracing.EventSource (from .NET) and
-    Windows.Foundation.Diagnostics.LoggingChannel (from Windows Runtime).
+    algorithm as System.Diagnostics.Tracing.EventSource (from .NET),
+    Windows.Foundation.Diagnostics.LoggingChannel (from Windows Runtime),
+    and Windows SDK tools like tracelog and traceview.
     */
     inline GUID GetGuidForName(
         _In_z_ char const* szUtf8Name);
@@ -613,8 +611,9 @@ namespace tld
     function GetGuidForName (low-level API):
 
     Hashes a provider name to generate a GUID. Uses the same GUID generation
-    algorithm as .NET System.Diagnostics.Tracing.EventSource and Windows
-    Runtime Windows.Foundation.Diagnostics.LoggingChannel.
+    algorithm as System.Diagnostics.Tracing.EventSource (from .NET),
+    Windows.Foundation.Diagnostics.LoggingChannel (from Windows Runtime),
+    and Windows SDK tools like tracelog and traceview.
     */
     inline GUID GetGuidForName(
         _In_z_ wchar_t const* szUtf16Name);
@@ -650,7 +649,7 @@ namespace tld
 
 #ifndef _tld_ASSERT
   #if TLD_DEBUG
-    #define _tld_ASSERT(exp, str) ((void)(!(exp) ? (__annotation(L"Debug", L"AssertFail", L"TraceLogging: " L#exp L" : " L##str), DbgRaiseAssertionFailure(), 0) : 0))
+    #define _tld_ASSERT(exp, str) ((void)(!(exp) ? (__annotation(L"Debug", L"AssertFail", L"TraceLogging: " #exp L" : " str), DbgRaiseAssertionFailure(), 0) : 0))
   #else // TLD_DEBUG
     #define _tld_ASSERT(exp, str) ((void)0)
   #endif // TLD_DEBUG
@@ -782,10 +781,10 @@ namespace tld
 #pragma region Sha1ForNonSecretPurposes
 
         /*
-        Implements the SHA1 hashing algorithm. Note that this implementation is
-        for hashing public information. Do not use this code to hash private data,
-        as this implementation does not take any steps to avoid information
-        disclosure (i.e. does not scrub its buffers).
+        Implements the SHA1 hashing algorithm. Note that this implementation
+        is for hashing public information. Do not use this code to hash
+        private data, as this implementation does not take any steps to avoid
+        information disclosure (i.e. does not scrub its buffers).
         */
         class Sha1ForNonSecretPurposes
         {
@@ -914,30 +913,33 @@ namespace tld
 
         /*
         Transcodes one code point from UTF-8 to UTF-16LE.
-    
-        Note that this function requires the input buffer to be nul-terminated.
-        This function may try to read several bytes from the input buffer, and the
-        nul-termination is required to ensure that it doesn't read off the end of
-        the valid buffer when decoding what appears to be a multi-byte code point.
+
+        Note that this function requires the input buffer to be
+        nul-terminated. This function may try to read several bytes from the
+        input buffer, and the nul-termination is required to ensure that it
+        doesn't read off the end of the valid buffer when decoding what
+        appears to be a multi-byte code point.
 
         The UTF-8 validation is very permissive -- anything that is not valid
         UTF-8 is treated as if it were ISO-8859-1 (i.e. the BYTE value is cast
         to wchar_t and assumed to be a valid Unicode code point). This usually
-        works well - it has a reasonable probability of doing what the developer
-        expects even when the input is CP1252/Latin1 instead of UTF-8, and doesn't
-        fail too badly when it doesn't do what the developer expects.
+        works well - it has a reasonable probability of doing what the
+        developer expects even when the input is CP1252/Latin1 instead of
+        UTF-8, and doesn't fail too badly when it doesn't do what the
+        developer expects.
 
         pchUtf16Output:
-        Buffer that receives a single code point, encoded in UTF-16-LE as one or
-        two 16-bit wchar_t values.
-    
+        Buffer that receives a single code point, encoded in UTF-16-LE as one
+        or two 16-bit wchar_t values.
+
         pszUtf8Input:
-        Pointer into a nul-terminated UTF-8 byte sequence. On entry, this points
-        to the next char to be consumed. This function will advance the pointer
-        past the consumed data.
+        Pointer into a nul-terminated UTF-8 byte sequence. On entry, this
+        points to the next char to be consumed. This function will advance the
+        pointer past the consumed data.
 
         returns:
-        The number of 16-bit wchar_t values added to pchUtf16Output (one or two).
+        The number of 16-bit wchar_t values added to pchUtf16Output (one or
+        two).
         */
         static unsigned CopyUtfCodePoint(
             _Out_writes_to_(2, return) wchar_t* pchUtf16Output,
@@ -1011,22 +1013,24 @@ namespace tld
         /*
         Copies one code point of UTF-16LE data.
 
-        Note that this function requires the input buffer to be nul-terminated.
-        This function may try to read several words from the input buffer, and the
-        nul-termination is required to ensure that it doesn't read off the end of
-        the valid buffer when copying what appears to be a surrogate pair.
+        Note that this function requires the input buffer to be
+        nul-terminated.  This function may try to read several words from the
+        input buffer, and the nul-termination is required to ensure that it
+        doesn't read off the end of the valid buffer when copying what appears
+        to be a surrogate pair.
 
         pchUtf16Output:
-        Buffer that receives a single code point, encoded in UTF-16-LE as one or
-        two 16-bit wchar_t values.
+        Buffer that receives a single code point, encoded in UTF-16-LE as one
+        or two 16-bit wchar_t values.
 
         pszUtf16Input:
-        Pointer into a nul-terminated UTF-16-LE wchar_t sequence. On entry, this
-        points to the next wchar_t to be consumed. This function will advance the
-        pointer past the consumed data.
+        Pointer into a nul-terminated UTF-16-LE wchar_t sequence. On entry,
+        this points to the next wchar_t to be consumed. This function will
+        advance the pointer past the consumed data.
 
         returns:
-        The number of 16-bit wchar_t values added to pchUtf16Output (one or two).
+        The number of 16-bit wchar_t values added to pchUtf16Output (one or
+        two).
         */
         static unsigned CopyUtfCodePoint(
             _Out_writes_to_(2, return) wchar_t* pchUtf16Output,
@@ -1084,7 +1088,7 @@ namespace tld
                     bool const bDone = *pszName == 0;
                     if (bDone || cchBuffer - 1 <= iBuffer)
                     {
-    #pragma warning(suppress: 26035) // string is counted, not nul-terminated.
+#pragma warning(suppress: 26035) // string is counted, not nul-terminated.
                         LCMapStringEx(
                             LOCALE_NAME_INVARIANT,
                             LCMAP_UPPERCASE | LCMAP_BYTEREV,
@@ -1124,10 +1128,9 @@ namespace tld
     enum InType : UINT8
     {
         /*
-        A field with no value (0-length payload).
-        Arrays of InTypeNull are illegal.
+        Invalid InType.
         */
-        InTypeNull,
+        InTypeNull = 0,
 
         /*
         A nul-terminated CHAR16 string.
@@ -1136,13 +1139,14 @@ namespace tld
         InTypeUnicodeString,
 
         /*
-        A nul-terminated CHAR8 string.
+        A nul-terminated MBCS string.
         Useful OutTypes: Xml, Json, Utf8.
         */
         InTypeAnsiString,
 
         /*
         INT8.
+        Useful OutTypes: String (interprets the value as a CHAR8).
         */
         InTypeInt8,
 
@@ -1171,7 +1175,7 @@ namespace tld
 
         /*
         UINT32.
-        Useful OutTypes: Pid, Tid, IPv4, Win32Error, NTStatus.
+        Useful OutTypes: Pid, Tid, IPv4, Win32Error, NTStatus, CodePointer.
         */
         InTypeUInt32,
 
@@ -1182,6 +1186,7 @@ namespace tld
 
         /*
         UINT64.
+        Useful OutTypes: CodePointer.
         */
         InTypeUInt64,
 
@@ -1202,9 +1207,9 @@ namespace tld
 
         /*
         UINT16 byte-count followed by binary data.
-        Useful OutTypes: IPv6, SocketAddress.
+        Useful OutTypes: IPv6, SocketAddress, Pkcs7WithTypeInfo.
         Arrays of InTypeBinary are not supported. (No error will be reported,
-        but decoding tools will probably not be able to decode them).
+        but most decoding tools will be unable to decode them).
         */
         InTypeBinary,
 
@@ -1215,17 +1220,19 @@ namespace tld
 
         /*
         Not supported. Use InTypePointer. (No error will be reported,
-        but decoding tools will probably not be able to decode them).
+        but most decoding tools will be unable to decode them).
         */
         InTypePointer_PlatformSpecific,
 
         /*
         FILETIME.
+        Useful OutTypes: DateTimeCultureInsensitive, DateTimeUtc.
         */
         InTypeFileTime,
 
         /*
         SYSTEMTIME.
+        Useful OutTypes: DateTimeCultureInsensitive, DateTimeUtc.
         */
         InTypeSystemTime,
 
@@ -1236,28 +1243,32 @@ namespace tld
 
         /*
         INT32.
+        Useful OutTypes: Win32Error, NTStatus, CodePointer.
         */
         InTypeHexInt32,
 
         /*
         INT64.
+        Useful OutTypes: CodePointer.
         */
         InTypeHexInt64,
 
         /*
         UINT16 byte-count followed by UTF-16 data.
+        Useful OutTypes: Xml, Json.
         */
         InTypeCountedString,
 
         /*
         UINT16 byte-count followed by MBCS data.
+        Useful OutTypes: Xml, Json, Utf8.
         */
         InTypeCountedAnsiString,
 
         /*
         This field has no value by itself, but it causes the decoder to treat
         the next N fields as part of this field. The value of N is taken from
-        the field's OutType.
+        the field's OutType. N should not be 0.
 
         Note that it is valid to have an array of structs. The array length
         will apply to the entire group of fields contained in the array.
@@ -1266,6 +1277,17 @@ namespace tld
         create nested structures.
         */
         InTypeStruct,
+
+        /*
+        UINT16 byte-count followed by binary data.
+        Useful OutTypes: IPv6, SocketAddress, Pkcs7WithTypeInfo.
+
+        This is the same as InTypeBinary except:
+        - Newer type code. Decoding support added in Windows 2018 Fall Update.
+        - Decodes without the synthesized "FieldName.Length" fields.
+        - Array of InTypeCountedBinary is supported.
+        */
+        InTypeCountedBinary,
 
         /*
         INT_PTR.
@@ -1293,39 +1315,37 @@ namespace tld
 
     enum OutType : UINT8
     {
-        OutTypeDefault = 0x00,
-        OutTypeNoPrint = 0x01,
-        OutTypeString = 0x02,    // affects 8-bit and 16-bit integral types.
-        OutTypeBoolean = 0x03,   // affects 8-bit and 32-bit integral types.
-        OutTypeHex = 0x04,       // affects integral types.
-        OutTypePid = 0x05,       // affects 32-bit integral types.
-        OutTypeTid = 0x06,       // affects 32-bit integral types.
-        OutTypePort = 0x07,      // affects 16-bit integral types.
-        OutTypeIPv4 = 0x08,      // affects 32-bit integral types.
-        OutTypeIPv6 = 0x09,      // affects arrays of 8-bit integral types, e.g. UInt8[].
-        OutTypeSocketAddress = 0x0a, // affects arrays of 8-bit integral types, e.g. UInt8[].
-        OutTypeXml = 0x0b,       // affects strings; affects arrays of 8-bit and 16-bit integral types.
-        OutTypeJson = 0x0c,      // affects strings; affects arrays of 8-bit and 16-bit integral types.
-        OutTypeWin32Error = 0x0d,// affects 32-bit integral types.
-        OutTypeNTStatus = 0x0e,  // affects 32-bit integral types.
-        OutTypeHResult = 0x0f,   // affects 32-bit integral types.
-        OutTypeFileTime = 0x10,  // affects 64-bit integral types.
-        OutTypeSigned = 0x11,    // affects integral types.
-        OutTypeUnsigned = 0x12,  // affects integral types.
-        OutTypeDateTimeCultureInsensitive = 0x21, // affects FileTime, SystemTime.
-        OutTypeUtf8 = 0x23,      // affects AnsiString types.
-        OutTypePkcs7WithTypeInfo = 0x24, // affects binary types.
-        OutTypeCodePointer = 0x25, // affects UInt32, UInt64, HexInt32, HexInt64.
-        OutTypeDateTimeUtc = 0x26, // affects FileTime, SystemTime.
+        OutTypeDefault = 0x00,   // Field formatted based on InType.
+        OutTypeNoPrint = 0x01,   // Ignored by most decoders.
+        OutTypeString = 0x02,    // Use with Int8, UInt8, UInt16.
+        OutTypeBoolean = 0x03,   // Use with UInt8.
+        OutTypeHex = 0x04,       // Use with UInt8, UInt16.
+        OutTypePid = 0x05,       // Use with UInt32.
+        OutTypeTid = 0x06,       // Use with UInt32.
+        OutTypePort = 0x07,      // Use with UInt16.
+        OutTypeIPv4 = 0x08,      // Use with UInt32.
+        OutTypeIPv6 = 0x09,      // Use with Binary, CountedBinary.
+        OutTypeSocketAddress = 0x0a,// Use with Binary, CountedBinary.
+        OutTypeXml = 0x0b,       // Use with String types.
+        OutTypeJson = 0x0c,      // Use with String types.
+        OutTypeWin32Error = 0x0d,// Use with UInt32, HexInt32.
+        OutTypeNTStatus = 0x0e,  // Use with UInt32, HexInt32.
+        OutTypeHResult = 0x0f,   // Use with Int32.
+        OutTypeFileTime = 0x10,
+        OutTypeSigned = 0x11,
+        OutTypeUnsigned = 0x12,
+        OutTypeDateTimeCultureInsensitive = 0x21, // Use with FileTime, SystemTime.
+        OutTypeUtf8 = 0x23,      // Use with AnsiString, CountedAnsiString.
+        OutTypePkcs7WithTypeInfo = 0x24, // Use with Binary, CountedBinary.
+        OutTypeCodePointer = 0x25, // Use with UInt32, UInt64, HexInt32, HexInt64.
+        OutTypeDateTimeUtc = 0x26, // Use with FileTime, SystemTime.
         OutTypeMask = 0x7f // OutType must fit into 7 bits.
     };
 
     enum Type : UINT16
     {
         /*
-        Field with no data (empty). 0-length payload.
-        Can only be used on scalar fields. Illegal for arrays.
-        NOTE: Not well-supported by decoders.
+        Invalid type.
         */
         TypeNone = InTypeNull,
 
@@ -1336,10 +1356,34 @@ namespace tld
         TypeUtf16String = InTypeUnicodeString,
 
         /*
+        Encoding assumes nul-terminated CHAR16 string.
+        Formatting treats as UTF-16LE XML.
+        */
+        TypeUtf16Xml = _tld_MAKE_TYPE(InTypeUnicodeString, OutTypeXml),
+
+        /*
+        Encoding assumes nul-terminated CHAR16 string.
+        Formatting treats as UTF-16LE JSON.
+        */
+        TypeUtf16Json = _tld_MAKE_TYPE(InTypeUnicodeString, OutTypeJson),
+
+        /*
         Encoding assumes 0-terminated CHAR8 string.
         Formatting treats as MBCS string.
         */
         TypeMbcsString = InTypeAnsiString,
+
+        /*
+        Encoding assumes nul-terminated CHAR8 string.
+        Formatting treats as UTF-8 XML.
+        */
+        TypeMbcsXml = _tld_MAKE_TYPE(InTypeAnsiString, OutTypeXml),
+
+        /*
+        Encoding assumes nul-terminated CHAR8 string.
+        Formatting treats as UTF-8 JSON.
+        */
+        TypeMbcsJson = _tld_MAKE_TYPE(InTypeAnsiString, OutTypeJson),
 
         /*
         Encoding assumes nul-terminated CHAR8 string.
@@ -1360,6 +1404,24 @@ namespace tld
         TypeUInt8 = InTypeUInt8,
 
         /*
+        Encoding assumes 1-byte value.
+        Formatting treats as hexadecimal unsigned integer.
+        */
+        TypeHexInt8 = _tld_MAKE_TYPE(InTypeUInt8, OutTypeHex),
+
+        /*
+        Encoding assumes 1-byte value.
+        Formatting treats as ANSI character.
+        */
+        TypeChar8 = _tld_MAKE_TYPE(InTypeUInt8, OutTypeString),
+
+        /*
+        Encoding assumes 1-byte value.
+        Formatting treats as Boolean.
+        */
+        TypeBool8 = _tld_MAKE_TYPE(InTypeUInt8, OutTypeBoolean),
+
+        /*
         Encoding assumes 2-byte value.
         Formatting treats as signed integer.
         */
@@ -1372,6 +1434,24 @@ namespace tld
         TypeUInt16 = InTypeUInt16,
 
         /*
+        Encoding assumes 2-byte value.
+        Formatting treats as big-endian IP port(s).
+        */
+        TypePort = _tld_MAKE_TYPE(InTypeUInt16, OutTypePort),
+
+        /*
+        Encoding assumes 2-byte value.
+        Formatting treats as hexadecimal unsigned integer.
+        */
+        TypeHexInt16 = _tld_MAKE_TYPE(InTypeUInt16, OutTypeHex),
+
+        /*
+        Encoding assumes 2-byte value.
+        Formatting treats as UTF-16LE character.
+        */
+        TypeChar16 = _tld_MAKE_TYPE(InTypeUInt16, OutTypeString),
+
+        /*
         Encoding assumes 4-byte value.
         Formatting treats as signed integer.
         */
@@ -1379,9 +1459,45 @@ namespace tld
 
         /*
         Encoding assumes 4-byte value.
+        Formatting treats as HRESULT(s).
+        */
+        TypeHResult = _tld_MAKE_TYPE(InTypeInt32, OutTypeHResult),
+
+        /*
+        Encoding assumes 4-byte value.
         Formatting treats as unsigned integer.
         */
         TypeUInt32 = InTypeUInt32,
+
+        /*
+        Encoding assumes 4-byte value.
+        Formatting treats as process identifier.
+        */
+        TypePid = _tld_MAKE_TYPE(InTypeUInt32, OutTypePid),
+
+        /*
+        Encoding assumes 4-byte value.
+        Formatting treats as thread identifier.
+        */
+        TypeTid = _tld_MAKE_TYPE(InTypeUInt32, OutTypeTid),
+
+        /*
+        Encoding assumes 4-byte value.
+        Formatting treats as IPv4 address.
+        */
+        TypeIPv4 = _tld_MAKE_TYPE(InTypeUInt32, OutTypeIPv4),
+
+        /*
+        Encoding assumes 4-byte value.
+        Formatting treats as Win32 error(s).
+        */
+        TypeWin32Error = _tld_MAKE_TYPE(InTypeUInt32, OutTypeWin32Error),
+
+        /*
+        Encoding assumes 4-byte value.
+        Formatting treats as NTSTATUS(s).
+        */
+        TypeNTStatus = _tld_MAKE_TYPE(InTypeUInt32, OutTypeNTStatus),
 
         /*
         Encoding assumes 8-byte value.
@@ -1417,15 +1533,67 @@ namespace tld
         Encoding assumes 2-byte length followed by binary data.
         Formatting treats as binary blob.
         Arrays of TypeBinary are not supported. (No error will be reported,
-        but decoding tools will probably not be able to decode them).
+        but most decoding tools will be unable to decode them.)
         */
         TypeBinary = InTypeBinary,
+
+        /*
+        Encoding assumes 2-byte length followed by binary data.
+        Formatting treats as IPv6 address.
+        Arrays of TypeIPv6 are not supported. (No error will be reported,
+        but most decoding tools will be unable to decode them.)
+        */
+        TypeIPv6 = _tld_MAKE_TYPE(InTypeBinary, OutTypeIPv6),
+
+        /*
+        Encoding assumes 2-byte length followed by binary data.
+        Formatting treats as SOCKADDR.
+        Arrays of TypeSocketAddress are not supported. (No error will be
+        reported, but most decoding tools will be unable to decode them.)
+        */
+        TypeSocketAddress = _tld_MAKE_TYPE(InTypeBinary, OutTypeSocketAddress),
 
         /*
         Encoding assumes 16-byte value.
         Formatting treats as GUID.
         */
         TypeGuid = InTypeGuid,
+
+        /*
+        Encoding assumes pointer-sized value.
+        Formatting treats as signed integer.
+        Note: the value of this enum is different on 32-bit and 64-bit systems.
+        This is an alias for TypeInt32 when compiled for a 32-bit target.
+        This is an alias for TypeInt64 when compiled for a 64-bit target.
+        */
+        TypeIntPtr = InTypeIntPtr,
+
+        /*
+        Encoding assumes pointer-sized value.
+        Formatting treats as unsigned integer.
+        Note: the value of this enum is different on 32-bit and 64-bit systems.
+        This is an alias for TypeUInt32 when compiled for a 32-bit target.
+        This is an alias for TypeUInt64 when compiled for a 64-bit target.
+        */
+        TypeUIntPtr = InTypeUIntPtr,
+
+        /*
+        Encoding assumes pointer-sized value.
+        Formatting treats as hexadecimal unsigned integer.
+        Note: the value of this enum is different on 32-bit and 64-bit systems.
+        This is an alias for TypeHexInt32 when compiled for a 32-bit target.
+        This is an alias for TypeHexInt64 when compiled for a 64-bit target.
+        */
+        TypePointer = InTypePointer,
+
+        /*
+        Encoding assumes pointer-sized value.
+        Formatting treats as code pointer.
+        Note: the value of this enum is different on 32-bit and 64-bit systems.
+        This is a subtype of TypeHexInt32 when compiled for a 32-bit target.
+        This is a subtype of TypeHexInt64 when compiled for a 64-bit target.
+        */
+        TypeCodePointer = _tld_MAKE_TYPE(InTypePointer, OutTypeCodePointer),
 
         /*
         Encoding assumes 8-byte value.
@@ -1470,158 +1638,10 @@ namespace tld
         TypeCountedUtf16String = InTypeCountedString,
 
         /*
-        Encoding assumes 2-byte bytecount followed by CHAR8 data.
-        Formatting treats as MBCS string.
-        */
-        TypeCountedMbcsString = InTypeCountedAnsiString,
-
-        /*
-        Encoding assumes 2-byte bytecount followed by CHAR8 data.
-        Formatting treats as UTF-8 string.
-        */
-        TypeCountedUtf8String = _tld_MAKE_TYPE(InTypeCountedAnsiString, OutTypeUtf8),
-
-        /*
-        Encoding assumes pointer-sized value.
-        Formatting treats as signed integer.
-        Note: the value of this enum is different on 32-bit and 64-bit systems.
-        This is an alias for TypeInt32 when compiled for a 32-bit target.
-        This is an alias for TypeInt64 when compiled for a 64-bit target.
-        */
-        TypeIntPtr = InTypeIntPtr,
-
-        /*
-        Encoding assumes pointer-sized value.
-        Formatting treats as unsigned integer.
-        Note: the value of this enum is different on 32-bit and 64-bit systems.
-        This is an alias for TypeUInt32 when compiled for a 32-bit target.
-        This is an alias for TypeUInt64 when compiled for a 64-bit target.
-        */
-        TypeUIntPtr = InTypeUIntPtr,
-
-        /*
-        Encoding assumes pointer-sized value.
-        Formatting treats as hexadecimal unsigned integer.
-        Note: the value of this enum is different on 32-bit and 64-bit systems.
-        This is an alias for TypeHexInt32 when compiled for a 32-bit target.
-        This is an alias for TypeHexInt64 when compiled for a 64-bit target.
-        */
-        TypePointer = InTypePointer,
-
-        /*
-        Encoding assumes pointer-sized value.
-        Formatting treats as code pointer.
-        Note: the value of this enum is different on 32-bit and 64-bit systems.
-        This is a subtype of TypeHexInt32 when compiled for a 32-bit target.
-        This is a subtype of TypeHexInt64 when compiled for a 64-bit target.
-        */
-        TypeCodePointer = _tld_MAKE_TYPE(InTypePointer, OutTypeCodePointer),
-
-        /*
-        Encoding assumes 2-byte value.
-        Formatting treats as UTF-16LE character.
-        */
-        TypeChar16 = _tld_MAKE_TYPE(InTypeUInt16, OutTypeString),
-
-        /*
-        Encoding assumes 1-byte value.
-        Formatting treats as ANSI character.
-        */
-        TypeChar8 = _tld_MAKE_TYPE(InTypeUInt8, OutTypeString),
-
-        /*
-        Encoding assumes 1-byte value.
-        Formatting treats as Boolean.
-        */
-        TypeBool8 = _tld_MAKE_TYPE(InTypeUInt8, OutTypeBoolean),
-
-        /*
-        Encoding assumes 1-byte value.
-        Formatting treats as hexadecimal unsigned integer.
-        */
-        TypeHexInt8 = _tld_MAKE_TYPE(InTypeUInt8, OutTypeHex),
-
-        /*
-        Encoding assumes 2-byte value.
-        Formatting treats as hexadecimal unsigned integer.
-        */
-        TypeHexInt16 = _tld_MAKE_TYPE(InTypeUInt16, OutTypeHex),
-
-        /*
-        Encoding assumes 4-byte value.
-        Formatting treats as process identifier.
-        */
-        TypePid = _tld_MAKE_TYPE(InTypeUInt32, OutTypePid),
-
-        /*
-        Encoding assumes 4-byte value.
-        Formatting treats as thread identifier.
-        */
-        TypeTid = _tld_MAKE_TYPE(InTypeUInt32, OutTypeTid),
-
-        /*
-        Encoding assumes 2-byte value.
-        Formatting treats as big-endian IP port(s).
-        */
-        TypePort = _tld_MAKE_TYPE(InTypeUInt16, OutTypePort),
-
-        /*
-        Encoding assumes 4-byte value.
-        Formatting treats as IPv4 address.
-        */
-        TypeIPv4 = _tld_MAKE_TYPE(InTypeUInt32, OutTypeIPv4),
-
-        /*
-        Encoding assumes 2-byte length followed by binary data.
-        Formatting treats as IPv6 address.
-        Arrays of TypeIPv6 are not supported. (No error will be reported,
-        but decoding tools will probably not be able to decode them).
-        */
-        TypeIPv6 = _tld_MAKE_TYPE(InTypeBinary, OutTypeIPv6),
-
-        /*
-        Encoding assumes 2-byte length followed by binary data.
-        Formatting treats as SOCKADDR.
-        Arrays of TypeSocketAddress are not supported. (No error will be
-        reported, but decoding tools will probably not be able to decode them).
-        */
-        TypeSocketAddress = _tld_MAKE_TYPE(InTypeBinary, OutTypeSocketAddress),
-
-        /*
-        Encoding assumes nul-terminated CHAR16 string.
-        Formatting treats as UTF-16LE XML.
-        */
-        TypeUtf16Xml = _tld_MAKE_TYPE(InTypeUnicodeString, OutTypeXml),
-
-        /*
-        Encoding assumes nul-terminated CHAR8 string.
-        Formatting treats as UTF-8 XML.
-        */
-        TypeMbcsXml = _tld_MAKE_TYPE(InTypeAnsiString, OutTypeXml),
-
-        /*
-        Encoding assumes nul-terminated CHAR16 string.
-        Formatting treats as UTF-16LE JSON.
-        */
-        TypeUtf16Json = _tld_MAKE_TYPE(InTypeUnicodeString, OutTypeJson),
-
-        /*
-        Encoding assumes nul-terminated CHAR8 string.
-        Formatting treats as UTF-8 JSON.
-        */
-        TypeMbcsJson = _tld_MAKE_TYPE(InTypeAnsiString, OutTypeJson),
-
-        /*
         Encoding assumes 2-byte bytecount followed by CHAR16 data.
         Formatting treats as UTF-16LE XML.
         */
         TypeCountedUtf16Xml = _tld_MAKE_TYPE(InTypeCountedString, OutTypeXml),
-
-        /*
-        Encoding assumes 2-byte bytecount followed by CHAR8 data.
-        Formatting treats as UTF-8 XML.
-        */
-        TypeCountedMbcsXml = _tld_MAKE_TYPE(InTypeCountedAnsiString, OutTypeXml),
 
         /*
         Encoding assumes 2-byte bytecount followed by CHAR16 data.
@@ -1631,27 +1651,48 @@ namespace tld
 
         /*
         Encoding assumes 2-byte bytecount followed by CHAR8 data.
+        Formatting treats as MBCS string.
+        */
+        TypeCountedMbcsString = InTypeCountedAnsiString,
+
+        /*
+        Encoding assumes 2-byte bytecount followed by CHAR8 data.
+        Formatting treats as UTF-8 XML.
+        */
+        TypeCountedMbcsXml = _tld_MAKE_TYPE(InTypeCountedAnsiString, OutTypeXml),
+
+        /*
+        Encoding assumes 2-byte bytecount followed by CHAR8 data.
         Formatting treats as UTF-8 JSON.
         */
         TypeCountedMbcsJson = _tld_MAKE_TYPE(InTypeCountedAnsiString, OutTypeJson),
 
         /*
-        Encoding assumes 4-byte value.
-        Formatting treats as Win32 error(s).
+        Encoding assumes 2-byte bytecount followed by CHAR8 data.
+        Formatting treats as UTF-8 string.
         */
-        TypeWin32Error = _tld_MAKE_TYPE(InTypeUInt32, OutTypeWin32Error),
+        TypeCountedUtf8String = _tld_MAKE_TYPE(InTypeCountedAnsiString, OutTypeUtf8),
 
         /*
-        Encoding assumes 4-byte value.
-        Formatting treats as NTSTATUS(s).
+        Encoding assumes 2-byte length followed by binary data.
+        Formatting treats as binary blob.
+        Newer type code. Decoding support added in Windows 2018 Fall Update.
         */
-        TypeNTStatus = _tld_MAKE_TYPE(InTypeUInt32, OutTypeNTStatus),
+        TypeCountedBinary = InTypeCountedBinary,
 
         /*
-        Encoding assumes 4-byte value.
-        Formatting treats as HRESULT(s).
+        Encoding assumes 2-byte length followed by binary data.
+        Formatting treats as IPv6 address.
+        Newer type code. Decoding support added in Windows 2018 Fall Update.
         */
-        TypeHResult = _tld_MAKE_TYPE(InTypeInt32, OutTypeHResult)
+        TypeCountedIPv6 = _tld_MAKE_TYPE(InTypeCountedBinary, OutTypeIPv6),
+
+        /*
+        Encoding assumes 2-byte length followed by binary data.
+        Formatting treats as SOCKADDR.
+        Newer type code. Decoding support added in Windows 2018 Fall Update.
+        */
+        TypeCountedSocketAddress = _tld_MAKE_TYPE(InTypeCountedBinary, OutTypeSocketAddress),
     };
 
     enum ProviderTraitType : UINT8
@@ -1683,7 +1724,7 @@ namespace tld
     {
         explicit EventDescriptor(
             UCHAR level = 5, // 5 = WINEVENT_LEVEL_VERBOSE
-            ULONGLONG keyword = 0, // 0 = no keywords
+            ULONGLONG keyword = 0, // 0 = no keyword
             UCHAR opcode = 0, // 0 = WINEVENT_OPCODE_INFO
             USHORT task = 0) // 0 = WINEVENT_TASK_NONE
         {
@@ -1692,7 +1733,7 @@ namespace tld
 
         void Reset(
             UCHAR level = 5, // 5 = WINEVENT_LEVEL_VERBOSE
-            ULONGLONG keyword = 0, // 0 = no keywords
+            ULONGLONG keyword = 0, // 0 = no keyword
             UCHAR opcode = 0, // 0 = WINEVENT_OPCODE_INFO
             USHORT task = 0) // 0 = WINEVENT_TASK_NONE
         {
@@ -2412,8 +2453,8 @@ namespace tld
         }
 
         /*
-        Appends an InTypeBinary field to the payload.
-        Compatible with: TypeBinary, TypeIPv6, TypeSocketAddress.
+        Appends an InTypeBinary or InTypeCountedBinary field to the payload.
+        Compatible with: Type[Counted]Binary, Type[Counted]IPv6, Type[Counted]SocketAddress.
         */
         void AddBinary(_In_reads_bytes_(cbData) void const* pbData, UINT16 cbData)
         {
@@ -2731,9 +2772,9 @@ namespace tld
             return level < m_levelPlus1;
         }
 
-        bool IsEnabled(UCHAR level, ULONGLONG keywords) const
+        bool IsEnabled(UCHAR level, ULONGLONG keyword) const
         {
-            return level < m_levelPlus1 && IsEnabledForKeywords(keywords);
+            return level < m_levelPlus1 && IsEnabledForKeywords(keyword);
         }
 
         HRESULT SetInformation(
@@ -3078,8 +3119,8 @@ namespace tld
         }
 
         /*
-        Appends an InTypeBinary field to the payload.
-        Compatible with: TypeBinary, TypeIPv6, TypeSocketAddress.
+        Appends an InTypeBinary or InTypeCountedBinary field to the payload.
+        Compatible with: Type[Counted]Binary, Type[Counted]IPv6, Type[Counted]SocketAddress.
         */
         void AddBinary(_In_reads_bytes_(cbData) void const* pbData, UINT16 cbData)
         {
@@ -3162,14 +3203,14 @@ namespace tld
         Event(
             _In_z_ char const* szUtf8Name,
             UCHAR level = 5,
-            ULONGLONG keywords = 0,
+            ULONGLONG keyword = 0,
             UINT32 tags = 0,
             UCHAR opcode = 0,
             USHORT task = 0,
             GUID const* pActivityId = 0,
             GUID const* pRelatedActivityId = 0)
             : EventBuilder<ByteBufferTy>(m_metaBuffer, m_dataBuffer, m_state)
-            , m_descriptor(level, keywords, opcode, task)
+            , m_descriptor(level, keyword, opcode, task)
             , m_pActivityId(pActivityId)
             , m_pRelatedActivityId(pRelatedActivityId)
             , m_state(EventStateOpen)
@@ -3180,14 +3221,14 @@ namespace tld
         Event(
             _In_z_ wchar_t const* szUtf16Name,
             UCHAR level = 5,
-            ULONGLONG keywords = 0,
+            ULONGLONG keyword = 0,
             UINT32 tags = 0,
             UCHAR opcode = 0,
             USHORT task = 0,
             GUID const* pActivityId = 0,
             GUID const* pRelatedActivityId = 0)
             : EventBuilder<ByteBufferTy>(m_metaBuffer, m_dataBuffer, m_state)
-            , m_descriptor(level, keywords, opcode, task)
+            , m_descriptor(level, keyword, opcode, task)
             , m_pActivityId(pActivityId)
             , m_pRelatedActivityId(pRelatedActivityId)
             , m_state(EventStateOpen)
@@ -3202,7 +3243,7 @@ namespace tld
         void Reset(
             _In_z_ CharTy const* szUtfName,
             UCHAR level = 5,
-            ULONGLONG keywords = 0,
+            ULONGLONG keyword = 0,
             UINT32 tags = 0,
             UCHAR opcode = 0,
             USHORT task = 0,
@@ -3211,7 +3252,7 @@ namespace tld
         {
             m_metaBuffer.clear();
             m_dataBuffer.clear();
-            m_descriptor.Reset(level, keywords, opcode, task);
+            m_descriptor.Reset(level, keyword, opcode, task);
             m_pActivityId = pActivityId;
             m_pRelatedActivityId = pRelatedActivityId;
             m_state = EventStateOpen;
@@ -3355,7 +3396,7 @@ namespace tld
         }
 
         /*
-        Note: the default channel is 11 (WINEVENT_CHANNEL_TRACELOGGING). 
+        Note: the default channel is 11 (WINEVENT_CHANNEL_TRACELOGGING).
         Other channels are only supported if the provider is running on
         Windows 10 or later. If a provider is running on an earlier version
         of Windows and it uses a channel other than 11, TDH will not be able
