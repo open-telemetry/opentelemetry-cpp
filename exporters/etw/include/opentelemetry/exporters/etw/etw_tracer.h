@@ -184,16 +184,14 @@ private:
    */
   ETWProvider::EventFormat encoding;
 
-  // Order matters: isClosed_ must initialize to true BEFORE provHandle
-  // runs its initialization logic.
-  std::atomic<bool> isClosed_{true};
-
   /**
    * @brief Provider Handle
    */
   ETWProvider::Handle &provHandle;
 
   opentelemetry::trace::TraceId traceId_;
+
+  std::atomic<bool> isClosed_{true};
 
   /**
    * @brief ETWProvider is a singleton that aggregates all ETW writes.
@@ -404,6 +402,7 @@ private:
 
   friend class Span;
 
+public:
   /**
    * @brief Tracer constructor
    * @param parent Parent TraceProvider
