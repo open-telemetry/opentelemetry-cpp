@@ -61,4 +61,18 @@ TEST(ETWProvider, CheckCloseSuccess)
   ASSERT_FALSE(etw.is_registered(providerName));
 }
 
+TEST(ETWProvider, CheckCloseInfiniteLoop)
+{
+  std::string providerName1 = "Provider1";
+  std::string providerName2 = "Provider2";
+
+  static ETWProvider etw;
+  auto handle1 = etw.open(providerName1.c_str());
+  auto handle2 = etw.open(providerName2.c_str());
+
+  // This should not hang
+  etw.close(handle2);
+  etw.close(handle1);
+}
+
 #endif
