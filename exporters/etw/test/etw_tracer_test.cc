@@ -568,11 +568,9 @@ TEST(ETWTracer, EndWithCustomTime)
 
 TEST(ETWTracer, ConstructorInitializesToOpenState)
 {
-  etw::TracerProvider provider;
+  opentelemetry::exporter::etw::TracerProvider provider;
   std::string providerId = "TestProvider";
-
   opentelemetry::exporter::etw::Tracer tracer(provider, providerId);
-
   // Tracer should be open after construction
   EXPECT_FALSE(tracer.IsClosed());
 }
