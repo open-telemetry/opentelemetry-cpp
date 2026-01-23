@@ -175,16 +175,31 @@ public:
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+    auto received_record_counter = 0;
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce(
-            [&mock_session](
+        .WillRepeatedly(
+            [&mock_session, &received_record_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               auto check_json =
                   nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
+              if (check_json["resourceMetrics"].size() == 0)
+              {
+                return;
+              }
               auto resource_metrics = *check_json["resourceMetrics"].begin();
-              auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
-              auto scope            = scope_metrics["scope"];
+              if (resource_metrics["scopeMetrics"].size() == 0)
+              {
+                return;
+              }
+              auto scope_metrics = *resource_metrics["scopeMetrics"].begin();
+              if (scope_metrics["metrics"].size() == 0)
+              {
+                return;
+              }
+              ++received_record_counter;
+
+              auto scope = scope_metrics["scope"];
               EXPECT_EQ("library_name", scope["name"].get<std::string>());
               EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
 
@@ -212,6 +227,9 @@ public:
     EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
 
     exporter->ForceFlush();
+
+    // Exporting can be retried
+    EXPECT_GE(received_record_counter, 1);
   }
 
   void ExportBinaryIntegrationTestExportSumPointData(
@@ -258,13 +276,21 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
 
+    auto received_record_counter = 0;
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session](
-                      const std::shared_ptr<opentelemetry::ext::http::client::EventHandler>
-                          &callback) {
+        .WillRepeatedly([&mock_session, &received_record_counter](
+                            const std::shared_ptr<opentelemetry::ext::http::client::EventHandler>
+                                &callback) {
           opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest request_body;
           request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                       static_cast<int>(mock_session->GetRequest()->body_.size()));
+          if (request_body.resource_metrics_size() == 0 ||
+              request_body.resource_metrics(0).scope_metrics_size() == 0 ||
+              request_body.resource_metrics(0).scope_metrics(0).metrics_size() == 0)
+          {
+            return;
+          }
+          ++received_record_counter;
           auto &scope_metrics = request_body.resource_metrics(0).scope_metrics(0);
           auto &scope         = scope_metrics.scope();
           EXPECT_EQ("library_name", scope.name());
@@ -308,6 +334,9 @@ public:
     EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
 
     exporter->ForceFlush();
+
+    // Exporting can be retried
+    EXPECT_GE(received_record_counter, 1);
   }
 
   void ExportJsonIntegrationTestExportLastValuePointData(
@@ -358,16 +387,31 @@ public:
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+    auto received_record_counter = 0;
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce(
-            [&mock_session](
+        .WillRepeatedly(
+            [&mock_session, &received_record_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               auto check_json =
                   nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
+              if (check_json["resourceMetrics"].size() == 0)
+              {
+                return;
+              }
               auto resource_metrics = *check_json["resourceMetrics"].begin();
-              auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
-              auto scope            = scope_metrics["scope"];
+              if (resource_metrics["scopeMetrics"].size() == 0)
+              {
+                return;
+              }
+              auto scope_metrics = *resource_metrics["scopeMetrics"].begin();
+              if (scope_metrics["metrics"].size() == 0)
+              {
+                return;
+              }
+              ++received_record_counter;
+
+              auto scope = scope_metrics["scope"];
               EXPECT_EQ("library_name", scope["name"].get<std::string>());
               EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
 
@@ -395,6 +439,9 @@ public:
     EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
 
     exporter->ForceFlush();
+
+    // Exporting can be retried
+    EXPECT_GE(received_record_counter, 1);
   }
 
   void ExportBinaryIntegrationTestExportLastValuePointData(
@@ -450,13 +497,22 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
 
+    auto received_record_counter = 0;
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session](
-                      const std::shared_ptr<opentelemetry::ext::http::client::EventHandler>
-                          &callback) {
+        .WillRepeatedly([&mock_session, &received_record_counter](
+                            const std::shared_ptr<opentelemetry::ext::http::client::EventHandler>
+                                &callback) {
           opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest request_body;
           request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                       static_cast<int>(mock_session->GetRequest()->body_.size()));
+          if (request_body.resource_metrics_size() == 0 ||
+              request_body.resource_metrics(0).scope_metrics_size() == 0 ||
+              request_body.resource_metrics(0).scope_metrics(0).metrics_size() == 0)
+          {
+            return;
+          }
+          ++received_record_counter;
+
           auto &scope_metrics = request_body.resource_metrics(0).scope_metrics(0);
           auto &scope         = scope_metrics.scope();
           EXPECT_EQ("library_name", scope.name());
@@ -500,6 +556,9 @@ public:
     EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
 
     exporter->ForceFlush();
+
+    // Exporting can be retried
+    EXPECT_GE(received_record_counter, 1);
   }
 
   void ExportJsonIntegrationTestExportHistogramPointData(
@@ -555,16 +614,31 @@ public:
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+    auto received_record_counter = 0;
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce(
-            [&mock_session](
+        .WillRepeatedly(
+            [&mock_session, &received_record_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               auto check_json =
                   nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
+              if (check_json["resourceMetrics"].size() == 0)
+              {
+                return;
+              }
               auto resource_metrics = *check_json["resourceMetrics"].begin();
-              auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
-              auto scope            = scope_metrics["scope"];
+              if (resource_metrics["scopeMetrics"].size() == 0)
+              {
+                return;
+              }
+              auto scope_metrics = *resource_metrics["scopeMetrics"].begin();
+              if (scope_metrics["metrics"].size() == 0)
+              {
+                return;
+              }
+              ++received_record_counter;
+
+              auto scope = scope_metrics["scope"];
               EXPECT_EQ("library_name", scope["name"].get<std::string>());
               EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
 
@@ -627,6 +701,9 @@ public:
     EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
 
     exporter->ForceFlush();
+
+    // Exporting can be retried
+    EXPECT_GE(received_record_counter, 1);
   }
 
   void ExportBinaryIntegrationTestExportHistogramPointData(
@@ -686,13 +763,22 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
 
+    auto received_record_counter = 0;
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session](
-                      const std::shared_ptr<opentelemetry::ext::http::client::EventHandler>
-                          &callback) {
+        .WillRepeatedly([&mock_session, &received_record_counter](
+                            const std::shared_ptr<opentelemetry::ext::http::client::EventHandler>
+                                &callback) {
           opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest request_body;
           request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                       static_cast<int>(mock_session->GetRequest()->body_.size()));
+          if (request_body.resource_metrics_size() == 0 ||
+              request_body.resource_metrics(0).scope_metrics_size() == 0 ||
+              request_body.resource_metrics(0).scope_metrics(0).metrics_size() == 0)
+          {
+            return;
+          }
+          ++received_record_counter;
+
           auto &scope_metrics = request_body.resource_metrics(0).scope_metrics(0);
           auto &scope         = scope_metrics.scope();
           EXPECT_EQ("library_name", scope.name());
@@ -769,6 +855,9 @@ public:
     EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
 
     exporter->ForceFlush();
+
+    // Exporting can be retried
+    EXPECT_GE(received_record_counter, 1);
   }
 };
 

@@ -61,4 +61,36 @@ TEST(ETWProvider, CheckCloseSuccess)
   ASSERT_FALSE(etw.is_registered(providerName));
 }
 
+TEST(ETWProvider, CheckCloseInfiniteLoop)
+{
+  std::string providerName1 = "Provider1";
+  std::string providerName2 = "Provider2";
+
+  static ETWProvider etw;
+  auto handle1 = etw.open(providerName1.c_str());
+  auto handle2 = etw.open(providerName2.c_str());
+
+  // This should not hang
+  auto result2 = etw.close(handle2);
+  ASSERT_EQ(result2, etw.STATUS_OK);
+  ASSERT_FALSE(etw.is_registered(providerName2));
+
+  auto result1 = etw.close(handle1);
+  ASSERT_EQ(result1, etw.STATUS_OK);
+  ASSERT_FALSE(etw.is_registered(providerName1));
+}
+
+TEST(ETWProvider, CheckCloseRefCountUnderflow)
+{
+  std::string providerName = "OpenTelemetry-ETW-Provider-Underflow";
+  static ETWProvider etw;
+  auto handle = etw.open(providerName.c_str());
+  auto result = etw.close(handle);
+  ASSERT_EQ(result, etw.STATUS_OK);
+
+  // Subsequent close should fail
+  result = etw.close(handle);
+  ASSERT_EQ(result, etw.STATUS_ERROR);
+}
+
 #endif

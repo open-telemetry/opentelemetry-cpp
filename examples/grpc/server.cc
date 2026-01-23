@@ -127,14 +127,10 @@ int main(int argc, char **argv)
 {
   InitTracer();
   constexpr uint16_t default_port = 8800;
-  uint16_t port;
+  uint16_t port{default_port};
   if (argc > 1)
   {
     port = static_cast<uint16_t>(atoi(argv[1]));
-  }
-  else
-  {
-    port = default_port;
   }
 
   RunServer(port);

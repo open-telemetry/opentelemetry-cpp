@@ -15,12 +15,17 @@ COPY ci /opt/ci
 
 RUN apt update && apt install -y wget \
     ninja-build \
-    llvm-dev \
-    libclang-dev \
-    clang-tidy \
+    llvm-20-dev \
+    libclang-20-dev \
+    clang-tidy-20 \
     shellcheck \
     sudo \
     cmake
+
+RUN update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-20 200 && \
+    update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-20 200 && \
+    update-alternatives --config clang-tidy && \
+    update-alternatives --config llvm-config
 
 RUN cd /opt/ci && bash setup_ci_environment.sh
 RUN cd /opt/ci && bash install_iwyu.sh
