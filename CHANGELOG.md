@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [ETW] Fix infinite loop in ETWProvider::close
+  [#3827](https://github.com/open-telemetry/opentelemetry-cpp/pull/3827)
+
 * [CONFIGURATION] File configuration - remove zipkin
   [#3804](https://github.com/open-telemetry/opentelemetry-cpp/pull/3804)
 
