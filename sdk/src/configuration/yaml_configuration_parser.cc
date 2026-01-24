@@ -32,8 +32,8 @@ std::unique_ptr<Configuration> YamlConfigurationParser::ParseFile(const std::str
   {
     static std::string env_var_name("OTEL_EXPERIMENTAL_CONFIG_FILE");
     std::string env_var;
-    bool env_exists;
-    env_exists = sdk::common::GetStringEnvironmentVariable(env_var_name.c_str(), env_var);
+    const bool env_exists =
+        sdk::common::GetStringEnvironmentVariable(env_var_name.c_str(), env_var);
 
     if (env_exists)
     {

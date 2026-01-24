@@ -31,14 +31,13 @@ std::string DocumentNode::DoSubstitution(const std::string &text) const
 
   std::string result;
 
-  std::string::size_type current_pos;
-  std::string::size_type begin_pos;
-  std::string::size_type end_pos;
+  std::string::size_type current_pos{};
+  std::string::size_type begin_pos{};
+  std::string::size_type end_pos{};
   std::string copy;
   std::string substitution;
 
-  current_pos = 0;
-  begin_pos   = text.find(begin_token);
+  begin_pos = text.find(begin_token);
 
   while (begin_pos != std::string::npos)
   {
@@ -96,17 +95,17 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
   static std::string env_with_replacement{"env:-"};
   static std::string replacement_token{":-"};
 
-  size_t len = text.length();
-  char c;
-  std::string::size_type begin_name;
-  std::string::size_type end_name;
-  std::string::size_type begin_fallback;
-  std::string::size_type end_fallback;
-  std::string::size_type pos;
+  const std::size_t len{text.length()};
+  char c{};
+  std::string::size_type begin_name{};
+  std::string::size_type end_name{};
+  std::string::size_type begin_fallback{};
+  std::string::size_type end_fallback{};
+  std::string::size_type pos{};
   std::string name;
   std::string fallback;
   std::string sub;
-  bool env_exists;
+  bool env_exists{};
 
   if (len < 4)
   {
