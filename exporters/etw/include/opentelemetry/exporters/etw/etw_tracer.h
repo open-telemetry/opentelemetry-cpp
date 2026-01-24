@@ -159,11 +159,16 @@ void UpdateStatus(T &t, Properties &props)
 /**
  * @brief Tracer class that allows to send spans to ETW Provider.
  */
-
 class Tracer : public opentelemetry::trace::Tracer,
                public std::enable_shared_from_this<opentelemetry::trace::Tracer>
 {
+public:
+  /**
+   * @brief Indicates whether the tracer is closed.
+   */
+  bool IsClosed() const noexcept { return isClosed_.load(); }
 
+private:
   /**
    * @brief Parent provider of this Tracer
    */
@@ -397,16 +402,6 @@ class Tracer : public opentelemetry::trace::Tracer,
 
   friend class Span;
 
-  /**
-   * @brief Init a reference to etw::ProviderHandle
-   * @return Provider Handle
-   */
-  ETWProvider::Handle &initProvHandle()
-  {
-    isClosed_ = false;
-    return etwProvider().open(provId, encoding);
-  }
-
 public:
   /**
    * @brief Tracer constructor
@@ -421,11 +416,11 @@ public:
         tracerProvider_(parent),
         provId(providerId.data(), providerId.size()),
         encoding(encoding),
-        provHandle(initProvHandle())
+        provHandle(etwProvider().open(provId, encoding))
   {
+    isClosed_.store(false);
     traceId_ = GetIdGenerator(tracerProvider_).GenerateTraceId();
   }
-
   /**
    * @brief Start Span
    * @param name Span name
