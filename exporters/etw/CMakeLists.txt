@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
+
 add_library(opentelemetry_exporter_etw INTERFACE)
 
 target_include_directories(
@@ -28,6 +30,14 @@ otel_add_component(
   FILES_MATCHING
   PATTERN
   "*.h")
+
+if(OPENTELEMETRY_INSTALL)
+  opentelemetry_add_pkgconfig(
+    exporter_etw
+    "OpenTelemetry Exporter - ETW"
+    "Event Tracing for Windows exporter."
+    "opentelemetry_api opentelemetry_trace opentelemetry_logs")
+endif()
 
 if(BUILD_TESTING)
   add_executable(etw_provider_test test/etw_provider_test.cc)
