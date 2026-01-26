@@ -50,14 +50,11 @@ otel_add_component(
 
 if(OPENTELEMETRY_INSTALL)
   opentelemetry_add_pkgconfig(
-    exporter_in_memory
-    "OpenTelemetry Exporter - In-Memory Span"
-    "In-memory span exporter for testing and debugging."
-    "opentelemetry_trace")
+    exporter_in_memory "OpenTelemetry Exporter - In-Memory Span"
+    "In-memory span exporter for testing and debugging." "opentelemetry_trace")
 
   opentelemetry_add_pkgconfig(
-    exporter_in_memory_metric
-    "OpenTelemetry Exporter - In-Memory Metric"
+    exporter_in_memory_metric "OpenTelemetry Exporter - In-Memory Metric"
     "In-memory metric exporter for testing and debugging."
     "opentelemetry_metrics")
 endif()

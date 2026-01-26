@@ -33,8 +33,7 @@ otel_add_component(
 
 if(OPENTELEMETRY_INSTALL)
   opentelemetry_add_pkgconfig(
-    exporter_etw
-    "OpenTelemetry Exporter - ETW"
+    exporter_etw "OpenTelemetry Exporter - ETW"
     "Event Tracing for Windows exporter."
     "opentelemetry_api opentelemetry_trace opentelemetry_logs")
 endif()

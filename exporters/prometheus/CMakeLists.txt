@@ -76,16 +76,12 @@ otel_add_component(
 
 if(OPENTELEMETRY_INSTALL)
   opentelemetry_add_pkgconfig(
-    exporter_prometheus
-    "OpenTelemetry Exporter - Prometheus"
-    "Exports metrics in Prometheus format."
-    "opentelemetry_metrics")
+    exporter_prometheus "OpenTelemetry Exporter - Prometheus"
+    "Exports metrics in Prometheus format." "opentelemetry_metrics")
 
   opentelemetry_add_pkgconfig(
-    exporter_prometheus_builder
-    "OpenTelemetry Exporter - Prometheus Builder"
-    "Builder for Prometheus exporter."
-    "opentelemetry_exporter_prometheus")
+    exporter_prometheus_builder "OpenTelemetry Exporter - Prometheus Builder"
+    "Builder for Prometheus exporter." "opentelemetry_exporter_prometheus")
 endif()
 
 if(BUILD_TESTING)

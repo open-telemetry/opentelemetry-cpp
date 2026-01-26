@@ -44,10 +44,8 @@ otel_add_component(
 
 if(OPENTELEMETRY_INSTALL)
   opentelemetry_add_pkgconfig(
-    exporter_zipkin_trace
-    "OpenTelemetry Exporter - Zipkin"
-    "Exports trace spans in Zipkin format."
-    "opentelemetry_trace")
+    exporter_zipkin_trace "OpenTelemetry Exporter - Zipkin"
+    "Exports trace spans in Zipkin format." "opentelemetry_trace")
 endif()
 
 if(BUILD_TESTING)

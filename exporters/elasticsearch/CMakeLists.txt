@@ -38,8 +38,7 @@ otel_add_component(
 
 if(OPENTELEMETRY_INSTALL)
   opentelemetry_add_pkgconfig(
-    exporter_elasticsearch_logs
-    "OpenTelemetry Exporter - Elasticsearch"
+    exporter_elasticsearch_logs "OpenTelemetry Exporter - Elasticsearch"
     "Exports log records to Elasticsearch."
     "opentelemetry_trace opentelemetry_logs")
 endif()

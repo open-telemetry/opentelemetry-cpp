@@ -193,22 +193,17 @@ otel_add_component(
 
 if(OPENTELEMETRY_INSTALL)
   opentelemetry_add_pkgconfig(
-    exporter_ostream_span
-    "OpenTelemetry Exporter - OStream Span"
-    "Exports trace spans to output stream."
-    "opentelemetry_trace")
+    exporter_ostream_span "OpenTelemetry Exporter - OStream Span"
+    "Exports trace spans to output stream." "opentelemetry_trace")
 
   opentelemetry_add_pkgconfig(
     exporter_ostream_span_builder
     "OpenTelemetry Exporter - OStream Span Builder"
-    "Builder for OStream span exporter."
-    "opentelemetry_exporter_ostream_span")
+    "Builder for OStream span exporter." "opentelemetry_exporter_ostream_span")
 
   opentelemetry_add_pkgconfig(
-    exporter_ostream_metrics
-    "OpenTelemetry Exporter - OStream Metrics"
-    "Exports metrics to output stream."
-    "opentelemetry_metrics")
+    exporter_ostream_metrics "OpenTelemetry Exporter - OStream Metrics"
+    "Exports metrics to output stream." "opentelemetry_metrics")
 
   opentelemetry_add_pkgconfig(
     exporter_ostream_metrics_builder
@@ -217,10 +212,8 @@ if(OPENTELEMETRY_INSTALL)
     "opentelemetry_exporter_ostream_metrics")
 
   opentelemetry_add_pkgconfig(
-    exporter_ostream_logs
-    "OpenTelemetry Exporter - OStream Logs"
-    "Exports log records to output stream."
-    "opentelemetry_logs")
+    exporter_ostream_logs "OpenTelemetry Exporter - OStream Logs"
+    "Exports log records to output stream." "opentelemetry_logs")
 
   opentelemetry_add_pkgconfig(
     exporter_ostream_logs_builder

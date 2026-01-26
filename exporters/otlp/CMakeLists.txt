@@ -61,11 +61,11 @@ if(OPENTELEMETRY_INSTALL)
     otlp_recordable
     "OpenTelemetry OTLP - Recordable"
     "OTLP recordable implementation for spans, metrics, and logs."
-    "opentelemetry_trace opentelemetry_metrics opentelemetry_logs opentelemetry_resources")
+    "opentelemetry_trace opentelemetry_metrics opentelemetry_logs opentelemetry_resources"
+  )
 
   opentelemetry_add_pkgconfig(
-    exporter_otlp_builder_utils
-    "OpenTelemetry OTLP - Builder Utils"
+    exporter_otlp_builder_utils "OpenTelemetry OTLP - Builder Utils"
     "Common utilities for OTLP exporter builders."
     "opentelemetry_otlp_recordable")
 endif()
@@ -250,14 +250,11 @@ if(WITH_OTLP_GRPC)
 
   if(OPENTELEMETRY_INSTALL)
     opentelemetry_add_pkgconfig(
-      exporter_otlp_grpc_client
-      "OpenTelemetry OTLP - gRPC Client"
-      "gRPC client for OTLP protocol."
-      "opentelemetry_sdk opentelemetry_common")
+      exporter_otlp_grpc_client "OpenTelemetry OTLP - gRPC Client"
+      "gRPC client for OTLP protocol." "opentelemetry_sdk opentelemetry_common")
 
     opentelemetry_add_pkgconfig(
-      exporter_otlp_grpc
-      "OpenTelemetry OTLP - gRPC Span Exporter"
+      exporter_otlp_grpc "OpenTelemetry OTLP - gRPC Span Exporter"
       "Exports trace spans via OTLP gRPC."
       "opentelemetry_otlp_recordable opentelemetry_exporter_otlp_grpc_client")
 
@@ -265,11 +262,11 @@ if(WITH_OTLP_GRPC)
       exporter_otlp_grpc_builder
       "OpenTelemetry OTLP - gRPC Span Builder"
       "Builder for OTLP gRPC span exporter."
-      "opentelemetry_exporter_otlp_grpc opentelemetry_exporter_otlp_builder_utils")
+      "opentelemetry_exporter_otlp_grpc opentelemetry_exporter_otlp_builder_utils"
+    )
 
     opentelemetry_add_pkgconfig(
-      exporter_otlp_grpc_log
-      "OpenTelemetry OTLP - gRPC Log Exporter"
+      exporter_otlp_grpc_log "OpenTelemetry OTLP - gRPC Log Exporter"
       "Exports log records via OTLP gRPC."
       "opentelemetry_otlp_recordable opentelemetry_exporter_otlp_grpc_client")
 
@@ -277,11 +274,11 @@ if(WITH_OTLP_GRPC)
       exporter_otlp_grpc_log_builder
       "OpenTelemetry OTLP - gRPC Log Builder"
       "Builder for OTLP gRPC log record exporter."
-      "opentelemetry_exporter_otlp_grpc_log opentelemetry_exporter_otlp_builder_utils")
+      "opentelemetry_exporter_otlp_grpc_log opentelemetry_exporter_otlp_builder_utils"
+    )
 
     opentelemetry_add_pkgconfig(
-      exporter_otlp_grpc_metrics
-      "OpenTelemetry OTLP - gRPC Metric Exporter"
+      exporter_otlp_grpc_metrics "OpenTelemetry OTLP - gRPC Metric Exporter"
       "Exports metrics via OTLP gRPC."
       "opentelemetry_otlp_recordable opentelemetry_exporter_otlp_grpc_client")
 
@@ -289,7 +286,8 @@ if(WITH_OTLP_GRPC)
       exporter_otlp_grpc_metric_builder
       "OpenTelemetry OTLP - gRPC Metric Builder"
       "Builder for OTLP gRPC metric exporter."
-      "opentelemetry_exporter_otlp_grpc_metrics opentelemetry_exporter_otlp_builder_utils")
+      "opentelemetry_exporter_otlp_grpc_metrics opentelemetry_exporter_otlp_builder_utils"
+    )
   endif()
 
 endif()
@@ -454,14 +452,11 @@ if(WITH_OTLP_HTTP)
 
   if(OPENTELEMETRY_INSTALL)
     opentelemetry_add_pkgconfig(
-      exporter_otlp_http_client
-      "OpenTelemetry OTLP - HTTP Client"
-      "HTTP client for OTLP protocol."
-      "opentelemetry_sdk")
+      exporter_otlp_http_client "OpenTelemetry OTLP - HTTP Client"
+      "HTTP client for OTLP protocol." "opentelemetry_sdk")
 
     opentelemetry_add_pkgconfig(
-      exporter_otlp_http
-      "OpenTelemetry OTLP - HTTP Span Exporter"
+      exporter_otlp_http "OpenTelemetry OTLP - HTTP Span Exporter"
       "Exports trace spans via OTLP HTTP."
       "opentelemetry_otlp_recordable opentelemetry_exporter_otlp_http_client")
 
@@ -469,11 +464,11 @@ if(WITH_OTLP_HTTP)
       exporter_otlp_http_builder
       "OpenTelemetry OTLP - HTTP Span Builder"
       "Builder for OTLP HTTP span exporter."
-      "opentelemetry_exporter_otlp_http opentelemetry_exporter_otlp_builder_utils")
+      "opentelemetry_exporter_otlp_http opentelemetry_exporter_otlp_builder_utils"
+    )
 
     opentelemetry_add_pkgconfig(
-      exporter_otlp_http_log
-      "OpenTelemetry OTLP - HTTP Log Exporter"
+      exporter_otlp_http_log "OpenTelemetry OTLP - HTTP Log Exporter"
       "Exports log records via OTLP HTTP."
       "opentelemetry_otlp_recordable opentelemetry_exporter_otlp_http_client")
 
@@ -481,11 +476,11 @@ if(WITH_OTLP_HTTP)
       exporter_otlp_http_log_builder
       "OpenTelemetry OTLP - HTTP Log Builder"
       "Builder for OTLP HTTP log record exporter."
-      "opentelemetry_exporter_otlp_http_log opentelemetry_exporter_otlp_builder_utils")
+      "opentelemetry_exporter_otlp_http_log opentelemetry_exporter_otlp_builder_utils"
+    )
 
     opentelemetry_add_pkgconfig(
-      exporter_otlp_http_metric
-      "OpenTelemetry OTLP - HTTP Metric Exporter"
+      exporter_otlp_http_metric "OpenTelemetry OTLP - HTTP Metric Exporter"
       "Exports metrics via OTLP HTTP."
       "opentelemetry_otlp_recordable opentelemetry_exporter_otlp_http_client")
 
@@ -493,7 +488,8 @@ if(WITH_OTLP_HTTP)
       exporter_otlp_http_metric_builder
       "OpenTelemetry OTLP - HTTP Metric Builder"
       "Builder for OTLP HTTP metric exporter."
-      "opentelemetry_exporter_otlp_http_metric opentelemetry_exporter_otlp_builder_utils")
+      "opentelemetry_exporter_otlp_http_metric opentelemetry_exporter_otlp_builder_utils"
+    )
   endif()
 
 endif()
@@ -651,14 +647,11 @@ if(WITH_OTLP_FILE)
 
   if(OPENTELEMETRY_INSTALL)
     opentelemetry_add_pkgconfig(
-      exporter_otlp_file_client
-      "OpenTelemetry OTLP - File Client"
-      "File client for OTLP protocol."
-      "opentelemetry_sdk opentelemetry_common")
+      exporter_otlp_file_client "OpenTelemetry OTLP - File Client"
+      "File client for OTLP protocol." "opentelemetry_sdk opentelemetry_common")
 
     opentelemetry_add_pkgconfig(
-      exporter_otlp_file
-      "OpenTelemetry OTLP - File Span Exporter"
+      exporter_otlp_file "OpenTelemetry OTLP - File Span Exporter"
       "Exports trace spans to file via OTLP."
       "opentelemetry_otlp_recordable opentelemetry_exporter_otlp_file_client")
 
@@ -666,11 +659,11 @@ if(WITH_OTLP_FILE)
       exporter_otlp_file_builder
       "OpenTelemetry OTLP - File Span Builder"
       "Builder for OTLP file span exporter."
-      "opentelemetry_exporter_otlp_file opentelemetry_exporter_otlp_builder_utils")
+      "opentelemetry_exporter_otlp_file opentelemetry_exporter_otlp_builder_utils"
+    )
 
     opentelemetry_add_pkgconfig(
-      exporter_otlp_file_log
-      "OpenTelemetry OTLP - File Log Exporter"
+      exporter_otlp_file_log "OpenTelemetry OTLP - File Log Exporter"
       "Exports log records to file via OTLP."
       "opentelemetry_otlp_recordable opentelemetry_exporter_otlp_file_client")
 
@@ -678,11 +671,11 @@ if(WITH_OTLP_FILE)
       exporter_otlp_file_log_builder
       "OpenTelemetry OTLP - File Log Builder"
       "Builder for OTLP file log record exporter."
-      "opentelemetry_exporter_otlp_file_log opentelemetry_exporter_otlp_builder_utils")
+      "opentelemetry_exporter_otlp_file_log opentelemetry_exporter_otlp_builder_utils"
+    )
 
     opentelemetry_add_pkgconfig(
-      exporter_otlp_file_metric
-      "OpenTelemetry OTLP - File Metric Exporter"
+      exporter_otlp_file_metric "OpenTelemetry OTLP - File Metric Exporter"
       "Exports metrics to file via OTLP."
       "opentelemetry_otlp_recordable opentelemetry_exporter_otlp_file_client")
 
@@ -690,7 +683,8 @@ if(WITH_OTLP_FILE)
       exporter_otlp_file_metric_builder
       "OpenTelemetry OTLP - File Metric Builder"
       "Builder for OTLP file metric exporter."
-      "opentelemetry_exporter_otlp_file_metric opentelemetry_exporter_otlp_builder_utils")
+      "opentelemetry_exporter_otlp_file_metric opentelemetry_exporter_otlp_builder_utils"
+    )
   endif()
 
 endif()
