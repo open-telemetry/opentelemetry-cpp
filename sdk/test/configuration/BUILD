@@ -136,6 +136,9 @@ cc_test(
         "//api",
         "//sdk:headers",
         "//sdk/src/configuration",
+        "//sdk/src/logs",
+        "//sdk/src/metrics",
+        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
