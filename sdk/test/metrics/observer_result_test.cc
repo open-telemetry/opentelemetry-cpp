@@ -5,20 +5,15 @@
 #include <cstdint>
 #include <map>
 #include <string>
-#include <unordered_map>
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/sdk/metrics/observer_result.h"
-#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
-#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 using namespace opentelemetry::sdk::metrics;
 TEST(ObserverResult, BasicTests)
 {
-  const AttributesProcessor *attributes_processor = new DefaultAttributesProcessor();
-
-  ObserverResultT<int64_t> observer_result(attributes_processor);
+  ObserverResultT<int64_t> observer_result;
 
   observer_result.Observe(10);
   observer_result.Observe(20);
@@ -37,6 +32,4 @@ TEST(ObserverResult, BasicTests)
   observer_result.Observe(
       40, opentelemetry::common::KeyValueIterableView<std::map<std::string, int64_t>>(m2));
   EXPECT_EQ(observer_result.GetMeasurements().size(), 3);
-
-  delete attributes_processor;
 }
