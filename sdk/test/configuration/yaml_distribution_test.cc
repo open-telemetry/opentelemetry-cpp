@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -10,6 +9,7 @@
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/distribution_configuration.h"
 #include "opentelemetry/sdk/configuration/distribution_entry_configuration.h"
+#include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
 
 static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(

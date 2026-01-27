@@ -31,6 +31,8 @@
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/default_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
+#include "opentelemetry/sdk/configuration/distribution_configuration.h"
+#include "opentelemetry/sdk/configuration/distribution_entry_configuration.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
