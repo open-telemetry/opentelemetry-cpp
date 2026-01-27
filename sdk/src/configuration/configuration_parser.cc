@@ -2114,6 +2114,33 @@ std::unique_ptr<ResourceConfiguration> ConfigurationParser::ParseResourceConfigu
   return model;
 }
 
+std::unique_ptr<DistributionConfiguration> ConfigurationParser::ParseDistributionConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<DistributionConfiguration>();
+
+  for (auto it = node->begin(); it != node->end(); ++it)
+  {
+    std::unique_ptr<DocumentNode> child(*it);
+    std::string name = child->Key();
+
+    auto entry  = std::make_unique<DistributionEntryConfiguration>();
+    entry->name = std::move(name);
+    entry->node = std::move(child);
+
+    model->entries.push_back(std::move(entry));
+  }
+
+  size_t count = model->entries.size();
+  if (count == 0)
+  {
+    std::string message("Illegal distribution, 0 entries");
+    throw InvalidSchemaException(node->Location(), message);
+  }
+
+  return model;
+}
+
 std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Document> doc)
 {
   std::unique_ptr<DocumentNode> node = doc->GetRootNode();
@@ -2199,7 +2226,11 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
 
   // FIXME: instrumentation/development
 
-  // FIXME: distribution
+  child = node->GetChildNode("distribution");
+  if (child)
+  {
+    model->distribution = ParseDistributionConfiguration(child);
+  }
 
   return model;
 }

@@ -122,3 +122,20 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "yaml_distribution_test",
+    srcs = [
+        "yaml_distribution_test.cc",
+    ],
+    tags = [
+        "test",
+        "yaml",
+    ],
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/configuration",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
