@@ -23,6 +23,7 @@
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_parser.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
@@ -820,11 +821,10 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
   auto model = std::make_unique<PrometheusPullMetricExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->host               = node->GetString("host", "localhost");
-  model->port               = node->GetInteger("port", 9464);
-  model->without_scope_info = node->GetBoolean("without_scope_info", false);
-
-  // FIXME: without_target_info
+  model->host                = node->GetString("host", "localhost");
+  model->port                = node->GetInteger("port", 9464);
+  model->without_scope_info  = node->GetBoolean("without_scope_info", false);
+  model->without_target_info = node->GetBoolean("without_target_info", false);
 
   child = node->GetChildNode("with_resource_constant_labels");
   if (child)
@@ -1006,6 +1006,24 @@ std::unique_ptr<MetricProducerConfiguration> ConfigurationParser::ParseMetricPro
   return model;
 }
 
+std::unique_ptr<CardinalityLimitsConfiguration>
+ConfigurationParser::ParseCardinalityLimitsConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<CardinalityLimitsConfiguration>();
+
+  model->default_limit              = node->GetInteger("default", 2000);
+  model->counter                    = node->GetInteger("counter", 0);
+  model->gauge                      = node->GetInteger("gauge", 0);
+  model->histogram                  = node->GetInteger("histogram", 0);
+  model->observable_counter         = node->GetInteger("observable_counter", 0);
+  model->observable_gauge           = node->GetInteger("observable_gauge", 0);
+  model->observable_up_down_counter = node->GetInteger("observable_up_down_counter", 0);
+  model->up_down_counter            = node->GetInteger("up_down_counter", 0);
+
+  return model;
+}
+
 std::unique_ptr<PeriodicMetricReaderConfiguration>
 ConfigurationParser::ParsePeriodicMetricReaderConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
@@ -1027,6 +1045,12 @@ ConfigurationParser::ParsePeriodicMetricReaderConfiguration(
     {
       model->producers.push_back(ParseMetricProducerConfiguration(*it));
     }
+  }
+
+  child = node->GetChildNode("cardinality_limits");
+  if (child)
+  {
+    model->cardinality_limits = ParseCardinalityLimitsConfiguration(child);
   }
 
   return model;
@@ -1052,7 +1076,11 @@ ConfigurationParser::ParsePullMetricReaderConfiguration(
     }
   }
 
-  // FIXME: cardinality_limits
+  child = node->GetChildNode("cardinality_limits");
+  if (child)
+  {
+    model->cardinality_limits = ParseCardinalityLimitsConfiguration(child);
+  }
 
   return model;
 }

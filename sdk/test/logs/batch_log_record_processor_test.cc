@@ -407,6 +407,34 @@ TEST_F(BatchLogRecordProcessorTest, TestScheduleDelayInvalidValueFromEnv)
   unsetenv("OTEL_BLRP_SCHEDULE_DELAY");
 }
 
+TEST_F(BatchLogRecordProcessorTest, TestScheduleDelayInvalidEdgeCasesFromEnv)
+{
+  struct TestCase
+  {
+    const char *value;
+    const char *description;
+  };
+
+  const std::vector<TestCase> cases = {
+      {"-5ms", "negative duration"},
+      {"0ms", "zero duration"},
+      {"999999999999999999999s", "overflow"},
+      {"", "empty string"},
+  };
+
+  for (const auto &tc : cases)
+  {
+    setenv("OTEL_BLRP_SCHEDULE_DELAY", tc.value, 1);
+
+    BatchLogRecordProcessorOptions options;
+
+    EXPECT_EQ(options.schedule_delay_millis, std::chrono::milliseconds(1000))
+        << "Failed for case: " << tc.description << " (value='" << tc.value << "')";
+
+    unsetenv("OTEL_BLRP_SCHEDULE_DELAY");
+  }
+}
+
 TEST_F(BatchLogRecordProcessorTest, TestExportTimeoutFromEnv)
 {
   setenv("OTEL_BLRP_EXPORT_TIMEOUT", "250ms", 1);
