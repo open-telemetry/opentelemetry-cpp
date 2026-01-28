@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
+
 add_library(opentelemetry_exporter_elasticsearch_logs
             src/es_log_record_exporter.cc src/es_log_recordable.cc)
 
@@ -33,6 +35,13 @@ otel_add_component(
   PATTERN
   "es_log_recordable.h"
   EXCLUDE)
+
+if(OPENTELEMETRY_INSTALL)
+  opentelemetry_add_pkgconfig(
+    exporter_elasticsearch_logs "OpenTelemetry Exporter - Elasticsearch"
+    "Exports log records to Elasticsearch."
+    "opentelemetry_trace opentelemetry_logs")
+endif()
 
 if(BUILD_TESTING)
   add_executable(es_log_record_exporter_test
