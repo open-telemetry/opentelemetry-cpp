@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "opentelemetry/sdk/configuration/distribution_entry_configuration.h"
 #include "opentelemetry/version.h"
