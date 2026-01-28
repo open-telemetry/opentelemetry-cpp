@@ -31,7 +31,7 @@ otel_add_component(
   PATTERN
   "*.h")
 
-if(OPENTELEMETRY_INSTALL)
+if(OPENTELEMETRY_INSTALL AND WIN32)
   opentelemetry_add_pkgconfig(
     exporter_etw "OpenTelemetry Exporter - ETW"
     "Event Tracing for Windows exporter."
