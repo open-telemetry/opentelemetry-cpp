@@ -11,6 +11,7 @@
 #  define OPENTELEMETRY_ATTRIBUTE_TIMESTAMP_PREVIEW
 
 #  include "opentelemetry/exporters/etw/etw_logger_exporter.h"
+#  include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
@@ -193,6 +194,114 @@ TEST(ETWLogger, LoggerCheckWithTimestampAttributes)
 
   EXPECT_NO_THROW(
       logger->Debug("This is a debug log body", opentelemetry::common::MakeAttributes(attribs)));
+}
+
+/**
+ * @brief Test that LogRecord created within an active span context
+ *        inherits TraceId, SpanId, and TraceFlags from the current span.
+ *
+ * This test verifies the fix for issue #3830 where traceId and spanId
+ * were incorrectly reported as all zeros.
+ */
+TEST(ETWLogger, LoggerInheritsTraceContextFromActiveSpan)
+{
+  std::string providerName = kGlobalProviderName;
+
+  // Create tracer and logger providers
+  exporter::etw::TracerProvider tp;
+  exporter::etw::LoggerProvider lp;
+
+  auto tracer = tp.GetTracer(providerName);
+  auto logger = lp.GetLogger(providerName, "test");
+
+  // Create a span and set it as the active span
+  auto span  = tracer->StartSpan("TestSpan");
+  auto scope = tracer->WithActiveSpan(span);
+
+  // Get the span's trace context for verification
+  auto span_context = span->GetContext();
+
+  // Create a log record while the span is active
+  auto log_record = logger->CreateLogRecord();
+  ASSERT_NE(log_record, nullptr);
+
+  // Cast to ETW LogRecord to access trace context
+  auto *etw_record = static_cast<exporter::etw::LogRecord *>(log_record.get());
+
+  // Verify TraceId matches the active span's TraceId
+  EXPECT_EQ(etw_record->GetTraceId(), span_context.trace_id());
+
+  // Verify SpanId matches the active span's SpanId
+  EXPECT_EQ(etw_record->GetSpanId(), span_context.span_id());
+
+  // Verify TraceFlags match
+  EXPECT_EQ(etw_record->GetTraceFlags(), span_context.trace_flags());
+
+  // Emit the log (should not throw)
+  EXPECT_NO_THROW(logger->EmitLogRecord(std::move(log_record)));
+
+  span->End();
+}
+
+/**
+ * @brief Test that LogRecord created without an active span context
+ *        has default (invalid/zero) TraceId and SpanId.
+ */
+TEST(ETWLogger, LoggerWithoutActiveSpanHasDefaultTraceContext)
+{
+  std::string providerName = kGlobalProviderName;
+  exporter::etw::LoggerProvider lp;
+
+  auto logger = lp.GetLogger(providerName, "test");
+
+  // Create a log record without any active span
+  auto log_record = logger->CreateLogRecord();
+  ASSERT_NE(log_record, nullptr);
+
+  auto *etw_record = static_cast<exporter::etw::LogRecord *>(log_record.get());
+
+  // TraceId and SpanId should be invalid (all zeros) when no span is active
+  EXPECT_FALSE(etw_record->GetTraceId().IsValid());
+  EXPECT_FALSE(etw_record->GetSpanId().IsValid());
+
+  EXPECT_NO_THROW(logger->EmitLogRecord(std::move(log_record)));
+}
+
+/**
+ * @brief Test that LogRecord timestamp defaults to a valid time (not epoch).
+ *
+ * This test verifies the fix for issue #3830 where timestamp was
+ * incorrectly reported as 1970-01-01 (epoch).
+ */
+TEST(ETWLogger, LoggerTimestampIsNotEpoch)
+{
+  std::string providerName = kGlobalProviderName;
+  exporter::etw::LoggerProvider lp;
+
+  auto logger = lp.GetLogger(providerName, "test");
+
+  // Capture time before creating log record
+  auto before = std::chrono::system_clock::now();
+
+  auto log_record = logger->CreateLogRecord();
+  ASSERT_NE(log_record, nullptr);
+
+  // Capture time after creating log record
+  auto after = std::chrono::system_clock::now();
+
+  auto *etw_record = static_cast<exporter::etw::LogRecord *>(log_record.get());
+
+  // Get the observed timestamp (which should be initialized to now())
+  std::chrono::system_clock::time_point observed_ts = etw_record->GetObservedTimestamp();
+
+  // Verify observed timestamp is not epoch (1970-01-01)
+  EXPECT_GT(observed_ts.time_since_epoch().count(), 0);
+
+  // Verify observed timestamp is within the expected range
+  EXPECT_GE(observed_ts, before);
+  EXPECT_LE(observed_ts, after);
+
+  EXPECT_NO_THROW(logger->EmitLogRecord(std::move(log_record)));
 }
 
 #endif  // _WIN32
