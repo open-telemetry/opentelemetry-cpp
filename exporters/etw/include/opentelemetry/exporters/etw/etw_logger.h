@@ -221,11 +221,12 @@ public:
         }
       }
       else if (opentelemetry::nostd::holds_alternative<
-                   opentelemetry::nostd::shared_ptr<opentelemetry::trace::SpanContext>>(context_value))
+                   opentelemetry::nostd::shared_ptr<opentelemetry::trace::SpanContext>>(
+                   context_value))
       {
         opentelemetry::nostd::shared_ptr<opentelemetry::trace::SpanContext> &span_context =
-            opentelemetry::nostd::get<opentelemetry::nostd::shared_ptr<opentelemetry::trace::SpanContext>>(
-                context_value);
+            opentelemetry::nostd::get<
+                opentelemetry::nostd::shared_ptr<opentelemetry::trace::SpanContext>>(context_value);
         if (span_context)
         {
           log_record->SetTraceId(span_context->trace_id());
