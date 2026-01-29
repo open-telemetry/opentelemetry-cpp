@@ -99,7 +99,8 @@ meter_provider:
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->meter_provider, nullptr);
-  ASSERT_EQ(config->meter_provider->exemplar_filter, opentelemetry::sdk::configuration::ExemplarFilter::trace_based);
+  ASSERT_EQ(config->meter_provider->exemplar_filter,
+            opentelemetry::sdk::configuration::ExemplarFilter::trace_based);
   ASSERT_EQ(config->meter_provider->readers.size(), 1);
   auto *reader = config->meter_provider->readers[0].get();
   ASSERT_NE(reader, nullptr);
@@ -141,7 +142,8 @@ meter_provider:
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->meter_provider, nullptr);
-  ASSERT_EQ(config->meter_provider->exemplar_filter, opentelemetry::sdk::configuration::ExemplarFilter::always_on);
+  ASSERT_EQ(config->meter_provider->exemplar_filter,
+            opentelemetry::sdk::configuration::ExemplarFilter::always_on);
   ASSERT_EQ(config->meter_provider->readers.size(), 1);
   auto *reader = config->meter_provider->readers[0].get();
   ASSERT_NE(reader, nullptr);
@@ -180,7 +182,8 @@ meter_provider:
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->meter_provider, nullptr);
-  ASSERT_EQ(config->meter_provider->exemplar_filter, opentelemetry::sdk::configuration::ExemplarFilter::always_off);
+  ASSERT_EQ(config->meter_provider->exemplar_filter,
+            opentelemetry::sdk::configuration::ExemplarFilter::always_off);
   ASSERT_EQ(config->meter_provider->readers.size(), 1);
   auto *reader = config->meter_provider->readers[0].get();
   ASSERT_NE(reader, nullptr);
@@ -217,7 +220,8 @@ meter_provider:
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->meter_provider, nullptr);
-  ASSERT_EQ(config->meter_provider->exemplar_filter, opentelemetry::sdk::configuration::ExemplarFilter::trace_based);
+  ASSERT_EQ(config->meter_provider->exemplar_filter,
+            opentelemetry::sdk::configuration::ExemplarFilter::trace_based);
   ASSERT_EQ(config->meter_provider->readers.size(), 1);
   auto *reader = config->meter_provider->readers[0].get();
   ASSERT_NE(reader, nullptr);
