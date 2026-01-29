@@ -210,7 +210,7 @@ if(TARGET protobuf::libprotobuf)
       set(protobuf_lib_compile_features_cxx_std 17)
       message(
         STATUS
-          "protobuf::libprotobuf $(Protobuf_VERSION) detected and we force set CXX_STANDARD to 17 for .pb.cc files."
+          "protobuf::libprotobuf ${Protobuf_VERSION} detected and we force set CXX_STANDARD to 17 for .pb.cc files."
       )
     endif()
   endif()
