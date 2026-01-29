@@ -28,6 +28,7 @@
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/drop_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/exemplar_filter.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
@@ -224,6 +225,9 @@ public:
       const std::unique_ptr<DocumentNode> &node) const;
 
   InstrumentType ParseInstrumentType(const std::unique_ptr<DocumentNode> &node,
+                                     const std::string &name) const;
+
+  ExemplarFilter ParseExemplarFilter(const std::unique_ptr<DocumentNode> &node,
                                      const std::string &name) const;
 
   std::unique_ptr<ViewSelectorConfiguration> ParseViewSelectorConfiguration(

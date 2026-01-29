@@ -1500,6 +1500,8 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMe
     meter_context->AddMetricReader(metric_reader);
   }
 
+  // FIXME: exemplar_filter not supported in metrics SDK.
+
   sdk = opentelemetry::sdk::metrics::MeterProviderFactory::Create(std::move(meter_context));
 
   return sdk;
