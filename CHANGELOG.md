@@ -45,6 +45,9 @@ Increment the:
 * [CONFIGURATION] File configuration - implement cardinality_limits
   [#3820](https://github.com/open-telemetry/opentelemetry-cpp/pull/3820)
 
+* [CONFIGURATION] File configuration - implement distribution
+  [#3833](https://github.com/open-telemetry/opentelemetry-cpp/pull/3833)
+
 * [CONFIGURATION] File configuration - exemplar filter
   [#3837](https://github.com/open-telemetry/opentelemetry-cpp/pull/3837)
 
