@@ -38,6 +38,7 @@
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/drop_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/exemplar_filter.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
@@ -1171,6 +1172,34 @@ InstrumentType ConfigurationParser::ParseInstrumentType(const std::unique_ptr<Do
   throw InvalidSchemaException(node->Location(), message);
 }
 
+ExemplarFilter ConfigurationParser::ParseExemplarFilter(const std::unique_ptr<DocumentNode> &node,
+                                                        const std::string &name) const
+{
+  if (name == "")
+  {
+    return ExemplarFilter::trace_based;
+  }
+
+  if (name == "always_on")
+  {
+    return ExemplarFilter::always_on;
+  }
+
+  if (name == "always_off")
+  {
+    return ExemplarFilter::always_off;
+  }
+
+  if (name == "trace_based")
+  {
+    return ExemplarFilter::trace_based;
+  }
+
+  std::string message("Illegal exemplar filter: ");
+  message.append(name);
+  throw InvalidSchemaException(node->Location(), message);
+}
+
 std::unique_ptr<ViewSelectorConfiguration> ConfigurationParser::ParseViewSelectorConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
@@ -1384,7 +1413,8 @@ std::unique_ptr<MeterProviderConfiguration> ConfigurationParser::ParseMeterProvi
     }
   }
 
-  // FIXME: exemplar_filter
+  std::string exemplar_filter = node->GetString("exemplar_filter", "trace_based");
+  model->exemplar_filter      = ParseExemplarFilter(node, exemplar_filter);
 
   // FIXME: meter_configurator/development
 
