@@ -24,7 +24,7 @@ class MeterProviderConfiguration
 public:
   std::vector<std::unique_ptr<MetricReaderConfiguration>> readers;
   std::vector<std::unique_ptr<ViewConfiguration>> views;
-  ExemplarFilter exemplar_filter;
+  ExemplarFilter exemplar_filter = ExemplarFilter::trace_based;
   // FIXME: meter_configurator
 };
 
