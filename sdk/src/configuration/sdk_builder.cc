@@ -156,6 +156,10 @@
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/version.h"
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/configuration/exemplar_filter.h"
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
