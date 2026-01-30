@@ -639,6 +639,42 @@ TEST(OtlpRecordableTest, TestCollectionLimits)
   EXPECT_EQ(event_list[0].attributes_size(), 1);
   EXPECT_EQ(event_list[0].dropped_attributes_count(), 1);
 }
+
+TEST(OtlpRecordableTest, TestLinkLimits)
+{
+  // Limits: Max Links: 2, Max Attributes Per Link: 1
+  OtlpRecordable recordable(10, 10, 2, 10, 1);
+
+  // Dummy SpanContext for the links
+  trace::SpanContext context = trace::SpanContext::GetInvalid();
+
+  // Test Link Limits
+  // Create an empty attribute map for the links
+  std::map<std::string, int> empty_map;
+  common::KeyValueIterableView<std::map<std::string, int>> empty_attrs(empty_map);
+
+  recordable.AddLink(context, empty_attrs);
+  recordable.AddLink(context, empty_attrs);
+  recordable.AddLink(context, empty_attrs);  // Should be dropped (Max 2)
+
+  EXPECT_EQ(recordable.span().links_size(), 2);
+  EXPECT_EQ(recordable.span().dropped_links_count(), 1);
+
+  // Test Per-Link Attribute Limits
+  // Create a map with 2 attributes. Limit is 1
+  std::map<std::string, int> attr_map = {{"l_attr1", 1}, {"l_attr2", 2}};
+  common::KeyValueIterableView<std::map<std::string, int>> link_attrs(attr_map);
+
+  // Create a new recordable for this sub-test
+  OtlpRecordable link_recordable(10, 10, 10, 10, 1);
+  link_recordable.AddLink(context, link_attrs);
+
+  auto &link_list = link_recordable.span().links();
+  ASSERT_EQ(link_list.size(), 1);
+  // The link itself should have 1 attribute kept, 1 dropped
+  EXPECT_EQ(link_list[0].attributes_size(), 1);
+  EXPECT_EQ(link_list[0].dropped_attributes_count(), 1);
+}
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

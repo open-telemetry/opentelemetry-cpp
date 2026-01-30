@@ -4,8 +4,8 @@
 #pragma once
 
 #include <chrono>
-#include <cstdint>  // For uint32_t
-#include <limits>   // For UINT32_MAX
+#include <cstdint>  // For std::uint32_t
+#include <limits>   // For std::numeric_limits
 #include <string>
 
 // clang-format off
@@ -37,11 +37,12 @@ namespace otlp
 class OtlpRecordable final : public opentelemetry::sdk::trace::Recordable
 {
 public:
-  explicit OtlpRecordable(uint32_t max_attributes           = UINT32_MAX,
-                          uint32_t max_events               = UINT32_MAX,
-                          uint32_t max_links                = UINT32_MAX,
-                          uint32_t max_attributes_per_event = UINT32_MAX,
-                          uint32_t max_attributes_per_link  = UINT32_MAX)
+  explicit OtlpRecordable(
+      std::uint32_t max_attributes           = std::numeric_limits<std::uint32_t>::max(),
+      std::uint32_t max_events               = std::numeric_limits<std::uint32_t>::max(),
+      std::uint32_t max_links                = std::numeric_limits<std::uint32_t>::max(),
+      std::uint32_t max_attributes_per_event = std::numeric_limits<std::uint32_t>::max(),
+      std::uint32_t max_attributes_per_link  = std::numeric_limits<std::uint32_t>::max())
       : max_attributes_(max_attributes),
         max_events_(max_events),
         max_links_(max_links),
@@ -99,11 +100,11 @@ private:
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
       nullptr;
-  uint32_t max_attributes_;
-  uint32_t max_events_;
-  uint32_t max_links_;
-  uint32_t max_attributes_per_event_;
-  uint32_t max_attributes_per_link_;
+  std::uint32_t max_attributes_;
+  std::uint32_t max_events_;
+  std::uint32_t max_links_;
+  std::uint32_t max_attributes_per_event_;
+  std::uint32_t max_attributes_per_link_;
 };
 }  // namespace otlp
 }  // namespace exporter
