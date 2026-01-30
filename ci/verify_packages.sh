@@ -15,7 +15,7 @@ validate_package() {
 }
 
 # Core packages
-for library in api common logs metrics resources trace version configuration; do
+for library in api common logs metrics resources trace version; do
   pkg-config --validate opentelemetry_${library} --print-errors
 done
 
@@ -29,7 +29,8 @@ validate_package "opentelemetry_otlp_recordable"
 validate_package "opentelemetry_exporter_otlp_builder_utils"
 
 for protocol in grpc http file; do
-  for variant in client "" builder log log_builder metrics metric_builder; do
+  validate_package "opentelemetry_exporter_otlp_${protocol}"
+  for variant in client builder log log_builder metrics metric_builder; do
     validate_package "opentelemetry_exporter_otlp_${protocol}_${variant}"
   done
 done
@@ -38,3 +39,6 @@ done
 for exporter in prometheus prometheus_builder zipkin_trace elasticsearch_logs in_memory in_memory_metric etw; do
   validate_package "opentelemetry_exporter_${exporter}"
 done
+
+# Optional features
+validate_package "opentelemetry_configuration"
