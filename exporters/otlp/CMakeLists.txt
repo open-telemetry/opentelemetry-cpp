@@ -251,7 +251,7 @@ if(WITH_OTLP_GRPC)
   if(OPENTELEMETRY_INSTALL)
     opentelemetry_add_pkgconfig(
       exporter_otlp_grpc_client "OpenTelemetry OTLP - gRPC Client"
-      "gRPC client for OTLP protocol." "opentelemetry_sdk opentelemetry_common")
+      "gRPC client for OTLP protocol." "opentelemetry_api opentelemetry_common")
 
     opentelemetry_add_pkgconfig(
       exporter_otlp_grpc "OpenTelemetry OTLP - gRPC Span Exporter"
@@ -453,7 +453,7 @@ if(WITH_OTLP_HTTP)
   if(OPENTELEMETRY_INSTALL)
     opentelemetry_add_pkgconfig(
       exporter_otlp_http_client "OpenTelemetry OTLP - HTTP Client"
-      "HTTP client for OTLP protocol." "opentelemetry_sdk")
+      "HTTP client for OTLP protocol." "opentelemetry_api")
 
     opentelemetry_add_pkgconfig(
       exporter_otlp_http "OpenTelemetry OTLP - HTTP Span Exporter"
@@ -648,7 +648,7 @@ if(WITH_OTLP_FILE)
   if(OPENTELEMETRY_INSTALL)
     opentelemetry_add_pkgconfig(
       exporter_otlp_file_client "OpenTelemetry OTLP - File Client"
-      "File client for OTLP protocol." "opentelemetry_sdk opentelemetry_common")
+      "File client for OTLP protocol." "opentelemetry_api opentelemetry_common")
 
     opentelemetry_add_pkgconfig(
       exporter_otlp_file "OpenTelemetry OTLP - File Span Exporter"
