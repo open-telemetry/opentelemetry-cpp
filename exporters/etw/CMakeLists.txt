@@ -1,8 +1,6 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
-
 add_library(opentelemetry_exporter_etw INTERFACE)
 
 target_include_directories(
