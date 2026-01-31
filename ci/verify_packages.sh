@@ -28,15 +28,22 @@ done
 validate_package "opentelemetry_otlp_recordable"
 validate_package "opentelemetry_exporter_otlp_builder_utils"
 
-for protocol in grpc http file; do
+# OTLP gRPC exporter
+validate_package "opentelemetry_exporter_otlp_grpc"
+for variant in client builder log log_builder metrics metric_builder; do
+  validate_package "opentelemetry_exporter_otlp_grpc_${variant}"
+done
+
+# OTLP HTTP and File exporters
+for protocol in http file; do
   validate_package "opentelemetry_exporter_otlp_${protocol}"
-  for variant in client builder log log_builder metrics metric_builder; do
+  for variant in client builder log log_builder metric metric_builder; do
     validate_package "opentelemetry_exporter_otlp_${protocol}_${variant}"
   done
 done
 
 # Other exporters
-for exporter in prometheus prometheus_builder zipkin_trace elasticsearch_logs in_memory in_memory_metric etw; do
+for exporter in prometheus prometheus_builder zipkin_trace elasticsearch_logs in_memory in_memory_metric; do
   validate_package "opentelemetry_exporter_${exporter}"
 done
 

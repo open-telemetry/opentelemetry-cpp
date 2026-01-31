@@ -31,13 +31,6 @@ otel_add_component(
   PATTERN
   "*.h")
 
-if(OPENTELEMETRY_INSTALL AND WIN32)
-  opentelemetry_add_pkgconfig(
-    exporter_etw "OpenTelemetry Exporter - ETW"
-    "Event Tracing for Windows exporter."
-    "opentelemetry_api opentelemetry_trace opentelemetry_logs")
-endif()
-
 if(BUILD_TESTING)
   add_executable(etw_provider_test test/etw_provider_test.cc)
   add_executable(etw_tracer_test test/etw_tracer_test.cc)
