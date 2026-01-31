@@ -18,6 +18,9 @@ Increment the:
 * [ETW] Fix ETW Log Exporter: incorrect timestamp, traceId, and spanId
   [#3836](https://github.com/open-telemetry/opentelemetry-cpp/pull/3836)
 
+* [EXPORTER] Add support for otlp exporter collection limits
+  [#3816](https://github.com/open-telemetry/opentelemetry-cpp/pull/3816)
+
 * [ETW] Fix infinite loop in ETWProvider::close
   [#3827](https://github.com/open-telemetry/opentelemetry-cpp/pull/3827)
 
