@@ -125,6 +125,7 @@
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -154,6 +155,10 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/version.h"
+
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/configuration/exemplar_filter.h"
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -1149,6 +1154,33 @@ static opentelemetry::sdk::metrics::InstrumentType ConvertInstrumentType(
   return sdk;
 }
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+
+static opentelemetry::sdk::metrics::ExemplarFilterType ConvertExemplarFilter(
+    enum opentelemetry::sdk::configuration::ExemplarFilter config)
+{
+  opentelemetry::sdk::metrics::ExemplarFilterType sdk{
+      opentelemetry::sdk::metrics::ExemplarFilterType::kTraceBased};
+
+  switch (config)
+  {
+    case opentelemetry::sdk::configuration::ExemplarFilter::always_on:
+      sdk = opentelemetry::sdk::metrics::ExemplarFilterType::kAlwaysOn;
+      break;
+    case opentelemetry::sdk::configuration::ExemplarFilter::always_off:
+      sdk = opentelemetry::sdk::metrics::ExemplarFilterType::kAlwaysOff;
+      break;
+    case opentelemetry::sdk::configuration::ExemplarFilter::trace_based:
+      sdk = opentelemetry::sdk::metrics::ExemplarFilterType::kTraceBased;
+      break;
+    default:
+      break;
+  }
+
+  return sdk;
+}
+#endif /* ENABLE_METRICS_EXEMPLAR_PREVIEW */
+
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
 SdkBuilder::CreateOtlpHttpPushMetricExporter(
     const opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *model) const
@@ -1499,6 +1531,17 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMe
     metric_reader = CreateMetricReader(reader_configuration);
     meter_context->AddMetricReader(metric_reader);
   }
+
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+  auto sdk_exemplar_filter = ConvertExemplarFilter(model->exemplar_filter);
+  meter_context->SetExemplarFilter(sdk_exemplar_filter);
+#else
+  /* Do not spam with warnings if disabled anyway. */
+  if (model->exemplar_filter != ExemplarFilter::always_off)
+  {
+    OTEL_INTERNAL_LOG_WARN("ENABLE_METRICS_EXEMPLAR_PREVIEW not set, ignoring exemplar filter");
+  }
+#endif /* ENABLE_METRICS_EXEMPLAR_PREVIEW */
 
   sdk = opentelemetry::sdk::metrics::MeterProviderFactory::Create(std::move(meter_context));
 

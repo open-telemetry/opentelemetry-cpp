@@ -31,11 +31,14 @@
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/default_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
+#include "opentelemetry/sdk/configuration/distribution_configuration.h"
+#include "opentelemetry/sdk/configuration/distribution_entry_configuration.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/drop_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/exemplar_filter.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
@@ -1169,6 +1172,34 @@ InstrumentType ConfigurationParser::ParseInstrumentType(const std::unique_ptr<Do
   throw InvalidSchemaException(node->Location(), message);
 }
 
+ExemplarFilter ConfigurationParser::ParseExemplarFilter(const std::unique_ptr<DocumentNode> &node,
+                                                        const std::string &name) const
+{
+  if (name == "")
+  {
+    return ExemplarFilter::trace_based;
+  }
+
+  if (name == "always_on")
+  {
+    return ExemplarFilter::always_on;
+  }
+
+  if (name == "always_off")
+  {
+    return ExemplarFilter::always_off;
+  }
+
+  if (name == "trace_based")
+  {
+    return ExemplarFilter::trace_based;
+  }
+
+  std::string message("Illegal exemplar filter: ");
+  message.append(name);
+  throw InvalidSchemaException(node->Location(), message);
+}
+
 std::unique_ptr<ViewSelectorConfiguration> ConfigurationParser::ParseViewSelectorConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
@@ -1382,7 +1413,8 @@ std::unique_ptr<MeterProviderConfiguration> ConfigurationParser::ParseMeterProvi
     }
   }
 
-  // FIXME: exemplar_filter
+  std::string exemplar_filter = node->GetString("exemplar_filter", "trace_based");
+  model->exemplar_filter      = ParseExemplarFilter(node, exemplar_filter);
 
   // FIXME: meter_configurator/development
 
@@ -2114,6 +2146,33 @@ std::unique_ptr<ResourceConfiguration> ConfigurationParser::ParseResourceConfigu
   return model;
 }
 
+std::unique_ptr<DistributionConfiguration> ConfigurationParser::ParseDistributionConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<DistributionConfiguration>();
+
+  for (auto it = node->begin(); it != node->end(); ++it)
+  {
+    std::unique_ptr<DocumentNode> child(*it);
+    std::string name = child->Key();
+
+    auto entry  = std::make_unique<DistributionEntryConfiguration>();
+    entry->name = std::move(name);
+    entry->node = std::move(child);
+
+    model->entries.push_back(std::move(entry));
+  }
+
+  size_t count = model->entries.size();
+  if (count == 0)
+  {
+    std::string message("Illegal distribution, 0 entries");
+    throw InvalidSchemaException(node->Location(), message);
+  }
+
+  return model;
+}
+
 std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Document> doc)
 {
   std::unique_ptr<DocumentNode> node = doc->GetRootNode();
@@ -2199,7 +2258,11 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
 
   // FIXME: instrumentation/development
 
-  // FIXME: distribution
+  child = node->GetChildNode("distribution");
+  if (child)
+  {
+    model->distribution = ParseDistributionConfiguration(child);
+  }
 
   return model;
 }

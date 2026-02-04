@@ -50,7 +50,7 @@ public:
     }
   }
 
-  ~HttpServer() { Stop(); }
+  ~HttpServer() override { Stop(); }
 };
 
 }  // namespace

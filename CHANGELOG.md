@@ -18,6 +18,9 @@ Increment the:
 * [ETW] Fix ETW Log Exporter: incorrect timestamp, traceId, and spanId
   [#3836](https://github.com/open-telemetry/opentelemetry-cpp/pull/3836)
 
+* [EXPORTER] Add support for otlp exporter collection limits
+  [#3816](https://github.com/open-telemetry/opentelemetry-cpp/pull/3816)
+
 * [ETW] Fix infinite loop in ETWProvider::close
   [#3827](https://github.com/open-telemetry/opentelemetry-cpp/pull/3827)
 
@@ -45,6 +48,15 @@ Increment the:
 * [CONFIGURATION] File configuration - implement cardinality_limits
   [#3820](https://github.com/open-telemetry/opentelemetry-cpp/pull/3820)
 
+* [CONFIGURATION] File configuration - implement distribution
+  [#3833](https://github.com/open-telemetry/opentelemetry-cpp/pull/3833)
+
+* [CONFIGURATION] File configuration - exemplar filter
+  [#3837](https://github.com/open-telemetry/opentelemetry-cpp/pull/3837)
+
+* [SDK] Invalid thread instrumentation in PeriodicExportingMetricReader
+  [#3842](https://github.com/open-telemetry/opentelemetry-cpp/pull/3842)
+
 Breaking changes:
 
 * [CONFIGURATION] File configuration - remove zipkin
@@ -56,6 +68,13 @@ Breaking changes:
   [#3805](https://github.com/open-telemetry/opentelemetry-cpp/pull/3805)
   * The Tls properties for Grpc and Http are renamed,
     due to an upstream schema change.
+
+* [SDK] Invalid thread instrumentation in PeriodicExportingMetricReader
+  [#3842](https://github.com/open-telemetry/opentelemetry-cpp/pull/3842)
+  * The collect thread in the periodic exporting metric reader no longer
+    exists.
+  * As a result, member `collect_thread_instrumentation` in class
+    `PeriodicExportingMetricReaderRuntimeOptions` is removed.
 
 ## [1.24 2025-11-20]
 
