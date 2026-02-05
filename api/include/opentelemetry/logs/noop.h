@@ -96,10 +96,10 @@ private:
 #    pragma warning(disable : 4996)
 #  elif defined(__GNUC__) && !defined(__clang__) && !defined(__apple_build_version__)
 #    pragma GCC diagnostic push
-#    pragma GCC diagnostic warning "-Wdeprecated-declarations"
+#    pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #  elif defined(__clang__) || defined(__apple_build_version__)
 #    pragma clang diagnostic push
-#    pragma clang diagnostic warning "-Wdeprecated-declarations"
+#    pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #  endif
 
 class NoopEventLogger final : public EventLogger
