@@ -82,13 +82,15 @@ Increment the:
 * Bump actions/cache from 5.0.0 to 5.0.1
   [#3789](https://github.com/open-telemetry/opentelemetry-cpp/pull/3789)
 
-* Bump bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml from 1.0.0 to 1.1.0
+* Bump bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml
+  from 1.0.0 to 1.1.0
   [#3788](https://github.com/open-telemetry/opentelemetry-cpp/pull/3788)
 
 * [CI] upgrade to clang-tidy 20
   [#3762](https://github.com/open-telemetry/opentelemetry-cpp/pull/3762)
 
-* [SDK] Fix off-by-one error in Base2ExponentialHistogramAggregation::Merge() downscaling
+* [SDK] Fix off-by-one error in
+  Base2ExponentialHistogramAggregation::Merge() downscaling
   [#3793](https://github.com/open-telemetry/opentelemetry-cpp/pull/3793)
 
 * Bump github/codeql-action from 4.31.8 to 4.31.9
@@ -139,7 +141,8 @@ Increment the:
 * [TEST] Extend logs invalid schedule delay tests
   [#3812](https://github.com/open-telemetry/opentelemetry-cpp/pull/3812)
 
-* [BUILD] Update vendored TraceLoggingDynamic.h to compile with msvc's conformant preprocessor
+* [BUILD] Update vendored TraceLoggingDynamic.h to compile
+  with msvc's conformant preprocessor
   [#3822](https://github.com/open-telemetry/opentelemetry-cpp/pull/3822)
 
 * [CONFIGURATION] File configuration - implement cardinality_limits
@@ -201,6 +204,9 @@ Increment the:
 
 * Bump fossas/fossa-action from 1.7.0 to 1.8.0
   [#3848](https://github.com/open-telemetry/opentelemetry-cpp/pull/3848)
+
+* [RELEASE] Release opentelemetry-cpp 1.25.0
+  [#3850](https://github.com/open-telemetry/opentelemetry-cpp/pull/3850)
 
 Breaking changes:
 
