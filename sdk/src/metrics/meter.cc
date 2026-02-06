@@ -592,7 +592,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
        ,
        exemplar_filter_type
 #endif
-  ](const View &view) {
+  ](const View &view) -> bool {
         auto view_instr_desc = instrument_descriptor;
         if (!view.GetName().empty())
         {
@@ -616,12 +616,14 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         {
           WarnOnDuplicateInstrument(GetInstrumentationScope(), storage_registry_, view_instr_desc);
           async_storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
-              view_instr_desc, view.GetAggregationType(),
+              view_instr_desc, view.GetAggregationType(), view.GetAttributesProcessor()
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+                                                              ,
               exemplar_filter_type,
               GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
-                                   view_instr_desc),
+                                   view_instr_desc)
 #endif
+                  ,
               view.GetAggregationConfig()));
           storage_registry_.insert({view_instr_desc, async_storage});
         }
