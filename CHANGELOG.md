@@ -210,6 +210,9 @@ Increment the:
 * [RELEASE] Release opentelemetry-cpp 1.25.0
   [#3850](https://github.com/open-telemetry/opentelemetry-cpp/pull/3850)
 
+* [BUILD] Ignore deprecated warning
+  [#3845](https://github.com/open-telemetry/opentelemetry-cpp/pull/3845)
+
 Breaking changes:
 
 * [CONFIGURATION] File configuration - remove zipkin
