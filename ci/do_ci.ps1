@@ -34,6 +34,35 @@ $VCPKG_DIR = Join-Path "$SRC_DIR" "tools/vcpkg"
 
 $Env:CTEST_OUTPUT_ON_FAILURE = "1"
 
+function FindAndMergeDllPath {
+  param (
+    [string[]]$AdditionalDirs
+  )
+  
+  $FINAL_PATH = $env:PATH
+  $PATH_SET = @{}
+  $PATH_ITEMS = $FINAL_PATH -split [IO.Path]::PathSeparator
+  foreach ($item in $PATH_ITEMS) {
+    $PATH_SET[$item] = $true
+  }
+
+  foreach ($dir in $AdditionalDirs) {
+    $GLOB_PATTERN = Join-Path "$dir" "*.dll"
+    $DETECTED_DLL_FILES = Get-ChildItem -Path $GLOB_PATTERN -Recurse
+    $DETECTED_DLL_DIRS = $(foreach ($dll_file in $DETECTED_DLL_FILES) {
+        $dll_file.Directory.FullName
+      }) | Sort-Object | Get-Unique
+    foreach ($dll_dir in $DETECTED_DLL_DIRS) {
+      if (-not $PATH_SET.ContainsKey($dll_dir)) {
+        $FINAL_PATH = "$dll_dir" + [IO.Path]::PathSeparator + $FINAL_PATH
+        $PATH_SET[$dll_dir] = $true
+      }
+    }
+  }
+
+  return $FINAL_PATH
+}
+
 switch ($action) {
   "bazel.build" {
     bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS --action_env=VCPKG_DIR=$VCPKG_DIR --deleted_packages=opentracing-shim -- //...
@@ -67,7 +96,7 @@ switch ($action) {
     cmake $SRC_DIR `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       -DOPENTELEMETRY_BUILD_DLL=1 `
-     "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -77,7 +106,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    $env:PATH = "$BUILD_DIR\ext\src\dll\Debug;$env:PATH"
+    $env:PATH = FindAndMergeDllPath "$BUILD_DIR\ext\src\dll\Debug"
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -90,7 +119,7 @@ switch ($action) {
       -DCMAKE_CXX_STANDARD=20 `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       -DOPENTELEMETRY_BUILD_DLL=1 `
-     "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -100,7 +129,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    $env:PATH = "$BUILD_DIR\ext\src\dll\Debug;$env:PATH"
+    $env:PATH = FindAndMergeDllPath "$BUILD_DIR\ext\src\dll\Debug"
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -125,6 +154,10 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
+
+    $env:PATH = FindAndMergeDllPath "."
+    Write-Output "PATH=$env:PATH"
+
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -151,6 +184,10 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
+
+    $env:PATH = FindAndMergeDllPath "."
+    Write-Output "PATH=$env:PATH"
+
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -175,6 +212,10 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
+
+    $env:PATH = FindAndMergeDllPath "."
+    Write-Output "PATH=$env:PATH"
+
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -196,6 +237,10 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
+
+    $env:PATH = FindAndMergeDllPath "."
+    Write-Output "PATH=$env:PATH"
+
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -208,7 +253,7 @@ switch ($action) {
       "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
       -DWITH_OPENTRACING=OFF `
       -DVCPKG_TARGET_TRIPLET=x64-windows `      
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+    "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -218,6 +263,10 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
+
+    $env:PATH = FindAndMergeDllPath "."
+    Write-Output "PATH=$env:PATH"
+
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -240,7 +289,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    $env:PATH = "$BUILD_DIR\ext\src\dll\Debug;$env:PATH"
+    $env:PATH = FindAndMergeDllPath "$BUILD_DIR\ext\src\dll\Debug"
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -264,6 +313,10 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
+
+    $env:PATH = FindAndMergeDllPath "."
+    Write-Output "PATH=$env:PATH"
+
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -316,21 +369,22 @@ switch ($action) {
     cd "$BUILD_DIR"
 
     if (Test-Path Env:\CXX_STANDARD) {
-        $CXX_STANDARD = [int](Get-Item Env:\CXX_STANDARD).Value
-    } else {
-        $CXX_STANDARD = 17
+      $CXX_STANDARD = [int](Get-Item Env:\CXX_STANDARD).Value
+    }
+    else {
+      $CXX_STANDARD = 17
     }
     if (-not $CXX_STANDARD) {
-        $CXX_STANDARD = 17
+      $CXX_STANDARD = 17
     }
     Write-Host "Using CXX_STANDARD: $CXX_STANDARD"
       
     $CMAKE_OPTIONS = @(
-    "-DCMAKE_CXX_STANDARD=$CXX_STANDARD",
-    "-DCMAKE_CXX_STANDARD_REQUIRED=ON",
-    "-DCMAKE_CXX_EXTENSIONS=OFF",
-    "-DVCPKG_TARGET_TRIPLET=x64-windows",
-    "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      "-DCMAKE_CXX_STANDARD=$CXX_STANDARD",
+      "-DCMAKE_CXX_STANDARD_REQUIRED=ON",
+      "-DCMAKE_CXX_EXTENSIONS=OFF",
+      "-DVCPKG_TARGET_TRIPLET=x64-windows",
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     )
 
     cmake $SRC_DIR `
@@ -352,6 +406,10 @@ switch ($action) {
       exit $exit
     }
 
+    $env:PATH = FindAndMergeDllPath "."
+
+    Write-Output "PATH=$env:PATH"
+
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -364,7 +422,9 @@ switch ($action) {
       exit $exit
     }
 
-    $env:PATH = "$INSTALL_TEST_DIR\bin;$env:PATH"
+    $env:PATH = FindAndMergeDllPath "$INSTALL_TEST_DIR\bin"
+
+    Write-Output "PATH=$env:PATH"
 
     $CMAKE_OPTIONS_STRING = $CMAKE_OPTIONS -join " "
    
@@ -389,11 +449,14 @@ switch ($action) {
     mkdir "$BUILD_DIR\install_test"
     cd "$BUILD_DIR\install_test"
 
+    $env:PATH = FindAndMergeDllPath "."
+    Write-Output "PATH=$env:PATH"
+
     cmake $CMAKE_OPTIONS `
-          "-DCMAKE_PREFIX_PATH=$INSTALL_TEST_DIR" `
-          "-DINSTALL_TEST_CMAKE_OPTIONS=$CMAKE_OPTIONS_STRING" `
-          "-DINSTALL_TEST_COMPONENTS=$EXPECTED_COMPONENTS_STRING" `
-          -S "$SRC_DIR\install\test\cmake"
+      "-DCMAKE_PREFIX_PATH=$INSTALL_TEST_DIR" `
+      "-DINSTALL_TEST_CMAKE_OPTIONS=$CMAKE_OPTIONS_STRING" `
+      "-DINSTALL_TEST_COMPONENTS=$EXPECTED_COMPONENTS_STRING" `
+      -S "$SRC_DIR\install\test\cmake"
           
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -414,10 +477,10 @@ switch ($action) {
     Remove-Item -Recurse -Force "$INSTALL_TEST_DIR\*"
 
     $CMAKE_OPTIONS = @(
-    "-DCMAKE_CXX_STANDARD=17",
-    "-DVCPKG_TARGET_TRIPLET=x64-windows",
-    "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake",
-    "-DOPENTELEMETRY_BUILD_DLL=1"
+      "-DCMAKE_CXX_STANDARD=17",
+      "-DVCPKG_TARGET_TRIPLET=x64-windows",
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake",
+      "-DOPENTELEMETRY_BUILD_DLL=1"
     )
 
     cmake $SRC_DIR `
@@ -452,7 +515,12 @@ switch ($action) {
       exit $exit
     }
 
+    $env:PATH = FindAndMergeDllPath "."
+
+    Write-Output "PATH=$env:PATH"
+
     ctest -C Debug
+
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -464,9 +532,9 @@ switch ($action) {
       exit $exit
     }
 
-    $env:PATH = "$INSTALL_TEST_DIR\bin;$env:PATH"
+    $env:PATH = FindAndMergeDllPath "$INSTALL_TEST_DIR\bin"
 
-    echo "$env:PATH" 
+    Write-Output "PATH=$env:PATH"
 
     $CMAKE_OPTIONS_STRING = $CMAKE_OPTIONS -join " "
 
@@ -484,11 +552,15 @@ switch ($action) {
     mkdir "$BUILD_DIR\install_test"
     cd "$BUILD_DIR\install_test"
 
+    $env:PATH = FindAndMergeDllPath "."
+
+    Write-Output "PATH=$env:PATH"
+
     cmake $CMAKE_OPTIONS `
-          "-DCMAKE_PREFIX_PATH=$INSTALL_TEST_DIR" `
-          "-DINSTALL_TEST_CMAKE_OPTIONS=$CMAKE_OPTIONS_STRING" `
-          "-DINSTALL_TEST_COMPONENTS=$EXPECTED_COMPONENTS_STRING" `
-          -S "$SRC_DIR\install\test\cmake"
+      "-DCMAKE_PREFIX_PATH=$INSTALL_TEST_DIR" `
+      "-DINSTALL_TEST_CMAKE_OPTIONS=$CMAKE_OPTIONS_STRING" `
+      "-DINSTALL_TEST_COMPONENTS=$EXPECTED_COMPONENTS_STRING" `
+      -S "$SRC_DIR\install\test\cmake"
           
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {

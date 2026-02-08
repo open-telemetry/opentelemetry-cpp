@@ -7,6 +7,7 @@
 #include <string>
 
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
+#include "opentelemetry/sdk/configuration/distribution_configuration.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
@@ -75,6 +76,7 @@ public:
   std::unique_ptr<TracerProviderConfiguration> tracer_provider;
   std::unique_ptr<ResourceConfiguration> resource;
   // Ignored: instrumentation
+  std::unique_ptr<DistributionConfiguration> distribution;
 
 private:
   std::unique_ptr<Document> doc_;
