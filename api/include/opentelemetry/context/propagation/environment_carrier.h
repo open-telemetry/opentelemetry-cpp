@@ -6,10 +6,10 @@
 #include <algorithm>
 #include <cstdlib>
 #include <map>
+#include <memory>
 #include <string>
 
 #include "opentelemetry/context/propagation/text_map_propagator.h"
-#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
@@ -34,7 +34,7 @@ namespace propagation
  *    - Set() is a no-op (extraction doesn't modify environment)
  *    - Values are cached on first access for lifetime management
  *
- * 2. Inject (map constructor): Writes context to a provided map
+ * 2. Inject: Writes context to a provided map
  *    - Used with TextMapPropagator::Inject() to prepare context for child processes
  *    - Get() reads from process environment (not the map - Inject doesn't call Get)
  *    - Set() writes to the provided std::map that can be passed to exec/spawn functions
@@ -53,11 +53,11 @@ namespace propagation
  *
  * Example usage (Inject):
  * @code
- * std::map<std::string, std::string> child_env;
- * EnvironmentCarrier carrier(child_env);  // Map constructor
+ * auto env_map = std::make_shared<std::map<std::string, std::string>>();
+ * EnvironmentCarrier carrier(env_map);
  * auto propagator = GlobalTextMapPropagator::GetGlobalPropagator();
  * propagator->Inject(carrier, RuntimeContext::GetCurrent());
- * // child_env now contains TRACEPARENT, TRACESTATE, BAGGAGE
+ * // env_map now contains TRACEPARENT, TRACESTATE, BAGGAGE
  * // Pass to exec/spawn function
  * @endcode
  *
@@ -71,18 +71,18 @@ public:
    * Used with TextMapPropagator::Extract() to retrieve parent context.
    * Set() calls will be no-ops.
    */
-  EnvironmentCarrier() noexcept : env_map_ptr_(nullptr) {}
+  EnvironmentCarrier() noexcept = default;
 
   /**
    * Constructs an EnvironmentCarrier for Inject operations.
    * Writes environment variables to the provided map.
    * Used with TextMapPropagator::Inject() to prepare context for child processes.
    *
-   * @param env_map Reference to a map that will receive environment variables.
-   *                The map is owned by the caller and must outlive this carrier.
+   * @param env_map Shared pointer to a map that will receive environment variables.
    */
-  explicit EnvironmentCarrier(std::map<std::string, std::string> &env_map) noexcept
-      : env_map_ptr_(&env_map)
+  explicit EnvironmentCarrier(
+      std::shared_ptr<std::map<std::string, std::string>> env_map) noexcept
+      : env_map_ptr_(std::move(env_map))
   {}
 
   /**
@@ -126,45 +126,18 @@ public:
    */
   void Set(nostd::string_view key, nostd::string_view value) noexcept override
   {
-    if (env_map_ptr_ == nullptr)
+    if (!env_map_ptr_)
     {
       return;  // No-op if map not provided (Extract scenario)
     }
 
-    std::string env_name = ToEnvName(key);
-    (*env_map_ptr_)[env_name] = std::string(value);
-  }
-
-  /**
-   * Lists all keys in the carrier.
-   *
-   * Returns only known OTel environment variables (traceparent, tracestate, baggage)
-   * that exist in the environment.
-   *
-   * @param callback Function to call for each key. Return false to stop iteration.
-   * @return true if all keys were processed, false if iteration was stopped early.
-   */
-  bool Keys(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
-  {
-    // Only check for known OTel environment variables
-    // to avoid exposing all process environment variables
-    const char *known_keys[] = {"traceparent", "tracestate", "baggage"};
-    for (const char *key : known_keys)
-    {
-      if (!Get(key).empty())
-      {
-        if (!callback(key))
-        {
-          return false;
-        }
-      }
-    }
-    return true;
+    std::string env_name                = ToEnvName(key);
+    env_map_ptr_->operator[](env_name) = std::string(value);
   }
 
 private:
-  std::map<std::string, std::string> *env_map_ptr_;  // For Inject
-  mutable std::map<std::string, std::string> cache_; // For Extract
+  std::shared_ptr<std::map<std::string, std::string>> env_map_ptr_;  // For Inject
+  mutable std::map<std::string, std::string> cache_;                 // For Extract
 
   /**
    * Converts a header name to an environment variable name.
