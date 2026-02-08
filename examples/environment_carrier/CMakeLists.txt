@@ -12,8 +12,7 @@ if(NOT WIN32)
   else()
     target_link_libraries(
       example_environment_carrier
-      PRIVATE opentelemetry-cpp::trace
-              opentelemetry-cpp::ostream_span_exporter)
+      PRIVATE opentelemetry-cpp::trace opentelemetry-cpp::ostream_span_exporter)
   endif()
 
   if(BUILD_TESTING)

@@ -19,80 +19,36 @@ namespace context
 namespace propagation
 {
 
-/**
- * EnvironmentCarrier is a TextMapCarrier that reads from and writes to environment variables.
- *
- * This carrier enables context propagation across process boundaries using environment variables
- * as specified in the OpenTelemetry specification:
- * https://opentelemetry.io/docs/specs/otel/context/env-carriers/
- *
- * The carrier supports two usage scenarios:
- *
- * 1. Extract (default constructor): Reads context from environment variables
- *    - Used with TextMapPropagator::Extract() to retrieve parent context
- *    - Get() reads from TRACEPARENT, TRACESTATE, BAGGAGE environment variables
- *    - Set() is a no-op (extraction doesn't modify environment)
- *    - Values are cached on first access for lifetime management
- *
- * 2. Inject: Writes context to a provided map
- *    - Used with TextMapPropagator::Inject() to prepare context for child processes
- *    - Get() reads from process environment (not the map - Inject doesn't call Get)
- *    - Set() writes to the provided std::map that can be passed to exec/spawn functions
- *
- * Environment variable naming:
- * - Propagators use lowercase header names: traceparent, tracestate, baggage
- * - Environment variables use uppercase names: TRACEPARENT, TRACESTATE, BAGGAGE
- * - The carrier automatically converts between formats
- *
- * Example usage (Extract):
- * @code
- * auto propagator = GlobalTextMapPropagator::GetGlobalPropagator();
- * EnvironmentCarrier carrier;  // Default constructor
- * auto context = propagator->Extract(carrier, Context{});
- * @endcode
- *
- * Example usage (Inject):
- * @code
- * auto env_map = std::make_shared<std::map<std::string, std::string>>();
- * EnvironmentCarrier carrier(env_map);
- * auto propagator = GlobalTextMapPropagator::GetGlobalPropagator();
- * propagator->Inject(carrier, RuntimeContext::GetCurrent());
- * // env_map now contains TRACEPARENT, TRACESTATE, BAGGAGE
- * // Pass to exec/spawn function
- * @endcode
- *
- */
+// EnvironmentCarrier is a TextMapCarrier that reads from and writes to environment variables.
+//
+// This carrier enables context propagation across process boundaries using environment variables
+// as specified in the OpenTelemetry specification:
+// https://opentelemetry.io/docs/specs/otel/context/env-carriers/
+//
+// The carrier supports two usage scenarios:
+//
+// 1. Extract (default constructor): Reads context from environment variables.
+//    Get() reads from TRACEPARENT, TRACESTATE, BAGGAGE environment variables.
+//    Set() is a no-op. Values are cached on first access for lifetime management.
+//
+// 2. Inject (shared_ptr constructor): Writes context to a provided map.
+//    Set() writes to the provided std::map. Keys are automatically converted
+//    from lowercase header names to uppercase environment variable names.
+
 class EnvironmentCarrier : public TextMapCarrier
 {
 public:
-  /**
-   * Constructs an EnvironmentCarrier for Extract operations.
-   * Reads environment variables from the current process environment.
-   * Used with TextMapPropagator::Extract() to retrieve parent context.
-   * Set() calls will be no-ops.
-   */
+  // Constructs an EnvironmentCarrier for Extract operations.
   EnvironmentCarrier() noexcept = default;
 
-  /**
-   * Constructs an EnvironmentCarrier for Inject operations.
-   * Writes environment variables to the provided map.
-   * Used with TextMapPropagator::Inject() to prepare context for child processes.
-   *
-   * @param env_map Shared pointer to a map that will receive environment variables.
-   */
-  explicit EnvironmentCarrier(
-      std::shared_ptr<std::map<std::string, std::string>> env_map) noexcept
+  // Constructs an EnvironmentCarrier for Inject operations.
+  explicit EnvironmentCarrier(std::shared_ptr<std::map<std::string, std::string>> env_map) noexcept
       : env_map_ptr_(std::move(env_map))
   {}
 
-  /**
-   * Gets the value associated with the passed key.
-   * Always reads from process environment variables (with caching).
-   *
-   * @param key The key to look up (e.g., "traceparent").
-   *            Automatically converted to uppercase (e.g., "TRACEPARENT").
-   * @return The value associated with the key, or an empty string if not found.
-   */
+  // Returns the value associated with the passed key.
+  // Always reads from process environment variables (with caching).
+  // The key is automatically converted to uppercase.
   nostd::string_view Get(nostd::string_view key) const noexcept override
   {
     std::string env_name = ToEnvName(key);
@@ -115,37 +71,26 @@ public:
     return "";
   }
 
-  /**
-   * Stores the key-value pair.
-   * If a map was provided at construction, writes to the map.
-   * Otherwise, this operation is a no-op.
-   *
-   * @param key The key to set (e.g., "traceparent").
-   *            Automatically converted to uppercase (e.g., "TRACEPARENT").
-   * @param value The value to set.
-   */
+  // Stores the key-value pair in the map if one was provided at construction.
+  // Otherwise, this operation is a no-op.
+  // The key is automatically converted to uppercase.
   void Set(nostd::string_view key, nostd::string_view value) noexcept override
   {
     if (!env_map_ptr_)
     {
-      return;  // No-op if map not provided (Extract scenario)
+      return;
     }
 
-    std::string env_name                = ToEnvName(key);
+    std::string env_name               = ToEnvName(key);
     env_map_ptr_->operator[](env_name) = std::string(value);
   }
 
 private:
-  std::shared_ptr<std::map<std::string, std::string>> env_map_ptr_;  // For Inject
-  mutable std::map<std::string, std::string> cache_;                 // For Extract
+  std::shared_ptr<std::map<std::string, std::string>> env_map_ptr_;
+  mutable std::map<std::string, std::string> cache_;
 
-  /**
-   * Converts a header name to an environment variable name.
-   * Example: "traceparent" -> "TRACEPARENT"
-   *
-   * @param key The header name (lowercase).
-   * @return The environment variable name (uppercase).
-   */
+  // Converts a header name to an environment variable name.
+  // e.g., "traceparent" -> "TRACEPARENT"
   static std::string ToEnvName(nostd::string_view key)
   {
     std::string env_name(key);

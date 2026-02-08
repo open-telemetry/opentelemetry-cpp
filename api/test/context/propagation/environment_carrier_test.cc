@@ -3,21 +3,25 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <map>
-#include <memory>
 #include <string>
+#include <utility>
 
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/environment_carrier.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
@@ -116,8 +120,7 @@ TEST_F(EnvironmentCarrierTest, SetWritesToMap)
   context::propagation::EnvironmentCarrier carrier(env_map);
 
   carrier.Set("traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01");
-  EXPECT_EQ(env_map->at("TRACEPARENT"),
-            "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01");
+  EXPECT_EQ(env_map->at("TRACEPARENT"), "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01");
 }
 
 TEST_F(EnvironmentCarrierTest, SetUppercaseConversion)
@@ -207,8 +210,7 @@ TEST_F(EnvironmentCarrierTest, InjectTraceContext)
 
   propagator.Inject(carrier, context::RuntimeContext::GetCurrent());
 
-  EXPECT_EQ(env_map->at("TRACEPARENT"),
-            "00-0102030405060708090a0b0c0d0e0f10-0102030405060708-01");
+  EXPECT_EQ(env_map->at("TRACEPARENT"), "00-0102030405060708090a0b0c0d0e0f10-0102030405060708-01");
 }
 
 TEST_F(EnvironmentCarrierTest, RoundTrip)

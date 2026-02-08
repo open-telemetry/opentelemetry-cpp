@@ -93,7 +93,7 @@ void RunChild()
 
   // Create child span under the extracted parent context
   trace_api::StartSpanOptions opts;
-  opts.parent = parent_ctx;
+  opts.parent     = parent_ctx;
   auto child_span = tracer->StartSpan("child-operation", opts);
 
   std::cout << "[child]  trace_id: " << Hex(child_span->GetContext().trace_id()) << std::endl;
