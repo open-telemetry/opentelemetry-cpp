@@ -20,27 +20,25 @@
 // Both spans share the same trace_id, demonstrating cross-process trace continuity.
 //
 
-#if defined(__unix__) || defined(__APPLE__)
+#include <sys/wait.h>
+#include <unistd.h>
 
-#  include <sys/wait.h>
-#  include <unistd.h>
+#include <cstdlib>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <string>
 
-#  include <cstdlib>
-#  include <iostream>
-#  include <map>
-#  include <memory>
-#  include <string>
-
-#  include "opentelemetry/context/propagation/environment_carrier.h"
-#  include "opentelemetry/context/propagation/global_propagator.h"
-#  include "opentelemetry/context/runtime_context.h"
-#  include "opentelemetry/exporters/ostream/span_exporter_factory.h"
-#  include "opentelemetry/sdk/trace/simple_processor_factory.h"
-#  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#  include "opentelemetry/trace/propagation/http_trace_context.h"
-#  include "opentelemetry/trace/provider.h"
-#  include "opentelemetry/trace/scope.h"
-#  include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/context/propagation/environment_carrier.h"
+#include "opentelemetry/context/propagation/global_propagator.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/exporters/ostream/span_exporter_factory.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/propagation/http_trace_context.h"
+#include "opentelemetry/trace/provider.h"
+#include "opentelemetry/trace/scope.h"
+#include "opentelemetry/trace/tracer.h"
 
 namespace trace_api      = opentelemetry::trace;
 namespace trace_sdk      = opentelemetry::sdk::trace;
@@ -158,15 +156,3 @@ int main()
   RunParent();
   return 0;
 }
-
-#else  // !(__unix__ || __APPLE__)
-
-#  include <iostream>
-
-int main()
-{
-  std::cout << "This example requires a Unix platform with fork() support." << std::endl;
-  return 0;
-}
-
-#endif
