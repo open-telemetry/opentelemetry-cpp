@@ -55,8 +55,7 @@ public:
    * nullptr EventLoggerProvider.
    * @deprecated
    */
-  static nostd::shared_ptr<EventLoggerProvider>
-  GetEventLoggerProvider() noexcept
+  static nostd::shared_ptr<EventLoggerProvider> GetEventLoggerProvider() noexcept
   {
     std::lock_guard<common::SpinLockMutex> guard(GetLock());
     return nostd::shared_ptr<EventLoggerProvider>(GetEventProvider());
@@ -66,8 +65,7 @@ public:
    * Changes the singleton EventLoggerProvider.
    * @deprecated
    */
-  static void SetEventLoggerProvider(
-      const nostd::shared_ptr<EventLoggerProvider> &tp) noexcept
+  static void SetEventLoggerProvider(const nostd::shared_ptr<EventLoggerProvider> &tp) noexcept
   {
     std::lock_guard<common::SpinLockMutex> guard(GetLock());
     GetEventProvider() = tp;

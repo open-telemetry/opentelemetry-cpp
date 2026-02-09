@@ -29,8 +29,7 @@ public:
    * Create a EventLoggerProvider.
    */
 
-  static std::unique_ptr<opentelemetry::sdk::logs::EventLoggerProvider>
-  Create();
+  static std::unique_ptr<opentelemetry::sdk::logs::EventLoggerProvider> Create();
 };
 #endif
 
