@@ -46,7 +46,29 @@ N/A
 
 ## [opentelemetry-cpp API]
 
-N/A
+### New deprecation (EventLogger)
+
+TODO
+
+#### Announcement (EventLogger)
+
+TODO
+
+#### Motivation (EventLogger)
+
+TODO
+
+#### Scope (EventLogger)
+
+TODO
+
+#### Mitigation (EventLogger)
+
+TODO
+
+#### Planned removal (EventLogger)
+
+TODO
 
 ## [opentelemetry-cpp SDK]
 
