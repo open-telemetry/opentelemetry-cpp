@@ -25,8 +25,10 @@ namespace configuration
 // Custom ryml error callback that throws instead of calling abort().
 // This ensures the try-catch in ParseDocument works regardless of how
 // ryml was compiled (with or without RYML_DEFAULT_CALLBACK_USES_EXCEPTIONS).
-void RymlDocument::OnError(
-    const char *msg, size_t msg_len, ryml::Location location, void * /*user_data*/)
+void RymlDocument::OnError(const char *msg,
+                           size_t msg_len,
+                           ryml::Location location,
+                           void * /*user_data*/)
 {
   std::string error_msg(msg, msg_len);
   if (location.line != ryml::npos)
