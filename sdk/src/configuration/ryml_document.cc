@@ -16,34 +16,31 @@
 #include "opentelemetry/sdk/configuration/ryml_document_node.h"
 #include "opentelemetry/version.h"
 
-namespace
-{
-
-// Custom ryml error callback that throws instead of calling abort().
-[[noreturn]] void on_ryml_error(
-    const char *msg, size_t msg_len, ryml::Location location, void * /*user_data*/)
-{
-  std::string error_msg(msg, msg_len);
-  if (location.line != ryml::npos)
-  {
-    error_msg +=
-        " at line " + std::to_string(location.line + 1) + " col " + std::to_string(location.col + 1);
-  }
-  throw std::runtime_error(error_msg);
-}
-
-}  // namespace
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace configuration
 {
 
+// Custom ryml error callback that throws instead of calling abort().
+// This ensures the try-catch in ParseDocument works regardless of how
+// ryml was compiled (with or without RYML_DEFAULT_CALLBACK_USES_EXCEPTIONS).
+void RymlDocument::OnError(
+    const char *msg, size_t msg_len, ryml::Location location, void * /*user_data*/)
+{
+  std::string error_msg(msg, msg_len);
+  if (location.line != ryml::npos)
+  {
+    error_msg += " at line " + std::to_string(location.line + 1) + " col " +
+                 std::to_string(location.col + 1);
+  }
+  throw std::runtime_error(error_msg);
+}
+
 ryml::Callbacks RymlDocument::MakeCallbacks()
 {
   ryml::Callbacks cb = ryml::get_callbacks();
-  cb.m_error         = &on_ryml_error;
+  cb.m_error         = &RymlDocument::OnError;
   return cb;
 }
 
