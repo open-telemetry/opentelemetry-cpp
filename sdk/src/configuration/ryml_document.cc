@@ -7,7 +7,6 @@
 #include <ostream>
 #include <ryml.hpp>
 #include <ryml_std.hpp>
-#include <stdexcept>
 #include <string>
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
