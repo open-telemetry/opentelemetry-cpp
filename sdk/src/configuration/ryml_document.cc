@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <stddef.h>
 #include <exception>
 #include <memory>
 #include <ostream>
@@ -12,6 +13,7 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
+#include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/sdk/configuration/ryml_document.h"
 #include "opentelemetry/sdk/configuration/ryml_document_node.h"
 #include "opentelemetry/version.h"
@@ -30,13 +32,13 @@ void RymlDocument::OnError(const char *msg,
                            ryml::Location location,
                            void * /*user_data*/)
 {
-  std::string error_msg(msg, msg_len);
-  if (location.line != ryml::npos)
-  {
-    error_msg += " at line " + std::to_string(location.line + 1) + " col " +
-                 std::to_string(location.col + 1);
-  }
-  throw std::runtime_error(error_msg);
+  DocumentNodeLocation loc;
+  loc.offset   = location.offset;
+  loc.line     = location.line;
+  loc.col      = location.col;
+  loc.filename = std::string(location.name.str, location.name.len);
+
+  throw InvalidSchemaException(loc, std::string(msg, msg_len));
 }
 
 ryml::Callbacks RymlDocument::MakeCallbacks()

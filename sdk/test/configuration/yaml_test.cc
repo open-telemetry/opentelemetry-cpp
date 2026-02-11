@@ -720,6 +720,7 @@ tracer_provider:
 
 TEST(Yaml, malformed_yaml)
 {
+  // "headers" is indented under "client_certificate" instead of "otlp_http"
   std::string yaml = R"(
 file_format: "1.0"
 tracer_provider:
