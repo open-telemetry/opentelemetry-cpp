@@ -22,7 +22,7 @@ namespace logs
  * Factory class for EventLoggerProvider.
  * @deprecated
  */
-class EventLoggerProviderFactory
+class OPENTELEMETRY_DEPRECATED EventLoggerProviderFactory
 {
 public:
   /**
