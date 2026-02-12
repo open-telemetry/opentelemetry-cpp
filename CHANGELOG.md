@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Avoid break caused by max() macro on windows
+  [#3863](https://github.com/open-telemetry/opentelemetry-cpp/pull/3863)
+
 ## [1.25 2026-02-07]
 
 * [RELEASE] Bump main branch to 1.25.0-dev (#3759)
