@@ -19,6 +19,10 @@ namespace sdk
 namespace logs
 {
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
+/**
+ * Sdk implementation of EventLogger.
+ * @deprecated
+ */
 class EventLogger final : public opentelemetry::logs::EventLogger
 {
 public:
@@ -26,7 +30,6 @@ public:
    * Initialize a new Eventlogger.
    * @param delegate_logger The delegate logger instance
    * @param event_domain Event domain
-   * @deprecated
    */
   explicit EventLogger(nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
                        nostd::string_view event_domain) noexcept;

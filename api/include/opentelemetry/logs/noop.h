@@ -91,6 +91,10 @@ private:
 };
 
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
+/**
+ * No-op implementation of a EventLogger.
+ * @deprecated
+ */
 class NoopEventLogger final : public EventLogger
 {
 public:
@@ -109,6 +113,7 @@ private:
 
 /**
  * No-op implementation of a EventLoggerProvider.
+ * @deprecated
  */
 class NoopEventLoggerProvider final : public EventLoggerProvider
 {
