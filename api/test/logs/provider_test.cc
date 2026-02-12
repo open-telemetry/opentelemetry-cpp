@@ -76,8 +76,8 @@ TEST(Provider, GetLogger)
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
 
 /*
- * opentelemetry::logs::Provider::GetLoggerProvider() is deprecated.
- * opentelemetry::logs::Provider::SetLoggerProvider() is deprecated.
+ * opentelemetry::logs::Provider::GetEventLoggerProvider() is deprecated.
+ * opentelemetry::logs::Provider::SetEventLoggerProvider() is deprecated.
  * Suppress warnings in tests, to have a clean build and coverage.
  */
 
