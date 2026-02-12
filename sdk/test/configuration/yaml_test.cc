@@ -717,3 +717,26 @@ tracer_provider:
   auto config = DoParse(yaml);
   ASSERT_EQ(config, nullptr);
 }
+
+TEST(Yaml, malformed_yaml)
+{
+  // "headers" is indented under "client_certificate" instead of "otlp_http"
+  std::string yaml = R"(
+file_format: "1.0"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/traces
+            certificate: /app/cert.pem
+            client_key: /app/cert.pem
+            client_certificate: /app/cert.pem
+              headers:
+                - name: header_name
+                  value: header_value
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
