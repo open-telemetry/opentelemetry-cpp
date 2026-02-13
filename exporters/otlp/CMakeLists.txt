@@ -863,6 +863,16 @@ if(WITH_OTLP_FILE)
 endif()
 
 if(BUILD_TESTING)
+  add_executable(otlp_windows_max_macro_compile_test
+                 test/otlp_windows_max_macro_compile_test.cc)
+  target_link_libraries(
+    otlp_windows_max_macro_compile_test ${GTEST_BOTH_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable)
+  gtest_add_tests(
+    TARGET otlp_windows_max_macro_compile_test
+    TEST_PREFIX exporter.otlp.
+    TEST_LIST otlp_windows_max_macro_compile_test)
+
   add_executable(otlp_recordable_test test/otlp_recordable_test.cc)
   target_link_libraries(
     otlp_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
