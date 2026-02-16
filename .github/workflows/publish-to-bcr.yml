@@ -4,6 +4,10 @@ on:
   # Allow manual triggering for testing and recovery
   workflow_dispatch:
     inputs:
+      registry_fork:
+        default: open-telemetry/bazel-central-registry
+        description: The Bazel registry fork to push to when opening up a pull request"
+        type: string
       tag_name:
         description: 'Tag name to publish (e.g., v1.24.0)'
         required: true
@@ -16,9 +20,12 @@ jobs:
   publish:
     permissions:
       contents: write
+      id-token: write
+      attestations: write
     uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@v1.1.0
     with:
       tag_name: ${{ inputs.tag_name || github.event.release.tag_name }}
-      attest: false
+      registry_fork: ${{ inputs.registry_fork || 'open-telemetry/bazel-central-registry' }}
+      attest: true
     secrets:
       publish_token: ${{ secrets.BCR_PUBLISH_TOKEN }}
