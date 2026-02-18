@@ -26,6 +26,11 @@ public:
       : attributes_processor_(attributes_processor)
   {}
 
+  ObserverResultT(const ObserverResultT &)            = delete;
+  ObserverResultT(ObserverResultT &&)                 = delete;
+  ObserverResultT &operator=(const ObserverResultT &) = delete;
+  ObserverResultT &operator=(ObserverResultT &&)      = delete;
+
   ~ObserverResultT() override = default;
 
   void Observe(T value) noexcept override
