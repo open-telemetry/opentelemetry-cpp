@@ -18,6 +18,9 @@ Increment the:
 * [BUILD] Avoid break caused by max() macro on windows
   [#3863](https://github.com/open-telemetry/opentelemetry-cpp/pull/3863)
 
+* [CODE HEALTH] Fix clang-tidy warnings, part 2
+  [#3872](https://github.com/open-telemetry/opentelemetry-cpp/pull/3872)
+
 ## [1.25 2026-02-07]
 
 * [RELEASE] Bump main branch to 1.25.0-dev (#3759)
