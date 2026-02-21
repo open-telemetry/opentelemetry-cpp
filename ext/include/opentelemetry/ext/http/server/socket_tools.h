@@ -272,10 +272,10 @@ struct Socket
 
   Socket(int af, int type, int proto) : m_sock(::socket(af, type, proto)) {}
 
-  Socket(const Socket &)            = delete;
-  Socket(Socket &&)                 = delete;
-  Socket &operator=(const Socket &) = delete;
-  Socket &operator=(Socket &&)      = delete;
+  Socket(const Socket &)            = default;
+  Socket(Socket &&)                 = default;
+  Socket &operator=(const Socket &) = default;
+  Socket &operator=(Socket &&)      = default;
 
   ~Socket() {}
 
