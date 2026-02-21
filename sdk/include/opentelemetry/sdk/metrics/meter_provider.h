@@ -109,6 +109,8 @@ public:
 
   /**
    * Attaches a View to list of configured Views for this Meter provider.
+   * @param instrument_selector The instrument selector for this view.
+   * @param meter_selector The meter selector for this view.
    * @param view The Views for this meter provider. This
    * must not be a nullptr.
    *
