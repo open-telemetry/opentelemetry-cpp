@@ -272,6 +272,11 @@ struct Socket
 
   Socket(int af, int type, int proto) : m_sock(::socket(af, type, proto)) {}
 
+  Socket(const Socket &)            = delete;
+  Socket(Socket &&)                 = delete;
+  Socket &operator=(const Socket &) = delete;
+  Socket &operator=(Socket &&)      = delete;
+
   ~Socket() {}
 
   operator Socket::Type() const { return m_sock; }
@@ -447,7 +452,13 @@ struct Reactor : protected common::Thread
   class SocketCallback
   {
   public:
-    SocketCallback()                             = default;
+    SocketCallback() = default;
+
+    SocketCallback(const SocketCallback &)            = delete;
+    SocketCallback(SocketCallback &&)                 = delete;
+    SocketCallback &operator=(const SocketCallback &) = delete;
+    SocketCallback &operator=(SocketCallback &&)      = delete;
+
     virtual ~SocketCallback()                    = default;
     virtual void onSocketReadable(Socket sock)   = 0;
     virtual void onSocketWritable(Socket sock)   = 0;
@@ -503,6 +514,11 @@ public:
     kq = kqueue();
 #endif
   }
+
+  Reactor(const Reactor &)            = delete;
+  Reactor(Reactor &&)                 = delete;
+  Reactor &operator=(const Reactor &) = delete;
+  Reactor &operator=(Reactor &&)      = delete;
 
   ~Reactor() override
   {
