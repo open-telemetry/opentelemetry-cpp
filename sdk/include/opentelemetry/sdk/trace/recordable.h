@@ -44,6 +44,13 @@ class SpanData;
 class Recordable
 {
 public:
+  Recordable() = default;
+
+  Recordable(const Recordable &)            = delete;
+  Recordable(Recordable &&)                 = delete;
+  Recordable &operator=(const Recordable &) = delete;
+  Recordable &operator=(Recordable &&)      = delete;
+
   virtual ~Recordable() = default;
 
   /**

@@ -29,6 +29,7 @@ public:
   Base2ExponentialHistogramIndexer(Base2ExponentialHistogramIndexer &&)                 = default;
   Base2ExponentialHistogramIndexer &operator=(const Base2ExponentialHistogramIndexer &) = default;
   Base2ExponentialHistogramIndexer &operator=(Base2ExponentialHistogramIndexer &&)      = default;
+  ~Base2ExponentialHistogramIndexer()                                                   = default;
 
   /**
    * Compute the index for the given value.

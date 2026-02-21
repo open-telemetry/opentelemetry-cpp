@@ -53,6 +53,11 @@ class MockCollectorHandle : public opentelemetry::sdk::metrics::CollectorHandle
 public:
   MockCollectorHandle(opentelemetry::sdk::metrics::AggregationTemporality);
 
+  MockCollectorHandle(const MockCollectorHandle &)            = delete;
+  MockCollectorHandle(MockCollectorHandle &&)                 = delete;
+  MockCollectorHandle &operator=(const MockCollectorHandle &) = delete;
+  MockCollectorHandle &operator=(MockCollectorHandle &&)      = delete;
+
   ~MockCollectorHandle() override = default;
 
   opentelemetry::sdk::metrics::AggregationTemporality GetAggregationTemporality(
