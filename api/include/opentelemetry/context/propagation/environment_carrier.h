@@ -4,6 +4,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cctype>
 #include <cstdlib>
 #include <map>
 #include <memory>
@@ -90,12 +91,14 @@ private:
   mutable std::map<std::string, std::string> cache_;
 
   // Converts a header name to an environment variable name.
-  // e.g., "traceparent" -> "TRACEPARENT"
+  // e.g., "traceparent" -> "TRACEPARENT", "my-key" -> "MY_KEY",
+  //        "my.complex.key" -> "MY_COMPLEX_KEY"
   static std::string ToEnvName(nostd::string_view key)
   {
     std::string env_name(key);
-    std::transform(env_name.begin(), env_name.end(), env_name.begin(),
-                   [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+    std::transform(env_name.begin(), env_name.end(), env_name.begin(), [](unsigned char c) {
+      return static_cast<char>(std::isalnum(c) ? std::toupper(c) : '_');
+    });
     return env_name;
   }
 };
