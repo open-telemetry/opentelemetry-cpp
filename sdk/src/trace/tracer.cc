@@ -71,7 +71,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     auto span_context = nostd::get<opentelemetry::trace::SpanContext>(options.parent);
     if (span_context.IsValid())
     {
-      parent_context = span_context;
+      parent_context      = span_context;
       get_current_context = false;
     }
   }
@@ -82,7 +82,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     auto span_context = opentelemetry::trace::GetSpan(context)->GetContext();
     if (span_context.IsValid())
     {
-      parent_context = span_context;
+      parent_context      = span_context;
       get_current_context = false;
     }
     else
