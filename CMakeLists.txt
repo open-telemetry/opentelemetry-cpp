@@ -432,14 +432,16 @@ if(OTELCPP_MAINTAINER_MODE)
     add_compile_options(/WX)
     add_compile_options(/W4)
 
-    # Relaxed warnings
+    # Relaxed warnings (ignored)
     add_compile_options(/wd4100)
     add_compile_options(/wd4125)
     add_compile_options(/wd4566)
     add_compile_options(/wd4127)
     add_compile_options(/wd4512)
     add_compile_options(/wd4267)
-    # add_compile_options(/wd4996) # deprecation warning
+
+    # Relaxed warnings (still reported as warnings, not errors)
+    add_compile_options(/w34996) # 'xxx' was declared deprecated
 
     # Enforced warnings
     add_compile_options(/we4265) # 'class': class has virtual functions, but
