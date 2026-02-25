@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Avoid break caused by max() macro on windows
+  [#3863](https://github.com/open-telemetry/opentelemetry-cpp/pull/3863)
+
+* [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.40.0
+  [#3881](https://github.com/open-telemetry/opentelemetry-cpp/pull/3881)
+
 * [BUILD] Revisit EventLogger deprecation
   [#3855](https://github.com/open-telemetry/opentelemetry-cpp/pull/3855)
 
