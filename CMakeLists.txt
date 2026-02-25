@@ -439,7 +439,7 @@ if(OTELCPP_MAINTAINER_MODE)
     add_compile_options(/wd4127)
     add_compile_options(/wd4512)
     add_compile_options(/wd4267)
-    add_compile_options(/wd4996)
+    # add_compile_options(/wd4996) # deprecation warning
 
     # Enforced warnings
     add_compile_options(/we4265) # 'class': class has virtual functions, but
