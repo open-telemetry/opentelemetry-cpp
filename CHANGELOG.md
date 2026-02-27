@@ -18,6 +18,9 @@ Increment the:
 * [BUILD] Avoid break caused by max() macro on windows
   [#3863](https://github.com/open-telemetry/opentelemetry-cpp/pull/3863)
 
+* [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.40.0
+  [#3881](https://github.com/open-telemetry/opentelemetry-cpp/pull/3881)
+
 * [CODE HEALTH] Fix clang-tidy warnings, part 2
   [#3872](https://github.com/open-telemetry/opentelemetry-cpp/pull/3872)
 
