@@ -26,10 +26,10 @@ public:
       : attributes_processor_(attributes_processor)
   {}
 
-  ObserverResultT(const ObserverResultT &)            = delete;
-  ObserverResultT(ObserverResultT &&)                 = delete;
-  ObserverResultT &operator=(const ObserverResultT &) = delete;
-  ObserverResultT &operator=(ObserverResultT &&)      = delete;
+  ObserverResultT(const ObserverResultT &)            = default;
+  ObserverResultT(ObserverResultT &&)                 = default;
+  ObserverResultT &operator=(const ObserverResultT &) = default;
+  ObserverResultT &operator=(ObserverResultT &&)      = default;
 
   ~ObserverResultT() override = default;
 
