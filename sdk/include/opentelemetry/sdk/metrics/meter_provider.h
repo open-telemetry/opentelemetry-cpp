@@ -58,6 +58,11 @@ public:
    */
   explicit MeterProvider(std::unique_ptr<MeterContext> context) noexcept;
 
+  MeterProvider(const MeterProvider &)            = delete;
+  MeterProvider(MeterProvider &&)                 = delete;
+  MeterProvider &operator=(const MeterProvider &) = delete;
+  MeterProvider &operator=(MeterProvider &&)      = delete;
+
   /*
     Make sure GetMeter() helpers from the API are seen in overload resolution.
   */

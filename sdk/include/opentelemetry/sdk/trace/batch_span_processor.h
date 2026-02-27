@@ -56,6 +56,11 @@ public:
                      const BatchSpanProcessorOptions &options,
                      const BatchSpanProcessorRuntimeOptions &runtime_options);
 
+  BatchSpanProcessor(const BatchSpanProcessor &)            = delete;
+  BatchSpanProcessor(BatchSpanProcessor &&)                 = delete;
+  BatchSpanProcessor &operator=(const BatchSpanProcessor &) = delete;
+  BatchSpanProcessor &operator=(BatchSpanProcessor &&)      = delete;
+
   /**
    * Requests a Recordable(Span) from the configured exporter.
    *

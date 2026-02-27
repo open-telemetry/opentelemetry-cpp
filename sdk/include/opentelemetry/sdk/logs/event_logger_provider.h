@@ -29,6 +29,11 @@ class OPENTELEMETRY_EXPORT OPENTELEMETRY_DEPRECATED EventLoggerProvider final
 public:
   EventLoggerProvider() noexcept;
 
+  EventLoggerProvider(const EventLoggerProvider &)            = delete;
+  EventLoggerProvider(EventLoggerProvider &&)                 = delete;
+  EventLoggerProvider &operator=(const EventLoggerProvider &) = delete;
+  EventLoggerProvider &operator=(EventLoggerProvider &&)      = delete;
+
   ~EventLoggerProvider() override;
 
   nostd::shared_ptr<opentelemetry::logs::EventLogger> CreateEventLogger(

@@ -21,6 +21,9 @@ Increment the:
 * [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.40.0
   [#3881](https://github.com/open-telemetry/opentelemetry-cpp/pull/3881)
 
+* [CODE HEALTH] Fix clang-tidy warnings, part 2
+  [#3872](https://github.com/open-telemetry/opentelemetry-cpp/pull/3872)
+
 ## [1.25 2026-02-07]
 
 * [RELEASE] Bump main branch to 1.25.0-dev (#3759)

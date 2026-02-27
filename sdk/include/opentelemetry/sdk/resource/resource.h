@@ -26,7 +26,11 @@ public:
   Resource(const ResourceAttributes &attributes, const std::string &schema_url) noexcept;
 
   Resource(const Resource &)            = default;
+  Resource(Resource &&)                 = default;
   Resource &operator=(const Resource &) = default;
+  Resource &operator=(Resource &&)      = default;
+
+  ~Resource() = default;
 
   const ResourceAttributes &GetAttributes() const noexcept;
   const std::string &GetSchemaURL() const noexcept;

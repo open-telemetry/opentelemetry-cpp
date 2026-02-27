@@ -78,6 +78,11 @@ public:
    */
   explicit LoggerProvider(std::unique_ptr<LoggerContext> context) noexcept;
 
+  LoggerProvider(const LoggerProvider &)            = delete;
+  LoggerProvider(LoggerProvider &&)                 = delete;
+  LoggerProvider &operator=(const LoggerProvider &) = delete;
+  LoggerProvider &operator=(LoggerProvider &&)      = delete;
+
   ~LoggerProvider() override;
 
   using opentelemetry::logs::LoggerProvider::GetLogger;
