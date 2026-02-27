@@ -18,10 +18,12 @@
 #include "opentelemetry/sdk/common/circular_buffer.h"
 #include "opentelemetry/sdk/common/circular_buffer_range.h"
 #include "test/common/baseline_circular_buffer.h"
+#include "test/common/optmize_circular_buffer.h"
 
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
+using opentelemetry::sdk::common::OptimizedCircularBuffer;
 using opentelemetry::testing::BaselineCircularBuffer;
 
 const int N = 10000;
@@ -39,6 +41,20 @@ static uint64_t ConsumeBufferNumbers(BaselineCircularBuffer<uint64_t> &buffer) n
 }
 
 static uint64_t ConsumeBufferNumbers(CircularBuffer<uint64_t> &buffer) noexcept
+{
+  uint64_t result = 0;
+  buffer.Consume(buffer.size(),
+                 [&](CircularBufferRange<AtomicUniquePtr<uint64_t>> &range) noexcept {
+                   range.ForEach([&](AtomicUniquePtr<uint64_t> &ptr) noexcept {
+                     result += *ptr;
+                     ptr.Reset();
+                     return true;
+                   });
+                 });
+  return result;
+}
+
+static uint64_t ConsumeBufferNumbers(OptimizedCircularBuffer<uint64_t> &buffer) noexcept
 {
   uint64_t result = 0;
   buffer.Consume(buffer.size(),
@@ -90,7 +106,9 @@ static void ConsumeNumbers(Buffer &buffer, uint64_t &sum, std::atomic<bool> &fin
   {
     sum += ConsumeBufferNumbers(buffer);
   }
-  sum += ConsumeBufferNumbers(buffer);
+  while (buffer.size()){
+    sum += ConsumeBufferNumbers(buffer);
+  }
 }
 
 template <class Buffer>
@@ -122,7 +140,7 @@ static void BM_BaselineBuffer(benchmark::State &state)
   }
 }
 
-BENCHMARK(BM_BaselineBuffer)->Arg(1)->Arg(2)->Arg(4);
+BENCHMARK(BM_BaselineBuffer)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(16);
 
 static void BM_LockFreeBuffer(benchmark::State &state)
 {
@@ -136,6 +154,20 @@ static void BM_LockFreeBuffer(benchmark::State &state)
   }
 }
 
-BENCHMARK(BM_LockFreeBuffer)->Arg(1)->Arg(2)->Arg(4);
+BENCHMARK(BM_LockFreeBuffer)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(16);
+
+static void BM_OptimizedBuffer(benchmark::State &state)
+{
+  const size_t max_elements = 500;
+  const int num_threads     = static_cast<int>(state.range(0));
+  const int n               = static_cast<int>(N / num_threads);
+  OptimizedCircularBuffer<uint64_t> buffer{max_elements};
+  for (auto _ : state)
+  {
+    RunSimulation(buffer, num_threads, n);
+  }
+}
+
+BENCHMARK(BM_OptimizedBuffer)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(16);
 
 BENCHMARK_MAIN();
