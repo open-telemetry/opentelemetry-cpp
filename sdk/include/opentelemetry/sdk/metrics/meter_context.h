@@ -174,6 +174,11 @@ public:
    */
   bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
+  /**
+   * Check if this meter context has been shut down.
+   */
+  bool IsShutdown() const noexcept;
+
 private:
   friend class ::testing::MetricCollectorTest;
 
@@ -191,8 +196,10 @@ private:
 #if defined(__cpp_lib_atomic_value_initialization) && \
     __cpp_lib_atomic_value_initialization >= 201911L
   std::atomic_flag shutdown_latch_{};
+  std::atomic<bool> is_shutdown_{false};
 #else
   std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
+  std::atomic<bool> is_shutdown_{false};
 #endif
   opentelemetry::common::SpinLockMutex forceflush_lock_;
   opentelemetry::common::SpinLockMutex meter_lock_;
