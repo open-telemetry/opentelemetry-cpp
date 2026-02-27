@@ -842,6 +842,11 @@ jobs:
   bazel_asan:
     name: Bazel asan config
     runs-on: ubuntu-latest
+    # Temporarily disabled
+    # abseil-cpp fails to build with asan using gcc
+    # see https://github.com/abseil/abseil-cpp/issues/1634
+    # see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=71962
+    if: false
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@a90bcbc6539c36a85cdfeb73f7e2f433735f215b # v2.15.0
