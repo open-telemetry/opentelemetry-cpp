@@ -4,6 +4,7 @@
 #include <benchmark/benchmark.h>
 #include <atomic>
 #include <cstdint>
+#include <mutex>
 #include <thread>
 #include <vector>
 
@@ -27,8 +28,8 @@ constexpr int TightLoopLocks = 10000;
 //
 // lock: A lambda denoting how to lock.   Accepts a reference to `SpinLockType`.
 // unlock: A lambda denoting how to unlock.   Accepts a reference to `SpinLockType`.
-template <typename SpinLockType, typename LockF, typename UnlockF>
-inline void SpinThrash(benchmark::State &s, SpinLockType &spinlock, LockF lock, UnlockF unlock)
+template <typename LockF, typename UnlockF>
+void SpinThrash(benchmark::State &s, LockF lock, UnlockF unlock)
 {
   auto num_threads = s.range(0);
   // Value we will increment, fighting over a spinlock.
@@ -49,9 +50,9 @@ inline void SpinThrash(benchmark::State &s, SpinLockType &spinlock, LockF lock, 
         // to ensure maximum thread contention.
         for (int i = 0; i < TightLoopLocks; i++)
         {
-          lock(spinlock);
+          lock();
           value++;
-          unlock(spinlock);
+          unlock();
         }
       });
     }
@@ -63,35 +64,35 @@ inline void SpinThrash(benchmark::State &s, SpinLockType &spinlock, LockF lock, 
 }
 
 // Benchmark of full spin-lock implementation.
-static void BM_SpinLockThrashing(benchmark::State &s)
+void BM_SpinLockThrashing(benchmark::State &s)
 {
   SpinLockMutex spinlock;
-  SpinThrash(s, spinlock, [](SpinLockMutex &m) { m.lock(); }, [](SpinLockMutex &m) { m.unlock(); });
+  SpinThrash(s, [&] { spinlock.lock(); }, [&] { spinlock.unlock(); });
 }
 
 // Naive `while(try_lock()) {}` implementation of lock.
-static void BM_NaiveSpinLockThrashing(benchmark::State &s)
+void BM_NaiveSpinLockThrashing(benchmark::State &s)
 {
   SpinLockMutex spinlock;
   SpinThrash(
-      s, spinlock,
-      [](SpinLockMutex &m) {
-        while (!m.try_lock())
+      s,
+      [&] {
+        while (!spinlock.try_lock())
         {
           // Left this comment to keep the same format on old and new versions of clang-format
         }
       },
-      [](SpinLockMutex &m) { m.unlock(); });
+      [&] { spinlock.unlock(); });
 }
 
 // Simple `while(try_lock()) { yield-processor }`
-static void BM_ProcYieldSpinLockThrashing(benchmark::State &s)
+void BM_ProcYieldSpinLockThrashing(benchmark::State &s)
 {
   SpinLockMutex spinlock;
-  SpinThrash<SpinLockMutex>(
-      s, spinlock,
-      [](SpinLockMutex &m) {
-        while (!m.try_lock())
+  SpinThrash(
+      s,
+      [&] {
+        while (!spinlock.try_lock())
         {
 #if defined(_MSC_VER)
           YieldProcessor();
@@ -108,33 +109,33 @@ static void BM_ProcYieldSpinLockThrashing(benchmark::State &s)
 #endif
         }
       },
-      [](SpinLockMutex &m) { m.unlock(); });
+      [&] { spinlock.unlock(); });
 }
 
 // SpinLock thrashing with thread::yield().
-static void BM_ThreadYieldSpinLockThrashing(benchmark::State &s)
+void BM_ThreadYieldSpinLockThrashing(benchmark::State &s)
 {
 #if defined(__cpp_lib_atomic_value_initialization) && \
     __cpp_lib_atomic_value_initialization >= 201911L
   std::atomic_flag mutex{};
 #else
-  std::atomic_flag mutex = ATOMIC_FLAG_INIT;
+  alignas(8) std::atomic_flag mutex = ATOMIC_FLAG_INIT;
 #endif
-  SpinThrash<std::atomic_flag>(
-      s, mutex,
-      [](std::atomic_flag &l) {
-        uint32_t try_count = 0;
-        while (l.test_and_set(std::memory_order_acq_rel))
+  SpinThrash(
+      s,
+      [&]() {
+        while (mutex.test_and_set(std::memory_order_acq_rel))
         {
-          ++try_count;
-          if (try_count % 32)
-          {
-            std::this_thread::yield();
-          }
+          std::this_thread::yield();
         }
-        std::this_thread::yield();
       },
-      [](std::atomic_flag &l) { l.clear(std::memory_order_release); });
+      [&] { mutex.clear(std::memory_order_release); });
+}
+
+void BM_StdMutexCheck(benchmark::State &s)
+{
+  std::mutex mtx;
+  SpinThrash(s, [&] { mtx.lock(); }, [&] { mtx.unlock(); });
 }
 
 // Run the benchmarks at 2x thread/core and measure the amount of time to thrash around.
@@ -157,6 +158,12 @@ BENCHMARK(BM_NaiveSpinLockThrashing)
     ->UseRealTime()
     ->Unit(benchmark::kMillisecond);
 BENCHMARK(BM_ThreadYieldSpinLockThrashing)
+    ->RangeMultiplier(2)
+    ->Range(1, std::thread::hardware_concurrency())
+    ->MeasureProcessCPUTime()
+    ->UseRealTime()
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_StdMutexCheck)
     ->RangeMultiplier(2)
     ->Range(1, std::thread::hardware_concurrency())
     ->MeasureProcessCPUTime()
