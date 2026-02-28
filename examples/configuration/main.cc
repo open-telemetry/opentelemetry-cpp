@@ -274,7 +274,7 @@ static void usage(FILE *out)
       "\n"
       "The configuration file used will be:\n"
       "  1) the file provided in the command line\n"
-      "  2) the file provided in environment variable ${OTEL_EXPERIMENTAL_CONFIG_FILE}\n"
+      "  2) the file provided in environment variable ${OTEL_CONFIG_FILE}\n"
       "  3) file config.yaml\n"
       "\n"
       "This utility is also used for functional tests.\n"
