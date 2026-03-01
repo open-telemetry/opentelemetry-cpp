@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Remove explicit timestamps from metric points exported by Prometheus
+  [#3895](https://github.com/open-telemetry/opentelemetry-cpp/pull/3895)
+
 * [BUILD] Avoid break caused by max() macro on windows
   [#3863](https://github.com/open-telemetry/opentelemetry-cpp/pull/3863)
 
