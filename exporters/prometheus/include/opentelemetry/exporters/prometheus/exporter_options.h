@@ -38,6 +38,9 @@ struct PrometheusExporterOptions
 
   // Option to export metrics without the type suffix
   bool without_type_suffix = false;
+
+  // Option to export metrics without a timestamp
+  bool without_timestamps = false;
 };
 
 }  // namespace metrics
