@@ -30,17 +30,31 @@ namespace metrics
 
 MetricCollector::MetricCollector(opentelemetry::sdk::metrics::MeterContext *context,
                                  std::shared_ptr<MetricReader> metric_reader,
-                                 std::unique_ptr<MetricFilter> metric_filter)
+                                 std::unique_ptr<MetricFilter> metric_filter) noexcept
     : meter_context_{context},
       metric_reader_{std::move(metric_reader)},
       metric_filter_(std::move(metric_filter))
 {
-  metric_reader_->SetMetricProducer(this);
+  if (!context)
+      OTEL_INTERNAL_LOG_ERROR("[MetricCollector::MetricCollector] - Error constructing MetricCollector."
+                          << "The context is invalid");
+  if (metric_reader_)
+      metric_reader_->SetMetricProducer(this);
+  else
+      OTEL_INTERNAL_LOG_ERROR("[MetricCollector::MetricCollector] - Error constructing MetricCollector."
+                          << "The metric reader is invalid");
 }
 
 AggregationTemporality MetricCollector::GetAggregationTemporality(
     InstrumentType instrument_type) noexcept
 {
+  if (!metric_reader_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[MetricCollector::GetAggregationTemporality] - Error getting aggregation temporality."
+                            << "The metric reader is invalid");
+    return AggregationTemporality::kCumulative;
+  }
+
   auto aggregation_temporality = metric_reader_->GetAggregationTemporality(instrument_type);
   if (aggregation_temporality == AggregationTemporality::kDelta &&
       instrument_type == InstrumentType::kGauge)
@@ -64,78 +78,106 @@ MetricProducer::Result MetricCollector::Produce() noexcept
     return {{}, MetricProducer::Status::kFailure};
   }
   ResourceMetrics resource_metrics;
-  meter_context_->ForEachMeter([&](const std::shared_ptr<Meter> &meter) noexcept {
-    auto collection_ts = std::chrono::system_clock::now();
-    auto metric_data   = meter->Collect(this, collection_ts);
-    if (metric_data.empty())
+  bool success = meter_context_->ForEachMeter([&](const std::shared_ptr<Meter> &meter) noexcept {
+    try
     {
-      return true;
-    }
-    ScopeMetrics scope_metrics;
-    scope_metrics.metric_data_ = std::move(metric_data);
-    scope_metrics.scope_       = meter->GetInstrumentationScope();
-    if (!metric_filter_)
-    {
-      resource_metrics.scope_metric_data_.emplace_back(std::move(scope_metrics));
-      return true;
-    }
-
-    ScopeMetrics filtered_scope_metrics;
-    filtered_scope_metrics.scope_ = meter->GetInstrumentationScope();
-    for (MetricData &metric : scope_metrics.metric_data_)
-    {
-      const opentelemetry::sdk::instrumentationscope::InstrumentationScope &scope =
-          *scope_metrics.scope_;
-      opentelemetry::nostd::string_view name = metric.instrument_descriptor.name_;
-      const InstrumentType &type             = metric.instrument_descriptor.type_;
-      opentelemetry::nostd::string_view unit = metric.instrument_descriptor.unit_;
-
-      MetricFilter::MetricFilterResult metric_filter_result =
-          metric_filter_->TestMetric(scope, name, type, unit);
-      if (metric_filter_result == MetricFilter::MetricFilterResult::kAccept)
+      auto collection_ts = std::chrono::system_clock::now();
+      auto metric_data   = meter->Collect(this, collection_ts);
+      if (metric_data.empty())
       {
-        filtered_scope_metrics.metric_data_.emplace_back(std::move(metric));
-        continue;
+        return true;
       }
-      else if (metric_filter_result == MetricFilter::MetricFilterResult::kDrop)
+      ScopeMetrics scope_metrics;
+      scope_metrics.metric_data_ = std::move(metric_data);
+      scope_metrics.scope_       = meter->GetInstrumentationScope();
+      if (!metric_filter_)
       {
-        continue;
+        resource_metrics.scope_metric_data_.emplace_back(std::move(scope_metrics));
+        return true;
       }
 
-      std::vector<PointDataAttributes> filtered_point_data_attrs;
-      for (PointDataAttributes &point_data_attr : metric.point_data_attr_)
+      ScopeMetrics filtered_scope_metrics;
+      filtered_scope_metrics.scope_ = scope_metrics.scope_;
+      for (MetricData &metric : scope_metrics.metric_data_)
       {
-        const PointAttributes &attributes = point_data_attr.attributes;
-        MetricFilter::AttributesFilterResult attributes_filter_result =
-            metric_filter_->TestAttributes(scope, name, type, unit, attributes);
-        if (attributes_filter_result == MetricFilter::AttributesFilterResult::kAccept)
+        const opentelemetry::sdk::instrumentationscope::InstrumentationScope &scope =
+            *scope_metrics.scope_;
+        opentelemetry::nostd::string_view name = metric.instrument_descriptor.name_;
+        const InstrumentType &type             = metric.instrument_descriptor.type_;
+        opentelemetry::nostd::string_view unit = metric.instrument_descriptor.unit_;
+
+        MetricFilter::MetricFilterResult metric_filter_result =
+            metric_filter_->TestMetric(scope, name, type, unit);
+        if (metric_filter_result == MetricFilter::MetricFilterResult::kAccept)
         {
-          filtered_point_data_attrs.emplace_back(std::move(point_data_attr));
+          filtered_scope_metrics.metric_data_.emplace_back(std::move(metric));
+          continue;
+        }
+        else if (metric_filter_result == MetricFilter::MetricFilterResult::kDrop)
+        {
+          continue;
+        }
+
+        std::vector<PointDataAttributes> filtered_point_data_attrs;
+        for (PointDataAttributes &point_data_attr : metric.point_data_attr_)
+        {
+          const PointAttributes &attributes = point_data_attr.attributes;
+          MetricFilter::AttributesFilterResult attributes_filter_result =
+              metric_filter_->TestAttributes(scope, name, type, unit, attributes);
+          if (attributes_filter_result == MetricFilter::AttributesFilterResult::kAccept)
+          {
+            filtered_point_data_attrs.emplace_back(std::move(point_data_attr));
+          }
+        }
+        if (!filtered_point_data_attrs.empty())
+        {
+          metric.point_data_attr_ = std::move(filtered_point_data_attrs);
+          filtered_scope_metrics.metric_data_.emplace_back(std::move(metric));
         }
       }
-      if (!filtered_point_data_attrs.empty())
+      if (!filtered_scope_metrics.metric_data_.empty())
       {
-        metric.point_data_attr_ = std::move(filtered_point_data_attrs);
-        filtered_scope_metrics.metric_data_.emplace_back(std::move(metric));
+        resource_metrics.scope_metric_data_.emplace_back(std::move(filtered_scope_metrics));
       }
     }
-    if (!filtered_scope_metrics.metric_data_.empty())
+    catch (const std::exception &e)
     {
-      resource_metrics.scope_metric_data_.emplace_back(std::move(filtered_scope_metrics));
+      OTEL_INTERNAL_LOG_ERROR("[MetricCollector::Collect] - Error during collecting."
+                              << "Exception caught: " << e.what());
+      return false;
+    }
+    catch (...)
+    {
+      OTEL_INTERNAL_LOG_ERROR("[MetricCollector::Collect] - Error during collecting."
+                              << "Unknown exception caught.");
+      return false;
     }
     return true;
   });
   resource_metrics.resource_ = &meter_context_->GetResource();
-  return {resource_metrics, MetricProducer::Status::kSuccess};
+  return {resource_metrics,
+              success ? MetricProducer::Status::kSuccess : MetricProducer::Status::kFailure};
 }
 
 bool MetricCollector::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
+  if (!metric_reader_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[MetricCollector::ForceFlush] - Error accessing meter_reader_."
+                            << "The metric reader is invalid");
+    return false;
+  }
   return metric_reader_->ForceFlush(timeout);
 }
 
 bool MetricCollector::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  if (!metric_reader_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[MetricCollector::Shutdown] - Error accessing meter_reader_."
+                            << "The metric reader is invalid");
+    return false;
+  }
   return metric_reader_->Shutdown(timeout);
 }
 
