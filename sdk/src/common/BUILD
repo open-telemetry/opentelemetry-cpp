@@ -60,6 +60,17 @@ cc_library(
 )
 
 cc_library(
+    name = "empty_attributes",
+    srcs = [
+        "empty_attributes.cc",
+    ],
+    deps = [
+        "//api",
+        "//sdk:headers",
+    ],
+)
+
+cc_library(
     name = "global_log_handler",
     srcs = [
         "global_log_handler.cc",

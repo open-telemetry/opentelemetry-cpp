@@ -131,6 +131,7 @@ cc_test(
     deps = [
         "//api",
         "//sdk:headers",
+        "//sdk/src/common:empty_attributes",
         "@com_google_googletest//:gtest_main",
     ],
 )
