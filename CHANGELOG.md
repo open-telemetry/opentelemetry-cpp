@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Prometheus: Adding ability to disable timestamps from metric points
+  [#3894](https://github.com/open-telemetry/opentelemetry-cpp/pull/3894)
+
 * [TEST] Add multi-threaded metrics benchmarks for shared vs per-thread counter
   [#3865](https://github.com/open-telemetry/opentelemetry-cpp/pull/3865)
 

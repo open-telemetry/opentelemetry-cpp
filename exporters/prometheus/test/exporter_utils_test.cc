@@ -286,6 +286,46 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
   ASSERT_EQ(checked_label_num, 3);
 }
 
+class TimestampTest : public ::testing::Test
+{
+  opentelemetry::sdk::resource::Resource resource_ = opentelemetry::sdk::resource::Resource::Create(
+      {{"service.name", "test_service"}});
+
+  protected:
+    void CheckTimestamp(bool without_timestamps, metric_sdk::ResourceMetrics metrics_data)
+    {
+      metrics_data.resource_ = &resource_;
+      auto translated = PrometheusExporterUtils::TranslateToPrometheus(
+        metrics_data, false, false, false, false, without_timestamps);
+
+      auto metric = translated[0];
+      for (const prometheus::ClientMetric &cm : metric.metric)
+      {
+        if (without_timestamps)
+        {
+          // Prometheus metric data points should not have explicit timestamps
+          ASSERT_EQ(cm.timestamp_ms, 0);
+        } else {
+          // end_ts is set as 1766662560000
+          ASSERT_EQ(cm.timestamp_ms, 1766662560);
+        }
+      }
+    }
+};
+
+TEST_F(TimestampTest, Timestamp)
+{
+  TestDataPoints dp;
+  // Without timestamps
+  CheckTimestamp(true, dp.CreateHistogramPointData());
+  CheckTimestamp(true, dp.CreateSumPointData());
+  CheckTimestamp(true, dp.CreateLastValuePointData());
+  // With timestamps
+  CheckTimestamp(false, dp.CreateHistogramPointData());
+  CheckTimestamp(false, dp.CreateSumPointData());
+  CheckTimestamp(false, dp.CreateLastValuePointData());
+}
+
 class SanitizeTest : public ::testing::Test
 {
   Resource resource_ = Resource::Create({});
