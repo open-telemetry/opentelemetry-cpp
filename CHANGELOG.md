@@ -18,6 +18,21 @@ Increment the:
 * [BUILD] Avoid break caused by max() macro on windows
   [#3863](https://github.com/open-telemetry/opentelemetry-cpp/pull/3863)
 
+* [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.40.0
+  [#3881](https://github.com/open-telemetry/opentelemetry-cpp/pull/3881)
+
+* [BUILD] Revisit EventLogger deprecation
+  [#3855](https://github.com/open-telemetry/opentelemetry-cpp/pull/3855)
+
+Important changes:
+
+* [BUILD] Revisit EventLogger deprecation
+  [#3855](https://github.com/open-telemetry/opentelemetry-cpp/pull/3855)
+
+  * File `DEPRECATED.md` contains information about current deprecation
+    plans.
+  * Please adjust your application accordingly, to avoid disruption.
+
 ## [1.25 2026-02-07]
 
 * [RELEASE] Bump main branch to 1.25.0-dev (#3759)

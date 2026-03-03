@@ -161,6 +161,23 @@ TEST(Logger, LogMethodOverloads)
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
+
+/*
+ * opentelemetry::logs::Provider::GetLoggerProvider() is deprecated.
+ * Suppress warnings in tests, to have a clean build and coverage.
+ */
+
+#  if defined(_MSC_VER)
+#    pragma warning(push)
+#    pragma warning(disable : 4996)
+#  elif defined(__GNUC__) && !defined(__clang__) && !defined(__apple_build_version__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#  elif defined(__clang__) || defined(__apple_build_version__)
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#  endif
+
 TEST(Logger, EventLogMethodOverloads)
 {
   auto lp = Provider::GetLoggerProvider();
@@ -192,6 +209,15 @@ TEST(Logger, EventLogMethodOverloads)
   event_logger->EmitEvent("event name", Severity::kDebug,
                           opentelemetry::common::MakeAttributes(vec));
 }
+
+#  if defined(_MSC_VER)
+#    pragma warning(pop)
+#  elif defined(__GNUC__) && !defined(__clang__) && !defined(__apple_build_version__)
+#    pragma GCC diagnostic pop
+#  elif defined(__clang__) || defined(__apple_build_version__)
+#    pragma clang diagnostic pop
+#  endif
+
 #endif
 
 // Define a basic Logger class
