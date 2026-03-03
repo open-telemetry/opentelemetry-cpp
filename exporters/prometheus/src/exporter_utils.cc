@@ -119,7 +119,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
     bool populate_target_info,
     bool without_otel_scope,
     bool without_units,
-    bool without_type_suffix)
+    bool without_type_suffix,
+    bool without_timestamps)
 {
 
   // initialize output vector
@@ -140,6 +141,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
   {
     SetTarget(data,
               data.scope_metric_data_.begin()->metric_data_.begin()->end_ts.time_since_epoch(),
+              without_timestamps,
               without_otel_scope ? nullptr : (*data.scope_metric_data_.begin()).scope_, &output);
   }
 
@@ -185,8 +187,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             sum = static_cast<double>(nostd::get<int64_t>(histogram_point_data.sum_));
           }
           SetData(std::vector<double>{sum, static_cast<double>(histogram_point_data.count_)},
-                  boundaries, counts, point_data_attr.attributes, scope, time, &metric_family,
-                  data.resource_);
+                  boundaries, counts, point_data_attr.attributes, scope, time, without_timestamps,
+                  &metric_family, data.resource_);
         }
         else if (type == prometheus_client::MetricType::Gauge)
         {
@@ -196,16 +198,16 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto last_value_point_data =
                 nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
-            SetData(values, point_data_attr.attributes, scope, type, time, &metric_family,
-                    data.resource_);
+            SetData(values, point_data_attr.attributes, scope, type, time, without_timestamps,
+                    &metric_family, data.resource_);
           }
           else if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
           {
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, scope, type, time, &metric_family,
-                    data.resource_);
+            SetData(values, point_data_attr.attributes, scope, type, time, without_timestamps,
+                    &metric_family, data.resource_);
           }
           else
           {
@@ -221,8 +223,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, scope, type, time, &metric_family,
-                    data.resource_);
+            SetData(values, point_data_attr.attributes, scope, type, time, without_timestamps,
+                    &metric_family, data.resource_);
           }
           else
           {
@@ -606,6 +608,7 @@ prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
 void PrometheusExporterUtils::SetTarget(
     const sdk::metrics::ResourceMetrics &data,
     std::chrono::nanoseconds time,
+    bool without_timestamps,
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
     std::vector<::prometheus::MetricFamily> *output)
 {
@@ -624,7 +627,7 @@ void PrometheusExporterUtils::SetTarget(
   metric.info.value                       = 1.0;
 
   metric_sdk::PointAttributes empty_attributes;
-  SetMetricBasic(metric, empty_attributes, time, scope, data.resource_);
+  SetMetricBasic(metric, empty_attributes, time, without_timestamps, scope, data.resource_);
 
   for (auto &label : data.resource_->GetAttributes())
   {
@@ -646,12 +649,13 @@ void PrometheusExporterUtils::SetData(
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
     prometheus_client::MetricType type,
     std::chrono::nanoseconds time,
+    bool without_timestamps,
     prometheus_client::MetricFamily *metric_family,
     const opentelemetry::sdk::resource::Resource *resource)
 {
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
-  SetMetricBasic(metric, labels, time, scope, resource);
+  SetMetricBasic(metric, labels, time, without_timestamps, scope, resource);
   SetValue(values, type, &metric);
 }
 
@@ -667,12 +671,13 @@ void PrometheusExporterUtils::SetData(
     const metric_sdk::PointAttributes &labels,
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
     std::chrono::nanoseconds time,
+    bool without_timestamps,
     prometheus_client::MetricFamily *metric_family,
     const opentelemetry::sdk::resource::Resource *resource)
 {
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
-  SetMetricBasic(metric, labels, time, scope, resource);
+  SetMetricBasic(metric, labels, time, without_timestamps, scope, resource);
   SetValue(values, boundaries, counts, &metric);
 }
 
@@ -683,10 +688,15 @@ void PrometheusExporterUtils::SetMetricBasic(
     prometheus_client::ClientMetric &metric,
     const metric_sdk::PointAttributes &labels,
     std::chrono::nanoseconds time,
+    bool without_timestamps,
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
     const opentelemetry::sdk::resource::Resource *resource)
 {
-  metric.timestamp_ms = time.count() / 1000000;
+  if (!without_timestamps)
+  {  
+    metric.timestamp_ms = time.count() / 1000000;
+  }
+
   if (labels.empty() && nullptr == resource)
   {
     return;

@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Prometheus: Adding ability to disable timestamps from metric points
+  [#?](https://github.com/open-telemetry/opentelemetry-cpp/pull/?)
+
 * [BUILD] Avoid break caused by max() macro on windows
   [#3863](https://github.com/open-telemetry/opentelemetry-cpp/pull/3863)
 

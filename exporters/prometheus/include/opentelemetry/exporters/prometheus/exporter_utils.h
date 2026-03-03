@@ -41,7 +41,8 @@ public:
       bool populate_target_info = true,
       bool without_otel_scope   = false,
       bool without_units        = false,
-      bool without_type_suffix  = false);
+      bool without_type_suffix  = false,
+      bool without_timestamps   = false);
 
 private:
   /**
@@ -154,6 +155,7 @@ private:
    */
   static void SetTarget(const sdk::metrics::ResourceMetrics &data,
                         std::chrono::nanoseconds time,
+                        bool without_timestamps,
                         const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
                         std::vector<::prometheus::MetricFamily> *output);
 
@@ -167,6 +169,7 @@ private:
                       const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
                       ::prometheus::MetricType type,
                       std::chrono::nanoseconds time,
+                      bool without_timestamps,
                       ::prometheus::MetricFamily *metric_family,
                       const opentelemetry::sdk::resource::Resource *resource);
 
@@ -181,6 +184,7 @@ private:
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
                       const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
                       std::chrono::nanoseconds time,
+                      bool without_timestamps,
                       ::prometheus::MetricFamily *metric_family,
                       const opentelemetry::sdk::resource::Resource *resource);
 
@@ -191,6 +195,7 @@ private:
       ::prometheus::ClientMetric &metric,
       const opentelemetry::sdk::metrics::PointAttributes &labels,
       std::chrono::nanoseconds time,
+      bool without_timestamps,
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
       const opentelemetry::sdk::resource::Resource *resource);
 
