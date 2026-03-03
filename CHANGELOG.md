@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [TEST] Add multi-threaded metrics benchmarks for shared vs per-thread counter
+  [#3865](https://github.com/open-telemetry/opentelemetry-cpp/pull/3865)
+
 * [BUILD] Avoid break caused by max() macro on windows
   [#3863](https://github.com/open-telemetry/opentelemetry-cpp/pull/3863)
 
