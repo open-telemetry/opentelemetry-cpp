@@ -52,6 +52,21 @@ private:
 
 namespace
 {
+
+size_t GetBenchmarkThreads()
+{
+  const char *env = std::getenv("BENCHMARK_THREADS");
+  if (env != nullptr && env[0] != '\0')
+  {
+    int val = std::atoi(env);
+    if (val > 0)
+    {
+      return static_cast<size_t>(val);
+    }
+  }
+  return 4;  // default
+}
+
 void BM_MeasurementsTest(benchmark::State &state)
 {
   MeterProvider mp;
@@ -106,7 +121,7 @@ void BM_MeasurementsThreadsShareCounterTest(benchmark::State &state)
   mp.AddMetricReader(exporter);
   auto h = m->CreateDoubleCounter("counter1", "counter1_description", "counter1_unit");
   size_t MAX_MEASUREMENTS = 10000;  // keep low to prevent CI failure due to timeout
-  size_t NUM_CORES        = 4;
+  size_t NUM_CORES        = GetBenchmarkThreads();
   std::vector<std::thread> threads;
   std::map<std::string, uint32_t> attributes[1000];
   size_t total_index = 0;
@@ -152,7 +167,7 @@ void BM_MeasurementsPerThreadCounterTest(benchmark::State &state)
   std::shared_ptr<MetricReader> exporter(new MockMetricExporter());
   mp.AddMetricReader(exporter);
   size_t MAX_MEASUREMENTS = 10000;  // keep low to prevent CI failure due to timeout
-  size_t NUM_CORES        = 4;
+  size_t NUM_CORES        = GetBenchmarkThreads();
   std::vector<std::thread> threads;
   std::map<std::string, uint32_t> attributes[1000];
   size_t total_index = 0;
