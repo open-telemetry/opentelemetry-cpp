@@ -137,8 +137,8 @@ void BM_MeasurementsThreadsShareCounterTest(benchmark::State &state)
     std::atomic<size_t> cur_processed{0};
     for (size_t i = 0; i < NUM_CORES; i++)
     {
-      threads.push_back(
-          std::thread([&h, &cur_processed, &MAX_MEASUREMENTS, &attributes](size_t /*thread_id*/) {
+      threads.push_back(std::thread(
+          [&h, &cur_processed, &MAX_MEASUREMENTS, &attributes](size_t /*thread_id*/) {
             while (cur_processed++ <= MAX_MEASUREMENTS)
             {
               size_t index = rand() % 1000;
@@ -183,8 +183,8 @@ void BM_MeasurementsPerThreadCounterTest(benchmark::State &state)
     std::atomic<size_t> cur_processed{0};
     for (size_t i = 0; i < NUM_CORES; i++)
     {
-      threads.push_back(
-          std::thread([&m, &cur_processed, &MAX_MEASUREMENTS, &attributes](size_t thread_id) {
+      threads.push_back(std::thread(
+          [&m, &cur_processed, &MAX_MEASUREMENTS, &attributes](size_t thread_id) {
             // Each thread creates its own counter with the same name but a unique description
             // encoding the thread id, ensuring no shared underlying storage.
             std::string description = "counter1_description_thread_" + std::to_string(thread_id);
