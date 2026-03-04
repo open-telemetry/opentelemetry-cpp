@@ -62,12 +62,6 @@ public:
 
   virtual ~HttpRequestCallback() = default;
 
-  HttpRequestCallback &operator=(HttpRequestCallback other)
-  {
-    callback = other.callback;
-    return *this;
-  }
-
   HttpRequestCallback(CallbackFunction func) : callback(func) {}
 
   HttpRequestCallback &operator=(CallbackFunction func)
