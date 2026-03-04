@@ -1,5 +1,15 @@
 version: 2
 updates:
+  - package-ecosystem: "bazel"
+    directory: "/"
+    schedule:
+     interval: daily
+
+  - package-ecosystem: "devcontainers"
+    directory: "/"
+    schedule:
+     interval: daily
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -7,7 +17,3 @@ updates:
     labels:
       - "GHA"
 
-  - package-ecosystem: "devcontainers"
-    directory: "/"
-    schedule:
-     interval: daily

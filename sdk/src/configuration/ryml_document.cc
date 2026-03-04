@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <stddef.h>
 #include <exception>
 #include <memory>
 #include <ostream>
@@ -11,6 +12,7 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
+#include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/sdk/configuration/ryml_document.h"
 #include "opentelemetry/sdk/configuration/ryml_document_node.h"
 #include "opentelemetry/version.h"
@@ -20,6 +22,30 @@ namespace sdk
 {
 namespace configuration
 {
+
+// Custom ryml error callback that throws instead of calling abort().
+// This ensures the try-catch in ParseDocument works regardless of how
+// ryml was compiled (with or without RYML_DEFAULT_CALLBACK_USES_EXCEPTIONS).
+void RymlDocument::OnError(const char *msg,
+                           size_t msg_len,
+                           ryml::Location location,
+                           void * /*user_data*/)
+{
+  DocumentNodeLocation loc;
+  loc.offset   = location.offset;
+  loc.line     = location.line;
+  loc.col      = location.col;
+  loc.filename = std::string(location.name.str, location.name.len);
+
+  throw InvalidSchemaException(loc, std::string(msg, msg_len));
+}
+
+ryml::Callbacks RymlDocument::MakeCallbacks()
+{
+  ryml::Callbacks cb = ryml::get_callbacks();
+  cb.m_error         = &RymlDocument::OnError;
+  return cb;
+}
 
 std::unique_ptr<Document> RymlDocument::Parse(const std::string &source, const std::string &content)
 {

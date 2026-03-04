@@ -23,7 +23,11 @@ namespace sdk
 namespace logs
 {
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
-class OPENTELEMETRY_EXPORT OPENTELEMETRY_DEPRECATED EventLoggerProvider final
+/**
+ * Sdk implementation of EventLoggerProvider.
+ * @deprecated
+ */
+class OPENTELEMETRY_EXPORT EventLoggerProvider final
     : public opentelemetry::logs::EventLoggerProvider
 {
 public:
