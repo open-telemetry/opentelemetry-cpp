@@ -38,6 +38,11 @@ public:
         attributes_processor_{std::move(attributes_processor)}
   {}
 
+  View(const View &)            = delete;
+  View(View &&)                 = delete;
+  View &operator=(const View &) = delete;
+  View &operator=(View &&)      = delete;
+
   virtual ~View() = default;
 
   virtual std::string GetName() const noexcept { return name_; }
