@@ -105,10 +105,10 @@ DocumentNodeLocation RymlDocument::Location(ryml::ConstNodeRef node) const
   // Up to rapidyaml 0.9.0
   auto ryml_loc = parser_->location(node);
 #endif
-  loc.offset    = ryml_loc.offset;
-  loc.line      = ryml_loc.line;
-  loc.col       = ryml_loc.col;
-  loc.filename  = std::string(ryml_loc.name.str, ryml_loc.name.len);
+  loc.offset   = ryml_loc.offset;
+  loc.line     = ryml_loc.line;
+  loc.col      = ryml_loc.col;
+  loc.filename = std::string(ryml_loc.name.str, ryml_loc.name.len);
 
   return loc;
 }
