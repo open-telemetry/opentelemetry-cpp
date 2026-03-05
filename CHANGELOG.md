@@ -33,6 +33,9 @@ Increment the:
 * [CONFIGURATION] File configuration - spec stability
   [#3862](https://github.com/open-telemetry/opentelemetry-cpp/pull/3862)
 
+* [EXAMPLES] Deprecated semantic conventions used
+  [#3905](https://github.com/open-telemetry/opentelemetry-cpp/pull/3905)
+
 Important changes:
 
 * [BUILD] Revisit EventLogger deprecation
