@@ -108,10 +108,7 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
-      env:
-        CFSSL_VERSION: 1.6.3
       run: |
-        sudo -E ./tools/setup-cfssl.sh
         (cd ./functional/cert; ./generate_cert.sh)
     - name: run func test
       run: |
@@ -142,10 +139,7 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
-      env:
-        CFSSL_VERSION: 1.6.3
       run: |
-        sudo -E ./tools/setup-cfssl.sh
         (cd ./functional/cert; ./generate_cert.sh)
     - name: run func test
       run: |
@@ -176,10 +170,7 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
-      env:
-        CFSSL_VERSION: 1.6.3
       run: |
-        sudo -E ./tools/setup-cfssl.sh
         (cd ./functional/cert; ./generate_cert.sh)
     - name: run func test
       run: |
@@ -210,10 +201,7 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
-      env:
-        CFSSL_VERSION: 1.6.3
       run: |
-        sudo -E ./tools/setup-cfssl.sh
         (cd ./functional/cert; ./generate_cert.sh)
     - name: run func test
       run: |
@@ -246,10 +234,7 @@ jobs:
     - name: install shelltest
       run: sudo apt update && sudo apt-get install -y shelltestrunner
     - name: generate test cert
-      env:
-        CFSSL_VERSION: 1.6.3
       run: |
-        sudo -E ./tools/setup-cfssl.sh
         (cd ./functional/cert; ./generate_cert.sh)
     - name: run otlp func test
       run: |
@@ -283,10 +268,7 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
-      env:
-        CFSSL_VERSION: 1.6.3
       run: |
-        sudo -E ./tools/setup-cfssl.sh
         (cd ./functional/cert; ./generate_cert.sh)
     - name: run func test
       run: |
@@ -317,10 +299,7 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.maintainer.abiv2.test
     - name: generate test cert
-      env:
-        CFSSL_VERSION: 1.6.3
       run: |
-        sudo -E ./tools/setup-cfssl.sh
         (cd ./functional/cert; ./generate_cert.sh)
     - name: run func test
       run: |
@@ -609,10 +588,7 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
     - name: generate test cert
-      env:
-        CFSSL_VERSION: 1.6.3
       run: |
-        sudo -E ./tools/setup-cfssl.sh
         (cd ./functional/cert; ./generate_cert.sh)
     - name: run func test
       run: |
