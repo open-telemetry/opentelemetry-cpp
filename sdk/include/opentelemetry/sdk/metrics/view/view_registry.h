@@ -139,7 +139,13 @@ public:
     return true;
   }
 
-  ViewRegistry()  = default;
+  ViewRegistry() = default;
+
+  ViewRegistry(const ViewRegistry &)            = delete;
+  ViewRegistry(ViewRegistry &&)                 = delete;
+  ViewRegistry &operator=(const ViewRegistry &) = delete;
+  ViewRegistry &operator=(ViewRegistry &&)      = delete;
+
   ~ViewRegistry() = default;
 
 private:

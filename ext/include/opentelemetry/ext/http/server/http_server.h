@@ -54,13 +54,13 @@ protected:
 
 public:
   HttpRequestCallback() {}
-  virtual ~HttpRequestCallback() = default;
 
-  HttpRequestCallback &operator=(HttpRequestCallback other)
-  {
-    callback = other.callback;
-    return *this;
-  }
+  HttpRequestCallback(const HttpRequestCallback &)            = delete;
+  HttpRequestCallback(HttpRequestCallback &&)                 = delete;
+  HttpRequestCallback &operator=(const HttpRequestCallback &) = delete;
+  HttpRequestCallback &operator=(HttpRequestCallback &&)      = delete;
+
+  virtual ~HttpRequestCallback() = default;
 
   HttpRequestCallback(CallbackFunction func) : callback(func) {}
 
@@ -175,6 +175,11 @@ public:
     setServerName(os.str());
     addListeningPort(port);
   }
+
+  HttpServer(const HttpServer &)            = delete;
+  HttpServer(HttpServer &&)                 = delete;
+  HttpServer &operator=(const HttpServer &) = delete;
+  HttpServer &operator=(HttpServer &&)      = delete;
 
   ~HttpServer() override
   {
