@@ -98,7 +98,7 @@ std::unique_ptr<DocumentNode> RymlDocument::GetRootNode()
 DocumentNodeLocation RymlDocument::Location(ryml::ConstNodeRef node) const
 {
   DocumentNodeLocation loc;
-  auto ryml_loc = parser_->location(node);
+  auto ryml_loc = node.location(*parser_);
   loc.offset    = ryml_loc.offset;
   loc.line      = ryml_loc.line;
   loc.col       = ryml_loc.col;
