@@ -71,8 +71,7 @@ inline bool GetPrometheusWithoutTypeSuffix()
 
 inline bool GetPrometheusWithoutTimestamps()
 {
-  constexpr char kPrometheusWithoutTypeSuffix[] =
-      "OTEL_CPP_PROMETHEUS_EXPORTER_WITHOUT_TIMESTAMPS";
+  constexpr char kPrometheusWithoutTypeSuffix[] = "OTEL_CPP_PROMETHEUS_EXPORTER_WITHOUT_TIMESTAMPS";
   bool setting{};
   const auto exists =
       opentelemetry::sdk::common::GetBoolEnvironmentVariable(kPrometheusWithoutTypeSuffix, setting);
