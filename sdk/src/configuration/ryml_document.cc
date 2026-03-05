@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stddef.h>
+#include <c4/yml/version.hpp>
 #include <exception>
 #include <memory>
 #include <ostream>
