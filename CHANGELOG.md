@@ -30,6 +30,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy warnings, part 2
   [#3872](https://github.com/open-telemetry/opentelemetry-cpp/pull/3872)
 
+* [CONFIGURATION] File configuration - spec stability
+  [#3862](https://github.com/open-telemetry/opentelemetry-cpp/pull/3862)
+
 Important changes:
 
 * [BUILD] Revisit EventLogger deprecation
@@ -38,6 +41,13 @@ Important changes:
   * File `DEPRECATED.md` contains information about current deprecation
     plans.
   * Please adjust your application accordingly, to avoid disruption.
+
+* [CONFIGURATION] File configuration - spec stability
+  [#3862](https://github.com/open-telemetry/opentelemetry-cpp/pull/3862)
+
+  * The specification for declarative configuration is now stable.
+  * As a result, environment variable `OTEL_EXPERIMENTAL_CONFIG_FILE`
+    is now renamed to `OTEL_CONFIG_FILE`.
 
 ## [1.25 2026-02-07]
 
