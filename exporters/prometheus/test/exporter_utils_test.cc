@@ -288,29 +288,31 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
 
 class TimestampTest : public ::testing::Test
 {
-  opentelemetry::sdk::resource::Resource resource_ = opentelemetry::sdk::resource::Resource::Create(
-      {{"service.name", "test_service"}});
+  opentelemetry::sdk::resource::Resource resource_ =
+      opentelemetry::sdk::resource::Resource::Create({{"service.name", "test_service"}});
 
-  protected:
-    void CheckTimestamp(bool without_timestamps, metric_sdk::ResourceMetrics metrics_data)
-    {
-      metrics_data.resource_ = &resource_;
-      auto translated = PrometheusExporterUtils::TranslateToPrometheus(
+protected:
+  void CheckTimestamp(bool without_timestamps, metric_sdk::ResourceMetrics metrics_data)
+  {
+    metrics_data.resource_ = &resource_;
+    auto translated        = PrometheusExporterUtils::TranslateToPrometheus(
         metrics_data, false, false, false, false, without_timestamps);
 
-      auto metric = translated[0];
-      for (const prometheus::ClientMetric &cm : metric.metric)
+    auto metric = translated[0];
+    for (const prometheus::ClientMetric &cm : metric.metric)
+    {
+      if (without_timestamps)
       {
-        if (without_timestamps)
-        {
-          // Prometheus metric data points should not have explicit timestamps
-          ASSERT_EQ(cm.timestamp_ms, 0);
-        } else {
-          // end_ts is set as 1766662560000
-          ASSERT_EQ(cm.timestamp_ms, 1766662560);
-        }
+        // Prometheus metric data points should not have explicit timestamps
+        ASSERT_EQ(cm.timestamp_ms, 0);
+      }
+      else
+      {
+        // end_ts is set as 1766662560000
+        ASSERT_EQ(cm.timestamp_ms, 1766662560);
       }
     }
+  }
 };
 
 TEST_F(TimestampTest, Timestamp)

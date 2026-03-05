@@ -693,7 +693,7 @@ void PrometheusExporterUtils::SetMetricBasic(
     const opentelemetry::sdk::resource::Resource *resource)
 {
   if (!without_timestamps)
-  {  
+  {
     metric.timestamp_ms = time.count() / 1000000;
   }
 
