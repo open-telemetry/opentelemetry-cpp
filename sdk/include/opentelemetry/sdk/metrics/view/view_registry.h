@@ -68,7 +68,7 @@ public:
 
       if (aggregation_type == AggregationType::kDefault)
       {
-        bool is_monotonic;
+        bool is_monotonic{false};
         aggregation_type = DefaultAggregation::GetDefaultAggregationType(
             instrument_selector->GetInstrumentType(), is_monotonic);
       }

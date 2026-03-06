@@ -67,7 +67,7 @@ distribution:
   auto *distribution = config->distribution.get();
   ASSERT_NE(distribution, nullptr);
   ASSERT_EQ(distribution->entries.size(), 2);
-  opentelemetry::sdk::configuration::DocumentNode *node;
+  opentelemetry::sdk::configuration::DocumentNode *node{nullptr};
   std::unique_ptr<opentelemetry::sdk::configuration::DocumentNode> property;
   std::string name;
 
