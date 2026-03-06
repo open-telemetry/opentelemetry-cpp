@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stddef.h>
+#include <c4/yml/version.hpp>
 #include <exception>
 #include <memory>
 #include <ostream>
@@ -98,11 +99,17 @@ std::unique_ptr<DocumentNode> RymlDocument::GetRootNode()
 DocumentNodeLocation RymlDocument::Location(ryml::ConstNodeRef node) const
 {
   DocumentNodeLocation loc;
+#if RYML_VERSION_MINOR >= 10
+  // Starting with rapidyaml 0.10.0
+  auto ryml_loc = node.location(*parser_);
+#else
+  // Up to rapidyaml 0.9.0
   auto ryml_loc = parser_->location(node);
-  loc.offset    = ryml_loc.offset;
-  loc.line      = ryml_loc.line;
-  loc.col       = ryml_loc.col;
-  loc.filename  = std::string(ryml_loc.name.str, ryml_loc.name.len);
+#endif
+  loc.offset   = ryml_loc.offset;
+  loc.line     = ryml_loc.line;
+  loc.col      = ryml_loc.col;
+  loc.filename = std::string(ryml_loc.name.str, ryml_loc.name.len);
 
   return loc;
 }
