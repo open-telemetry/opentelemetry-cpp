@@ -36,6 +36,9 @@ Increment the:
 * [BUILD] Upgrade to rapidyaml 0.10.0
   [#3906](https://github.com/open-telemetry/opentelemetry-cpp/pull/3906)
 
+* [EXAMPLES] Deprecated semantic conventions used
+  [#3905](https://github.com/open-telemetry/opentelemetry-cpp/pull/3905)
+
 Important changes:
 
 * [BUILD] Revisit EventLogger deprecation
