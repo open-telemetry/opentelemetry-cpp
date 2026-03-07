@@ -49,7 +49,7 @@ class MetricCollector : public MetricProducer, public CollectorHandle
 public:
   MetricCollector(MeterContext *context,
                   std::shared_ptr<MetricReader> metric_reader,
-                  std::unique_ptr<MetricFilter> metric_filter = nullptr);
+                  std::unique_ptr<MetricFilter> metric_filter = nullptr) noexcept;
 
   MetricCollector(const MetricCollector &)            = delete;
   MetricCollector(MetricCollector &&)                 = delete;
