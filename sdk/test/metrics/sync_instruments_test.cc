@@ -21,7 +21,7 @@ using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
 
-auto instrumentation_scope = InstrumentationScope::Create("opentelemetry-cpp", "0.1.0");
+static auto instrumentation_scope = InstrumentationScope::Create("opentelemetry-cpp", "0.1.0");
 
 using M = std::map<std::string, std::string>;
 
