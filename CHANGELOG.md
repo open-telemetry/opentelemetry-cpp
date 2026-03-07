@@ -36,6 +36,9 @@ Increment the:
 * [BUILD] Upgrade to rapidyaml 0.10.0
   [#3906](https://github.com/open-telemetry/opentelemetry-cpp/pull/3906)
 
+* [CODE HEALTH] Fix clang-tidy misc-use-internal-linkage warnings
+  [#3600](https://github.com/open-telemetry/opentelemetry-cpp/pull/3600)
+
 Important changes:
 
 * [BUILD] Revisit EventLogger deprecation
