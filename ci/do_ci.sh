@@ -335,6 +335,22 @@ elif [[ "$1" == "cmake.c++23.stl.test" ]]; then
   eval "$MAKE_COMMAND"
   make test
   exit 0
+elif [[ "$1" == "cmake.different_std.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DBUILD_SHARED_LIBS=ON \
+        -DWITH_STL=CXX23 \
+        -DWITH_OTLP_GRPC=ON \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
+        "${SRC_DIR}"
+  eval "$MAKE_COMMAND"
+  make test
+  exit 0
 elif [[ "$1" == "cmake.legacy.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
