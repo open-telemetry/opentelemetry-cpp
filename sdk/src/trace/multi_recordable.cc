@@ -80,10 +80,9 @@ void MultiRecordable::SetAttribute(nostd::string_view key,
   }
 }
 
-void MultiRecordable::AddEvent(
-    nostd::string_view name,
-    opentelemetry::common::SystemTimestamp timestamp,
-    const opentelemetry::common::KeyValueIterable &attributes) noexcept
+void MultiRecordable::AddEvent(nostd::string_view name,
+                               opentelemetry::common::SystemTimestamp timestamp,
+                               const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   for (auto &recordable : recordables_)
   {
@@ -92,7 +91,7 @@ void MultiRecordable::AddEvent(
 }
 
 void MultiRecordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
-                               const opentelemetry::common::KeyValueIterable &attributes) noexcept
+                              const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   for (auto &recordable : recordables_)
   {
@@ -133,8 +132,7 @@ void MultiRecordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noex
   }
 }
 
-void MultiRecordable::SetResource(
-    const opentelemetry::sdk::resource::Resource &resource) noexcept
+void MultiRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
   for (auto &recordable : recordables_)
   {

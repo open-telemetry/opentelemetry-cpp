@@ -241,8 +241,7 @@ public:
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override;
 
-  void SetInstrumentationScope(
-      const InstrumentationScope &instrumentation_scope) noexcept override;
+  void SetInstrumentationScope(const InstrumentationScope &instrumentation_scope) noexcept override;
 
 private:
   opentelemetry::trace::SpanContext span_context_{false, false};

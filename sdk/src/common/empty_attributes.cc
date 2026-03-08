@@ -13,8 +13,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 
-const opentelemetry::common::KeyValueIterableView<
-    std::array<std::pair<std::string, int32_t>, 0>> &
+const opentelemetry::common::KeyValueIterableView<std::array<std::pair<std::string, int32_t>, 0>> &
 GetEmptyAttributes() noexcept
 {
   static const std::array<std::pair<std::string, int32_t>, 0> array{};

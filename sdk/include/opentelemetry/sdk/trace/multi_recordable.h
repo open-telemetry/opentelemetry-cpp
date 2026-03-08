@@ -56,8 +56,7 @@ public:
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override;
 
-  void SetInstrumentationScope(
-      const InstrumentationScope &instrumentation_scope) noexcept override;
+  void SetInstrumentationScope(const InstrumentationScope &instrumentation_scope) noexcept override;
 
 private:
   std::map<std::size_t, std::unique_ptr<Recordable>> recordables_;

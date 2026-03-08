@@ -141,8 +141,7 @@ void SpanData::SetDuration(std::chrono::nanoseconds duration) noexcept
   duration_ = duration;
 }
 
-void SpanData::SetInstrumentationScope(
-    const InstrumentationScope &instrumentation_scope) noexcept
+void SpanData::SetInstrumentationScope(const InstrumentationScope &instrumentation_scope) noexcept
 {
   instrumentation_scope_ = &instrumentation_scope;
 }
