@@ -39,6 +39,9 @@ Increment the:
 * [EXAMPLES] Deprecated semantic conventions used
   [#3905](https://github.com/open-telemetry/opentelemetry-cpp/pull/3905)
 
+* [CODE HEALTH] Fix clang-tidy misc-use-internal-linkage warnings
+  [#3600](https://github.com/open-telemetry/opentelemetry-cpp/pull/3600)
+
 Important changes:
 
 * [BUILD] Revisit EventLogger deprecation

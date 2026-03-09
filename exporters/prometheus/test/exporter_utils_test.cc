@@ -79,12 +79,12 @@ public:
 }  // namespace exporter
 
 template <typename T>
-void assert_basic(prometheus_client::MetricFamily &metric,
-                  const std::string &expected_name,
-                  const std::string &description,
-                  prometheus_client::MetricType type,
-                  size_t label_num,
-                  std::vector<T> vals)
+static void assert_basic(prometheus_client::MetricFamily &metric,
+                         const std::string &expected_name,
+                         const std::string &description,
+                         prometheus_client::MetricType type,
+                         size_t label_num,
+                         std::vector<T> vals)
 {
   ASSERT_EQ(metric.name, expected_name);  // name sanitized
   ASSERT_EQ(metric.help, description);    // description not changed
@@ -130,9 +130,9 @@ void assert_basic(prometheus_client::MetricFamily &metric,
   }
 }
 
-void assert_histogram(prometheus_client::MetricFamily &metric,
-                      const std::list<double> &boundaries,
-                      std::vector<int> correct)
+static void assert_histogram(prometheus_client::MetricFamily &metric,
+                             const std::list<double> &boundaries,
+                             std::vector<int> correct)
 {
   int cumulative_count = 0;
   auto buckets         = metric.metric[0].histogram.bucket;

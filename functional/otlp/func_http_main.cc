@@ -46,15 +46,15 @@ enum test_mode : std::uint8_t
   MODE_HTTPS
 };
 
-bool opt_help   = false;
-bool opt_list   = false;
-bool opt_debug  = false;
-bool opt_secure = false;
+static bool opt_help   = false;
+static bool opt_list   = false;
+static bool opt_debug  = false;
+static bool opt_secure = false;
 // HTTPS by default
-std::string opt_endpoint = "https://localhost:4318/v1/traces";
-std::string opt_cert_dir;
-std::string opt_test_name;
-test_mode opt_mode = MODE_NONE;
+static std::string opt_endpoint = "https://localhost:4318/v1/traces";
+static std::string opt_cert_dir;
+static std::string opt_test_name;
+static test_mode opt_mode = MODE_NONE;
 
 /*
   Log parsing
@@ -82,9 +82,9 @@ struct TestResult
   }
 };
 
-struct TestResult g_test_result;
+static struct TestResult g_test_result;
 
-void parse_error_msg(TestResult *result, const std::string &msg)
+static void parse_error_msg(TestResult *result, const std::string &msg)
 {
   static std::string connection_failed("Session state: connection failed.");
 
@@ -129,11 +129,11 @@ void parse_error_msg(TestResult *result, const std::string &msg)
   }
 }
 
-void parse_warning_msg(TestResult * /* result */, const std::string & /* msg */) {}
+static void parse_warning_msg(TestResult * /* result */, const std::string & /* msg */) {}
 
-void parse_info_msg(TestResult * /* result */, const std::string & /* msg */) {}
+static void parse_info_msg(TestResult * /* result */, const std::string & /* msg */) {}
 
-void parse_debug_msg(TestResult *result, const std::string &msg)
+static void parse_debug_msg(TestResult *result, const std::string &msg)
 {
   static std::string export_success("Export 1 trace span(s) success");
 
@@ -181,7 +181,7 @@ public:
   }
 };
 
-void init(const otlp::OtlpHttpExporterOptions &opts)
+static void init(const otlp::OtlpHttpExporterOptions &opts)
 {
   // Create OTLP exporter instance
   auto exporter  = otlp::OtlpHttpExporterFactory::Create(opts);
@@ -192,7 +192,7 @@ void init(const otlp::OtlpHttpExporterOptions &opts)
   trace_sdk::Provider::SetTracerProvider(provider);
 }
 
-void payload()
+static void payload()
 {
   static const nostd::string_view k_tracer_name("func_test");
   static const nostd::string_view k_span_name("func_http_main");
@@ -206,13 +206,13 @@ void payload()
   span->End();
 }
 
-void cleanup()
+static void cleanup()
 {
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
   trace_sdk::Provider::SetTracerProvider(none);
 }
 
-void instrumented_payload(const otlp::OtlpHttpExporterOptions &opts)
+static void instrumented_payload(const otlp::OtlpHttpExporterOptions &opts)
 {
   g_test_result.reset();
   init(opts);
@@ -220,7 +220,7 @@ void instrumented_payload(const otlp::OtlpHttpExporterOptions &opts)
   cleanup();
 }
 
-void usage(FILE *out)
+static void usage(FILE *out)
 {
   static const char *msg =
       "Usage: func_otlp_http [options] test_name\n"
@@ -236,7 +236,7 @@ void usage(FILE *out)
   fprintf(out, "%s", msg);
 }
 
-int parse_args(int argc, char *argv[])
+static int parse_args(int argc, char *argv[])
 {
   int remaining_argc    = argc;
   char **remaining_argv = argv;
@@ -337,49 +337,49 @@ struct test_case
   test_func_t m_func;
 };
 
-int test_basic();
+static int test_basic();
 
-int test_cert_not_found();
-int test_cert_invalid();
-int test_cert_unreadable();
-int test_cert_ok();
-int test_client_cert_not_found();
-int test_client_cert_invalid();
-int test_client_cert_unreadable();
-int test_client_cert_no_key();
-int test_client_key_not_found();
-int test_client_key_invalid();
-int test_client_key_unreadable();
-int test_client_key_ok();
+static int test_cert_not_found();
+static int test_cert_invalid();
+static int test_cert_unreadable();
+static int test_cert_ok();
+static int test_client_cert_not_found();
+static int test_client_cert_invalid();
+static int test_client_cert_unreadable();
+static int test_client_cert_no_key();
+static int test_client_key_not_found();
+static int test_client_key_invalid();
+static int test_client_key_unreadable();
+static int test_client_key_ok();
 
-int test_min_tls_unknown();
-int test_min_tls_10();
-int test_min_tls_11();
-int test_min_tls_12();
-int test_min_tls_13();
-int test_max_tls_unknown();
-int test_max_tls_10();
-int test_max_tls_11();
-int test_max_tls_12();
-int test_max_tls_13();
-int test_range_tls_10();
-int test_range_tls_11();
-int test_range_tls_12();
-int test_range_tls_13();
-int test_range_tls_10_11();
-int test_range_tls_10_12();
-int test_range_tls_10_13();
-int test_range_tls_11_10();
-int test_range_tls_11_12();
-int test_range_tls_11_13();
-int test_range_tls_12_10();
-int test_range_tls_12_11();
-int test_range_tls_12_13();
-int test_range_tls_13_10();
-int test_range_tls_13_11();
-int test_range_tls_13_12();
+static int test_min_tls_unknown();
+static int test_min_tls_10();
+static int test_min_tls_11();
+static int test_min_tls_12();
+static int test_min_tls_13();
+static int test_max_tls_unknown();
+static int test_max_tls_10();
+static int test_max_tls_11();
+static int test_max_tls_12();
+static int test_max_tls_13();
+static int test_range_tls_10();
+static int test_range_tls_11();
+static int test_range_tls_12();
+static int test_range_tls_13();
+static int test_range_tls_10_11();
+static int test_range_tls_10_12();
+static int test_range_tls_10_13();
+static int test_range_tls_11_10();
+static int test_range_tls_11_12();
+static int test_range_tls_11_13();
+static int test_range_tls_12_10();
+static int test_range_tls_12_11();
+static int test_range_tls_12_13();
+static int test_range_tls_13_10();
+static int test_range_tls_13_11();
+static int test_range_tls_13_12();
 
-int test_gzip_compression();
+static int test_gzip_compression();
 
 static const test_case all_tests[] = {{"basic", test_basic},
                                       {"cert-not-found", test_cert_not_found},
@@ -423,7 +423,7 @@ static const test_case all_tests[] = {{"basic", test_basic},
                                       {"gzip-compression", test_gzip_compression},
                                       {"", nullptr}};
 
-void list_test_cases()
+static void list_test_cases()
 {
   const test_case *current = all_tests;
 
@@ -434,7 +434,7 @@ void list_test_cases()
   }
 }
 
-int run_test_case(const std::string &name)
+static int run_test_case(const std::string &name)
 {
   const test_case *current = all_tests;
 
@@ -496,7 +496,7 @@ int main(int argc, char *argv[])
   return rc;
 }
 
-void set_common_opts(otlp::OtlpHttpExporterOptions &opts)
+static void set_common_opts(otlp::OtlpHttpExporterOptions &opts)
 {
   opts.url = opt_endpoint;
 
@@ -511,7 +511,7 @@ void set_common_opts(otlp::OtlpHttpExporterOptions &opts)
 #endif
 }
 
-int expect_connection_failed()
+static int expect_connection_failed()
 {
   if (g_test_result.found_export_error && g_test_result.found_connection_failed)
   {
@@ -520,7 +520,7 @@ int expect_connection_failed()
   return TEST_FAILED;
 }
 
-int expect_success()
+static int expect_success()
 {
   if (g_test_result.found_export_success)
   {
@@ -529,7 +529,8 @@ int expect_success()
   return TEST_FAILED;
 }
 
-int expect_request_send_failed()
+#if 0
+static int expect_request_send_failed()
 {
   if (g_test_result.found_export_error && g_test_result.found_request_send_failure)
   {
@@ -537,8 +538,9 @@ int expect_request_send_failed()
   }
   return TEST_FAILED;
 }
+#endif
 
-int expect_unknown_min_tls()
+static int expect_unknown_min_tls()
 {
   if (g_test_result.found_export_error && g_test_result.found_unknown_min_tls)
   {
@@ -547,7 +549,7 @@ int expect_unknown_min_tls()
   return TEST_FAILED;
 }
 
-int expect_unknown_max_tls()
+static int expect_unknown_max_tls()
 {
   if (g_test_result.found_export_error && g_test_result.found_unknown_max_tls)
   {
@@ -556,7 +558,7 @@ int expect_unknown_max_tls()
   return TEST_FAILED;
 }
 
-int expect_export_failed()
+static int expect_export_failed()
 {
   /*
     Can not test exact root cause:
@@ -573,7 +575,7 @@ int expect_export_failed()
   return TEST_FAILED;
 }
 
-int test_basic()
+static int test_basic()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -604,7 +606,7 @@ int test_basic()
   return expect_connection_failed();
 }
 
-int test_cert_not_found()
+static int test_cert_not_found()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -631,7 +633,7 @@ int test_cert_not_found()
   return expect_connection_failed();
 }
 
-int test_cert_invalid()
+static int test_cert_invalid()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -658,7 +660,7 @@ int test_cert_invalid()
   return expect_connection_failed();
 }
 
-int test_cert_unreadable()
+static int test_cert_unreadable()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -685,7 +687,7 @@ int test_cert_unreadable()
   return expect_connection_failed();
 }
 
-int test_cert_ok()
+static int test_cert_ok()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -717,7 +719,7 @@ int test_cert_ok()
   return expect_success();
 }
 
-int test_client_cert_not_found()
+static int test_client_cert_not_found()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -745,7 +747,7 @@ int test_client_cert_not_found()
   return expect_connection_failed();
 }
 
-int test_client_cert_invalid()
+static int test_client_cert_invalid()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -773,7 +775,7 @@ int test_client_cert_invalid()
   return expect_connection_failed();
 }
 
-int test_client_cert_unreadable()
+static int test_client_cert_unreadable()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -801,7 +803,7 @@ int test_client_cert_unreadable()
   return expect_connection_failed();
 }
 
-int test_client_cert_no_key()
+static int test_client_cert_no_key()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -829,7 +831,7 @@ int test_client_cert_no_key()
   return expect_connection_failed();
 }
 
-int test_client_key_not_found()
+static int test_client_key_not_found()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -858,7 +860,7 @@ int test_client_key_not_found()
   return expect_connection_failed();
 }
 
-int test_client_key_invalid()
+static int test_client_key_invalid()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -887,7 +889,7 @@ int test_client_key_invalid()
   return expect_connection_failed();
 }
 
-int test_client_key_unreadable()
+static int test_client_key_unreadable()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -916,7 +918,7 @@ int test_client_key_unreadable()
   return expect_connection_failed();
 }
 
-int test_client_key_ok()
+static int test_client_key_ok()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -950,7 +952,7 @@ int test_client_key_ok()
   return expect_success();
 }
 
-int test_min_tls_unknown()
+static int test_min_tls_unknown()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -980,7 +982,7 @@ int test_min_tls_unknown()
   return expect_unknown_min_tls();
 }
 
-int test_min_tls_10()
+static int test_min_tls_10()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1015,7 +1017,7 @@ int test_min_tls_10()
   return expect_unknown_min_tls();
 }
 
-int test_min_tls_11()
+static int test_min_tls_11()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1050,7 +1052,7 @@ int test_min_tls_11()
   return expect_unknown_min_tls();
 }
 
-int test_min_tls_12()
+static int test_min_tls_12()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1085,7 +1087,7 @@ int test_min_tls_12()
   return expect_success();
 }
 
-int test_min_tls_13()
+static int test_min_tls_13()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1120,7 +1122,7 @@ int test_min_tls_13()
   return expect_success();
 }
 
-int test_max_tls_unknown()
+static int test_max_tls_unknown()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1150,7 +1152,7 @@ int test_max_tls_unknown()
   return expect_unknown_max_tls();
 }
 
-int test_max_tls_10()
+static int test_max_tls_10()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1186,7 +1188,7 @@ int test_max_tls_10()
   return expect_unknown_max_tls();
 }
 
-int test_max_tls_11()
+static int test_max_tls_11()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1222,7 +1224,7 @@ int test_max_tls_11()
   return expect_unknown_max_tls();
 }
 
-int test_max_tls_12()
+static int test_max_tls_12()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1257,7 +1259,7 @@ int test_max_tls_12()
   return expect_success();
 }
 
-int test_max_tls_13()
+static int test_max_tls_13()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1292,7 +1294,7 @@ int test_max_tls_13()
   return expect_success();
 }
 
-int test_range_tls_10()
+static int test_range_tls_10()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1329,7 +1331,7 @@ int test_range_tls_10()
   return expect_unknown_min_tls();
 }
 
-int test_range_tls_11()
+static int test_range_tls_11()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1366,7 +1368,7 @@ int test_range_tls_11()
   return expect_unknown_min_tls();
 }
 
-int test_range_tls_12()
+static int test_range_tls_12()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1402,7 +1404,7 @@ int test_range_tls_12()
   return expect_success();
 }
 
-int test_range_tls_13()
+static int test_range_tls_13()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1438,7 +1440,7 @@ int test_range_tls_13()
   return expect_success();
 }
 
-int test_range_tls_10_11()
+static int test_range_tls_10_11()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1475,7 +1477,7 @@ int test_range_tls_10_11()
   return expect_unknown_min_tls();
 }
 
-int test_range_tls_10_12()
+static int test_range_tls_10_12()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1511,7 +1513,7 @@ int test_range_tls_10_12()
   return expect_unknown_min_tls();
 }
 
-int test_range_tls_10_13()
+static int test_range_tls_10_13()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1547,7 +1549,7 @@ int test_range_tls_10_13()
   return expect_unknown_min_tls();
 }
 
-int test_range_tls_11_10()
+static int test_range_tls_11_10()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1579,7 +1581,7 @@ int test_range_tls_11_10()
   return expect_connection_failed();
 }
 
-int test_range_tls_11_12()
+static int test_range_tls_11_12()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1615,7 +1617,7 @@ int test_range_tls_11_12()
   return expect_unknown_min_tls();
 }
 
-int test_range_tls_11_13()
+static int test_range_tls_11_13()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1651,7 +1653,7 @@ int test_range_tls_11_13()
   return expect_unknown_min_tls();
 }
 
-int test_range_tls_12_10()
+static int test_range_tls_12_10()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1683,7 +1685,7 @@ int test_range_tls_12_10()
   return expect_connection_failed();
 }
 
-int test_range_tls_12_11()
+static int test_range_tls_12_11()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1715,7 +1717,7 @@ int test_range_tls_12_11()
   return expect_connection_failed();
 }
 
-int test_range_tls_12_13()
+static int test_range_tls_12_13()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1751,7 +1753,7 @@ int test_range_tls_12_13()
   return expect_success();
 }
 
-int test_range_tls_13_10()
+static int test_range_tls_13_10()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1783,7 +1785,7 @@ int test_range_tls_13_10()
   return expect_connection_failed();
 }
 
-int test_range_tls_13_11()
+static int test_range_tls_13_11()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1815,7 +1817,7 @@ int test_range_tls_13_11()
   return expect_connection_failed();
 }
 
-int test_range_tls_13_12()
+static int test_range_tls_13_12()
 {
   otlp::OtlpHttpExporterOptions opts;
 
@@ -1847,7 +1849,7 @@ int test_range_tls_13_12()
   return expect_connection_failed();
 }
 
-int test_gzip_compression()
+static int test_gzip_compression()
 {
   otlp::OtlpHttpExporterOptions opts;
 

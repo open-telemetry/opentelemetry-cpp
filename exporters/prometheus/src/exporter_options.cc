@@ -13,7 +13,7 @@ namespace exporter
 namespace metrics
 {
 
-inline const std::string GetPrometheusDefaultHttpEndpoint()
+static inline const std::string GetPrometheusDefaultHttpEndpoint()
 {
   constexpr char kPrometheusEndpointEnv[]     = "PROMETHEUS_EXPORTER_ENDPOINT";
   constexpr char kPrometheusEndpointDefault[] = "localhost:9464";
@@ -25,7 +25,7 @@ inline const std::string GetPrometheusDefaultHttpEndpoint()
   return exists ? endpoint : kPrometheusEndpointDefault;
 }
 
-inline bool GetPrometheusWithoutOtelScope()
+static inline bool GetPrometheusWithoutOtelScope()
 {
   constexpr char kPrometheusWithoutOtelScope[] = "OTEL_CPP_PROMETHEUS_EXPORTER_WITHOUT_OTEL_SCOPE";
 
@@ -36,7 +36,7 @@ inline bool GetPrometheusWithoutOtelScope()
   return exists ? setting : false;
 }
 
-inline bool GetPrometheusPopulateTargetInfo()
+static inline bool GetPrometheusPopulateTargetInfo()
 {
   constexpr char kPrometheusPopulateTargetInfo[] =
       "OTEL_CPP_PROMETHEUS_EXPORTER_POPULATE_TARGET_INFO";
@@ -48,7 +48,7 @@ inline bool GetPrometheusPopulateTargetInfo()
   return exists ? setting : true;
 }
 
-inline bool GetPrometheusWithoutUnits()
+static inline bool GetPrometheusWithoutUnits()
 {
   constexpr char kPrometheusWithoutUnits[] = "OTEL_CPP_PROMETHEUS_EXPORTER_WITHOUT_UNITS";
   bool setting{};
@@ -58,7 +58,7 @@ inline bool GetPrometheusWithoutUnits()
   return exists ? setting : false;
 }
 
-inline bool GetPrometheusWithoutTypeSuffix()
+static inline bool GetPrometheusWithoutTypeSuffix()
 {
   constexpr char kPrometheusWithoutTypeSuffix[] =
       "OTEL_CPP_PROMETHEUS_EXPORTER_WITHOUT_TYPE_SUFFIX";

@@ -15,7 +15,7 @@
 
 using namespace opentelemetry::baggage;
 
-std::string header_with_custom_entries(size_t num_entries)
+static std::string header_with_custom_entries(size_t num_entries)
 {
   std::string header;
   for (size_t i = 0; i < num_entries; i++)
@@ -31,7 +31,7 @@ std::string header_with_custom_entries(size_t num_entries)
   return header;
 }
 
-std::string header_with_custom_size(size_t key_value_size, size_t num_entries)
+static std::string header_with_custom_size(size_t key_value_size, size_t num_entries)
 {
   std::string header = "";
   for (size_t i = 0; i < num_entries; i++)
