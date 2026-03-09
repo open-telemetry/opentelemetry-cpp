@@ -70,9 +70,9 @@ void Recordable::SetIdentity(const trace_api::SpanContext &span_context,
   span_["traceId"] = std::string(trace_id_lower_base16, 32);
 }
 
-void PopulateAttribute(nlohmann::json &attribute,
-                       nostd::string_view key,
-                       const common::AttributeValue &value)
+static void PopulateAttribute(nlohmann::json &attribute,
+                              nostd::string_view key,
+                              const common::AttributeValue &value)
 {
   // Assert size of variant to ensure that this method gets updated if the variant
   // definition changes
