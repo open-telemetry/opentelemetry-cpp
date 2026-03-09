@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 
+#include "opentelemetry/sdk/configuration/experimental_tracer_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
@@ -25,7 +26,7 @@ public:
   std::vector<std::unique_ptr<SpanProcessorConfiguration>> processors;
   std::unique_ptr<SpanLimitsConfiguration> limits;
   std::unique_ptr<SamplerConfiguration> sampler;
-  // FIXME: tracer_configurator
+  std::unique_ptr<ExperimentalTracerConfiguratorConfiguration> tracer_configurator;
 };
 
 }  // namespace configuration

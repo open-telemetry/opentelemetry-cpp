@@ -30,6 +30,9 @@
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/drop_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/exemplar_filter.h"
+#include "opentelemetry/sdk/configuration/experimental_logger_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/experimental_meter_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/experimental_tracer_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
@@ -164,6 +167,16 @@ public:
   std::unique_ptr<LoggerProviderConfiguration> ParseLoggerProviderConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
 
+  ExperimentalLoggerConfigConfiguration ParseExperimentalLoggerConfigConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  ExperimentalLoggerMatcherAndConfigConfiguration
+  ParseExperimentalLoggerMatcherAndConfigConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  std::unique_ptr<ExperimentalLoggerConfiguratorConfiguration>
+  ParseExperimentalLoggerConfiguratorConfiguration(const std::unique_ptr<DocumentNode> &node) const;
+
   DefaultHistogramAggregation ParseDefaultHistogramAggregation(
       const std::unique_ptr<DocumentNode> &node,
       const std::string &name) const;
@@ -266,6 +279,16 @@ public:
   std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
 
+  ExperimentalMeterConfigConfiguration ParseExperimentalMeterConfigConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  ExperimentalMeterMatcherAndConfigConfiguration
+  ParseExperimentalMeterMatcherAndConfigConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  std::unique_ptr<ExperimentalMeterConfiguratorConfiguration>
+  ParseExperimentalMeterConfiguratorConfiguration(const std::unique_ptr<DocumentNode> &node) const;
+
   std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
 
@@ -335,6 +358,16 @@ public:
 
   std::unique_ptr<TracerProviderConfiguration> ParseTracerProviderConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
+
+  ExperimentalTracerConfigConfiguration ParseExperimentalTracerConfigConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  ExperimentalTracerMatcherAndConfigConfiguration
+  ParseExperimentalTracerMatcherAndConfigConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  std::unique_ptr<ExperimentalTracerConfiguratorConfiguration>
+  ParseExperimentalTracerConfiguratorConfiguration(const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<StringAttributeValueConfiguration> ParseStringAttributeValueConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;

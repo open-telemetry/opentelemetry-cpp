@@ -9,6 +9,9 @@
 
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
+#include "opentelemetry/sdk/configuration/experimental_logger_config_configuration.h"
+#include "opentelemetry/sdk/configuration/experimental_logger_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/experimental_logger_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
@@ -481,4 +484,110 @@ logger_provider:
   ASSERT_NE(config->logger_provider->limits, nullptr);
   ASSERT_EQ(config->logger_provider->limits->attribute_value_length_limit, 1111);
   ASSERT_EQ(config->logger_provider->limits->attribute_count_limit, 2222);
+}
+
+TEST(YamlLogs, no_logger_configurator)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_EQ(config->logger_provider->logger_configurator, nullptr);
+}
+
+TEST(YamlLogs, logger_configurator_default_only)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  logger_configurator/development:
+    default_config:
+      disabled: true
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
+  ASSERT_EQ(config->logger_provider->logger_configurator->default_config.disabled, true);
+  ASSERT_EQ(config->logger_provider->logger_configurator->loggers.size(), 0);
+}
+
+TEST(YamlLogs, logger_configurator_with_loggers)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  logger_configurator/development:
+    default_config:
+      disabled: true
+    loggers:
+      - name: io.opentelemetry.contrib.*
+        config:
+          disabled: false
+      - name: my.exact.logger
+        config:
+          disabled: true
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
+
+  auto &configurator = config->logger_provider->logger_configurator;
+  ASSERT_EQ(configurator->default_config.disabled, true);
+  ASSERT_EQ(configurator->loggers.size(), 2);
+
+  ASSERT_EQ(configurator->loggers[0].name, "io.opentelemetry.contrib.*");
+  ASSERT_EQ(configurator->loggers[0].config.disabled, false);
+
+  ASSERT_EQ(configurator->loggers[1].name, "my.exact.logger");
+  ASSERT_EQ(configurator->loggers[1].config.disabled, true);
+}
+
+TEST(YamlLogs, logger_configurator_default_enabled)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  logger_configurator/development:
+    default_config:
+      disabled: false
+    loggers:
+      - name: noisy.library
+        config:
+          disabled: true
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
+
+  auto &configurator = config->logger_provider->logger_configurator;
+  ASSERT_EQ(configurator->default_config.disabled, false);
+  ASSERT_EQ(configurator->loggers.size(), 1);
+  ASSERT_EQ(configurator->loggers[0].name, "noisy.library");
+  ASSERT_EQ(configurator->loggers[0].config.disabled, true);
 }

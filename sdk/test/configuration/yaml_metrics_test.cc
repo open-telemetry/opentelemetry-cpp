@@ -12,6 +12,9 @@
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
 #include "opentelemetry/sdk/configuration/exemplar_filter.h"
+#include "opentelemetry/sdk/configuration/experimental_meter_config_configuration.h"
+#include "opentelemetry/sdk/configuration/experimental_meter_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/experimental_meter_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
@@ -1041,4 +1044,110 @@ meter_provider:
   ASSERT_EQ(view->stream->attribute_keys->excluded->string_array.size(), 2);
   ASSERT_EQ(view->stream->attribute_keys->excluded->string_array[0], "foo.ex");
   ASSERT_EQ(view->stream->attribute_keys->excluded->string_array[1], "bar.ex");
+}
+
+TEST(YamlMetrics, no_meter_configurator)
+{
+  std::string yaml = R"(
+file_format: "1.0-metrics"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->meter_configurator, nullptr);
+}
+
+TEST(YamlMetrics, meter_configurator_default_only)
+{
+  std::string yaml = R"(
+file_format: "1.0-metrics"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  meter_configurator/development:
+    default_config:
+      disabled: true
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_NE(config->meter_provider->meter_configurator, nullptr);
+  ASSERT_EQ(config->meter_provider->meter_configurator->default_config.disabled, true);
+  ASSERT_EQ(config->meter_provider->meter_configurator->meters.size(), 0);
+}
+
+TEST(YamlMetrics, meter_configurator_with_meters)
+{
+  std::string yaml = R"(
+file_format: "1.0-metrics"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  meter_configurator/development:
+    default_config:
+      disabled: true
+    meters:
+      - name: io.opentelemetry.contrib.*
+        config:
+          disabled: false
+      - name: my.exact.meter
+        config:
+          disabled: true
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_NE(config->meter_provider->meter_configurator, nullptr);
+
+  auto &configurator = config->meter_provider->meter_configurator;
+  ASSERT_EQ(configurator->default_config.disabled, true);
+  ASSERT_EQ(configurator->meters.size(), 2);
+
+  ASSERT_EQ(configurator->meters[0].name, "io.opentelemetry.contrib.*");
+  ASSERT_EQ(configurator->meters[0].config.disabled, false);
+
+  ASSERT_EQ(configurator->meters[1].name, "my.exact.meter");
+  ASSERT_EQ(configurator->meters[1].config.disabled, true);
+}
+
+TEST(YamlMetrics, meter_configurator_default_enabled)
+{
+  std::string yaml = R"(
+file_format: "1.0-metrics"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  meter_configurator/development:
+    default_config:
+      disabled: false
+    meters:
+      - name: noisy.library
+        config:
+          disabled: true
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_NE(config->meter_provider->meter_configurator, nullptr);
+
+  auto &configurator = config->meter_provider->meter_configurator;
+  ASSERT_EQ(configurator->default_config.disabled, false);
+  ASSERT_EQ(configurator->meters.size(), 1);
+  ASSERT_EQ(configurator->meters[0].name, "noisy.library");
+  ASSERT_EQ(configurator->meters[0].config.disabled, true);
 }

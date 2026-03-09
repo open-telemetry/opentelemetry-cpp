@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 
+#include "opentelemetry/sdk/configuration/experimental_logger_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
 #include "opentelemetry/version.h"
@@ -23,7 +24,7 @@ class LoggerProviderConfiguration
 public:
   std::vector<std::unique_ptr<LogRecordProcessorConfiguration>> processors;
   std::unique_ptr<LogRecordLimitsConfiguration> limits;
-  // FIXME: logger_configurator
+  std::unique_ptr<ExperimentalLoggerConfiguratorConfiguration> logger_configurator;
 };
 
 }  // namespace configuration
