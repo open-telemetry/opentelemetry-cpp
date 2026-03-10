@@ -5,7 +5,6 @@
 #include <prometheus/metric_family.h>
 #include <prometheus/metric_type.h>
 #include <algorithm>
-#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -19,7 +18,6 @@
 #include <utility>
 #include <vector>
 
-#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
