@@ -23,10 +23,10 @@ struct TestDataPoints
   Resource resource = Resource::Create(ResourceAttributes{});
   nostd::unique_ptr<InstrumentationScope> instrumentation_scope =
       InstrumentationScope::Create("library_name", "1.2.0");
-  opentelemetry::common::SystemTimestamp start_ts = 
-    opentelemetry::common::SystemTimestamp{std::chrono::microseconds{1766662500000}};
-  opentelemetry::common::SystemTimestamp end_ts = 
-    opentelemetry::common::SystemTimestamp{std::chrono::microseconds{1766662560000}};
+  opentelemetry::common::SystemTimestamp start_ts =
+      opentelemetry::common::SystemTimestamp{std::chrono::microseconds{1766662500000}};
+  opentelemetry::common::SystemTimestamp end_ts =
+      opentelemetry::common::SystemTimestamp{std::chrono::microseconds{1766662560000}};
 
   /**
    * Helper function to create ResourceMetrics
@@ -43,9 +43,7 @@ struct TestDataPoints
         metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                          metric_sdk::InstrumentType::kCounter,
                                          metric_sdk::InstrumentValueType::kDouble},
-        metric_sdk::AggregationTemporality::kDelta,
-        start_ts,
-        end_ts,
+        metric_sdk::AggregationTemporality::kDelta, start_ts, end_ts,
         std::vector<metric_sdk::PointDataAttributes>{
             {metric_sdk::PointAttributes{{"a1", "b1"}}, sum_point_data},
             {metric_sdk::PointAttributes{{"a2", "b2"}}, sum_point_data2}}};
@@ -72,9 +70,7 @@ struct TestDataPoints
         metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                          metric_sdk::InstrumentType::kHistogram,
                                          metric_sdk::InstrumentValueType::kDouble},
-        metric_sdk::AggregationTemporality::kDelta,
-        start_ts,
-        end_ts,
+        metric_sdk::AggregationTemporality::kDelta, start_ts, end_ts,
         std::vector<metric_sdk::PointDataAttributes>{
             {metric_sdk::PointAttributes{{"a1", "b1"}}, histogram_point_data},
             {metric_sdk::PointAttributes{{"a2", "b2"}}, histogram_point_data2}}};
@@ -100,9 +96,7 @@ struct TestDataPoints
         metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                          metric_sdk::InstrumentType::kCounter,
                                          metric_sdk::InstrumentValueType::kDouble},
-        metric_sdk::AggregationTemporality::kDelta,
-        start_ts,
-        end_ts,
+        metric_sdk::AggregationTemporality::kDelta, start_ts, end_ts,
         std::vector<metric_sdk::PointDataAttributes>{
             {metric_sdk::PointAttributes{{"a1", "b1"}}, last_value_point_data},
             {metric_sdk::PointAttributes{{"a2", "b2"}}, last_value_point_data2}}};
@@ -121,9 +115,7 @@ struct TestDataPoints
         metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                          metric_sdk::InstrumentType::kCounter,
                                          metric_sdk::InstrumentValueType::kDouble},
-        metric_sdk::AggregationTemporality::kDelta,
-        start_ts,
-        end_ts,
+        metric_sdk::AggregationTemporality::kDelta, start_ts, end_ts,
         std::vector<metric_sdk::PointDataAttributes>{
             {metric_sdk::PointAttributes{{"a1", "b1"}}, drop_point_data},
             {metric_sdk::PointAttributes{{"a2", "b2"}}, drop_point_data2}}};

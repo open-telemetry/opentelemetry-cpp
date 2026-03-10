@@ -138,8 +138,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
   // Append target_info as the first metric
   if (populate_target_info && !data.scope_metric_data_.empty())
   {
-    SetTarget(data,
-              without_otel_scope ? nullptr : (*data.scope_metric_data_.begin()).scope_, &output);
+    SetTarget(data, without_otel_scope ? nullptr : (*data.scope_metric_data_.begin()).scope_,
+              &output);
   }
 
   for (const auto &instrumentation_info : data.scope_metric_data_)
