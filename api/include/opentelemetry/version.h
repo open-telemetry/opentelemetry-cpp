@@ -7,6 +7,7 @@
 #include "opentelemetry/detail/preprocessor.h"
 
 #ifndef OPENTELEMETRY_ABI_VERSION_NO
+// NOLINTNEXTLINE(cppcoreguidelines-macro-to-enum)
 #  define OPENTELEMETRY_ABI_VERSION_NO 1
 #endif
 

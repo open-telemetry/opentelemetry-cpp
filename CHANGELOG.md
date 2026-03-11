@@ -42,6 +42,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy misc-use-internal-linkage warnings
   [#3600](https://github.com/open-telemetry/opentelemetry-cpp/pull/3600)
 
+* [CODE HEALTH] Fix clang-tidy macro to enum warnings
+  [#3922](https://github.com/open-telemetry/opentelemetry-cpp/pull/3922)
+
 Important changes:
 
 * [BUILD] Revisit EventLogger deprecation
