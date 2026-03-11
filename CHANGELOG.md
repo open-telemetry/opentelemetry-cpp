@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Fix benchmark genrule capturing stderr into JSON output
+  [#3925](https://github.com/open-telemetry/opentelemetry-cpp/pull/3925)
+
 * [TEST] Add multi-threaded metrics benchmarks for shared vs per-thread counter
   [#3865](https://github.com/open-telemetry/opentelemetry-cpp/pull/3865)
 
