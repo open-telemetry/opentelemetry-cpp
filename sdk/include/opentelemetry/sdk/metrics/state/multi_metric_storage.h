@@ -31,8 +31,7 @@ public:
     storages_.push_back(storage);
   }
 
-  virtual void RecordLong(int64_t value,
-                          const opentelemetry::context::Context &context) noexcept override
+  void RecordLong(int64_t value, const opentelemetry::context::Context &context) noexcept override
   {
     for (auto &s : storages_)
     {
@@ -40,9 +39,9 @@ public:
     }
   }
 
-  virtual void RecordLong(int64_t value,
-                          const opentelemetry::common::KeyValueIterable &attributes,
-                          const opentelemetry::context::Context &context) noexcept override
+  void RecordLong(int64_t value,
+                  const opentelemetry::common::KeyValueIterable &attributes,
+                  const opentelemetry::context::Context &context) noexcept override
   {
     for (auto &s : storages_)
     {
@@ -50,8 +49,7 @@ public:
     }
   }
 
-  virtual void RecordDouble(double value,
-                            const opentelemetry::context::Context &context) noexcept override
+  void RecordDouble(double value, const opentelemetry::context::Context &context) noexcept override
   {
     for (auto &s : storages_)
     {
@@ -59,9 +57,9 @@ public:
     }
   }
 
-  virtual void RecordDouble(double value,
-                            const opentelemetry::common::KeyValueIterable &attributes,
-                            const opentelemetry::context::Context &context) noexcept override
+  void RecordDouble(double value,
+                    const opentelemetry::common::KeyValueIterable &attributes,
+                    const opentelemetry::context::Context &context) noexcept override
   {
     for (auto &s : storages_)
     {

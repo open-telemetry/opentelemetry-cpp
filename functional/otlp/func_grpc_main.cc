@@ -47,15 +47,15 @@ enum class TestMode : std::uint8_t
   kHttps
 };
 
-bool opt_help   = false;
-bool opt_list   = false;
-bool opt_debug  = false;
-bool opt_secure = false;
+static bool opt_help   = false;
+static bool opt_list   = false;
+static bool opt_debug  = false;
+static bool opt_secure = false;
 // HTTPS by default
-std::string opt_endpoint = "https://127.0.0.1:4317";
-std::string opt_cert_dir;
-std::string opt_test_name;
-TestMode opt_mode = TestMode::kNone;
+static std::string opt_endpoint = "https://127.0.0.1:4317";
+static std::string opt_cert_dir;
+static std::string opt_test_name;
+static TestMode opt_mode = TestMode::kNone;
 
 /*
   Log parsing
@@ -79,9 +79,9 @@ struct TestResult
   }
 };
 
-struct TestResult g_test_result;
+static struct TestResult g_test_result;
 
-void parse_error_msg(TestResult *result, const std::string &msg)
+static void parse_error_msg(TestResult *result, const std::string &msg)
 {
   static std::string connection_failed("failed to connect to all addresses");
 
@@ -112,11 +112,11 @@ void parse_error_msg(TestResult *result, const std::string &msg)
   }
 }
 
-void parse_warning_msg(TestResult * /* result */, const std::string & /* msg */) {}
+static void parse_warning_msg(TestResult * /* result */, const std::string & /* msg */) {}
 
-void parse_info_msg(TestResult * /* result */, const std::string & /* msg */) {}
+static void parse_info_msg(TestResult * /* result */, const std::string & /* msg */) {}
 
-void parse_debug_msg(TestResult *result, const std::string &msg)
+static void parse_debug_msg(TestResult *result, const std::string &msg)
 {
   static std::string export_success("Export 1 trace span(s) success");
 
@@ -164,7 +164,7 @@ public:
   }
 };
 
-void init(const otlp::OtlpGrpcExporterOptions &opts)
+static void init(const otlp::OtlpGrpcExporterOptions &opts)
 {
   // Create OTLP exporter instance
   auto exporter  = otlp::OtlpGrpcExporterFactory::Create(opts);
@@ -175,7 +175,7 @@ void init(const otlp::OtlpGrpcExporterOptions &opts)
   trace_sdk::Provider::SetTracerProvider(provider);
 }
 
-void payload()
+static void payload()
 {
   static const nostd::string_view k_tracer_name("func_test");
   static const nostd::string_view k_span_name("func_grpc_main");
@@ -189,13 +189,13 @@ void payload()
   span->End();
 }
 
-void cleanup()
+static void cleanup()
 {
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
   trace_sdk::Provider::SetTracerProvider(none);
 }
 
-void instrumented_payload(const otlp::OtlpGrpcExporterOptions &opts)
+static void instrumented_payload(const otlp::OtlpGrpcExporterOptions &opts)
 {
   g_test_result.reset();
   init(opts);
@@ -203,7 +203,7 @@ void instrumented_payload(const otlp::OtlpGrpcExporterOptions &opts)
   cleanup();
 }
 
-void usage(FILE *out)
+static void usage(FILE *out)
 {
   static const char *msg =
       "Usage: func_otlp_grpc [options] test_name\n"
@@ -219,7 +219,7 @@ void usage(FILE *out)
   fprintf(out, "%s", msg);
 }
 
-int parse_args(int argc, char *argv[])
+static int parse_args(int argc, char *argv[])
 {
   int remaining_argc    = argc;
   char **remaining_argv = argv;
@@ -320,20 +320,22 @@ struct test_case
   test_func_t m_func;
 };
 
-int test_basic();
+static int test_basic();
 
-int test_cert_not_found();
-int test_cert_invalid();
-int test_cert_unreadable();
-int test_client_cert_not_found();
-int test_client_cert_invalid();
-int test_client_cert_unreadable();
-int test_client_cert_no_key();
-int test_client_key_not_found();
-int test_client_key_invalid();
-int test_client_key_unreadable();
+static int test_cert_not_found();
+static int test_cert_invalid();
+static int test_cert_unreadable();
 
-int test_mtls_ok();
+#ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
+static int test_client_cert_not_found();
+static int test_client_cert_invalid();
+static int test_client_cert_unreadable();
+static int test_client_cert_no_key();
+static int test_client_key_not_found();
+static int test_client_key_invalid();
+static int test_client_key_unreadable();
+static int test_mtls_ok();
+#endif  // ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
 
 static const test_case all_tests[] = {{"basic", test_basic},
                                       {"cert-not-found", test_cert_not_found},
@@ -362,7 +364,7 @@ void list_test_cases()
   }
 }
 
-int run_test_case(const std::string &name)
+static int run_test_case(const std::string &name)
 {
   const test_case *current = all_tests;
 
@@ -424,7 +426,7 @@ int main(int argc, char *argv[])
   return rc;
 }
 
-void set_common_opts(otlp::OtlpGrpcExporterOptions &opts)
+static void set_common_opts(otlp::OtlpGrpcExporterOptions &opts)
 {
   opts.endpoint            = opt_endpoint;
   opts.timeout             = std::chrono::milliseconds{100};
@@ -436,7 +438,7 @@ void set_common_opts(otlp::OtlpGrpcExporterOptions &opts)
 #endif
 }
 
-int expect_connection_failed()
+static int expect_connection_failed()
 {
   if (g_test_result.found_export_error &&
       (g_test_result.found_connection_failed || g_test_result.deadline_exceeded ||
@@ -447,7 +449,7 @@ int expect_connection_failed()
   return TEST_FAILED;
 }
 
-int expect_success()
+static int expect_success()
 {
   if (g_test_result.found_export_success)
   {
@@ -456,7 +458,7 @@ int expect_success()
   return TEST_FAILED;
 }
 
-int expect_export_failed()
+static int expect_export_failed()
 {
   /*
     Can not test exact root cause:
@@ -473,7 +475,7 @@ int expect_export_failed()
   return TEST_FAILED;
 }
 
-int test_basic()
+static int test_basic()
 {
   otlp::OtlpGrpcExporterOptions opts;
 
@@ -504,7 +506,7 @@ int test_basic()
   return expect_connection_failed();
 }
 
-int test_cert_not_found()
+static int test_cert_not_found()
 {
   otlp::OtlpGrpcExporterOptions opts;
 
@@ -531,7 +533,7 @@ int test_cert_not_found()
   return expect_connection_failed();
 }
 
-int test_cert_invalid()
+static int test_cert_invalid()
 {
   otlp::OtlpGrpcExporterOptions opts;
 
@@ -558,7 +560,7 @@ int test_cert_invalid()
   return expect_connection_failed();
 }
 
-int test_cert_unreadable()
+static int test_cert_unreadable()
 {
   otlp::OtlpGrpcExporterOptions opts;
 
@@ -586,7 +588,7 @@ int test_cert_unreadable()
 }
 
 #ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
-int test_client_cert_not_found()
+static int test_client_cert_not_found()
 {
   otlp::OtlpGrpcExporterOptions opts;
 
@@ -614,7 +616,7 @@ int test_client_cert_not_found()
   return expect_connection_failed();
 }
 
-int test_client_cert_invalid()
+static int test_client_cert_invalid()
 {
   otlp::OtlpGrpcExporterOptions opts;
 
@@ -642,7 +644,7 @@ int test_client_cert_invalid()
   return expect_connection_failed();
 }
 
-int test_client_cert_unreadable()
+static int test_client_cert_unreadable()
 {
   otlp::OtlpGrpcExporterOptions opts;
 
@@ -670,7 +672,7 @@ int test_client_cert_unreadable()
   return expect_connection_failed();
 }
 
-int test_client_cert_no_key()
+static int test_client_cert_no_key()
 {
   otlp::OtlpGrpcExporterOptions opts;
 
@@ -698,7 +700,7 @@ int test_client_cert_no_key()
   return expect_connection_failed();
 }
 
-int test_client_key_not_found()
+static int test_client_key_not_found()
 {
   otlp::OtlpGrpcExporterOptions opts;
 
@@ -727,7 +729,7 @@ int test_client_key_not_found()
   return expect_connection_failed();
 }
 
-int test_client_key_invalid()
+static int test_client_key_invalid()
 {
   otlp::OtlpGrpcExporterOptions opts;
 
@@ -756,7 +758,7 @@ int test_client_key_invalid()
   return expect_connection_failed();
 }
 
-int test_client_key_unreadable()
+static int test_client_key_unreadable()
 {
   otlp::OtlpGrpcExporterOptions opts;
 
@@ -785,7 +787,7 @@ int test_client_key_unreadable()
   return expect_connection_failed();
 }
 
-int test_mtls_ok()
+static int test_mtls_ok()
 {
   otlp::OtlpGrpcExporterOptions opts;
 

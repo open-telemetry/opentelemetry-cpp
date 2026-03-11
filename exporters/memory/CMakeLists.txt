@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
+
 add_library(opentelemetry_exporter_in_memory
             src/in_memory_span_exporter_factory.cc)
 
@@ -45,6 +47,17 @@ otel_add_component(
   FILES_MATCHING
   PATTERN
   "*.h")
+
+if(OPENTELEMETRY_INSTALL)
+  opentelemetry_add_pkgconfig(
+    exporter_in_memory "OpenTelemetry Exporter - In-Memory Span"
+    "In-memory span exporter for testing and debugging." "opentelemetry_trace")
+
+  opentelemetry_add_pkgconfig(
+    exporter_in_memory_metric "OpenTelemetry Exporter - In-Memory Metric"
+    "In-memory metric exporter for testing and debugging."
+    "opentelemetry_metrics")
+endif()
 
 if(BUILD_TESTING)
   add_executable(in_memory_span_data_test test/in_memory_span_data_test.cc)

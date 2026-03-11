@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
+
 #
 # opentelemetry_exporter_prometheus
 #
@@ -71,6 +73,16 @@ otel_add_component(
   FILES_MATCHING
   PATTERN
   "prometheus_pull_builder.h")
+
+if(OPENTELEMETRY_INSTALL)
+  opentelemetry_add_pkgconfig(
+    exporter_prometheus "OpenTelemetry Exporter - Prometheus"
+    "Exports metrics in Prometheus format." "opentelemetry_metrics")
+
+  opentelemetry_add_pkgconfig(
+    exporter_prometheus_builder "OpenTelemetry Exporter - Prometheus Builder"
+    "Builder for Prometheus exporter." "opentelemetry_exporter_prometheus")
+endif()
 
 if(BUILD_TESTING)
   add_subdirectory(test)

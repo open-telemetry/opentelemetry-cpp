@@ -23,6 +23,11 @@ class ObserverResultT final : public opentelemetry::metrics::ObserverResultT<T>
 public:
   explicit ObserverResultT() = default;
 
+  ObserverResultT(const ObserverResultT &)            = default;
+  ObserverResultT(ObserverResultT &&)                 = default;
+  ObserverResultT &operator=(const ObserverResultT &) = default;
+  ObserverResultT &operator=(ObserverResultT &&)      = default;
+
   ~ObserverResultT() override = default;
 
   void Observe(T value) noexcept override

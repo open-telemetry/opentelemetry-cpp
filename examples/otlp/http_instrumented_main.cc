@@ -229,10 +229,7 @@ void InitMetrics()
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   auto reader_periodic_instr = std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation>(
       new MyThreadInstrumentation("PeriodicExportingMetricReader(periodic)", "", "medium"));
-  auto reader_collect_instr = std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation>(
-      new MyThreadInstrumentation("PeriodicExportingMetricReader(collect)", "", "medium"));
   reader_rt_opts.periodic_thread_instrumentation = reader_periodic_instr;
-  reader_rt_opts.collect_thread_instrumentation  = reader_collect_instr;
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
   auto reader = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
       std::move(exporter), reader_options, reader_rt_opts);

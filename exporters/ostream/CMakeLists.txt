@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
+
 #
 # opentelemetry_exporter_ostream_span
 #
@@ -188,3 +190,34 @@ otel_add_component(
   "console_push_metric_builder.h"
   PATTERN
   "console_span_builder.h")
+
+if(OPENTELEMETRY_INSTALL)
+  opentelemetry_add_pkgconfig(
+    exporter_ostream_span "OpenTelemetry Exporter - OStream Span"
+    "Exports trace spans to output stream." "opentelemetry_trace")
+
+  opentelemetry_add_pkgconfig(
+    exporter_ostream_span_builder
+    "OpenTelemetry Exporter - OStream Span Builder"
+    "Builder for OStream span exporter." "opentelemetry_exporter_ostream_span")
+
+  opentelemetry_add_pkgconfig(
+    exporter_ostream_metrics "OpenTelemetry Exporter - OStream Metrics"
+    "Exports metrics to output stream." "opentelemetry_metrics")
+
+  opentelemetry_add_pkgconfig(
+    exporter_ostream_metrics_builder
+    "OpenTelemetry Exporter - OStream Metrics Builder"
+    "Builder for OStream metrics exporter."
+    "opentelemetry_exporter_ostream_metrics")
+
+  opentelemetry_add_pkgconfig(
+    exporter_ostream_logs "OpenTelemetry Exporter - OStream Logs"
+    "Exports log records to output stream." "opentelemetry_logs")
+
+  opentelemetry_add_pkgconfig(
+    exporter_ostream_logs_builder
+    "OpenTelemetry Exporter - OStream Logs Builder"
+    "Builder for OStream log record exporter."
+    "opentelemetry_exporter_ostream_logs")
+endif()

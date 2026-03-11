@@ -22,6 +22,7 @@ cc_library(
         ],
         "//conditions:default": [],
     }),
+    linkstatic = True,
     deps = [
         "//api",
         "//ext:headers",

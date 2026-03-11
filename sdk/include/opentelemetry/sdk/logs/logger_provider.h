@@ -36,6 +36,8 @@ public:
    * @param processor The log record processor for this logger provider. This must
    * not be a nullptr.
    * @param resource  The resources for this logger provider.
+   * @param logger_configurator The scope configurator used to determine the configs for loggers
+   * created using this logger provider.
    */
   explicit LoggerProvider(
       std::unique_ptr<LogRecordProcessor> &&processor,
@@ -76,6 +78,11 @@ public:
    */
   explicit LoggerProvider(std::unique_ptr<LoggerContext> context) noexcept;
 
+  LoggerProvider(const LoggerProvider &)            = delete;
+  LoggerProvider(LoggerProvider &&)                 = delete;
+  LoggerProvider &operator=(const LoggerProvider &) = delete;
+  LoggerProvider &operator=(LoggerProvider &&)      = delete;
+
   ~LoggerProvider() override;
 
   using opentelemetry::logs::LoggerProvider::GetLogger;
@@ -87,6 +94,7 @@ public:
    * @param library_name The version of the library.
    * @param library_version The version of the library.
    * @param schema_url The schema URL.
+   * @param attributes The attributes to be associated with the logger.
    */
   nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
       nostd::string_view logger_name,

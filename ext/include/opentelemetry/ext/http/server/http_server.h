@@ -54,13 +54,13 @@ protected:
 
 public:
   HttpRequestCallback() {}
-  virtual ~HttpRequestCallback() = default;
 
-  HttpRequestCallback &operator=(HttpRequestCallback other)
-  {
-    callback = other.callback;
-    return *this;
-  }
+  HttpRequestCallback(const HttpRequestCallback &)            = delete;
+  HttpRequestCallback(HttpRequestCallback &&)                 = delete;
+  HttpRequestCallback &operator=(const HttpRequestCallback &) = delete;
+  HttpRequestCallback &operator=(HttpRequestCallback &&)      = delete;
+
+  virtual ~HttpRequestCallback() = default;
 
   HttpRequestCallback(CallbackFunction func) : callback(func) {}
 
@@ -176,6 +176,11 @@ public:
     addListeningPort(port);
   }
 
+  HttpServer(const HttpServer &)            = delete;
+  HttpServer(HttpServer &&)                 = delete;
+  HttpServer &operator=(const HttpServer &) = delete;
+  HttpServer &operator=(HttpServer &&)      = delete;
+
   ~HttpServer() override
   {
     for (auto &sock : m_listeningSockets)
@@ -238,7 +243,7 @@ public:
   void stop() { m_reactor.stop(); }
 
 protected:
-  virtual void onSocketAcceptable(SocketTools::Socket socket) override
+  void onSocketAcceptable(SocketTools::Socket socket) override
   {
     LOG_TRACE("HttpServer: accepting socket fd=0x%llx", socket.m_sock);
     assert(std::find(m_listeningSockets.begin(), m_listeningSockets.end(), socket) !=
@@ -258,7 +263,7 @@ protected:
     }
   }
 
-  virtual void onSocketReadable(SocketTools::Socket socket) override
+  void onSocketReadable(SocketTools::Socket socket) override
   {
     LOG_TRACE("HttpServer: reading socket fd=0x%llx", socket.m_sock);
     // No thread-safety here!
@@ -286,7 +291,7 @@ protected:
     handleConnection(conn);
   }
 
-  virtual void onSocketWritable(SocketTools::Socket socket) override
+  void onSocketWritable(SocketTools::Socket socket) override
   {
     LOG_TRACE("HttpServer: writing socket fd=0x%llx", socket.m_sock);
 
@@ -308,7 +313,7 @@ protected:
     }
   }
 
-  virtual void onSocketClosed(SocketTools::Socket socket) override
+  void onSocketClosed(SocketTools::Socket socket) override
   {
     LOG_TRACE("HttpServer: closing socket fd=0x%llx", socket.m_sock);
     assert(std::find(m_listeningSockets.begin(), m_listeningSockets.end(), socket) ==
