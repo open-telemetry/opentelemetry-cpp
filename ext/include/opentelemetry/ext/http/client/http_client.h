@@ -4,6 +4,7 @@
 #pragma once
 
 #include <chrono>
+#include <cstdint>
 #include <cstring>
 #include <map>
 #include <memory>
@@ -67,7 +68,7 @@ namespace http
 namespace client
 {
 
-enum class Method
+enum class Method : std::uint8_t
 {
   Get,
   Post,
@@ -78,7 +79,7 @@ enum class Method
   Delete
 };
 
-enum class SessionState
+enum class SessionState : std::uint8_t
 {
   CreateFailed,        // session create failed
   Created,             // session created
@@ -97,7 +98,7 @@ enum class SessionState
   Cancelled            // (manually) cancelled
 };
 
-enum class Compression
+enum class Compression : std::uint8_t
 {
   kNone,
   kGzip

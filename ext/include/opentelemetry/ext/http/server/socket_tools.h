@@ -6,6 +6,7 @@
 #include <atomic>
 #include <cassert>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <map>
@@ -405,7 +406,7 @@ struct Socket
 #endif
   }
 
-  enum
+  enum  // NOLINT(performance-enum-size)
   {
 #ifdef _WIN32
     ErrorWouldBlock = WSAEWOULDBLOCK
@@ -414,7 +415,7 @@ struct Socket
 #endif
   };
 
-  enum
+  enum  // NOLINT(performance-enum-size)
   {
 #ifdef _WIN32
     ShutdownReceive = SD_RECEIVE,
@@ -469,7 +470,7 @@ struct Reactor : protected common::Thread
   /// <summary>
   /// Socket State
   /// </summary>
-  enum State
+  enum State : std::uint8_t
   {
     Readable   = 1,
     Writable   = 2,
