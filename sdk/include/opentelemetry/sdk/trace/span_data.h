@@ -37,7 +37,7 @@ namespace trace
 class SpanDataEvent
 {
 public:
-  SpanDataEvent(std::string name,
+  SpanDataEvent(const std::string &name,
                 opentelemetry::common::SystemTimestamp timestamp,
                 const opentelemetry::common::KeyValueIterable &attributes)
       : name_(name), timestamp_(timestamp), attribute_map_(attributes)
@@ -77,7 +77,7 @@ private:
 class SpanDataLink
 {
 public:
-  SpanDataLink(opentelemetry::trace::SpanContext span_context,
+  SpanDataLink(const opentelemetry::trace::SpanContext &span_context,
                const opentelemetry::common::KeyValueIterable &attributes)
       : span_context_(span_context), attribute_map_(attributes)
   {}

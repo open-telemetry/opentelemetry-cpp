@@ -134,7 +134,7 @@ class Session : public opentelemetry::ext::http::client::Session
 {
 public:
   Session(HttpClient &http_client,
-          std::string scheme      = "http",
+          const std::string &scheme      = "http",
           const std::string &host = "",
           uint16_t port           = 80)
       : http_client_(http_client), is_session_active_(false)

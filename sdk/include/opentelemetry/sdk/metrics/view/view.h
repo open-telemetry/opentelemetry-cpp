@@ -27,7 +27,7 @@ public:
   View(const std::string &name,
        const std::string &description                        = "",
        AggregationType aggregation_type                      = AggregationType::kDefault,
-       std::shared_ptr<AggregationConfig> aggregation_config = nullptr,
+       const std::shared_ptr<AggregationConfig> &aggregation_config = nullptr,
        std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor =
            std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>(
                new opentelemetry::sdk::metrics::DefaultAttributesProcessor()))

@@ -45,7 +45,7 @@ public:
      * @param scope_config the scope configuration to return for the matched scope.
      * @return this
      */
-    Builder &AddCondition(std::function<bool(const InstrumentationScope &)> scope_matcher,
+    Builder &AddCondition(const std::function<bool(const InstrumentationScope &)> &scope_matcher,
                           T scope_config)
     {
       conditions_.emplace_back(scope_matcher, scope_config);
@@ -135,7 +135,7 @@ public:
 private:
   // Prevent direct initialization of ScopeConfigurator objects.
   explicit ScopeConfigurator(std::function<T(const InstrumentationScope &)> configurator)
-      : configurator_(configurator)
+      : configurator_(std::move(configurator))
   {}
 
   std::function<T(const InstrumentationScope &)> configurator_;

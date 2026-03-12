@@ -46,7 +46,7 @@ public:
       size_t size,
       std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
       MapAndResetCellType map_and_reset_cell)
-      : FixedSizeExemplarReservoir(size + 1, reservoir_cell_selector, map_and_reset_cell)
+      : FixedSizeExemplarReservoir(size + 1, std::move(reservoir_cell_selector), map_and_reset_cell)
   {}
 
   class HistogramCellSelector : public ReservoirCellSelector
