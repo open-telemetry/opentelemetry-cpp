@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
@@ -34,7 +35,7 @@ namespace trace
 /**
  * A sampling Decision for a Span to be created.
  */
-enum class Decision
+enum class Decision : std::uint8_t
 {
   // IsRecording() == false, span will not be recorded and all events and attributes will be
   // dropped.
