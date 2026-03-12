@@ -26,11 +26,11 @@ using MetricAttributes = opentelemetry::sdk::metrics::FilteredOrderedAttributeMa
 class ExemplarData
 {
 public:
-  static ExemplarData Create(std::shared_ptr<opentelemetry::trace::SpanContext> context,
+  static ExemplarData Create(const std::shared_ptr<opentelemetry::trace::SpanContext> &context,
                              const opentelemetry::common::SystemTimestamp &timestamp,
                              const PointDataAttributes &point_data_attr)
   {
-    return ExemplarData(std::move(context), timestamp, point_data_attr);
+    return ExemplarData(context, timestamp, point_data_attr);
   }
 
   /**

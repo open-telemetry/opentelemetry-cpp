@@ -51,6 +51,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy performance enum size warnings
   [#3923](https://github.com/open-telemetry/opentelemetry-cpp/pull/3923)
 
+* [CODE HEALTH] Fix clang-tidy unnecessary value param warnings
+  [#3931](https://github.com/open-telemetry/opentelemetry-cpp/pull/3931)
+
 Important changes:
 
 * [BUILD] Revisit EventLogger deprecation
