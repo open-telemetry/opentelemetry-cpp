@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <sstream>  // IWYU pragma: keep
 #include <string>
 
@@ -28,7 +29,7 @@ namespace common
 namespace internal_log
 {
 
-enum class LogLevel
+enum class LogLevel : std::uint8_t
 {
   None    = OTEL_INTERNAL_LOG_LEVEL_NONE,
   Error   = OTEL_INTERNAL_LOG_LEVEL_ERROR,

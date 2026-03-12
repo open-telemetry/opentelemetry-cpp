@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <functional>
 #include <memory>
 
@@ -35,14 +36,14 @@ namespace metrics
 class MetricFilter
 {
 public:
-  enum class MetricFilterResult
+  enum class MetricFilterResult : std::uint8_t
   {
     kAccept,
     kDrop,
     kAcceptPartial,
   };
 
-  enum class AttributesFilterResult
+  enum class AttributesFilterResult : std::uint8_t
   {
     kAccept,
     kDrop,

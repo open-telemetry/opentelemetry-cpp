@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <functional>
 #include <list>
 #include <map>
@@ -54,13 +55,13 @@ protected:
 
 public:
   HttpRequestCallback() {}
-  virtual ~HttpRequestCallback() = default;
 
-  HttpRequestCallback &operator=(HttpRequestCallback other)
-  {
-    callback = other.callback;
-    return *this;
-  }
+  HttpRequestCallback(const HttpRequestCallback &)            = delete;
+  HttpRequestCallback(HttpRequestCallback &&)                 = delete;
+  HttpRequestCallback &operator=(const HttpRequestCallback &) = delete;
+  HttpRequestCallback &operator=(HttpRequestCallback &&)      = delete;
+
+  virtual ~HttpRequestCallback() = default;
 
   HttpRequestCallback(CallbackFunction func) : callback(func) {}
 
@@ -95,7 +96,7 @@ protected:
     SocketTools::Socket socket;
     std::string receiveBuffer;
     std::string sendBuffer;
-    enum
+    enum : std::uint8_t
     {
       Idle,
       ReceivingHeaders,
@@ -175,6 +176,11 @@ public:
     setServerName(os.str());
     addListeningPort(port);
   }
+
+  HttpServer(const HttpServer &)            = delete;
+  HttpServer(HttpServer &&)                 = delete;
+  HttpServer &operator=(const HttpServer &) = delete;
+  HttpServer &operator=(HttpServer &&)      = delete;
 
   ~HttpServer() override
   {

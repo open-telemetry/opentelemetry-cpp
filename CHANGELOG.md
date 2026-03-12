@@ -15,11 +15,57 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Fix benchmark genrule capturing stderr into JSON output
+  [#3925](https://github.com/open-telemetry/opentelemetry-cpp/pull/3925)
+
+* [TEST] Add multi-threaded metrics benchmarks for shared vs per-thread counter
+  [#3865](https://github.com/open-telemetry/opentelemetry-cpp/pull/3865)
+
 * [BUILD] Avoid break caused by max() macro on windows
   [#3863](https://github.com/open-telemetry/opentelemetry-cpp/pull/3863)
 
 * [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.40.0
   [#3881](https://github.com/open-telemetry/opentelemetry-cpp/pull/3881)
+
+* [BUILD] Revisit EventLogger deprecation
+  [#3855](https://github.com/open-telemetry/opentelemetry-cpp/pull/3855)
+
+* [CODE HEALTH] Fix clang-tidy warnings, part 2
+  [#3872](https://github.com/open-telemetry/opentelemetry-cpp/pull/3872)
+
+* [CONFIGURATION] File configuration - spec stability
+  [#3862](https://github.com/open-telemetry/opentelemetry-cpp/pull/3862)
+
+* [BUILD] Upgrade to rapidyaml 0.10.0
+  [#3906](https://github.com/open-telemetry/opentelemetry-cpp/pull/3906)
+
+* [EXAMPLES] Deprecated semantic conventions used
+  [#3905](https://github.com/open-telemetry/opentelemetry-cpp/pull/3905)
+
+* [CODE HEALTH] Fix clang-tidy misc-use-internal-linkage warnings
+  [#3600](https://github.com/open-telemetry/opentelemetry-cpp/pull/3600)
+
+* [CODE HEALTH] Fix clang-tidy macro to enum warnings
+  [#3922](https://github.com/open-telemetry/opentelemetry-cpp/pull/3922)
+
+* [CODE HEALTH] Fix clang-tidy performance enum size warnings
+  [#3923](https://github.com/open-telemetry/opentelemetry-cpp/pull/3923)
+
+Important changes:
+
+* [BUILD] Revisit EventLogger deprecation
+  [#3855](https://github.com/open-telemetry/opentelemetry-cpp/pull/3855)
+
+  * File `DEPRECATED.md` contains information about current deprecation
+    plans.
+  * Please adjust your application accordingly, to avoid disruption.
+
+* [CONFIGURATION] File configuration - spec stability
+  [#3862](https://github.com/open-telemetry/opentelemetry-cpp/pull/3862)
+
+  * The specification for declarative configuration is now stable.
+  * As a result, environment variable `OTEL_EXPERIMENTAL_CONFIG_FILE`
+    is now renamed to `OTEL_CONFIG_FILE`.
 
 ## [1.25 2026-02-07]
 

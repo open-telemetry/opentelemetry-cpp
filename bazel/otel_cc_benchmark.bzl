@@ -40,7 +40,7 @@ def otel_cc_benchmark(name, srcs, deps, tags = [""]):
         tools = [":" + name],
         tags = tags + ["benchmark_result", "manual"],
         testonly = True,
-        cmd = "$(location :" + name + (") --benchmark_format=json --benchmark_color=false --benchmark_min_time=.1s &> $@"),
+        cmd = "$(location :" + name + (") --benchmark_format=json --benchmark_color=false --benchmark_min_time=.1s > $@ 2>/dev/null"),
     )
 
     # This is run as part of "bazel test ..." to smoke-test benchmarks. It's

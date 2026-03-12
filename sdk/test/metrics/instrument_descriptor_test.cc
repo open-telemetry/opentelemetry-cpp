@@ -8,7 +8,7 @@
 
 using namespace opentelemetry::sdk::metrics;
 
-InstrumentDescriptor CreateInstrumentDescriptor(
+static InstrumentDescriptor CreateInstrumentDescriptor(
     const std::string &name        = "counter",
     const std::string &description = "description",
     const std::string &unit        = "unit",
