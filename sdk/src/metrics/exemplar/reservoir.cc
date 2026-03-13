@@ -4,7 +4,6 @@
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 #  include <stddef.h>
-#  include <utility>
 
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/metrics/exemplar/aligned_histogram_bucket_exemplar_reservoir.h"
