@@ -158,7 +158,18 @@ public:
 
   pointer get() const noexcept { return wrapper().Get(); }
 
-  void swap(shared_ptr<T> &other) noexcept { std::swap(buffer_, other.buffer_); }
+  void swap(shared_ptr<T> &other) noexcept
+  {
+    if (this == &other)
+    {
+      return;
+    }
+
+    // Swap the live wrapper objects (object-level swap), not the raw
+    // PlacementBuffer bytes. This preserves object lifetime correctness and
+    // avoids moving `other` as an object.
+    std::swap(wrapper(), other.wrapper());
+  }
 
   template <typename U>
   friend class shared_ptr;
