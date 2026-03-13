@@ -89,7 +89,7 @@ public:
       return ScopeConfigurator<T>(
           [conditions_ = this->conditions_, default_scope_config_ = this->default_scope_config_](
               const InstrumentationScope &scope_info) {
-            for (Condition condition : conditions_)
+            for (const Condition &condition : conditions_)
             {
               if (condition.scope_matcher(scope_info))
               {
