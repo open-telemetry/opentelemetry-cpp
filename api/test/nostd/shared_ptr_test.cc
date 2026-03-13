@@ -166,6 +166,31 @@ TEST(SharedPtrTest, Swap)
   EXPECT_EQ(ptr2.get(), value1);
 }
 
+TEST(SharedPtrTest, SwapSelfNoOp)
+{
+  struct TestStruct
+  {
+    explicit TestStruct(int &destruct_count) noexcept : destruct_count_{&destruct_count} {}
+
+    ~TestStruct() { ++(*destruct_count_); }
+
+    int *destruct_count_;
+  };
+
+  int destruct_count{0};
+
+  {
+    shared_ptr<TestStruct> ptr{std::make_shared<TestStruct>(destruct_count)};
+    auto *ptr_before = ptr.get();
+
+    ptr.swap(ptr);
+
+    EXPECT_EQ(ptr.get(), ptr_before);
+  }
+
+  EXPECT_EQ(destruct_count, 1);
+}
+
 TEST(SharedPtrTest, Comparison)
 {
   shared_ptr<int> ptr1{new int{123}};
