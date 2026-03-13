@@ -134,8 +134,8 @@ public:
 
 private:
   // Prevent direct initialization of ScopeConfigurator objects.
-  explicit ScopeConfigurator(std::function<T(const InstrumentationScope &)> configurator)
-      : configurator_(std::move(configurator))
+  explicit ScopeConfigurator(const std::function<T(const InstrumentationScope &)> &configurator)
+      : configurator_(configurator)
   {}
 
   std::function<T(const InstrumentationScope &)> configurator_;
