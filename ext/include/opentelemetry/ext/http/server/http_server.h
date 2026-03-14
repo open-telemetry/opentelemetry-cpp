@@ -63,11 +63,11 @@ public:
 
   virtual ~HttpRequestCallback() = default;
 
-  HttpRequestCallback(CallbackFunction func) : callback(func) {}
+  HttpRequestCallback(CallbackFunction func) : callback(std::move(func)) {}
 
   HttpRequestCallback &operator=(CallbackFunction func)
   {
-    callback = func;
+    callback = std::move(func);
     return (*this);
   }
 
@@ -133,7 +133,7 @@ protected:
       second = nullptr;
     }
 
-    HttpRequestHandler &operator=(std::pair<std::string, HttpRequestCallback *> other)
+    HttpRequestHandler &operator=(const std::pair<std::string, HttpRequestCallback *> &other)
     {
       first  = other.first;
       second = other.second;

@@ -62,7 +62,7 @@ namespace otlp
 {
 
 template <class IntegerType>
-static IntegerType JsonToInteger(nlohmann::json value)
+static IntegerType JsonToInteger(const nlohmann::json &value)
 {
   if (value.is_string())
   {
