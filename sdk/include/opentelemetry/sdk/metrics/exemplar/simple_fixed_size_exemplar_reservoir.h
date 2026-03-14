@@ -17,11 +17,6 @@
 #  include "src/common/random.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace common
-{
-class OrderedAttributeMap;
-}  // namespace common
-
 namespace context
 {
 class Context;
