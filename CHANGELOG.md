@@ -54,6 +54,9 @@ Increment the:
 * [EXPORTER] Allow custom HttpClient in OTLP HTTP
   [#3930](https://github.com/open-telemetry/opentelemetry-cpp/pull/3930)
 
+* [CODE HEALTH] Fix clang-tidy unnecessary value param warnings
+  [#3931](https://github.com/open-telemetry/opentelemetry-cpp/pull/3931)
+
 Important changes:
 
 * [BUILD] Revisit EventLogger deprecation
