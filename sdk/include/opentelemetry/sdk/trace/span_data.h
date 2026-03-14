@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
@@ -37,10 +38,10 @@ namespace trace
 class SpanDataEvent
 {
 public:
-  SpanDataEvent(const std::string &name,
+  SpanDataEvent(std::string name,
                 opentelemetry::common::SystemTimestamp timestamp,
                 const opentelemetry::common::KeyValueIterable &attributes)
-      : name_(name), timestamp_(timestamp), attribute_map_(attributes)
+      : name_(std::move(name)), timestamp_(timestamp), attribute_map_(attributes)
   {}
 
   /**
@@ -77,9 +78,9 @@ private:
 class SpanDataLink
 {
 public:
-  SpanDataLink(const opentelemetry::trace::SpanContext &span_context,
+  SpanDataLink(opentelemetry::trace::SpanContext span_context,
                const opentelemetry::common::KeyValueIterable &attributes)
-      : span_context_(span_context), attribute_map_(attributes)
+      : span_context_(std::move(span_context)), attribute_map_(attributes)
   {}
 
   /**
