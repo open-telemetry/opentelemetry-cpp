@@ -1,12 +1,13 @@
-# OpenTelemetry C++ ASYNC Example
+# OpenTelemetry C++ Manual Asynchronous Context Propagation Example
 
-This is a simple example that demonstrates tracing async requests between
-generic clients and servers. It simulates context injections and extractions
-and shows how to explicitly set parent span_id's in different situations, when
-the scope is not available, or different threads are run in parallel.
+This example demonstrates how to manually propagate tracing context across
+asynchronous calls between generic clients and servers. It simulates context
+injections and extractions showing how to **explicitly/manually** set parent
+span_id's in different situations, when the scope is not available, or
+different threads are run in parallel.
 
-The proposed pattern may be used for any kind of asynchronous client/server
-communication.
+The proposed pattern may be helpful for use cases which involve asynchronous
+operations.
 
 ## Running the example
 
@@ -19,15 +20,14 @@ requests have distributed tracing context `injected` into a map, simulating
 headers.
 
 * These requests then arrive to a server, which `extracts` the span information
-and creates child spans sharing the same trace id's with the client request,
-and marking it as parent. After that, other spans are `nested`, simulating
-server work.
+and creates child spans sharing the same trace id's with the client request.
+After that, other spans are `nested`, simulating server work.
 
-* Answers contain again the context `injected`, and the client extracts them
-without more context than the headers arriving from the
+* Answers contain again the context `injected`, and the client propagates it
+without more context than the headers arriving in the answer.
 
-* The Parent spans that originated the only 2 `trace-id`'s of this example are
-kept alive during the whole example, and ended at the end.
+* The parent spans that originated the only 2 `trace-id`'s simulated here are
+kept alive until the end of the example.
 
 ```text
 [Client]                    [Server]
@@ -45,7 +45,7 @@ process_answer
 ## Span Hierarchy
 
 Only 2 traces are generated in this example. Each one contains 4 spans in
-total, created across both a server and a client. The Span hierarchy is
+total, and are propagated across a server and a client. The Span hierarchy is
 shown below:
 
 ```text
@@ -67,7 +67,9 @@ create child spans from a previous one, independently on the active span.
 
 It's worth noting that `shared_ptr`'s are used because it helps for keeping
 spans alive and passing them across different lambda functions or execution
-scopes for more complex use cases. These functions are:
+scopes for more complex use cases.
+
+The auxiliary functions used in this example are explained below:
 
 ### Creating Child Spans
 

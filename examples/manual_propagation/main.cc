@@ -42,7 +42,7 @@ void InitTracer()
   std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
       trace_sdk::TracerProviderFactory::Create(std::move(processor),
                                                opentelemetry::sdk::resource::Resource::Create({}));
-  // Set the global trace provider
+  // Set the global tracer provider
   trace_sdk::Provider::SetTracerProvider(provider);
 
   ctx::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
