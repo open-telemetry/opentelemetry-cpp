@@ -70,7 +70,7 @@ public:
   // movable and copiable
   DefaultSpan(const DefaultSpan &other) noexcept : span_context_(other.span_context_) {}
 
-  DefaultSpan &operator=(const DefaultSpan &other)
+  DefaultSpan &operator=(const DefaultSpan &other) noexcept
   {
     if (this == &other)
     {
