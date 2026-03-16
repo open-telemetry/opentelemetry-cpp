@@ -70,7 +70,7 @@ Increment the:
   [#3933](https://github.com/open-telemetry/opentelemetry-cpp/pull/3933)
 
 * [CODE HEALTH] Fix clang-tidy special-member-functions warnings in trace
-  [#3668](https://github.com/open-telemetry/opentelemetry-cpp/pull/3668)
+  [#3934](https://github.com/open-telemetry/opentelemetry-cpp/pull/3934)
 
 Important changes:
 
