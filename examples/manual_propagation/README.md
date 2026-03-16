@@ -163,7 +163,7 @@ outlined in the previous diagrams are fulfilled. For example:
 ### Trace 1 `29656cc8079bff4fe30bdb96b0f24bef`
 
 | name | parent_span_id | span_id | events |
-|------|----------------|---------|--------|
+| ------ | ---------------- | --------- | -------- |
 | request1 | 0000000000000000 | f026e45ec526047e | _(none)_ |
 | server | f026e45ec526047e | d701525271ff5d72 | Processing in server, Replying answer |
 | nested | d701525271ff5d72 | c6aaee683b544ec3 | Nested did some work |
@@ -172,7 +172,7 @@ outlined in the previous diagrams are fulfilled. For example:
 ### Trace 2 `24a0afe30c007794d43dac03c4b7c956`
 
 | name | parent_span_id | span_id | events |
-|------|----------------|---------|--------|
+| ------ | ---------------- | --------- | -------- |
 | request2 | 0000000000000000 | a038787bb5eb6f1b | _(none)_ |
 | server | a038787bb5eb6f1b | 529c7df6581d9279 | Processing in server, Replying answer |
 | nested | 529c7df6581d9279 | d4946bb9738ae08b | Nested did some work |
