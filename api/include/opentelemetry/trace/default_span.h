@@ -68,19 +68,27 @@ public:
   DefaultSpan(SpanContext span_context) noexcept : span_context_(std::move(span_context)) {}
 
   // movable and copiable
-  DefaultSpan(const DefaultSpan &spn) noexcept : span_context_(spn.span_context_) {}
+  DefaultSpan(const DefaultSpan &other) noexcept : span_context_(other.span_context_) {}
 
-  DefaultSpan &operator=(const DefaultSpan &spn)
+  DefaultSpan &operator=(const DefaultSpan &other)
   {
-    span_context_ = spn.span_context_;
+    if (this == &other)
+    {
+      return *this;
+    }
+    span_context_ = other.span_context_;
     return *this;
   }
 
-  DefaultSpan(DefaultSpan &&spn) noexcept : span_context_(std::move(spn.span_context_)) {}
+  DefaultSpan(DefaultSpan &&other) noexcept : span_context_(std::move(other.span_context_)) {}
 
-  DefaultSpan &operator=(DefaultSpan &&spn) noexcept
+  DefaultSpan &operator=(DefaultSpan &&other) noexcept
   {
-    span_context_ = std::move(spn.span_context_);
+    if (this == &other)
+    {
+      return *this;
+    }
+    span_context_ = std::move(other.span_context_);
     return *this;
   }
 
