@@ -13,20 +13,34 @@ operations.
 
 Build and Deploy this opentelemetry-cpp example as described in [INSTALL.md](../../INSTALL.md).
 
+## Auxiliary functions
+
+This example provides a small set of auxiliary functions that are able to
+create child spans from a previous one, independently on the active span:
+
+- `CreateChildSpan`: Creating Child Spans for a given explicit parent.
+- `CreateChildSpanFromRemote`: Creating Child Spans from incoming carriers
+(i.e. headers).
+- `InjectTraceContext`: Injecting arbitrary spans into carriers (i.e. headers).
+
+> It's worth noting that `shared_ptr`'s are used because it helps for keeping
+> spans alive and passing them across different lambda functions or execution
+> scopes for more complex use cases.
+
 ## Example Flow
 
-* This example creates 2 asynchronous requests from a theoretical client. The
+- This example creates 2 asynchronous requests from a theoretical client. The
 requests have distributed tracing context `injected` into a map, simulating
 headers.
 
-* These requests then arrive to a server, which `extracts` the span information
+- These requests then arrive to a server, which `extracts` the span information
 and creates child spans sharing the same trace id's with the client request.
 After that, other spans are `nested`, simulating server work.
 
-* Answers contain again the context `injected`, and the client propagates it
+- Answers contain again the context `injected`, and the client propagates it
 without more context than the headers arriving in the answer.
 
-* The parent spans that originated the only 2 `trace-id`'s simulated here are
+- The parent spans that originated the only 2 `trace-id`'s simulated here are
 kept alive until the end of the example.
 
 ```text
@@ -58,101 +72,6 @@ request2  (trace: 24a0afe3...,  in client)
 └─→ server
     ├─→ nested (in server)
     └─→ answer (in client)
-```
-
-## Auxiliary functions
-
-This example provides a small set of auxiliary functions that are able to
-create child spans from a previous one, independently on the active span.
-
-It's worth noting that `shared_ptr`'s are used because it helps for keeping
-spans alive and passing them across different lambda functions or execution
-scopes for more complex use cases.
-
-The auxiliary functions used in this example are explained below:
-
-### Creating Child Spans
-
-An auxiliary function that returns a child span for a desired arbitrary parent.
-In this example, the `SpanKind` and `name` are also passed from outside the
-function.
-
-```cpp
-nostd::shared_ptr<trace_api::Span> create_child_span(
-    const std::string &name,
-    const nostd::shared_ptr<trace_api::Span> &parent,
-    trace_api::SpanKind kind)
-{
-  trace_api::StartSpanOptions opts;
-  opts.kind = kind;
-  if (parent)
-  {
-    opts.parent = parent->GetContext();
-  }
-
-  auto span =  get_tracer()->StartSpan(name, opts);
-  return span;
-}
-```
-
-### Creating Child Spans from incoming requests
-
-An auxiliary function that returns a child span from incoming headers that
-contain tracing information. In this example, the `SpanKind` and `name` are
-also passed from outside the function.
-
-```cpp
-nostd::shared_ptr<trace_api::Span> create_child_span_from_remote(header_map &headers,
-                                                                 const std::string &name,
-                                                                trace_api::SpanKind kind)
-{
-  HttpTextMapCarrier carrier(headers);
-  auto current_ctx = ctx::RuntimeContext::GetCurrent();
-  auto new_context = ctx::propagation::GlobalTextMapPropagator::GetGlobalPropagator()->Extract(
-      carrier, current_ctx);
-  auto remote_span = opentelemetry::trace::GetSpan(new_context);
-
-  return create_child_span(name, remote_span, kind);
-}
-
-```
-
-### Injecting arbitrary spans into carriers (i.e. headers)
-
-An auxiliary function that `injects` the tracing information to a given carrier
-structure. In this example a simple implementation of the `TextMapCarrier` as
-an `std::map<std::string, std::string>` was used.
-
-It's important to note that the `trace_api::SetSpan(current_ctx, span)`
-function is needed for the injection to explicitly use the desired span
-context.
-
-```cpp
-void inject_trace_context(const nostd::shared_ptr<trace_api::Span> &span, header_map &headers)
-{
-  if (!span)
-  {
-    return;
-  }
-
-  // First, we set the Span into the context explicitly
-  auto current_ctx   = ctx::RuntimeContext::GetCurrent();
-  auto ctx_with_span = trace_api::SetSpan(current_ctx, span);
-
-  // Then we inject the span info into the headers
-  HttpTextMapCarrier carrier(headers);
-  ctx::propagation::GlobalTextMapPropagator::GetGlobalPropagator()->Inject(carrier, ctx_with_span);
-}
-```
-
-The previous examples make use of the following aliases:
-
-```cpp
-namespace trace_api = opentelemetry::trace;
-namespace trace_sdk = opentelemetry::sdk::trace;
-namespace nostd     = opentelemetry::nostd;
-namespace ctx       = opentelemetry::context;
-using header_map = std::map<std::string, std::string>;
 ```
 
 ## Output
