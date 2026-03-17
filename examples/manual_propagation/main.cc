@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <functional>
 #include <future>
 #include <map>
 #include <string>
@@ -36,7 +37,7 @@ namespace trace_sdk = opentelemetry::sdk::trace;
 namespace nostd     = opentelemetry::nostd;
 namespace ctx       = opentelemetry::context;
 
-using header_map = std::map<std::string, std::string>;
+using HeaderMap = std::map<std::string, std::string>;
 
 namespace
 {
@@ -66,24 +67,19 @@ nostd::shared_ptr<trace_api::Tracer> get_tracer()
   auto provider = trace_api::Provider::GetTracerProvider();
   return provider->GetTracer("foo_library");
 }
-}  // namespace
 
 namespace utils
 {
 
-nostd::shared_ptr<trace_api::Span> create_span(const std::string &name, trace_api::SpanKind kind)
-{
-  trace_api::StartSpanOptions opts;
-  opts.kind = kind;
+// An auxiliary function that returns a child span for a desired arbitrary
+// parent (when passed). Otherwise, defaults to root span creation.
+// In this example, the `SpanKind` and `name` are also passed from outside the
+// function.
 
-  auto span = get_tracer()->StartSpan(name, opts);
-  return span;
-}
-
-nostd::shared_ptr<trace_api::Span> create_child_span(
+nostd::shared_ptr<trace_api::Span> CreateSpan(
     const std::string &name,
-    const nostd::shared_ptr<trace_api::Span> &parent,
-    trace_api::SpanKind kind)
+    trace_api::SpanKind kind,
+    const nostd::shared_ptr<trace_api::Span> &parent = nostd::shared_ptr<trace_api::Span>{})
 {
   trace_api::StartSpanOptions opts;
   opts.kind = kind;
@@ -99,12 +95,12 @@ nostd::shared_ptr<trace_api::Span> create_child_span(
 class HttpTextMapCarrier : public ctx::propagation::TextMapCarrier
 {
 public:
-  HttpTextMapCarrier(header_map &headers) : headers_(headers) {}
+  HttpTextMapCarrier(HeaderMap &headers) : headers_(headers) {}
 
   nostd::string_view Get(nostd::string_view key) const noexcept override
   {
-    auto it = headers_.find(std::string(key.data(), key.size()));
-    if (it != headers_.end())
+    auto it = headers_.get().find(std::string(key.data(), key.size()));
+    if (it != headers_.get().end())
     {
       return it->second;
     }
@@ -113,13 +109,21 @@ public:
 
   void Set(nostd::string_view k, nostd::string_view v) noexcept override
   {
-    headers_.emplace(std::string(k.data(), k.size()), std::string(v.data(), v.size()));
+    headers_.get()[std::string(k.data(), k.size())] = std::string(v.data(), v.size());
   }
 
-  header_map &headers_;
+  std::reference_wrapper<HeaderMap> headers_;
 };
 
-void inject_trace_context(const nostd::shared_ptr<trace_api::Span> &span, header_map &headers)
+// An auxiliary function that injects the tracing information to a given carrier
+// structure. In this example a simple implementation of the `TextMapCarrier` as
+// an `std::map<std::string, std::string>` was used.
+//
+// It's important to note that the `trace_api::SetSpan(current_ctx, span)`
+// function is needed for the injection to explicitly use the desired span
+// context.
+
+void InjectTraceContext(const nostd::shared_ptr<trace_api::Span> &span, HeaderMap &headers)
 {
   if (!span)
   {
@@ -135,9 +139,13 @@ void inject_trace_context(const nostd::shared_ptr<trace_api::Span> &span, header
   ctx::propagation::GlobalTextMapPropagator::GetGlobalPropagator()->Inject(carrier, ctx_with_span);
 }
 
-nostd::shared_ptr<trace_api::Span> create_child_span_from_remote(header_map &headers,
-                                                                 const std::string &name,
-                                                                 const trace_api::SpanKind kind)
+// An auxiliary function that returns a child span from incoming headers that
+// contain tracing information. In this example, the `SpanKind` and `name` are
+// also passed from outside the function.
+
+nostd::shared_ptr<trace_api::Span> CreateChildSpanFromRemote(HeaderMap &headers,
+                                                             const std::string &name,
+                                                             trace_api::SpanKind kind)
 {
   HttpTextMapCarrier carrier(headers);
   auto current_ctx = ctx::RuntimeContext::GetCurrent();
@@ -145,7 +153,7 @@ nostd::shared_ptr<trace_api::Span> create_child_span_from_remote(header_map &hea
       carrier, current_ctx);
   auto remote_span = opentelemetry::trace::GetSpan(new_context);
 
-  return create_child_span(name, remote_span, kind);
+  return CreateSpan(name, kind, remote_span);
 }
 
 }  // namespace utils
@@ -153,11 +161,11 @@ nostd::shared_ptr<trace_api::Span> create_child_span_from_remote(header_map &hea
 namespace client
 {
 
-void process_answer(header_map &remote_headers)
+void ProcessAnswer(HeaderMap &remote_headers)
 {
   // The only context we have here is the headers
-  auto remote = utils::create_child_span_from_remote(remote_headers, "process_answer",
-                                                     trace_api::SpanKind::kClient);
+  auto remote = utils::CreateChildSpanFromRemote(remote_headers, "process_answer",
+                                                 trace_api::SpanKind::kClient);
   remote->AddEvent("Answer processed");
   remote->SetStatus(trace_api::StatusCode::kOk);
   // this span is automatically ended on exit
@@ -168,22 +176,22 @@ void process_answer(header_map &remote_headers)
 namespace server
 {
 
-header_map process_request(header_map &remote_headers)
+HeaderMap ProcessRequest(HeaderMap &remote_headers)
 {
   // Extract remote context and create server-side child span
   auto server_span =
-      utils::create_child_span_from_remote(remote_headers, "server", trace_api::SpanKind::kServer);
+      utils::CreateChildSpanFromRemote(remote_headers, "server", trace_api::SpanKind::kServer);
 
   // Simulating work with nested spans
   server_span->AddEvent("Processing in server");
-  auto nested = utils::create_child_span("nested", server_span, trace_api::SpanKind::kServer);
+  auto nested = utils::CreateSpan("nested", trace_api::SpanKind::kServer, server_span);
   nested->AddEvent("Nested did some work");
   nested->SetStatus(trace_api::StatusCode::kOk);
   nested->End();
 
   // Filling answer headers
-  header_map answer_headers;
-  utils::inject_trace_context(server_span, answer_headers);
+  HeaderMap answer_headers;
+  utils::InjectTraceContext(server_span, answer_headers);
 
   // server_span is automatically ended on exit
   server_span->AddEvent("Replying answer");
@@ -192,6 +200,7 @@ header_map process_request(header_map &remote_headers)
 }
 
 }  // namespace server
+}  // namespace
 
 int main(int /* argc */, char ** /* argv */)
 {
@@ -199,29 +208,29 @@ int main(int /* argc */, char ** /* argv */)
 
   // The main client thread is in charge of sending requests and
   // processing when they are answered.
-  auto r1 = utils::create_span("request1", trace_api::SpanKind::kClient);
-  header_map h1;
-  utils::inject_trace_context(r1, h1);
+  auto r1 = utils::CreateSpan("request1", trace_api::SpanKind::kClient);
+  HeaderMap h1;
+  utils::InjectTraceContext(r1, h1);
 
   // The simulated "server" will handle the request asynchronously
   auto server_future_1 =
-      std::async(std::launch::async, [&h1] { return server::process_request(h1); });
+      std::async(std::launch::async, [&h1] { return server::ProcessRequest(h1); });
 
   // The client thread is now free to send another request
-  auto r2 = utils::create_span("request2", trace_api::SpanKind::kClient);
-  header_map h2;
-  utils::inject_trace_context(r2, h2);
+  auto r2 = utils::CreateSpan("request2", trace_api::SpanKind::kClient);
+  HeaderMap h2;
+  utils::InjectTraceContext(r2, h2);
 
   // The simulated "server" will handle the request asynchronously
   auto server_future_2 =
-      std::async(std::launch::async, [&h2] { return server::process_request(h2); });
+      std::async(std::launch::async, [&h2] { return server::ProcessRequest(h2); });
 
   // Order doesn't matter. Let's simulate that we get the second answer before the first one
-  header_map answer_headers_2 = server_future_2.get();
-  client::process_answer(answer_headers_2);
+  HeaderMap answer_headers_2 = server_future_2.get();
+  client::ProcessAnswer(answer_headers_2);
 
-  header_map answer_headers_1 = server_future_1.get();
-  client::process_answer(answer_headers_1);
+  HeaderMap answer_headers_1 = server_future_1.get();
+  client::ProcessAnswer(answer_headers_1);
 
   // Both root spans are kept alive till the end, to prove they can both
   // outlive other parallel and async processing without interfering each other
