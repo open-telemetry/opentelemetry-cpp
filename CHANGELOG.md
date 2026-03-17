@@ -57,6 +57,21 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy unnecessary value param warnings
   [#3931](https://github.com/open-telemetry/opentelemetry-cpp/pull/3931)
 
+* [CODE HEALTH] Fix clang-tidy cppcoreguidelines-init-variables warnings
+  [#3919](https://github.com/open-telemetry/opentelemetry-cpp/pull/3919)
+
+* [CODE HEALTH] Fix clang-tidy warnings in nostd files
+  [#3924](https://github.com/open-telemetry/opentelemetry-cpp/pull/3924)
+
+* [CODE HEALTH] Fix clang-tidy performance-for-range-copy warnings
+  [#3932](https://github.com/open-telemetry/opentelemetry-cpp/pull/3932)
+
+* [CODE HEALTH] Fix clang-tidy bugprone warnings
+  [#3933](https://github.com/open-telemetry/opentelemetry-cpp/pull/3933)
+
+* [CODE HEALTH] Fix clang-tidy special-member-functions warnings in trace
+  [#3934](https://github.com/open-telemetry/opentelemetry-cpp/pull/3934)
+
 Important changes:
 
 * [BUILD] Revisit EventLogger deprecation
