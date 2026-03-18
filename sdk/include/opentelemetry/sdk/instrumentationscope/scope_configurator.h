@@ -49,7 +49,7 @@ public:
     Builder &AddCondition(std::function<bool(const InstrumentationScope &)> scope_matcher,
                           T scope_config)
     {
-      conditions_.emplace_back(std::move(scope_matcher), scope_config);
+      conditions_.emplace_back(std::move(scope_matcher), std::move(scope_config));
       return *this;
     }
 
@@ -67,7 +67,7 @@ public:
           [scope_name = std::string(scope_name)](const InstrumentationScope &scope_info) {
             return scope_info.GetName() == scope_name;
           };
-      conditions_.emplace_back(name_equals_matcher, scope_config);
+      conditions_.emplace_back(std::move(name_equals_matcher), std::move(scope_config));
       return *this;
     }
 
@@ -112,8 +112,8 @@ public:
       std::function<bool(const InstrumentationScope &)> scope_matcher;
       T scope_config;
 
-      Condition(const std::function<bool(const InstrumentationScope &)> &matcher, const T &config)
-          : scope_matcher(matcher), scope_config(config)
+      Condition(std::function<bool(const InstrumentationScope &)> matcher, T config)
+          : scope_matcher(std::move(matcher)), scope_config(std::move(config))
       {}
     };
 
