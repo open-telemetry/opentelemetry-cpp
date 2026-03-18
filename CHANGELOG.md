@@ -15,11 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-<<<<<<< HEAD
 ## [1.26 2026-03-19]
-=======
-
->>>>>>> main
 
 * [RELEASE] Bump main branch to 1.26.0-dev
   [#3853](https://github.com/open-telemetry/opentelemetry-cpp/pull/3853)
@@ -201,7 +197,7 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy performance warnings
   [#3941](https://github.com/open-telemetry/opentelemetry-cpp/pull/3941)
 
-* [EXPORTER] Remove explicit timestamps from metric points exported by Prometheus
+* [EXPORTERS] Remove prometheus timestamps
   [#3895](https://github.com/open-telemetry/opentelemetry-cpp/pull/3895)
 
 Important changes:
