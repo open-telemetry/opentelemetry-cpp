@@ -70,7 +70,7 @@ public:
       const std::shared_ptr<OtlpGrpcClient> &client)
   {
     return std::unique_ptr<sdk::metrics::PushMetricExporter>(
-        new OtlpGrpcMetricExporter(std::move(stub_interface), std::move(client)));
+        new OtlpGrpcMetricExporter(std::move(stub_interface), client));
   }
 
   std::unique_ptr<sdk::metrics::PushMetricExporter> GetExporter(
@@ -78,7 +78,7 @@ public:
       const std::shared_ptr<OtlpGrpcClient> &client)
   {
     return std::unique_ptr<sdk::metrics::PushMetricExporter>(
-        new OtlpGrpcMetricExporter(options, std::move(client)));
+        new OtlpGrpcMetricExporter(options, client));
   }
 
   // Get the options associated with the given exporter.
