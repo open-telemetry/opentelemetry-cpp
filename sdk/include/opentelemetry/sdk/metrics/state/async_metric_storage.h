@@ -36,7 +36,7 @@ namespace metrics
 class AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStorage
 {
 public:
-  AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
+  AsyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,
                      const AggregationType aggregation_type,
                      std::shared_ptr<const AttributesProcessor> attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW

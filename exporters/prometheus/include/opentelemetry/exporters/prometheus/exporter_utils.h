@@ -162,7 +162,7 @@ private:
    * Counter => Prometheus Counter
    */
   template <typename T>
-  static void SetData(std::vector<T> values,
+  static void SetData(const std::vector<T> &values,
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
                       const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
                       ::prometheus::MetricType type,
@@ -175,7 +175,7 @@ private:
    * Histogram => Prometheus Histogram
    */
   template <typename T>
-  static void SetData(std::vector<T> values,
+  static void SetData(const std::vector<T> &values,
                       const std::vector<double> &boundaries,
                       const std::vector<uint64_t> &counts,
                       const opentelemetry::sdk::metrics::PointAttributes &labels,

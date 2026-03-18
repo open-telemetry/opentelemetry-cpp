@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -94,7 +95,7 @@ public:
   MetricProducer &operator=(const MetricProducer &) = delete;
   MetricProducer &operator=(MetricProducer &&)      = delete;
 
-  enum class Status
+  enum class Status : std::uint8_t
   {
     kSuccess,
     kFailure,

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <functional>
 #include <list>
 #include <map>
@@ -62,11 +63,11 @@ public:
 
   virtual ~HttpRequestCallback() = default;
 
-  HttpRequestCallback(CallbackFunction func) : callback(func) {}
+  HttpRequestCallback(CallbackFunction func) : callback(std::move(func)) {}
 
   HttpRequestCallback &operator=(CallbackFunction func)
   {
-    callback = func;
+    callback = std::move(func);
     return (*this);
   }
 
@@ -95,7 +96,7 @@ protected:
     SocketTools::Socket socket;
     std::string receiveBuffer;
     std::string sendBuffer;
-    enum
+    enum : std::uint8_t
     {
       Idle,
       ReceivingHeaders,
@@ -132,7 +133,7 @@ protected:
       second = nullptr;
     }
 
-    HttpRequestHandler &operator=(std::pair<std::string, HttpRequestCallback *> other)
+    HttpRequestHandler &operator=(const std::pair<std::string, HttpRequestCallback *> &other)
     {
       first  = other.first;
       second = other.second;
