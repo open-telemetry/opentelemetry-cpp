@@ -636,7 +636,7 @@ void PrometheusExporterUtils::SetTarget(
  */
 template <typename T>
 void PrometheusExporterUtils::SetData(
-    std::vector<T> values,
+    const std::vector<T> &values,
     const metric_sdk::PointAttributes &labels,
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
     prometheus_client::MetricType type,
@@ -655,7 +655,7 @@ void PrometheusExporterUtils::SetData(
  */
 template <typename T>
 void PrometheusExporterUtils::SetData(
-    std::vector<T> values,
+    const std::vector<T> &values,
     const std::vector<double> &boundaries,
     const std::vector<uint64_t> &counts,
     const metric_sdk::PointAttributes &labels,

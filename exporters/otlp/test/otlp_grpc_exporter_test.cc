@@ -407,7 +407,8 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryGenericValuesFromEnv)
 #  ifdef ENABLE_OTLP_RETRY_PREVIEW
 struct TestTraceService : public opentelemetry::proto::collector::trace::v1::TraceService::Service
 {
-  TestTraceService(std::vector<grpc::StatusCode> status_codes) : status_codes_(status_codes) {}
+  TestTraceService(const std::vector<grpc::StatusCode> &status_codes) : status_codes_(status_codes)
+  {}
 
   inline grpc::Status Export(
       grpc::ServerContext *,
