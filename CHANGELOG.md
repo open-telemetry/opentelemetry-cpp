@@ -83,8 +83,10 @@ Important changes:
 * [SDK] Swap Tracer/Meter/LoggerConfig disabled for enabled
   [#3942](https://github.com/open-telemetry/opentelemetry-cpp/pull/3942)
 
-  * In TracerConfig(bool), MeterConfig(bool), and LoggerConfig(bool), the boolean parameter now represents `enabled` instead of `disabled`.
-  * User code calling these constructors explicitly must be adjusted to pass `false` to disable.
+  * In TracerConfig(bool), MeterConfig(bool), and LoggerConfig(bool),
+    the boolean parameter now represents `enabled` instead of `disabled`.
+  * User code calling these constructors explicitly must be adjusted
+    to pass `false` to disable.
 
 * [BUILD] Revisit EventLogger deprecation
   [#3855](https://github.com/open-telemetry/opentelemetry-cpp/pull/3855)
