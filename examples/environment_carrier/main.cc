@@ -128,7 +128,7 @@ void RunParent()
   std::cout << "[parent] trace_id: " << Hex(root_span->GetContext().trace_id()) << '\n';
   std::cout << "[parent] span_id:  " << Hex(root_span->GetContext().span_id()) << '\n';
   std::cout << std::flush;
-  
+
   // Inject context into a map via EnvironmentCarrier
   auto env_map = std::make_shared<std::map<std::string, std::string>>();
   propagation::EnvironmentCarrier carrier(env_map);

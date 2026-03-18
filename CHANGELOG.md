@@ -75,6 +75,9 @@ Increment the:
 * [TEST] CMake component install test for resource_detectors
   [#3940](https://github.com/open-telemetry/opentelemetry-cpp/pull/3940)
 
+* [CODE HEALTH] Fix clang-tidy performance warnings
+  [#3941](https://github.com/open-telemetry/opentelemetry-cpp/pull/3941)
+
 Important changes:
 
 * [BUILD] Revisit EventLogger deprecation
