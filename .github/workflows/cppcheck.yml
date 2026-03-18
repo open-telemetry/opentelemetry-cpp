@@ -47,6 +47,7 @@ jobs:
             -I exporters/zipkin/include \
             -I ext/include \
             -I opentracing-shim/include \
+            -I resource_detectors/include \
             -I sdk/include \
             -i build \
             -i test \
