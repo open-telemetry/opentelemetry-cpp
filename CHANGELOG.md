@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Remove explicit timestamps from metric points exported by Prometheus
+  [#3895](https://github.com/open-telemetry/opentelemetry-cpp/pull/3895)
+
 * [BUILD] Fix benchmark genrule capturing stderr into JSON output
   [#3925](https://github.com/open-telemetry/opentelemetry-cpp/pull/3925)
 
