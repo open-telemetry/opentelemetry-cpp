@@ -442,7 +442,8 @@ switch ($action) {
       "exporters_prometheus",
       "exporters_elasticsearch",
       "exporters_zipkin",
-      "exporters_etw"
+      "exporters_etw",
+      "resource_detectors"
     )
     $EXPECTED_COMPONENTS_STRING = $EXPECTED_COMPONENTS -join ";"
 

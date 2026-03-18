@@ -72,6 +72,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy special-member-functions warnings in trace
   [#3934](https://github.com/open-telemetry/opentelemetry-cpp/pull/3934)
 
+* [TEST] CMake component install test for resource_detectors
+  [#3940](https://github.com/open-telemetry/opentelemetry-cpp/pull/3940)
+
 Important changes:
 
 * [BUILD] Revisit EventLogger deprecation
