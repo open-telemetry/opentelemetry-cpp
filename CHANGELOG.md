@@ -15,8 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
-* [SDK] Swap Tracer/Meter/LoggerConfig disabled for enabled
-  [#3942](https://github.com/open-telemetry/opentelemetry-cpp/pull/3942)
+* [EXPORTER] Remove explicit timestamps from metric points exported by Prometheus
+  [#3895](https://github.com/open-telemetry/opentelemetry-cpp/pull/3895)
 
 * [BUILD] Fix benchmark genrule capturing stderr into JSON output
   [#3925](https://github.com/open-telemetry/opentelemetry-cpp/pull/3925)
@@ -77,6 +77,12 @@ Increment the:
 
 * [TEST] CMake component install test for resource_detectors
   [#3940](https://github.com/open-telemetry/opentelemetry-cpp/pull/3940)
+
+* [CODE HEALTH] Fix clang-tidy performance warnings
+  [#3941](https://github.com/open-telemetry/opentelemetry-cpp/pull/3941)
+
+* [SDK] Swap Tracer/Meter/LoggerConfig disabled for enabled
+  [#3942](https://github.com/open-telemetry/opentelemetry-cpp/pull/3942)
 
 Important changes:
 
