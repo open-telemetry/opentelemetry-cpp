@@ -85,6 +85,7 @@
 #   exporters_elasticsearch
 #   exporters_etw
 #   exporters_zipkin
+#   resource_detectors
 #   shims_opentracing
 #
 # ::
@@ -125,6 +126,7 @@
 #   opentelemetry-cpp::elasticsearch_log_record_exporter - Imported target of COMPONENT exporters_elasticsearch
 #   opentelemetry-cpp::etw_exporter                      - Imported target of COMPONENT exporters_etw
 #   opentelemetry-cpp::zipkin_trace_exporter             - Imported target of COMPONENT exporters_zipkin
+#   opentelemetry-cpp::resource_detectors                - Imported target of COMPONENT resource_detectors
 #   opentelemetry-cpp::opentracing_shim                  - Imported target of COMPONENT shims_opentracing
 #
 # Additional Files Used in Component to Component and Third-Party Dependency Resolution
