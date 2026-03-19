@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Remove explicit timestamps from metric points exported by Prometheus
+  [#3895](https://github.com/open-telemetry/opentelemetry-cpp/pull/3895)
+
+* [BUILD] Fix benchmark genrule capturing stderr into JSON output
+  [#3925](https://github.com/open-telemetry/opentelemetry-cpp/pull/3925)
+
 * [TEST] Add multi-threaded metrics benchmarks for shared vs per-thread counter
   [#3865](https://github.com/open-telemetry/opentelemetry-cpp/pull/3865)
 
@@ -42,7 +48,51 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy misc-use-internal-linkage warnings
   [#3600](https://github.com/open-telemetry/opentelemetry-cpp/pull/3600)
 
+* [CODE HEALTH] Fix clang-tidy macro to enum warnings
+  [#3922](https://github.com/open-telemetry/opentelemetry-cpp/pull/3922)
+
+* [CODE HEALTH] Fix clang-tidy performance enum size warnings
+  [#3923](https://github.com/open-telemetry/opentelemetry-cpp/pull/3923)
+
+* [EXPORTER] Allow custom HttpClient in OTLP HTTP
+  [#3930](https://github.com/open-telemetry/opentelemetry-cpp/pull/3930)
+
+* [CODE HEALTH] Fix clang-tidy unnecessary value param warnings
+  [#3931](https://github.com/open-telemetry/opentelemetry-cpp/pull/3931)
+
+* [CODE HEALTH] Fix clang-tidy cppcoreguidelines-init-variables warnings
+  [#3919](https://github.com/open-telemetry/opentelemetry-cpp/pull/3919)
+
+* [CODE HEALTH] Fix clang-tidy warnings in nostd files
+  [#3924](https://github.com/open-telemetry/opentelemetry-cpp/pull/3924)
+
+* [CODE HEALTH] Fix clang-tidy performance-for-range-copy warnings
+  [#3932](https://github.com/open-telemetry/opentelemetry-cpp/pull/3932)
+
+* [CODE HEALTH] Fix clang-tidy bugprone warnings
+  [#3933](https://github.com/open-telemetry/opentelemetry-cpp/pull/3933)
+
+* [CODE HEALTH] Fix clang-tidy special-member-functions warnings in trace
+  [#3934](https://github.com/open-telemetry/opentelemetry-cpp/pull/3934)
+
+* [TEST] CMake component install test for resource_detectors
+  [#3940](https://github.com/open-telemetry/opentelemetry-cpp/pull/3940)
+
+* [CODE HEALTH] Fix clang-tidy performance warnings
+  [#3941](https://github.com/open-telemetry/opentelemetry-cpp/pull/3941)
+
+* [SDK] Swap Tracer/Meter/LoggerConfig disabled for enabled
+  [#3942](https://github.com/open-telemetry/opentelemetry-cpp/pull/3942)
+
 Important changes:
+
+* [SDK] Swap Tracer/Meter/LoggerConfig disabled for enabled
+  [#3942](https://github.com/open-telemetry/opentelemetry-cpp/pull/3942)
+
+  * In TracerConfig(bool), MeterConfig(bool), and LoggerConfig(bool),
+    the boolean parameter now represents `enabled` instead of `disabled`.
+  * User code calling these constructors explicitly must be adjusted
+    to pass `false` to disable.
 
 * [BUILD] Revisit EventLogger deprecation
   [#3855](https://github.com/open-telemetry/opentelemetry-cpp/pull/3855)

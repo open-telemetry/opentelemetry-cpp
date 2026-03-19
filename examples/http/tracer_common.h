@@ -89,7 +89,8 @@ void CleanupTracer()
   opentelemetry::sdk::trace::Provider::SetTracerProvider(none);
 }
 
-opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer(std::string tracer_name)
+opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer(
+    const std::string &tracer_name)
 {
   auto provider = opentelemetry::trace::Provider::GetTracerProvider();
   return provider->GetTracer(tracer_name);
