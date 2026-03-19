@@ -3,7 +3,6 @@
 
 foreach(
   testname
-  wildcard_match_test
   yaml_logs_test
   yaml_metrics_test
   yaml_propagator_test

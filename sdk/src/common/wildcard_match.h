@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <string>
 
 #include "opentelemetry/version.h"
@@ -10,7 +11,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace configuration
+namespace common
 {
 
 /**
@@ -57,6 +58,6 @@ inline bool WildcardMatch(const std::string &pattern, const std::string &text)
   return p == pattern.size();
 }
 
-}  // namespace configuration
+}  // namespace common
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

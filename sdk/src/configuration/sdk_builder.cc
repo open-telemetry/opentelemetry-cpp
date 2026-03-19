@@ -173,7 +173,7 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/version.h"
-#include "wildcard_match.h"
+#include "src/common/wildcard_match.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/configuration/exemplar_filter.h"
@@ -184,6 +184,8 @@ namespace sdk
 {
 namespace configuration
 {
+
+using common::WildcardMatch;
 
 class ResourceAttributeValueSetter
     : public opentelemetry::sdk::configuration::AttributeValueConfigurationVisitor

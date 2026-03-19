@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <string>
 
-#include "../../src/configuration/wildcard_match.h"
+#include "../../src/common/wildcard_match.h"
 
-using opentelemetry::sdk::configuration::WildcardMatch;
+using opentelemetry::sdk::common::WildcardMatch;
 
 TEST(WildcardMatch, exact_match)
 {

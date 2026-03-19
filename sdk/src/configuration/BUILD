@@ -12,6 +12,7 @@ cc_library(
     deps = [
         "//api",
         "//sdk:headers",
+        "//sdk/src/common:wildcard_match",
         "@rapidyaml",
     ],
 )
