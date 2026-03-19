@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.26 2026-03-19]
+## [1.26] 2026-03-19
 
 * [RELEASE] Bump main branch to 1.26.0-dev
   [#3853](https://github.com/open-telemetry/opentelemetry-cpp/pull/3853)
@@ -239,7 +239,7 @@ Important changes:
   * As a result, environment variable `OTEL_EXPERIMENTAL_CONFIG_FILE`
     is now renamed to `OTEL_CONFIG_FILE`.
 
-## [1.25 2026-02-07]
+## [1.25] 2026-02-07
 
 * [RELEASE] Bump main branch to 1.25.0-dev (#3759)
   [#3759](https://github.com/open-telemetry/opentelemetry-cpp/pull/3759)
@@ -456,7 +456,7 @@ Breaking changes:
   * As a result, member `collect_thread_instrumentation` in class
     `PeriodicExportingMetricReaderRuntimeOptions` is removed.
 
-## [1.24 2025-11-20]
+## [1.24] 2025-11-20
 
 * [RELEASE] Bump main branch to 1.24-dev
   [#3662](https://github.com/open-telemetry/opentelemetry-cpp/pull/3662)
@@ -648,7 +648,7 @@ New Features:
     file, instead of using environment variables.
   * See [opentelemetry-configuration](https://github.com/open-telemetry/opentelemetry-configuration)
 
-## [1.23 2025-09-25]
+## [1.23] 2025-09-25
 
 * [CodeHealth] Fix clang-tidy warnings part 6
   [#3507](https://github.com/open-telemetry/opentelemetry-cpp/pull/3507)
@@ -872,7 +872,7 @@ Breaking changes:
     and `ViewFactory::Create` methods.
   * Please adjust SDK configuration code accordingly.
 
-## [1.22 2025-07-11]
+## [1.22] 2025-07-11
 
 * [DOC] Udpate link to membership document
   [#3452](https://github.com/open-telemetry/opentelemetry-cpp/pull/3452)
@@ -1079,7 +1079,7 @@ Important changes:
     defines `semconv::url::kUrlDomain`,
     which is not marked as stable in semconv v1.27.0
 
-## [1.21 2025-05-28]
+## [1.21] 2025-05-28
 
 * [BUILD] Remove WITH_ABSEIL
   [#3318](https://github.com/open-telemetry/opentelemetry-cpp/pull/3318)
@@ -1290,7 +1290,7 @@ Important changes:
     that occurred in the past when mixing several versions of abseil
     in the build.
 
-## [1.20 2025-04-01]
+## [1.20] 2025-04-01
 
 * [BUILD] Update opentelemetry-proto version
   [#3254](https://github.com/open-telemetry/opentelemetry-cpp/pull/3254)
@@ -1434,7 +1434,7 @@ Important changes:
 
   * All the example code has been updated to reflect the new usage.
 
-## [1.19 2025-01-22]
+## [1.19] 2025-01-22
 
 * [PROMETHEUS_EXPORTER] Fix default for emitting otel_scope attributes
   [#3171](https://github.com/open-telemetry/opentelemetry-cpp/pull/3171)
@@ -1628,7 +1628,7 @@ New features:
     protected by a WITH_OTLP_RETRY_PREVIEW
     flag in CMake.
 
-## [1.18 2024-11-25]
+## [1.18] 2024-11-25
 
 * [EXPORTER] Fix crash in ElasticsearchLogRecordExporter
   [#3082](https://github.com/open-telemetry/opentelemetry-cpp/pull/3082)
@@ -1790,7 +1790,7 @@ Deprecations:
 
 * This release contains deprecations, see file DEPRECATED.md for details.
 
-## [1.17 2024-10-07]
+## [1.17] 2024-10-07
 
 * [CI] Add a clang-tidy build
   [#3001](https://github.com/open-telemetry/opentelemetry-cpp/pull/3001)
@@ -1923,7 +1923,7 @@ Breaking changes:
       longer perform static_cast do convert an API object to an SDK object.
       Please refer to examples for guidance on how to adjust.
 
-## [1.16.1 2024-07-17]
+## [1.16.1] 2024-07-17
 
 * [BUILD] Add bazel missing BUILD file
   [#2720](https://github.com/open-telemetry/opentelemetry-cpp/pull/2720)
