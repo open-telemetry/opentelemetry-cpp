@@ -39,15 +39,6 @@
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/drop_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/exemplar_filter.h"
-#include "opentelemetry/sdk/configuration/experimental_logger_config_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_logger_configurator_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_logger_matcher_and_config_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_meter_config_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_meter_configurator_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_meter_matcher_and_config_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_tracer_config_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_tracer_configurator_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_tracer_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
@@ -70,7 +61,13 @@
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_config_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
+#include "opentelemetry/sdk/configuration/meter_config_configuration.h"
+#include "opentelemetry/sdk/configuration/meter_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/meter_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_producer_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
@@ -106,6 +103,9 @@
 #include "opentelemetry/sdk/configuration/sum_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/temporality_preference.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_config_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/translation_strategy.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
@@ -609,36 +609,34 @@ ConfigurationParser::ParseLogRecordLimitsConfiguration(
   return model;
 }
 
-ExperimentalLoggerConfigConfiguration
-ConfigurationParser::ParseExperimentalLoggerConfigConfiguration(
+LoggerConfigConfiguration ConfigurationParser::ParseLoggerConfigConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  ExperimentalLoggerConfigConfiguration model;
-  model.disabled = node->GetBoolean("disabled", false);
+  LoggerConfigConfiguration model;
+  model.enabled = node->GetBoolean("enabled", true);
   return model;
 }
 
-ExperimentalLoggerMatcherAndConfigConfiguration
-ConfigurationParser::ParseExperimentalLoggerMatcherAndConfigConfiguration(
+LoggerMatcherAndConfigConfiguration ConfigurationParser::ParseLoggerMatcherAndConfigConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  ExperimentalLoggerMatcherAndConfigConfiguration model;
+  LoggerMatcherAndConfigConfiguration model;
   model.name = node->GetRequiredString("name");
 
   auto child   = node->GetRequiredChildNode("config");
-  model.config = ParseExperimentalLoggerConfigConfiguration(child);
+  model.config = ParseLoggerConfigConfiguration(child);
 
   return model;
 }
 
-std::unique_ptr<ExperimentalLoggerConfiguratorConfiguration>
-ConfigurationParser::ParseExperimentalLoggerConfiguratorConfiguration(
+std::unique_ptr<LoggerConfiguratorConfiguration>
+ConfigurationParser::ParseLoggerConfiguratorConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<ExperimentalLoggerConfiguratorConfiguration>();
+  auto model = std::make_unique<LoggerConfiguratorConfiguration>();
 
   auto child            = node->GetRequiredChildNode("default_config");
-  model->default_config = ParseExperimentalLoggerConfigConfiguration(child);
+  model->default_config = ParseLoggerConfigConfiguration(child);
 
   child = node->GetChildNode("loggers");
   if (child)
@@ -646,7 +644,7 @@ ConfigurationParser::ParseExperimentalLoggerConfiguratorConfiguration(
     for (auto it = child->begin(); it != child->end(); ++it)
     {
       std::unique_ptr<DocumentNode> element(*it);
-      model->loggers.push_back(ParseExperimentalLoggerMatcherAndConfigConfiguration(element));
+      model->loggers.push_back(ParseLoggerMatcherAndConfigConfiguration(element));
     }
   }
 
@@ -682,7 +680,7 @@ std::unique_ptr<LoggerProviderConfiguration> ConfigurationParser::ParseLoggerPro
   child = node->GetChildNode("logger_configurator/development");
   if (child)
   {
-    model->logger_configurator = ParseExperimentalLoggerConfiguratorConfiguration(child);
+    model->logger_configurator = ParseLoggerConfiguratorConfiguration(child);
   }
 
   return model;
@@ -1443,35 +1441,34 @@ std::unique_ptr<ViewConfiguration> ConfigurationParser::ParseViewConfiguration(
   return model;
 }
 
-ExperimentalMeterConfigConfiguration ConfigurationParser::ParseExperimentalMeterConfigConfiguration(
+MeterConfigConfiguration ConfigurationParser::ParseMeterConfigConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  ExperimentalMeterConfigConfiguration model;
-  model.disabled = node->GetBoolean("disabled", false);
+  MeterConfigConfiguration model;
+  model.enabled = node->GetBoolean("enabled", true);
   return model;
 }
 
-ExperimentalMeterMatcherAndConfigConfiguration
-ConfigurationParser::ParseExperimentalMeterMatcherAndConfigConfiguration(
+MeterMatcherAndConfigConfiguration ConfigurationParser::ParseMeterMatcherAndConfigConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  ExperimentalMeterMatcherAndConfigConfiguration model;
+  MeterMatcherAndConfigConfiguration model;
   model.name = node->GetRequiredString("name");
 
   auto child   = node->GetRequiredChildNode("config");
-  model.config = ParseExperimentalMeterConfigConfiguration(child);
+  model.config = ParseMeterConfigConfiguration(child);
 
   return model;
 }
 
-std::unique_ptr<ExperimentalMeterConfiguratorConfiguration>
-ConfigurationParser::ParseExperimentalMeterConfiguratorConfiguration(
+std::unique_ptr<MeterConfiguratorConfiguration>
+ConfigurationParser::ParseMeterConfiguratorConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<ExperimentalMeterConfiguratorConfiguration>();
+  auto model = std::make_unique<MeterConfiguratorConfiguration>();
 
   auto child            = node->GetRequiredChildNode("default_config");
-  model->default_config = ParseExperimentalMeterConfigConfiguration(child);
+  model->default_config = ParseMeterConfigConfiguration(child);
 
   child = node->GetChildNode("meters");
   if (child)
@@ -1479,7 +1476,7 @@ ConfigurationParser::ParseExperimentalMeterConfiguratorConfiguration(
     for (auto it = child->begin(); it != child->end(); ++it)
     {
       std::unique_ptr<DocumentNode> element(*it);
-      model->meters.push_back(ParseExperimentalMeterMatcherAndConfigConfiguration(element));
+      model->meters.push_back(ParseMeterMatcherAndConfigConfiguration(element));
     }
   }
 
@@ -1521,7 +1518,7 @@ std::unique_ptr<MeterProviderConfiguration> ConfigurationParser::ParseMeterProvi
   child = node->GetChildNode("meter_configurator/development");
   if (child)
   {
-    model->meter_configurator = ParseExperimentalMeterConfiguratorConfiguration(child);
+    model->meter_configurator = ParseMeterConfiguratorConfiguration(child);
   }
 
   return model;
@@ -1989,36 +1986,34 @@ std::unique_ptr<SpanProcessorConfiguration> ConfigurationParser::ParseSpanProces
   return model;
 }
 
-ExperimentalTracerConfigConfiguration
-ConfigurationParser::ParseExperimentalTracerConfigConfiguration(
+TracerConfigConfiguration ConfigurationParser::ParseTracerConfigConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  ExperimentalTracerConfigConfiguration model;
-  model.disabled = node->GetBoolean("disabled", false);
+  TracerConfigConfiguration model;
+  model.enabled = node->GetBoolean("enabled", true);
   return model;
 }
 
-ExperimentalTracerMatcherAndConfigConfiguration
-ConfigurationParser::ParseExperimentalTracerMatcherAndConfigConfiguration(
+TracerMatcherAndConfigConfiguration ConfigurationParser::ParseTracerMatcherAndConfigConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  ExperimentalTracerMatcherAndConfigConfiguration model;
+  TracerMatcherAndConfigConfiguration model;
   model.name = node->GetRequiredString("name");
 
   auto child   = node->GetRequiredChildNode("config");
-  model.config = ParseExperimentalTracerConfigConfiguration(child);
+  model.config = ParseTracerConfigConfiguration(child);
 
   return model;
 }
 
-std::unique_ptr<ExperimentalTracerConfiguratorConfiguration>
-ConfigurationParser::ParseExperimentalTracerConfiguratorConfiguration(
+std::unique_ptr<TracerConfiguratorConfiguration>
+ConfigurationParser::ParseTracerConfiguratorConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<ExperimentalTracerConfiguratorConfiguration>();
+  auto model = std::make_unique<TracerConfiguratorConfiguration>();
 
   auto child            = node->GetRequiredChildNode("default_config");
-  model->default_config = ParseExperimentalTracerConfigConfiguration(child);
+  model->default_config = ParseTracerConfigConfiguration(child);
 
   child = node->GetChildNode("tracers");
   if (child)
@@ -2026,7 +2021,7 @@ ConfigurationParser::ParseExperimentalTracerConfiguratorConfiguration(
     for (auto it = child->begin(); it != child->end(); ++it)
     {
       std::unique_ptr<DocumentNode> element(*it);
-      model->tracers.push_back(ParseExperimentalTracerMatcherAndConfigConfiguration(element));
+      model->tracers.push_back(ParseTracerMatcherAndConfigConfiguration(element));
     }
   }
 
@@ -2068,7 +2063,7 @@ std::unique_ptr<TracerProviderConfiguration> ConfigurationParser::ParseTracerPro
   child = node->GetChildNode("tracer_configurator/development");
   if (child)
   {
-    model->tracer_configurator = ParseExperimentalTracerConfiguratorConfiguration(child);
+    model->tracer_configurator = ParseTracerConfiguratorConfiguration(child);
   }
 
   return model;

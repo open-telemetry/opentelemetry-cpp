@@ -17,9 +17,6 @@
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_logger_configurator_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_meter_configurator_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_tracer_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
@@ -27,6 +24,8 @@
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/integer_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/integer_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/meter_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_configuration.h"
@@ -47,6 +46,7 @@
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/string_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/string_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_configurator_configuration.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
@@ -134,8 +134,7 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
       opentelemetry::sdk::trace::TracerConfig>>
-  CreateTracerConfigurator(
-      const std::unique_ptr<ExperimentalTracerConfiguratorConfiguration> &model) const;
+  CreateTracerConfigurator(const std::unique_ptr<TracerConfiguratorConfiguration> &model) const;
 
   std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> CreateTracerProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model,
@@ -218,8 +217,7 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
       opentelemetry::sdk::metrics::MeterConfig>>
-  CreateMeterConfigurator(
-      const std::unique_ptr<ExperimentalMeterConfiguratorConfiguration> &model) const;
+  CreateMeterConfigurator(const std::unique_ptr<MeterConfiguratorConfiguration> &model) const;
 
   std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> CreateMeterProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::MeterProviderConfiguration> &model,
@@ -261,8 +259,7 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
       opentelemetry::sdk::logs::LoggerConfig>>
-  CreateLoggerConfigurator(
-      const std::unique_ptr<ExperimentalLoggerConfiguratorConfiguration> &model) const;
+  CreateLoggerConfigurator(const std::unique_ptr<LoggerConfiguratorConfiguration> &model) const;
 
   std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> CreateLoggerProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,

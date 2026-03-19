@@ -12,11 +12,11 @@ namespace configuration
 {
 
 // YAML-SCHEMA: schema/meter_provider.yaml
-// YAML-NODE: ExperimentalMeterConfig
-class ExperimentalMeterConfigConfiguration
+// YAML-NODE: MeterConfig
+class MeterConfigConfiguration
 {
 public:
-  bool disabled{false};
+  bool enabled{true};
 };
 
 }  // namespace configuration

@@ -41,15 +41,6 @@
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_logger_config_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_logger_configurator_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_logger_matcher_and_config_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_meter_config_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_meter_configurator_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_meter_matcher_and_config_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_tracer_config_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_tracer_configurator_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_tracer_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
@@ -74,7 +65,13 @@
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/logger_config_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
+#include "opentelemetry/sdk/configuration/meter_config_configuration.h"
+#include "opentelemetry/sdk/configuration/meter_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/meter_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration_visitor.h"
@@ -122,6 +119,9 @@
 #include "opentelemetry/sdk/configuration/string_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_config_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/unsupported_exception.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
@@ -139,6 +139,7 @@
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -147,7 +148,6 @@
 #include "opentelemetry/sdk/metrics/meter_context_factory.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
-#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
@@ -173,6 +173,7 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/version.h"
+#include "wildcard_match.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/configuration/exemplar_filter.h"
@@ -183,46 +184,6 @@ namespace sdk
 {
 namespace configuration
 {
-
-static bool WildcardMatch(const std::string &pattern, const std::string &text)
-{
-  size_t p      = 0;
-  size_t t      = 0;
-  size_t star_p = std::string::npos;
-  size_t star_t = 0;
-
-  while (t < text.size())
-  {
-    if (p < pattern.size() && (pattern[p] == '?' || pattern[p] == text[t]))
-    {
-      ++p;
-      ++t;
-    }
-    else if (p < pattern.size() && pattern[p] == '*')
-    {
-      star_p = p;
-      star_t = t;
-      ++p;
-    }
-    else if (star_p != std::string::npos)
-    {
-      p = star_p + 1;
-      ++star_t;
-      t = star_t;
-    }
-    else
-    {
-      return false;
-    }
-  }
-
-  while (p < pattern.size() && pattern[p] == '*')
-  {
-    ++p;
-  }
-
-  return p == pattern.size();
-}
 
 class ResourceAttributeValueSetter
     : public opentelemetry::sdk::configuration::AttributeValueConfigurationVisitor
@@ -1045,21 +1006,21 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateSpan
 std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
     opentelemetry::sdk::trace::TracerConfig>>
 SdkBuilder::CreateTracerConfigurator(
-    const std::unique_ptr<ExperimentalTracerConfiguratorConfiguration> &model) const
+    const std::unique_ptr<TracerConfiguratorConfiguration> &model) const
 {
   using opentelemetry::sdk::instrumentationscope::InstrumentationScope;
   using opentelemetry::sdk::instrumentationscope::ScopeConfigurator;
   using opentelemetry::sdk::trace::TracerConfig;
 
   TracerConfig default_config =
-      model->default_config.disabled ? TracerConfig::Disabled() : TracerConfig::Enabled();
+      model->default_config.enabled ? TracerConfig::Enabled() : TracerConfig::Disabled();
 
   auto builder = ScopeConfigurator<TracerConfig>::Builder(default_config);
 
   for (const auto &entry : model->tracers)
   {
     TracerConfig entry_config =
-        entry.config.disabled ? TracerConfig::Disabled() : TracerConfig::Enabled();
+        entry.config.enabled ? TracerConfig::Enabled() : TracerConfig::Disabled();
     std::string pattern = entry.name;
     builder.AddCondition(
         [pattern](const InstrumentationScope &scope) {
@@ -1610,21 +1571,21 @@ void SdkBuilder::AddView(
 std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
     opentelemetry::sdk::metrics::MeterConfig>>
 SdkBuilder::CreateMeterConfigurator(
-    const std::unique_ptr<ExperimentalMeterConfiguratorConfiguration> &model) const
+    const std::unique_ptr<MeterConfiguratorConfiguration> &model) const
 {
   using opentelemetry::sdk::instrumentationscope::InstrumentationScope;
   using opentelemetry::sdk::instrumentationscope::ScopeConfigurator;
   using opentelemetry::sdk::metrics::MeterConfig;
 
   MeterConfig default_config =
-      model->default_config.disabled ? MeterConfig::Disabled() : MeterConfig::Enabled();
+      model->default_config.enabled ? MeterConfig::Enabled() : MeterConfig::Disabled();
 
   auto builder = ScopeConfigurator<MeterConfig>::Builder(default_config);
 
   for (const auto &entry : model->meters)
   {
     MeterConfig entry_config =
-        entry.config.disabled ? MeterConfig::Disabled() : MeterConfig::Enabled();
+        entry.config.enabled ? MeterConfig::Enabled() : MeterConfig::Disabled();
     std::string pattern = entry.name;
     builder.AddCondition(
         [pattern](const InstrumentationScope &scope) {
@@ -1860,21 +1821,21 @@ std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> SdkBuilder::Create
 std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
     opentelemetry::sdk::logs::LoggerConfig>>
 SdkBuilder::CreateLoggerConfigurator(
-    const std::unique_ptr<ExperimentalLoggerConfiguratorConfiguration> &model) const
+    const std::unique_ptr<LoggerConfiguratorConfiguration> &model) const
 {
   using opentelemetry::sdk::instrumentationscope::InstrumentationScope;
   using opentelemetry::sdk::instrumentationscope::ScopeConfigurator;
   using opentelemetry::sdk::logs::LoggerConfig;
 
   LoggerConfig default_config =
-      model->default_config.disabled ? LoggerConfig::Disabled() : LoggerConfig::Enabled();
+      model->default_config.enabled ? LoggerConfig::Enabled() : LoggerConfig::Disabled();
 
   auto builder = ScopeConfigurator<LoggerConfig>::Builder(default_config);
 
   for (const auto &entry : model->loggers)
   {
     LoggerConfig entry_config =
-        entry.config.disabled ? LoggerConfig::Disabled() : LoggerConfig::Enabled();
+        entry.config.enabled ? LoggerConfig::Enabled() : LoggerConfig::Disabled();
     std::string pattern = entry.name;
     builder.AddCondition(
         [pattern](const InstrumentationScope &scope) {

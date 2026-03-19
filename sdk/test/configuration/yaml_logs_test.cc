@@ -9,14 +9,14 @@
 
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_logger_config_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_logger_configurator_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_logger_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_config_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_configuration.h"
@@ -514,14 +514,14 @@ logger_provider:
           console:
   logger_configurator/development:
     default_config:
-      disabled: true
+      enabled: false
 )";
 
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->logger_provider, nullptr);
   ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
-  ASSERT_EQ(config->logger_provider->logger_configurator->default_config.disabled, true);
+  ASSERT_EQ(config->logger_provider->logger_configurator->default_config.enabled, false);
   ASSERT_EQ(config->logger_provider->logger_configurator->loggers.size(), 0);
 }
 
@@ -536,14 +536,14 @@ logger_provider:
           console:
   logger_configurator/development:
     default_config:
-      disabled: true
+      enabled: false
     loggers:
       - name: io.opentelemetry.contrib.*
         config:
-          disabled: false
+          enabled: true
       - name: my.exact.logger
         config:
-          disabled: true
+          enabled: false
 )";
 
   auto config = DoParse(yaml);
@@ -552,14 +552,14 @@ logger_provider:
   ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
 
   auto &configurator = config->logger_provider->logger_configurator;
-  ASSERT_EQ(configurator->default_config.disabled, true);
+  ASSERT_EQ(configurator->default_config.enabled, false);
   ASSERT_EQ(configurator->loggers.size(), 2);
 
   ASSERT_EQ(configurator->loggers[0].name, "io.opentelemetry.contrib.*");
-  ASSERT_EQ(configurator->loggers[0].config.disabled, false);
+  ASSERT_EQ(configurator->loggers[0].config.enabled, true);
 
   ASSERT_EQ(configurator->loggers[1].name, "my.exact.logger");
-  ASSERT_EQ(configurator->loggers[1].config.disabled, true);
+  ASSERT_EQ(configurator->loggers[1].config.enabled, false);
 }
 
 TEST(YamlLogs, logger_configurator_default_enabled)
@@ -573,11 +573,11 @@ logger_provider:
           console:
   logger_configurator/development:
     default_config:
-      disabled: false
+      enabled: true
     loggers:
       - name: noisy.library
         config:
-          disabled: true
+          enabled: false
 )";
 
   auto config = DoParse(yaml);
@@ -586,8 +586,8 @@ logger_provider:
   ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
 
   auto &configurator = config->logger_provider->logger_configurator;
-  ASSERT_EQ(configurator->default_config.disabled, false);
+  ASSERT_EQ(configurator->default_config.enabled, true);
   ASSERT_EQ(configurator->loggers.size(), 1);
   ASSERT_EQ(configurator->loggers[0].name, "noisy.library");
-  ASSERT_EQ(configurator->loggers[0].config.disabled, true);
+  ASSERT_EQ(configurator->loggers[0].config.enabled, false);
 }

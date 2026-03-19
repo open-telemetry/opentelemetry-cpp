@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "opentelemetry/sdk/configuration/exemplar_filter.h"
-#include "opentelemetry/sdk/configuration/experimental_meter_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/meter_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/version.h"
@@ -26,7 +26,7 @@ public:
   std::vector<std::unique_ptr<MetricReaderConfiguration>> readers;
   std::vector<std::unique_ptr<ViewConfiguration>> views;
   ExemplarFilter exemplar_filter = ExemplarFilter::trace_based;
-  std::unique_ptr<ExperimentalMeterConfiguratorConfiguration> meter_configurator;
+  std::unique_ptr<MeterConfiguratorConfiguration> meter_configurator;
 };
 
 }  // namespace configuration

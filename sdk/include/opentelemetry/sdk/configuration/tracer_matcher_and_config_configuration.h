@@ -5,7 +5,7 @@
 
 #include <string>
 
-#include "opentelemetry/sdk/configuration/experimental_tracer_config_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_config_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -14,13 +14,13 @@ namespace sdk
 namespace configuration
 {
 
-// YAML-SCHEMA: schema/tracer_provider.json
-// YAML-NODE: ExperimentalTracerMatcherAndConfig
-class ExperimentalTracerMatcherAndConfigConfiguration
+// YAML-SCHEMA: schema/tracer_provider.yaml
+// YAML-NODE: TracerMatcherAndConfig
+class TracerMatcherAndConfigConfiguration
 {
 public:
   std::string name;
-  ExperimentalTracerConfigConfiguration config;
+  TracerConfigConfiguration config;
 };
 
 }  // namespace configuration

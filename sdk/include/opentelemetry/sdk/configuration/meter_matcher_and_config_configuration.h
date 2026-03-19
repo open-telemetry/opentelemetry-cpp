@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include <string>
+
+#include "opentelemetry/sdk/configuration/meter_config_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -11,12 +14,13 @@ namespace sdk
 namespace configuration
 {
 
-// YAML-SCHEMA: schema/logger_provider.json
-// YAML-NODE: ExperimentalLoggerConfig
-class ExperimentalLoggerConfigConfiguration
+// YAML-SCHEMA: schema/meter_provider.yaml
+// YAML-NODE: MeterMatcherAndConfig
+class MeterMatcherAndConfigConfiguration
 {
 public:
-  bool disabled{false};
+  std::string name;
+  MeterConfigConfiguration config;
 };
 
 }  // namespace configuration

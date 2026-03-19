@@ -9,9 +9,6 @@
 
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_tracer_config_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_tracer_configurator_configuration.h"
-#include "opentelemetry/sdk/configuration/experimental_tracer_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
@@ -25,6 +22,9 @@
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_config_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
 
@@ -763,14 +763,14 @@ tracer_provider:
           console:
   tracer_configurator/development:
     default_config:
-      disabled: true
+      enabled: false
 )";
 
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->tracer_provider, nullptr);
   ASSERT_NE(config->tracer_provider->tracer_configurator, nullptr);
-  ASSERT_EQ(config->tracer_provider->tracer_configurator->default_config.disabled, true);
+  ASSERT_EQ(config->tracer_provider->tracer_configurator->default_config.enabled, false);
   ASSERT_EQ(config->tracer_provider->tracer_configurator->tracers.size(), 0);
 }
 
@@ -785,14 +785,14 @@ tracer_provider:
           console:
   tracer_configurator/development:
     default_config:
-      disabled: true
+      enabled: false
     tracers:
       - name: io.opentelemetry.contrib.*
         config:
-          disabled: false
+          enabled: true
       - name: my.exact.tracer
         config:
-          disabled: true
+          enabled: false
 )";
 
   auto config = DoParse(yaml);
@@ -801,14 +801,14 @@ tracer_provider:
   ASSERT_NE(config->tracer_provider->tracer_configurator, nullptr);
 
   auto &configurator = config->tracer_provider->tracer_configurator;
-  ASSERT_EQ(configurator->default_config.disabled, true);
+  ASSERT_EQ(configurator->default_config.enabled, false);
   ASSERT_EQ(configurator->tracers.size(), 2);
 
   ASSERT_EQ(configurator->tracers[0].name, "io.opentelemetry.contrib.*");
-  ASSERT_EQ(configurator->tracers[0].config.disabled, false);
+  ASSERT_EQ(configurator->tracers[0].config.enabled, true);
 
   ASSERT_EQ(configurator->tracers[1].name, "my.exact.tracer");
-  ASSERT_EQ(configurator->tracers[1].config.disabled, true);
+  ASSERT_EQ(configurator->tracers[1].config.enabled, false);
 }
 
 TEST(YamlTrace, tracer_configurator_default_enabled)
@@ -822,11 +822,11 @@ tracer_provider:
           console:
   tracer_configurator/development:
     default_config:
-      disabled: false
+      enabled: true
     tracers:
       - name: noisy.library
         config:
-          disabled: true
+          enabled: false
 )";
 
   auto config = DoParse(yaml);
@@ -835,8 +835,8 @@ tracer_provider:
   ASSERT_NE(config->tracer_provider->tracer_configurator, nullptr);
 
   auto &configurator = config->tracer_provider->tracer_configurator;
-  ASSERT_EQ(configurator->default_config.disabled, false);
+  ASSERT_EQ(configurator->default_config.enabled, true);
   ASSERT_EQ(configurator->tracers.size(), 1);
   ASSERT_EQ(configurator->tracers[0].name, "noisy.library");
-  ASSERT_EQ(configurator->tracers[0].config.disabled, true);
+  ASSERT_EQ(configurator->tracers[0].config.enabled, false);
 }

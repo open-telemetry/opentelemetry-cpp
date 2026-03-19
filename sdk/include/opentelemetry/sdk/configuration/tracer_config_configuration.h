@@ -11,12 +11,12 @@ namespace sdk
 namespace configuration
 {
 
-// YAML-SCHEMA: schema/tracer_provider.json
-// YAML-NODE: ExperimentalTracerConfig
-class ExperimentalTracerConfigConfiguration
+// YAML-SCHEMA: schema/tracer_provider.yaml
+// YAML-NODE: TracerConfig
+class TracerConfigConfiguration
 {
 public:
-  bool disabled{false};
+  bool enabled{true};
 };
 
 }  // namespace configuration
