@@ -203,6 +203,18 @@ Increment the:
 * [SDK] Swap Tracer/Meter/LoggerConfig disabled for enabled
   [#3942](https://github.com/open-telemetry/opentelemetry-cpp/pull/3942)
 
+* [CMAKE] Update third party dependencies for cmake builds
+  [#3943](https://github.com/open-telemetry/opentelemetry-cpp/pull/3943)
+
+* Bump codecov/codecov-action from 5.5.2 to 5.5.3
+  [#3945](https://github.com/open-telemetry/opentelemetry-cpp/pull/3945)
+
+* Bump actions/cache from 5.0.3 to 5.0.4
+  [#3946](https://github.com/open-telemetry/opentelemetry-cpp/pull/3946)
+
+* [CONFIGURATION] File configuration - Tracer/Meter/Logger config
+  [#3920](https://github.com/open-telemetry/opentelemetry-cpp/pull/3920)
+
 Important changes:
 
 * [SDK] Swap Tracer/Meter/LoggerConfig disabled for enabled
