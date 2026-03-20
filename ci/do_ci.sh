@@ -3,7 +3,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -eo pipefail
 
 function install_prometheus_cpp_client
 {
