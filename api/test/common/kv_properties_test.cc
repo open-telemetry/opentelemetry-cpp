@@ -52,7 +52,8 @@ TEST(EntryTest, Assignment)
 TEST(EntryTest, SelfAssignment)
 {
   KeyValueProperties::Entry e("test_key", "test_value");
-  e = e;
+  KeyValueProperties::Entry &self = e;
+  e                               = self;
   EXPECT_EQ(e.GetKey(), "test_key");
   EXPECT_EQ(e.GetValue(), "test_value");
 }
