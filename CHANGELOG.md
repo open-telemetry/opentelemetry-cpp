@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] Fix clang tidy warnings in API `common` and `context`
+  [#3948](https://github.com/open-telemetry/opentelemetry-cpp/pull/3948)
+
 ## [1.26.0] 2026-03-19
 
 * [RELEASE] Bump main branch to 1.26.0-dev
