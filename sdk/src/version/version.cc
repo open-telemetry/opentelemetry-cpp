@@ -23,7 +23,7 @@ const char *full_version   = "1.27.0-dev";
  * For published releases: YYYY-MM-DD
  * For -dev releases: empty string
  */
-const char *build_date     = "";
+const char *build_date = "";
 }  // namespace version
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
