@@ -384,7 +384,7 @@ private:
 
   OPENTELEMETRY_API_SINGLETON Stack &GetStack()
   {
-    static thread_local Stack stack_ = Stack();
+    static thread_local Stack stack_{};
     return stack_;
   }
 };

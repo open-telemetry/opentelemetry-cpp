@@ -210,18 +210,14 @@ public:
 public:
   // Create Key-value list of given size
   // @param size : Size of list.
-  KeyValueProperties(size_t size) noexcept
-      : num_entries_(0), max_num_entries_(size), entries_(new Entry[size])
-  {}
+  KeyValueProperties(size_t size) noexcept : max_num_entries_(size), entries_(new Entry[size]) {}
 
   // Create Empty Key-Value list
   KeyValueProperties() noexcept = default;
 
   template <class T, class = typename std::enable_if<detail::is_key_value_iterable<T>::value>::type>
   KeyValueProperties(const T &keys_and_values) noexcept
-      : num_entries_(0),
-        max_num_entries_(keys_and_values.size()),
-        entries_(new Entry[max_num_entries_])
+      : max_num_entries_(keys_and_values.size()), entries_(new Entry[max_num_entries_])
   {
     for (auto &e : keys_and_values)
     {

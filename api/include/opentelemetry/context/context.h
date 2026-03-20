@@ -127,8 +127,8 @@ private:
     // and returns that head.
     DataList(nostd::string_view key, ContextValue value)
         : key_{new char[key.size()]},
-          key_length_{key.size()},
           next_{nostd::shared_ptr<DataList>{nullptr}},
+          key_length_{key.size()},
           value_{std::move(value)}
     {
       std::memcpy(key_, key.data(), key.size() * sizeof(char));
