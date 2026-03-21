@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add bundle version of utf8_range to validate attributes
+  [#3512](https://github.com/open-telemetry/opentelemetry-cpp/pull/3512)
+
+## [1.24 2025-11-20]
+
 * [CODE HEALTH] Fix clang tidy warnings in API `common` and `context`
   [#3948](https://github.com/open-telemetry/opentelemetry-cpp/pull/3948)
 
