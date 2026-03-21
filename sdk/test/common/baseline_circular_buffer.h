@@ -78,6 +78,11 @@ public:
     tail_ = head_;
   }
 
+  size_t size() noexcept {
+    std::lock_guard<std::mutex> lock_guard{mutex_};
+    return head_ - tail_;
+  }
+
 private:
   std::mutex mutex_;
   uint64_t head_{0};
