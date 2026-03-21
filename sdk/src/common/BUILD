@@ -6,6 +6,18 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "wildcard_match",
+    hdrs = [
+        "wildcard_match.h",
+    ],
+    include_prefix = "src/common",
+    deps = [
+        "//api",
+        "//sdk:headers",
+    ],
+)
+
+cc_library(
     name = "random",
     srcs = [
         "random.cc",

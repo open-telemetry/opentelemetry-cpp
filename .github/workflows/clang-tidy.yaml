@@ -17,16 +17,16 @@ jobs:
       matrix:
         include:
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 595
+            warning_limit: 170
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 597
+            warning_limit: 166
     env:
       CC: /usr/bin/clang-18
       CXX: /usr/bin/clang++-18
       CXX_STANDARD: '14' # Run clang-tidy on the minimum supported c++ standard
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@a90bcbc6539c36a85cdfeb73f7e2f433735f215b # v2.15.0
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
         with:
           egress-policy: audit
 

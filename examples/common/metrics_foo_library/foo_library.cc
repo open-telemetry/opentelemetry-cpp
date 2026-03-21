@@ -169,7 +169,7 @@ void foo_library::semconv_observable_counter_example()
   auto provider = metrics_api::Provider::GetMeterProvider();
   opentelemetry::nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter("demo", "1.2.0");
   double_observable_counter =
-      opentelemetry::semconv::system::CreateAsyncDoubleMetricSystemCpuTime(meter.get());
+      opentelemetry::semconv::system::CreateAsyncDoubleMetricSystemDiskIo(meter.get());
   double_observable_counter->AddCallback(MeasurementFetcher::Fetcher, nullptr);
   for (uint32_t i = 0; i < 20; ++i)
   {

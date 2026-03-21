@@ -19,10 +19,6 @@
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
-// Define the maximum number of loggers that are allowed to be registered to the loggerprovider.
-// TODO: Add link to logging spec once this is added to it
-#define MAX_LOGGER_COUNT 100
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -77,6 +73,11 @@ public:
    * @param context The owned logger configuration/pipeline for this provider.
    */
   explicit LoggerProvider(std::unique_ptr<LoggerContext> context) noexcept;
+
+  LoggerProvider(const LoggerProvider &)            = delete;
+  LoggerProvider(LoggerProvider &&)                 = delete;
+  LoggerProvider &operator=(const LoggerProvider &) = delete;
+  LoggerProvider &operator=(LoggerProvider &&)      = delete;
 
   ~LoggerProvider() override;
 

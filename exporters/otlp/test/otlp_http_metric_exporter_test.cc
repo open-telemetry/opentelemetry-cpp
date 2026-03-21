@@ -62,7 +62,7 @@ namespace otlp
 {
 
 template <class IntegerType>
-static IntegerType JsonToInteger(nlohmann::json value)
+static IntegerType JsonToInteger(const nlohmann::json &value)
 {
   if (value.is_string())
   {
@@ -72,8 +72,8 @@ static IntegerType JsonToInteger(nlohmann::json value)
   return value.get<IntegerType>();
 }
 
-OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_type,
-                                                bool async_mode)
+static OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_type,
+                                                       bool async_mode)
 {
   std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation> not_instrumented;
   OtlpHttpMetricExporterOptions options;

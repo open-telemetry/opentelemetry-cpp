@@ -63,9 +63,9 @@ static void RunNumberProducers(CircularBuffer<uint32_t> &buffer,
   }
 }
 
-void RunNumberConsumer(CircularBuffer<uint32_t> &buffer,
-                       std::atomic<bool> &exit,
-                       std::vector<uint32_t> &numbers)
+static void RunNumberConsumer(CircularBuffer<uint32_t> &buffer,
+                              std::atomic<bool> &exit,
+                              std::vector<uint32_t> &numbers)
 {
   while (true)
   {

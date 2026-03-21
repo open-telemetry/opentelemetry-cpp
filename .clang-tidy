@@ -5,6 +5,7 @@ Checks: >
   -*,
   performance-*,
   portability-*,
+  -portability-template-virtual-member-function,
   abseil-*,
   -abseil-string-find-str-contains,
   bugprone-*,

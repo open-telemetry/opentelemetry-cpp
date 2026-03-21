@@ -73,6 +73,11 @@ public:
                                    const BatchLogRecordProcessorOptions &options,
                                    const BatchLogRecordProcessorRuntimeOptions &runtime_options);
 
+  BatchLogRecordProcessor(const BatchLogRecordProcessor &)            = delete;
+  BatchLogRecordProcessor(BatchLogRecordProcessor &&)                 = delete;
+  BatchLogRecordProcessor &operator=(const BatchLogRecordProcessor &) = delete;
+  BatchLogRecordProcessor &operator=(BatchLogRecordProcessor &&)      = delete;
+
   /** Makes a new recordable **/
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
 

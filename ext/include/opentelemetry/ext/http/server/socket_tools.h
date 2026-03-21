@@ -6,6 +6,7 @@
 #include <atomic>
 #include <cassert>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <map>
@@ -272,6 +273,11 @@ struct Socket
 
   Socket(int af, int type, int proto) : m_sock(::socket(af, type, proto)) {}
 
+  Socket(const Socket &)            = default;
+  Socket(Socket &&)                 = default;
+  Socket &operator=(const Socket &) = default;
+  Socket &operator=(Socket &&)      = default;
+
   ~Socket() {}
 
   operator Socket::Type() const { return m_sock; }
@@ -400,7 +406,7 @@ struct Socket
 #endif
   }
 
-  enum
+  enum  // NOLINT(performance-enum-size)
   {
 #ifdef _WIN32
     ErrorWouldBlock = WSAEWOULDBLOCK
@@ -409,7 +415,7 @@ struct Socket
 #endif
   };
 
-  enum
+  enum  // NOLINT(performance-enum-size)
   {
 #ifdef _WIN32
     ShutdownReceive = SD_RECEIVE,
@@ -433,7 +439,7 @@ struct SocketData
 
   SocketData() : socket(), flags(0) {}
 
-  bool operator==(Socket s) { return (socket == s); }
+  bool operator==(const Socket &s) { return (socket == s); }
 };
 
 /// <summary>
@@ -447,7 +453,13 @@ struct Reactor : protected common::Thread
   class SocketCallback
   {
   public:
-    SocketCallback()                             = default;
+    SocketCallback() = default;
+
+    SocketCallback(const SocketCallback &)            = delete;
+    SocketCallback(SocketCallback &&)                 = delete;
+    SocketCallback &operator=(const SocketCallback &) = delete;
+    SocketCallback &operator=(SocketCallback &&)      = delete;
+
     virtual ~SocketCallback()                    = default;
     virtual void onSocketReadable(Socket sock)   = 0;
     virtual void onSocketWritable(Socket sock)   = 0;
@@ -458,7 +470,7 @@ struct Reactor : protected common::Thread
   /// <summary>
   /// Socket State
   /// </summary>
-  enum State
+  enum State : std::uint8_t
   {
     Readable   = 1,
     Writable   = 2,
@@ -503,6 +515,11 @@ public:
     kq = kqueue();
 #endif
   }
+
+  Reactor(const Reactor &)            = delete;
+  Reactor(Reactor &&)                 = delete;
+  Reactor &operator=(const Reactor &) = delete;
+  Reactor &operator=(Reactor &&)      = delete;
 
   ~Reactor() override
   {

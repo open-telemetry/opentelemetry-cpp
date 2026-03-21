@@ -101,7 +101,7 @@ private:
   std::string trace_id_;
 };
 
-PolymorphicMatcher<IsValidMessageMatcher> IsValidMessage(const std::string &trace_id)
+static PolymorphicMatcher<IsValidMessageMatcher> IsValidMessage(const std::string &trace_id)
 {
   return MakePolymorphicMatcher(IsValidMessageMatcher(trace_id));
 }

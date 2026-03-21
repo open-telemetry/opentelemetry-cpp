@@ -68,14 +68,13 @@ public:
     options.kind = SpanKind::kClient;
 
     std::string span_name = "GreeterClient/Greet";
-    auto span =
-        get_tracer("grpc")->StartSpan(span_name,
-                                      {{semconv::rpc::kRpcSystem, "grpc"},
-                                       {semconv::rpc::kRpcService, "grpc-example.GreetService"},
-                                       {semconv::rpc::kRpcMethod, "Greet"},
-                                       {semconv::network::kNetworkPeerAddress, ip},
-                                       {semconv::network::kNetworkPeerPort, port}},
-                                      options);
+    auto span             = get_tracer("grpc")->StartSpan(
+        span_name,
+        {{semconv::rpc::kRpcSystemName, "grpc"},
+                     {semconv::rpc::kRpcMethod, "grpc-example.GreetService/Greet"},
+                     {semconv::network::kNetworkPeerAddress, ip},
+                     {semconv::network::kNetworkPeerPort, port}},
+        options);
 
     auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
 
@@ -90,7 +89,7 @@ public:
     if (status.ok())
     {
       span->SetStatus(StatusCode::kOk);
-      span->SetAttribute(semconv::rpc::kRpcGrpcStatusCode, status.error_code());
+      span->SetAttribute(semconv::rpc::kRpcResponseStatusCode, status.error_message());
       // Make sure to end your spans!
       span->End();
       return response.response();
@@ -99,7 +98,7 @@ public:
     {
       std::cout << status.error_code() << ": " << status.error_message() << '\n';
       span->SetStatus(StatusCode::kError);
-      span->SetAttribute(semconv::rpc::kRpcGrpcStatusCode, status.error_code());
+      span->SetAttribute(semconv::rpc::kRpcResponseStatusCode, status.error_message());
       // Make sure to end your spans!
       span->End();
       return "RPC failed";

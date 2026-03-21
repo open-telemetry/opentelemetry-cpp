@@ -42,7 +42,7 @@ TEST(RandomTest, GenerateRandomBuffer)
   }
 }
 
-void doSomethingOnce(std::atomic_uint *count)
+static void doSomethingOnce(std::atomic_uint *count)
 {
   static std::atomic_flag flag;
   if (!flag.test_and_set())
