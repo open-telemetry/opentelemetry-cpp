@@ -366,7 +366,7 @@ DocumentNodeConstIterator RymlDocumentNode::begin() const
 #ifdef WITH_DEBUG_NODE
   DebugNode("::begin()", node_);
 
-  for (int index = 0; index < node_.num_children(); index++)
+  for (long unsigned int index = 0; index < node_.num_children(); index++)
   {
     DebugNode("(child)", node_[index]);
   }
@@ -407,7 +407,7 @@ PropertiesNodeConstIterator RymlDocumentNode::begin_properties() const
 #ifdef WITH_DEBUG_NODE
   DebugNode("::begin_properties()", node_);
 
-  for (int index = 0; index < node_.num_children(); index++)
+  for (long unsigned int index = 0; index < node_.num_children(); index++)
   {
     DebugNode("(child)", node_[index]);
   }

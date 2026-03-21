@@ -138,7 +138,7 @@ public:
 }  // namespace
 
 // Sends an HTTP POST request to the given url, with the given body.
-void send_request(curl::HttpClient &client, const std::string &url, const std::string &body)
+static void send_request(curl::HttpClient &client, const std::string &url, const std::string &body)
 {
   static std::shared_ptr<http_client::EventHandler> handler(new NoopEventHandler());
 

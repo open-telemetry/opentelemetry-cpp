@@ -14,6 +14,9 @@
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_config_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_configuration.h"
@@ -206,9 +209,9 @@ logger_provider:
           otlp_http:
             endpoint: "somewhere"
             tls:
-              certificate_file: "certificate_file"
-              client_key_file: "client_key_file"
-              client_certificate_file: "client_certificate_file"
+              ca_file: "ca_file"
+              key_file: "key_file"
+              cert_file: "cert_file"
             headers:
               - name: foo
                 value: "123"
@@ -237,9 +240,9 @@ logger_provider:
           exporter);
   ASSERT_EQ(otlp_http->endpoint, "somewhere");
   ASSERT_NE(otlp_http->tls, nullptr);
-  ASSERT_EQ(otlp_http->tls->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_http->tls->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_http->tls->client_certificate_file, "client_certificate_file");
+  ASSERT_EQ(otlp_http->tls->ca_file, "ca_file");
+  ASSERT_EQ(otlp_http->tls->key_file, "key_file");
+  ASSERT_EQ(otlp_http->tls->cert_file, "cert_file");
   ASSERT_NE(otlp_http->headers, nullptr);
   ASSERT_EQ(otlp_http->headers->kv_map.size(), 2);
   ASSERT_EQ(otlp_http->headers->kv_map["foo"], "123");
@@ -296,9 +299,9 @@ logger_provider:
           otlp_grpc:
             endpoint: "somewhere"
             tls:
-              certificate_file: "certificate_file"
-              client_key_file: "client_key_file"
-              client_certificate_file: "client_certificate_file"
+              ca_file: "ca_file"
+              key_file: "key_file"
+              cert_file: "cert_file"
               insecure: true
             headers:
               - name: foo
@@ -327,9 +330,9 @@ logger_provider:
           exporter);
   ASSERT_EQ(otlp_grpc->endpoint, "somewhere");
   ASSERT_NE(otlp_grpc->tls, nullptr);
-  ASSERT_EQ(otlp_grpc->tls->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_grpc->tls->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_grpc->tls->client_certificate_file, "client_certificate_file");
+  ASSERT_EQ(otlp_grpc->tls->ca_file, "ca_file");
+  ASSERT_EQ(otlp_grpc->tls->key_file, "key_file");
+  ASSERT_EQ(otlp_grpc->tls->cert_file, "cert_file");
   ASSERT_EQ(otlp_grpc->tls->insecure, true);
   ASSERT_NE(otlp_grpc->headers, nullptr);
   ASSERT_EQ(otlp_grpc->headers->kv_map.size(), 2);
@@ -481,4 +484,110 @@ logger_provider:
   ASSERT_NE(config->logger_provider->limits, nullptr);
   ASSERT_EQ(config->logger_provider->limits->attribute_value_length_limit, 1111);
   ASSERT_EQ(config->logger_provider->limits->attribute_count_limit, 2222);
+}
+
+TEST(YamlLogs, no_logger_configurator)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_EQ(config->logger_provider->logger_configurator, nullptr);
+}
+
+TEST(YamlLogs, logger_configurator_default_only)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  logger_configurator/development:
+    default_config:
+      enabled: false
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
+  ASSERT_EQ(config->logger_provider->logger_configurator->default_config.enabled, false);
+  ASSERT_EQ(config->logger_provider->logger_configurator->loggers.size(), 0);
+}
+
+TEST(YamlLogs, logger_configurator_with_loggers)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  logger_configurator/development:
+    default_config:
+      enabled: false
+    loggers:
+      - name: io.opentelemetry.contrib.*
+        config:
+          enabled: true
+      - name: my.exact.logger
+        config:
+          enabled: false
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
+
+  auto &configurator = config->logger_provider->logger_configurator;
+  ASSERT_EQ(configurator->default_config.enabled, false);
+  ASSERT_EQ(configurator->loggers.size(), 2);
+
+  ASSERT_EQ(configurator->loggers[0].name, "io.opentelemetry.contrib.*");
+  ASSERT_EQ(configurator->loggers[0].config.enabled, true);
+
+  ASSERT_EQ(configurator->loggers[1].name, "my.exact.logger");
+  ASSERT_EQ(configurator->loggers[1].config.enabled, false);
+}
+
+TEST(YamlLogs, logger_configurator_default_enabled)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  logger_configurator/development:
+    default_config:
+      enabled: true
+    loggers:
+      - name: noisy.library
+        config:
+          enabled: false
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
+
+  auto &configurator = config->logger_provider->logger_configurator;
+  ASSERT_EQ(configurator->default_config.enabled, true);
+  ASSERT_EQ(configurator->loggers.size(), 1);
+  ASSERT_EQ(configurator->loggers[0].name, "noisy.library");
+  ASSERT_EQ(configurator->loggers[0].config.enabled, false);
 }

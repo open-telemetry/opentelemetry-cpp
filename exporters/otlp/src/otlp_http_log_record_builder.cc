@@ -50,9 +50,9 @@ std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> OtlpHttpLogRecordBu
 
   if (tls != nullptr)
   {
-    options.ssl_ca_cert_path     = tls->certificate_file;
-    options.ssl_client_key_path  = tls->client_key_file;
-    options.ssl_client_cert_path = tls->client_certificate_file;
+    options.ssl_ca_cert_path     = tls->ca_file;
+    options.ssl_client_key_path  = tls->key_file;
+    options.ssl_client_cert_path = tls->cert_file;
   }
 
   options.compression = model->compression;

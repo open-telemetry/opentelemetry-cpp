@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk/common/env_variables.h"
@@ -26,7 +28,7 @@ inline const std::string GetDefaultZipkinEndpoint()
   return exists ? endpoint : kZipkinEndpointDefault;
 }
 
-enum class TransportFormat
+enum class TransportFormat : std::uint8_t
 {
   kJson,
   kProtobuf

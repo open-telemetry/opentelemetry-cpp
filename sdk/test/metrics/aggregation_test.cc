@@ -451,3 +451,159 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMerge)
                expected_scale, expected_max_buckets);
   }
 }
+
+// Test that verifies the count invariant is maintained during merge operations that require
+// downscaling. The invariant is: count == zero_count + sum(positive_bucket_counts) +
+// sum(negative_bucket_counts)
+//
+TEST(Aggregation, Base2ExponentialHistogramAggregationMergeCountInvariant)
+{
+  // Helper to sum all bucket counts
+  auto sum_bucket_counts = [](const Base2ExponentialHistogramPointData &point) -> uint64_t {
+    uint64_t total = 0;
+    if (point.positive_buckets_ && !point.positive_buckets_->Empty())
+    {
+      for (int32_t i = point.positive_buckets_->StartIndex();
+           i <= point.positive_buckets_->EndIndex(); ++i)
+      {
+        total += point.positive_buckets_->Get(i);
+      }
+    }
+    if (point.negative_buckets_ && !point.negative_buckets_->Empty())
+    {
+      for (int32_t i = point.negative_buckets_->StartIndex();
+           i <= point.negative_buckets_->EndIndex(); ++i)
+      {
+        total += point.negative_buckets_->Get(i);
+      }
+    }
+    return total;
+  };
+
+  // Helper to verify the count invariant
+  auto verify_invariant = [&sum_bucket_counts](const Base2ExponentialHistogramPointData &point,
+                                               uint64_t expected_count, const std::string &phase) {
+    uint64_t bucket_sum       = sum_bucket_counts(point);
+    uint64_t calculated_count = point.zero_count_ + bucket_sum;
+
+    EXPECT_EQ(point.count_, expected_count) << "Count mismatch at " << phase << ": expected "
+                                            << expected_count << ", got " << point.count_;
+    EXPECT_EQ(point.count_, calculated_count)
+        << "Invariant violation at " << phase << ": count(" << point.count_ << ") != zero_count("
+        << point.zero_count_ << ") + bucket_sum(" << bucket_sum << ") = " << calculated_count;
+  };
+
+  // Use scale 0 for easy bucket index reasoning: value 2^N -> index N-1
+  // Use max_buckets=5 so we can trigger the bug with small powers of 2
+  Base2ExponentialHistogramAggregationConfig config;
+  config.max_scale_   = 0;
+  config.max_buckets_ = 5;
+
+  std::unique_ptr<Aggregation> cumulative =
+      std::make_unique<Base2ExponentialHistogramAggregation>(&config);
+
+  uint64_t expected_count = 0;
+
+  // === Cycle 1: values 2,4,8,16,32 -> indices 0,1,2,3,4 (5 buckets, fits in max_buckets=5) ===
+  {
+    Base2ExponentialHistogramAggregation delta(&config);
+    delta.Aggregate(2.0, {});   // 2^1 -> index 0
+    delta.Aggregate(4.0, {});   // 2^2 -> index 1
+    delta.Aggregate(8.0, {});   // 2^3 -> index 2
+    delta.Aggregate(16.0, {});  // 2^4 -> index 3
+    delta.Aggregate(32.0, {});  // 2^5 -> index 4
+    expected_count += 5;
+
+    cumulative = cumulative->Merge(delta);
+
+    auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
+    verify_invariant(point, expected_count, "Cycle 1: indices 0-4");
+
+    // Verify bucket positions
+    EXPECT_EQ(point.positive_buckets_->StartIndex(), 0);
+    EXPECT_EQ(point.positive_buckets_->EndIndex(), 4);
+  }
+
+  // === Cycle 2: values 4,8,16,32,64 -> indices 1,2,3,4,5 (5 buckets, fits individually) ===
+  // But combined with Cycle 1: indices 0-5 = 6 buckets = max_buckets + 1
+  // This triggers the off-by-one bug as of commit
+  // https://github.com/open-telemetry/opentelemetry-cpp/commit/5fc4707a8b7820f6bdbc782ccdffac7ccafbe80d.
+  {
+    Base2ExponentialHistogramAggregation delta(&config);
+    delta.Aggregate(4.0, {});   // 2^2 -> index 1
+    delta.Aggregate(8.0, {});   // 2^3 -> index 2
+    delta.Aggregate(16.0, {});  // 2^4 -> index 3
+    delta.Aggregate(32.0, {});  // 2^5 -> index 4
+    delta.Aggregate(64.0, {});  // 2^6 -> index 5
+    expected_count += 5;
+
+    cumulative = cumulative->Merge(delta);
+
+    auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
+    verify_invariant(point, expected_count, "Cycle 2: combined indices 0-5");
+  }
+
+  // === Cycle 3: values 8,16,32,64,128 -> indices 2,3,4,5,6 ===
+  {
+    Base2ExponentialHistogramAggregation delta(&config);
+    delta.Aggregate(8.0, {});    // 2^3 -> index 2
+    delta.Aggregate(16.0, {});   // 2^4 -> index 3
+    delta.Aggregate(32.0, {});   // 2^5 -> index 4
+    delta.Aggregate(64.0, {});   // 2^6 -> index 5
+    delta.Aggregate(128.0, {});  // 2^7 -> index 6
+    expected_count += 5;
+
+    cumulative = cumulative->Merge(delta);
+
+    auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
+    verify_invariant(point, expected_count, "Cycle 3: indices 2-6");
+  }
+
+  // === Cycle 4: values 16,32,64,128,256 -> indices 3,4,5,6,7 ===
+  {
+    Base2ExponentialHistogramAggregation delta(&config);
+    delta.Aggregate(16.0, {});   // 2^4 -> index 3
+    delta.Aggregate(32.0, {});   // 2^5 -> index 4
+    delta.Aggregate(64.0, {});   // 2^6 -> index 5
+    delta.Aggregate(128.0, {});  // 2^7 -> index 6
+    delta.Aggregate(256.0, {});  // 2^8 -> index 7
+    expected_count += 5;
+
+    cumulative = cumulative->Merge(delta);
+
+    auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
+    verify_invariant(point, expected_count, "Cycle 4: indices 3-7");
+  }
+
+  // === Cycle 5: values 32,64,128,256,512 -> indices 4,5,6,7,8 ===
+  {
+    Base2ExponentialHistogramAggregation delta(&config);
+    delta.Aggregate(32.0, {});   // 2^5 -> index 4
+    delta.Aggregate(64.0, {});   // 2^6 -> index 5
+    delta.Aggregate(128.0, {});  // 2^7 -> index 6
+    delta.Aggregate(256.0, {});  // 2^8 -> index 7
+    delta.Aggregate(512.0, {});  // 2^9 -> index 8
+    expected_count += 5;
+
+    cumulative = cumulative->Merge(delta);
+
+    auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
+    verify_invariant(point, expected_count, "Cycle 5: indices 4-8");
+  }
+
+  // === Cycle 6: values 64,128,256,512,1024 -> indices 5,6,7,8,9 ===
+  {
+    Base2ExponentialHistogramAggregation delta(&config);
+    delta.Aggregate(64.0, {});    // 2^6 -> index 5
+    delta.Aggregate(128.0, {});   // 2^7 -> index 6
+    delta.Aggregate(256.0, {});   // 2^8 -> index 7
+    delta.Aggregate(512.0, {});   // 2^9 -> index 8
+    delta.Aggregate(1024.0, {});  // 2^10 -> index 9
+    expected_count += 5;
+
+    cumulative = cumulative->Merge(delta);
+
+    auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
+    verify_invariant(point, expected_count, "Cycle 6: indices 5-9");
+  }
+}

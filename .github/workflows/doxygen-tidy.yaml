@@ -1,0 +1,40 @@
+name: doxygen-tidy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  doxygen-lint:
+    name: Doxygen lint
+    runs-on: ubuntu-latest
+    env:
+      DOXYFILE_FOLDER: 'docs/public'
+      DOXYFILE_NAME: 'Doxyfile.lint'
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Install doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen
+          echo "Installed Doxygen version: $(doxygen --version)"
+      - name: Analyze Doxygen comments
+        working-directory: ${{ env.DOXYFILE_FOLDER }}
+        run: |
+          mkdir /tmp/doxyoutput
+          doxygen ${{ env.DOXYFILE_NAME }}
+      - name: Check for Doxygen warnings
+        working-directory: ${{ env.DOXYFILE_FOLDER }}
+        run: |
+          if [ -s doxygen_warnings.log ]; then
+            echo "Doxygen warnings found:"
+            cat doxygen_warnings.log
+            exit 1
+          else
+            echo "No Doxygen warnings found."
+          fi

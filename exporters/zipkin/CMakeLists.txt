@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
+
 #
 # opentelemetry_exporter_zipkin_trace
 #
@@ -24,25 +26,6 @@ target_link_libraries(
   PUBLIC opentelemetry_trace opentelemetry_http_client_curl
          nlohmann_json::nlohmann_json)
 
-#
-# opentelemetry_exporter_zipkin_trace_builder
-#
-
-add_library(opentelemetry_exporter_zipkin_trace_builder src/zipkin_builder.cc)
-
-target_include_directories(
-  opentelemetry_exporter_zipkin_trace_builder
-  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
-         "$<INSTALL_INTERFACE:include>")
-
-set_target_properties(opentelemetry_exporter_zipkin_trace_builder
-                      PROPERTIES EXPORT_NAME zipkin_trace_exporter_builder)
-
-set_target_version(opentelemetry_exporter_zipkin_trace_builder)
-
-target_link_libraries(opentelemetry_exporter_zipkin_trace_builder
-                      PUBLIC opentelemetry_exporter_zipkin_trace)
-
 otel_add_component(
   COMPONENT
   exporters_zipkin
@@ -57,23 +40,13 @@ otel_add_component(
   "*.h"
   PATTERN
   "recordable.h"
-  EXCLUDE
-  PATTERN
-  "zipkin_builder.h"
   EXCLUDE)
 
-otel_add_component(
-  COMPONENT
-  exporters_zipkin_builder
-  TARGETS
-  opentelemetry_exporter_zipkin_trace_builder
-  FILES_DIRECTORY
-  "include/opentelemetry/exporters/zipkin"
-  FILES_DESTINATION
-  "include/opentelemetry/exporters"
-  FILES_MATCHING
-  PATTERN
-  "zipkin_builder.h")
+if(OPENTELEMETRY_INSTALL)
+  opentelemetry_add_pkgconfig(
+    exporter_zipkin_trace "OpenTelemetry Exporter - Zipkin"
+    "Exports trace spans in Zipkin format." "opentelemetry_trace")
+endif()
 
 if(BUILD_TESTING)
   add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)

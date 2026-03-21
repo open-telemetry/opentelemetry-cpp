@@ -58,6 +58,8 @@ std::unique_ptr<ConfiguredSdk> ConfiguredSdk::Create(
 
 void ConfiguredSdk::Install()
 {
+  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogLevel(log_level);
+
   if (propagator)
   {
     opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(propagator);

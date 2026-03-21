@@ -32,7 +32,7 @@
 
 using namespace opentelemetry;
 
-void do_something()
+static void do_something()
 {
   do_something_in_a();
   do_something_in_b();
@@ -111,33 +111,33 @@ void do_something()
 #endif /* BAZEL_BUILD */
 }
 
-int span_a_lib_count   = 0;
-int span_a_f1_count    = 0;
-int span_a_f2_count    = 0;
-int span_b_lib_count   = 0;
-int span_b_f1_count    = 0;
-int span_b_f2_count    = 0;
-int span_c_lib_count   = 0;
-int span_c_f1_count    = 0;
-int span_c_f2_count    = 0;
-int span_d_lib_count   = 0;
-int span_d_f1_count    = 0;
-int span_d_f2_count    = 0;
-int span_e_lib_count   = 0;
-int span_e_f1_count    = 0;
-int span_e_f2_count    = 0;
-int span_f_lib_count   = 0;
-int span_f_f1_count    = 0;
-int span_f_f2_count    = 0;
-int span_g_lib_count   = 0;
-int span_g_f1_count    = 0;
-int span_g_f2_count    = 0;
-int span_h_lib_count   = 0;
-int span_h_f1_count    = 0;
-int span_h_f2_count    = 0;
-int unknown_span_count = 0;
+static int span_a_lib_count   = 0;
+static int span_a_f1_count    = 0;
+static int span_a_f2_count    = 0;
+static int span_b_lib_count   = 0;
+static int span_b_f1_count    = 0;
+static int span_b_f2_count    = 0;
+static int span_c_lib_count   = 0;
+static int span_c_f1_count    = 0;
+static int span_c_f2_count    = 0;
+static int span_d_lib_count   = 0;
+static int span_d_f1_count    = 0;
+static int span_d_f2_count    = 0;
+static int span_e_lib_count   = 0;
+static int span_e_f1_count    = 0;
+static int span_e_f2_count    = 0;
+static int span_f_lib_count   = 0;
+static int span_f_f1_count    = 0;
+static int span_f_f2_count    = 0;
+static int span_g_lib_count   = 0;
+static int span_g_f1_count    = 0;
+static int span_g_f2_count    = 0;
+static int span_h_lib_count   = 0;
+static int span_h_f1_count    = 0;
+static int span_h_f2_count    = 0;
+static int unknown_span_count = 0;
 
-void reset_counts()
+static void reset_counts()
 {
   span_a_lib_count   = 0;
   span_a_f1_count    = 0;
@@ -331,7 +331,7 @@ public:
 #endif
 };
 
-void setup_otel()
+static void setup_otel()
 {
   std::shared_ptr<opentelemetry::trace::TracerProvider> provider = MyTracerProvider::Create();
 
@@ -343,7 +343,7 @@ void setup_otel()
   trace_api::Provider::SetTracerProvider(provider);
 }
 
-void cleanup_otel()
+static void cleanup_otel()
 {
   std::shared_ptr<opentelemetry::trace::TracerProvider> provider(
       new opentelemetry::trace::NoopTracerProvider());

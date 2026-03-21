@@ -22,9 +22,11 @@
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_config_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
-#include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 
 static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(
     const std::string &yaml)
@@ -210,9 +212,9 @@ tracer_provider:
           otlp_http:
             endpoint: "somewhere"
             tls:
-              certificate_file: "certificate_file"
-              client_key_file: "client_key_file"
-              client_certificate_file: "client_certificate_file"
+              ca_file: "ca_file"
+              key_file: "key_file"
+              cert_file: "cert_file"
             headers:
               - name: foo
                 value: "123"
@@ -241,9 +243,9 @@ tracer_provider:
           exporter);
   ASSERT_EQ(otlp_http->endpoint, "somewhere");
   ASSERT_NE(otlp_http->tls, nullptr);
-  ASSERT_EQ(otlp_http->tls->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_http->tls->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_http->tls->client_certificate_file, "client_certificate_file");
+  ASSERT_EQ(otlp_http->tls->ca_file, "ca_file");
+  ASSERT_EQ(otlp_http->tls->key_file, "key_file");
+  ASSERT_EQ(otlp_http->tls->cert_file, "cert_file");
   ASSERT_NE(otlp_http->headers, nullptr);
   ASSERT_EQ(otlp_http->headers->kv_map.size(), 2);
   ASSERT_EQ(otlp_http->headers->kv_map["foo"], "123");
@@ -300,9 +302,9 @@ tracer_provider:
           otlp_grpc:
             endpoint: "somewhere"
             tls:
-              certificate_file: "certificate_file"
-              client_key_file: "client_key_file"
-              client_certificate_file: "client_certificate_file"
+              ca_file: "ca_file"
+              key_file: "key_file"
+              cert_file: "cert_file"
               insecure: true
             headers:
               - name: foo
@@ -331,9 +333,9 @@ tracer_provider:
           exporter);
   ASSERT_EQ(otlp_grpc->endpoint, "somewhere");
   ASSERT_NE(otlp_grpc->tls, nullptr);
-  ASSERT_EQ(otlp_grpc->tls->certificate_file, "certificate_file");
-  ASSERT_EQ(otlp_grpc->tls->client_key_file, "client_key_file");
-  ASSERT_EQ(otlp_grpc->tls->client_certificate_file, "client_certificate_file");
+  ASSERT_EQ(otlp_grpc->tls->ca_file, "ca_file");
+  ASSERT_EQ(otlp_grpc->tls->key_file, "key_file");
+  ASSERT_EQ(otlp_grpc->tls->cert_file, "cert_file");
   ASSERT_EQ(otlp_grpc->tls->insecure, true);
   ASSERT_NE(otlp_grpc->headers, nullptr);
   ASSERT_EQ(otlp_grpc->headers->kv_map.size(), 2);
@@ -426,69 +428,6 @@ tracer_provider:
   ASSERT_NE(simple->exporter, nullptr);
   auto *exporter = simple->exporter.get();
   ASSERT_NE(exporter, nullptr);
-}
-
-TEST(YamlTrace, default_otlp_zipkin)
-{
-  std::string yaml = R"(
-file_format: "1.0-trace"
-tracer_provider:
-  processors:
-    - simple:
-        exporter:
-          zipkin:
-            endpoint: "zipkin"
-)";
-
-  auto config = DoParse(yaml);
-  ASSERT_NE(config, nullptr);
-  ASSERT_NE(config->tracer_provider, nullptr);
-  ASSERT_EQ(config->tracer_provider->processors.size(), 1);
-  auto *processor = config->tracer_provider->processors[0].get();
-  ASSERT_NE(processor, nullptr);
-  auto *simple =
-      reinterpret_cast<opentelemetry::sdk::configuration::SimpleSpanProcessorConfiguration *>(
-          processor);
-  ASSERT_NE(simple->exporter, nullptr);
-  auto *exporter = simple->exporter.get();
-  ASSERT_NE(exporter, nullptr);
-  auto *zipkin =
-      reinterpret_cast<opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *>(
-          exporter);
-  ASSERT_EQ(zipkin->endpoint, "zipkin");
-  ASSERT_EQ(zipkin->timeout, 10000);
-}
-
-TEST(YamlTrace, otlp_zipkin)
-{
-  std::string yaml = R"(
-file_format: "1.0-trace"
-tracer_provider:
-  processors:
-    - simple:
-        exporter:
-          zipkin:
-            endpoint: "zipkin"
-            timeout: 5000
-)";
-
-  auto config = DoParse(yaml);
-  ASSERT_NE(config, nullptr);
-  ASSERT_NE(config->tracer_provider, nullptr);
-  ASSERT_EQ(config->tracer_provider->processors.size(), 1);
-  auto *processor = config->tracer_provider->processors[0].get();
-  ASSERT_NE(processor, nullptr);
-  auto *simple =
-      reinterpret_cast<opentelemetry::sdk::configuration::SimpleSpanProcessorConfiguration *>(
-          processor);
-  ASSERT_NE(simple->exporter, nullptr);
-  auto *exporter = simple->exporter.get();
-  ASSERT_NE(exporter, nullptr);
-  auto *zipkin =
-      reinterpret_cast<opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *>(
-          exporter);
-  ASSERT_EQ(zipkin->endpoint, "zipkin");
-  ASSERT_EQ(zipkin->timeout, 5000);
 }
 
 TEST(YamlTrace, no_limits)
@@ -794,4 +733,110 @@ tracer_provider:
       reinterpret_cast<opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *>(
           sampler);
   ASSERT_EQ(ratio->ratio, 3.14);
+}
+
+TEST(YamlTrace, no_tracer_configurator)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_EQ(config->tracer_provider->tracer_configurator, nullptr);
+}
+
+TEST(YamlTrace, tracer_configurator_default_only)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  tracer_configurator/development:
+    default_config:
+      enabled: false
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->tracer_configurator, nullptr);
+  ASSERT_EQ(config->tracer_provider->tracer_configurator->default_config.enabled, false);
+  ASSERT_EQ(config->tracer_provider->tracer_configurator->tracers.size(), 0);
+}
+
+TEST(YamlTrace, tracer_configurator_with_tracers)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  tracer_configurator/development:
+    default_config:
+      enabled: false
+    tracers:
+      - name: io.opentelemetry.contrib.*
+        config:
+          enabled: true
+      - name: my.exact.tracer
+        config:
+          enabled: false
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->tracer_configurator, nullptr);
+
+  auto &configurator = config->tracer_provider->tracer_configurator;
+  ASSERT_EQ(configurator->default_config.enabled, false);
+  ASSERT_EQ(configurator->tracers.size(), 2);
+
+  ASSERT_EQ(configurator->tracers[0].name, "io.opentelemetry.contrib.*");
+  ASSERT_EQ(configurator->tracers[0].config.enabled, true);
+
+  ASSERT_EQ(configurator->tracers[1].name, "my.exact.tracer");
+  ASSERT_EQ(configurator->tracers[1].config.enabled, false);
+}
+
+TEST(YamlTrace, tracer_configurator_default_enabled)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  tracer_configurator/development:
+    default_config:
+      enabled: true
+    tracers:
+      - name: noisy.library
+        config:
+          enabled: false
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->tracer_configurator, nullptr);
+
+  auto &configurator = config->tracer_provider->tracer_configurator;
+  ASSERT_EQ(configurator->default_config.enabled, true);
+  ASSERT_EQ(configurator->tracers.size(), 1);
+  ASSERT_EQ(configurator->tracers[0].name, "noisy.library");
+  ASSERT_EQ(configurator->tracers[0].config.enabled, false);
 }

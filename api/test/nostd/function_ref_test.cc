@@ -8,12 +8,12 @@
 
 using namespace opentelemetry::nostd;
 
-int Call(function_ref<int()> f)
+static int Call(function_ref<int()> f)
 {
   return f();
 }
 
-int Return3()
+static int Return3()
 {
   return 3;
 }

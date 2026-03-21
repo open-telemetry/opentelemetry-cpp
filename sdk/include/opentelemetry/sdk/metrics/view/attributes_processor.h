@@ -38,6 +38,13 @@ typedef std::unordered_map<std::string,
 class AttributesProcessor
 {
 public:
+  AttributesProcessor() = default;
+
+  AttributesProcessor(const AttributesProcessor &)            = delete;
+  AttributesProcessor(AttributesProcessor &&)                 = delete;
+  AttributesProcessor &operator=(const AttributesProcessor &) = delete;
+  AttributesProcessor &operator=(AttributesProcessor &&)      = delete;
+
   // Process the metric instrument attributes.
   // @returns integer with individual bits set if they are to be filtered.
 

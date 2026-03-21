@@ -42,10 +42,10 @@ std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> OtlpGrpcLogRecordBu
 
   if (tls != nullptr)
   {
-    options.ssl_credentials_cacert_path = tls->certificate_file;
+    options.ssl_credentials_cacert_path = tls->ca_file;
 #ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
-    options.ssl_client_key_path  = tls->client_key_file;
-    options.ssl_client_cert_path = tls->client_certificate_file;
+    options.ssl_client_key_path  = tls->key_file;
+    options.ssl_client_cert_path = tls->cert_file;
 #endif
   }
 

@@ -32,14 +32,14 @@ class GrpcClientCarrier : public opentelemetry::context::propagation::TextMapCar
 public:
   GrpcClientCarrier(ClientContext *context) : context_(context) {}
   GrpcClientCarrier() = default;
-  virtual opentelemetry::nostd::string_view Get(
+  opentelemetry::nostd::string_view Get(
       opentelemetry::nostd::string_view /* key */) const noexcept override
   {
     return "";
   }
 
-  virtual void Set(opentelemetry::nostd::string_view key,
-                   opentelemetry::nostd::string_view value) noexcept override
+  void Set(opentelemetry::nostd::string_view key,
+           opentelemetry::nostd::string_view value) noexcept override
   {
     std::cout << " Client ::: Adding " << key << " " << value << "\n";
     context_->AddMetadata(std::string(key), std::string(value));
@@ -53,7 +53,7 @@ class GrpcServerCarrier : public opentelemetry::context::propagation::TextMapCar
 public:
   GrpcServerCarrier(ServerContext *context) : context_(context) {}
   GrpcServerCarrier() = default;
-  virtual opentelemetry::nostd::string_view Get(
+  opentelemetry::nostd::string_view Get(
       opentelemetry::nostd::string_view key) const noexcept override
   {
     auto it = context_->client_metadata().find({key.data(), key.size()});
@@ -64,8 +64,8 @@ public:
     return "";
   }
 
-  virtual void Set(opentelemetry::nostd::string_view /* key */,
-                   opentelemetry::nostd::string_view /* value */) noexcept override
+  void Set(opentelemetry::nostd::string_view /* key */,
+           opentelemetry::nostd::string_view /* value */) noexcept override
   {
     // Not required for server
   }
@@ -100,7 +100,8 @@ void CleanupTracer()
   opentelemetry::sdk::trace::Provider::SetTracerProvider(none);
 }
 
-opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer(std::string tracer_name)
+opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer(
+    const std::string &tracer_name)
 {
   auto provider = opentelemetry::trace::Provider::GetTracerProvider();
   return provider->GetTracer(tracer_name);
