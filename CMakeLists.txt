@@ -634,6 +634,7 @@ if(NOT WITH_API_ONLY)
   if(WITH_FUNC_TESTS)
     add_subdirectory(functional)
   endif()
+  add_subdirectory(stress)
 endif()
 
 include(
