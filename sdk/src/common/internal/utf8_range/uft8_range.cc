@@ -39,7 +39,7 @@ namespace utf8_range
 
 static FORCE_INLINE_ATTR uint64_t utf8_range_UnalignedLoad64(const void *p)
 {
-  uint64_t t;
+  uint64_t t = 0;
   memcpy(&t, p, sizeof t);
   return t;
 }

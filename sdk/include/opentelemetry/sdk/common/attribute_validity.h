@@ -106,6 +106,29 @@ public:
 
   ~KeyValueFilterIterable() override;
 
+  KeyValueFilterIterable(const KeyValueFilterIterable &other)            = default;
+  KeyValueFilterIterable &operator=(const KeyValueFilterIterable &other) = default;
+  KeyValueFilterIterable(KeyValueFilterIterable &&other) noexcept
+      : origin_(other.origin_), size_(other.size_), log_hint_(other.log_hint_)
+  {
+    other.origin_ = nullptr;
+    other.size_   = 0;
+  }
+
+  KeyValueFilterIterable &operator=(KeyValueFilterIterable &&other) noexcept
+  {
+    if (this != &other)
+    {
+      origin_   = other.origin_;
+      size_     = other.size_;
+      log_hint_ = other.log_hint_;
+
+      other.origin_ = nullptr;
+      other.size_   = 0;
+    }
+    return *this;
+  }
+
   bool ForEachKeyValue(
       opentelemetry::nostd::function_ref<bool(opentelemetry::nostd::string_view,
                                               opentelemetry::common::AttributeValue)> callback)
