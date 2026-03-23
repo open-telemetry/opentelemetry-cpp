@@ -2086,7 +2086,7 @@ ConfigurationParser::ParseIntegerAttributeValueConfiguration(
 {
   auto model = std::make_unique<IntegerAttributeValueConfiguration>();
 
-  model->value = node->AsInteger();
+  model->value = static_cast<int64_t>(node->AsInteger());
 
   return model;
 }
