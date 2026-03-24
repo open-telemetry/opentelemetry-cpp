@@ -22,7 +22,12 @@ public:
   class FactoryImpl
   {
   public:
-    virtual ~FactoryImpl() {}
+    FactoryImpl()                                   = default;
+    FactoryImpl(const FactoryImpl &)                = default;
+    FactoryImpl(FactoryImpl &&) noexcept            = default;
+    FactoryImpl &operator=(const FactoryImpl &)     = default;
+    FactoryImpl &operator=(FactoryImpl &&) noexcept = default;
+    virtual ~FactoryImpl()                          = default;
 
     virtual nostd::unique_ptr<TracerHandle> MakeTracerHandle(
         nostd::string_view tracer_config,
