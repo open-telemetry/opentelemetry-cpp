@@ -110,7 +110,7 @@ private:
 class SpanData final : public Recordable
 {
 public:
-  SpanData() : resource_{nullptr}, instrumentation_scope_{nullptr} {}
+  SpanData() = default;
   /**
    * Get the trace id for this span
    * @return the trace id for this span
@@ -321,8 +321,8 @@ private:
   std::vector<SpanDataLink> links_;
   opentelemetry::trace::TraceFlags flags_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
-  const opentelemetry::sdk::resource::Resource *resource_;
-  const InstrumentationScope *instrumentation_scope_;
+  const opentelemetry::sdk::resource::Resource *resource_{nullptr};
+  const InstrumentationScope *instrumentation_scope_{nullptr};
 };
 }  // namespace trace
 }  // namespace sdk
