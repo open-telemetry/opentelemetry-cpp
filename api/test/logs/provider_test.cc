@@ -19,12 +19,10 @@
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
 using opentelemetry::logs::EventLogger;
 using opentelemetry::logs::EventLoggerProvider;
-using opentelemetry::logs::NoopEventLogger;
 using opentelemetry::logs::NoopEventLoggerProvider;
 #endif
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
-using opentelemetry::logs::NoopLogger;
 using opentelemetry::logs::NoopLoggerProvider;
 using opentelemetry::logs::Provider;
 using opentelemetry::nostd::shared_ptr;
