@@ -15,6 +15,7 @@
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "prometheus_test_helper.h"
 
+using namespace prometheus_test;
 using opentelemetry::exporter::metrics::PrometheusCollector;
 using opentelemetry::sdk::metrics::MetricProducer;
 using opentelemetry::sdk::metrics::ResourceMetrics;

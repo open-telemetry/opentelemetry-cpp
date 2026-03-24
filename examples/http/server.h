@@ -9,7 +9,7 @@
 #include <atomic>
 #include <string>
 
-namespace
+namespace http_example
 {
 
 class HttpServer : public HTTP_SERVER_NS::HttpRequestCallback
@@ -58,4 +58,4 @@ public:
   ~HttpServer() override { Stop(); }
 };
 
-}  // namespace
+}  // namespace http_example

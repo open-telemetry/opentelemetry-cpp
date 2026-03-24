@@ -22,7 +22,7 @@
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/provider.h"
 
-namespace
+namespace http_example
 {
 
 template <typename T>
@@ -96,4 +96,4 @@ opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer(
   return provider->GetTracer(tracer_name);
 }
 
-}  // namespace
+}  // namespace http_example

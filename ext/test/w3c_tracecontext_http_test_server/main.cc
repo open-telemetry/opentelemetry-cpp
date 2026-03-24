@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <atomic>
 #include <chrono>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <nlohmann/json.hpp>
