@@ -9,6 +9,7 @@
 #include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
 #include "opentelemetry/logs/logger.h"                 // IWYU pragma: keep
 #include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/logs/noop.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -16,9 +17,13 @@
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
 using opentelemetry::logs::EventLogger;
 using opentelemetry::logs::EventLoggerProvider;
+using opentelemetry::logs::NoopEventLogger;
+using opentelemetry::logs::NoopEventLoggerProvider;
 #endif
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
+using opentelemetry::logs::NoopLogger;
+using opentelemetry::logs::NoopLoggerProvider;
 using opentelemetry::logs::Provider;
 using opentelemetry::nostd::shared_ptr;
 namespace nostd = opentelemetry::nostd;
@@ -71,6 +76,17 @@ TEST(Provider, GetLogger)
 
   auto logger2 = tf->GetLogger("logger2", "opentelelemtry_library", "", schema_url);
   EXPECT_EQ(nullptr, logger2);
+}
+
+TEST(NoopLoggerProvider, CreateNoopLogger)
+{
+  NoopLoggerProvider provider;
+  auto logger = provider.GetLogger(
+      "test", "lib", "1.0", "schema_url",
+      opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>({}));
+  ASSERT_TRUE(logger != nullptr);
+  ASSERT_TRUE(dynamic_cast<NoopLogger *>(logger.get()) != nullptr);
+  EXPECT_EQ(logger->GetName(), "noop logger");
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
@@ -132,6 +148,15 @@ TEST(Provider, CreateEventLogger)
   auto logger = tf->CreateEventLogger(nostd::shared_ptr<Logger>(nullptr), "domain");
 
   EXPECT_EQ(nullptr, logger);
+}
+
+TEST(NoopEventLoggerProvider, CreateNoopEventLogger)
+{
+  NoopEventLoggerProvider provider;
+  auto event_logger = provider.CreateEventLogger(nostd::shared_ptr<Logger>(nullptr), "domain");
+  ASSERT_TRUE(event_logger != nullptr);
+  ASSERT_TRUE(dynamic_cast<NoopEventLogger *>(event_logger.get()) != nullptr);
+  EXPECT_EQ(event_logger->GetName(), "noop event logger");
 }
 
 #  if defined(_MSC_VER)

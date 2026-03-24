@@ -46,8 +46,11 @@ public:
 
   using Logger::EmitLogRecord;
 
-  // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
-  void EmitLogRecord(nostd::unique_ptr<LogRecord> && /* log_record */) noexcept override {}
+  void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record) noexcept override
+  {
+    auto local = std::move(log_record);
+    local.reset();
+  }
 
 private:
   class NoopLogRecord : public LogRecord
@@ -102,10 +105,11 @@ public:
 
   nostd::shared_ptr<Logger> GetDelegateLogger() noexcept override { return logger_; }
 
-  // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
-  void EmitEvent(nostd::string_view,
-                 nostd::unique_ptr<LogRecord> && /* log_record */) noexcept override
-  {}
+  void EmitEvent(nostd::string_view, nostd::unique_ptr<LogRecord> &&log_record) noexcept override
+  {
+    auto local = std::move(log_record);
+    local.reset();
+  }
 
 private:
   nostd::shared_ptr<Logger> logger_;
