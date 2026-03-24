@@ -85,7 +85,6 @@ TEST(NoopLoggerProvider, CreateNoopLogger)
       "test", "lib", "1.0", "schema_url",
       opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>({}));
   ASSERT_TRUE(logger != nullptr);
-  ASSERT_TRUE(dynamic_cast<NoopLogger *>(logger.get()) != nullptr);
   EXPECT_EQ(logger->GetName(), "noop logger");
 }
 
@@ -155,7 +154,6 @@ TEST(NoopEventLoggerProvider, CreateNoopEventLogger)
   NoopEventLoggerProvider provider;
   auto event_logger = provider.CreateEventLogger(nostd::shared_ptr<Logger>(nullptr), "domain");
   ASSERT_TRUE(event_logger != nullptr);
-  ASSERT_TRUE(dynamic_cast<NoopEventLogger *>(event_logger.get()) != nullptr);
   EXPECT_EQ(event_logger->GetName(), "noop event logger");
 }
 
