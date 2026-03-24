@@ -163,7 +163,6 @@ public:
 
   HttpServer()
       : m_serverHost("unnamed"),
-        allowKeepalive(true),
         m_reactor(*this),
         m_maxRequestHeadersSize(8192),
         m_maxRequestContentSize(2 * 1024 * 1024)

@@ -28,6 +28,11 @@ public:
     server_.setKeepalive(false);
   }
 
+  HttpServer(const HttpServer &)            = delete;
+  HttpServer(HttpServer &&)                 = delete;
+  HttpServer &operator=(const HttpServer &) = delete;
+  HttpServer &operator=(HttpServer &&)      = delete;
+
   void AddHandler(const std::string &path, HTTP_SERVER_NS::HttpRequestCallback *request_handler)
   {
     server_.addHandler(path, *request_handler);
