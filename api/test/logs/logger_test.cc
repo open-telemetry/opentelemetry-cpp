@@ -70,7 +70,7 @@ TEST(NoopLogger, NoopLoggerUsage)
   NoopLogger logger;
   auto record = logger.CreateLogRecord();
   ASSERT_TRUE(record != nullptr);
-  EXPECT_NO_THROW(logger.EmitLogRecord(std::move(record)));
+  logger.EmitLogRecord(std::move(record));
 }
 
 // Test the EmitLogRecord() overloads
@@ -201,7 +201,7 @@ TEST(NoopEventLogger, NoopEventLoggerUsage)
   ASSERT_TRUE(logger != nullptr);
   auto record = logger->CreateLogRecord();
   ASSERT_TRUE(record != nullptr);
-  EXPECT_NO_THROW(event_logger.EmitEvent("event_name", std::move(record)));
+  event_logger.EmitEvent("event_name", std::move(record));
 }
 
 TEST(Logger, EventLogMethodOverloads)
