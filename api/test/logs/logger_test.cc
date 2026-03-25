@@ -26,7 +26,6 @@
 
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
 using opentelemetry::logs::NoopEventLogger;
-using opentelemetry::logs::NoopEventLoggerProvider;
 #endif
 
 using opentelemetry::logs::EventId;
