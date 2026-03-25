@@ -24,6 +24,9 @@ Increment the:
 * [CODE HEALTH] Fix more clang-tidy warnings in API
   [#3950](https://github.com/open-telemetry/opentelemetry-cpp/pull/3950)
 
+* [CODE HEALTH] Fix clang-tidy warnings in ext, exporters, and examples
+  [#3952](https://github.com/open-telemetry/opentelemetry-cpp/pull/3952)
+
 ## [1.26.0] 2026-03-19
 
 * [RELEASE] Bump main branch to 1.26.0-dev

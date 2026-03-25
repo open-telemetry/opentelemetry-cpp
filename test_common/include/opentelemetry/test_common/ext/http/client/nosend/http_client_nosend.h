@@ -31,8 +31,6 @@ const opentelemetry::ext::http::client::StatusCode Http_Ok = 200;
 class Request : public opentelemetry::ext::http::client::Request
 {
 public:
-  Request() : method_(opentelemetry::ext::http::client::Method::Get), uri_("/") {}
-
   void SetMethod(opentelemetry::ext::http::client::Method method) noexcept override
   {
     method_ = method;
@@ -78,11 +76,11 @@ public:
   }
 
 public:
-  opentelemetry::ext::http::client::Method method_;
+  opentelemetry::ext::http::client::Method method_{opentelemetry::ext::http::client::Method::Get};
   opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
   opentelemetry::ext::http::client::Body body_;
   opentelemetry::ext::http::client::Headers headers_;
-  std::string uri_;
+  std::string uri_{"/"};
   std::chrono::milliseconds timeout_ms_{5000};  // ms
   opentelemetry::ext::http::client::Compression compression_{
       opentelemetry::ext::http::client::Compression::kNone};
@@ -93,8 +91,6 @@ public:
 class Response : public opentelemetry::ext::http::client::Response
 {
 public:
-  Response() : status_code_(Http_Ok) {}
-
   const opentelemetry::ext::http::client::Body &GetBody() const noexcept override { return body_; }
 
   bool ForEachHeader(nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)>
@@ -125,7 +121,7 @@ public:
 public:
   Headers headers_;
   opentelemetry::ext::http::client::Body body_;
-  opentelemetry::ext::http::client::StatusCode status_code_;
+  opentelemetry::ext::http::client::StatusCode status_code_{Http_Ok};
 };
 
 class HttpClient;  // IWYU pragma: keep
@@ -137,10 +133,8 @@ public:
           const std::string &scheme = "http",
           const std::string &host   = "",
           uint16_t port             = 80)
-      : http_client_(http_client), is_session_active_(false)
-  {
-    host_ = scheme + "://" + host + ":" + std::to_string(port) + "/";
-  }
+      : host_(scheme + "://" + host + ":" + std::to_string(port) + "/"), http_client_(http_client)
+  {}
 
   std::shared_ptr<opentelemetry::ext::http::client::Request> CreateRequest() noexcept override
   {
@@ -172,9 +166,9 @@ public:
 private:
   std::shared_ptr<Request> http_request_;
   std::string host_;
-  uint64_t session_id_;
+  uint64_t session_id_{};
   HttpClient &http_client_;
-  bool is_session_active_;
+  bool is_session_active_{false};
 };
 
 class HttpClient : public opentelemetry::ext::http::client::HttpClient
