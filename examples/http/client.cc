@@ -27,6 +27,8 @@
 #include <type_traits>
 #include <utility>
 
+using namespace http_example;
+
 namespace
 {
 

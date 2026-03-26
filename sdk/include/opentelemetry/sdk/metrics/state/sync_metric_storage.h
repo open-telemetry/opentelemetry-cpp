@@ -57,7 +57,7 @@ class SyncMetricStorage : public MetricStorage, public SyncWritableMetricStorage
 #endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 public:
-  SyncMetricStorage(InstrumentDescriptor instrument_descriptor,
+  SyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,
                     const AggregationType aggregation_type,
                     std::shared_ptr<const AttributesProcessor> attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -72,7 +72,7 @@ public:
         attributes_processor_(std::move(attributes_processor)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_filter_type_(exempler_filter_type),
-        exemplar_reservoir_(exemplar_reservoir),
+        exemplar_reservoir_(std::move(exemplar_reservoir)),
 #endif
         temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
   {

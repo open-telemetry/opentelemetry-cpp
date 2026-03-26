@@ -24,6 +24,7 @@
 #include "opentelemetry/version.h"
 #include "prometheus_test_helper.h"
 
+using namespace prometheus_test;
 using opentelemetry::exporter::metrics::PrometheusExporterUtils;
 namespace metric_sdk        = opentelemetry::sdk::metrics;
 namespace prometheus_client = ::prometheus;

@@ -3,6 +3,7 @@
 
 foreach(
   testname
+  wildcard_match_test
   random_test
   fast_random_number_generator_test
   atomic_unique_ptr_test

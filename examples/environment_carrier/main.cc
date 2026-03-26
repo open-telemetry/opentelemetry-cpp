@@ -107,8 +107,9 @@ void RunChild()
   opts.parent     = parent_ctx;
   auto child_span = tracer->StartSpan("child-operation", opts);
 
-  std::cout << "[child]  trace_id: " << Hex(child_span->GetContext().trace_id()) << std::endl;
-  std::cout << "[child]  span_id:  " << Hex(child_span->GetContext().span_id()) << std::endl;
+  std::cout << "[child]  trace_id: " << Hex(child_span->GetContext().trace_id()) << '\n';
+  std::cout << "[child]  span_id:  " << Hex(child_span->GetContext().span_id()) << '\n';
+  std::cout << std::flush;
 
   child_span->End();
   CleanupTracer();
@@ -124,8 +125,9 @@ void RunParent()
   auto root_span = tracer->StartSpan("parent-operation");
   auto scope     = trace_api::Scope(root_span);
 
-  std::cout << "[parent] trace_id: " << Hex(root_span->GetContext().trace_id()) << std::endl;
-  std::cout << "[parent] span_id:  " << Hex(root_span->GetContext().span_id()) << std::endl;
+  std::cout << "[parent] trace_id: " << Hex(root_span->GetContext().trace_id()) << '\n';
+  std::cout << "[parent] span_id:  " << Hex(root_span->GetContext().span_id()) << '\n';
+  std::cout << std::flush;
 
   // Inject context into a map via EnvironmentCarrier
   auto env_map = std::make_shared<std::map<std::string, std::string>>();
@@ -155,7 +157,7 @@ void RunParent()
   }
   else
   {
-    std::cerr << "fork() failed" << std::endl;
+    std::cerr << "fork() failed\n";
   }
 
   root_span->End();

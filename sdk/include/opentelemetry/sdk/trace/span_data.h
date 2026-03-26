@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
@@ -39,7 +40,9 @@ class SpanDataEvent
 public:
   SpanDataEvent(std::string name,
                 opentelemetry::common::SystemTimestamp timestamp,
-                const opentelemetry::common::KeyValueIterable &attributes);
+                const opentelemetry::common::KeyValueIterable &attributes)
+      : name_(std::move(name)), timestamp_(timestamp), attribute_map_(attributes)
+  {}
 
   /**
    * Get the name for this event
@@ -76,7 +79,9 @@ class SpanDataLink
 {
 public:
   SpanDataLink(opentelemetry::trace::SpanContext span_context,
-               const opentelemetry::common::KeyValueIterable &attributes);
+               const opentelemetry::common::KeyValueIterable &attributes)
+      : span_context_(std::move(span_context)), attribute_map_(attributes)
+  {}
 
   /**
    * Get the attributes for this link
@@ -105,8 +110,7 @@ private:
 class SpanData final : public Recordable
 {
 public:
-  SpanData();
-
+  SpanData() = default;
   /**
    * Get the trace id for this span
    * @return the trace id for this span
@@ -256,8 +260,8 @@ private:
   std::vector<SpanDataLink> links_;
   opentelemetry::trace::TraceFlags flags_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
-  const opentelemetry::sdk::resource::Resource *resource_;
-  const InstrumentationScope *instrumentation_scope_;
+  const opentelemetry::sdk::resource::Resource *resource_{nullptr};
+  const InstrumentationScope *instrumentation_scope_{nullptr};
 };
 }  // namespace trace
 }  // namespace sdk

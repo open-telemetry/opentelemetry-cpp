@@ -93,7 +93,11 @@ struct Thread
   /// Thread Constructor
   /// </summary>
   /// <returns>Thread</returns>
-  Thread() {}
+  Thread()                          = default;
+  Thread(const Thread &)            = delete;
+  Thread(Thread &&)                 = delete;
+  Thread &operator=(const Thread &) = delete;
+  Thread &operator=(Thread &&)      = delete;
 
   /// <summary>
   /// Start Thread
@@ -131,7 +135,7 @@ struct Thread
   /// Thread destructor
   /// </summary>
   /// <returns></returns>
-  virtual ~Thread() noexcept {}
+  virtual ~Thread() noexcept = default;
 };
 
 }  // namespace common
@@ -175,7 +179,7 @@ struct SocketAddr
   {
     sockaddr_in &inet4    = reinterpret_cast<sockaddr_in &>(m_data);
     inet4.sin_family      = AF_INET;
-    inet4.sin_port        = htons(static_cast<unsigned short>(port));
+    inet4.sin_port        = htons(static_cast<uint16_t>(port));
     inet4.sin_addr.s_addr = htonl(addr);
   }
 
@@ -209,10 +213,6 @@ struct SocketAddr
     }
 #endif
   }
-
-  SocketAddr(SocketAddr const &other) = default;
-
-  SocketAddr &operator=(SocketAddr const &other) = default;
 
   operator sockaddr *() { return &m_data; }
 
@@ -272,13 +272,6 @@ struct Socket
   Socket(Type sock = Invalid) : m_sock(sock) {}
 
   Socket(int af, int type, int proto) : m_sock(::socket(af, type, proto)) {}
-
-  Socket(const Socket &)            = default;
-  Socket(Socket &&)                 = default;
-  Socket &operator=(const Socket &) = default;
-  Socket &operator=(Socket &&)      = default;
-
-  ~Socket() {}
 
   operator Socket::Type() const { return m_sock; }
 
@@ -435,11 +428,9 @@ struct Socket
 struct SocketData
 {
   Socket socket;
-  int flags;
+  int flags{0};
 
-  SocketData() : socket(), flags(0) {}
-
-  bool operator==(Socket s) { return (socket == s); }
+  bool operator==(const Socket &s) { return (socket == s); }
 };
 
 /// <summary>
@@ -489,7 +480,7 @@ struct Reactor : protected common::Thread
 
 #ifdef __linux__
   /* use epoll on Linux */
-  int m_epollFd;
+  int m_epollFd{};
 #endif
 
 #ifdef TARGET_OS_MAC
@@ -500,16 +491,19 @@ struct Reactor : protected common::Thread
 #endif
 
 public:
-  Reactor(SocketCallback &callback) : m_callback(callback)
-  {
+  Reactor(SocketCallback &callback)
+      : m_callback(callback)
 #ifdef __linux__
+        ,
+        m_epollFd{
 #  ifdef ANDROID
-    m_epollFd = ::epoll_create(0);
+            ::epoll_create(0)
 #  else
-    m_epollFd = ::epoll_create1(0);
+            ::epoll_create1(0)
 #  endif
+        }
 #endif
-
+  {
 #ifdef TARGET_OS_MAC
     bzero(&m_events[0], sizeof(m_events));
     kq = kqueue();
