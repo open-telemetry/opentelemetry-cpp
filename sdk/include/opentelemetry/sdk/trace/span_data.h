@@ -40,9 +40,7 @@ class SpanDataEvent
 public:
   SpanDataEvent(std::string name,
                 opentelemetry::common::SystemTimestamp timestamp,
-                const opentelemetry::common::KeyValueIterable &attributes)
-      : name_(std::move(name)), timestamp_(timestamp), attribute_map_(attributes)
-  {}
+                const opentelemetry::common::KeyValueIterable &attributes);
 
   /**
    * Get the name for this event
@@ -61,10 +59,7 @@ public:
    * @return the attributes for this event
    */
   const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
-  GetAttributes() const noexcept
-  {
-    return attribute_map_.GetAttributes();
-  }
+  GetAttributes() const noexcept;
 
 private:
   std::string name_;
@@ -79,19 +74,14 @@ class SpanDataLink
 {
 public:
   SpanDataLink(opentelemetry::trace::SpanContext span_context,
-               const opentelemetry::common::KeyValueIterable &attributes)
-      : span_context_(std::move(span_context)), attribute_map_(attributes)
-  {}
+               const opentelemetry::common::KeyValueIterable &attributes);
 
   /**
    * Get the attributes for this link
    * @return the attributes for this link
    */
   const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
-  GetAttributes() const noexcept
-  {
-    return attribute_map_.GetAttributes();
-  }
+  GetAttributes() const noexcept;
 
   /**
    * Get the span context for this link

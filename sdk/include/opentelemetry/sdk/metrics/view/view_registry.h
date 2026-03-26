@@ -34,8 +34,8 @@ struct RegisteredView
 class ViewRegistry
 {
 public:
-  ViewRegistry()  = default;
-  
+  ViewRegistry() = default;
+
   ViewRegistry(const ViewRegistry &)            = delete;
   ViewRegistry(ViewRegistry &&)                 = delete;
   ViewRegistry &operator=(const ViewRegistry &) = delete;

@@ -33,15 +33,25 @@ namespace trace
 SpanDataEvent::SpanDataEvent(std::string name,
                              opentelemetry::common::SystemTimestamp timestamp,
                              const opentelemetry::common::KeyValueIterable &attributes)
-    : name_(name), timestamp_(timestamp), attribute_map_(attributes)
+    : name_(std::move(name)), timestamp_(timestamp), attribute_map_(attributes)
 {}
+
+const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
+SpanDataEvent::GetAttributes() const noexcept
+{
+  return attribute_map_.GetAttributes();
+}
 
 SpanDataLink::SpanDataLink(opentelemetry::trace::SpanContext span_context,
                            const opentelemetry::common::KeyValueIterable &attributes)
-    : span_context_(span_context), attribute_map_(attributes)
+    : span_context_(std::move(span_context)), attribute_map_(attributes)
 {}
 
-SpanData::SpanData() : resource_{nullptr}, instrumentation_scope_{nullptr} {}
+const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
+SpanDataLink::GetAttributes() const noexcept
+{
+  return attribute_map_.GetAttributes();
+}
 
 const opentelemetry::sdk::resource::Resource &SpanData::GetResource() const noexcept
 {
