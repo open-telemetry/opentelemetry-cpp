@@ -3,11 +3,15 @@
 
 #include <cassert>
 #include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
