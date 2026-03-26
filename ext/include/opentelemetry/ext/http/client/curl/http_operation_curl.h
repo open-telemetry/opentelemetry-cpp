@@ -55,14 +55,14 @@ struct HttpCurlEasyResource
       : easy_handle{curl}, headers_chunk{headers}
   {}
 
-  HttpCurlEasyResource(HttpCurlEasyResource &&other)
+  HttpCurlEasyResource(HttpCurlEasyResource &&other) noexcept
       : easy_handle{other.easy_handle}, headers_chunk{other.headers_chunk}
   {
     other.easy_handle   = nullptr;
     other.headers_chunk = nullptr;
   }
 
-  HttpCurlEasyResource &operator=(HttpCurlEasyResource &&other)
+  HttpCurlEasyResource &operator=(HttpCurlEasyResource &&other) noexcept
   {
     using std::swap;
     swap(easy_handle, other.easy_handle);
@@ -225,17 +225,20 @@ public:
     return static_cast<StatusCode>(response_code_);
   }
 
-  CURLcode GetLastResultCode() { return last_curl_result_; }
+  CURLcode GetLastResultCode() const noexcept { return last_curl_result_; }
 
   /**
    * Get last session state.
    */
-  opentelemetry::ext::http::client::SessionState GetSessionState() { return session_state_; }
+  opentelemetry::ext::http::client::SessionState GetSessionState() const noexcept
+  {
+    return session_state_;
+  }
 
   /**
    * Get whether or not response was programmatically aborted
    */
-  bool WasAborted() { return is_aborted_.load(std::memory_order_acquire); }
+  bool WasAborted() const noexcept { return is_aborted_.load(std::memory_order_acquire); }
 
   /**
    * Return a copy of response headers
@@ -300,37 +303,38 @@ private:
   std::atomic<bool> is_aborted_{false};   // Set to 'true' when async callback is aborted
   std::atomic<bool> is_finished_{false};  // Set to 'true' when async callback is finished.
   std::atomic<bool> is_cleaned_{false};   // Set to 'true' when async callback is cleaned.
-  const bool is_raw_response_;            // Do not split response headers from response body
-  const bool reuse_connection_;           // Reuse connection
+  const bool is_raw_response_{false};     // Do not split response headers from response body
+  const bool reuse_connection_{false};    // Reuse connection
   const std::chrono::milliseconds http_conn_timeout_;  // Timeout for connect.  Default: 5000ms
 
   char curl_error_message_[CURL_ERROR_SIZE];
   HttpCurlEasyResource curl_resource_;
-  CURLcode last_curl_result_;  // Curl result OR HTTP status code if successful
+  CURLcode last_curl_result_{CURLE_OK};  // Curl result OR HTTP status code if successful
 
-  opentelemetry::ext::http::client::EventHandler *event_handle_;
+  opentelemetry::ext::http::client::EventHandler *event_handle_{nullptr};
 
   // Request values
-  opentelemetry::ext::http::client::Method method_;
+  opentelemetry::ext::http::client::Method method_{opentelemetry::ext::http::client::Method::Get};
   std::string url_;
 
   const opentelemetry::ext::http::client::HttpSslOptions &ssl_options_;
 
   const Headers &request_headers_;
   const opentelemetry::ext::http::client::Body &request_body_;
-  size_t request_nwrite_;
-  opentelemetry::ext::http::client::SessionState session_state_;
+  size_t request_nwrite_{0};
+  opentelemetry::ext::http::client::SessionState session_state_{
+      opentelemetry::ext::http::client::SessionState::Created};
 
   const opentelemetry::ext::http::client::Compression &compression_;
 
-  const bool is_log_enabled_;
+  const bool is_log_enabled_{false};
 
   const RetryPolicy retry_policy_;
   decltype(RetryPolicy::max_attempts) retry_attempts_;
   std::chrono::system_clock::time_point last_attempt_time_;
 
   // Processed response headers and body
-  long response_code_;
+  long response_code_{0};
   std::vector<uint8_t> response_headers_;
   std::vector<uint8_t> response_body_;
   std::vector<uint8_t> raw_response_;

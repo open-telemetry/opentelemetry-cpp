@@ -27,7 +27,12 @@ class LogRecord;
 class Logger
 {
 public:
-  virtual ~Logger() = default;
+  Logger()                              = default;
+  Logger(const Logger &)                = default;
+  Logger(Logger &&) noexcept            = default;
+  Logger &operator=(const Logger &)     = default;
+  Logger &operator=(Logger &&) noexcept = default;
+  virtual ~Logger()                     = default;
 
   /* Returns the name of the logger */
   virtual const nostd::string_view GetName() noexcept = 0;

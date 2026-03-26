@@ -265,7 +265,7 @@ public:
 
     for (size_t i = 0; i < length; i++)
     {
-      int_array[i] = model->value[i];
+      int_array[i] = static_cast<int64_t>(model->value[i]);
     }
 
     nostd::span<const int64_t> span(int_array.data(), int_array.size());

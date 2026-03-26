@@ -11,7 +11,7 @@ namespace metric_sdk      = opentelemetry::sdk::metrics;
 namespace nostd           = opentelemetry::nostd;
 namespace exportermetrics = opentelemetry::exporter::metrics;
 
-namespace
+namespace prometheus_test
 {
 
 using opentelemetry::sdk::instrumentationscope::InstrumentationScope;
@@ -124,7 +124,7 @@ struct TestDataPoints
     return data;
   }
 };
-}  // namespace
+}  // namespace prometheus_test
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
