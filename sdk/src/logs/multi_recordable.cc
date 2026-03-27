@@ -23,7 +23,8 @@ namespace sdk
 namespace logs
 {
 
-std::size_t MultiRecordable::MakeKey(const opentelemetry::sdk::logs::LogRecordProcessor &processor) noexcept
+std::size_t MultiRecordable::MakeKey(
+    const opentelemetry::sdk::logs::LogRecordProcessor &processor) noexcept
 {
   return reinterpret_cast<std::size_t>(&processor);
 }
