@@ -20,6 +20,8 @@ namespace trace
 
 class MultiRecordable : public Recordable
 {
+  static std::size_t MakeKey(const SpanProcessor &processor) noexcept;
+
 public:
   void AddRecordable(const SpanProcessor &processor,
                      std::unique_ptr<Recordable> recordable) noexcept;

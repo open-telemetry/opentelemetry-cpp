@@ -27,14 +27,10 @@ namespace sdk
 namespace trace
 {
 
-namespace
-{
-std::size_t MakeKey(const SpanProcessor &processor)
+std::size_t MultiRecordable::MakeKey(const SpanProcessor &processor) noexcept
 {
   return reinterpret_cast<std::size_t>(&processor);
 }
-
-}  // namespace
 
 void MultiRecordable::AddRecordable(const SpanProcessor &processor,
                                     std::unique_ptr<Recordable> recordable) noexcept
