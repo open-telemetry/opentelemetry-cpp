@@ -164,7 +164,7 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
     StubType *stub,
     std::unique_ptr<grpc::ClientContext> context,
     std::unique_ptr<google::protobuf::Arena> arena,
-    RequestType request,
+    RequestType *request,
     std::function<bool(opentelemetry::sdk::common::ExportResult,
                        std::unique_ptr<google::protobuf::Arena> &&,
                        const RequestType &,
@@ -178,10 +178,10 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
     OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
                             << export_data_count << " " << export_data_name
                             << " failed, exporter queue is full");
-    if (result_callback)
+    if (result_callback && request != nullptr)
     {
       result_callback(opentelemetry::sdk::common::ExportResult::kFailureFull, std::move(arena),
-                      request, nullptr);
+                      *request, nullptr);
     }
     return opentelemetry::sdk::common::ExportResult::kFailureFull;
   }
@@ -192,9 +192,9 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
   call_data->result_callback = std::move(result_callback);
 
   call_data->request = google::protobuf::Arena::Create<RequestType>(call_data->arena.get());
-  if (call_data->request != nullptr)
+  if (call_data->request != nullptr && request != nullptr)
   {
-    call_data->request->Swap(&request);
+    call_data->request->Swap(request);
   }
   call_data->response = google::protobuf::Arena::Create<ResponseType>(call_data->arena.get());
 
@@ -204,11 +204,11 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
                             << export_data_count << " " << export_data_name
                             << " failed, create gRPC request/response failed");
 
-    if (call_data->result_callback)
+    if (call_data->result_callback && request != nullptr)
     {
       call_data->result_callback(
           opentelemetry::sdk::common::ExportResult::kFailure, std::move(call_data->arena),
-          nullptr == call_data->request ? request : *call_data->request, call_data->response);
+          nullptr == call_data->request ? *request : *call_data->request, call_data->response);
     }
 
     return opentelemetry::sdk::common::ExportResult::kFailure;
@@ -527,31 +527,37 @@ OtlpGrpcClient::MakeLogsServiceStub()
 grpc::Status OtlpGrpcClient::DelegateExport(
     proto::collector::trace::v1::TraceService::StubInterface *stub,
     std::unique_ptr<grpc::ClientContext> &&context,
-    std::unique_ptr<google::protobuf::Arena> && /*arena*/,
-    proto::collector::trace::v1::ExportTraceServiceRequest &&request,
+    std::unique_ptr<google::protobuf::Arena> &&arena,
+    proto::collector::trace::v1::ExportTraceServiceRequest *request,
     proto::collector::trace::v1::ExportTraceServiceResponse *response)
 {
-  return stub->Export(context.get(), request, response);
+  auto local_context = std::move(context);
+  auto local_arena   = std::move(arena);
+  return stub->Export(local_context.get(), *request, response);
 }
 
 grpc::Status OtlpGrpcClient::DelegateExport(
     proto::collector::metrics::v1::MetricsService::StubInterface *stub,
     std::unique_ptr<grpc::ClientContext> &&context,
-    std::unique_ptr<google::protobuf::Arena> && /*arena*/,
-    proto::collector::metrics::v1::ExportMetricsServiceRequest &&request,
+    std::unique_ptr<google::protobuf::Arena> &&arena,
+    proto::collector::metrics::v1::ExportMetricsServiceRequest *request,
     proto::collector::metrics::v1::ExportMetricsServiceResponse *response)
 {
-  return stub->Export(context.get(), request, response);
+  auto local_context = std::move(context);
+  auto local_arena   = std::move(arena);
+  return stub->Export(local_context.get(), *request, response);
 }
 
 grpc::Status OtlpGrpcClient::DelegateExport(
     proto::collector::logs::v1::LogsService::StubInterface *stub,
     std::unique_ptr<grpc::ClientContext> &&context,
-    std::unique_ptr<google::protobuf::Arena> && /*arena*/,
-    proto::collector::logs::v1::ExportLogsServiceRequest &&request,
+    std::unique_ptr<google::protobuf::Arena> &&arena,
+    proto::collector::logs::v1::ExportLogsServiceRequest *request,
     proto::collector::logs::v1::ExportLogsServiceResponse *response)
 {
-  return stub->Export(context.get(), request, response);
+  auto local_context = std::move(context);
+  auto local_arena   = std::move(arena);
+  return stub->Export(local_context.get(), *request, response);
 }
 
 void OtlpGrpcClient::AddReference(OtlpGrpcClientReferenceGuard &guard,
@@ -598,29 +604,29 @@ sdk::common::ExportResult OtlpGrpcClient::DelegateAsyncExport(
     proto::collector::trace::v1::TraceService::StubInterface *stub,
     std::unique_ptr<grpc::ClientContext> &&context,
     std::unique_ptr<google::protobuf::Arena> &&arena,
-    proto::collector::trace::v1::ExportTraceServiceRequest &&request,
+    proto::collector::trace::v1::ExportTraceServiceRequest *request,
     std::function<bool(opentelemetry::sdk::common::ExportResult,
                        std::unique_ptr<google::protobuf::Arena> &&,
                        const proto::collector::trace::v1::ExportTraceServiceRequest &,
                        proto::collector::trace::v1::ExportTraceServiceResponse *)>
         &&result_callback) noexcept
 {
-  auto span_count = request.resource_spans_size();
+  const auto span_count = request->resource_spans_size();
   if (is_shutdown_.load(std::memory_order_acquire))
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
                             << span_count << " trace span(s) failed, exporter is shutdown");
-    if (result_callback)
+    if (result_callback && request != nullptr)
     {
-      result_callback(opentelemetry::sdk::common::ExportResult::kFailure, std::move(arena), request,
-                      nullptr);
+      result_callback(opentelemetry::sdk::common::ExportResult::kFailure, std::move(arena),
+                      *request, nullptr);
     }
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
 
   std::shared_ptr<OtlpGrpcClientAsyncData> async_data = MutableAsyncData(options);
   return InternalDelegateAsyncExport(async_data, stub, std::move(context), std::move(arena),
-                                     std::move(request), std::move(result_callback), span_count,
+                                     request, std::move(result_callback), span_count,
                                      "trace span(s)");
 }
 
@@ -629,29 +635,29 @@ sdk::common::ExportResult OtlpGrpcClient::DelegateAsyncExport(
     proto::collector::metrics::v1::MetricsService::StubInterface *stub,
     std::unique_ptr<grpc::ClientContext> &&context,
     std::unique_ptr<google::protobuf::Arena> &&arena,
-    proto::collector::metrics::v1::ExportMetricsServiceRequest &&request,
+    proto::collector::metrics::v1::ExportMetricsServiceRequest *request,
     std::function<bool(opentelemetry::sdk::common::ExportResult,
                        std::unique_ptr<google::protobuf::Arena> &&,
                        const proto::collector::metrics::v1::ExportMetricsServiceRequest &,
                        proto::collector::metrics::v1::ExportMetricsServiceResponse *)>
         &&result_callback) noexcept
 {
-  auto metrics_count = request.resource_metrics_size();
+  const auto metrics_count = request->resource_metrics_size();
   if (is_shutdown_.load(std::memory_order_acquire))
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
                             << metrics_count << " metric(s) failed, exporter is shutdown");
-    if (result_callback)
+    if (result_callback && request != nullptr)
     {
-      result_callback(opentelemetry::sdk::common::ExportResult::kFailure, std::move(arena), request,
-                      nullptr);
+      result_callback(opentelemetry::sdk::common::ExportResult::kFailure, std::move(arena),
+                      *request, nullptr);
     }
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
 
   std::shared_ptr<OtlpGrpcClientAsyncData> async_data = MutableAsyncData(options);
   return InternalDelegateAsyncExport(async_data, stub, std::move(context), std::move(arena),
-                                     std::move(request), std::move(result_callback), metrics_count,
+                                     request, std::move(result_callback), metrics_count,
                                      "metric(s)");
 }
 
@@ -660,30 +666,29 @@ sdk::common::ExportResult OtlpGrpcClient::DelegateAsyncExport(
     proto::collector::logs::v1::LogsService::StubInterface *stub,
     std::unique_ptr<grpc::ClientContext> &&context,
     std::unique_ptr<google::protobuf::Arena> &&arena,
-    proto::collector::logs::v1::ExportLogsServiceRequest &&request,
+    proto::collector::logs::v1::ExportLogsServiceRequest *request,
     std::function<bool(opentelemetry::sdk::common::ExportResult,
                        std::unique_ptr<google::protobuf::Arena> &&,
                        const proto::collector::logs::v1::ExportLogsServiceRequest &,
                        proto::collector::logs::v1::ExportLogsServiceResponse *)>
         &&result_callback) noexcept
 {
-  auto logs_count = request.resource_logs_size();
+  const auto logs_count = request->resource_logs_size();
   if (is_shutdown_.load(std::memory_order_acquire))
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
                             << logs_count << " log(s) failed, exporter is shutdown");
-    if (result_callback)
+    if (result_callback && request != nullptr)
     {
-      result_callback(opentelemetry::sdk::common::ExportResult::kFailure, std::move(arena), request,
-                      nullptr);
+      result_callback(opentelemetry::sdk::common::ExportResult::kFailure, std::move(arena),
+                      *request, nullptr);
     }
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
 
   std::shared_ptr<OtlpGrpcClientAsyncData> async_data = MutableAsyncData(options);
   return InternalDelegateAsyncExport(async_data, stub, std::move(context), std::move(arena),
-                                     std::move(request), std::move(result_callback), logs_count,
-                                     "log(s)");
+                                     request, std::move(result_callback), logs_count, "log(s)");
 }
 
 #endif

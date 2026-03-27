@@ -141,16 +141,12 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcLogRecordExporter::Export(
   OtlpRecordableUtils::PopulateRequest(logs, request);
 
   auto context = OtlpGrpcClient::MakeClientContext(options_);
-  proto::collector::logs::v1::ExportLogsServiceResponse *response =
-      google::protobuf::Arena::Create<proto::collector::logs::v1::ExportLogsServiceResponse>(
-          arena.get());
 
 #ifdef ENABLE_ASYNC_EXPORT
   if (options_.max_concurrent_requests > 1)
   {
     return client->DelegateAsyncExport(
-        options_, log_service_stub_.get(), std::move(context), std::move(arena),
-        std::move(*request),
+        options_, log_service_stub_.get(), std::move(context), std::move(arena), request,
         // Capture log_service_stub by value to ensure it is not destroyed before the callback is
         // called.
         [log_service_stub = log_service_stub_](
@@ -175,9 +171,11 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcLogRecordExporter::Export(
   else
   {
 #endif
-    grpc::Status status =
-        OtlpGrpcClient::DelegateExport(log_service_stub_.get(), std::move(context),
-                                       std::move(arena), std::move(*request), response);
+    proto::collector::logs::v1::ExportLogsServiceResponse *response =
+        google::protobuf::Arena::Create<proto::collector::logs::v1::ExportLogsServiceResponse>(
+            arena.get());
+    grpc::Status status = OtlpGrpcClient::DelegateExport(
+        log_service_stub_.get(), std::move(context), std::move(arena), request, response);
 
     if (!status.ok())
     {
