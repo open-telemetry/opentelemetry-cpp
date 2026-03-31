@@ -21,14 +21,14 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 // clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 #ifdef ENABLE_ASYNC_EXPORT
+#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 #  include "google/protobuf/arena.h"
+#  include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
+#  include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
+#  include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
+#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 #endif /* ENABLE_ASYNC_EXPORT */
-#include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
-#include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
-#include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
 #ifdef ENABLE_ASYNC_EXPORT
