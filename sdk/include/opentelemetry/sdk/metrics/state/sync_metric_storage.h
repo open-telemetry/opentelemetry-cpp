@@ -119,9 +119,9 @@ public:
     }
 #endif
 
+    MetricAttributes attr{attributes, attributes_processor_.get()};
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
-    attributes_hashmap_
-        ->GetOrSetDefault(attributes, attributes_processor_.get(), create_default_aggregation_)
+    attributes_hashmap_->GetOrSetDefault(std::move(attr), create_default_aggregation_)
         ->Aggregate(value);
   }
 
@@ -160,9 +160,9 @@ public:
                                             std::chrono::system_clock::now());
     }
 #endif
+    MetricAttributes attr{attributes, attributes_processor_.get()};
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
-    attributes_hashmap_
-        ->GetOrSetDefault(attributes, attributes_processor_.get(), create_default_aggregation_)
+    attributes_hashmap_->GetOrSetDefault(std::move(attr), create_default_aggregation_)
         ->Aggregate(value);
   }
 
