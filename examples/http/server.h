@@ -9,7 +9,7 @@
 #include <atomic>
 #include <string>
 
-namespace
+namespace http_example
 {
 
 class HttpServer : public HTTP_SERVER_NS::HttpRequestCallback
@@ -27,6 +27,11 @@ public:
     server_.setServerName(server_name);
     server_.setKeepalive(false);
   }
+
+  HttpServer(const HttpServer &)            = delete;
+  HttpServer(HttpServer &&)                 = delete;
+  HttpServer &operator=(const HttpServer &) = delete;
+  HttpServer &operator=(HttpServer &&)      = delete;
 
   void AddHandler(const std::string &path, HTTP_SERVER_NS::HttpRequestCallback *request_handler)
   {
@@ -53,4 +58,4 @@ public:
   ~HttpServer() override { Stop(); }
 };
 
-}  // namespace
+}  // namespace http_example

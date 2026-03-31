@@ -293,15 +293,11 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                              bool reuse_connection,
                              bool is_log_enabled,
                              const RetryPolicy &retry_policy)
-    : is_aborted_(false),
-      is_finished_(false),
-      is_cleaned_(false),
-      // Optional connection params
+    :  // Optional connection params
       is_raw_response_(is_raw_response),
       reuse_connection_(reuse_connection),
       http_conn_timeout_(http_conn_timeout),
       // Result
-      last_curl_result_(CURLE_OK),
       event_handle_(event_handle),
       method_(method),
       url_(std::move(url)),
@@ -309,8 +305,6 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       // Local vars
       request_headers_(request_headers),
       request_body_(request_body),
-      request_nwrite_(0),
-      session_state_(opentelemetry::ext::http::client::SessionState::Created),
       compression_(compression),
       is_log_enabled_(is_log_enabled),
       retry_policy_(retry_policy),
@@ -319,8 +313,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                        retry_policy.max_backoff > SecondsDecimal::zero() &&
                        retry_policy.backoff_multiplier > 0.0f)
                           ? 0
-                          : retry_policy.max_attempts),
-      response_code_(0)
+                          : retry_policy.max_attempts)
 {
   /* get a curl handle */
   curl_resource_.easy_handle = curl_easy_init();

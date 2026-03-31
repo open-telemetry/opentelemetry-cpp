@@ -13,7 +13,6 @@ namespace otlp
 {
 
 OtlpFileMetricExporterOptions::OtlpFileMetricExporterOptions()
-    : aggregation_temporality(PreferredAggregationTemporality::kCumulative)
 {
   console_debug = false;
 

@@ -1612,9 +1612,7 @@ private:
 
 OtlpFileClient::OtlpFileClient(OtlpFileClientOptions &&options,
                                OtlpFileClientRuntimeOptions &&runtime_options)
-    : is_shutdown_(false),
-      options_{std::move(options)},
-      runtime_options_{std::move(runtime_options)}
+    : options_{std::move(options)}, runtime_options_{std::move(runtime_options)}
 {
   if (nostd::holds_alternative<OtlpFileClientFileSystemOptions>(options_.backend_options))
   {

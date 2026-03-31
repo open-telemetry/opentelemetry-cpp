@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <cstddef>
 #include <fstream>
@@ -2086,7 +2087,7 @@ ConfigurationParser::ParseIntegerAttributeValueConfiguration(
 {
   auto model = std::make_unique<IntegerAttributeValueConfiguration>();
 
-  model->value = node->AsInteger();
+  model->value = static_cast<int64_t>(node->AsInteger());
 
   return model;
 }

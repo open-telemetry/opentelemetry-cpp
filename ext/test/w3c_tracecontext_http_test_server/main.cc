@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <atomic>
 #include <chrono>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <nlohmann/json.hpp>
@@ -68,7 +69,7 @@ public:
   TextMapCarrierTest(std::map<std::string, std::string> &headers) : headers_(headers) {}
   nostd::string_view Get(nostd::string_view key) const noexcept override
   {
-    for (const auto &elem : headers_)
+    for (const auto &elem : headers_.get())
     {
       if (equalsIgnoreCase(elem.first, std::string(key)))
       {
@@ -79,10 +80,10 @@ public:
   }
   void Set(nostd::string_view key, nostd::string_view value) noexcept override
   {
-    headers_[std::string(key)] = std::string(value);
+    headers_.get()[std::string(key)] = std::string(value);
   }
 
-  std::map<std::string, std::string> &headers_;
+  std::reference_wrapper<std::map<std::string, std::string>> headers_;
 };
 
 void initTracer()
