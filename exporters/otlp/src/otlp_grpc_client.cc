@@ -160,7 +160,7 @@ static std::string GetFileContentsOrInMemoryContents(const std::string &file_pat
 #ifdef ENABLE_ASYNC_EXPORT
 template <class StubType, class RequestType, class ResponseType>
 static sdk::common::ExportResult InternalDelegateAsyncExport(
-    std::shared_ptr<OtlpGrpcClientAsyncData> async_data,
+    const std::shared_ptr<OtlpGrpcClientAsyncData> &async_data,
     StubType *stub,
     std::unique_ptr<grpc::ClientContext> context,
     std::unique_ptr<google::protobuf::Arena> arena,
