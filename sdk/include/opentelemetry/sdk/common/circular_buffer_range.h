@@ -75,7 +75,10 @@ public:
    */
   CircularBufferRange Take(size_t n) const noexcept
   {
-    assert(n <= size());
+    // assert(n <= size());
+    if (n >= size()) {
+      return CircularBufferRange{first_,second_};
+    }
     if (first_.size() >= n)
     {
       return CircularBufferRange{nostd::span<T>{first_.data(), n}};
