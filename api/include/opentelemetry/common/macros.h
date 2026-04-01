@@ -420,6 +420,31 @@ point.
 #  define OPENTELEMETRY_HAVE_EXCEPTIONS 0
 #endif
 
+// Exception handling macros
+//
+// When exceptions are enabled, expands to real try/catch.
+// When exceptions are disabled, expands to if(true)/else-if(false)
+//
+// Usage:
+//   bool NoexceptMethod() noexcept
+//   {
+//     OPENTELEMETRY_TRY
+//     {
+//       return ThrowingMethod();
+//     }
+//     OPENTELEMETRY_CATCH_ALL
+//     {
+//       return false;
+//     }
+//   }
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#  define OPENTELEMETRY_TRY try
+#  define OPENTELEMETRY_CATCH_ALL catch (...)
+#else
+#  define OPENTELEMETRY_TRY if (true)
+#  define OPENTELEMETRY_CATCH_ALL else if (false)
+#endif
+
 /*
    OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND indicates that a resource owned by a function
    parameter or implicit object parameter is retained by the return value of the

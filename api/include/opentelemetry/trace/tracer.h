@@ -159,14 +159,11 @@ public:
   static nostd::shared_ptr<Span> GetCurrentSpan() noexcept
   {
     context::ContextValue active_span = context::RuntimeContext::GetValue(kSpanKey);
-    if (nostd::holds_alternative<nostd::shared_ptr<Span>>(active_span))
+    if (const nostd::shared_ptr<Span> *value = nostd::get_if<nostd::shared_ptr<Span>>(&active_span))
     {
-      return nostd::get<nostd::shared_ptr<Span>>(active_span);
+      return *value;
     }
-    else
-    {
-      return nostd::shared_ptr<Span>(new DefaultSpan(SpanContext::GetInvalid()));
-    }
+    return nostd::shared_ptr<Span>(new DefaultSpan(SpanContext::GetInvalid()));
   }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
