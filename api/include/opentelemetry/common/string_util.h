@@ -34,7 +34,7 @@ public:
     {
       return nostd::string_view();
     }
-    return nostd::string_view();
+    OPENTELEMETRY_UNREACHABLE();
   }
 
   static nostd::string_view Trim(nostd::string_view str) noexcept

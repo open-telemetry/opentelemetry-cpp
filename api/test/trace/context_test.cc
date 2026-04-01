@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 
 #include <stdint.h>
-#include <cstddef>
 #include <string>
 
 #include "opentelemetry/context/context.h"

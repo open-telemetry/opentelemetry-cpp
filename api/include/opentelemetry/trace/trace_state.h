@@ -91,7 +91,7 @@ public:
     {
       return GetDefault();
     }
-    return GetDefault();
+    OPENTELEMETRY_UNREACHABLE();
   }
 
   /**
@@ -182,7 +182,7 @@ public:
     {
       return TraceState::GetDefault();
     }
-    return TraceState::GetDefault();
+    OPENTELEMETRY_UNREACHABLE();
   }
 
   /**
@@ -221,7 +221,7 @@ public:
     {
       return TraceState::GetDefault();
     }
-    return TraceState::GetDefault();
+    OPENTELEMETRY_UNREACHABLE();
   }
 
   // Returns true if there are no keys, false otherwise.
