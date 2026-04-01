@@ -14,6 +14,7 @@ cc_library(
         "//api",
         "//sdk:headers",
         "//sdk/src/common:disabled",
+        "//sdk/src/common:empty_attributes",
         "//sdk/src/common:global_log_handler",
         "//sdk/src/common:random",
         "//sdk/src/resource",

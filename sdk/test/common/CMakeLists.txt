@@ -9,6 +9,7 @@ foreach(
   atomic_unique_ptr_test
   circular_buffer_range_test
   circular_buffer_test
+  empty_attributes_test
   attribute_utils_test
   attributemap_hash_test
   global_log_handle_test
