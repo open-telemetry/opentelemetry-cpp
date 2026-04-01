@@ -178,7 +178,7 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
     OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
                             << export_data_count << " " << export_data_name
                             << " failed, exporter queue is full");
-    if (result_callback && request != nullptr)
+    if (result_callback)
     {
       result_callback(opentelemetry::sdk::common::ExportResult::kFailureFull, std::move(arena),
                       *request, nullptr);
@@ -191,23 +191,7 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
   call_data->arena           = std::move(arena);
   call_data->result_callback = std::move(result_callback);
   call_data->request         = request;
-  call_data->response = google::protobuf::Arena::Create<ResponseType>(call_data->arena.get());
-
-  if (call_data->request == nullptr || call_data->response == nullptr)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
-                            << export_data_count << " " << export_data_name
-                            << " failed, create gRPC request/response failed");
-
-    if (call_data->result_callback && request != nullptr)
-    {
-      call_data->result_callback(
-          opentelemetry::sdk::common::ExportResult::kFailure, std::move(call_data->arena),
-          nullptr == call_data->request ? *request : *call_data->request, call_data->response);
-    }
-
-    return opentelemetry::sdk::common::ExportResult::kFailure;
-  }
+  call_data->response     = google::protobuf::Arena::Create<ResponseType>(call_data->arena.get());
   call_data->grpc_context = std::move(context);
 
   call_data->grpc_async_callback = [](OtlpGrpcAsyncCallDataBase *base_call_data) {
@@ -606,11 +590,6 @@ sdk::common::ExportResult OtlpGrpcClient::DelegateAsyncExport(
                        proto::collector::trace::v1::ExportTraceServiceResponse *)>
         &&result_callback) noexcept
 {
-  if (request == nullptr)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Trace request message is null");
-    return opentelemetry::sdk::common::ExportResult::kFailure;
-  }
   const auto span_count = request->resource_spans_size();
   if (is_shutdown_.load(std::memory_order_acquire))
   {
@@ -642,11 +621,6 @@ sdk::common::ExportResult OtlpGrpcClient::DelegateAsyncExport(
                        proto::collector::metrics::v1::ExportMetricsServiceResponse *)>
         &&result_callback) noexcept
 {
-  if (request == nullptr)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Metrics request message is null");
-    return opentelemetry::sdk::common::ExportResult::kFailure;
-  }
   const auto metrics_count = request->resource_metrics_size();
   if (is_shutdown_.load(std::memory_order_acquire))
   {
@@ -678,11 +652,6 @@ sdk::common::ExportResult OtlpGrpcClient::DelegateAsyncExport(
                        proto::collector::logs::v1::ExportLogsServiceResponse *)>
         &&result_callback) noexcept
 {
-  if (request == nullptr)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Logs request message is null");
-    return opentelemetry::sdk::common::ExportResult::kFailure;
-  }
   const auto logs_count = request->resource_logs_size();
 
   if (is_shutdown_.load(std::memory_order_acquire))
