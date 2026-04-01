@@ -91,6 +91,7 @@ public:
     {
       return GetDefault();
     }
+    return GetDefault();
   }
 
   /**
@@ -130,13 +131,12 @@ public:
       {
         return false;
       }
-
-      return kv_properties_->GetValue(key, value);
     }
     OPENTELEMETRY_CATCH_ALL
     {
       return false;
     }
+    return kv_properties_->GetValue(key, value);
   }
 
   /**
@@ -154,13 +154,13 @@ public:
   {
     OPENTELEMETRY_TRY
     {
-      const auto curr_size = kv_properties_->Size();
       if (!IsValidKey(key) || !IsValidValue(value))
       {
         // max size reached or invalid key/value. Returning empty TraceState
         return TraceState::GetDefault();
       }
-      auto allocate_size = curr_size;
+      const auto curr_size = kv_properties_->Size();
+      auto allocate_size   = curr_size;
       if (curr_size < kMaxKeyValuePairs)
       {
         allocate_size += 1;
@@ -182,6 +182,7 @@ public:
     {
       return TraceState::GetDefault();
     }
+    return TraceState::GetDefault();
   }
 
   /**
@@ -220,6 +221,7 @@ public:
     {
       return TraceState::GetDefault();
     }
+    return TraceState::GetDefault();
   }
 
   // Returns true if there are no keys, false otherwise.

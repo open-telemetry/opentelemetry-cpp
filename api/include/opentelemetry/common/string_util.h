@@ -5,6 +5,7 @@
 
 #include <ctype.h>
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
@@ -25,7 +26,15 @@ public:
     {
       right--;
     }
-    return str.substr(left, 1 + right - left);
+    OPENTELEMETRY_TRY
+    {
+      return str.substr(left, 1 + right - left);
+    }
+    OPENTELEMETRY_CATCH_ALL
+    {
+      return nostd::string_view();
+    }
+    return nostd::string_view();
   }
 
   static nostd::string_view Trim(nostd::string_view str) noexcept

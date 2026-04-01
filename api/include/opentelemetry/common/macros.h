@@ -442,7 +442,7 @@ point.
 #  define OPENTELEMETRY_CATCH_ALL catch (...)
 #else
 #  define OPENTELEMETRY_TRY if (true)
-#  define OPENTELEMETRY_CATCH_ALL else if (false)
+#  define OPENTELEMETRY_CATCH_ALL else
 #endif
 
 /*

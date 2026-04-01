@@ -3,12 +3,20 @@
 
 #include <gtest/gtest.h>
 
+#include <stdint.h>
+#include <cstddef>
+#include <string>
+
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/default_span.h"
+#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 
@@ -85,7 +93,7 @@ TEST(TraceContextTest, IsRootSpan)
 
   {
     context_api::Context context;
-    std::size_t value{1};
+    uint64_t value{1};
     auto context_with_wrong_type = context.SetValue(trace_api::kIsRootSpanKey, value);
     EXPECT_FALSE(trace_api::IsRootSpan(context_with_wrong_type));
   }
