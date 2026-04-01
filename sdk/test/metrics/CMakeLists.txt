@@ -55,8 +55,9 @@ if(WITH_BENCHMARK)
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
 
   add_executable(attributes_hashmap_benchmark attributes_hashmap_benchmark.cc)
-  target_link_libraries(attributes_hashmap_benchmark benchmark::benchmark
-                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+  target_link_libraries(
+    attributes_hashmap_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_metrics opentelemetry_common)
 
   add_executable(base2_exponential_histogram_indexer_benchmark
                  base2_exponential_histogram_indexer_benchmark.cc)

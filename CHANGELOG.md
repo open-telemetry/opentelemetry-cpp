@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Move inline implementation from SDK headers to .cc files.
+  Note: `GetEmptyAttributes()` now requires linking `opentelemetry_common`.
+  [#3887](https://github.com/open-telemetry/opentelemetry-cpp/pull/3887)
+
 * [CODE HEALTH] Fix clang tidy warnings in API `common` and `context`
   [#3948](https://github.com/open-telemetry/opentelemetry-cpp/pull/3948)
 
