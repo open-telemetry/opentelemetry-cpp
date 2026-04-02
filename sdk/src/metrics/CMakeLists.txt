@@ -22,6 +22,7 @@ add_library(
   state/observable_registry.cc
   state/sync_metric_storage.cc
   state/temporal_metric_storage.cc
+  aggregation/drop_aggregation.cc
   aggregation/base2_exponential_histogram_aggregation.cc
   aggregation/base2_exponential_histogram_indexer.cc
   aggregation/histogram_aggregation.cc
@@ -32,6 +33,7 @@ add_library(
   view/instrument_selector_factory.cc
   view/meter_selector_factory.cc
   view/view_factory.cc
+  view/view_registry.cc
   view/view_registry_factory.cc
   sync_instruments.cc)
 
