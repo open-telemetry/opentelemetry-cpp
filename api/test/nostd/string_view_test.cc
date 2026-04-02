@@ -8,6 +8,7 @@
 #include <string>
 #include <utility>
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/string_view.h"
 
 using opentelemetry::nostd::string_view;
