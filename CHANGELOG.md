@@ -57,7 +57,7 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy unnecessary value param warnings
   [#3931](https://github.com/open-telemetry/opentelemetry-cpp/pull/3931)
 
-* [EXAMPLE] Add manual asynchronous context propagation example
+* [EXAMPLE] Add explicit_parent example
   [#3935](https://github.com/open-telemetry/opentelemetry-cpp/pull/3935)
 
 Important changes:

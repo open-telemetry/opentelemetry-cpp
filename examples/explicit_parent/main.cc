@@ -80,13 +80,12 @@ nostd::shared_ptr<trace_api::Span> CreateSpan(
 namespace app
 {
 
-void ProcessTask(nostd::shared_ptr<trace_api::Span> &producer_span)
+void ProcessTask(const nostd::shared_ptr<trace_api::Span> &producer_span)
 {
   // Simulating work with nested spans
   auto nested = utils::CreateSpan("nested", producer_span);
   nested->SetStatus(trace_api::StatusCode::kOk);
   nested->End();
-  return;
 }
 
 }  // namespace app

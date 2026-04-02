@@ -4,7 +4,7 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 
 cc_binary(
-    name = "example_manual_propagation",
+    name = "example_explicit_parent",
     srcs = [
         "main.cc",
     ],
