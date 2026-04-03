@@ -21,22 +21,6 @@ cc_test(
 )
 
 cc_test(
-    name = "context_test",
-    srcs = [
-        "context_test.cc",
-    ],
-    tags = [
-        "api",
-        "test",
-        "trace",
-    ],
-    deps = [
-        "//api",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_test(
     name = "noop_test",
     srcs = [
         "noop_test.cc",
