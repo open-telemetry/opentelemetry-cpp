@@ -1,3 +1,6 @@
+#include <cstdint>
+#include "opentelemetry/sdk/configuration/sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -848,11 +851,21 @@ tracer_provider:
 
 namespace
 {
+enum class SamplerType : std::uint8_t
+{
+  kUnmatched                 = 0,
+  kComposableAlwaysOn        = 1,
+  kComposableProbability     = 2,
+  kComposableRuleBased       = 3,
+  kComposableAlwaysOff       = 4,
+  kComposableParentThreshold = 5
+};
+
 class TestSamplerVisitor : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
 {
 public:
-  int type_matched   = 0;
-  double probability = -1.0;
+  SamplerType type_matched = SamplerType::kUnmatched;
+  double probability       = -1.0;
 
   void VisitAlwaysOff(
       const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration *) override
@@ -876,30 +889,30 @@ public:
   void VisitComposableAlwaysOff(
       const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration *) override
   {
-    type_matched = 4;
+    type_matched = SamplerType::kComposableAlwaysOff;
   }
   void VisitComposableAlwaysOn(
       const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration *) override
   {
-    type_matched = 1;
+    type_matched = SamplerType::kComposableAlwaysOn;
   }
   void VisitComposableProbability(
       const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
       override
   {
-    type_matched = 2;
+    type_matched = SamplerType::kComposableProbability;
     probability  = model->probability;
   }
   void VisitComposableParentThreshold(
       const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *)
       override
   {
-    type_matched = 5;
+    type_matched = SamplerType::kComposableParentThreshold;
   }
   void VisitComposableRuleBased(
       const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *) override
   {
-    type_matched = 3;
+    type_matched = SamplerType::kComposableRuleBased;
   }
   void VisitComposable(
       const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *) override
@@ -927,7 +940,7 @@ tracer_provider:
 
   TestSamplerVisitor visitor;
   config->tracer_provider->sampler->Accept(&visitor);
-  EXPECT_EQ(visitor.type_matched, 1);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kComposableAlwaysOn);
 }
 
 TEST(YamlTrace, composable_probability_sampler)
@@ -952,7 +965,7 @@ tracer_provider:
   TestSamplerVisitor visitor;
   config->tracer_provider->sampler->Accept(&visitor);
 
-  EXPECT_EQ(visitor.type_matched, 2);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kComposableProbability);
   EXPECT_DOUBLE_EQ(visitor.probability, 0.25);
 }
 
@@ -976,7 +989,7 @@ tracer_provider:
 
   TestSamplerVisitor visitor;
   config->tracer_provider->sampler->Accept(&visitor);
-  EXPECT_EQ(visitor.type_matched, 3);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kComposableRuleBased);
 }
 
 TEST(YamlTrace, composable_always_off_sampler)
@@ -999,7 +1012,7 @@ tracer_provider:
 
   TestSamplerVisitor visitor;
   config->tracer_provider->sampler->Accept(&visitor);
-  EXPECT_EQ(visitor.type_matched, 4);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kComposableAlwaysOff);
 }
 
 TEST(YamlTrace, composable_parent_threshold_sampler)
@@ -1022,5 +1035,5 @@ tracer_provider:
 
   TestSamplerVisitor visitor;
   config->tracer_provider->sampler->Accept(&visitor);
-  EXPECT_EQ(visitor.type_matched, 5);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kComposableParentThreshold);
 }

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -15,10 +16,8 @@ namespace configuration
 class ComposableProbabilitySamplerConfiguration : public SamplerConfiguration
 {
 public:
-  ComposableProbabilitySamplerConfiguration()           = default;
-  ~ComposableProbabilitySamplerConfiguration() override = default;
+  ComposableProbabilitySamplerConfiguration() = default;
 
-  // The core property for this sampler type
   double probability{1.0};
 
   void Accept(SamplerConfigurationVisitor *visitor) const override;

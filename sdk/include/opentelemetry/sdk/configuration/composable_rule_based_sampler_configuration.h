@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -15,8 +16,7 @@ namespace configuration
 class ComposableRuleBasedSamplerConfiguration : public SamplerConfiguration
 {
 public:
-  ComposableRuleBasedSamplerConfiguration()           = default;
-  ~ComposableRuleBasedSamplerConfiguration() override = default;
+  ComposableRuleBasedSamplerConfiguration() = default;
 
   void Accept(SamplerConfigurationVisitor *visitor) const override;
 };
