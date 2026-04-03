@@ -84,6 +84,8 @@ target_compile_definitions(
 if(WITH_OTLP_RETRY_PREVIEW)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_OTLP_RETRY_PREVIEW)
+else()
+  message(WARNING "WITH_OTLP_RETRY_PREVIEW=OFF is deprecated")
 endif()
 
 if(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
