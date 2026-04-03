@@ -1685,6 +1685,57 @@ ConfigurationParser::ParseTraceIdRatioBasedSamplerConfiguration(
   return model;
 }
 
+std::unique_ptr<ComposableAlwaysOffSamplerConfiguration>
+ConfigurationParser::ParseComposableAlwaysOffSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */,
+    size_t /* depth */) const
+{
+  return std::make_unique<ComposableAlwaysOffSamplerConfiguration>();
+}
+
+std::unique_ptr<ComposableAlwaysOnSamplerConfiguration>
+ConfigurationParser::ParseComposableAlwaysOnSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */,
+    size_t /* depth */) const
+{
+  return std::make_unique<ComposableAlwaysOnSamplerConfiguration>();
+}
+
+std::unique_ptr<ComposableProbabilitySamplerConfiguration>
+ConfigurationParser::ParseComposableProbabilitySamplerConfiguration(
+    const std::unique_ptr<DocumentNode> &node,
+    size_t /* depth */) const
+{
+  auto model         = std::make_unique<ComposableProbabilitySamplerConfiguration>();
+  model->probability = node->GetDouble("probability", 1.0);
+  return model;
+}
+
+std::unique_ptr<ComposableParentThresholdSamplerConfiguration>
+ConfigurationParser::ParseComposableParentThresholdSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */,
+    size_t /* depth */) const
+{
+  return std::make_unique<ComposableParentThresholdSamplerConfiguration>();
+}
+
+std::unique_ptr<ComposableRuleBasedSamplerConfiguration>
+ConfigurationParser::ParseComposableRuleBasedSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */,
+    size_t /* depth */) const
+{
+  // FIXME-CONFIG: Parse rules list from YAML node here
+  return std::make_unique<ComposableRuleBasedSamplerConfiguration>();
+}
+
+std::unique_ptr<ComposableSamplerConfiguration>
+ConfigurationParser::ParseComposableSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */,
+    size_t /* depth */) const
+{
+  return std::make_unique<ComposableSamplerConfiguration>();
+}
+
 std::unique_ptr<ExtensionSamplerConfiguration>
 ConfigurationParser::ParseSamplerExtensionConfiguration(const std::string &name,
                                                         std::unique_ptr<DocumentNode> node,
@@ -1754,6 +1805,30 @@ std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseSamplerConfigura
   else if (name == "trace_id_ratio_based")
   {
     model = ParseTraceIdRatioBasedSamplerConfiguration(child, depth);
+  }
+  else if (name == "composable_always_off")
+  {
+    model = ParseComposableAlwaysOffSamplerConfiguration(child, depth);
+  }
+  else if (name == "composable_always_on")
+  {
+    model = ParseComposableAlwaysOnSamplerConfiguration(child, depth);
+  }
+  else if (name == "composable_probability")
+  {
+    model = ParseComposableProbabilitySamplerConfiguration(child, depth);
+  }
+  else if (name == "composable_parent_threshold")
+  {
+    model = ParseComposableParentThresholdSamplerConfiguration(child, depth);
+  }
+  else if (name == "composable_rule_based")
+  {
+    model = ParseComposableRuleBasedSamplerConfiguration(child, depth);
+  }
+  else if (name == "composable")
+  {
+    model = ParseComposableSamplerConfiguration(child, depth);
   }
   else
   {
