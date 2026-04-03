@@ -5,6 +5,7 @@ add_subdirectory(propagation)
 
 foreach(
   testname
+  context_test
   key_value_iterable_view_test
   provider_test
   span_id_test

@@ -22,6 +22,7 @@
 #include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_metadata.h"
@@ -67,37 +68,14 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
 
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());
 
-  if (opentelemetry::context::RuntimeContext::GetCurrent().HasKey(opentelemetry::trace::kSpanKey))
+  const opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span> span =
+      trace_api::GetSpan(context::RuntimeContext::GetCurrent());
+  const trace_api::SpanContext span_context = span->GetContext();
+  if (span_context.IsValid())
   {
-    opentelemetry::context::ContextValue context_value =
-        opentelemetry::context::RuntimeContext::GetCurrent().GetValue(
-            opentelemetry::trace::kSpanKey);
-    if (opentelemetry::nostd::holds_alternative<
-            opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>>(context_value))
-    {
-      opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span> &data =
-          opentelemetry::nostd::get<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>>(
-              context_value);
-      if (data)
-      {
-        recordable->SetTraceId(data->GetContext().trace_id());
-        recordable->SetTraceFlags(data->GetContext().trace_flags());
-        recordable->SetSpanId(data->GetContext().span_id());
-      }
-    }
-    else if (opentelemetry::nostd::holds_alternative<
-                 opentelemetry::nostd::shared_ptr<trace::SpanContext>>(context_value))
-    {
-      opentelemetry::nostd::shared_ptr<trace::SpanContext> &data =
-          opentelemetry::nostd::get<opentelemetry::nostd::shared_ptr<trace::SpanContext>>(
-              context_value);
-      if (data)
-      {
-        recordable->SetTraceId(data->trace_id());
-        recordable->SetTraceFlags(data->trace_flags());
-        recordable->SetSpanId(data->span_id());
-      }
-    }
+    recordable->SetTraceId(span_context.trace_id());
+    recordable->SetTraceFlags(span_context.trace_flags());
+    recordable->SetSpanId(span_context.span_id());
   }
 
   return opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
