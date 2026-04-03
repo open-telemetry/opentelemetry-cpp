@@ -63,6 +63,8 @@ necessary.
 
 Remove compilation flag WITH_OTLP_RETRY_PREVIEW in CMake.
 
+Remove ifdef ENABLE_OTLP_RETRY_PREVIEW in C++ .
+
 #### Mitigation (WITH_OTLP_RETRY_PREVIEW)
 
 Applications built with `WITH_OTLP_RETRY_PREVIEW=ON` need to:
@@ -73,6 +75,14 @@ Applications built with `WITH_OTLP_RETRY_PREVIEW=OFF` need to:
 
 * remove the WITH_OTLP_RETRY_PREVIEW flag from CMake scripts
 * use `retry_policy_max_attempts` = 0 in the OTLP exporter options.
+
+For Bazel, no compilation flag exists.
+
+When WITH_OTLP_RETRY_PREVIEW / ENABLE_OTLP_RETRY_PREVIEW gets
+removed from the code base, the bazel build will have the retry feature.
+
+Make sure to properly initialize `retry_policy_max_attempts`
+to enable or disable the retry feature.
 
 #### Planned removal (WITH_OTLP_RETRY_PREVIEW)
 
