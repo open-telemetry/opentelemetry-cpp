@@ -145,21 +145,21 @@ public:
       proto::collector::trace::v1::TraceService::StubInterface *stub,
       std::unique_ptr<grpc::ClientContext> &&context,
       std::unique_ptr<google::protobuf::Arena> &&arena,
-      proto::collector::trace::v1::ExportTraceServiceRequest &&request,
+      proto::collector::trace::v1::ExportTraceServiceRequest *request,
       proto::collector::trace::v1::ExportTraceServiceResponse *response);
 
   static grpc::Status DelegateExport(
       proto::collector::metrics::v1::MetricsService::StubInterface *stub,
       std::unique_ptr<grpc::ClientContext> &&context,
       std::unique_ptr<google::protobuf::Arena> &&arena,
-      proto::collector::metrics::v1::ExportMetricsServiceRequest &&request,
+      proto::collector::metrics::v1::ExportMetricsServiceRequest *request,
       proto::collector::metrics::v1::ExportMetricsServiceResponse *response);
 
   static grpc::Status DelegateExport(
       proto::collector::logs::v1::LogsService::StubInterface *stub,
       std::unique_ptr<grpc::ClientContext> &&context,
       std::unique_ptr<google::protobuf::Arena> &&arena,
-      proto::collector::logs::v1::ExportLogsServiceRequest &&request,
+      proto::collector::logs::v1::ExportLogsServiceRequest *request,
       proto::collector::logs::v1::ExportLogsServiceResponse *response);
 
   void AddReference(OtlpGrpcClientReferenceGuard &guard,
@@ -187,7 +187,7 @@ public:
       proto::collector::trace::v1::TraceService::StubInterface *stub,
       std::unique_ptr<grpc::ClientContext> &&context,
       std::unique_ptr<google::protobuf::Arena> &&arena,
-      proto::collector::trace::v1::ExportTraceServiceRequest &&request,
+      proto::collector::trace::v1::ExportTraceServiceRequest *request,
       std::function<bool(opentelemetry::sdk::common::ExportResult,
                          std::unique_ptr<google::protobuf::Arena> &&,
                          const proto::collector::trace::v1::ExportTraceServiceRequest &,
@@ -207,7 +207,7 @@ public:
       proto::collector::metrics::v1::MetricsService::StubInterface *stub,
       std::unique_ptr<grpc::ClientContext> &&context,
       std::unique_ptr<google::protobuf::Arena> &&arena,
-      proto::collector::metrics::v1::ExportMetricsServiceRequest &&request,
+      proto::collector::metrics::v1::ExportMetricsServiceRequest *request,
       std::function<bool(opentelemetry::sdk::common::ExportResult,
                          std::unique_ptr<google::protobuf::Arena> &&,
                          const proto::collector::metrics::v1::ExportMetricsServiceRequest &,
@@ -227,7 +227,7 @@ public:
       proto::collector::logs::v1::LogsService::StubInterface *stub,
       std::unique_ptr<grpc::ClientContext> &&context,
       std::unique_ptr<google::protobuf::Arena> &&arena,
-      proto::collector::logs::v1::ExportLogsServiceRequest &&request,
+      proto::collector::logs::v1::ExportLogsServiceRequest *request,
       std::function<bool(opentelemetry::sdk::common::ExportResult,
                          std::unique_ptr<google::protobuf::Arena> &&,
                          const proto::collector::logs::v1::ExportLogsServiceRequest &,
