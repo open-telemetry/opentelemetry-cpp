@@ -34,6 +34,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy param-not-moved in otlp grpc exporters
   [#3956](https://github.com/open-telemetry/opentelemetry-cpp/pull/3956)
 
+* [CODE HEALTH] Cleanup nostd variant access in API and SDK
+  [#3965](https://github.com/open-telemetry/opentelemetry-cpp/pull/3965)
+
 ## [1.26.0] 2026-03-19
 
 * [RELEASE] Bump main branch to 1.26.0-dev

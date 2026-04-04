@@ -31,6 +31,8 @@ namespace logs
 {
 namespace trace_api = opentelemetry::trace;
 namespace common    = opentelemetry::common;
+namespace context   = opentelemetry::context;
+namespace nostd     = opentelemetry::nostd;
 
 opentelemetry::logs::NoopLogger Logger::kNoopLogger = opentelemetry::logs::NoopLogger();
 
@@ -64,14 +66,38 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
 
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());
 
-  const opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span> span =
-      trace_api::GetSpan(context::RuntimeContext::GetCurrent());
-  const trace_api::SpanContext span_context = span->GetContext();
-  if (span_context.IsValid())
+  // Get the current span metadata from the runtime context
+  const auto current_context = opentelemetry::context::RuntimeContext::GetCurrent();
+
+  if (current_context.HasKey(trace_api::kSpanKey))
   {
-    recordable->SetTraceId(span_context.trace_id());
-    recordable->SetTraceFlags(span_context.trace_flags());
-    recordable->SetSpanId(span_context.span_id());
+    const context::ContextValue context_value = current_context.GetValue(trace_api::kSpanKey);
+
+    const trace_api::SpanContext span_context = [&context_value]() {
+      // Get the span metadata from the active span in the runtime context
+      if (const nostd::shared_ptr<trace_api::Span> *maybe_span =
+              nostd::get_if<nostd::shared_ptr<trace_api::Span>>(&context_value))
+      {
+        const nostd::shared_ptr<trace_api::Span> &span = *maybe_span;
+        return span->GetContext();
+      }
+      // Get the span metadata directly from a SpanContext in the runtime context.
+      // TODO: This path is unused and may be removed in the future.
+      else if (const nostd::shared_ptr<trace_api::SpanContext> *maybe_span_context =
+                   nostd::get_if<nostd::shared_ptr<trace_api::SpanContext>>(&context_value))
+      {
+        const nostd::shared_ptr<trace_api::SpanContext> &span_context = *maybe_span_context;
+        return *span_context;
+      }
+      return trace_api::SpanContext::GetInvalid();
+    }();
+
+    if (span_context.IsValid())
+    {
+      recordable->SetTraceId(span_context.trace_id());
+      recordable->SetTraceFlags(span_context.trace_flags());
+      recordable->SetSpanId(span_context.span_id());
+    }
   }
 
   return opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
