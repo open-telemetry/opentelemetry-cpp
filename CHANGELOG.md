@@ -37,12 +37,21 @@ Increment the:
 * Enable WITH_OTLP_RETRY_PREVIEW by default
   [#3953](https://github.com/open-telemetry/opentelemetry-cpp/pull/3953)
 
+* Enable WITH_OTLP_GRPC_SSL_MTLS_PREVIEW by default
+  [#3970](https://github.com/open-telemetry/opentelemetry-cpp/pull/3970)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
   [#3953](https://github.com/open-telemetry/opentelemetry-cpp/pull/3953)
 
   * CMake flag WITH_OTLP_RETRY_PREVIEW is now enabled by default.
+  * This flag is deprecated, planned for removal.
+
+* Enable WITH_OTLP_GRPC_SSL_MTLS_PREVIEW by default
+  [#3970](https://github.com/open-telemetry/opentelemetry-cpp/pull/3970)
+
+  * CMake flag WITH_OTLP_GRPC_SSL_MTLS_PREVIEW is now enabled by default.
   * This flag is deprecated, planned for removal.
 
 ## [1.26.0] 2026-03-19

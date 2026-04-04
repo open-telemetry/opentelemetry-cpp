@@ -95,7 +95,7 @@ This compilation flag will be removed after October 1st, 2026.
 The CMake compile flag WITH_OTLP_GRPC_SSL_MTLS_PREVIEW is deprecated by:
 
 * Enable WITH_OTLP_GRPC_SSL_MTLS_PREVIEW by default
-  [#XXXX](https://github.com/open-telemetry/opentelemetry-cpp/pull/XXXX)
+  [#3970](https://github.com/open-telemetry/opentelemetry-cpp/pull/3970)
 
 #### Motivation (WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
 
