@@ -6,12 +6,15 @@
 #include <utility>
 
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context_value.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/noop.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/logger.h"
@@ -22,6 +25,7 @@
 #include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -67,7 +71,7 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());
 
   // Get the current span metadata from the runtime context
-  const auto current_context = opentelemetry::context::RuntimeContext::GetCurrent();
+  const auto current_context = context::RuntimeContext::GetCurrent();
 
   if (current_context.HasKey(trace_api::kSpanKey))
   {
