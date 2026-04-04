@@ -42,7 +42,51 @@ N/A
 
 ## [Build scripts]
 
-N/A
+### CMake WITH_OTLP_RETRY_PREVIEW
+
+#### Announcement (WITH_OTLP_RETRY_PREVIEW)
+
+The CMake compile flag WITH_OTLP_RETRY_PREVIEW is deprecated by:
+
+* Enable WITH_OTLP_RETRY_PREVIEW by default
+  [#3953](https://github.com/open-telemetry/opentelemetry-cpp/pull/3953)
+
+#### Motivation (WITH_OTLP_RETRY_PREVIEW)
+
+Flags like `WITH_OTLP_RETRY_PREVIEW` are used to conditionally compile
+new features, when they are introduced in the code base.
+
+Now that this feature is stable, conditional compilation is no longer
+necessary.
+
+#### Scope (WITH_OTLP_RETRY_PREVIEW)
+
+Remove compilation flag WITH_OTLP_RETRY_PREVIEW in CMake.
+
+Remove ifdef ENABLE_OTLP_RETRY_PREVIEW in C++ .
+
+#### Mitigation (WITH_OTLP_RETRY_PREVIEW)
+
+Applications built with `WITH_OTLP_RETRY_PREVIEW=ON` need to:
+
+* remove the WITH_OTLP_RETRY_PREVIEW flag from CMake scripts
+
+Applications built with `WITH_OTLP_RETRY_PREVIEW=OFF` need to:
+
+* remove the WITH_OTLP_RETRY_PREVIEW flag from CMake scripts
+* use `retry_policy_max_attempts` = 0 in the OTLP exporter options.
+
+For Bazel, no compilation flag exists.
+
+When WITH_OTLP_RETRY_PREVIEW / ENABLE_OTLP_RETRY_PREVIEW gets
+removed from the code base, the bazel build will have the retry feature.
+
+Make sure to properly initialize `retry_policy_max_attempts`
+to enable or disable the retry feature.
+
+#### Planned removal (WITH_OTLP_RETRY_PREVIEW)
+
+This compilation flag will be removed after October 1st, 2026.
 
 ## [opentelemetry-cpp API]
 

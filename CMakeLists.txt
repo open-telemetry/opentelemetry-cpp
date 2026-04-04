@@ -131,8 +131,7 @@ if(NOT WITH_STL STREQUAL "OFF")
   endif()
 endif()
 
-option(WITH_OTLP_RETRY_PREVIEW
-       "Whether to enable experimental retry functionality" OFF)
+option(WITH_OTLP_RETRY_PREVIEW "Whether to enable retry functionality" ON)
 
 option(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
        "Whether to enable mTLS support for gRPC" OFF)
