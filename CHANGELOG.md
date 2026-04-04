@@ -34,6 +34,20 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy warnings in ext, exporters, and examples
   [#3952](https://github.com/open-telemetry/opentelemetry-cpp/pull/3952)
 
+* [CODE HEALTH] Fix clang-tidy param-not-moved in otlp grpc exporters
+  [#3956](https://github.com/open-telemetry/opentelemetry-cpp/pull/3956)
+
+* Enable WITH_OTLP_RETRY_PREVIEW by default
+  [#3953](https://github.com/open-telemetry/opentelemetry-cpp/pull/3953)
+
+Important changes:
+
+* Enable WITH_OTLP_RETRY_PREVIEW by default
+  [#3953](https://github.com/open-telemetry/opentelemetry-cpp/pull/3953)
+
+  * CMake flag WITH_OTLP_RETRY_PREVIEW is now enabled by default.
+  * This flag is deprecated, planned for removal.
+
 ## [1.26.0] 2026-03-19
 
 * [RELEASE] Bump main branch to 1.26.0-dev
