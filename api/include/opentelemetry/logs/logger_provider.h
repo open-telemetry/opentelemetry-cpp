@@ -23,7 +23,12 @@ class Logger;
 class OPENTELEMETRY_EXPORT LoggerProvider
 {
 public:
-  virtual ~LoggerProvider() = default;
+  LoggerProvider()                                      = default;
+  LoggerProvider(const LoggerProvider &)                = default;
+  LoggerProvider(LoggerProvider &&) noexcept            = default;
+  LoggerProvider &operator=(const LoggerProvider &)     = default;
+  LoggerProvider &operator=(LoggerProvider &&) noexcept = default;
+  virtual ~LoggerProvider()                             = default;
 
   /**
    * Gets or creates a named Logger instance.

@@ -29,6 +29,8 @@
 #include <utility>
 #include "server.h"
 
+using namespace http_example;
+
 namespace
 {
 

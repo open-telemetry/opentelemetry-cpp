@@ -172,6 +172,11 @@ TEST(SharedPtrTest, SwapSelfNoOp)
   {
     explicit TestStruct(int &destruct_count) noexcept : destruct_count_{&destruct_count} {}
 
+    TestStruct(const TestStruct &)            = delete;
+    TestStruct(TestStruct &&)                 = delete;
+    TestStruct &operator=(const TestStruct &) = delete;
+    TestStruct &operator=(TestStruct &&)      = delete;
+
     ~TestStruct() { ++(*destruct_count_); }
 
     int *destruct_count_;

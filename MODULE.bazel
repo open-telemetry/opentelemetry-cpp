@@ -3,7 +3,7 @@
 
 module(
     name = "opentelemetry-cpp",
-    version = "1.26.0-dev",
+    version = "1.27.0-dev",
     compatibility_level = 0,
     repo_name = "io_opentelemetry_cpp",
 )
@@ -11,7 +11,7 @@ module(
 bazel_dep(name = "abseil-cpp", version = "20260107.1", repo_name = "com_google_absl")
 bazel_dep(name = "bazel_skylib", version = "1.9.0")
 bazel_dep(name = "curl", version = "8.12.0")
-bazel_dep(name = "grpc", version = "1.78.0", repo_name = "com_github_grpc_grpc")
+bazel_dep(name = "grpc", version = "1.80.0", repo_name = "com_github_grpc_grpc")
 bazel_dep(name = "nlohmann_json", version = "3.12.0.bcr.1", repo_name = "github_nlohmann_json")
 bazel_dep(name = "opentelemetry-proto", version = "1.8.0", repo_name = "com_github_opentelemetry_proto")
 bazel_dep(name = "opentracing-cpp", version = "1.6.0", repo_name = "com_github_opentracing")

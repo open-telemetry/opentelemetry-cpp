@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <cstddef>
 #include <fstream>
@@ -61,7 +62,13 @@
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_config_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
+#include "opentelemetry/sdk/configuration/meter_config_configuration.h"
+#include "opentelemetry/sdk/configuration/meter_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/meter_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_producer_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
@@ -97,6 +104,9 @@
 #include "opentelemetry/sdk/configuration/sum_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/temporality_preference.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_config_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/translation_strategy.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
@@ -600,6 +610,48 @@ ConfigurationParser::ParseLogRecordLimitsConfiguration(
   return model;
 }
 
+LoggerConfigConfiguration ConfigurationParser::ParseLoggerConfigConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  LoggerConfigConfiguration model;
+  model.enabled = node->GetBoolean("enabled", true);
+  return model;
+}
+
+LoggerMatcherAndConfigConfiguration ConfigurationParser::ParseLoggerMatcherAndConfigConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  LoggerMatcherAndConfigConfiguration model;
+  model.name = node->GetRequiredString("name");
+
+  auto child   = node->GetRequiredChildNode("config");
+  model.config = ParseLoggerConfigConfiguration(child);
+
+  return model;
+}
+
+std::unique_ptr<LoggerConfiguratorConfiguration>
+ConfigurationParser::ParseLoggerConfiguratorConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<LoggerConfiguratorConfiguration>();
+
+  auto child            = node->GetRequiredChildNode("default_config");
+  model->default_config = ParseLoggerConfigConfiguration(child);
+
+  child = node->GetChildNode("loggers");
+  if (child)
+  {
+    for (auto it = child->begin(); it != child->end(); ++it)
+    {
+      std::unique_ptr<DocumentNode> element(*it);
+      model->loggers.push_back(ParseLoggerMatcherAndConfigConfiguration(element));
+    }
+  }
+
+  return model;
+}
+
 std::unique_ptr<LoggerProviderConfiguration> ConfigurationParser::ParseLoggerProviderConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
@@ -624,6 +676,12 @@ std::unique_ptr<LoggerProviderConfiguration> ConfigurationParser::ParseLoggerPro
   if (child)
   {
     model->limits = ParseLogRecordLimitsConfiguration(child);
+  }
+
+  child = node->GetChildNode("logger_configurator/development");
+  if (child)
+  {
+    model->logger_configurator = ParseLoggerConfiguratorConfiguration(child);
   }
 
   return model;
@@ -1384,6 +1442,48 @@ std::unique_ptr<ViewConfiguration> ConfigurationParser::ParseViewConfiguration(
   return model;
 }
 
+MeterConfigConfiguration ConfigurationParser::ParseMeterConfigConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  MeterConfigConfiguration model;
+  model.enabled = node->GetBoolean("enabled", true);
+  return model;
+}
+
+MeterMatcherAndConfigConfiguration ConfigurationParser::ParseMeterMatcherAndConfigConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  MeterMatcherAndConfigConfiguration model;
+  model.name = node->GetRequiredString("name");
+
+  auto child   = node->GetRequiredChildNode("config");
+  model.config = ParseMeterConfigConfiguration(child);
+
+  return model;
+}
+
+std::unique_ptr<MeterConfiguratorConfiguration>
+ConfigurationParser::ParseMeterConfiguratorConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<MeterConfiguratorConfiguration>();
+
+  auto child            = node->GetRequiredChildNode("default_config");
+  model->default_config = ParseMeterConfigConfiguration(child);
+
+  child = node->GetChildNode("meters");
+  if (child)
+  {
+    for (auto it = child->begin(); it != child->end(); ++it)
+    {
+      std::unique_ptr<DocumentNode> element(*it);
+      model->meters.push_back(ParseMeterMatcherAndConfigConfiguration(element));
+    }
+  }
+
+  return model;
+}
+
 std::unique_ptr<MeterProviderConfiguration> ConfigurationParser::ParseMeterProviderConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
@@ -1416,7 +1516,11 @@ std::unique_ptr<MeterProviderConfiguration> ConfigurationParser::ParseMeterProvi
   std::string exemplar_filter = node->GetString("exemplar_filter", "trace_based");
   model->exemplar_filter      = ParseExemplarFilter(node, exemplar_filter);
 
-  // FIXME: meter_configurator/development
+  child = node->GetChildNode("meter_configurator/development");
+  if (child)
+  {
+    model->meter_configurator = ParseMeterConfiguratorConfiguration(child);
+  }
 
   return model;
 }
@@ -1883,6 +1987,48 @@ std::unique_ptr<SpanProcessorConfiguration> ConfigurationParser::ParseSpanProces
   return model;
 }
 
+TracerConfigConfiguration ConfigurationParser::ParseTracerConfigConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  TracerConfigConfiguration model;
+  model.enabled = node->GetBoolean("enabled", true);
+  return model;
+}
+
+TracerMatcherAndConfigConfiguration ConfigurationParser::ParseTracerMatcherAndConfigConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  TracerMatcherAndConfigConfiguration model;
+  model.name = node->GetRequiredString("name");
+
+  auto child   = node->GetRequiredChildNode("config");
+  model.config = ParseTracerConfigConfiguration(child);
+
+  return model;
+}
+
+std::unique_ptr<TracerConfiguratorConfiguration>
+ConfigurationParser::ParseTracerConfiguratorConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<TracerConfiguratorConfiguration>();
+
+  auto child            = node->GetRequiredChildNode("default_config");
+  model->default_config = ParseTracerConfigConfiguration(child);
+
+  child = node->GetChildNode("tracers");
+  if (child)
+  {
+    for (auto it = child->begin(); it != child->end(); ++it)
+    {
+      std::unique_ptr<DocumentNode> element(*it);
+      model->tracers.push_back(ParseTracerMatcherAndConfigConfiguration(element));
+    }
+  }
+
+  return model;
+}
+
 std::unique_ptr<TracerProviderConfiguration> ConfigurationParser::ParseTracerProviderConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
@@ -1915,6 +2061,12 @@ std::unique_ptr<TracerProviderConfiguration> ConfigurationParser::ParseTracerPro
     model->sampler = ParseSamplerConfiguration(child, 0);
   }
 
+  child = node->GetChildNode("tracer_configurator/development");
+  if (child)
+  {
+    model->tracer_configurator = ParseTracerConfiguratorConfiguration(child);
+  }
+
   return model;
 }
 
@@ -1935,7 +2087,7 @@ ConfigurationParser::ParseIntegerAttributeValueConfiguration(
 {
   auto model = std::make_unique<IntegerAttributeValueConfiguration>();
 
-  model->value = node->AsInteger();
+  model->value = static_cast<int64_t>(node->AsInteger());
 
   return model;
 }
