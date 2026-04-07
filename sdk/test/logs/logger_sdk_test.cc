@@ -20,7 +20,6 @@
 #include "opentelemetry/logs/noop.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
@@ -35,6 +34,7 @@
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
@@ -227,13 +227,13 @@ TEST(LoggerSDK, LogToAProcessor)
   // Create an API LoggerProvider and logger
   auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url);
+  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "1.2.3", schema_url);
 
   // Cast the API LoggerProvider to an SDK Logger Provider and assert that it is still the same
   // LoggerProvider by checking that getting a logger with the same name as the previously defined
   // logger is the same instance
   auto lp      = static_cast<LoggerProvider *>(api_lp.get());
-  auto logger2 = lp->GetLogger("logger", "opentelelemtry_library", "", schema_url);
+  auto logger2 = lp->GetLogger("logger", "opentelelemtry_library", "1.2.3", schema_url);
   ASSERT_EQ(logger, logger2);
 
   nostd::shared_ptr<opentelemetry::trace::Span> include_span;
@@ -245,11 +245,16 @@ TEST(LoggerSDK, LogToAProcessor)
   }
   opentelemetry::trace::Scope trace_scope{include_span};
 
+  const auto include_span_context = include_span->GetContext();
+  ASSERT_TRUE(include_span_context.IsValid());
+  ASSERT_TRUE(include_span_context.span_id().IsValid());
+  ASSERT_TRUE(include_span_context.trace_id().IsValid());
+
   auto now = std::chrono::system_clock::now();
 
   auto sdk_logger = static_cast<opentelemetry::sdk::logs::Logger *>(logger.get());
   ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetName(), "opentelelemtry_library");
-  ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetVersion(), "");
+  ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetVersion(), "1.2.3");
   ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetSchemaURL(), schema_url);
   // Set a processor for the LoggerProvider
   auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
@@ -261,22 +266,9 @@ TEST(LoggerSDK, LogToAProcessor)
 
   ASSERT_EQ(shared_recordable->GetSeverity(), logs_api::Severity::kWarn);
   ASSERT_EQ(shared_recordable->GetBody(), "Log Message");
-  ASSERT_EQ(shared_recordable->GetTraceFlags().flags(),
-            include_span->GetContext().trace_flags().flags());
-  char trace_id_in_logger[opentelemetry::trace::TraceId::kSize * 2];
-  char trace_id_in_span[opentelemetry::trace::TraceId::kSize * 2];
-  char span_id_in_logger[opentelemetry::trace::SpanId::kSize * 2];
-  char span_id_in_span[opentelemetry::trace::SpanId::kSize * 2];
-  shared_recordable->GetTraceId().ToLowerBase16(trace_id_in_logger);
-  include_span->GetContext().trace_id().ToLowerBase16(trace_id_in_span);
-  shared_recordable->GetSpanId().ToLowerBase16(span_id_in_logger);
-  include_span->GetContext().span_id().ToLowerBase16(span_id_in_span);
-  std::string trace_id_text_in_logger{trace_id_in_logger, sizeof(trace_id_in_logger)};
-  std::string trace_id_text_in_span{trace_id_in_span, sizeof(trace_id_in_span)};
-  std::string span_id_text_in_logger{span_id_in_logger, sizeof(span_id_in_logger)};
-  std::string span_id_text_in_span{span_id_in_span, sizeof(span_id_in_span)};
-  ASSERT_EQ(trace_id_text_in_logger, trace_id_text_in_span);
-  ASSERT_EQ(span_id_text_in_logger, span_id_text_in_span);
+  ASSERT_EQ(shared_recordable->GetTraceFlags(), include_span_context.trace_flags());
+  ASSERT_EQ(shared_recordable->GetTraceId(), include_span_context.trace_id());
+  ASSERT_EQ(shared_recordable->GetSpanId(), include_span_context.span_id());
 
   ASSERT_GE(
       static_cast<std::chrono::system_clock::time_point>(shared_recordable->GetObservedTimestamp()),
@@ -317,6 +309,9 @@ TEST(LoggerSDK, LoggerWithDisabledConfig)
   ASSERT_EQ(shared_recordable->GetBody(), "");
   ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kInvalid);
   ASSERT_EQ(shared_recordable->GetObservedTimestamp(), std::chrono::system_clock::from_time_t(0));
+  ASSERT_EQ(shared_recordable->GetTraceFlags(), trace_api::TraceFlags{});
+  ASSERT_FALSE(shared_recordable->GetTraceId().IsValid());
+  ASSERT_FALSE(shared_recordable->GetSpanId().IsValid());
 }
 
 TEST(LoggerSDK, LoggerWithEnabledConfig)
@@ -355,6 +350,9 @@ TEST(LoggerSDK, LoggerWithEnabledConfig)
   ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kWarn);
   ASSERT_GE(shared_recordable->GetObservedTimestamp().time_since_epoch().count(),
             reference_ts.count());
+  ASSERT_EQ(shared_recordable->GetTraceFlags(), trace_api::TraceFlags{});
+  ASSERT_FALSE(shared_recordable->GetTraceId().IsValid());
+  ASSERT_FALSE(shared_recordable->GetSpanId().IsValid());
 }
 
 static std::unique_ptr<MockLogRecordable> create_mock_log_recordable(
@@ -542,5 +540,8 @@ TEST(LoggerSDK, EventLog)
   ASSERT_EQ(shared_recordable->GetBody(), "Event Log Message");
   ASSERT_EQ(shared_recordable->GetEventName(), "otel-cpp.event_name");
   ASSERT_EQ(shared_recordable->GetEventDomain(), "otel-cpp.event_domain");
+  ASSERT_EQ(shared_recordable->GetTraceFlags(), trace_api::TraceFlags{});
+  ASSERT_FALSE(shared_recordable->GetTraceId().IsValid());
+  ASSERT_FALSE(shared_recordable->GetSpanId().IsValid());
 }
 #endif

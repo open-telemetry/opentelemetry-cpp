@@ -99,6 +99,7 @@ For edit access, get in touch on
 
 ### Maintainers
 
+* [Doug Barker](https://github.com/dbarker)
 * [Ehsan Saei](https://github.com/esigo)
 * [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
 * [Marc Alff](https://github.com/marcalff), Oracle
@@ -108,22 +109,21 @@ For more information about the maintainer role, see the [community repository](h
 
 ### Approvers
 
-* [Doug Barker](https://github.com/dbarker)
 * [Josh Suereth](https://github.com/jsuereth), Google
 * [Pranav Sharma](https://github.com/psx95), Google
 * [WenTao Ou](https://github.com/owent), Tencent
 
 For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).
 
-### Emeritus Maintainer/Approver/Triager
+### Emeritus
 
-* [Alolita Sharma](https://github.com/alolita)
-* [Emil Mikulic](https://github.com/g-easy)
-* [Jodee Varney](https://github.com/jodeev)
-* [Johannes Tax](https://github.com/pyohannes)
-* [Max Golovanov](https://github.com/maxgolov)
-* [Reiley Yang](https://github.com/reyang)
-* [Ryan Burn](https://github.com/rnburn)
+* [Alolita Sharma](https://github.com/alolita), Triager
+* [Emil Mikulic](https://github.com/g-easy), Maintainer
+* [Jodee Varney](https://github.com/jodeev), Triager
+* [Johannes Tax](https://github.com/pyohannes), Approver
+* [Max Golovanov](https://github.com/maxgolov), Approver
+* [Reiley Yang](https://github.com/reyang), Approver
+* [Ryan Burn](https://github.com/rnburn), Approver
 
 For more information about the emeritus role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#emeritus-maintainerapprovertriager).
 
