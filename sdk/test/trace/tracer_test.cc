@@ -1342,6 +1342,42 @@ TEST(Tracer, ExpectParentAsContext)
   EXPECT_EQ(spandata_second->GetSpanId(), spandata_third->GetParentSpanId());
 }
 
+TEST(Tracer, RootContextAsParent)
+{
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::unique_ptr<SpanExporter>{exporter});
+  auto spans                                  = span_data.get()->GetSpans();
+
+  ASSERT_EQ(0, spans.size());
+
+  {
+    auto span_first       = tracer->StartSpan("span 1");
+    auto span_first_scope = trace_api::Scope{span_first};
+
+    opentelemetry::context::Context context_root{opentelemetry::trace::kIsRootSpanKey, true};
+    trace_api::StartSpanOptions options;
+    options.parent   = context_root;
+    auto span_second = tracer->StartSpan("span 2", options);
+    auto span_third  = tracer->StartSpan("span 3");
+  }
+
+  spans = span_data->GetSpans();
+  ASSERT_EQ(3, spans.size());
+  auto spandata_first  = std::move(spans.at(2));
+  auto spandata_second = std::move(spans.at(1));
+  auto spandata_third  = std::move(spans.at(0));
+  EXPECT_EQ("span 1", spandata_first->GetName());
+  EXPECT_EQ("span 2", spandata_second->GetName());
+  EXPECT_EQ("span 3", spandata_third->GetName());
+
+  EXPECT_TRUE(spandata_first->GetSpanContext().IsValid());
+  EXPECT_FALSE(spandata_first->GetParentSpanId().IsValid());   // span 1 is a root span
+  EXPECT_FALSE(spandata_second->GetParentSpanId().IsValid());  // span 2 is a root span
+  EXPECT_EQ(spandata_first->GetSpanId(),
+            spandata_third->GetParentSpanId());  // span 3 is child of span 1
+}
+
 TEST(Tracer, ValidTraceIdToSampler)
 {
   InMemorySpanExporter *exporter              = new InMemorySpanExporter();

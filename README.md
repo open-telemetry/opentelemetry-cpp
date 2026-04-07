@@ -99,6 +99,7 @@ For edit access, get in touch on
 
 ### Maintainers
 
+* [Doug Barker](https://github.com/dbarker)
 * [Ehsan Saei](https://github.com/esigo)
 * [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
 * [Marc Alff](https://github.com/marcalff), Oracle
@@ -108,7 +109,6 @@ For more information about the maintainer role, see the [community repository](h
 
 ### Approvers
 
-* [Doug Barker](https://github.com/dbarker)
 * [Josh Suereth](https://github.com/jsuereth), Google
 * [Pranav Sharma](https://github.com/psx95), Google
 * [WenTao Ou](https://github.com/owent), Tencent
