@@ -122,7 +122,7 @@ For more information about the approver role, see the [community repository](htt
 * [Jodee Varney](https://github.com/jodeev), Triager
 * [Johannes Tax](https://github.com/pyohannes), Approver
 * [Max Golovanov](https://github.com/maxgolov), Approver
-* [Reiley Yang](https://github.com/reyang), Approver
+* [Reiley Yang](https://github.com/reyang), Maintainer
 * [Ryan Burn](https://github.com/rnburn), Approver
 
 For more information about the emeritus role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#emeritus-maintainerapprovertriager).
