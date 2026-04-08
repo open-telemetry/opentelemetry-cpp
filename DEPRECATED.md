@@ -130,10 +130,8 @@ See:
 * struct `OtlpGrpcMetricExporterOptions`
 * struct `OtlpGrpcExporterOptions`
 
-For Bazel, no compilation flag exists.
-
-When WITH_OTLP_GRPC_SSL_MTLS_PREVIEW / ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW gets
-removed from the code base, the bazel build will have the grpc ssl options.
+For Bazel, no compilation flag exists, the code is always built using
+ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW.
 
 Make sure to properly initialize ssl client properties
 to enable or disable the feature.
