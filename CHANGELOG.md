@@ -58,7 +58,7 @@ Important changes:
   * This flag is deprecated, planned for removal.
   * Bazel now always builds with ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW.
   * grpc properties for ssl KEY and CERT are always available,
-    adjust the application code to intialize all members in grpc options.
+    adjust the application code to initialize all members in grpc options.
 
 ## [1.26.0] 2026-03-19
 
