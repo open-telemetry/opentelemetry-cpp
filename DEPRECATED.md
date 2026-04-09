@@ -88,6 +88,58 @@ to enable or disable the retry feature.
 
 This compilation flag will be removed after October 1st, 2026.
 
+### CMake WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
+
+#### Announcement (WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
+
+The CMake compile flag WITH_OTLP_GRPC_SSL_MTLS_PREVIEW is deprecated by:
+
+* Enable WITH_OTLP_GRPC_SSL_MTLS_PREVIEW by default
+  [#3970](https://github.com/open-telemetry/opentelemetry-cpp/pull/3970)
+
+#### Motivation (WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
+
+Flags like `WITH_OTLP_GRPC_SSL_MTLS_PREVIEW` are used to conditionally compile
+new features, when they are introduced in the code base.
+
+Now that this feature is stable, conditional compilation is no longer
+necessary.
+
+#### Scope (WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
+
+Remove compilation flag WITH_OTLP_GRPC_SSL_MTLS_PREVIEW in CMake.
+
+Remove ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW in C++ .
+
+#### Mitigation (WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
+
+Applications built with `WITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON` need to:
+
+* remove the WITH_OTLP_GRPC_SSL_MTLS_PREVIEW flag from CMake scripts
+
+Applications built with `WITH_OTLP_GRPC_SSL_MTLS_PREVIEW=OFF` need to:
+
+* remove the WITH_OTLP_GRPC_SSL_MTLS_PREVIEW flag from CMake scripts
+* initialize ssl client properties in the OTLP GRPC exporter options,
+  either with real KEY and CERT data, or with empty strings.
+
+See:
+
+* struct `OtlpGrpcClientOptions`
+* struct `OtlpGrpcLogRecordExporterOptions`
+* struct `OtlpGrpcMetricExporterOptions`
+* struct `OtlpGrpcExporterOptions`
+
+For Bazel, no compilation flag exists, the code is always built using
+ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW.
+
+Make sure to properly initialize ssl client properties
+to enable or disable the feature.
+
+#### Planned removal (WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
+
+This compilation flag will be removed after October 1st, 2026.
+
 ## [opentelemetry-cpp API]
 
 ### Deprecation of EventLogger
