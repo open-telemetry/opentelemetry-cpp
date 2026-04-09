@@ -76,7 +76,7 @@ cc_library(
     defines = select({
         ":enable_otlp_grpc_credential_preview": ["ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW"],
         "//conditions:default": [],
-    }),
+    }) + ["ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW"],
     strip_include_prefix = "include",
     tags = [
         "otlp",
@@ -122,6 +122,7 @@ cc_library(
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
+    defines = ["ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW"],
     strip_include_prefix = "include",
     tags = [
         "otlp",
@@ -146,6 +147,7 @@ cc_library(
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_grpc_span_builder.h",
     ],
+    defines = ["ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW"],
     strip_include_prefix = "include",
     tags = [
         "otlp",
@@ -336,6 +338,7 @@ cc_library(
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
+    defines = ["ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW"],
     strip_include_prefix = "include",
     tags = [
         "otlp",
@@ -360,6 +363,7 @@ cc_library(
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_grpc_push_metric_builder.h",
     ],
+    defines = ["ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW"],
     strip_include_prefix = "include",
     tags = [
         "otlp",
@@ -602,6 +606,7 @@ cc_library(
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_grpc_log_record_builder.h",
     ],
+    defines = ["ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW"],
     strip_include_prefix = "include",
     tags = [
         "otlp",
