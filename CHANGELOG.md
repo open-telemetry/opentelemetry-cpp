@@ -90,6 +90,9 @@ Increment the:
 * [SDK] env var durations non conforming to spec
   [#4020](https://github.com/open-telemetry/opentelemetry-cpp/pull/4020)
 
+* [CODE HEALTH] clean up nostd::variant access in otlp exporters
+  [#3973](https://github.com/open-telemetry/opentelemetry-cpp/pull/3973)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
