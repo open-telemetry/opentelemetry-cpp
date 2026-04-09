@@ -43,6 +43,9 @@ Increment the:
 * Enable WITH_OTLP_GRPC_SSL_MTLS_PREVIEW by default
   [#3970](https://github.com/open-telemetry/opentelemetry-cpp/pull/3970)
 
+* [CODE HEALTH] clean up nostd::variant access in otlp exporters
+  [#3973](https://github.com/open-telemetry/opentelemetry-cpp/pull/3973)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
