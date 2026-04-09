@@ -42,7 +42,6 @@ struct OtlpGrpcClientOptions
   /** CA CERT, as a string. */
   std::string ssl_credentials_cacert_as_string;
 
-#ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
   /** CLIENT KEY, path to a file. */
   std::string ssl_client_key_path;
 
@@ -54,7 +53,6 @@ struct OtlpGrpcClientOptions
 
   /** CLIENT CERT, as a string. */
   std::string ssl_client_cert_string;
-#endif
 
 #ifdef ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
   /** Use custom ChannelCredentials, instead of the SSL options above. */
