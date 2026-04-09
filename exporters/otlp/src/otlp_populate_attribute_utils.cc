@@ -291,20 +291,18 @@ struct OwnedAttributeValueVisitor
 void OtlpPopulateAttributeUtils::PopulateAnyValue(
     opentelemetry::proto::common::v1::AnyValue *proto_value,
     const opentelemetry::common::AttributeValue &value,
-    bool allow_bytes) noexcept
+    bool allow_bytes) noexcept  // NOLINT(bugprone-exception-escape)
 {
   // AttributeValueVisitor is noexcept and nostd::visit should never throw.
-  // NOLINTNEXTLINE(bugprone-exception-escape)
   nostd::visit(AttributeValueVisitor{proto_value, allow_bytes}, value);
 }
 
 void OtlpPopulateAttributeUtils::PopulateAnyValue(
     opentelemetry::proto::common::v1::AnyValue *proto_value,
     const opentelemetry::sdk::common::OwnedAttributeValue &value,
-    bool allow_bytes) noexcept
+    bool allow_bytes) noexcept  // NOLINT(bugprone-exception-escape)
 {
   // OwnedAttributeValueVisitor is noexcept and nostd::visit should never throw.
-  // NOLINTNEXTLINE(bugprone-exception-escape)
   nostd::visit(OwnedAttributeValueVisitor{proto_value, allow_bytes}, value);
 }
 
