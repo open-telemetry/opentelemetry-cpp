@@ -38,7 +38,7 @@ Increment the:
   [#3965](https://github.com/open-telemetry/opentelemetry-cpp/pull/3965)
 
 * [CODE HEALTH] Fix clang-tidy misc-use-internal-linkage warnings
-  [#3977](https://github.com/open-telemetry/opentelemetry-cpp/issues/3977)
+  [#3985](https://github.com/open-telemetry/opentelemetry-cpp/pull/3985)
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
   [#3953](https://github.com/open-telemetry/opentelemetry-cpp/pull/3953)
