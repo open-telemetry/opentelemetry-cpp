@@ -13,6 +13,12 @@
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
+#ifdef BAZEL_BUILD
+#  include "examples/common/logs_foo_library/foo_library.h"
+#else
+#  include "logs_foo_library/foo_library.h"
+#endif
+
 namespace logs  = opentelemetry::logs;
 namespace trace = opentelemetry::trace;
 
@@ -31,7 +37,6 @@ opentelemetry::nostd::shared_ptr<logs::Logger> get_logger()
 }
 }  // namespace
 
-// NOLINTNEXTLINE(misc-use-internal-linkage)
 void foo_library()
 {
   auto span        = get_tracer()->StartSpan("span 1");
