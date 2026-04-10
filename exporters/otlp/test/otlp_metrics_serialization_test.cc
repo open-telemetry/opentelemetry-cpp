@@ -278,7 +278,7 @@ TEST(OtlpMetricSerializationTest, Counter)
   EXPECT_EQ(sum.is_monotonic(), true);
   for (size_t i = 0; i < 1; i++)
   {
-    const auto &proto_number_point = sum.data_points(i);
+    const auto &proto_number_point = sum.data_points(static_cast<int>(i));
     EXPECT_EQ(proto_number_point.as_double(), i == 0 ? 10.2 : 20.2);
   }
 
@@ -308,7 +308,7 @@ TEST(OtlpMetricSerializationTest, Histogram)
             proto::metrics::v1::AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE);
   for (size_t i = 0; i < 1; i++)
   {
-    const auto &proto_number_point = histogram.data_points(i);
+    const auto &proto_number_point = histogram.data_points(static_cast<int>(i));
     EXPECT_EQ(proto_number_point.sum(), i == 0 ? 100.2 : 200.2);
   }
 
@@ -381,7 +381,7 @@ TEST(OtlpMetricSerializationTest, ObservableGauge)
   otlp_exporter::OtlpMetricUtils::ConvertGaugeMetric(data, &gauge);
   for (size_t i = 0; i < 1; i++)
   {
-    const auto &proto_number_point = gauge.data_points(i);
+    const auto &proto_number_point = gauge.data_points(static_cast<int>(i));
     EXPECT_EQ(proto_number_point.as_double(), i == 0 ? 30.2 : 50.2);
   }
 

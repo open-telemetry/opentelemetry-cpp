@@ -416,8 +416,8 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMerge)
     const int expected_scale =
         aggr_point.scale_ < default_point.scale_ ? aggr_point.scale_ : default_point.scale_;
     const int expected_max_buckets = aggr_point.max_buckets_ < default_point.max_buckets_
-                                         ? aggr_point.max_buckets_
-                                         : default_point.max_buckets_;
+                                         ? static_cast<int>(aggr_point.max_buckets_)
+                                         : static_cast<int>(default_point.max_buckets_);
     const int expected_zero_count  = 0;
 
     auto merged_from_default = aggr.Merge(*default_aggr);
@@ -438,8 +438,8 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMerge)
     const int expected_scale =
         aggr_point.scale_ < zero_point.scale_ ? aggr_point.scale_ : zero_point.scale_;
     const int expected_max_buckets = aggr_point.max_buckets_ < zero_point.max_buckets_
-                                         ? aggr_point.max_buckets_
-                                         : zero_point.max_buckets_;
+                                         ? static_cast<int>(aggr_point.max_buckets_)
+                                         : static_cast<int>(zero_point.max_buckets_);
     const int expected_zero_count  = 1;
 
     auto merged_from_zero = aggr.Merge(zero_aggr);
