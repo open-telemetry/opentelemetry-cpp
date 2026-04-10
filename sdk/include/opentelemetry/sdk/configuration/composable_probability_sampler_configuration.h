@@ -17,9 +17,7 @@ class ComposableProbabilitySamplerConfiguration : public SamplerConfiguration
 {
 public:
   ComposableProbabilitySamplerConfiguration() = default;
-
-  double probability{1.0};
-
+  double ratio{1.0};
   void Accept(SamplerConfigurationVisitor *visitor) const override;
 };
 

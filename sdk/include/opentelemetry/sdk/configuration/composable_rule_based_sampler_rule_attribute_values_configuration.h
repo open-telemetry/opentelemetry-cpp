@@ -1,8 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 #pragma once
-#include "opentelemetry/sdk/configuration/sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
+#include <string>
+#include <vector>
 #include "opentelemetry/version.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -12,8 +12,9 @@ namespace configuration
 class ComposableRuleBasedSamplerRuleAttributeValuesConfiguration
 {
 public:
-  ComposableRuleBasedSamplerRuleAttributeValuesConfiguration()  = default;
-  ~ComposableRuleBasedSamplerRuleAttributeValuesConfiguration() = default;
+  ComposableRuleBasedSamplerRuleAttributeValuesConfiguration() = default;
+  std::string key;
+  std::vector<std::string> values;
 };
 }  // namespace configuration
 }  // namespace sdk

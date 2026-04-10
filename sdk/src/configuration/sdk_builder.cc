@@ -390,8 +390,7 @@ public:
       const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
       override
   {
-    sampler =
-        opentelemetry::sdk::trace::TraceIdRatioBasedSamplerFactory::Create(model->probability);
+    sampler = opentelemetry::sdk::trace::TraceIdRatioBasedSamplerFactory::Create(model->ratio);
   }
 
   void VisitComposableParentThreshold(
@@ -410,11 +409,18 @@ public:
     sampler = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
   }
 
-  void VisitComposable(const opentelemetry::sdk::configuration::ComposableSamplerConfiguration
-                           * /* model */) override
+  void VisitComposable(
+      const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model) override
   {
-    OTEL_INTERNAL_LOG_WARN("ComposableSampler wrapper not yet fully supported by SDK");
-    sampler = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
+    if (model->inner)
+    {
+      model->inner->Accept(this);
+    }
+    else
+    {
+      OTEL_INTERNAL_LOG_WARN("ComposableSampler: no inner sampler configured");
+      sampler = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
+    }
   }
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sampler;

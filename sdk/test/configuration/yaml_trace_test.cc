@@ -1,14 +1,13 @@
-#include <cstdint>
-#include "opentelemetry/sdk/configuration/sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
-
+#include <cstdint>
 #include <gtest/gtest.h>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
+#include "opentelemetry/sdk/configuration/sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_off_sampler_configuration.h"
@@ -865,7 +864,7 @@ class TestSamplerVisitor : public opentelemetry::sdk::configuration::SamplerConf
 {
 public:
   SamplerType type_matched = SamplerType::kUnmatched;
-  double probability       = -1.0;
+  double ratio             = -1.0;
 
   void VisitAlwaysOff(
       const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration *) override
@@ -901,7 +900,7 @@ public:
       override
   {
     type_matched = SamplerType::kComposableProbability;
-    probability  = model->probability;
+    ratio        = model->ratio;
   }
   void VisitComposableParentThreshold(
       const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *)
@@ -915,8 +914,13 @@ public:
     type_matched = SamplerType::kComposableRuleBased;
   }
   void VisitComposable(
-      const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *) override
-  {}
+      const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model) override
+  {
+    if (model->inner)
+    {
+      model->inner->Accept(this);
+    }
+  }
 };
 }  // namespace
 
@@ -930,7 +934,8 @@ tracer_provider:
         exporter:
           console:
   sampler:
-    composable_always_on:
+    composite/development:
+      always_on:
 )";
 
   auto config = DoParse(yaml);
@@ -953,8 +958,9 @@ tracer_provider:
         exporter:
           console:
   sampler:
-    composable_probability:
-      probability: 0.25
+    composite/development:
+      probability:
+        ratio: 0.25
 )";
 
   auto config = DoParse(yaml);
@@ -966,7 +972,7 @@ tracer_provider:
   config->tracer_provider->sampler->Accept(&visitor);
 
   EXPECT_EQ(visitor.type_matched, SamplerType::kComposableProbability);
-  EXPECT_DOUBLE_EQ(visitor.probability, 0.25);
+  EXPECT_DOUBLE_EQ(visitor.ratio, 0.25);
 }
 
 TEST(YamlTrace, composable_rule_based_sampler)
@@ -979,7 +985,11 @@ tracer_provider:
         exporter:
           console:
   sampler:
-    composable_rule_based:
+    composite/development:
+      rule_based:
+        rules:
+          - sampler:
+              always_on:
 )";
 
   auto config = DoParse(yaml);
@@ -1002,7 +1012,8 @@ tracer_provider:
         exporter:
           console:
   sampler:
-    composable_always_off:
+    composite/development:
+      always_off:
 )";
 
   auto config = DoParse(yaml);
@@ -1025,7 +1036,8 @@ tracer_provider:
         exporter:
           console:
   sampler:
-    composable_parent_threshold:
+    composite/development:
+      parent_threshold:
 )";
 
   auto config = DoParse(yaml);

@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-
+#include <memory>
+#include <vector>
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/version.h"
@@ -17,7 +19,7 @@ class ComposableRuleBasedSamplerConfiguration : public SamplerConfiguration
 {
 public:
   ComposableRuleBasedSamplerConfiguration() = default;
-
+  std::vector<std::unique_ptr<ComposableRuleBasedSamplerRuleConfiguration>> rules;
   void Accept(SamplerConfigurationVisitor *visitor) const override;
 };
 
