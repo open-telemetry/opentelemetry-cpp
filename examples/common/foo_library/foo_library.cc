@@ -33,6 +33,7 @@ void f2()
 }
 }  // namespace
 
+// NOLINTNEXTLINE(misc-use-internal-linkage)
 void foo_library()
 {
   auto scoped_span = trace::Scope(get_tracer()->StartSpan("library"));

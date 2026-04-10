@@ -31,6 +31,7 @@ opentelemetry::nostd::shared_ptr<logs::Logger> get_logger()
 }
 }  // namespace
 
+// NOLINTNEXTLINE(misc-use-internal-linkage)
 void foo_library()
 {
   auto span        = get_tracer()->StartSpan("span 1");
