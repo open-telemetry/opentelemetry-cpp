@@ -35,8 +35,7 @@ foreach(
   periodic_exporting_metric_reader_test
   instrument_metadata_validator_test
   metric_test_stress
-  instrument_descriptor_test
-  multi_observer_test)
+  instrument_descriptor_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${GMOCK_LIB} ${CMAKE_THREAD_LIBS_INIT}
@@ -47,6 +46,18 @@ foreach(
     TEST_PREFIX metrics.
     TEST_LIST ${testname})
 endforeach()
+
+if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)
+  add_executable(multi_observer_test multi_observer_test.cc)
+  target_link_libraries(
+    multi_observer_test ${GTEST_BOTH_LIBRARIES} ${GMOCK_LIB}
+    ${CMAKE_THREAD_LIBS_INIT} metrics_common_test_utils opentelemetry_resources)
+  target_compile_definitions(multi_observer_test PRIVATE UNIT_TESTING)
+  gtest_add_tests(
+    TARGET multi_observer_test
+    TEST_PREFIX metrics.
+    TEST_LIST multi_observer_test)
+endif()
 
 if(WITH_BENCHMARK)
   add_executable(attributes_processor_benchmark
