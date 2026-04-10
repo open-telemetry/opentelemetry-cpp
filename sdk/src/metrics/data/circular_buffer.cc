@@ -123,8 +123,8 @@ void AdaptingIntegerArray::EnlargeToFit(uint64_t value)
   {
     backing = std::vector<uint64_t>(backing_size, 0);
   }
-  std::swap(backing_, backing);
-  nostd::visit(AdaptingIntegerArrayCopy{}, backing, backing_);
+  nostd::visit(AdaptingIntegerArrayCopy{}, backing_, backing);
+  backing_ = std::move(backing);
 }
 
 void AdaptingCircularBufferCounter::Clear()
