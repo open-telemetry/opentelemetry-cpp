@@ -583,6 +583,7 @@ cc_library(
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
+    defines = ["ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW"],
     strip_include_prefix = "include",
     tags = [
         "otlp",
