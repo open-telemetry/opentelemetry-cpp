@@ -1,10 +1,10 @@
 # OpenTelemetry C++ Explicit Parent Span Example
 
 This example demonstrates how to explicitly set a parent span when the
-thread-local active context cannot be relied upon. This is typical when
-multiple spans coexist concurrently — for example, two parallel async tasks
-each needing a different parent — so `GetCurrent()` cannot know which span
-should be the parent of a new child.
+thread-local active context cannot be relied upon. This is typical in
+callback or deferred-execution patterns, where spans are created at
+registration time and their children are created later in a different scope
+— so `GetCurrent()` cannot know which span should be the parent of a new child.
 
 ## Running the example
 
@@ -24,14 +24,15 @@ spans from a given parent, independently of the active span:
 
 ## Example Flow
 
-- This example creates 2 parent spans (`parent_1`, `parent_2`) in the main
-  thread.
+- This example creates 2 parent spans (`parent_1`, `parent_2`) at registration
+  time, before any processing begins.
 
-- Each is passed to an independent `std::async` task, which creates a `nested`
-  child span explicitly under that parent.
+- Each is captured in a lambda and queued for later execution. When invoked,
+  the captured span is passed explicitly to `ProcessTask`, which creates a
+  `nested` child span under it.
 
-- The parent spans are kept alive until both tasks finish, ensuring the
-  parent-child relationships are always valid.
+- The parent spans are kept alive until all tasks have been processed, ensuring
+  the parent-child relationships are always valid.
 
 ## Span Hierarchy
 

@@ -1,9 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <future>
+#include <functional>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -80,10 +81,10 @@ nostd::shared_ptr<trace_api::Span> CreateSpan(
 namespace app
 {
 
-void ProcessTask(const nostd::shared_ptr<trace_api::Span> &producer_span)
+void ProcessTask(const nostd::shared_ptr<trace_api::Span> &parent_span)
 {
   // Simulating work with nested spans
-  auto nested = utils::CreateSpan("nested", producer_span);
+  auto nested = utils::CreateSpan("nested", parent_span);
   nested->SetStatus(trace_api::StatusCode::kOk);
   nested->End();
 }
@@ -97,25 +98,26 @@ int main(int /* argc */, char ** /* argv */)
 
   // In this example, we simulate handling of 2 independent traces that are alive at the same time.
   // This may happen for various reasons. For example, 2 different tasks
-  // are run in parallel within the same process, and we may want to nest
+  // are scheduled to run within the same process, and we may want to nest
   // spans to each of them, but cannot know which one will be active at runtime.
   auto parent_1 = utils::CreateSpan("parent_1");
   auto parent_2 = utils::CreateSpan("parent_2");
 
   // To make sure that both the wanted parent-child relationship is met and
   // the parent is kept alive, the parent span is passed.
-  auto task_future_1 =
-      std::async(std::launch::async, [&parent_1] { return app::ProcessTask(parent_1); });
+  std::vector<std::function<void()>> tasks = {
+      [&parent_1] { app::ProcessTask(parent_1); },
+      [&parent_2] { app::ProcessTask(parent_2); },
+  };
 
-  auto task_future_2 =
-      std::async(std::launch::async, [&parent_2] { return app::ProcessTask(parent_2); });
-
-  // Order doesn't matter. Let's simulate that we get the second answer before the first one
-  task_future_2.get();
-  task_future_1.get();
+  // Order doesn't matter
+  for (auto &task : tasks)
+  {
+    task();
+  }
 
   // Both root spans are kept alive till the end, to prove they can both
-  // outlive other parallel and async processing without interfering each other
+  // outlive the task queue processing without interfering each other
   // when we explicitly set parent spans with the aux functions
   parent_1->SetStatus(trace_api::StatusCode::kOk);
   parent_1->End();
