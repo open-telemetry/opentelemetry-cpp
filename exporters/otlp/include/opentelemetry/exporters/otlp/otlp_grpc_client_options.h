@@ -13,7 +13,8 @@
 namespace grpc
 {
 class ChannelCredentials;
-}
+class ChannelArguments;
+}  // namespace grpc
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -90,6 +91,13 @@ struct OtlpGrpcClientOptions
 
   /** The backoff will be multiplied by this value after each retry attempt. */
   float retry_policy_backoff_multiplier{};
+
+  /**
+   * Optional caller-provided gRPC channel arguments.
+   * This is a non-owning pointer, and the pointed-to arguments are copied when the channel is
+   * created.
+   */
+  const grpc::ChannelArguments *channel_arguments{};
 };
 
 }  // namespace otlp

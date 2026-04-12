@@ -254,6 +254,11 @@ public:
   bool IsShutdown() const noexcept;
 
 private:
+  friend class OtlpGrpcClientTestPeer;
+
+  // Build gRPC channel arguments from exporter options. Shared by MakeChannel() and unit tests.
+  static grpc::ChannelArguments BuildChannelArguments(const OtlpGrpcClientOptions &options);
+
   // Stores if this gRPC client had its Shutdown() method called
   std::atomic<bool> is_shutdown_;
 
