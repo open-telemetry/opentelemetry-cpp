@@ -43,6 +43,9 @@ Increment the:
 * Enable WITH_OTLP_GRPC_SSL_MTLS_PREVIEW by default
   [#3970](https://github.com/open-telemetry/opentelemetry-cpp/pull/3970)
 
+* [BAZEL] Add ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW define to otlp_grpc_log_record_exporter
+  [#3988](https://github.com/open-telemetry/opentelemetry-cpp/pull/3988)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
