@@ -1,10 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <grpc/grpc.h>
 #include <grpcpp/support/channel_arguments.h>
 #include <gtest/gtest.h>
 
 #include <cstring>
+#include <string>
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
@@ -40,7 +42,9 @@ class OtlpGrpcClientTestPeer : public ::testing::Test
 public:
   static grpc::ChannelArguments BuildChannelArguments(const OtlpGrpcClientOptions &options)
   {
-    return OtlpGrpcClient::BuildChannelArguments(options);
+    grpc::ChannelArguments grpc_arguments;
+    OtlpGrpcClient::PopulateChannelArguments(options, grpc_arguments);
+    return grpc_arguments;
   }
 };
 

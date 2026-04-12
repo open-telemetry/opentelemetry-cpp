@@ -355,7 +355,8 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
     return nullptr;
   }
 
-  grpc::ChannelArguments grpc_arguments = BuildChannelArguments(options);
+  grpc::ChannelArguments grpc_arguments;
+  PopulateChannelArguments(options, grpc_arguments);
 
   if (options.use_ssl_credentials)
   {
@@ -394,9 +395,11 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
   return channel;
 }
 
-grpc::ChannelArguments OtlpGrpcClient::BuildChannelArguments(const OtlpGrpcClientOptions &options)
+void OtlpGrpcClient::PopulateChannelArguments(const OtlpGrpcClientOptions &options,
+                                              grpc::ChannelArguments &grpc_arguments)
 {
-  grpc::ChannelArguments grpc_arguments;
+  grpc_arguments = grpc::ChannelArguments{};
+
   if (options.channel_arguments != nullptr)
   {
     grpc_arguments = *options.channel_arguments;
@@ -455,8 +458,6 @@ grpc::ChannelArguments OtlpGrpcClient::BuildChannelArguments(const OtlpGrpcClien
     grpc_arguments.SetServiceConfigJSON(service_config);
   }
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
-
-  return grpc_arguments;
 }
 
 std::unique_ptr<grpc::ClientContext> OtlpGrpcClient::MakeClientContext(
