@@ -33,9 +33,16 @@ target_include_directories(
 
 set(OPENTELEMETRY_OTLP_TARGETS opentelemetry_otlp_recordable)
 
-target_link_libraries(opentelemetry_otlp_recordable PUBLIC opentelemetry_logs)
-target_link_libraries(opentelemetry_otlp_recordable
-                      PUBLIC opentelemetry_metrics)
+if(TARGET utf8_range::utf8_validity)
+  target_link_libraries(
+    opentelemetry_otlp_recordable
+    PUBLIC opentelemetry_logs opentelemetry_metrics utf8_range::utf8_validity)
+  target_compile_definitions(opentelemetry_otlp_recordable
+                             PRIVATE ENABLE_OTLP_UTF8_VALIDITY)
+else()
+  target_link_libraries(opentelemetry_otlp_recordable
+                        PUBLIC opentelemetry_logs opentelemetry_metrics)
+endif()
 
 #
 # opentelemetry_exporter_otlp_builder_utils
@@ -57,6 +64,12 @@ target_link_libraries(opentelemetry_exporter_otlp_builder_utils
                       PUBLIC opentelemetry_otlp_recordable)
 
 if(OPENTELEMETRY_INSTALL)
+  if(TARGET opentelemetry_otlp_utf8_validity)
+    opentelemetry_add_pkgconfig(
+      otlp_utf8_validity "OpenTelemetry OTLP - UTF-8 Validity"
+      "OTLP UTF-8 validity implementation for value conversion.")
+  endif()
+
   opentelemetry_add_pkgconfig(
     otlp_recordable
     "OpenTelemetry OTLP - Recordable"
@@ -875,6 +888,10 @@ if(BUILD_TESTING)
   add_executable(otlp_log_recordable_test test/otlp_log_recordable_test.cc)
   target_link_libraries(otlp_log_recordable_test ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable)
+  if(TARGET utf8_range::utf8_validity)
+    target_compile_definitions(otlp_log_recordable_test
+                               PRIVATE ENABLE_OTLP_UTF8_VALIDITY)
+  endif()
   gtest_add_tests(
     TARGET otlp_log_recordable_test
     TEST_PREFIX exporter.otlp.
