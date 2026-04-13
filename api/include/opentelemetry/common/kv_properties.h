@@ -49,67 +49,56 @@ public:
   // @returns true if next kv pair was found, false otherwise.
   bool next(bool &valid_kv, nostd::string_view &key, nostd::string_view &value) noexcept
   {
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-    try
-#endif
+    valid_kv = true;
+    while (index_ < str_.size())
     {
-      valid_kv = true;
-      while (index_ < str_.size())
+      bool is_empty_pair = false;
+      size_t end         = str_.find(opts_.member_separator, index_);
+      if (end == std::string::npos)
       {
-        bool is_empty_pair = false;
-        size_t end         = str_.find(opts_.member_separator, index_);
-        if (end == std::string::npos)
+        end = str_.size() - 1;
+      }
+      else if (end == index_)  // empty pair. do not update end
+      {
+        is_empty_pair = true;
+      }
+      else
+      {
+        end--;
+      }
+
+      auto list_member = StringUtil::Trim(str_, index_, end);
+      if (list_member.size() == 0 || is_empty_pair)
+      {
+        // empty list member
+        index_ = end + 2 - is_empty_pair;
+        if (opts_.ignore_empty_members)
         {
-          end = str_.size() - 1;
-        }
-        else if (end == index_)  // empty pair. do not update end
-        {
-          is_empty_pair = true;
-        }
-        else
-        {
-          end--;
+          continue;
         }
 
-        auto list_member = StringUtil::Trim(str_, index_, end);
-        if (list_member.size() == 0 || is_empty_pair)
-        {
-          // empty list member
-          index_ = end + 2 - is_empty_pair;
-          if (opts_.ignore_empty_members)
-          {
-            continue;
-          }
-
-          valid_kv = true;
-          key      = GetDefaultKeyOrValue();
-          value    = GetDefaultKeyOrValue();
-          return true;
-        }
-
-        auto key_end_pos = list_member.find(opts_.key_value_separator);
-        if (key_end_pos == std::string::npos)
-        {
-          // invalid member
-          valid_kv = false;
-        }
-        else
-        {
-          key   = list_member.substr(0, key_end_pos);
-          value = list_member.substr(key_end_pos + 1);
-        }
-
-        index_ = end + 2;
-
+        valid_kv = true;
+        key      = GetDefaultKeyOrValue();
+        value    = GetDefaultKeyOrValue();
         return true;
       }
+
+      auto key_end_pos = list_member.find(opts_.key_value_separator);
+      if (key_end_pos == std::string::npos)
+      {
+        // invalid member
+        valid_kv = false;
+      }
+      else
+      {
+        key   = list_member.substr(0, key_end_pos);
+        value = list_member.substr(key_end_pos + 1);
+      }
+
+      index_ = end + 2;
+
+      return true;
     }
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-    catch (...)
-    {
-      return false;
-    }
-#endif
 
     // no more entries remaining
     return false;
