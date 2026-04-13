@@ -336,7 +336,6 @@ private:
   std::chrono::system_clock::time_point last_attempt_time_;
 
   // Processed response headers and body
-
   // See CURLINFO_RESPONSE_CODE, type is long
   // NOLINTNEXTLINE(google-runtime-int)
   long response_code_{0};
