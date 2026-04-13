@@ -104,7 +104,14 @@ jobs:
     - name: install dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-    - name: run cmake gcc (maintainer mode, sync)
+    - name: run cmake gcc (maintainer mode, sync, Debug)
+      env:
+        BUILD_TYPE: Debug
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.sync.test
+    - name: run cmake gcc (maintainer mode, sync, Release)
+      env:
+        BUILD_TYPE: Release
       run: |
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
@@ -135,7 +142,14 @@ jobs:
     - name: install dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-    - name: run cmake gcc (maintainer mode, async)
+    - name: run cmake gcc (maintainer mode, async, Debug)
+      env:
+        BUILD_TYPE: Debug
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.async.test
+    - name: run cmake gcc (maintainer mode, async, Release)
+      env:
+        BUILD_TYPE: Release
       run: |
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
