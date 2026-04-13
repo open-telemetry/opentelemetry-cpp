@@ -49,6 +49,9 @@ Increment the:
 * [BAZEL] Add ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW define to otlp_grpc_log_record_exporter
   [#3988](https://github.com/open-telemetry/opentelemetry-cpp/pull/3988)
 
+* [CODE HEALTH] Fix clang-tidy narrowing conversions in baggage
+  [#3989](https://github.com/open-telemetry/opentelemetry-cpp/pull/3989)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
