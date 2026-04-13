@@ -1720,6 +1720,7 @@ ConfigurationParser::ParseComposableProbabilitySamplerConfiguration(
   return model;
 }
 
+// NOLINTBEGIN(misc-no-recursion)
 std::unique_ptr<ComposableParentThresholdSamplerConfiguration>
 ConfigurationParser::ParseComposableParentThresholdSamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node,
@@ -1857,6 +1858,7 @@ ConfigurationParser::ParseComposableSamplerConfiguration(const std::unique_ptr<D
 
   return model;
 }
+// NOLINTEND(misc-no-recursion)
 
 std::unique_ptr<ExtensionSamplerConfiguration>
 ConfigurationParser::ParseSamplerExtensionConfiguration(const std::string &name,
