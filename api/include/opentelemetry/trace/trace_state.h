@@ -54,7 +54,9 @@ public:
    */
   static nostd::shared_ptr<TraceState> FromHeader(nostd::string_view header) noexcept
   {
-    OPENTELEMETRY_TRY
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+#endif
     {
       common::KeyValueStringTokenizer kv_str_tokenizer(header);
       size_t cnt = kv_str_tokenizer.NumTokens();  // upper bound on number of kv pairs
@@ -87,11 +89,12 @@ public:
 
       return ts;
     }
-    OPENTELEMETRY_CATCH_ALL
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    catch (...)
     {
       return GetDefault();
     }
-    OPENTELEMETRY_UNREACHABLE();
+#endif
   }
 
   /**
@@ -125,17 +128,21 @@ public:
    */
   bool Get(nostd::string_view key, std::string &value) const noexcept
   {
-    OPENTELEMETRY_TRY
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+#endif
     {
       if (!IsValidKey(key))
       {
         return false;
       }
     }
-    OPENTELEMETRY_CATCH_ALL
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    catch (...)
     {
       return false;
     }
+#endif
     return kv_properties_->GetValue(key, value);
   }
 
@@ -152,7 +159,9 @@ public:
   nostd::shared_ptr<TraceState> Set(const nostd::string_view &key,
                                     const nostd::string_view &value) noexcept
   {
-    OPENTELEMETRY_TRY
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+#endif
     {
       if (!IsValidKey(key) || !IsValidValue(value))
       {
@@ -178,11 +187,12 @@ public:
       });
       return ts;
     }
-    OPENTELEMETRY_CATCH_ALL
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    catch (...)
     {
       return TraceState::GetDefault();
     }
-    OPENTELEMETRY_UNREACHABLE();
+#endif
   }
 
   /**
@@ -193,7 +203,9 @@ public:
    */
   nostd::shared_ptr<TraceState> Delete(const nostd::string_view &key) noexcept
   {
-    OPENTELEMETRY_TRY
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+#endif
     {
       if (!IsValidKey(key))
       {
@@ -217,11 +229,12 @@ public:
           });
       return ts;
     }
-    OPENTELEMETRY_CATCH_ALL
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    catch (...)
     {
       return TraceState::GetDefault();
     }
-    OPENTELEMETRY_UNREACHABLE();
+#endif
   }
 
   // Returns true if there are no keys, false otherwise.

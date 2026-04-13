@@ -14,7 +14,9 @@ namespace detail
 {
 inline void CopyErrorMessage(const char *source, std::string &destination) noexcept
 {
-  OPENTELEMETRY_TRY
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+#endif
   {
     if (source == nullptr)
     {
@@ -22,10 +24,12 @@ inline void CopyErrorMessage(const char *source, std::string &destination) noexc
     }
     destination.assign(source);
   }
-  OPENTELEMETRY_CATCH_ALL
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  catch (...)
   {
     return;
   }
+#endif
 }
 }  // namespace detail
 }  // namespace plugin

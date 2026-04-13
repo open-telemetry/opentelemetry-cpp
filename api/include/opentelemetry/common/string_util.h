@@ -26,15 +26,18 @@ public:
     {
       right--;
     }
-    OPENTELEMETRY_TRY
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+#endif
     {
       return str.substr(left, 1 + right - left);
     }
-    OPENTELEMETRY_CATCH_ALL
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    catch (...)
     {
       return nostd::string_view();
     }
-    OPENTELEMETRY_UNREACHABLE();
+#endif
   }
 
   static nostd::string_view Trim(nostd::string_view str) noexcept

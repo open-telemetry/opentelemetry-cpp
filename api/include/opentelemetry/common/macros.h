@@ -420,44 +420,6 @@ point.
 #  define OPENTELEMETRY_HAVE_EXCEPTIONS 0
 #endif
 
-// Exception handling macros
-//
-// When exceptions are enabled, expands to real try/catch.
-// When exceptions are disabled, expands to if(true)/else-if(false)
-//
-// Usage:
-//   bool NoexceptMethod() noexcept
-//   {
-//     OPENTELEMETRY_TRY
-//     {
-//       return ThrowingMethod();
-//     }
-//     OPENTELEMETRY_CATCH_ALL
-//     {
-//       return false;
-//     }
-//   }
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-#  define OPENTELEMETRY_TRY try
-#  define OPENTELEMETRY_CATCH_ALL catch (...)
-#else
-#  define OPENTELEMETRY_TRY if (true)
-#  define OPENTELEMETRY_CATCH_ALL else
-#endif
-
-// Marks a path as unreachable
-#if defined(__cpp_lib_unreachable) && (__cpp_lib_unreachable >= 202202L)
-#  include <utility>
-#  define OPENTELEMETRY_UNREACHABLE() std::unreachable()
-#elif OPENTELEMETRY_HAVE_BUILTIN(__builtin_unreachable)
-#  define OPENTELEMETRY_UNREACHABLE() __builtin_unreachable()
-#elif defined(_MSC_VER)
-#  define OPENTELEMETRY_UNREACHABLE() __assume(0)
-#else
-#  include <cstdlib>
-#  define OPENTELEMETRY_UNREACHABLE() abort()
-#endif
-
 /*
    OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND indicates that a resource owned by a function
    parameter or implicit object parameter is retained by the return value of the
