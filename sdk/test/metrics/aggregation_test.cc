@@ -3,6 +3,7 @@
 
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include <gtest/gtest.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <limits>
 #include <string>
