@@ -37,14 +37,20 @@ Increment the:
 * [CODE HEALTH] Cleanup nostd variant access in API and SDK
   [#3965](https://github.com/open-telemetry/opentelemetry-cpp/pull/3965)
 
-* [CODE HEALTH] Fix clang-tidy narrowing conversions in baggage
-  [#3989](https://github.com/open-telemetry/opentelemetry-cpp/pull/3989)
+* [CODE HEALTH] Fix clang-tidy misc-use-internal-linkage warnings
+  [#3985](https://github.com/open-telemetry/opentelemetry-cpp/pull/3985)
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
   [#3953](https://github.com/open-telemetry/opentelemetry-cpp/pull/3953)
 
 * Enable WITH_OTLP_GRPC_SSL_MTLS_PREVIEW by default
   [#3970](https://github.com/open-telemetry/opentelemetry-cpp/pull/3970)
+
+* [BAZEL] Add ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW define to otlp_grpc_log_record_exporter
+  [#3988](https://github.com/open-telemetry/opentelemetry-cpp/pull/3988)
+
+* [CODE HEALTH] Fix clang-tidy narrowing conversions in baggage
+  [#3989](https://github.com/open-telemetry/opentelemetry-cpp/pull/3989)
 
 Important changes:
 
