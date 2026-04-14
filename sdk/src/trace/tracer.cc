@@ -66,28 +66,27 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
   // make sure to always overwrite this parent_context
   bool get_current_context = true;
   opentelemetry::trace::SpanContext parent_context(false, false);
-  if (nostd::holds_alternative<opentelemetry::trace::SpanContext>(options.parent))
+  if (const opentelemetry::trace::SpanContext *span_context =
+          nostd::get_if<opentelemetry::trace::SpanContext>(&options.parent))
   {
-    auto span_context = nostd::get<opentelemetry::trace::SpanContext>(options.parent);
-    if (span_context.IsValid())
+    if (span_context->IsValid())
     {
-      parent_context      = span_context;
+      parent_context      = *span_context;
       get_current_context = false;
     }
   }
-  else if (nostd::holds_alternative<context::Context>(options.parent))
+  else if (const context::Context *context = nostd::get_if<context::Context>(&options.parent))
   {
-    auto context = nostd::get<context::Context>(options.parent);
     // fetch span context from parent span stored in the context
-    auto span_context = opentelemetry::trace::GetSpan(context)->GetContext();
-    if (span_context.IsValid())
+    auto parent_span_context = opentelemetry::trace::GetSpan(*context)->GetContext();
+    if (parent_span_context.IsValid())
     {
-      parent_context      = span_context;
+      parent_context      = parent_span_context;
       get_current_context = false;
     }
     else
     {
-      if (opentelemetry::trace::IsRootSpan(context))
+      if (opentelemetry::trace::IsRootSpan(*context))
       {
         get_current_context = false;
       }

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <chrono>
+#include <cstdint>
 #include <cstring>
 #include <map>
 #include <memory>
@@ -67,7 +68,7 @@ namespace http
 namespace client
 {
 
-enum class Method
+enum class Method : std::uint8_t
 {
   Get,
   Post,
@@ -78,7 +79,7 @@ enum class Method
   Delete
 };
 
-enum class SessionState
+enum class SessionState : std::uint8_t
 {
   CreateFailed,        // session create failed
   Created,             // session created
@@ -97,7 +98,7 @@ enum class SessionState
   Cancelled            // (manually) cancelled
 };
 
-enum class Compression
+enum class Compression : std::uint8_t
 {
   kNone,
   kGzip
@@ -134,8 +135,7 @@ struct HttpSslOptions
                  nostd::string_view input_ssl_max_tls,
                  nostd::string_view input_ssl_cipher,
                  nostd::string_view input_ssl_cipher_suite)
-      : use_ssl(false),
-        ssl_insecure_skip_verify(input_ssl_insecure_skip_verify),
+      : ssl_insecure_skip_verify(input_ssl_insecure_skip_verify),
         ssl_ca_cert_path(input_ssl_ca_cert_path),
         ssl_ca_cert_string(input_ssl_ca_cert_string),
         ssl_client_key_path(input_ssl_client_key_path),

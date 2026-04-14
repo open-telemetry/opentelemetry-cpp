@@ -29,6 +29,11 @@ public:
     stream_.rdbuf(captured_.rdbuf());
   }
 
+  OStreamCapture(const OStreamCapture &)            = delete;
+  OStreamCapture(OStreamCapture &&)                 = delete;
+  OStreamCapture &operator=(const OStreamCapture &) = delete;
+  OStreamCapture &operator=(OStreamCapture &&)      = delete;
+
   ~OStreamCapture() { stream_.rdbuf(buf_); }
 
   /**

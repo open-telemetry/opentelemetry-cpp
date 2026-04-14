@@ -42,9 +42,7 @@ using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
 
-using grpc_example::Greeter;
-using grpc_example::GreetRequest;
-using grpc_example::GreetResponse;
+using namespace grpc_example;
 
 namespace
 {

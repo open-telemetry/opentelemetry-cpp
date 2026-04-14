@@ -1256,7 +1256,8 @@ private:
         strerror_s(error_message, sizeof(error_message) - 1, error_code);
 #else
         char error_message[256] = {0};
-        strerror_r(error_code, error_message, sizeof(error_message) - 1);
+        OPENTELEMETRY_MAYBE_UNUSED auto strerror_r_result =
+            strerror_r(error_code, error_message, sizeof(error_message) - 1);
 #endif
         OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Create directory \""
                                 << directory_name << "\" failed.errno: " << error_code
@@ -1612,9 +1613,7 @@ private:
 
 OtlpFileClient::OtlpFileClient(OtlpFileClientOptions &&options,
                                OtlpFileClientRuntimeOptions &&runtime_options)
-    : is_shutdown_(false),
-      options_{std::move(options)},
-      runtime_options_{std::move(runtime_options)}
+    : options_{std::move(options)}, runtime_options_{std::move(runtime_options)}
 {
   if (nostd::holds_alternative<OtlpFileClientFileSystemOptions>(options_.backend_options))
   {

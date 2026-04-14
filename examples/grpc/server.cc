@@ -44,12 +44,7 @@ using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
 
-using grpc_example::Greeter;
-using grpc_example::GreetRequest;
-using grpc_example::GreetResponse;
-
-using Span        = opentelemetry::trace::Span;
-using SpanContext = opentelemetry::trace::SpanContext;
+using namespace grpc_example;
 using namespace opentelemetry::trace;
 
 namespace context = opentelemetry::context;

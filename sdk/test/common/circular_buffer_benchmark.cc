@@ -55,7 +55,7 @@ static uint64_t ConsumeBufferNumbers(CircularBuffer<uint64_t> &buffer) noexcept
 template <class Buffer>
 static void GenerateNumbersForThread(Buffer &buffer, int n, std::atomic<uint64_t> &sum) noexcept
 {
-  thread_local std::mt19937_64 random_number_generator{std::random_device{}()};
+  static thread_local std::mt19937_64 random_number_generator{std::random_device{}()};
   for (int i = 0; i < n; ++i)
   {
     auto x = random_number_generator();
