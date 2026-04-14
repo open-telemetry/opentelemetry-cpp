@@ -55,6 +55,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy narrowing conversions in baggage
   [#3989](https://github.com/open-telemetry/opentelemetry-cpp/pull/3989)
 
+* [EXAMPLE] Add explicit_parent example
+  [#3935](https://github.com/open-telemetry/opentelemetry-cpp/pull/3935)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
