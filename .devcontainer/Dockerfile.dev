@@ -8,10 +8,10 @@ ARG USER_GID=1000
 ARG INSTALL_PACKAGES=
 
 ARG CXX_STANDARD=17
-ARG BUILD_TYPE=RelWithDebInfo
+ARG THIRD_PARTY_BUILD_TYPE=Release
 
 ENV CXX_STANDARD=${CXX_STANDARD}
-ENV BUILD_TYPE=${BUILD_TYPE}
+ENV THIRD_PARTY_BUILD_TYPE=${THIRD_PARTY_BUILD_TYPE}
 
 COPY ci /opt/ci
 
@@ -52,7 +52,7 @@ RUN apt install -y npm && npm install -g markdownlint-cli@0.44.0
 USER devuser
 
 WORKDIR  /workspaces/opentelemetry-cpp
-RUN cd /opt && CMAKE_BUILD_TYPE=Release bash ci/install_thirdparty.sh --install-dir /home/devuser/third-party/install --tags-file third_party_release
+RUN cd /opt && bash ci/install_thirdparty.sh --install-dir /home/devuser/third-party/install --build-type ${THIRD_PARTY_BUILD_TYPE} --tags-file third_party_release
 ENV CMAKE_PREFIX_PATH=/home/devuser/third-party/install
 
 ENTRYPOINT []
