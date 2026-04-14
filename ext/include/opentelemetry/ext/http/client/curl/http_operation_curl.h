@@ -294,6 +294,8 @@ private:
     return SetCurlPtrOption(option, list);
   }
 
+  // Curl parameter must really be a long
+  // NOLINTNEXTLINE(google-runtime-int)
   CURLcode SetCurlLongOption(CURLoption option, long value);
 
   CURLcode SetCurlOffOption(CURLoption option, curl_off_t value);
@@ -334,6 +336,8 @@ private:
   std::chrono::system_clock::time_point last_attempt_time_;
 
   // Processed response headers and body
+  // See CURLINFO_RESPONSE_CODE, type is long
+  // NOLINTNEXTLINE(google-runtime-int)
   long response_code_{0};
   std::vector<uint8_t> response_headers_;
   std::vector<uint8_t> response_body_;

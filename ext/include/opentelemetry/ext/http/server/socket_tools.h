@@ -52,10 +52,6 @@
 
 #endif
 
-#ifndef _Out_cap_
-#  define _Out_cap_(size)
-#endif
-
 #if defined(HAVE_CONSOLE_LOG) && !defined(LOG_DEBUG)
 // Log to console if there's no standard log facility defined
 #  include <cstdio>
@@ -336,7 +332,7 @@ struct Socket
     m_sock = Invalid;
   }
 
-  int recv(_Out_cap_(size) void *buffer, unsigned size)
+  int recv(void *buffer, unsigned size)
   {
     assert(m_sock != Invalid);
     int flags = 0;
