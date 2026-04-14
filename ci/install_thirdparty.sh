@@ -6,10 +6,11 @@
 set -e
 
 usage() {
-    echo "Usage: $0 --install-dir <path> [--tags-file <file>] [--packages \"<pkg1>;<pkg2>\"]"
+    echo "Usage: $0 --install-dir <path> [--tags-file <file>] [--packages \"<pkg1>;<pkg2>\"] [--build-type <type>]"
     echo "  --install-dir <path>          Path where third-party packages will be installed (required)"
     echo "  --tags-file <file>            File containing tags for third-party packages (optional)"
     echo "  --packages \"<pkg1>;<pkg2>;...\"  Semicolon-separated list of packages to build (optional). Default installs all third-party packages."
+    echo "  --build-type <type>           Build type for third-party packages (optional). Valid: Debug|Release|RelWithDebInfo|MinSizeRel. Default: Release"
     echo "  -h, --help                    Show this help message"
 }
 
@@ -17,6 +18,7 @@ THIRDPARTY_TAGS_FILE=""
 THIRDPARTY_PACKAGES=""
 SRC_DIR="$(pwd)"
 THIRDPARTY_INSTALL_DIR=""
+BUILD_TYPE=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -45,6 +47,15 @@ while [[ $# -gt 0 ]]; do
                 exit 1
             fi
             THIRDPARTY_PACKAGES="$2"
+            shift 2
+            ;;
+        --build-type)
+            if [ -z "$2" ] || [[ "$2" == --* ]]; then
+                echo "Error: --build-type requires a value" >&2
+                usage
+                exit 1
+            fi
+            BUILD_TYPE="$2"
             shift 2
             ;;
         -h|--help)
@@ -113,3 +124,4 @@ echo "-- THIRDPARTY_TAGS_FILE: ${THIRDPARTY_TAGS_FILE}"
 echo "-- THIRDPARTY_PACKAGES: ${THIRDPARTY_PACKAGES:-all}"
 echo "-- CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}"
 echo "-- CXX_STANDARD: ${CXX_STANDARD}"
+echo "-- CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}"
