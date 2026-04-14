@@ -153,7 +153,6 @@ private:
    * Add a target_info metric to collect resource attributes
    */
   static void SetTarget(const sdk::metrics::ResourceMetrics &data,
-                        std::chrono::nanoseconds time,
                         const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
                         std::vector<::prometheus::MetricFamily> *output);
 
@@ -166,7 +165,6 @@ private:
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
                       const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
                       ::prometheus::MetricType type,
-                      std::chrono::nanoseconds time,
                       ::prometheus::MetricFamily *metric_family,
                       const opentelemetry::sdk::resource::Resource *resource);
 
@@ -180,7 +178,6 @@ private:
                       const std::vector<uint64_t> &counts,
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
                       const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
-                      std::chrono::nanoseconds time,
                       ::prometheus::MetricFamily *metric_family,
                       const opentelemetry::sdk::resource::Resource *resource);
 
@@ -190,7 +187,6 @@ private:
   static void SetMetricBasic(
       ::prometheus::ClientMetric &metric,
       const opentelemetry::sdk::metrics::PointAttributes &labels,
-      std::chrono::nanoseconds time,
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
       const opentelemetry::sdk::resource::Resource *resource);
 

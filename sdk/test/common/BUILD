@@ -6,6 +6,18 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 cc_test(
+    name = "wildcard_match_test",
+    srcs = [
+        "wildcard_match_test.cc",
+    ],
+    tags = ["test"],
+    deps = [
+        "//sdk/src/common:wildcard_match",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "random_test",
     srcs = [
         "random_test.cc",
@@ -88,6 +100,19 @@ cc_test(
 )
 
 cc_test(
+    name = "circular_buffer_test",
+    srcs = [
+        "circular_buffer_test.cc",
+    ],
+    tags = ["test"],
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "random_fork_test",
     srcs = [
         "random_fork_test.cc",
@@ -131,6 +156,7 @@ cc_test(
     deps = [
         "//api",
         "//sdk:headers",
+        "//sdk/src/common:empty_attributes",
         "@com_google_googletest//:gtest_main",
     ],
 )
