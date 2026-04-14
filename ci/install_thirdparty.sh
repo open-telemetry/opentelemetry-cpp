@@ -83,6 +83,9 @@ fi
 if [[ "${BUILD_TYPE}" =~ ^(Debug|Release|RelWithDebInfo|MinSizeRel)$ ]]; then
     CMAKE_BUILD_TYPE="${BUILD_TYPE}"
 else
+    if [ -n "${BUILD_TYPE}" ]; then
+        echo "Warning: invalid --build-type '${BUILD_TYPE}', defaulting to Release" >&2
+    fi
     CMAKE_BUILD_TYPE=Release
 fi
 
@@ -95,11 +98,13 @@ CMAKE_OPTIONS=(
    "-DOTELCPP_PROTO_PATH=${OTELCPP_PROTO_PATH}"
    "-DOTELCPP_THIRDPARTY_INSTALL_LIST=${THIRDPARTY_PACKAGES}"
 )
-CMAKE_BUILD_ARGS=(--clean-first --parallel "$(nproc)")
+CMAKE_BUILD_ARGS=(--clean-first --parallel)
 
-if [[ "${OTELCPP_CMAKE_VERBOSE_BUILD:-OFF}" =~ ^(1|ON|on|TRUE|true|YES|yes)$ ]]; then
+shopt -s nocasematch
+if [[ "${OTELCPP_CMAKE_VERBOSE_BUILD:-OFF}" =~ ^(1|ON|TRUE|YES)$ ]]; then
     CMAKE_BUILD_ARGS+=(--verbose)
 fi
+shopt -u nocasematch
 
 if command -v ninja >/dev/null 2>&1; then
     CMAKE_OPTIONS+=("-G" "Ninja")
