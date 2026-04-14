@@ -95,7 +95,7 @@ TEST(HistogramStress, UnsignedInt64)
   //
   // Start logging threads
   //
-  int record_thread_count = std::thread::hardware_concurrency() - 1;
+  int record_thread_count = static_cast<int>(std::thread::hardware_concurrency()) - 1;
   if (record_thread_count <= 0)
   {
     record_thread_count = 1;
@@ -160,12 +160,12 @@ TEST(HistogramStress, UnsignedInt64)
     int64_t collected_bucket_sum = 0;
     for (const auto &count : actual.counts_)
     {
-      collected_bucket_sum += count;
+      collected_bucket_sum += static_cast<int64_t>(count);
     }
     ASSERT_EQ(collected_bucket_sum, actual.count_);
 
     collected_sum += opentelemetry::nostd::get<int64_t>(actual.sum_);
-    collected_count += actual.count_;
+    collected_count += static_cast<int64_t>(actual.count_);
   }
 
   ASSERT_EQ(expected_count, collected_count);

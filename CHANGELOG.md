@@ -40,6 +40,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy misc-use-internal-linkage warnings
   [#3985](https://github.com/open-telemetry/opentelemetry-cpp/pull/3985)
 
+* [CODE HEALTH] Fix clang-tidy narrowing-conversions warnings in tests
+  [#3987](https://github.com/open-telemetry/opentelemetry-cpp/pull/3987)
+
 * Enable WITH_OTLP_RETRY_PREVIEW by default
   [#3953](https://github.com/open-telemetry/opentelemetry-cpp/pull/3953)
 
