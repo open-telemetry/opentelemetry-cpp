@@ -31,14 +31,13 @@ markdownlint .
 shellcheck --severity=error <path to shell script>.sh
 ```
 
-### Testing 
+### Testing
+
 ```sh
 ./ci/do_ci.sh cmake.maintainer.sync.test
 ./ci/do_ci.sh cmake.c++20.stl.test
 ./ci/run_docker.sh ./ci/do_ci.sh bazel.test
 ```
-
-
 
 ## Build configuration
 

@@ -360,6 +360,15 @@ if(WITH_OPENTRACING)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/opentracing-cpp.cmake")
 endif()
 
+include(CTest)
+if(BUILD_TESTING)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/googletest.cmake")
+  enable_testing()
+  if(WITH_BENCHMARK)
+    include("${opentelemetry-cpp_SOURCE_DIR}/cmake/benchmark.cmake")
+  endif()
+endif()
+
 if(OTELCPP_MAINTAINER_MODE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     message(STATUS "Building with gcc in maintainer mode.")
@@ -452,15 +461,6 @@ if(OTELCPP_MAINTAINER_MODE)
 endif(OTELCPP_MAINTAINER_MODE)
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
-
-include(CTest)
-if(BUILD_TESTING)
-  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/googletest.cmake")
-  enable_testing()
-  if(WITH_BENCHMARK)
-    include("${opentelemetry-cpp_SOURCE_DIR}/cmake/benchmark.cmake")
-  endif()
-endif()
 
 # Record build config and versions
 message(STATUS "---------------------------------------------")

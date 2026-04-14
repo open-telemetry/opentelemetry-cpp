@@ -87,7 +87,7 @@ fi
 CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD_REQUIRED=ON")
 CMAKE_OPTIONS+=("-DCMAKE_CXX_EXTENSIONS=OFF")
 
-CMAKE_BUILD_ARGS=(--parallel "$(nproc)")
+CMAKE_BUILD_ARGS=(--parallel)
 
 if [[ "${OTELCPP_CMAKE_VERBOSE_BUILD:-OFF}" =~ ^(1|ON|on|TRUE|true|YES|yes)$ ]]; then
   CMAKE_BUILD_ARGS+=(--verbose)
