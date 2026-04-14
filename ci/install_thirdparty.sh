@@ -69,20 +69,39 @@ if [ -z "${CXX_STANDARD}" ]; then
     CXX_STANDARD=17
 fi
 
+if [[ "${BUILD_TYPE}" =~ ^(Debug|Release|RelWithDebInfo|MinSizeRel)$ ]]; then
+    CMAKE_BUILD_TYPE="${BUILD_TYPE}"
+else
+    CMAKE_BUILD_TYPE=Release
+fi
+
 THIRDPARTY_BUILD_DIR="/tmp/otel-cpp-third-party-build"
+CMAKE_OPTIONS=(
+   "-DCMAKE_INSTALL_PREFIX=${THIRDPARTY_INSTALL_DIR}"
+   "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+   "-DCMAKE_CXX_STANDARD=${CXX_STANDARD}"
+   "-DOTELCPP_THIRDPARTY_TAGS_FILE=${THIRDPARTY_TAGS_FILE}"
+   "-DOTELCPP_PROTO_PATH=${OTELCPP_PROTO_PATH}"
+   "-DOTELCPP_THIRDPARTY_INSTALL_LIST=${THIRDPARTY_PACKAGES}"
+)
+CMAKE_BUILD_ARGS=(--clean-first --parallel "$(nproc)")
+
+if [[ "${OTELCPP_CMAKE_VERBOSE_BUILD:-OFF}" =~ ^(1|ON|on|TRUE|true|YES|yes)$ ]]; then
+    CMAKE_BUILD_ARGS+=(--verbose)
+fi
+
+if command -v ninja >/dev/null 2>&1; then
+    CMAKE_OPTIONS+=("-G" "Ninja")
+fi
 
 if [ -d "${THIRDPARTY_BUILD_DIR}" ]; then
     rm -rf "${THIRDPARTY_BUILD_DIR}"
 fi
 
 cmake -S "${SRC_DIR}/install/cmake" -B "${THIRDPARTY_BUILD_DIR}" \
-   "-DCMAKE_INSTALL_PREFIX=${THIRDPARTY_INSTALL_DIR}" \
-   "-DCMAKE_CXX_STANDARD=${CXX_STANDARD}" \
-   "-DOTELCPP_THIRDPARTY_TAGS_FILE=${THIRDPARTY_TAGS_FILE}" \
-   "-DOTELCPP_PROTO_PATH=${OTELCPP_PROTO_PATH}" \
-   "-DOTELCPP_THIRDPARTY_INSTALL_LIST=${THIRDPARTY_PACKAGES}"
+    "${CMAKE_OPTIONS[@]}"
 
-cmake --build "${THIRDPARTY_BUILD_DIR}" --clean-first -j"$(nproc)"
+cmake --build "${THIRDPARTY_BUILD_DIR}" "${CMAKE_BUILD_ARGS[@]}"
 
 if [ "${THIRDPARTY_INSTALL_DIR}" = "/usr/local" ]; then
   ldconfig
@@ -92,4 +111,5 @@ echo "Third-party packages installed successfully."
 echo "-- THIRDPARTY_INSTALL_DIR: ${THIRDPARTY_INSTALL_DIR}"
 echo "-- THIRDPARTY_TAGS_FILE: ${THIRDPARTY_TAGS_FILE}"
 echo "-- THIRDPARTY_PACKAGES: ${THIRDPARTY_PACKAGES:-all}"
+echo "-- CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}"
 echo "-- CXX_STANDARD: ${CXX_STANDARD}"
