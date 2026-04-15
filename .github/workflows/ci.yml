@@ -1093,6 +1093,9 @@ jobs:
         CXX: /usr/bin/g++-13
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+    - name: install dependencies
+      run: |
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run tests and generate report
       env:
         CC: /usr/bin/gcc-13
