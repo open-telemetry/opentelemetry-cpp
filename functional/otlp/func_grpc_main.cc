@@ -353,7 +353,7 @@ static const test_case all_tests[] = {{"basic", test_basic},
 #endif  // ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
                                       {"", nullptr}};
 
-void list_test_cases()
+static void list_test_cases()
 {
   const test_case *current = all_tests;
 
