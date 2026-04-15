@@ -1077,7 +1077,7 @@ jobs:
 
   code_coverage:
     name: Code coverage
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
@@ -1089,14 +1089,14 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-13
+        CXX: /usr/bin/g++-13
       run: |
         sudo -E ./ci/setup_ci_environment.sh
     - name: run tests and generate report
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-13
+        CXX: /usr/bin/g++-13
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
       uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0

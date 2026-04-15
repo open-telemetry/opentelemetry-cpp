@@ -655,13 +655,27 @@ elif [[ "$1" == "code.coverage" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_FLAGS="-Werror --coverage $CXXFLAGS" \
+        -C "${SRC_DIR}/test_common/cmake/all-options-abiv2-preview.cmake" \
+        -DWITH_EXAMPLES=OFF \
+        -DWITH_EXAMPLES_HTTP=OFF \
+        -DWITH_BENCHMARK=OFF \
         "${SRC_DIR}"
-  make
-  make test
-  lcov --directory $PWD --capture --output-file coverage.info
-  # removing test http server coverage from the total coverage. We don't use this server completely.
-  lcov --remove coverage.info '*/ext/http/server/*'> tmp_coverage.info 2>/dev/null
-  cp tmp_coverage.info coverage.info
+  cmake --build "${BUILD_DIR}" --parallel
+  ctest --output-on-failure
+
+  lcov --directory "$PWD" --capture \
+  --include "${SRC_DIR}/*" \
+  --exclude "${SRC_DIR}/third_party/*" \
+  --exclude "${SRC_DIR}/test_common/*" \
+  --exclude "${SRC_DIR}/*/test/*" \
+  --exclude "${SRC_DIR}/functional/*" \
+  --exclude "${SRC_DIR}/semconv/*" \
+  --exclude "${SRC_DIR}/examples/*" \
+  --ignore-errors gcov,mismatch,negative,unused \
+  --output-file coverage.info
+
+  echo "Code coverage output file generated at ${BUILD_DIR}/coverage.info. To generate an HTML report run:"
+  echo "genhtml ${BUILD_DIR}/coverage.info -o coverage_html"
   exit 0
 elif [[ "$1" == "third_party.tags" ]]; then
   echo "gRPC=v1.49.2" > third_party_release
