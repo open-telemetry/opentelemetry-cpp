@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include <stdint.h>
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <initializer_list>  // IWYU pragma: keep
@@ -95,7 +96,10 @@ TEST(HistogramStress, UnsignedInt64)
   //
   // Start logging threads
   //
-  int record_thread_count = static_cast<int>(std::thread::hardware_concurrency()) - 1;
+
+  constexpr int kMaxStressThreads = 4;
+  int record_thread_count =
+      (std::min)(static_cast<int>(std::thread::hardware_concurrency()) - 1, kMaxStressThreads);
   if (record_thread_count <= 0)
   {
     record_thread_count = 1;
