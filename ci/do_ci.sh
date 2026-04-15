@@ -660,7 +660,7 @@ elif [[ "$1" == "code.coverage" ]]; then
         -DWITH_EXAMPLES_HTTP=OFF \
         -DWITH_BENCHMARK=OFF \
         "${SRC_DIR}"
-  cmake --build "${BUILD_DIR}" --parallel
+  cmake --build "${BUILD_DIR}" --parallel 2
   ctest --output-on-failure
 
   lcov --directory "$PWD" --capture \
