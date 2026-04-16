@@ -8,8 +8,10 @@ ARG USER_GID=1000
 ARG INSTALL_PACKAGES=
 
 ARG CXX_STANDARD=17
+ARG THIRD_PARTY_BUILD_TYPE=Release
 
 ENV CXX_STANDARD=${CXX_STANDARD}
+ENV THIRD_PARTY_BUILD_TYPE=${THIRD_PARTY_BUILD_TYPE}
 
 COPY ci /opt/ci
 
@@ -42,6 +44,7 @@ ENV USER_GID=${USER_GID}
 ENV IS_CONTAINER_BUILD=true
 
 COPY install /opt/install
+COPY third_party_release /opt/third_party_release
 COPY ./.devcontainer/customize_container.sh /tmp/opentelemetry_cpp/devcontainer/customize_container.sh
 RUN /tmp/opentelemetry_cpp/devcontainer/customize_container.sh
 RUN apt install -y npm && npm install -g markdownlint-cli@0.44.0
@@ -49,8 +52,8 @@ RUN apt install -y npm && npm install -g markdownlint-cli@0.44.0
 USER devuser
 
 WORKDIR  /workspaces/opentelemetry-cpp
-RUN cd /opt && bash ci/install_thirdparty.sh --install-dir /home/devuser/third-party/install-stable --tags-file install/cmake/third_party_stable
-ENV CMAKE_PREFIX_PATH=/home/devuser/third-party/install-stable
+RUN cd /opt && bash ci/install_thirdparty.sh --install-dir /home/devuser/third-party/install --build-type ${THIRD_PARTY_BUILD_TYPE} --tags-file third_party_release
+ENV CMAKE_PREFIX_PATH=/home/devuser/third-party/install
 
 ENTRYPOINT []
 
