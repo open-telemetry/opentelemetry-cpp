@@ -36,6 +36,8 @@ public:
                                 const PeriodicExportingMetricReaderOptions &options,
                                 const PeriodicExportingMetricReaderRuntimeOptions &runtime_options);
 
+  ~PeriodicExportingMetricReader() override;
+
   AggregationTemporality GetAggregationTemporality(
       InstrumentType instrument_type) const noexcept override;
 
