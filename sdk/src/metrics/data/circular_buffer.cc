@@ -83,13 +83,16 @@ struct AdaptingIntegerArrayCopy
 
 void AdaptingIntegerArray::Increment(size_t index, uint64_t count)
 {
+  /* May or may not fit */
   const uint64_t result = nostd::visit(AdaptingIntegerArrayIncrement{index, count}, backing_);
   if OPENTELEMETRY_LIKELY_CONDITION (result == 0)
   {
     return;
   }
   EnlargeToFit(result);
-  Increment(index, count);
+  /* Must fit, buffer was enlarged for the value to store */
+  const uint64_t result2 = nostd::visit(AdaptingIntegerArrayIncrement{index, count}, backing_);
+  assert(result2 == 0);
 }
 
 uint64_t AdaptingIntegerArray::Get(size_t index) const
