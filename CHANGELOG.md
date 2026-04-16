@@ -61,6 +61,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy warnings in base2 exponential histogram aggregation
   [#3997](https://github.com/open-telemetry/opentelemetry-cpp/pull/3997)
 
+* [CODE HEALTH] Fix cland-tidy misc-no-recursion warnings
+  [#4009](https://github.com/open-telemetry/opentelemetry-cpp/pull/4009)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
