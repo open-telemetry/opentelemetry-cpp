@@ -97,8 +97,7 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
   }
 
   std::unique_ptr<instrumentationscope::InstrumentationScope> lib =
-      instrumentationscope::InstrumentationScope::Create(name, version, schema_url,
-                                                         attributes);
+      instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attributes);
 
   loggers_.push_back(std::shared_ptr<opentelemetry::sdk::logs::Logger>(
       new Logger(logger_name, context_, std::move(lib))));
