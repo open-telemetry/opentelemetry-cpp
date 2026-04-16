@@ -1039,6 +1039,8 @@ tracer_provider:
   sampler:
     composite/development:
       parent_threshold:
+        root:
+          always_on:
 )";
 
   auto config = DoParse(yaml);

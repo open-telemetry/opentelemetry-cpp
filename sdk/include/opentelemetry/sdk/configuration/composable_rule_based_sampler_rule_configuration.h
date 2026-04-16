@@ -17,11 +17,19 @@ class ComposableRuleBasedSamplerRuleConfiguration
 {
 public:
   ComposableRuleBasedSamplerRuleConfiguration() = default;
-
   std::unique_ptr<ComposableRuleBasedSamplerRuleAttributeValuesConfiguration> attribute_values;
   std::unique_ptr<ComposableRuleBasedSamplerRuleAttributePatternsConfiguration> attribute_patterns;
-  std::vector<std::string> parent;
-  std::vector<std::string> span_kinds;
+
+  bool match_parent_none{false};
+  bool match_parent_remote{false};
+  bool match_parent_local{false};
+
+  bool match_span_kind_internal{false};
+  bool match_span_kind_server{false};
+  bool match_span_kind_client{false};
+  bool match_span_kind_producer{false};
+  bool match_span_kind_consumer{false};
+
   std::unique_ptr<SamplerConfiguration> sampler;
 };
 }  // namespace configuration

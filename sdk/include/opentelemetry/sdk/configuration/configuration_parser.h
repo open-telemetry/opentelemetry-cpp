@@ -335,11 +335,23 @@ public:
   ParseComposableParentThresholdSamplerConfiguration(const std::unique_ptr<DocumentNode> &node,
                                                      size_t depth) const;
 
+  std::unique_ptr<ComposableRuleBasedSamplerRuleAttributeValuesConfiguration>
+  ParseComposableRuleBasedSamplerRuleAttributeValuesConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  std::unique_ptr<ComposableRuleBasedSamplerRuleAttributePatternsConfiguration>
+  ParseComposableRuleBasedSamplerRuleAttributePatternsConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  std::unique_ptr<ComposableRuleBasedSamplerRuleConfiguration>
+  ParseComposableRuleBasedSamplerRuleConfiguration(const std::unique_ptr<DocumentNode> &node,
+                                                   size_t depth) const;
+
   std::unique_ptr<ComposableRuleBasedSamplerConfiguration>
   ParseComposableRuleBasedSamplerConfiguration(const std::unique_ptr<DocumentNode> &node,
                                                size_t depth) const;
 
-  std::unique_ptr<ComposableSamplerConfiguration> ParseComposableSamplerConfiguration(
+  std::unique_ptr<SamplerConfiguration> ParseComposableSamplerConfiguration(
       const std::unique_ptr<DocumentNode> &node,
       size_t depth) const;
 

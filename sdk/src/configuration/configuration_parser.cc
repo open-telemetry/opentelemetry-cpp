@@ -1727,14 +1727,120 @@ ConfigurationParser::ParseComposableParentThresholdSamplerConfiguration(
     size_t depth) const
 {
   auto model = std::make_unique<ComposableParentThresholdSamplerConfiguration>();
-  std::unique_ptr<DocumentNode> child;
 
-  child = node->GetChildNode("root");
-  if (child)
+  std::unique_ptr<DocumentNode> child = node->GetRequiredChildNode("root");
+  model->root                         = ParseComposableSamplerConfiguration(child, depth + 1);
+
+  return model;
+}
+
+std::unique_ptr<ComposableRuleBasedSamplerRuleAttributeValuesConfiguration>
+ConfigurationParser::ParseComposableRuleBasedSamplerRuleAttributeValuesConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<ComposableRuleBasedSamplerRuleAttributeValuesConfiguration>();
+  model->key = node->GetString("key", "");
+  auto vals  = node->GetChildNode("values");
+  if (vals)
   {
-    model->root = ParseComposableSamplerConfiguration(child, depth + 1);
+    for (auto vit = vals->begin(); vit != vals->end(); ++vit)
+    {
+      std::unique_ptr<DocumentNode> v(*vit);
+      model->values.push_back(v->AsString());
+    }
   }
   return model;
+}
+
+std::unique_ptr<ComposableRuleBasedSamplerRuleAttributePatternsConfiguration>
+ConfigurationParser::ParseComposableRuleBasedSamplerRuleAttributePatternsConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<ComposableRuleBasedSamplerRuleAttributePatternsConfiguration>();
+  model->key = node->GetString("key", "");
+
+  auto included = node->GetChildNode("included");
+  if (included)
+  {
+    for (auto iit = included->begin(); iit != included->end(); ++iit)
+    {
+      std::unique_ptr<DocumentNode> i(*iit);
+      model->included.push_back(i->AsString());
+    }
+  }
+
+  auto excluded = node->GetChildNode("excluded");
+  if (excluded)
+  {
+    for (auto eit = excluded->begin(); eit != excluded->end(); ++eit)
+    {
+      std::unique_ptr<DocumentNode> e(*eit);
+      model->excluded.push_back(e->AsString());
+    }
+  }
+  return model;
+}
+
+std::unique_ptr<ComposableRuleBasedSamplerRuleConfiguration>
+ConfigurationParser::ParseComposableRuleBasedSamplerRuleConfiguration(
+    const std::unique_ptr<DocumentNode> &node,
+    size_t depth) const
+{
+  auto rule = std::make_unique<ComposableRuleBasedSamplerRuleConfiguration>();
+
+  std::unique_ptr<DocumentNode> av = node->GetChildNode("attribute_values");
+  if (av)
+  {
+    rule->attribute_values = ParseComposableRuleBasedSamplerRuleAttributeValuesConfiguration(av);
+  }
+
+  std::unique_ptr<DocumentNode> ap = node->GetChildNode("attribute_patterns");
+  if (ap)
+  {
+    rule->attribute_patterns =
+        ParseComposableRuleBasedSamplerRuleAttributePatternsConfiguration(ap);
+  }
+
+  std::unique_ptr<DocumentNode> parent = node->GetChildNode("parent");
+  if (parent)
+  {
+    for (auto pit = parent->begin(); pit != parent->end(); ++pit)
+    {
+      std::unique_ptr<DocumentNode> p(*pit);
+      std::string p_str = p->AsString();
+      if (p_str == "none")
+        rule->match_parent_none = true;
+      else if (p_str == "remote")
+        rule->match_parent_remote = true;
+      else if (p_str == "local")
+        rule->match_parent_local = true;
+    }
+  }
+
+  std::unique_ptr<DocumentNode> span_kinds = node->GetChildNode("span_kinds");
+  if (span_kinds)
+  {
+    for (auto kit = span_kinds->begin(); kit != span_kinds->end(); ++kit)
+    {
+      std::unique_ptr<DocumentNode> k(*kit);
+      std::string k_str = k->AsString();
+      if (k_str == "internal")
+        rule->match_span_kind_internal = true;
+      else if (k_str == "server")
+        rule->match_span_kind_server = true;
+      else if (k_str == "client")
+        rule->match_span_kind_client = true;
+      else if (k_str == "producer")
+        rule->match_span_kind_producer = true;
+      else if (k_str == "consumer")
+        rule->match_span_kind_consumer = true;
+    }
+  }
+
+  std::unique_ptr<DocumentNode> sampler = node->GetRequiredChildNode("sampler");
+  rule->sampler                         = ParseComposableSamplerConfiguration(sampler, depth + 1);
+
+  return rule;
 }
 
 std::unique_ptr<ComposableRuleBasedSamplerConfiguration>
@@ -1750,113 +1856,49 @@ ConfigurationParser::ParseComposableRuleBasedSamplerConfiguration(
     for (auto it = rules_node->begin(); it != rules_node->end(); ++it)
     {
       std::unique_ptr<DocumentNode> rule_node(*it);
-      auto rule = std::make_unique<ComposableRuleBasedSamplerRuleConfiguration>();
-
-      // parse attribute_values
-      std::unique_ptr<DocumentNode> av = rule_node->GetChildNode("attribute_values");
-      if (av)
-      {
-        auto avc  = std::make_unique<ComposableRuleBasedSamplerRuleAttributeValuesConfiguration>();
-        avc->key  = av->GetString("key", "");
-        auto vals = av->GetChildNode("values");
-        if (vals)
-        {
-          for (auto vit = vals->begin(); vit != vals->end(); ++vit)
-          {
-            std::unique_ptr<DocumentNode> v(*vit);
-            avc->values.push_back(v->AsString());
-          }
-        }
-        rule->attribute_values = std::move(avc);
-      }
-
-      // parse attribute_patterns
-      std::unique_ptr<DocumentNode> ap = rule_node->GetChildNode("attribute_patterns");
-      if (ap)
-      {
-        auto apc = std::make_unique<ComposableRuleBasedSamplerRuleAttributePatternsConfiguration>();
-        apc->key = ap->GetString("key", "");
-        auto included = ap->GetChildNode("included");
-        if (included)
-        {
-          for (auto iit = included->begin(); iit != included->end(); ++iit)
-          {
-            std::unique_ptr<DocumentNode> i(*iit);
-            apc->included.push_back(i->AsString());
-          }
-        }
-        auto excluded = ap->GetChildNode("excluded");
-        if (excluded)
-        {
-          for (auto eit = excluded->begin(); eit != excluded->end(); ++eit)
-          {
-            std::unique_ptr<DocumentNode> e(*eit);
-            apc->excluded.push_back(e->AsString());
-          }
-        }
-        rule->attribute_patterns = std::move(apc);
-      }
-
-      // parse parent list
-      std::unique_ptr<DocumentNode> parent = rule_node->GetChildNode("parent");
-      if (parent)
-      {
-        for (auto pit = parent->begin(); pit != parent->end(); ++pit)
-        {
-          std::unique_ptr<DocumentNode> p(*pit);
-          rule->parent.push_back(p->AsString());
-        }
-      }
-
-      // parse span_kinds list
-      std::unique_ptr<DocumentNode> span_kinds = rule_node->GetChildNode("span_kinds");
-      if (span_kinds)
-      {
-        for (auto kit = span_kinds->begin(); kit != span_kinds->end(); ++kit)
-        {
-          std::unique_ptr<DocumentNode> k(*kit);
-          rule->span_kinds.push_back(k->AsString());
-        }
-      }
-
-      // parse the rule's sampler
-      std::unique_ptr<DocumentNode> sampler = rule_node->GetChildNode("sampler");
-      if (sampler)
-      {
-        rule->sampler = ParseComposableSamplerConfiguration(sampler, depth + 1);
-      }
-
-      model->rules.push_back(std::move(rule));
+      model->rules.push_back(ParseComposableRuleBasedSamplerRuleConfiguration(rule_node, depth));
     }
   }
 
   return model;
 }
 
-std::unique_ptr<ComposableSamplerConfiguration>
-ConfigurationParser::ParseComposableSamplerConfiguration(const std::unique_ptr<DocumentNode> &node,
-                                                         size_t depth) const
+std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseComposableSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> &node,
+    size_t depth) const
 {
-  auto model = std::make_unique<ComposableSamplerConfiguration>();
+  std::string inner_name;
+  std::unique_ptr<DocumentNode> inner_child;
+  size_t count = 0;
 
   for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
   {
-    std::string inner_name = it.Name();
-    auto inner_child       = it.Value();
-
-    if (inner_name == "always_off")
-      model->inner = ParseComposableAlwaysOffSamplerConfiguration(inner_child, depth);
-    else if (inner_name == "always_on")
-      model->inner = ParseComposableAlwaysOnSamplerConfiguration(inner_child, depth);
-    else if (inner_name == "probability")
-      model->inner = ParseComposableProbabilitySamplerConfiguration(inner_child, depth);
-    else if (inner_name == "parent_threshold")
-      model->inner = ParseComposableParentThresholdSamplerConfiguration(inner_child, depth);
-    else if (inner_name == "rule_based")
-      model->inner = ParseComposableRuleBasedSamplerConfiguration(inner_child, depth);
+    inner_name  = it.Name();
+    inner_child = it.Value();
+    count++;
   }
 
-  return model;
+  if (count != 1)
+  {
+    std::string message("Illegal composable sampler, properties count: ");
+    message.append(std::to_string(count));
+    throw InvalidSchemaException(node->Location(), message);
+  }
+
+  if (inner_name == "always_off")
+    return ParseComposableAlwaysOffSamplerConfiguration(inner_child, depth);
+  if (inner_name == "always_on")
+    return ParseComposableAlwaysOnSamplerConfiguration(inner_child, depth);
+  if (inner_name == "probability")
+    return ParseComposableProbabilitySamplerConfiguration(inner_child, depth);
+  if (inner_name == "parent_threshold")
+    return ParseComposableParentThresholdSamplerConfiguration(inner_child, depth);
+  if (inner_name == "rule_based")
+    return ParseComposableRuleBasedSamplerConfiguration(inner_child, depth);
+
+  std::string message("Illegal composable sampler type: ");
+  message.append(inner_name);
+  throw InvalidSchemaException(node->Location(), message);
 }
 // NOLINTEND(misc-no-recursion)
 
