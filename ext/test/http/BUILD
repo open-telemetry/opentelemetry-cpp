@@ -8,6 +8,7 @@ cc_test(
     srcs = [
         "curl_http_test.cc",
     ],
+    defines = ["ENABLE_OTLP_RETRY_PREVIEW"],
     tags = ["test"],
     deps = [
         "//ext:headers",
