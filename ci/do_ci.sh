@@ -624,6 +624,8 @@ elif [[ "$1" == "code.coverage" ]]; then
         -DWITH_EXAMPLES_HTTP=OFF \
         -DWITH_BENCHMARK=OFF \
         "${SRC_DIR}"
+
+  # Limit parallelism to 2 to avoid hitting github runner limits
   cmake --build "${BUILD_DIR}" --parallel 2
   ctest --output-on-failure
 

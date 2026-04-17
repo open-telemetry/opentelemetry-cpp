@@ -61,6 +61,15 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy warnings in base2 exponential histogram aggregation
   [#3997](https://github.com/open-telemetry/opentelemetry-cpp/pull/3997)
 
+* [CI] Build third-party dependencies in release with ninja
+  [#3995](https://github.com/open-telemetry/opentelemetry-cpp/pull/3995)
+
+* [CI] Update ci scripts and documentation
+  [#4000](https://github.com/open-telemetry/opentelemetry-cpp/pull/4000)
+
+* [CI] Update code.coverage job to report on all components and features
+  [#4002](https://github.com/open-telemetry/opentelemetry-cpp/pull/4002)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
