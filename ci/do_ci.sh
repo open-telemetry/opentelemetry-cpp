@@ -87,10 +87,10 @@ fi
 CMAKE_OPTIONS+=("-DCMAKE_CXX_STANDARD_REQUIRED=ON")
 CMAKE_OPTIONS+=("-DCMAKE_CXX_EXTENSIONS=OFF")
 
-CMAKE_BUILD_ARGS=(--parallel)
-
-if [[ "${OTELCPP_CMAKE_VERBOSE_BUILD:-OFF}" =~ ^(1|ON|on|TRUE|true|YES|yes)$ ]]; then
-  CMAKE_BUILD_ARGS+=(--verbose)
+if [ -n "${OTELCPP_CMAKE_BUILD_ARGS}" ]; then
+  read -ra CMAKE_BUILD_ARGS <<< "${OTELCPP_CMAKE_BUILD_ARGS}"
+else
+  CMAKE_BUILD_ARGS=(--parallel)
 fi
 
 if command -v ninja >/dev/null 2>&1; then
@@ -625,8 +625,7 @@ elif [[ "$1" == "code.coverage" ]]; then
         -DWITH_BENCHMARK=OFF \
         "${SRC_DIR}"
 
-  # Limit parallelism to 2 to avoid hitting github runner limits
-  cmake --build "${BUILD_DIR}" --parallel 2
+  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
 
   lcov --directory "$PWD" --capture \
@@ -637,7 +636,7 @@ elif [[ "$1" == "code.coverage" ]]; then
   --exclude "${SRC_DIR}/functional/*" \
   --exclude "${SRC_DIR}/semconv/*" \
   --exclude "${SRC_DIR}/examples/*" \
-  --ignore-errors gcov,mismatch,negative,unused \
+  --ignore-errors unused \
   --output-file coverage.info
 
   echo "Code coverage output file generated at ${BUILD_DIR}/coverage.info. To generate an HTML report run:"

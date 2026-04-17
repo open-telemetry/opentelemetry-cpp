@@ -1096,9 +1096,6 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CC: /usr/bin/gcc-13
-        CXX: /usr/bin/g++-13
       run: |
         sudo -E ./ci/setup_ci_environment.sh
     - name: install dependencies
@@ -1108,6 +1105,7 @@ jobs:
       env:
         CC: /usr/bin/gcc-13
         CXX: /usr/bin/g++-13
+        OTELCPP_CMAKE_BUILD_ARGS: "--parallel 2" # Limit parallelism to avoid hitting runner limits
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
       uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
