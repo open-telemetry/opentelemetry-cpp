@@ -38,7 +38,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -62,7 +62,7 @@ jobs:
       BUILD_TYPE: 'Release'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -92,7 +92,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -130,7 +130,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -168,7 +168,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -199,7 +199,7 @@ jobs:
       CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -230,7 +230,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -266,7 +266,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -297,7 +297,7 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -324,7 +324,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -342,7 +342,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -362,7 +362,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -382,7 +382,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -408,7 +408,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -426,7 +426,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -439,6 +439,10 @@ jobs:
     - name: install dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file ./install/cmake/third_party_stable --packages "googletest;benchmark"
+    - name: run tests
+      env:
+        CXX_STANDARD: '14'
+      run: ./ci/do_ci.sh cmake.c++14.test
     - name: run tests (enable stl)
       env:
         CXX_STANDARD: '14'
@@ -449,7 +453,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -459,6 +463,10 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+    - name: run tests
+      env:
+        CXX_STANDARD: '17'
+      run: ./ci/do_ci.sh cmake.c++17.test
     - name: run tests (enable stl)
       env:
         CXX_STANDARD: '17'
@@ -469,7 +477,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -493,7 +501,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -527,7 +535,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -551,7 +559,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -585,7 +593,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -615,7 +623,7 @@ jobs:
       CXX_STANDARD: '14'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -636,7 +644,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -658,7 +666,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -680,7 +688,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -704,7 +712,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -730,7 +738,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -756,7 +764,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -782,7 +790,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -808,7 +816,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -839,7 +847,7 @@ jobs:
     if: false
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -865,7 +873,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -891,7 +899,7 @@ jobs:
     runs-on: macos-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -918,7 +926,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -951,7 +959,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -966,7 +974,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -979,7 +987,7 @@ jobs:
     runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -1000,7 +1008,7 @@ jobs:
     runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -1023,7 +1031,7 @@ jobs:
     runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -1044,7 +1052,7 @@ jobs:
     runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -1062,7 +1070,7 @@ jobs:
     runs-on: windows-2022
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -1080,7 +1088,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -1111,7 +1119,7 @@ jobs:
 
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -1128,7 +1136,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -1143,7 +1151,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -1161,7 +1169,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
       with:
         egress-policy: audit
 
@@ -1177,7 +1185,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+        uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
         with:
           egress-policy: audit
 
