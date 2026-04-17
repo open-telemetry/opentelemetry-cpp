@@ -80,12 +80,6 @@ PeriodicExportingMetricReader::~PeriodicExportingMetricReader()
   {
     Shutdown();
   }
-
-  if (worker_thread_.joinable())
-  {
-    cv_.notify_all();
-    worker_thread_.join();
-  }
 }
 
 AggregationTemporality PeriodicExportingMetricReader::GetAggregationTemporality(
