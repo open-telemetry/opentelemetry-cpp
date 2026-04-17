@@ -87,7 +87,7 @@ public:
    * Creates a logger with the given name, and returns a shared pointer to it.
    * If a logger with that name already exists, return a shared pointer to it
    * @param logger_name The name of the logger to be created.
-   * @param name The version of the library.
+   * @param name The name of the library.
    * @param version The version of the library.
    * @param schema_url The schema URL.
    * @param attributes The attributes to be associated with the logger.
@@ -95,8 +95,8 @@ public:
   nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
       nostd::string_view logger_name,
       nostd::string_view name,
-      nostd::string_view version = "",
-      nostd::string_view schema_url      = "",
+      nostd::string_view version    = "",
+      nostd::string_view schema_url = "",
       const opentelemetry::common::KeyValueIterable &attributes =
           opentelemetry::common::NoopKeyValueIterable()) noexcept override;
 

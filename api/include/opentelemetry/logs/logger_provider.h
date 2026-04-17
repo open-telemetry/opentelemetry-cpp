@@ -43,8 +43,8 @@ public:
 
   virtual nostd::shared_ptr<Logger> GetLogger(
       nostd::string_view logger_name,
-      nostd::string_view name = "",
-      nostd::string_view version = "",
+      nostd::string_view name                    = "",
+      nostd::string_view version                 = "",
       nostd::string_view schema_url              = "",
       const common::KeyValueIterable &attributes = common::NoopKeyValueIterable()) = 0;
 
