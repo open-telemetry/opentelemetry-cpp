@@ -92,7 +92,8 @@ void AdaptingIntegerArray::Increment(size_t index, uint64_t count)
   }
   EnlargeToFit(result);
   /* Must fit, buffer was enlarged for the value to store */
-  const uint64_t result2 = nostd::visit(AdaptingIntegerArrayIncrement{index, count}, backing_);
+  OPENTELEMETRY_MAYBE_UNUSED const uint64_t result2 =
+      nostd::visit(AdaptingIntegerArrayIncrement{index, count}, backing_);
   assert(result2 == 0);
 }
 
