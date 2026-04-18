@@ -54,36 +54,47 @@ public:
    */
   static nostd::shared_ptr<TraceState> FromHeader(nostd::string_view header) noexcept
   {
-
-    common::KeyValueStringTokenizer kv_str_tokenizer(header);
-    size_t cnt = kv_str_tokenizer.NumTokens();  // upper bound on number of kv pairs
-    if (cnt > kMaxKeyValuePairs)
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+#endif
     {
-      // trace state should be discarded if count exceeds
-      return GetDefault();
-    }
-
-    nostd::shared_ptr<TraceState> ts(new TraceState(cnt));
-    bool kv_valid{false};
-    nostd::string_view key, value;
-    while (kv_str_tokenizer.next(kv_valid, key, value) && ts->kv_properties_->Size() < cnt)
-    {
-      if (kv_valid == false)
+      common::KeyValueStringTokenizer kv_str_tokenizer(header);
+      size_t cnt = kv_str_tokenizer.NumTokens();  // upper bound on number of kv pairs
+      if (cnt > kMaxKeyValuePairs)
       {
+        // trace state should be discarded if count exceeds
         return GetDefault();
       }
 
-      if (!IsValidKey(key) || !IsValidValue(value))
+      nostd::shared_ptr<TraceState> ts(new TraceState(cnt));
+      bool kv_valid{false};
+      nostd::string_view key;
+      nostd::string_view value;
+      while (kv_str_tokenizer.next(kv_valid, key, value) && ts->kv_properties_->Size() < cnt)
       {
-        // invalid header. return empty TraceState
-        ts->kv_properties_.reset(new common::KeyValueProperties());
-        break;
+        if (kv_valid == false)
+        {
+          return GetDefault();
+        }
+
+        if (!IsValidKey(key) || !IsValidValue(value))
+        {
+          // invalid header. return empty TraceState
+          ts->kv_properties_.reset(new common::KeyValueProperties());
+          break;
+        }
+
+        ts->kv_properties_->AddEntry(key, value);
       }
 
-      ts->kv_properties_->AddEntry(key, value);
+      return ts;
     }
-
-    return ts;
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    catch (...)
+    {
+      return GetDefault();
+    }
+#endif
   }
 
   /**
@@ -117,11 +128,21 @@ public:
    */
   bool Get(nostd::string_view key, std::string &value) const noexcept
   {
-    if (!IsValidKey(key))
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+#endif
+    {
+      if (!IsValidKey(key))
+      {
+        return false;
+      }
+    }
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    catch (...)
     {
       return false;
     }
-
+#endif
     return kv_properties_->GetValue(key, value);
   }
 
@@ -138,29 +159,40 @@ public:
   nostd::shared_ptr<TraceState> Set(const nostd::string_view &key,
                                     const nostd::string_view &value) noexcept
   {
-    auto curr_size = kv_properties_->Size();
-    if (!IsValidKey(key) || !IsValidValue(value))
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+#endif
     {
-      // max size reached or invalid key/value. Returning empty TraceState
+      if (!IsValidKey(key) || !IsValidValue(value))
+      {
+        // max size reached or invalid key/value. Returning empty TraceState
+        return TraceState::GetDefault();
+      }
+      const auto curr_size = kv_properties_->Size();
+      auto allocate_size   = curr_size;
+      if (curr_size < kMaxKeyValuePairs)
+      {
+        allocate_size += 1;
+      }
+      nostd::shared_ptr<TraceState> ts(new TraceState(allocate_size));
+      if (curr_size < kMaxKeyValuePairs)
+      {
+        // add new field first
+        ts->kv_properties_->AddEntry(key, value);
+      }
+      // add rest of the fields.
+      kv_properties_->GetAllEntries([&ts](nostd::string_view key, nostd::string_view value) {
+        ts->kv_properties_->AddEntry(key, value);
+        return true;
+      });
+      return ts;
+    }
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    catch (...)
+    {
       return TraceState::GetDefault();
     }
-    auto allocate_size = curr_size;
-    if (curr_size < kMaxKeyValuePairs)
-    {
-      allocate_size += 1;
-    }
-    nostd::shared_ptr<TraceState> ts(new TraceState(allocate_size));
-    if (curr_size < kMaxKeyValuePairs)
-    {
-      // add new field first
-      ts->kv_properties_->AddEntry(key, value);
-    }
-    // add rest of the fields.
-    kv_properties_->GetAllEntries([&ts](nostd::string_view key, nostd::string_view value) {
-      ts->kv_properties_->AddEntry(key, value);
-      return true;
-    });
-    return ts;
+#endif
   }
 
   /**
@@ -171,25 +203,38 @@ public:
    */
   nostd::shared_ptr<TraceState> Delete(const nostd::string_view &key) noexcept
   {
-    if (!IsValidKey(key))
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+#endif
+    {
+      if (!IsValidKey(key))
+      {
+        return TraceState::GetDefault();
+      }
+      const auto curr_size = kv_properties_->Size();
+      auto allocate_size   = curr_size;
+      std::string unused;
+      if (kv_properties_->GetValue(key, unused))
+      {
+        allocate_size -= 1;
+      }
+      nostd::shared_ptr<TraceState> ts(new TraceState(allocate_size));
+      kv_properties_->GetAllEntries(
+          [&ts, &key](nostd::string_view e_key, nostd::string_view e_value) {
+            if (key != e_key)
+            {
+              ts->kv_properties_->AddEntry(e_key, e_value);
+            }
+            return true;
+          });
+      return ts;
+    }
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    catch (...)
     {
       return TraceState::GetDefault();
     }
-    auto curr_size     = kv_properties_->Size();
-    auto allocate_size = curr_size;
-    std::string unused;
-    if (kv_properties_->GetValue(key, unused))
-    {
-      allocate_size -= 1;
-    }
-    nostd::shared_ptr<TraceState> ts(new TraceState(allocate_size));
-    kv_properties_->GetAllEntries(
-        [&ts, &key](nostd::string_view e_key, nostd::string_view e_value) {
-          if (key != e_key)
-            ts->kv_properties_->AddEntry(e_key, e_value);
-          return true;
-        });
-    return ts;
+#endif
   }
 
   // Returns true if there are no keys, false otherwise.
