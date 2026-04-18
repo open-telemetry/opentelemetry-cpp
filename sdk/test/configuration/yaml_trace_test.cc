@@ -1,13 +1,21 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
-
 #include <gtest/gtest.h>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
+#include "opentelemetry/sdk/configuration/sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_always_off_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_probability_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
@@ -839,4 +847,208 @@ tracer_provider:
   ASSERT_EQ(configurator->tracers.size(), 1);
   ASSERT_EQ(configurator->tracers[0].name, "noisy.library");
   ASSERT_EQ(configurator->tracers[0].config.enabled, false);
+}
+
+namespace
+{
+enum class SamplerType : std::uint8_t
+{
+  kUnmatched                 = 0,
+  kComposableAlwaysOn        = 1,
+  kComposableProbability     = 2,
+  kComposableRuleBased       = 3,
+  kComposableAlwaysOff       = 4,
+  kComposableParentThreshold = 5
+};
+
+class TestSamplerVisitor : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
+{
+public:
+  SamplerType type_matched = SamplerType::kUnmatched;
+  double ratio             = -1.0;
+
+  void VisitAlwaysOff(
+      const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration *) override
+  {}
+  void VisitAlwaysOn(
+      const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration *) override
+  {}
+  void VisitJaegerRemote(
+      const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration *) override
+  {}
+  void VisitParentBased(
+      const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *) override
+  {}
+  void VisitTraceIdRatioBased(
+      const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *) override
+  {}
+  void VisitExtension(
+      const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *) override
+  {}
+
+  void VisitComposableAlwaysOff(
+      const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kComposableAlwaysOff;
+  }
+  void VisitComposableAlwaysOn(
+      const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kComposableAlwaysOn;
+  }
+  void VisitComposableProbability(
+      const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
+      override
+  {
+    type_matched = SamplerType::kComposableProbability;
+    ratio        = model->ratio;
+  }
+  void VisitComposableParentThreshold(
+      const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *)
+      override
+  {
+    type_matched = SamplerType::kComposableParentThreshold;
+  }
+  void VisitComposableRuleBased(
+      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kComposableRuleBased;
+  }
+  void VisitComposable(
+      const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model) override
+  {
+    if (model->inner)
+    {
+      model->inner->Accept(this);
+    }
+  }
+};
+}  // namespace
+
+TEST(YamlTrace, composable_always_on_sampler)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    composite/development:
+      always_on:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kComposableAlwaysOn);
+}
+
+TEST(YamlTrace, composable_probability_sampler)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    composite/development:
+      probability:
+        ratio: 0.25
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+
+  EXPECT_EQ(visitor.type_matched, SamplerType::kComposableProbability);
+  EXPECT_DOUBLE_EQ(visitor.ratio, 0.25);
+}
+
+TEST(YamlTrace, composable_rule_based_sampler)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    composite/development:
+      rule_based:
+        rules:
+          - sampler:
+              always_on:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kComposableRuleBased);
+}
+
+TEST(YamlTrace, composable_always_off_sampler)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    composite/development:
+      always_off:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kComposableAlwaysOff);
+}
+
+TEST(YamlTrace, composable_parent_threshold_sampler)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    composite/development:
+      parent_threshold:
+        root:
+          always_on:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kComposableParentThreshold);
 }

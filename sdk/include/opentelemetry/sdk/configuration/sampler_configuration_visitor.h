@@ -17,6 +17,12 @@ class JaegerRemoteSamplerConfiguration;
 class ParentBasedSamplerConfiguration;
 class TraceIdRatioBasedSamplerConfiguration;
 class ExtensionSamplerConfiguration;
+class ComposableAlwaysOffSamplerConfiguration;
+class ComposableAlwaysOnSamplerConfiguration;
+class ComposableProbabilitySamplerConfiguration;
+class ComposableParentThresholdSamplerConfiguration;
+class ComposableRuleBasedSamplerConfiguration;
+class ComposableSamplerConfiguration;
 
 class SamplerConfigurationVisitor
 {
@@ -34,6 +40,18 @@ public:
   virtual void VisitParentBased(const ParentBasedSamplerConfiguration *model)             = 0;
   virtual void VisitTraceIdRatioBased(const TraceIdRatioBasedSamplerConfiguration *model) = 0;
   virtual void VisitExtension(const ExtensionSamplerConfiguration *model)                 = 0;
+  virtual void VisitComposableAlwaysOff(const ComposableAlwaysOffSamplerConfiguration * /*model*/)
+  {}
+  virtual void VisitComposableAlwaysOn(const ComposableAlwaysOnSamplerConfiguration * /*model*/) {}
+  virtual void VisitComposableProbability(
+      const ComposableProbabilitySamplerConfiguration * /*model*/)
+  {}
+  virtual void VisitComposableParentThreshold(
+      const ComposableParentThresholdSamplerConfiguration * /*model*/)
+  {}
+  virtual void VisitComposableRuleBased(const ComposableRuleBasedSamplerConfiguration * /*model*/)
+  {}
+  virtual void VisitComposable(const ComposableSamplerConfiguration * /*model*/) {}
 };
 
 }  // namespace configuration
