@@ -398,8 +398,6 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
 void OtlpGrpcClient::PopulateChannelArguments(const OtlpGrpcClientOptions &options,
                                               grpc::ChannelArguments &grpc_arguments)
 {
-  grpc_arguments = grpc::ChannelArguments{};
-
   if (options.channel_arguments != nullptr)
   {
     grpc_arguments = *options.channel_arguments;

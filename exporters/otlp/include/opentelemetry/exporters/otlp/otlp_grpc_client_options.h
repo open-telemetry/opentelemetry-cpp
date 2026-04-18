@@ -94,8 +94,8 @@ struct OtlpGrpcClientOptions
 
   /**
    * Optional caller-provided gRPC channel arguments.
-   * This is a non-owning pointer, and the pointed-to arguments are copied when the channel is
-   * created.
+   * This is a non-owning pointer. If set, the pointed-to object must remain valid
+   * until the gRPC exporter or client has been constructed.
    */
   const grpc::ChannelArguments *channel_arguments{};
 };
