@@ -350,6 +350,11 @@ protected:
     return event_id_enabled_;
   }
 
+  bool EnabledImplementation(Severity severity, int64_t event_id) const noexcept override
+  {
+    return EnabledImplementation(severity, EventId{event_id});
+  }
+
 private:
   bool event_id_enabled_;
 };
