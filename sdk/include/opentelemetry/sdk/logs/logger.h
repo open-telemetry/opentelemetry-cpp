@@ -61,6 +61,11 @@ public:
   }
 
 private:
+  bool EnabledImplementation(opentelemetry::logs::Severity severity,
+                             const opentelemetry::logs::EventId &event_id) const noexcept override;
+
+  bool EnabledImplementation(opentelemetry::logs::Severity severity,
+                             int64_t event_id) const noexcept override;
   // The name of this logger
   std::string logger_name_;
 

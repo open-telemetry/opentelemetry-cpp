@@ -47,7 +47,11 @@ Logger::Logger(
       instrumentation_scope_(std::move(instrumentation_scope)),
       context_(std::move(context)),
       logger_config_(context_->GetLoggerConfigurator().ComputeConfig(*instrumentation_scope_))
-{}
+{
+  SetMinimumSeverity(logger_config_.IsEnabled()
+                         ? static_cast<uint8_t>(opentelemetry::logs::Severity::kTrace)
+                         : opentelemetry::logs::kMaxSeverity);
+}
 
 const opentelemetry::nostd::string_view Logger::GetName() noexcept
 {
@@ -130,6 +134,22 @@ void Logger::EmitLogRecord(
 
   // Send the log recordable to the processor
   processor.OnEmit(std::move(recordable));
+}
+
+bool Logger::EnabledImplementation(opentelemetry::logs::Severity /*severity*/,
+                                   const opentelemetry::logs::EventId & /*event_id*/) const noexcept
+{
+  // TODO: Revisit this if opentelemetry-cpp adopts logs SDK enablement
+  // semantics beyond the current stable severity-based behavior.
+  return true;
+}
+
+bool Logger::EnabledImplementation(opentelemetry::logs::Severity /*severity*/,
+                                   int64_t /*event_id*/) const noexcept
+{
+  // TODO: Revisit this if opentelemetry-cpp adopts logs SDK enablement
+  // semantics beyond the current stable severity-based behavior.
+  return true;
 }
 
 const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
