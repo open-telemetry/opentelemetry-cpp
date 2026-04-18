@@ -43,19 +43,19 @@ public:
 
   virtual nostd::shared_ptr<Logger> GetLogger(
       nostd::string_view logger_name,
-      nostd::string_view library_name            = "",
-      nostd::string_view library_version         = "",
+      nostd::string_view name                    = "",
+      nostd::string_view version                 = "",
       nostd::string_view schema_url              = "",
       const common::KeyValueIterable &attributes = common::NoopKeyValueIterable()) = 0;
 
   nostd::shared_ptr<Logger> GetLogger(
       nostd::string_view logger_name,
-      nostd::string_view library_name,
-      nostd::string_view library_version,
+      nostd::string_view name,
+      nostd::string_view version,
       nostd::string_view schema_url,
       std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes)
   {
-    return GetLogger(logger_name, library_name, library_version, schema_url,
+    return GetLogger(logger_name, name, version, schema_url,
                      nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                          attributes.begin(), attributes.end()});
   }
@@ -63,12 +63,12 @@ public:
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
-                                      nostd::string_view library_name,
-                                      nostd::string_view library_version,
+                                      nostd::string_view name,
+                                      nostd::string_view version,
                                       nostd::string_view schema_url,
                                       const T &attributes)
   {
-    return GetLogger(logger_name, library_name, library_version, schema_url,
+    return GetLogger(logger_name, name, version, schema_url,
                      common::KeyValueIterableView<T>(attributes));
   }
 };
