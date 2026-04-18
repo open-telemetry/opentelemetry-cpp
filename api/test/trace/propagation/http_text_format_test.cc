@@ -7,6 +7,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <format>
 #include "util.h"
 
 #include "opentelemetry/context/context.h"
