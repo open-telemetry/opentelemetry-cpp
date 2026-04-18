@@ -274,6 +274,48 @@ TEST(Tracer, StartSpanSampleOff)
   ASSERT_EQ(0, span_data->GetSpans().size());
 }
 
+TEST(Tracer, StartSpanSetsRandomTraceFlagForRootSpan)
+{
+  // AlwaysOn keeps the sampled bit set while RandomIdGenerator marks the
+  // locally generated trace-id as random.
+  auto tracer = initTracer(nullptr, new AlwaysOnSampler(), new RandomIdGenerator());
+
+  auto span    = tracer->StartSpan("span 1");
+  auto context = span->GetContext();
+
+  EXPECT_TRUE(context.IsValid());
+  EXPECT_TRUE(context.IsSampled());
+  EXPECT_TRUE(context.trace_flags().IsRandom());
+  EXPECT_EQ(context.trace_flags().flags(),
+            trace_api::TraceFlags::kIsSampled | trace_api::TraceFlags::kIsRandom);
+}
+
+TEST(Tracer, StartSpanPreservesRandomTraceFlagFromParent)
+{
+  constexpr uint8_t parent_span_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8};
+  constexpr uint8_t parent_trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8,
+                                             8, 7, 6, 5, 4, 3, 2, 1};
+  // Build a remote parent with only the random bit set so the child path can
+  // prove it preserves the incoming signal even when sampling is turned off.
+  trace_api::SpanContext parent_context{
+      trace_api::TraceId{parent_trace_id_buf}, trace_api::SpanId{parent_span_id_buf},
+      trace_api::TraceFlags{trace_api::TraceFlags::kIsRandom}, true};
+
+  auto tracer = initTracer(nullptr, new AlwaysOffSampler());
+
+  trace_api::StartSpanOptions options;
+  options.parent = parent_context;
+
+  auto span    = tracer->StartSpan("span 1", options);
+  auto context = span->GetContext();
+
+  EXPECT_TRUE(context.IsValid());
+  EXPECT_FALSE(context.IsSampled());
+  EXPECT_TRUE(context.trace_flags().IsRandom());
+  EXPECT_EQ(context.trace_flags().flags(), trace_api::TraceFlags::kIsRandom);
+  EXPECT_EQ(context.trace_id(), parent_context.trace_id());
+}
+
 TEST(Tracer, StartSpanCustomIdGenerator)
 {
   IdGenerator *id_generator                   = new MockIdGenerator();
