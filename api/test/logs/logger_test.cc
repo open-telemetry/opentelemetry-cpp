@@ -408,6 +408,23 @@ TEST(Logger, EmitLogRecordWithExistingRecordSkipsEmitWhenSeverityDisabled)
   EXPECT_EQ(logger.emit_log_record_calls_, 0u);
 }
 
+TEST(Logger, EmitLogRecordWithExistingRecordPopulatesAndEmitsWhenSeverityEnabled)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace);
+
+  auto log_record = logger.CreateLogRecord();
+  ASSERT_EQ(logger.create_log_record_calls_, 1u);
+
+  logger.EmitLogRecord(std::move(log_record), Severity::kInfo, "allowed");
+
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  ASSERT_TRUE(logger.last_emitted_record_ != nullptr);
+  EXPECT_EQ(logger.last_emitted_record_->severity_, Severity::kInfo);
+  EXPECT_EQ(logger.last_emitted_record_->event_id_, -1);
+  EXPECT_FALSE(logger.last_emitted_record_->event_id_was_set_);
+  EXPECT_TRUE(logger.last_emitted_record_->body_was_set_);
+}
+
 TEST(Logger, EmitLogRecordUsesEventIdEnablementBeforeCreate)
 {
   EnablementAwareTestLogger logger(Severity::kTrace);
