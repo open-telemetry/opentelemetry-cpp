@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] Fix `Logger::Enabled()` and helper log emission checks for SDK loggers
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+
 * [SDK] Move inline implementation from SDK headers to .cc files.
   Note: `GetEmptyAttributes()` now requires linking `opentelemetry_common`.
   [#3887](https://github.com/open-telemetry/opentelemetry-cpp/pull/3887)
