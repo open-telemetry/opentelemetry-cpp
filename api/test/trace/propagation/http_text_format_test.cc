@@ -3,11 +3,11 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
+#include <format>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
-#include <format>
 #include "util.h"
 
 #include "opentelemetry/context/context.h"
