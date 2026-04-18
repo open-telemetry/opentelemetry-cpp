@@ -108,6 +108,12 @@ message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
 # but may need the alias target created
 if(TARGET utf8_validity AND NOT TARGET utf8_range::utf8_validity)
   add_library(utf8_range::utf8_validity ALIAS utf8_validity)
+  if(protobuf_SOURCE_DIR AND EXISTS
+                             "${protobuf_SOURCE_DIR}/third_party/utf8_range")
+    target_include_directories(
+      utf8_validity
+      PUBLIC "$<BUILD_INTERFACE:${protobuf_SOURCE_DIR}/third_party/utf8_range>")
+  endif()
 endif()
 
 # For the find_package(Protobuf) path, utf8_range can also be found
