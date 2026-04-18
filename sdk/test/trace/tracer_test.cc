@@ -314,7 +314,7 @@ TEST(Tracer, StartSpanPreservesRandomTraceFlagFromParent)
   EXPECT_TRUE(context.IsValid());
   EXPECT_FALSE(context.IsSampled());
   EXPECT_TRUE(context.trace_flags().IsRandom());
-  EXPECT_EQ(context.trace_flags().flags(), trace_api::TraceFlags::kIsRandom);
+  EXPECT_EQ(context.trace_flags().flags(), static_cast<uint8_t>(trace_api::TraceFlags::kIsRandom));
   EXPECT_EQ(context.trace_id(), parent_context.trace_id());
 }
 
