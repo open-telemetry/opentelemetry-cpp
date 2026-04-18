@@ -155,8 +155,7 @@ public:
 class MockIdGenerator : public IdGenerator
 {
 public:
-  MockIdGenerator() : IdGenerator(false)
-  {}
+  MockIdGenerator() : IdGenerator(false) {}
 
   opentelemetry::trace::SpanId GenerateSpanId() noexcept override
   {
@@ -196,9 +195,9 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
   processors.push_back(std::move(processor));
   auto resource = Resource::Create({});
   auto context  = std::make_shared<TracerContext>(
-       std::move(processors), resource, std::unique_ptr<Sampler>(sampler),
-       std::unique_ptr<IdGenerator>(id_generator),
-       std::make_unique<ScopeConfigurator<TracerConfig>>(tracer_configurator));
+      std::move(processors), resource, std::unique_ptr<Sampler>(sampler),
+      std::unique_ptr<IdGenerator>(id_generator),
+      std::make_unique<ScopeConfigurator<TracerConfig>>(tracer_configurator));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context, std::move(scope)));
 }
 

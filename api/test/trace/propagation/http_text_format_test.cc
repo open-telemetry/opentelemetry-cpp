@@ -3,7 +3,6 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
-#include <format>
 #include <map>
 #include <string>
 #include <utility>
@@ -65,14 +64,13 @@ TEST(TextMapPropagatorTest, TraceFlagsBufferGeneration)
 TEST(TextMapPropagatorTest, PropagateRandomTraceFlag)
 {
   TextMapCarrierTest carrier;
-  auto const non_flag_traceparent = "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708";
+  // Only random bit is set(02), sampled bit is not set
+  auto const traceparent = "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-02";
   // Use a remote traceparent with only the random bit set and verify the
   // propagator round-trips it without forcing the sampled bit on.
-  carrier.headers_ = {
-      {"traceparent", std::format("{}-02", non_flag_traceparent)}};  // NOTE: No sampled bit is set,
-                                                                     // only random bit is set, - 02
-  auto ctx1 = context::Context{};
-  auto ctx2 = format.Extract(carrier, ctx1);
+  carrier.headers_ = {{"traceparent", traceparent}};
+  auto ctx1        = context::Context{};
+  auto ctx2        = format.Extract(carrier, ctx1);
 
   auto span = trace::GetSpan(ctx2);
   EXPECT_TRUE(span->GetContext().IsValid());
@@ -81,7 +79,7 @@ TEST(TextMapPropagatorTest, PropagateRandomTraceFlag)
 
   TextMapCarrierTest carrier2;
   format.Inject(carrier2, ctx2);
-  EXPECT_EQ(carrier2.headers_["traceparent"], std::format("{}-02", non_flag_traceparent));
+  EXPECT_EQ(carrier2.headers_["traceparent"], traceparent);
 }
 
 TEST(TextMapPropagatorTest, NoSendEmptyTraceState)
