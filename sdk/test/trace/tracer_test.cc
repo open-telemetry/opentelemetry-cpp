@@ -276,9 +276,11 @@ TEST(Tracer, StartSpanSampleOff)
 
 TEST(Tracer, StartSpanSetsRandomTraceFlagForRootSpan)
 {
+  InMemorySpanExporter *exporter = new InMemorySpanExporter();
   // AlwaysOn keeps the sampled bit set while RandomIdGenerator marks the
   // locally generated trace-id as random.
-  auto tracer = initTracer(nullptr, new AlwaysOnSampler(), new RandomIdGenerator());
+  auto tracer = initTracer(std::unique_ptr<SpanExporter>{exporter}, new AlwaysOnSampler(),
+                           new RandomIdGenerator());
 
   auto span    = tracer->StartSpan("span 1");
   auto context = span->GetContext();
@@ -292,6 +294,7 @@ TEST(Tracer, StartSpanSetsRandomTraceFlagForRootSpan)
 
 TEST(Tracer, StartSpanPreservesRandomTraceFlagFromParent)
 {
+  InMemorySpanExporter *exporter          = new InMemorySpanExporter();
   constexpr uint8_t parent_span_id_buf[]  = {1, 2, 3, 4, 5, 6, 7, 8};
   constexpr uint8_t parent_trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
   // Build a remote parent with only the random bit set so the child path can
@@ -300,7 +303,7 @@ TEST(Tracer, StartSpanPreservesRandomTraceFlagFromParent)
       trace_api::TraceId{parent_trace_id_buf}, trace_api::SpanId{parent_span_id_buf},
       trace_api::TraceFlags{trace_api::TraceFlags::kIsRandom}, true};
 
-  auto tracer = initTracer(nullptr, new AlwaysOffSampler());
+  auto tracer = initTracer(std::unique_ptr<SpanExporter>{exporter}, new AlwaysOffSampler());
 
   trace_api::StartSpanOptions options;
   options.parent = parent_context;
