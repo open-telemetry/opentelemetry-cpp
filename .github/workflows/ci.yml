@@ -1085,7 +1085,7 @@ jobs:
 
   code_coverage:
     name: Code coverage
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
@@ -1096,15 +1096,16 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+    - name: install dependencies
+      run: |
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
     - name: run tests and generate report
       env:
-        CC: /usr/bin/gcc-10
-        CXX: /usr/bin/g++-10
+        CC: /usr/bin/gcc-13
+        CXX: /usr/bin/g++-13
+        OTELCPP_CMAKE_BUILD_ARGS: "--parallel 2" # Limit parallelism to avoid hitting runner limits
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
       uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0

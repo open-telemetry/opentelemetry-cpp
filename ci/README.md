@@ -48,13 +48,20 @@ BUILD_DIR=$HOME/build
 BUILD_TYPE=Debug|Release|RelWithDebInfo|MinSizeRel
 CXX_STANDARD=14|17|20|23
 BUILD_SHARED_LIBS=ON|OFF
-OTELCPP_CMAKE_VERBOSE_BUILD=ON|OFF
+OTELCPP_CMAKE_BUILD_ARGS=<cmake-build-args>
 OTELCPP_CMAKE_CACHE_FILE=<cache-file-name>
 ```
 
 `OTELCPP_CMAKE_CACHE_FILE` should be the basename of a cache file from
 `test_common/cmake`, for example `all-options-abiv1-preview.cmake` or
 `all-options-abiv2.cmake`.
+
+`OTELCPP_CMAKE_BUILD_ARGS` overrides the default `cmake --build` arguments
+(`--parallel`). For example, to limit parallelism and enable verbose output:
+
+```sh
+OTELCPP_CMAKE_BUILD_ARGS="--parallel 2 --verbose" ./ci/do_ci.sh code.coverage
+```
 
 ## Targets
 
