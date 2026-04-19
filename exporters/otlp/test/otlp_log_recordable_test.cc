@@ -84,6 +84,17 @@ TEST(OtlpLogRecordable, Basic)
               memcmp(reinterpret_cast<const void *>(rec.log_record().body().bytes_value().data()),
                      reinterpret_cast<const void *>(byte_arr), 5));
   EXPECT_EQ(rec.log_record().body().bytes_value().size(), 5);
+
+#if defined(ENABLE_OTLP_UTF8_VALIDITY)
+  // Test bytes body: non-UTF8 string_view is automatically converted to bytes_value
+  const char byte_body[] = {'\x80', '\x81', '\x82', '\x83', '\x84'};
+  nostd::string_view byte_body_view(byte_body, 5);
+  rec.SetBody(byte_body_view);
+  EXPECT_TRUE(0 ==
+              memcmp(reinterpret_cast<const void *>(rec.log_record().body().bytes_value().data()),
+                     reinterpret_cast<const void *>(byte_body), 5));
+  EXPECT_EQ(rec.log_record().body().bytes_value().size(), 5);
+#endif
 }
 
 TEST(OtlpLogRecordable, GetResource)
@@ -128,6 +139,14 @@ TEST(OtlpLogRecordable, SetSingleAttribute)
       nostd::span<const uint8_t>{reinterpret_cast<const uint8_t *>(byte_arr), 4});
   rec.SetAttribute(byte_key, byte_val);
 
+#if defined(ENABLE_OTLP_UTF8_VALIDITY)
+  // Non-UTF8 string_view is automatically converted to bytes_value
+  nostd::string_view non_utf8_string_key = "non_utf8_string_attr";
+  const char non_utf8_string_arr[]       = {'\x80', '\x81', '\x82', '\x83'};
+  common::AttributeValue non_utf8_string_val(nostd::string_view(non_utf8_string_arr, 4));
+  rec.SetAttribute(non_utf8_string_key, non_utf8_string_val);
+#endif
+
   int checked_attributes = 0;
   for (auto &attribute : rec.log_record().attributes())
   {
@@ -154,8 +173,22 @@ TEST(OtlpLogRecordable, SetSingleAttribute)
                          reinterpret_cast<const void *>(byte_arr), 4));
       EXPECT_EQ(attribute.value().bytes_value().size(), 4);
     }
+#if defined(ENABLE_OTLP_UTF8_VALIDITY)
+    else if (attribute.key() == non_utf8_string_key)
+    {
+      ++checked_attributes;
+      EXPECT_TRUE(0 ==
+                  memcmp(reinterpret_cast<const void *>(attribute.value().bytes_value().data()),
+                         reinterpret_cast<const void *>(non_utf8_string_arr), 4));
+      EXPECT_EQ(attribute.value().bytes_value().size(), 4);
+    }
+#endif
   }
+#if defined(ENABLE_OTLP_UTF8_VALIDITY)
+  EXPECT_EQ(5, checked_attributes);
+#else
   EXPECT_EQ(4, checked_attributes);
+#endif
 }
 
 // Test non-int array types. Int array types are tested using templates (see IntAttributeTest)
