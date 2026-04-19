@@ -76,10 +76,8 @@ Applications built with `WITH_OTLP_RETRY_PREVIEW=OFF` need to:
 * remove the WITH_OTLP_RETRY_PREVIEW flag from CMake scripts
 * use `retry_policy_max_attempts` = 0 in the OTLP exporter options.
 
-For Bazel, no compilation flag exists.
-
-When WITH_OTLP_RETRY_PREVIEW / ENABLE_OTLP_RETRY_PREVIEW gets
-removed from the code base, the bazel build will have the retry feature.
+For Bazel, no compilation option exists,
+the bazel build enables unconditionally ENABLE_OTLP_RETRY_PREVIEW.
 
 Make sure to properly initialize `retry_policy_max_attempts`
 to enable or disable the retry feature.
