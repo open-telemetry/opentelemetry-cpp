@@ -64,7 +64,7 @@ Increment the:
 * Enable ENABLE_OTLP_RETRY_PREVIEW for bazel
   [#4010](https://github.com/open-telemetry/opentelemetry-cpp/pull/4010)
 
-* [CODE HEALTH] Fix cland-tidy misc-no-recursion warnings
+* [CODE HEALTH] Fix clang-tidy misc-no-recursion warnings
   [#4009](https://github.com/open-telemetry/opentelemetry-cpp/pull/4009)
 
 Important changes:
