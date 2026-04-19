@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <map>
 #include <string>
 #include <utility>
@@ -10,6 +12,7 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
 #include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
@@ -23,6 +26,9 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
 using opentelemetry::logs::NoopEventLogger;
@@ -264,6 +270,101 @@ class TestLogger : public Logger
   }
 };
 
+class EnablementAwareTestLogRecord : public opentelemetry::logs::LogRecord
+{
+public:
+  void SetTimestamp(common::SystemTimestamp /*timestamp*/) noexcept override {}
+
+  void SetObservedTimestamp(common::SystemTimestamp /*timestamp*/) noexcept override {}
+
+  void SetSeverity(Severity severity) noexcept override { severity_ = severity; }
+
+  void SetBody(const common::AttributeValue & /*message*/) noexcept override
+  {
+    body_was_set_ = true;
+  }
+
+  void SetAttribute(nostd::string_view /*key*/,
+                    const common::AttributeValue & /*value*/) noexcept override
+  {}
+
+  void SetEventId(int64_t id, nostd::string_view name = {}) noexcept override
+  {
+    event_id_           = id;
+    event_id_was_set_   = true;
+    event_name_was_set_ = !name.empty();
+  }
+
+  void SetTraceId(const trace::TraceId & /*trace_id*/) noexcept override {}
+
+  void SetSpanId(const trace::SpanId & /*span_id*/) noexcept override {}
+
+  void SetTraceFlags(const trace::TraceFlags & /*trace_flags*/) noexcept override {}
+
+  Severity severity_{Severity::kInvalid};
+  int64_t event_id_{-1};
+  bool body_was_set_{false};
+  bool event_id_was_set_{false};
+  bool event_name_was_set_{false};
+};
+
+class EnablementAwareTestLogger : public Logger
+{
+public:
+  explicit EnablementAwareTestLogger(Severity minimum_severity,
+                                     bool event_id_enabled = false) noexcept
+      : event_id_enabled_(event_id_enabled)
+  {
+    SetMinimumSeverity(static_cast<uint8_t>(minimum_severity));
+  }
+
+  const nostd::string_view GetName() noexcept override { return "enablement-aware logger"; }
+
+  nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override
+  {
+    ++create_log_record_calls_;
+    return nostd::unique_ptr<opentelemetry::logs::LogRecord>(new EnablementAwareTestLogRecord());
+  }
+
+  using Logger::EmitLogRecord;
+
+  void EmitLogRecord(
+      nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept override
+  {
+    if (log_record)
+    {
+      ++emit_log_record_calls_;
+      last_emitted_record_.reset(static_cast<EnablementAwareTestLogRecord *>(log_record.release()));
+    }
+  }
+
+  void SetEventIdEnabled(bool enabled) noexcept { event_id_enabled_ = enabled; }
+
+  size_t create_log_record_calls_{0};
+  size_t emit_log_record_calls_{0};
+  mutable size_t enabled_with_event_id_calls_{0};
+  mutable Severity last_enabled_severity_{Severity::kInvalid};
+  mutable int64_t last_enabled_event_id_{-1};
+  nostd::unique_ptr<EnablementAwareTestLogRecord> last_emitted_record_;
+
+protected:
+  bool EnabledImplementation(Severity severity, const EventId &event_id) const noexcept override
+  {
+    ++enabled_with_event_id_calls_;
+    last_enabled_severity_ = severity;
+    last_enabled_event_id_ = event_id.id_;
+    return event_id_enabled_;
+  }
+
+  bool EnabledImplementation(Severity severity, int64_t event_id) const noexcept override
+  {
+    return EnabledImplementation(severity, EventId{event_id});
+  }
+
+private:
+  bool event_id_enabled_;
+};
+
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
 class TestProvider : public LoggerProvider
 {
@@ -289,4 +390,86 @@ TEST(Logger, PushLoggerImplementation)
   nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
   ASSERT_EQ("test logger", logger->GetName());
+}
+
+TEST(Logger, EmitLogRecordSkipsCreateWhenSeverityDisabled)
+{
+  EnablementAwareTestLogger logger(Severity::kError);
+
+  logger.EmitLogRecord(Severity::kInfo, "suppressed");
+
+  EXPECT_EQ(logger.create_log_record_calls_, 0u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 0u);
+}
+
+TEST(Logger, EmitLogRecordWithExistingRecordSkipsEmitWhenSeverityDisabled)
+{
+  EnablementAwareTestLogger logger(Severity::kError);
+
+  auto log_record = logger.CreateLogRecord();
+  ASSERT_EQ(logger.create_log_record_calls_, 1u);
+
+  logger.EmitLogRecord(std::move(log_record), Severity::kInfo, "suppressed");
+
+  EXPECT_EQ(logger.emit_log_record_calls_, 0u);
+}
+
+TEST(Logger, EmitLogRecordWithExistingRecordPopulatesAndEmitsWhenSeverityEnabled)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace);
+
+  auto log_record = logger.CreateLogRecord();
+  ASSERT_EQ(logger.create_log_record_calls_, 1u);
+
+  logger.EmitLogRecord(std::move(log_record), Severity::kInfo, "allowed");
+
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  ASSERT_TRUE(logger.last_emitted_record_ != nullptr);
+  EXPECT_EQ(logger.last_emitted_record_->severity_, Severity::kInfo);
+  EXPECT_EQ(logger.last_emitted_record_->event_id_, -1);
+  EXPECT_FALSE(logger.last_emitted_record_->event_id_was_set_);
+  EXPECT_TRUE(logger.last_emitted_record_->body_was_set_);
+}
+
+TEST(Logger, EmitLogRecordUsesEventIdEnablementBeforeCreate)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace);
+
+  logger.EmitLogRecord(Severity::kInfo, EventId{7, "suppressed"}, "suppressed");
+
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 1u);
+  EXPECT_EQ(logger.last_enabled_severity_, Severity::kInfo);
+  EXPECT_EQ(logger.last_enabled_event_id_, 7);
+  EXPECT_EQ(logger.create_log_record_calls_, 0u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 0u);
+
+  logger.SetEventIdEnabled(true);
+  logger.EmitLogRecord(EventId{7, "allowed"}, Severity::kInfo, "allowed");
+
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 2u);
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  ASSERT_TRUE(logger.last_emitted_record_ != nullptr);
+  EXPECT_EQ(logger.last_emitted_record_->severity_, Severity::kInfo);
+  EXPECT_EQ(logger.last_emitted_record_->event_id_, 7);
+  EXPECT_TRUE(logger.last_emitted_record_->event_id_was_set_);
+  EXPECT_TRUE(logger.last_emitted_record_->event_name_was_set_);
+  EXPECT_TRUE(logger.last_emitted_record_->body_was_set_);
+}
+
+TEST(Logger, EmitLogRecordAllowsEventIdWithoutSeverity)
+{
+  EnablementAwareTestLogger logger(Severity::kError);
+
+  logger.EmitLogRecord(EventId{9, "event-only"}, "allowed");
+
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  ASSERT_TRUE(logger.last_emitted_record_ != nullptr);
+  EXPECT_EQ(logger.last_emitted_record_->severity_, Severity::kInvalid);
+  EXPECT_EQ(logger.last_emitted_record_->event_id_, 9);
+  EXPECT_TRUE(logger.last_emitted_record_->event_id_was_set_);
+  EXPECT_TRUE(logger.last_emitted_record_->event_name_was_set_);
+  EXPECT_TRUE(logger.last_emitted_record_->body_was_set_);
 }

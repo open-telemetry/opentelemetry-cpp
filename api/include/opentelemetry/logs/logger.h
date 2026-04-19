@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include <type_traits>
+#include <utility>
+
 #include "opentelemetry/logs/logger_type_traits.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -77,25 +80,12 @@ public:
       return;
     }
 
-    //
-    // Keep the parameter pack unpacking order from left to right because left
-    // ones are usually more important like severity and event_id than the
-    // attributes. The left to right unpack order could pass the more important
-    // data to processors to avoid caching and memory allocating.
-    //
-#if __cplusplus <= 201402L
-    // C++14 does not support fold expressions for parameter pack expansion.
-    int dummy[] = {(detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
-                        log_record.get(), std::forward<ArgumentType>(args)),
-                    0)...};
-    IgnoreTraitResult(dummy);
-#else
-    IgnoreTraitResult((detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
-                           log_record.get(), std::forward<ArgumentType>(args)),
-                       ...));
-#endif
+    if (!ShouldEmitLogRecord(args...))
+    {
+      return;
+    }
 
-    EmitLogRecord(std::move(log_record));
+    PopulateAndEmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
   }
 
   /**
@@ -118,9 +108,14 @@ public:
   template <class... ArgumentType>
   void EmitLogRecord(ArgumentType &&...args)
   {
+    if (!ShouldEmitLogRecord(args...))
+    {
+      return;
+    }
+
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
 
-    EmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
+    PopulateAndEmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
   }
 
   /**
@@ -482,6 +477,115 @@ protected:
   }
 
 private:
+  template <class... ArgumentType>
+  void PopulateAndEmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record, ArgumentType &&...args)
+  {
+    if (!log_record)
+    {
+      return;
+    }
+
+    //
+    // Keep the parameter pack unpacking order from left to right because left
+    // ones are usually more important like severity and event_id than the
+    // attributes. The left to right unpack order could pass the more important
+    // data to processors to avoid caching and memory allocating.
+    //
+#if __cplusplus <= 201402L
+    // C++14 does not support fold expressions for parameter pack expansion.
+    int dummy[] = {(detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
+                        log_record.get(), std::forward<ArgumentType>(args)),
+                    0)...};
+    IgnoreTraitResult(dummy);
+#else
+    IgnoreTraitResult((detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
+                           log_record.get(), std::forward<ArgumentType>(args)),
+                       ...));
+#endif
+
+    EmitLogRecord(std::move(log_record));
+  }
+
+  template <class... ArgumentType>
+  bool ShouldEmitLogRecord(const ArgumentType &...args) const noexcept
+  {
+    return ShouldEmitLogRecord(
+        std::integral_constant<
+            bool, detail::LogRecordHasType<Severity,
+                                           typename std::decay<ArgumentType>::type...>::value>{},
+        std::integral_constant<
+            bool,
+            detail::LogRecordHasType<EventId, typename std::decay<ArgumentType>::type...>::value>{},
+        args...);
+  }
+
+  template <class... ArgumentType>
+  bool ShouldEmitLogRecord(std::false_type,
+                           std::false_type,
+                           const ArgumentType &.../*args*/) const noexcept
+  {
+    return true;
+  }
+
+  template <class... ArgumentType>
+  bool ShouldEmitLogRecord(std::false_type,
+                           std::true_type,
+                           const ArgumentType &.../*args*/) const noexcept
+  {
+    return true;
+  }
+
+  template <class... ArgumentType>
+  bool ShouldEmitLogRecord(std::true_type,
+                           std::false_type,
+                           const ArgumentType &...args) const noexcept
+  {
+    const Severity *severity = FindLogArgument<Severity>(args...);
+    return severity == nullptr ? true : Enabled(*severity);
+  }
+
+  template <class... ArgumentType>
+  bool ShouldEmitLogRecord(std::true_type,
+                           std::true_type,
+                           const ArgumentType &...args) const noexcept
+  {
+    const Severity *severity = FindLogArgument<Severity>(args...);
+    const EventId *event_id  = FindLogArgument<EventId>(args...);
+    return severity == nullptr || event_id == nullptr ? true : Enabled(*severity, *event_id);
+  }
+
+  template <class ValueType>
+  static const ValueType *FindLogArgument() noexcept
+  {
+    return nullptr;
+  }
+
+  template <class ValueType, class FirstArgumentType, class... RestArgumentType>
+  static const ValueType *FindLogArgument(const FirstArgumentType &first_arg,
+                                          const RestArgumentType &...rest_args) noexcept
+  {
+    return FindLogArgument<ValueType>(
+        std::integral_constant<
+            bool, std::is_same<ValueType, typename std::decay<FirstArgumentType>::type>::value>{},
+        first_arg, rest_args...);
+  }
+
+  template <class ValueType, class FirstArgumentType, class... RestArgumentType>
+  static const ValueType *FindLogArgument(std::true_type,
+                                          const FirstArgumentType &first_arg,
+                                          const RestArgumentType &.../*rest_args*/) noexcept
+  {
+    return &first_arg;
+  }
+
+  template <class ValueType, class FirstArgumentType, class... RestArgumentType>
+  static const ValueType *FindLogArgument(std::false_type,
+                                          const FirstArgumentType & /*first_arg*/,
+                                          const RestArgumentType &...rest_args) noexcept
+  {
+    return FindLogArgument<ValueType>(rest_args...);
+  }
+
   template <class... ValueType>
   void IgnoreTraitResult(ValueType &&...)
   {}
