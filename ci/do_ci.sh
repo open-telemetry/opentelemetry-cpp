@@ -618,7 +618,7 @@ elif [[ "$1" == "code.coverage" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DCMAKE_CXX_FLAGS="-Werror --coverage $CXXFLAGS" \
+        -DCMAKE_CXX_FLAGS="-Werror --coverage -fprofile-update=atomic $CXXFLAGS" \
         -C "${SRC_DIR}/test_common/cmake/all-options-abiv2-preview.cmake" \
         -DWITH_EXAMPLES=OFF \
         -DWITH_EXAMPLES_HTTP=OFF \
