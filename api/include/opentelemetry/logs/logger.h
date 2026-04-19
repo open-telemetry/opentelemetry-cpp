@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include <type_traits>
+#include <utility>
+
 #include "opentelemetry/logs/logger_type_traits.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
