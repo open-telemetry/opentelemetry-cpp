@@ -321,3 +321,17 @@ TEST(MeterProvider, GetMeterInequalityCheckAbiv2)
 }
 
 #endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
+
+TEST(MeterProvider, ShutdownTwice)
+{
+  // Test that calling Shutdown twice doesn't emit warnings
+  MeterProvider mp;
+
+  // First shutdown should succeed
+  EXPECT_TRUE(mp.Shutdown());
+
+  // Second shutdown should also succeed without warnings
+  EXPECT_TRUE(mp.Shutdown());
+
+  // Destructor should not emit warnings either since we already shut down
+}
