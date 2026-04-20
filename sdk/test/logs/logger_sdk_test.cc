@@ -12,6 +12,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
 #include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
 #include "opentelemetry/logs/log_record.h"
@@ -296,6 +297,10 @@ TEST(LoggerSDK, LoggerWithDisabledConfig)
   // Test Logger functions for the constructed logger
   // This logger should behave like a noop logger
   ASSERT_EQ(logger->GetName(), noop_logger.GetName());
+  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kTrace));
+  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kWarn));
+  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInfo, 123));
+  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInfo, logs_api::EventId{123, "disabled"}));
 
   // Since the logger is disabled, when creating a LogRecord, the observed timestamp will not be
   // set in the underlying LogRecordable
@@ -332,6 +337,11 @@ TEST(LoggerSDK, LoggerWithEnabledConfig)
 
   // Test Logger functions for the constructed logger
   ASSERT_EQ(logger->GetName(), "test-logger");
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kTrace));
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kWarn));
+  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInvalid));
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kInfo, 123));
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kInfo, logs_api::EventId{123, "enabled"}));
 
   // Since the logger is enabled, when creating a LogRecord, the observed timestamp will be set
   // in the underlying LogRecordable.
@@ -491,12 +501,14 @@ TEST_P(CustomLoggerConfiguratorTestFixture, VerifyCustomConfiguratorBehavior)
   if (test_case->expected_disabled_for_scope_)
   {
     ASSERT_EQ(logger_under_test->GetName(), noop_logger.GetName());
+    EXPECT_FALSE(logger_under_test->Enabled(logs_api::Severity::kTrace));
     ASSERT_EQ(shared_recordable_under_test->GetObservedTimestamp(),
               std::chrono::system_clock::from_time_t(0));
   }
   else
   {
     ASSERT_EQ(logger_under_test->GetName(), "test-logger");
+    EXPECT_TRUE(logger_under_test->Enabled(logs_api::Severity::kTrace));
     ASSERT_GE(shared_recordable_under_test->GetObservedTimestamp().time_since_epoch().count(),
               reference_ts.count());
   }
