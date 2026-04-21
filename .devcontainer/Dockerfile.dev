@@ -31,11 +31,8 @@ RUN update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-
 
 RUN cd /opt/ci && bash setup_ci_environment.sh
 RUN cd /opt/ci && bash install_iwyu.sh
-
-ADD https://github.com/bazelbuild/bazelisk/releases/download/v1.22.1/bazelisk-linux-amd64 /usr/local/bin
-	
-RUN git config --global core.autocrlf input \
-	&& chmod +x /usr/local/bin/bazelisk-linux-amd64
+RUN cd /opt/ci && bash install_bazelisk.sh
+RUN git config --global core.autocrlf input
 
 ENV INSTALL_PACKAGES=${INSTALL_PACKAGES}
 ENV USER_NAME=devuser

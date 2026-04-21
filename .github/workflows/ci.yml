@@ -439,6 +439,10 @@ jobs:
     - name: install dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file ./install/cmake/third_party_stable --packages "googletest;benchmark"
+    - name: run tests
+      env:
+        CXX_STANDARD: '14'
+      run: ./ci/do_ci.sh cmake.c++14.test
     - name: run tests (enable stl)
       env:
         CXX_STANDARD: '14'
@@ -459,6 +463,10 @@ jobs:
     - name: setup
       run: |
         sudo -E ./ci/setup_ci_environment.sh
+    - name: run tests
+      env:
+        CXX_STANDARD: '17'
+      run: ./ci/do_ci.sh cmake.c++17.test
     - name: run tests (enable stl)
       env:
         CXX_STANDARD: '17'

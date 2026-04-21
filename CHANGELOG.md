@@ -17,6 +17,8 @@ Increment the:
 
 * [CONFIGURATION] Add YAML parsing support for Composable Samplers
   [#3914](https://github.com/open-telemetry/opentelemetry-cpp/issues/3914)
+* [SDK] Fix PeriodicExportingMetricReader shutdown race on destruction
+  [#4008](https://github.com/open-telemetry/opentelemetry-cpp/pull/4008)
 
 * [SDK] Move inline implementation from SDK headers to .cc files.
   Note: `GetEmptyAttributes()` now requires linking `opentelemetry_common`.
@@ -64,6 +66,12 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy warnings in base2 exponential histogram aggregation
   [#3997](https://github.com/open-telemetry/opentelemetry-cpp/pull/3997)
 
+* Enable ENABLE_OTLP_RETRY_PREVIEW for bazel
+  [#4010](https://github.com/open-telemetry/opentelemetry-cpp/pull/4010)
+
+* [CODE HEALTH] Fix clang-tidy misc-no-recursion warnings
+  [#4009](https://github.com/open-telemetry/opentelemetry-cpp/pull/4009)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
@@ -80,6 +88,11 @@ Important changes:
   * Bazel now always builds with ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW.
   * grpc properties for ssl KEY and CERT are always available,
     adjust the application code to initialize all members in grpc options.
+
+* Enable ENABLE_OTLP_RETRY_PREVIEW for bazel
+  [#4010](https://github.com/open-telemetry/opentelemetry-cpp/pull/4010)
+
+  * Bazel now always builds with ENABLE_OTLP_RETRY_PREVIEW.
 
 ## [1.26.0] 2026-03-19
 
