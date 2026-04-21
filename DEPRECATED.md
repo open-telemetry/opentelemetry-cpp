@@ -229,7 +229,7 @@ any code still using the deprecated `EventLogger` will break.
 The `plugin` API was deprecated by:
 
 * [API] Deprecate plugin
-  [#XXXX](https://github.com/open-telemetry/opentelemetry-cpp/pull/XXXX)
+  [#4021](https://github.com/open-telemetry/opentelemetry-cpp/pull/4021)
 
 on Apr 21, 2026.
 
