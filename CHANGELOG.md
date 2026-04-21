@@ -82,6 +82,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy narrowing-conversions warnings in sync_instruments
   [#4013](https://github.com/open-telemetry/opentelemetry-cpp/pull/4013)
 
+* [SDK] env var durations non corforming to spec
+  [#4020](https://github.com/open-telemetry/opentelemetry-cpp/pull/4020)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
@@ -103,6 +106,34 @@ Important changes:
   [#4010](https://github.com/open-telemetry/opentelemetry-cpp/pull/4010)
 
   * Bazel now always builds with ENABLE_OTLP_RETRY_PREVIEW.
+
+Breaking changes:
+
+* [SDK] env var durations non conforming to spec
+  [#4020](https://github.com/open-telemetry/opentelemetry-cpp/pull/4020)
+
+  * When parsing environment variables that represent durations,
+    for example `OTEL_METRIC_EXPORT_INTERVAL=15000`,
+    the code interpreted the value, `15000`,
+    in seconds instead of milliseconds per the specifications.
+  * Parsing duration has been fixed to use the proper units.
+  * As a consequence, every duration environment variable set
+    is now interpreted differently, which is a breaking change.
+  * For example, `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT=30` meant 30 seconds
+    before, and now means 30 milliseconds.
+    To preserve the same behavior, existing values must be adjusted,
+    to `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT=30000` in this case.
+  * The following variables are affected:
+    * OTEL_EXPORTER_OTLP_TRACES_TIMEOUT
+    * OTEL_EXPORTER_OTLP_METRICS_TIMEOUT
+    * OTEL_EXPORTER_OTLP_LOGS_TIMEOUT
+    * OTEL_EXPORTER_OTLP_TIMEOUT
+    * OTEL_BLRP_SCHEDULE_DELAY
+    * OTEL_BLRP_EXPORT_TIMEOUT
+    * OTEL_METRIC_EXPORT_INTERVAL
+    * OTEL_METRIC_EXPORT_TIMEOUT
+    * OTEL_BSP_SCHEDULE_DELAY
+    * OTEL_BSP_EXPORT_TIMEOUT
 
 ## [1.26.0] 2026-03-19
 
