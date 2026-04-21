@@ -840,11 +840,6 @@ jobs:
   bazel_asan:
     name: Bazel asan config
     runs-on: ubuntu-latest
-    # Temporarily disabled
-    # abseil-cpp fails to build with asan using gcc
-    # see https://github.com/abseil/abseil-cpp/issues/1634
-    # see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=71962
-    if: false
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
@@ -867,6 +862,32 @@ jobs:
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.asan
+
+  bazel_ubsan:
+    name: Bazel ubsan config
+    runs-on: ubuntu-latest
+    steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@6c3c2f2c1c457b00c10c4848d6f5491db3b629df # v2.18.0
+      with:
+        egress-policy: audit
+
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_ubsan
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.ubsan
 
   bazel_tsan:
     name: Bazel tsan config
