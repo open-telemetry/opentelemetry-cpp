@@ -67,6 +67,15 @@ Increment the:
 * Enable ENABLE_OTLP_RETRY_PREVIEW for bazel
   [#4010](https://github.com/open-telemetry/opentelemetry-cpp/pull/4010)
 
+* [CI] Build third-party dependencies in release with ninja
+  [#3995](https://github.com/open-telemetry/opentelemetry-cpp/pull/3995)
+
+* [CI] Update ci scripts and documentation
+  [#4000](https://github.com/open-telemetry/opentelemetry-cpp/pull/4000)
+
+* [CI] Update code.coverage job to report on all components and features
+  [#4002](https://github.com/open-telemetry/opentelemetry-cpp/pull/4002)
+
 * [CODE HEALTH] Fix clang-tidy misc-no-recursion warnings
   [#4009](https://github.com/open-telemetry/opentelemetry-cpp/pull/4009)
 
