@@ -159,11 +159,8 @@ static bool GetTimeoutFromString(const char *input, std::chrono::system_clock::d
 
   if (unit == "")
   {
-    // TODO: The spec says milliseconds, but opentelemetry-cpp implemented
-    // seconds by default. Fixing this is a breaking change.
-
     value = std::chrono::duration_cast<std::chrono::system_clock::duration>(
-        std::chrono::seconds{result});
+        std::chrono::milliseconds{result});
     return true;
   }
 
