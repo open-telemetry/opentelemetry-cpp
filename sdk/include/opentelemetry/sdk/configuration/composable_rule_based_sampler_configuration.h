@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+
 #include <memory>
 #include <vector>
+
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
-#include "opentelemetry/sdk/configuration/sampler_configuration.h"
+// 1. Include our new base class
+#include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
@@ -15,7 +18,8 @@ namespace sdk
 namespace configuration
 {
 
-class ComposableRuleBasedSamplerConfiguration : public SamplerConfiguration
+// 2. Inherit from ComposableSamplerConfiguration
+class ComposableRuleBasedSamplerConfiguration : public ComposableSamplerConfiguration
 {
 public:
   ComposableRuleBasedSamplerConfiguration() = default;

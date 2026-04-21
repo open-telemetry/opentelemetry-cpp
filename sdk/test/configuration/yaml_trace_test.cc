@@ -15,11 +15,14 @@
 #include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_patterns_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_values_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
+#include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_configuration.h"
@@ -914,14 +917,6 @@ public:
   {
     type_matched = SamplerType::kComposableRuleBased;
   }
-  void VisitComposable(
-      const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model) override
-  {
-    if (model->inner)
-    {
-      model->inner->Accept(this);
-    }
-  }
 };
 }  // namespace
 
@@ -1051,4 +1046,118 @@ tracer_provider:
   TestSamplerVisitor visitor;
   config->tracer_provider->sampler->Accept(&visitor);
   EXPECT_EQ(visitor.type_matched, SamplerType::kComposableParentThreshold);
+}
+
+TEST(YamlTrace, composable_rule_based_sampler_comprehensive)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    composite/development:
+      rule_based:
+        rules:
+          - attribute_values:
+              key: "http.method"
+              values:
+                - "GET"
+                - "POST"
+            attribute_patterns:
+              key: "http.url"
+              included:
+                - ".*/api/.*"
+              excluded:
+                - ".*/healthz"
+            parent:
+              - remote
+              - local
+            span_kinds:
+              - server
+              - client
+            sampler:
+              always_on:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  // Cast down to our specific type to check the fields
+  auto *rule_based_sampler =
+      static_cast<opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *>(
+          config->tracer_provider->sampler.get());
+  ASSERT_NE(rule_based_sampler, nullptr);
+  ASSERT_EQ(rule_based_sampler->rules.size(), 1);
+
+  const auto &rule = rule_based_sampler->rules[0];
+
+  // 1. Check attribute_values
+  ASSERT_NE(rule->attribute_values, nullptr);
+  EXPECT_EQ(rule->attribute_values->key, "http.method");
+  ASSERT_EQ(rule->attribute_values->values.size(), 2);
+  EXPECT_EQ(rule->attribute_values->values[0], "GET");
+
+  // 2. Check attribute_patterns
+  ASSERT_NE(rule->attribute_patterns, nullptr);
+  EXPECT_EQ(rule->attribute_patterns->key, "http.url");
+  ASSERT_EQ(rule->attribute_patterns->included.size(), 1);
+  EXPECT_EQ(rule->attribute_patterns->included[0], ".*/api/.*");
+  ASSERT_EQ(rule->attribute_patterns->excluded.size(), 1);
+  EXPECT_EQ(rule->attribute_patterns->excluded[0], ".*/healthz");
+
+  // 3. Check parent flags
+  EXPECT_TRUE(rule->match_parent_remote);
+  EXPECT_TRUE(rule->match_parent_local);
+  EXPECT_FALSE(rule->match_parent_none);
+
+  // 4. Check span kinds
+  EXPECT_TRUE(rule->match_span_kind_server);
+  EXPECT_TRUE(rule->match_span_kind_client);
+  EXPECT_FALSE(rule->match_span_kind_internal);
+
+  // 5. Check inner sampler
+  ASSERT_NE(rule->sampler, nullptr);
+}
+
+TEST(YamlTrace, composable_rule_based_sampler_illegal_parent)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  sampler:
+    composite/development:
+      rule_based:
+        rules:
+          - parent:
+              - illegal_parent_value
+            sampler:
+              always_on:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(YamlTrace, composable_rule_based_sampler_illegal_spankind)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  sampler:
+    composite/development:
+      rule_based:
+        rules:
+          - span_kinds:
+              - illegal_span_kind
+            sampler:
+              always_on:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
 }

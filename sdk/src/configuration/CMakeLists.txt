@@ -15,8 +15,7 @@ add_library(
   composable_always_on_sampler_configuration.cc
   composable_probability_sampler_configuration.cc
   composable_parent_threshold_sampler_configuration.cc
-  composable_rule_based_sampler_configuration.cc
-  composable_sampler_configuration.cc)
+  composable_rule_based_sampler_configuration.cc)
 
 set_target_properties(opentelemetry_configuration PROPERTIES EXPORT_NAME
                                                              configuration)

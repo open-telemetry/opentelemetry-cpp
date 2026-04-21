@@ -1739,16 +1739,15 @@ ConfigurationParser::ParseComposableRuleBasedSamplerRuleAttributeValuesConfigura
     const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<ComposableRuleBasedSamplerRuleAttributeValuesConfiguration>();
-  model->key = node->GetString("key", "");
-  auto vals  = node->GetChildNode("values");
-  if (vals)
+  model->key = node->GetRequiredString("key");
+
+  auto vals = node->GetRequiredChildNode("values");
+  for (auto vit = vals->begin(); vit != vals->end(); ++vit)
   {
-    for (auto vit = vals->begin(); vit != vals->end(); ++vit)
-    {
-      std::unique_ptr<DocumentNode> v(*vit);
-      model->values.push_back(v->AsString());
-    }
+    std::unique_ptr<DocumentNode> v(*vit);
+    model->values.push_back(v->AsString());
   }
+
   return model;
 }
 
@@ -1757,7 +1756,7 @@ ConfigurationParser::ParseComposableRuleBasedSamplerRuleAttributePatternsConfigu
     const std::unique_ptr<DocumentNode> &node) const
 {
   auto model = std::make_unique<ComposableRuleBasedSamplerRuleAttributePatternsConfiguration>();
-  model->key = node->GetString("key", "");
+  model->key = node->GetRequiredString("key");
 
   auto included = node->GetChildNode("included");
   if (included)
@@ -1814,6 +1813,8 @@ ConfigurationParser::ParseComposableRuleBasedSamplerRuleConfiguration(
         rule->match_parent_remote = true;
       else if (p_str == "local")
         rule->match_parent_local = true;
+      else
+        throw InvalidSchemaException(p->Location(), "Illegal parent type: " + p_str);
     }
   }
 
@@ -1834,6 +1835,8 @@ ConfigurationParser::ParseComposableRuleBasedSamplerRuleConfiguration(
         rule->match_span_kind_producer = true;
       else if (k_str == "consumer")
         rule->match_span_kind_consumer = true;
+      else
+        throw InvalidSchemaException(k->Location(), "Illegal span_kind type: " + k_str);
     }
   }
 
@@ -1863,9 +1866,9 @@ ConfigurationParser::ParseComposableRuleBasedSamplerConfiguration(
   return model;
 }
 
-std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseComposableSamplerConfiguration(
-    const std::unique_ptr<DocumentNode> &node,
-    size_t depth) const
+std::unique_ptr<ComposableSamplerConfiguration>
+ConfigurationParser::ParseComposableSamplerConfiguration(const std::unique_ptr<DocumentNode> &node,
+                                                         size_t depth) const
 {
   std::string inner_name;
   std::unique_ptr<DocumentNode> inner_child;

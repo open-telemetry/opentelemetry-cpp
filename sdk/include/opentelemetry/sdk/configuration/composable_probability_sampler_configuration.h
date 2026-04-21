@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/configuration/sampler_configuration.h"
+// 1. Include our new base class
+#include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
@@ -13,7 +14,8 @@ namespace sdk
 namespace configuration
 {
 
-class ComposableProbabilitySamplerConfiguration : public SamplerConfiguration
+// 2. Inherit from ComposableSamplerConfiguration
+class ComposableProbabilitySamplerConfiguration : public ComposableSamplerConfiguration
 {
 public:
   ComposableProbabilitySamplerConfiguration() = default;

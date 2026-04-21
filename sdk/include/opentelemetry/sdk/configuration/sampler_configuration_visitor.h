@@ -51,7 +51,6 @@ public:
   {}
   virtual void VisitComposableRuleBased(const ComposableRuleBasedSamplerConfiguration * /*model*/)
   {}
-  virtual void VisitComposable(const ComposableSamplerConfiguration * /*model*/) {}
 };
 
 }  // namespace configuration

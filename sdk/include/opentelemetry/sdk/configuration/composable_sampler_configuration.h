@@ -13,9 +13,12 @@ namespace configuration
 class ComposableSamplerConfiguration : public SamplerConfiguration
 {
 public:
-  ComposableSamplerConfiguration() = default;
-  std::unique_ptr<SamplerConfiguration> inner;
-  void Accept(SamplerConfigurationVisitor *visitor) const override;
+  ComposableSamplerConfiguration()                                                  = default;
+  ~ComposableSamplerConfiguration() override                                        = default;
+  ComposableSamplerConfiguration(const ComposableSamplerConfiguration &)            = default;
+  ComposableSamplerConfiguration(ComposableSamplerConfiguration &&)                 = default;
+  ComposableSamplerConfiguration &operator=(const ComposableSamplerConfiguration &) = default;
+  ComposableSamplerConfiguration &operator=(ComposableSamplerConfiguration &&)      = default;
 };
 }  // namespace configuration
 }  // namespace sdk
