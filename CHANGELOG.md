@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Fix PeriodicExportingMetricReader shutdown race on destruction
+  [#4008](https://github.com/open-telemetry/opentelemetry-cpp/pull/4008)
+
 * [SDK] Move inline implementation from SDK headers to .cc files.
   Note: `GetEmptyAttributes()` now requires linking `opentelemetry_common`.
   [#3887](https://github.com/open-telemetry/opentelemetry-cpp/pull/3887)
@@ -66,6 +69,9 @@ Increment the:
 
 * [CODE HEALTH] Fix clang-tidy misc-no-recursion warnings
   [#4009](https://github.com/open-telemetry/opentelemetry-cpp/pull/4009)
+
+* [CODE HEALTH] Fix clang-tidy narrowing-conversions warnings in sync_instruments
+  [#4013](https://github.com/open-telemetry/opentelemetry-cpp/pull/4013)
 
 Important changes:
 
