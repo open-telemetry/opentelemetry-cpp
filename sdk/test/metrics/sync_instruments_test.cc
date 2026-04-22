@@ -163,6 +163,11 @@ TEST(SyncInstruments, LongHistogram)
                    opentelemetry::context::Context{});
   histogram.Record(10, opentelemetry::common::KeyValueIterableView<M>({}),
                    opentelemetry::context::Context{});
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  histogram.Record(10ULL);
+  histogram.Record(10ULL, opentelemetry::common::KeyValueIterableView<M>({}));
+#endif
 }
 
 TEST(SyncInstruments, DoubleHistogram)
