@@ -16,7 +16,6 @@ namespace sdk
 namespace configuration
 {
 
-// Inherit from ComposableSamplerConfiguration
 class ComposableParentThresholdSamplerConfiguration : public ComposableSamplerConfiguration
 {
 public:
