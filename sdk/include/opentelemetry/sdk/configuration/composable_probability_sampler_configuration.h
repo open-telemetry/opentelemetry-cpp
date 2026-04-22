@@ -14,7 +14,6 @@ namespace sdk
 namespace configuration
 {
 
-// 2. Inherit from ComposableSamplerConfiguration
 class ComposableProbabilitySamplerConfiguration : public ComposableSamplerConfiguration
 {
 public:
