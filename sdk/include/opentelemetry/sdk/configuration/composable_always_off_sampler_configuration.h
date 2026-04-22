@@ -13,7 +13,6 @@ namespace sdk
 namespace configuration
 {
 
-// 2. Inherit from ComposableSamplerConfiguration
 class ComposableAlwaysOffSamplerConfiguration : public ComposableSamplerConfiguration
 {
 public:
