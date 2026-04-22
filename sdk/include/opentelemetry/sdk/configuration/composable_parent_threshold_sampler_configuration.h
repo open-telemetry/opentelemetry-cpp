@@ -5,7 +5,6 @@
 
 #include <memory>
 
-// Include the new base class
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/version.h"
