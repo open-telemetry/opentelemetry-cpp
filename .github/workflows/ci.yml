@@ -1018,7 +1018,6 @@ jobs:
     - name: setup
       run: |
         ./ci/setup_windows_ci_environment.ps1
-        ./ci/install_windows_protobuf.ps1
     - name: run cmake test
       run: ./ci/do_ci.ps1 cmake.test
     - name: run otprotocol test
@@ -1039,7 +1038,6 @@ jobs:
     - name: setup
       run: |
         ./ci/setup_windows_ci_environment.ps1
-        ./ci/install_windows_protobuf.ps1
     - name: run cmake test (DLL build)
       run: ./ci/do_ci.ps1 cmake.dll.test
     - name: run cmake cxx20 test (DLL build)
@@ -1062,7 +1060,6 @@ jobs:
     - name: setup
       run: |
         ./ci/setup_windows_ci_environment.ps1
-        ./ci/install_windows_protobuf.ps1
     - name: run cmake test
       run: ./ci/do_ci.ps1 cmake.with_async_export.test
     - name: run otprotocol test
