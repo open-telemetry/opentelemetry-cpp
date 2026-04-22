@@ -18,7 +18,6 @@ namespace sdk
 namespace configuration
 {
 
-// 2. Inherit from ComposableSamplerConfiguration
 class ComposableRuleBasedSamplerConfiguration : public ComposableSamplerConfiguration
 {
 public:
