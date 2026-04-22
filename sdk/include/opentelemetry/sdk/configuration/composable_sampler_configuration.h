@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
+
 #pragma once
+
 #include <memory>
 
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
