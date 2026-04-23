@@ -35,6 +35,11 @@ class Arena;
 }
 }  // namespace google
 
+namespace grpc
+{
+class ChannelArguments;
+}  // namespace grpc
+
 namespace opentelemetry
 {
 namespace proto
@@ -254,6 +259,13 @@ public:
   bool IsShutdown() const noexcept;
 
 private:
+  friend class OtlpGrpcClientTestPeer;
+
+  // Populate gRPC channel arguments from exporter options. Shared by MakeChannel() and unit
+  // tests.
+  static void PopulateChannelArguments(const OtlpGrpcClientOptions &options,
+                                       grpc::ChannelArguments &grpc_arguments);
+
   // Stores if this gRPC client had its Shutdown() method called
   std::atomic<bool> is_shutdown_;
 

@@ -3,6 +3,7 @@
 
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include <gtest/gtest.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <limits>
 #include <string>
@@ -391,7 +392,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMerge)
 
   auto test_merge = [](const std::unique_ptr<Aggregation> &merged_aggr, int expected_count,
                        double expected_sum, int expected_zero_count, int expected_scale,
-                       int expected_max_buckets) {
+                       size_t expected_max_buckets) {
     auto merged_point = nostd::get<Base2ExponentialHistogramPointData>(merged_aggr->ToPoint());
     EXPECT_EQ(merged_point.count_, expected_count);
     EXPECT_DOUBLE_EQ(merged_point.sum_, expected_sum);
@@ -415,10 +416,10 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMerge)
 
     const int expected_scale =
         aggr_point.scale_ < default_point.scale_ ? aggr_point.scale_ : default_point.scale_;
-    const int expected_max_buckets = aggr_point.max_buckets_ < default_point.max_buckets_
-                                         ? aggr_point.max_buckets_
-                                         : default_point.max_buckets_;
-    const int expected_zero_count  = 0;
+    const size_t expected_max_buckets = aggr_point.max_buckets_ < default_point.max_buckets_
+                                            ? aggr_point.max_buckets_
+                                            : default_point.max_buckets_;
+    const int expected_zero_count     = 0;
 
     auto merged_from_default = aggr.Merge(*default_aggr);
     test_merge(merged_from_default, expected_count, expected_sum, expected_zero_count,
@@ -437,10 +438,10 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMerge)
     const auto zero_point = nostd::get<Base2ExponentialHistogramPointData>(zero_aggr.ToPoint());
     const int expected_scale =
         aggr_point.scale_ < zero_point.scale_ ? aggr_point.scale_ : zero_point.scale_;
-    const int expected_max_buckets = aggr_point.max_buckets_ < zero_point.max_buckets_
-                                         ? aggr_point.max_buckets_
-                                         : zero_point.max_buckets_;
-    const int expected_zero_count  = 1;
+    const size_t expected_max_buckets = aggr_point.max_buckets_ < zero_point.max_buckets_
+                                            ? aggr_point.max_buckets_
+                                            : zero_point.max_buckets_;
+    const int expected_zero_count     = 1;
 
     auto merged_from_zero = aggr.Merge(zero_aggr);
     test_merge(merged_from_zero, expected_count + 1, expected_sum, expected_zero_count,
@@ -606,4 +607,28 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMergeCountInvariant)
     auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
     verify_invariant(point, expected_count, "Cycle 6: indices 5-9");
   }
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationDiffDownscale)
+{
+  // Force the scale-reduction branch in Diff() by giving left and right
+  // bucket indices whose combined span exceeds max_buckets. Each side
+  // individually has only one bucket so neither triggers Aggregate's
+  // internal Downscale; the reduction must happen inside Diff().
+  Base2ExponentialHistogramAggregationConfig config;
+  config.max_scale_   = 0;
+  config.max_buckets_ = 5;
+
+  Base2ExponentialHistogramAggregation left(&config);
+  left.Aggregate(2.0, {});  // 2^1 -> index 0
+
+  Base2ExponentialHistogramAggregation right(&config);
+  right.Aggregate(128.0, {});  // 2^7 -> index 6
+
+  // Combined span 0..6 (7 buckets) > max_buckets=5, so Diff() must downscale.
+  // GetScaleReduction(0, 6, 5) returns 1, so the result scale drops from 0 to -1.
+  auto diffed       = left.Diff(right);
+  auto diffed_point = nostd::get<Base2ExponentialHistogramPointData>(diffed->ToPoint());
+
+  EXPECT_EQ(diffed_point.scale_, -1);
 }

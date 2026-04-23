@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] File configuration - composable samplers
+  [#3966](https://github.com/open-telemetry/opentelemetry-cpp/issues/3966)
+* [SDK] Fix PeriodicExportingMetricReader shutdown race on destruction
+  [#4008](https://github.com/open-telemetry/opentelemetry-cpp/pull/4008)
+
 * [SDK] Move inline implementation from SDK headers to .cc files.
   Note: `GetEmptyAttributes()` now requires linking `opentelemetry_common`.
   [#3887](https://github.com/open-telemetry/opentelemetry-cpp/pull/3887)
@@ -40,6 +45,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy misc-use-internal-linkage warnings
   [#3985](https://github.com/open-telemetry/opentelemetry-cpp/pull/3985)
 
+* [CODE HEALTH] Fix clang-tidy narrowing-conversions warnings in tests
+  [#3987](https://github.com/open-telemetry/opentelemetry-cpp/pull/3987)
+
 * Enable WITH_OTLP_RETRY_PREVIEW by default
   [#3953](https://github.com/open-telemetry/opentelemetry-cpp/pull/3953)
 
@@ -48,6 +56,33 @@ Increment the:
 
 * [BAZEL] Add ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW define to otlp_grpc_log_record_exporter
   [#3988](https://github.com/open-telemetry/opentelemetry-cpp/pull/3988)
+
+* [CODE HEALTH] Fix clang-tidy narrowing conversions in baggage
+  [#3989](https://github.com/open-telemetry/opentelemetry-cpp/pull/3989)
+
+* [CODE HEALTH] Fix misc clang-tidy warnings
+  [#3993](https://github.com/open-telemetry/opentelemetry-cpp/pull/3993)
+
+* [CODE HEALTH] Fix clang-tidy warnings in base2 exponential histogram aggregation
+  [#3997](https://github.com/open-telemetry/opentelemetry-cpp/pull/3997)
+
+* Enable ENABLE_OTLP_RETRY_PREVIEW for bazel
+  [#4010](https://github.com/open-telemetry/opentelemetry-cpp/pull/4010)
+
+* [CI] Build third-party dependencies in release with ninja
+  [#3995](https://github.com/open-telemetry/opentelemetry-cpp/pull/3995)
+
+* [CI] Update ci scripts and documentation
+  [#4000](https://github.com/open-telemetry/opentelemetry-cpp/pull/4000)
+
+* [CI] Update code.coverage job to report on all components and features
+  [#4002](https://github.com/open-telemetry/opentelemetry-cpp/pull/4002)
+
+* [CODE HEALTH] Fix clang-tidy misc-no-recursion warnings
+  [#4009](https://github.com/open-telemetry/opentelemetry-cpp/pull/4009)
+
+* [CODE HEALTH] Fix clang-tidy narrowing-conversions warnings in sync_instruments
+  [#4013](https://github.com/open-telemetry/opentelemetry-cpp/pull/4013)
 
 Important changes:
 
@@ -65,6 +100,11 @@ Important changes:
   * Bazel now always builds with ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW.
   * grpc properties for ssl KEY and CERT are always available,
     adjust the application code to initialize all members in grpc options.
+
+* Enable ENABLE_OTLP_RETRY_PREVIEW for bazel
+  [#4010](https://github.com/open-telemetry/opentelemetry-cpp/pull/4010)
+
+  * Bazel now always builds with ENABLE_OTLP_RETRY_PREVIEW.
 
 ## [1.26.0] 2026-03-19
 
