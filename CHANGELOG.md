@@ -17,7 +17,6 @@ Increment the:
 
 * [CONFIGURATION] File configuration - composable samplers
   [#3966](https://github.com/open-telemetry/opentelemetry-cpp/issues/3966)
-  
 * [SDK] Fix PeriodicExportingMetricReader shutdown race on destruction
   [#4008](https://github.com/open-telemetry/opentelemetry-cpp/pull/4008)
 
