@@ -34,23 +34,19 @@ public:
   SamplerConfigurationVisitor &operator=(const SamplerConfigurationVisitor &other) = default;
   virtual ~SamplerConfigurationVisitor()                                           = default;
 
-  virtual void VisitAlwaysOff(const AlwaysOffSamplerConfiguration *model)                 = 0;
-  virtual void VisitAlwaysOn(const AlwaysOnSamplerConfiguration *model)                   = 0;
-  virtual void VisitJaegerRemote(const JaegerRemoteSamplerConfiguration *model)           = 0;
-  virtual void VisitParentBased(const ParentBasedSamplerConfiguration *model)             = 0;
-  virtual void VisitTraceIdRatioBased(const TraceIdRatioBasedSamplerConfiguration *model) = 0;
-  virtual void VisitExtension(const ExtensionSamplerConfiguration *model)                 = 0;
-  virtual void VisitComposableAlwaysOff(const ComposableAlwaysOffSamplerConfiguration * /*model*/)
-  {}
-  virtual void VisitComposableAlwaysOn(const ComposableAlwaysOnSamplerConfiguration * /*model*/) {}
+  virtual void VisitAlwaysOff(const AlwaysOffSamplerConfiguration *model)                     = 0;
+  virtual void VisitAlwaysOn(const AlwaysOnSamplerConfiguration *model)                       = 0;
+  virtual void VisitJaegerRemote(const JaegerRemoteSamplerConfiguration *model)               = 0;
+  virtual void VisitParentBased(const ParentBasedSamplerConfiguration *model)                 = 0;
+  virtual void VisitTraceIdRatioBased(const TraceIdRatioBasedSamplerConfiguration *model)     = 0;
+  virtual void VisitExtension(const ExtensionSamplerConfiguration *model)                     = 0;
+  virtual void VisitComposableAlwaysOff(const ComposableAlwaysOffSamplerConfiguration *model) = 0;
+  virtual void VisitComposableAlwaysOn(const ComposableAlwaysOnSamplerConfiguration *model)   = 0;
   virtual void VisitComposableProbability(
-      const ComposableProbabilitySamplerConfiguration * /*model*/)
-  {}
+      const ComposableProbabilitySamplerConfiguration *model) = 0;
   virtual void VisitComposableParentThreshold(
-      const ComposableParentThresholdSamplerConfiguration * /*model*/)
-  {}
-  virtual void VisitComposableRuleBased(const ComposableRuleBasedSamplerConfiguration * /*model*/)
-  {}
+      const ComposableParentThresholdSamplerConfiguration *model)                             = 0;
+  virtual void VisitComposableRuleBased(const ComposableRuleBasedSamplerConfiguration *model) = 0;
 };
 
 }  // namespace configuration

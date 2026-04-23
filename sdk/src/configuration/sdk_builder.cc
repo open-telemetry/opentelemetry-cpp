@@ -396,6 +396,7 @@ public:
       const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration
           * /* model */) override
   {
+    // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/4028
     OTEL_INTERNAL_LOG_WARN("ComposableParentThresholdSampler not yet fully supported by SDK");
     sampler = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
   }
@@ -404,6 +405,7 @@ public:
       const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration
           * /* model */) override
   {
+    // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/4028
     OTEL_INTERNAL_LOG_WARN("ComposableRuleBasedSampler not yet fully supported by SDK");
     sampler = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
   }

@@ -1870,14 +1870,14 @@ std::unique_ptr<ComposableSamplerConfiguration>
 ConfigurationParser::ParseComposableSamplerConfiguration(const std::unique_ptr<DocumentNode> &node,
                                                          size_t depth) const
 {
-  std::string inner_name;
-  std::unique_ptr<DocumentNode> inner_child;
+  std::string name;
+  std::unique_ptr<DocumentNode> child;
   size_t count = 0;
 
   for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
   {
-    inner_name  = it.Name();
-    inner_child = it.Value();
+    name  = it.Name();
+    child = it.Value();
     count++;
   }
 
@@ -1888,19 +1888,19 @@ ConfigurationParser::ParseComposableSamplerConfiguration(const std::unique_ptr<D
     throw InvalidSchemaException(node->Location(), message);
   }
 
-  if (inner_name == "always_off")
-    return ParseComposableAlwaysOffSamplerConfiguration(inner_child, depth);
-  if (inner_name == "always_on")
-    return ParseComposableAlwaysOnSamplerConfiguration(inner_child, depth);
-  if (inner_name == "probability")
-    return ParseComposableProbabilitySamplerConfiguration(inner_child, depth);
-  if (inner_name == "parent_threshold")
-    return ParseComposableParentThresholdSamplerConfiguration(inner_child, depth);
-  if (inner_name == "rule_based")
-    return ParseComposableRuleBasedSamplerConfiguration(inner_child, depth);
+  if (name == "always_off")
+    return ParseComposableAlwaysOffSamplerConfiguration(child, depth);
+  if (name == "always_on")
+    return ParseComposableAlwaysOnSamplerConfiguration(child, depth);
+  if (name == "probability")
+    return ParseComposableProbabilitySamplerConfiguration(child, depth);
+  if (name == "parent_threshold")
+    return ParseComposableParentThresholdSamplerConfiguration(child, depth);
+  if (name == "rule_based")
+    return ParseComposableRuleBasedSamplerConfiguration(child, depth);
 
   std::string message("Illegal composable sampler type: ");
-  message.append(inner_name);
+  message.append(name);
   throw InvalidSchemaException(node->Location(), message);
 }
 // NOLINTEND(misc-no-recursion)

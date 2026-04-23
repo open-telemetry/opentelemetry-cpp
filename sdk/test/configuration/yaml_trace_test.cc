@@ -6,8 +6,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "opentelemetry/sdk/configuration/sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_off_sampler_configuration.h"
@@ -22,13 +20,14 @@
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
-#include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_encoding.h"
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
@@ -857,11 +856,16 @@ namespace
 enum class SamplerType : std::uint8_t
 {
   kUnmatched                 = 0,
-  kComposableAlwaysOn        = 1,
-  kComposableProbability     = 2,
-  kComposableRuleBased       = 3,
-  kComposableAlwaysOff       = 4,
-  kComposableParentThreshold = 5
+  kAlwaysOn                  = 1,
+  kAlwaysOff                 = 2,
+  kTraceIdRatioBased         = 3,
+  kParentBased               = 4,
+  kJaegerRemote              = 5,
+  kComposableAlwaysOn        = 6,
+  kComposableProbability     = 7,
+  kComposableRuleBased       = 8,
+  kComposableAlwaysOff       = 9,
+  kComposableParentThreshold = 10
 };
 
 class TestSamplerVisitor : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
@@ -872,19 +876,31 @@ public:
 
   void VisitAlwaysOff(
       const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration *) override
-  {}
+  {
+    type_matched = SamplerType::kAlwaysOff;
+  }
   void VisitAlwaysOn(
       const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration *) override
-  {}
+  {
+    type_matched = SamplerType::kAlwaysOn;
+  }
   void VisitJaegerRemote(
       const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration *) override
-  {}
+  {
+    type_matched = SamplerType::kJaegerRemote;
+  }
   void VisitParentBased(
       const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *) override
-  {}
+  {
+    type_matched = SamplerType::kParentBased;
+  }
   void VisitTraceIdRatioBased(
-      const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *) override
-  {}
+      const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *model)
+      override
+  {
+    type_matched = SamplerType::kTraceIdRatioBased;
+    ratio        = model->ratio;
+  }
   void VisitExtension(
       const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *) override
   {}
@@ -1087,7 +1103,10 @@ tracer_provider:
   ASSERT_NE(config->tracer_provider, nullptr);
   ASSERT_NE(config->tracer_provider->sampler, nullptr);
 
-  // Cast down to our specific type to check the fields
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+  ASSERT_EQ(visitor.type_matched, SamplerType::kComposableRuleBased);
+
   auto *rule_based_sampler =
       static_cast<opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *>(
           config->tracer_provider->sampler.get());

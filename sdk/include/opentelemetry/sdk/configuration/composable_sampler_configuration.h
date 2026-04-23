@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <memory>
 
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
