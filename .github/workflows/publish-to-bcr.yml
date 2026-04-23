@@ -16,13 +16,16 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     permissions:
       contents: write
       id-token: write
       attestations: write
-    uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@v1.2.0
+    uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@0a23c53c2baffdaf2ce8dd23c2c0e45eb3b79093 # v1.2.0
     with:
       tag_name: ${{ inputs.tag_name || github.event.release.tag_name }}
       registry_fork: ${{ inputs.registry_fork || 'open-telemetry/bazel-central-registry' }}
