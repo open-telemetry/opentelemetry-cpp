@@ -54,47 +54,36 @@ public:
    */
   static nostd::shared_ptr<TraceState> FromHeader(nostd::string_view header) noexcept
   {
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-    try
-#endif
+
+    common::KeyValueStringTokenizer kv_str_tokenizer(header);
+    size_t cnt = kv_str_tokenizer.NumTokens();  // upper bound on number of kv pairs
+    if (cnt > kMaxKeyValuePairs)
     {
-      common::KeyValueStringTokenizer kv_str_tokenizer(header);
-      size_t cnt = kv_str_tokenizer.NumTokens();  // upper bound on number of kv pairs
-      if (cnt > kMaxKeyValuePairs)
+      // trace state should be discarded if count exceeds
+      return GetDefault();
+    }
+
+    nostd::shared_ptr<TraceState> ts(new TraceState(cnt));
+    bool kv_valid{false};
+    nostd::string_view key, value;
+    while (kv_str_tokenizer.next(kv_valid, key, value) && ts->kv_properties_->Size() < cnt)
+    {
+      if (kv_valid == false)
       {
-        // trace state should be discarded if count exceeds
         return GetDefault();
       }
 
-      nostd::shared_ptr<TraceState> ts(new TraceState(cnt));
-      bool kv_valid{false};
-      nostd::string_view key;
-      nostd::string_view value;
-      while (kv_str_tokenizer.next(kv_valid, key, value) && ts->kv_properties_->Size() < cnt)
+      if (!IsValidKey(key) || !IsValidValue(value))
       {
-        if (kv_valid == false)
-        {
-          return GetDefault();
-        }
-
-        if (!IsValidKey(key) || !IsValidValue(value))
-        {
-          // invalid header. return empty TraceState
-          ts->kv_properties_.reset(new common::KeyValueProperties());
-          break;
-        }
-
-        ts->kv_properties_->AddEntry(key, value);
+        // invalid header. return empty TraceState
+        ts->kv_properties_.reset(new common::KeyValueProperties());
+        break;
       }
 
-      return ts;
+      ts->kv_properties_->AddEntry(key, value);
     }
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-    catch (...)
-    {
-      return GetDefault();
-    }
-#endif
+
+    return ts;
   }
 
   /**
@@ -128,21 +117,11 @@ public:
    */
   bool Get(nostd::string_view key, std::string &value) const noexcept
   {
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-    try
-#endif
-    {
-      if (!IsValidKey(key))
-      {
-        return false;
-      }
-    }
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-    catch (...)
+    if (!IsValidKey(key))
     {
       return false;
     }
-#endif
+
     return kv_properties_->GetValue(key, value);
   }
 
@@ -159,40 +138,29 @@ public:
   nostd::shared_ptr<TraceState> Set(const nostd::string_view &key,
                                     const nostd::string_view &value) noexcept
   {
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-    try
-#endif
+    auto curr_size = kv_properties_->Size();
+    if (!IsValidKey(key) || !IsValidValue(value))
     {
-      if (!IsValidKey(key) || !IsValidValue(value))
-      {
-        // max size reached or invalid key/value. Returning empty TraceState
-        return TraceState::GetDefault();
-      }
-      const auto curr_size = kv_properties_->Size();
-      auto allocate_size   = curr_size;
-      if (curr_size < kMaxKeyValuePairs)
-      {
-        allocate_size += 1;
-      }
-      nostd::shared_ptr<TraceState> ts(new TraceState(allocate_size));
-      if (curr_size < kMaxKeyValuePairs)
-      {
-        // add new field first
-        ts->kv_properties_->AddEntry(key, value);
-      }
-      // add rest of the fields.
-      kv_properties_->GetAllEntries([&ts](nostd::string_view key, nostd::string_view value) {
-        ts->kv_properties_->AddEntry(key, value);
-        return true;
-      });
-      return ts;
-    }
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-    catch (...)
-    {
+      // max size reached or invalid key/value. Returning empty TraceState
       return TraceState::GetDefault();
     }
-#endif
+    auto allocate_size = curr_size;
+    if (curr_size < kMaxKeyValuePairs)
+    {
+      allocate_size += 1;
+    }
+    nostd::shared_ptr<TraceState> ts(new TraceState(allocate_size));
+    if (curr_size < kMaxKeyValuePairs)
+    {
+      // add new field first
+      ts->kv_properties_->AddEntry(key, value);
+    }
+    // add rest of the fields.
+    kv_properties_->GetAllEntries([&ts](nostd::string_view key, nostd::string_view value) {
+      ts->kv_properties_->AddEntry(key, value);
+      return true;
+    });
+    return ts;
   }
 
   /**
@@ -203,38 +171,25 @@ public:
    */
   nostd::shared_ptr<TraceState> Delete(const nostd::string_view &key) noexcept
   {
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-    try
-#endif
-    {
-      if (!IsValidKey(key))
-      {
-        return TraceState::GetDefault();
-      }
-      const auto curr_size = kv_properties_->Size();
-      auto allocate_size   = curr_size;
-      std::string unused;
-      if (kv_properties_->GetValue(key, unused))
-      {
-        allocate_size -= 1;
-      }
-      nostd::shared_ptr<TraceState> ts(new TraceState(allocate_size));
-      kv_properties_->GetAllEntries(
-          [&ts, &key](nostd::string_view e_key, nostd::string_view e_value) {
-            if (key != e_key)
-            {
-              ts->kv_properties_->AddEntry(e_key, e_value);
-            }
-            return true;
-          });
-      return ts;
-    }
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-    catch (...)
+    if (!IsValidKey(key))
     {
       return TraceState::GetDefault();
     }
-#endif
+    auto curr_size     = kv_properties_->Size();
+    auto allocate_size = curr_size;
+    std::string unused;
+    if (kv_properties_->GetValue(key, unused))
+    {
+      allocate_size -= 1;
+    }
+    nostd::shared_ptr<TraceState> ts(new TraceState(allocate_size));
+    kv_properties_->GetAllEntries(
+        [&ts, &key](nostd::string_view e_key, nostd::string_view e_value) {
+          if (key != e_key)
+            ts->kv_properties_->AddEntry(e_key, e_value);
+          return true;
+        });
+    return ts;
   }
 
   // Returns true if there are no keys, false otherwise.
@@ -254,7 +209,7 @@ public:
    * For multi-tenant vendor scenarios, an at sign (@) can be used to prefix the vendor name.
    *
    */
-  static bool IsValidKey(nostd::string_view key)
+  static bool IsValidKey(nostd::string_view key) noexcept
   {
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
     return IsValidKeyRegEx(key);
@@ -267,7 +222,7 @@ public:
    * The value is an opaque string containing up to 256 printable ASCII (RFC0020)
    *  characters ((i.e., the range 0x20 to 0x7E) except comma , and equal =)
    */
-  static bool IsValidValue(nostd::string_view value)
+  static bool IsValidValue(nostd::string_view value) noexcept
   {
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
     return IsValidValueRegEx(value);
@@ -294,29 +249,51 @@ private:
   }
 
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
-  static bool IsValidKeyRegEx(nostd::string_view key)
+  static bool IsValidKeyRegEx(nostd::string_view key) noexcept
   {
-    static std::regex reg_key("^[a-z0-9][a-z0-9*_\\-/]{0,255}$");
-    static std::regex reg_key_multitenant(
-        "^[a-z0-9][a-z0-9*_\\-/]{0,240}(@)[a-z0-9][a-z0-9*_\\-/]{0,13}$");
-    std::string key_s(key.data(), key.size());
-    if (std::regex_match(key_s, reg_key) || std::regex_match(key_s, reg_key_multitenant))
+#  if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
     {
-      return true;
+#  endif
+      static std::regex reg_key("^[a-z0-9][a-z0-9*_\\-/]{0,255}$");
+      static std::regex reg_key_multitenant(
+          "^[a-z0-9][a-z0-9*_\\-/]{0,240}(@)[a-z0-9][a-z0-9*_\\-/]{0,13}$");
+      std::string key_s(key.data(), key.size());
+      if (std::regex_match(key_s, reg_key) || std::regex_match(key_s, reg_key_multitenant))
+      {
+        return true;
+      }
+      return false;
+#  if OPENTELEMETRY_HAVE_EXCEPTIONS
     }
-    return false;
+    catch (...)
+    {
+      return false;
+    }
+#  endif
   }
 
-  static bool IsValidValueRegEx(nostd::string_view value)
+  static bool IsValidValueRegEx(nostd::string_view value) noexcept
   {
-    // Hex 0x20 to 0x2B, 0x2D to 0x3C, 0x3E to 0x7E
-    static std::regex reg_value(
-        "^[\\x20-\\x2B\\x2D-\\x3C\\x3E-\\x7E]{0,255}[\\x21-\\x2B\\x2D-\\x3C\\x3E-\\x7E]$");
-    // Need to benchmark without regex, as a string object is created here.
-    return std::regex_match(std::string(value.data(), value.size()), reg_value);
+#  if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+    {
+#  endif
+      // Hex 0x20 to 0x2B, 0x2D to 0x3C, 0x3E to 0x7E
+      static std::regex reg_value(
+          "^[\\x20-\\x2B\\x2D-\\x3C\\x3E-\\x7E]{0,255}[\\x21-\\x2B\\x2D-\\x3C\\x3E-\\x7E]$");
+      // Need to benchmark without regex, as a string object is created here.
+      return std::regex_match(std::string(value.data(), value.size()), reg_value);
+#  if OPENTELEMETRY_HAVE_EXCEPTIONS
+    }
+    catch (...)
+    {
+      return false;
+    }
+#  endif
   }
 #else
-  static bool IsValidKeyNonRegEx(nostd::string_view key)
+  static bool IsValidKeyNonRegEx(nostd::string_view key) noexcept
   {
     if (key.empty() || key.size() > kKeyMaxSize || !IsLowerCaseAlphaOrDigit(key[0]))
     {
@@ -339,7 +316,7 @@ private:
     return true;
   }
 
-  static bool IsValidValueNonRegEx(nostd::string_view value)
+  static bool IsValidValueNonRegEx(nostd::string_view value) noexcept
   {
     if (value.empty() || value.size() > kValueMaxSize)
     {
@@ -357,7 +334,7 @@ private:
   }
 #endif
 
-  static bool IsLowerCaseAlphaOrDigit(char c) { return isdigit(c) || islower(c); }
+  static bool IsLowerCaseAlphaOrDigit(char c) noexcept { return isdigit(c) || islower(c); }
 
 private:
   // Store entries in a C-style array to avoid using std::array or std::vector.
