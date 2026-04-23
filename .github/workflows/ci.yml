@@ -1262,5 +1262,5 @@ jobs:
           SPEC_LEVEL: 2
         run:
           |
-          python ${GITHUB_WORKSPACE}/trace-context/test/test.py http://localhost:30000/test TraceContextTest AdvancedTest
+          python ${GITHUB_WORKSPACE}/trace-context/test/test.py http://localhost:30000/test TraceContext2Test
           curl http://localhost:30000/stop
