@@ -84,7 +84,7 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy narrowing-conversions warnings in sync_instruments
   [#4013](https://github.com/open-telemetry/opentelemetry-cpp/pull/4013)
 
-* [SDK] env var durations non corforming to spec
+* [SDK] env var durations non conforming to spec
   [#4020](https://github.com/open-telemetry/opentelemetry-cpp/pull/4020)
 
 Important changes:
