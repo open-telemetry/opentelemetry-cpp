@@ -10,7 +10,12 @@ add_library(
   ryml_document_node.cc
   configured_sdk.cc
   sdk_builder.cc
-  registry.cc)
+  registry.cc
+  composable_always_off_sampler_configuration.cc
+  composable_always_on_sampler_configuration.cc
+  composable_probability_sampler_configuration.cc
+  composable_parent_threshold_sampler_configuration.cc
+  composable_rule_based_sampler_configuration.cc)
 
 set_target_properties(opentelemetry_configuration PROPERTIES EXPORT_NAME
                                                              configuration)
