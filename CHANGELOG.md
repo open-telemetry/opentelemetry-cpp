@@ -84,6 +84,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy narrowing-conversions warnings in sync_instruments
   [#4013](https://github.com/open-telemetry/opentelemetry-cpp/pull/4013)
 
+* [API] Deprecate opentelemetry::plugin
+  [#4021](https://github.com/open-telemetry/opentelemetry-cpp/pull/4021)
+
 * [SDK] env var durations non conforming to spec
   [#4020](https://github.com/open-telemetry/opentelemetry-cpp/pull/4020)
 
@@ -108,6 +111,12 @@ Important changes:
   [#4010](https://github.com/open-telemetry/opentelemetry-cpp/pull/4010)
 
   * Bazel now always builds with ENABLE_OTLP_RETRY_PREVIEW.
+
+* [API] Deprecate opentelemetry::plugin
+  [#4021](https://github.com/open-telemetry/opentelemetry-cpp/pull/4021)
+
+  * namespace opentelemetry::plugin is deprecated
+  * See file DEPRECATED.md for details.
 
 Breaking changes:
 
