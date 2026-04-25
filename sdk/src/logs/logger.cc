@@ -51,9 +51,9 @@ Logger::Logger(
       context_(std::move(context)),
       logger_config_(context_->GetLoggerConfigurator().ComputeConfig(*instrumentation_scope_))
 {
-  SetMinimumSeverity(logger_config_.IsEnabled()
-                         ? static_cast<uint8_t>(opentelemetry::logs::Severity::kTrace)
-                         : opentelemetry::logs::kMaxSeverity);
+  SetMinimumSeverity(
+      logger_config_.IsEnabled() ? static_cast<uint8_t>(logger_config_.GetMinimumSeverity())
+                                 : opentelemetry::logs::kMaxSeverity);
 }
 
 const opentelemetry::nostd::string_view Logger::GetName() noexcept

@@ -431,22 +431,24 @@ TEST(Logger, EmitLogRecordWithExistingRecordPopulatesAndEmitsWhenSeverityEnabled
   EXPECT_TRUE(logger.last_emitted_record_->body_was_set_);
 }
 
-TEST(Logger, EmitLogRecordUsesEventIdEnablementBeforeCreate)
+TEST(Logger, EmitLogRecordWithEventIdSkipsCreateWhenSeverityDisabled)
 {
-  EnablementAwareTestLogger logger(Severity::kTrace);
+  EnablementAwareTestLogger logger(Severity::kError);
 
   logger.EmitLogRecord(Severity::kInfo, EventId{7, "suppressed"}, "suppressed");
 
-  EXPECT_EQ(logger.enabled_with_event_id_calls_, 1u);
-  EXPECT_EQ(logger.last_enabled_severity_, Severity::kInfo);
-  EXPECT_EQ(logger.last_enabled_event_id_, 7);
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
   EXPECT_EQ(logger.create_log_record_calls_, 0u);
   EXPECT_EQ(logger.emit_log_record_calls_, 0u);
+}
 
-  logger.SetEventIdEnabled(true);
+TEST(Logger, EmitLogRecordWithEventIdUsesSeverityOnlyPrecheck)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace);
+
   logger.EmitLogRecord(EventId{7, "allowed"}, Severity::kInfo, "allowed");
 
-  EXPECT_EQ(logger.enabled_with_event_id_calls_, 2u);
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
   EXPECT_EQ(logger.create_log_record_calls_, 1u);
   EXPECT_EQ(logger.emit_log_record_calls_, 1u);
   ASSERT_TRUE(logger.last_emitted_record_ != nullptr);

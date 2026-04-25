@@ -17,6 +17,7 @@ namespace configuration
 // YAML-NODE: SeverityNumber
 enum class SeverityNumber : std::uint8_t
 {
+  unspecified = 0,
   trace,
   trace2,
   trace3,

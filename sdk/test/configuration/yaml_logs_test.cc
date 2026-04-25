@@ -22,8 +22,17 @@
 #include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_encoding.h"
 #include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/logs/logger_config.h"
+
+namespace configuration         = opentelemetry::sdk::configuration;
+namespace instrumentation_scope = opentelemetry::sdk::instrumentationscope;
+namespace logs_api              = opentelemetry::logs;
+namespace logs_sdk              = opentelemetry::sdk::logs;
 
 static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(
     const std::string &yaml)
@@ -515,6 +524,8 @@ logger_provider:
   logger_configurator/development:
     default_config:
       enabled: false
+      minimum_severity: warn
+      trace_based: true
 )";
 
   auto config = DoParse(yaml);
@@ -522,6 +533,10 @@ logger_provider:
   ASSERT_NE(config->logger_provider, nullptr);
   ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
   ASSERT_EQ(config->logger_provider->logger_configurator->default_config.enabled, false);
+  ASSERT_TRUE(config->logger_provider->logger_configurator->default_config.minimum_severity_specified);
+  ASSERT_EQ(config->logger_provider->logger_configurator->default_config.minimum_severity,
+            configuration::SeverityNumber::warn);
+  ASSERT_EQ(config->logger_provider->logger_configurator->default_config.trace_based, true);
   ASSERT_EQ(config->logger_provider->logger_configurator->loggers.size(), 0);
 }
 
@@ -537,13 +552,19 @@ logger_provider:
   logger_configurator/development:
     default_config:
       enabled: false
+      minimum_severity: error
+      trace_based: true
     loggers:
       - name: io.opentelemetry.contrib.*
         config:
           enabled: true
+          minimum_severity: warn
+          trace_based: false
       - name: my.exact.logger
         config:
           enabled: false
+          minimum_severity: fatal
+          trace_based: true
 )";
 
   auto config = DoParse(yaml);
@@ -553,13 +574,23 @@ logger_provider:
 
   auto &configurator = config->logger_provider->logger_configurator;
   ASSERT_EQ(configurator->default_config.enabled, false);
+  ASSERT_TRUE(configurator->default_config.minimum_severity_specified);
+  ASSERT_EQ(configurator->default_config.minimum_severity, configuration::SeverityNumber::error);
+  ASSERT_EQ(configurator->default_config.trace_based, true);
   ASSERT_EQ(configurator->loggers.size(), 2);
 
   ASSERT_EQ(configurator->loggers[0].name, "io.opentelemetry.contrib.*");
   ASSERT_EQ(configurator->loggers[0].config.enabled, true);
+  ASSERT_TRUE(configurator->loggers[0].config.minimum_severity_specified);
+  ASSERT_EQ(configurator->loggers[0].config.minimum_severity, configuration::SeverityNumber::warn);
+  ASSERT_EQ(configurator->loggers[0].config.trace_based, false);
 
   ASSERT_EQ(configurator->loggers[1].name, "my.exact.logger");
   ASSERT_EQ(configurator->loggers[1].config.enabled, false);
+  ASSERT_TRUE(configurator->loggers[1].config.minimum_severity_specified);
+  ASSERT_EQ(configurator->loggers[1].config.minimum_severity,
+            configuration::SeverityNumber::fatal);
+  ASSERT_EQ(configurator->loggers[1].config.trace_based, true);
 }
 
 TEST(YamlLogs, logger_configurator_default_enabled)
@@ -587,7 +618,58 @@ logger_provider:
 
   auto &configurator = config->logger_provider->logger_configurator;
   ASSERT_EQ(configurator->default_config.enabled, true);
+  ASSERT_FALSE(configurator->default_config.minimum_severity_specified);
+  ASSERT_EQ(configurator->default_config.trace_based, false);
   ASSERT_EQ(configurator->loggers.size(), 1);
   ASSERT_EQ(configurator->loggers[0].name, "noisy.library");
   ASSERT_EQ(configurator->loggers[0].config.enabled, false);
+  ASSERT_FALSE(configurator->loggers[0].config.minimum_severity_specified);
+  ASSERT_EQ(configurator->loggers[0].config.trace_based, false);
+}
+
+TEST(YamlLogs, logger_configurator_builder_preserves_full_logger_config)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  logger_configurator/development:
+    default_config:
+      enabled: true
+      trace_based: true
+    loggers:
+      - name: service.*
+        config:
+          enabled: true
+          minimum_severity: info
+          trace_based: false
+      - name: noisy.library
+        config:
+          enabled: false
+          minimum_severity: warn
+          trace_based: false
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
+
+  configuration::SdkBuilder builder(std::make_shared<configuration::Registry>());
+  auto logger_configurator =
+      builder.CreateLoggerConfigurator(config->logger_provider->logger_configurator);
+
+  auto default_scope  = *instrumentation_scope::InstrumentationScope::Create("other.logger");
+  auto service_scope  = *instrumentation_scope::InstrumentationScope::Create("service.worker");
+  auto disabled_scope = *instrumentation_scope::InstrumentationScope::Create("noisy.library");
+
+  ASSERT_EQ(logger_configurator->ComputeConfig(default_scope),
+            logs_sdk::LoggerConfig::Create(true, logs_api::Severity::kInvalid, true));
+  ASSERT_EQ(logger_configurator->ComputeConfig(service_scope),
+            logs_sdk::LoggerConfig::Create(true, logs_api::Severity::kInfo, false));
+  ASSERT_EQ(logger_configurator->ComputeConfig(disabled_scope),
+            logs_sdk::LoggerConfig::Create(false, logs_api::Severity::kWarn, false));
 }

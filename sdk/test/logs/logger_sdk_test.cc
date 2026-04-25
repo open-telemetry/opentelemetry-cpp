@@ -297,6 +297,7 @@ TEST(LoggerSDK, LoggerWithDisabledConfig)
   // Test Logger functions for the constructed logger
   // This logger should behave like a noop logger
   ASSERT_EQ(logger->GetName(), noop_logger.GetName());
+  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInvalid));
   EXPECT_FALSE(logger->Enabled(logs_api::Severity::kTrace));
   EXPECT_FALSE(logger->Enabled(logs_api::Severity::kWarn));
   EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInfo, 123));
@@ -337,9 +338,9 @@ TEST(LoggerSDK, LoggerWithEnabledConfig)
 
   // Test Logger functions for the constructed logger
   ASSERT_EQ(logger->GetName(), "test-logger");
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kInvalid));
   EXPECT_TRUE(logger->Enabled(logs_api::Severity::kTrace));
   EXPECT_TRUE(logger->Enabled(logs_api::Severity::kWarn));
-  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInvalid));
   EXPECT_TRUE(logger->Enabled(logs_api::Severity::kInfo, 123));
   EXPECT_TRUE(logger->Enabled(logs_api::Severity::kInfo, logs_api::EventId{123, "enabled"}));
 
@@ -363,6 +364,39 @@ TEST(LoggerSDK, LoggerWithEnabledConfig)
   ASSERT_EQ(shared_recordable->GetTraceFlags(), trace_api::TraceFlags{});
   ASSERT_FALSE(shared_recordable->GetTraceId().IsValid());
   ASSERT_FALSE(shared_recordable->GetSpanId().IsValid());
+}
+
+TEST(LoggerSDK, LoggerWithMinimumSeverityConfig)
+{
+  ScopeConfigurator<LoggerConfig> warn_and_above =
+      ScopeConfigurator<LoggerConfig>::Builder(
+          LoggerConfig::Create(true, logs_api::Severity::kWarn, false))
+          .Build();
+  auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
+  auto log_processor = std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable));
+
+  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(
+      new LoggerProvider(std::move(log_processor), resource,
+                         std::make_unique<ScopeConfigurator<LoggerConfig>>(warn_and_above)));
+  auto logger = api_lp->GetLogger("warn-logger", "opentelemetry_library", "", schema_url);
+
+  ASSERT_EQ(logger->GetName(), "warn-logger");
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kInvalid));
+  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInfo));
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kWarn));
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kError));
+  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInfo, 123));
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kWarn, 123));
+
+  logger->EmitLogRecord(logs_api::Severity::kInfo, "suppressed");
+  ASSERT_EQ(shared_recordable->GetBody(), "");
+  ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kInvalid);
+
+  logger->EmitLogRecord(logs_api::Severity::kWarn, "allowed");
+  ASSERT_EQ(shared_recordable->GetBody(), "allowed");
+  ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kWarn);
 }
 
 static std::unique_ptr<MockLogRecordable> create_mock_log_recordable(

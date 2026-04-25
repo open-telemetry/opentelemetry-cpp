@@ -190,6 +190,68 @@ namespace sdk
 namespace configuration
 {
 
+namespace
+{
+
+opentelemetry::logs::Severity ToLogSeverity(SeverityNumber model_severity) noexcept
+{
+  switch (model_severity)
+  {
+    case SeverityNumber::trace:
+      return opentelemetry::logs::Severity::kTrace;
+    case SeverityNumber::trace2:
+      return opentelemetry::logs::Severity::kTrace2;
+    case SeverityNumber::trace3:
+      return opentelemetry::logs::Severity::kTrace3;
+    case SeverityNumber::trace4:
+      return opentelemetry::logs::Severity::kTrace4;
+    case SeverityNumber::debug:
+      return opentelemetry::logs::Severity::kDebug;
+    case SeverityNumber::debug2:
+      return opentelemetry::logs::Severity::kDebug2;
+    case SeverityNumber::debug3:
+      return opentelemetry::logs::Severity::kDebug3;
+    case SeverityNumber::debug4:
+      return opentelemetry::logs::Severity::kDebug4;
+    case SeverityNumber::info:
+      return opentelemetry::logs::Severity::kInfo;
+    case SeverityNumber::info2:
+      return opentelemetry::logs::Severity::kInfo2;
+    case SeverityNumber::info3:
+      return opentelemetry::logs::Severity::kInfo3;
+    case SeverityNumber::info4:
+      return opentelemetry::logs::Severity::kInfo4;
+    case SeverityNumber::warn:
+      return opentelemetry::logs::Severity::kWarn;
+    case SeverityNumber::warn2:
+      return opentelemetry::logs::Severity::kWarn2;
+    case SeverityNumber::warn3:
+      return opentelemetry::logs::Severity::kWarn3;
+    case SeverityNumber::warn4:
+      return opentelemetry::logs::Severity::kWarn4;
+    case SeverityNumber::error:
+      return opentelemetry::logs::Severity::kError;
+    case SeverityNumber::error2:
+      return opentelemetry::logs::Severity::kError2;
+    case SeverityNumber::error3:
+      return opentelemetry::logs::Severity::kError3;
+    case SeverityNumber::error4:
+      return opentelemetry::logs::Severity::kError4;
+    case SeverityNumber::fatal:
+      return opentelemetry::logs::Severity::kFatal;
+    case SeverityNumber::fatal2:
+      return opentelemetry::logs::Severity::kFatal2;
+    case SeverityNumber::fatal3:
+      return opentelemetry::logs::Severity::kFatal3;
+    case SeverityNumber::fatal4:
+      return opentelemetry::logs::Severity::kFatal4;
+  }
+
+  return opentelemetry::logs::Severity::kInvalid;
+}
+
+}  // namespace
+
 using common::WildcardMatch;
 
 class ResourceAttributeValueSetter
@@ -1874,14 +1936,22 @@ SdkBuilder::CreateLoggerConfigurator(
   using opentelemetry::sdk::logs::LoggerConfig;
 
   LoggerConfig default_config =
-      model->default_config.enabled ? LoggerConfig::Enabled() : LoggerConfig::Disabled();
+      LoggerConfig::Create(model->default_config.enabled,
+                           model->default_config.minimum_severity_specified
+                               ? ToLogSeverity(model->default_config.minimum_severity)
+                               : opentelemetry::logs::Severity::kInvalid,
+                           model->default_config.trace_based);
 
   auto builder = ScopeConfigurator<LoggerConfig>::Builder(default_config);
 
   for (const auto &entry : model->loggers)
   {
     LoggerConfig entry_config =
-        entry.config.enabled ? LoggerConfig::Enabled() : LoggerConfig::Disabled();
+        LoggerConfig::Create(entry.config.enabled,
+                             entry.config.minimum_severity_specified
+                                 ? ToLogSeverity(entry.config.minimum_severity)
+                                 : opentelemetry::logs::Severity::kInvalid,
+                             entry.config.trace_based);
     std::string pattern = entry.name;
     builder.AddCondition(
         [pattern](const InstrumentationScope &scope) {
