@@ -15,15 +15,13 @@ Increment the:
 
 ## [Unreleased]
 
-<<<<<<< HEAD
 * [API] Fix `Logger::Enabled()` and helper log emission checks for SDK loggers
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
-=======
+
 * [CONFIGURATION] File configuration - composable samplers
   [#3966](https://github.com/open-telemetry/opentelemetry-cpp/issues/3966)
 * [SDK] Fix PeriodicExportingMetricReader shutdown race on destruction
   [#4008](https://github.com/open-telemetry/opentelemetry-cpp/pull/4008)
->>>>>>> d87c1305e299bb2838357b140e1ec75e2d592e3a
 
 * [SDK] Move inline implementation from SDK headers to .cc files.
   Note: `GetEmptyAttributes()` now requires linking `opentelemetry_common`.

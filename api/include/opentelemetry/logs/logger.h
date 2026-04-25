@@ -286,7 +286,12 @@ public:
 
   inline bool Enabled(Severity severity) const noexcept
   {
-    return static_cast<uint8_t>(severity) >= OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
+    uint8_t minimum_severity = OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
+    if (severity == Severity::kInvalid)
+    {
+      return minimum_severity != kMaxSeverity;
+    }
+    return static_cast<uint8_t>(severity) >= minimum_severity;
   }
 
   /**
@@ -550,8 +555,7 @@ private:
                            const ArgumentType &...args) const noexcept
   {
     const Severity *severity = FindLogArgument<Severity>(args...);
-    const EventId *event_id  = FindLogArgument<EventId>(args...);
-    return severity == nullptr || event_id == nullptr ? true : Enabled(*severity, *event_id);
+    return severity == nullptr ? true : Enabled(*severity);
   }
 
   template <class ValueType>
