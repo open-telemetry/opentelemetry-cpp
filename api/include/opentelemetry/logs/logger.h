@@ -6,6 +6,7 @@
 #include <type_traits>
 #include <utility>
 
+#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/logs/logger_type_traits.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -80,12 +81,25 @@ public:
       return;
     }
 
-    if (!ShouldEmitLogRecord(args...))
-    {
-      return;
-    }
+    //
+    // Keep the parameter pack unpacking order from left to right because left
+    // ones are usually more important like severity and event_id than the
+    // attributes. The left to right unpack order could pass the more important
+    // data to processors to avoid caching and memory allocating.
+    //
+#if __cplusplus <= 201402L
+    // C++14 does not support fold expressions for parameter pack expansion.
+    int dummy[] = {(detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
+                        log_record.get(), std::forward<ArgumentType>(args)),
+                    0)...};
+    IgnoreTraitResult(dummy);
+#else
+    IgnoreTraitResult((detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
+                           log_record.get(), std::forward<ArgumentType>(args)),
+                       ...));
+#endif
 
-    PopulateAndEmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
+    EmitLogRecord(std::move(log_record));
   }
 
   /**
@@ -108,14 +122,9 @@ public:
   template <class... ArgumentType>
   void EmitLogRecord(ArgumentType &&...args)
   {
-    if (!ShouldEmitLogRecord(args...))
-    {
-      return;
-    }
-
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
 
-    PopulateAndEmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
+    EmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
   }
 
   /**
@@ -266,9 +275,55 @@ public:
   // OpenTelemetry C++ user-facing Logs API
   //
 
+  inline bool Enabled(const opentelemetry::context::Context &context,
+                      Severity severity = Severity::kInvalid) const noexcept
+  {
+    uint8_t minimum_severity = OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
+    if (severity == Severity::kInvalid)
+    {
+      if OPENTELEMETRY_UNLIKELY_CONDITION(minimum_severity == kMaxSeverity)
+      {
+        return false;
+      }
+      return EnabledImplementation(context, severity);
+    }
+    else if OPENTELEMETRY_UNLIKELY_CONDITION(static_cast<uint8_t>(severity) < minimum_severity)
+    {
+      return false;
+    }
+    return EnabledImplementation(context, severity);
+  }
+
+  inline bool Enabled(const opentelemetry::context::Context &context,
+                      Severity severity,
+                      const EventId &event_id) const noexcept
+  {
+    uint8_t minimum_severity = OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
+    if (severity == Severity::kInvalid)
+    {
+      if OPENTELEMETRY_UNLIKELY_CONDITION(minimum_severity == kMaxSeverity)
+      {
+        return false;
+      }
+    }
+    else if OPENTELEMETRY_UNLIKELY_CONDITION(static_cast<uint8_t>(severity) < minimum_severity)
+    {
+      return false;
+    }
+    return EnabledImplementation(context, severity, event_id);
+  }
+
   inline bool Enabled(Severity severity, const EventId &event_id) const noexcept
   {
-    if OPENTELEMETRY_LIKELY_CONDITION (!Enabled(severity))
+    uint8_t minimum_severity = OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
+    if (severity == Severity::kInvalid)
+    {
+      if OPENTELEMETRY_UNLIKELY_CONDITION(minimum_severity == kMaxSeverity)
+      {
+        return false;
+      }
+    }
+    else if OPENTELEMETRY_UNLIKELY_CONDITION(static_cast<uint8_t>(severity) < minimum_severity)
     {
       return false;
     }
@@ -277,7 +332,15 @@ public:
 
   inline bool Enabled(Severity severity, int64_t event_id) const noexcept
   {
-    if OPENTELEMETRY_LIKELY_CONDITION (!Enabled(severity))
+    uint8_t minimum_severity = OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
+    if (severity == Severity::kInvalid)
+    {
+      if OPENTELEMETRY_UNLIKELY_CONDITION(minimum_severity == kMaxSeverity)
+      {
+        return false;
+      }
+    }
+    else if OPENTELEMETRY_UNLIKELY_CONDITION(static_cast<uint8_t>(severity) < minimum_severity)
     {
       return false;
     }
@@ -286,12 +349,7 @@ public:
 
   inline bool Enabled(Severity severity) const noexcept
   {
-    uint8_t minimum_severity = OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
-    if (severity == Severity::kInvalid)
-    {
-      return minimum_severity != kMaxSeverity;
-    }
-    return static_cast<uint8_t>(severity) >= minimum_severity;
+    return Enabled(opentelemetry::context::RuntimeContext::GetCurrent(), severity);
   }
 
   /**
@@ -464,7 +522,19 @@ public:
   //
 
 protected:
-  // TODO: discuss with community about naming for internal methods.
+  virtual bool EnabledImplementation(const opentelemetry::context::Context & /*context*/,
+                                     Severity /*severity*/) const noexcept
+  {
+    return true;
+  }
+
+  virtual bool EnabledImplementation(const opentelemetry::context::Context &context,
+                                     Severity severity,
+                                     const EventId & /*event_id*/) const noexcept
+  {
+    return EnabledImplementation(context, severity);
+  }
+
   virtual bool EnabledImplementation(Severity /*severity*/,
                                      const EventId & /*event_id*/) const noexcept
   {
@@ -482,114 +552,6 @@ protected:
   }
 
 private:
-  template <class... ArgumentType>
-  void PopulateAndEmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record, ArgumentType &&...args)
-  {
-    if (!log_record)
-    {
-      return;
-    }
-
-    //
-    // Keep the parameter pack unpacking order from left to right because left
-    // ones are usually more important like severity and event_id than the
-    // attributes. The left to right unpack order could pass the more important
-    // data to processors to avoid caching and memory allocating.
-    //
-#if __cplusplus <= 201402L
-    // C++14 does not support fold expressions for parameter pack expansion.
-    int dummy[] = {(detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
-                        log_record.get(), std::forward<ArgumentType>(args)),
-                    0)...};
-    IgnoreTraitResult(dummy);
-#else
-    IgnoreTraitResult((detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
-                           log_record.get(), std::forward<ArgumentType>(args)),
-                       ...));
-#endif
-
-    EmitLogRecord(std::move(log_record));
-  }
-
-  template <class... ArgumentType>
-  bool ShouldEmitLogRecord(const ArgumentType &...args) const noexcept
-  {
-    return ShouldEmitLogRecord(
-        std::integral_constant<
-            bool, detail::LogRecordHasType<Severity,
-                                           typename std::decay<ArgumentType>::type...>::value>{},
-        std::integral_constant<
-            bool,
-            detail::LogRecordHasType<EventId, typename std::decay<ArgumentType>::type...>::value>{},
-        args...);
-  }
-
-  template <class... ArgumentType>
-  bool ShouldEmitLogRecord(std::false_type,
-                           std::false_type,
-                           const ArgumentType &.../*args*/) const noexcept
-  {
-    return true;
-  }
-
-  template <class... ArgumentType>
-  bool ShouldEmitLogRecord(std::false_type,
-                           std::true_type,
-                           const ArgumentType &.../*args*/) const noexcept
-  {
-    return true;
-  }
-
-  template <class... ArgumentType>
-  bool ShouldEmitLogRecord(std::true_type,
-                           std::false_type,
-                           const ArgumentType &...args) const noexcept
-  {
-    const Severity *severity = FindLogArgument<Severity>(args...);
-    return severity == nullptr ? true : Enabled(*severity);
-  }
-
-  template <class... ArgumentType>
-  bool ShouldEmitLogRecord(std::true_type,
-                           std::true_type,
-                           const ArgumentType &...args) const noexcept
-  {
-    const Severity *severity = FindLogArgument<Severity>(args...);
-    return severity == nullptr ? true : Enabled(*severity);
-  }
-
-  template <class ValueType>
-  static const ValueType *FindLogArgument() noexcept
-  {
-    return nullptr;
-  }
-
-  template <class ValueType, class FirstArgumentType, class... RestArgumentType>
-  static const ValueType *FindLogArgument(const FirstArgumentType &first_arg,
-                                          const RestArgumentType &...rest_args) noexcept
-  {
-    return FindLogArgument<ValueType>(
-        std::integral_constant<
-            bool, std::is_same<ValueType, typename std::decay<FirstArgumentType>::type>::value>{},
-        first_arg, rest_args...);
-  }
-
-  template <class ValueType, class FirstArgumentType, class... RestArgumentType>
-  static const ValueType *FindLogArgument(std::true_type,
-                                          const FirstArgumentType &first_arg,
-                                          const RestArgumentType &.../*rest_args*/) noexcept
-  {
-    return &first_arg;
-  }
-
-  template <class ValueType, class FirstArgumentType, class... RestArgumentType>
-  static const ValueType *FindLogArgument(std::false_type,
-                                          const FirstArgumentType & /*first_arg*/,
-                                          const RestArgumentType &...rest_args) noexcept
-  {
-    return FindLogArgument<ValueType>(rest_args...);
-  }
-
   template <class... ValueType>
   void IgnoreTraitResult(ValueType &&...)
   {}

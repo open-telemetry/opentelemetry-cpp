@@ -25,6 +25,7 @@
 #include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_metadata.h"
@@ -39,6 +40,28 @@ namespace trace_api = opentelemetry::trace;
 namespace common    = opentelemetry::common;
 namespace context   = opentelemetry::context;
 namespace nostd     = opentelemetry::nostd;
+
+namespace
+{
+nostd::string_view GetEventName(const opentelemetry::logs::EventId &event_id) noexcept
+{
+  return event_id.name_ != nullptr ? nostd::string_view{event_id.name_.get()}
+                                   : nostd::string_view{};
+}
+
+bool IsTraceBasedEnabled(const context::Context &context,
+                         const LoggerConfig &logger_config) noexcept
+{
+  if (!logger_config.IsTraceBased())
+  {
+    return true;
+  }
+
+  const trace_api::SpanContext span_context = trace_api::GetSpan(context)->GetContext();
+
+  return !span_context.IsValid() || span_context.IsSampled();
+}
+}  // namespace
 
 opentelemetry::logs::NoopLogger Logger::kNoopLogger = opentelemetry::logs::NoopLogger();
 
@@ -139,20 +162,42 @@ void Logger::EmitLogRecord(
   processor.OnEmit(std::move(recordable));
 }
 
-bool Logger::EnabledImplementation(opentelemetry::logs::Severity /*severity*/,
-                                   const opentelemetry::logs::EventId & /*event_id*/) const noexcept
+bool Logger::EnabledImplementation(const opentelemetry::context::Context &context,
+                                   opentelemetry::logs::Severity severity) const noexcept
 {
-  // TODO: Revisit this if opentelemetry-cpp adopts logs SDK enablement
-  // semantics beyond the current stable severity-based behavior.
-  return true;
+  if (!IsTraceBasedEnabled(context, logger_config_))
+  {
+    return false;
+  }
+
+  return context_->GetProcessor().Enabled(context, GetInstrumentationScope(), severity);
 }
 
-bool Logger::EnabledImplementation(opentelemetry::logs::Severity /*severity*/,
+bool Logger::EnabledImplementation(const opentelemetry::context::Context &context,
+                                   opentelemetry::logs::Severity severity,
+                                   const opentelemetry::logs::EventId &event_id) const noexcept
+{
+  if (!IsTraceBasedEnabled(context, logger_config_))
+  {
+    return false;
+  }
+
+  return context_->GetProcessor().Enabled(context,
+                                          GetInstrumentationScope(),
+                                          severity,
+                                          GetEventName(event_id));
+}
+
+bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,
+                                   const opentelemetry::logs::EventId &event_id) const noexcept
+{
+  return EnabledImplementation(context::RuntimeContext::GetCurrent(), severity, event_id);
+}
+
+bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,
                                    int64_t /*event_id*/) const noexcept
 {
-  // TODO: Revisit this if opentelemetry-cpp adopts logs SDK enablement
-  // semantics beyond the current stable severity-based behavior.
-  return true;
+  return EnabledImplementation(context::RuntimeContext::GetCurrent(), severity);
 }
 
 const opentelemetry::sdk::instrumentationscope::InstrumentationScope &

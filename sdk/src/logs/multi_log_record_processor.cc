@@ -81,7 +81,7 @@ bool MultiLogRecordProcessor::EnabledImplementation(
 {
   if (processors_.empty())
   {
-    return true;
+    return false;
   }
 
   for (const auto &processor : processors_)

@@ -13,6 +13,7 @@
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
 #include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
@@ -43,6 +44,7 @@ using opentelemetry::logs::Severity;
 using opentelemetry::nostd::shared_ptr;
 using opentelemetry::nostd::string_view;
 namespace common = opentelemetry::common;
+namespace context = opentelemetry::context;
 namespace nostd  = opentelemetry::nostd;
 namespace trace  = opentelemetry::trace;
 
@@ -342,12 +344,55 @@ public:
 
   size_t create_log_record_calls_{0};
   size_t emit_log_record_calls_{0};
+  mutable size_t enabled_calls_{0};
   mutable size_t enabled_with_event_id_calls_{0};
   mutable Severity last_enabled_severity_{Severity::kInvalid};
   mutable int64_t last_enabled_event_id_{-1};
+  mutable bool last_enabled_context_has_test_key_{false};
+  mutable bool last_enabled_context_test_key_value_{false};
   nostd::unique_ptr<EnablementAwareTestLogRecord> last_emitted_record_;
 
 protected:
+  bool EnabledImplementation(const context::Context &context,
+                             Severity severity) const noexcept override
+  {
+    ++enabled_calls_;
+    last_enabled_severity_ = severity;
+    auto value             = context.GetValue("test-key");
+    if (const bool *maybe_value = nostd::get_if<bool>(&value))
+    {
+      last_enabled_context_has_test_key_   = true;
+      last_enabled_context_test_key_value_ = *maybe_value;
+    }
+    else
+    {
+      last_enabled_context_has_test_key_   = false;
+      last_enabled_context_test_key_value_ = false;
+    }
+    return true;
+  }
+
+  bool EnabledImplementation(const context::Context &context,
+                             Severity severity,
+                             const EventId &event_id) const noexcept override
+  {
+    ++enabled_with_event_id_calls_;
+    last_enabled_severity_ = severity;
+    last_enabled_event_id_ = event_id.id_;
+    auto value             = context.GetValue("test-key");
+    if (const bool *maybe_value = nostd::get_if<bool>(&value))
+    {
+      last_enabled_context_has_test_key_   = true;
+      last_enabled_context_test_key_value_ = *maybe_value;
+    }
+    else
+    {
+      last_enabled_context_has_test_key_   = false;
+      last_enabled_context_test_key_value_ = false;
+    }
+    return event_id_enabled_;
+  }
+
   bool EnabledImplementation(Severity severity, const EventId &event_id) const noexcept override
   {
     ++enabled_with_event_id_calls_;
@@ -392,28 +437,6 @@ TEST(Logger, PushLoggerImplementation)
   ASSERT_EQ("test logger", logger->GetName());
 }
 
-TEST(Logger, EmitLogRecordSkipsCreateWhenSeverityDisabled)
-{
-  EnablementAwareTestLogger logger(Severity::kError);
-
-  logger.EmitLogRecord(Severity::kInfo, "suppressed");
-
-  EXPECT_EQ(logger.create_log_record_calls_, 0u);
-  EXPECT_EQ(logger.emit_log_record_calls_, 0u);
-}
-
-TEST(Logger, EmitLogRecordWithExistingRecordSkipsEmitWhenSeverityDisabled)
-{
-  EnablementAwareTestLogger logger(Severity::kError);
-
-  auto log_record = logger.CreateLogRecord();
-  ASSERT_EQ(logger.create_log_record_calls_, 1u);
-
-  logger.EmitLogRecord(std::move(log_record), Severity::kInfo, "suppressed");
-
-  EXPECT_EQ(logger.emit_log_record_calls_, 0u);
-}
-
 TEST(Logger, EmitLogRecordWithExistingRecordPopulatesAndEmitsWhenSeverityEnabled)
 {
   EnablementAwareTestLogger logger(Severity::kTrace);
@@ -431,32 +454,17 @@ TEST(Logger, EmitLogRecordWithExistingRecordPopulatesAndEmitsWhenSeverityEnabled
   EXPECT_TRUE(logger.last_emitted_record_->body_was_set_);
 }
 
-TEST(Logger, EmitLogRecordWithEventIdSkipsCreateWhenSeverityDisabled)
-{
-  EnablementAwareTestLogger logger(Severity::kError);
-
-  logger.EmitLogRecord(Severity::kInfo, EventId{7, "suppressed"}, "suppressed");
-
-  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
-  EXPECT_EQ(logger.create_log_record_calls_, 0u);
-  EXPECT_EQ(logger.emit_log_record_calls_, 0u);
-}
-
-TEST(Logger, EmitLogRecordWithEventIdUsesSeverityOnlyPrecheck)
+TEST(Logger, EnabledWithExplicitContextUsesContextAwareImplementation)
 {
   EnablementAwareTestLogger logger(Severity::kTrace);
 
-  logger.EmitLogRecord(EventId{7, "allowed"}, Severity::kInfo, "allowed");
+  context::Context test_context{"test-key", true};
 
-  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
-  EXPECT_EQ(logger.create_log_record_calls_, 1u);
-  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
-  ASSERT_TRUE(logger.last_emitted_record_ != nullptr);
-  EXPECT_EQ(logger.last_emitted_record_->severity_, Severity::kInfo);
-  EXPECT_EQ(logger.last_emitted_record_->event_id_, 7);
-  EXPECT_TRUE(logger.last_emitted_record_->event_id_was_set_);
-  EXPECT_TRUE(logger.last_emitted_record_->event_name_was_set_);
-  EXPECT_TRUE(logger.last_emitted_record_->body_was_set_);
+  EXPECT_TRUE(logger.Enabled(test_context, Severity::kInfo));
+  EXPECT_EQ(logger.enabled_calls_, 1u);
+  EXPECT_EQ(logger.last_enabled_severity_, Severity::kInfo);
+  EXPECT_TRUE(logger.last_enabled_context_has_test_key_);
+  EXPECT_TRUE(logger.last_enabled_context_test_key_value_);
 }
 
 TEST(Logger, EmitLogRecordAllowsEventIdWithoutSeverity)

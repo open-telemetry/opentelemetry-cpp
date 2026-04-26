@@ -372,13 +372,13 @@ TEST(SimpleLogRecordProcessorTest, MultiLogRecordProcessorDisabledWhenAllChildre
       processor.Enabled(test_context, *scope, logs_api::Severity::kError, "test-event-name"));
 }
 
-TEST(SimpleLogRecordProcessorTest, EmptyMultiLogRecordProcessorEnabledByDefault)
+TEST(SimpleLogRecordProcessorTest, EmptyMultiLogRecordProcessorIsDisabled)
 {
   MultiLogRecordProcessor processor(std::vector<std::unique_ptr<LogRecordProcessor>>{});
 
   context::Context test_context{"test-key", true};
   auto scope = instrumentation_scope::InstrumentationScope::Create("test-scope");
 
-  EXPECT_TRUE(
+  EXPECT_FALSE(
       processor.Enabled(test_context, *scope, logs_api::Severity::kDebug, "test-event-name"));
 }
