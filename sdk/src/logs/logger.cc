@@ -74,9 +74,9 @@ Logger::Logger(
       context_(std::move(context)),
       logger_config_(context_->GetLoggerConfigurator().ComputeConfig(*instrumentation_scope_))
 {
-  SetMinimumSeverity(
-      logger_config_.IsEnabled() ? static_cast<uint8_t>(logger_config_.GetMinimumSeverity())
-                                 : opentelemetry::logs::kMaxSeverity);
+  SetMinimumSeverity(logger_config_.IsEnabled()
+                         ? static_cast<uint8_t>(logger_config_.GetMinimumSeverity())
+                         : opentelemetry::logs::kMaxSeverity);
 }
 
 const opentelemetry::nostd::string_view Logger::GetName() noexcept
@@ -182,9 +182,7 @@ bool Logger::EnabledImplementation(const opentelemetry::context::Context &contex
     return false;
   }
 
-  return context_->GetProcessor().Enabled(context,
-                                          GetInstrumentationScope(),
-                                          severity,
+  return context_->GetProcessor().Enabled(context, GetInstrumentationScope(), severity,
                                           GetEventName(event_id));
 }
 

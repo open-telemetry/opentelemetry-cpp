@@ -533,7 +533,8 @@ logger_provider:
   ASSERT_NE(config->logger_provider, nullptr);
   ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
   ASSERT_EQ(config->logger_provider->logger_configurator->default_config.enabled, false);
-  ASSERT_TRUE(config->logger_provider->logger_configurator->default_config.minimum_severity_specified);
+  ASSERT_TRUE(
+      config->logger_provider->logger_configurator->default_config.minimum_severity_specified);
   ASSERT_EQ(config->logger_provider->logger_configurator->default_config.minimum_severity,
             configuration::SeverityNumber::warn);
   ASSERT_EQ(config->logger_provider->logger_configurator->default_config.trace_based, true);
@@ -588,8 +589,7 @@ logger_provider:
   ASSERT_EQ(configurator->loggers[1].name, "my.exact.logger");
   ASSERT_EQ(configurator->loggers[1].config.enabled, false);
   ASSERT_TRUE(configurator->loggers[1].config.minimum_severity_specified);
-  ASSERT_EQ(configurator->loggers[1].config.minimum_severity,
-            configuration::SeverityNumber::fatal);
+  ASSERT_EQ(configurator->loggers[1].config.minimum_severity, configuration::SeverityNumber::fatal);
   ASSERT_EQ(configurator->loggers[1].config.trace_based, true);
 }
 

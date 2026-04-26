@@ -27,10 +27,10 @@
 
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::common;
-namespace context = opentelemetry::context;
-namespace logs_api = opentelemetry::logs;
+namespace context               = opentelemetry::context;
+namespace logs_api              = opentelemetry::logs;
 namespace instrumentation_scope = opentelemetry::sdk::instrumentationscope;
-namespace nostd = opentelemetry::nostd;
+namespace nostd                 = opentelemetry::nostd;
 
 class TestLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {

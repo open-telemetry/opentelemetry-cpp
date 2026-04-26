@@ -62,11 +62,11 @@ public:
    * Enabled returns whether this processor is interested in a log with the given inputs.
    * The default implementation is permissive and returns true.
    */
-  bool Enabled(const opentelemetry::context::Context &context,
-               const opentelemetry::sdk::instrumentationscope::InstrumentationScope
-                   &instrumentation_scope,
-               opentelemetry::logs::Severity severity,
-               opentelemetry::nostd::string_view event_name = {}) const noexcept
+  bool Enabled(
+      const opentelemetry::context::Context &context,
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope,
+      opentelemetry::logs::Severity severity,
+      opentelemetry::nostd::string_view event_name = {}) const noexcept
   {
     return EnabledImplementation(context, instrumentation_scope, severity, event_name);
   }

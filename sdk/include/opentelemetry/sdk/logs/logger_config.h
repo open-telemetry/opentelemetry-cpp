@@ -73,10 +73,10 @@ public:
   static LoggerConfig Default();
 
 private:
-  explicit LoggerConfig(bool enabled = true,
-                        opentelemetry::logs::Severity minimum_severity =
-                            opentelemetry::logs::Severity::kInvalid,
-                        bool trace_based = false) noexcept
+  explicit LoggerConfig(
+      bool enabled                                   = true,
+      opentelemetry::logs::Severity minimum_severity = opentelemetry::logs::Severity::kInvalid,
+      bool trace_based                               = false) noexcept
       : enabled_(enabled), minimum_severity_(minimum_severity), trace_based_(trace_based)
   {}
 

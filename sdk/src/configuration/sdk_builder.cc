@@ -1946,12 +1946,11 @@ SdkBuilder::CreateLoggerConfigurator(
 
   for (const auto &entry : model->loggers)
   {
-    LoggerConfig entry_config =
-        LoggerConfig::Create(entry.config.enabled,
-                             entry.config.minimum_severity_specified
-                                 ? ToLogSeverity(entry.config.minimum_severity)
-                                 : opentelemetry::logs::Severity::kInvalid,
-                             entry.config.trace_based);
+    LoggerConfig entry_config = LoggerConfig::Create(
+        entry.config.enabled,
+        entry.config.minimum_severity_specified ? ToLogSeverity(entry.config.minimum_severity)
+                                                : opentelemetry::logs::Severity::kInvalid,
+        entry.config.trace_based);
     std::string pattern = entry.name;
     builder.AddCondition(
         [pattern](const InstrumentationScope &scope) {
