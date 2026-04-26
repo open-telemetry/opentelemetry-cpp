@@ -17,7 +17,6 @@
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/readable_log_record.h"
@@ -31,6 +30,7 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 // IWYU pragma: no_include "net/proto2/public/repeated_field.h"
 #include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
+#include "opentelemetry/proto/resource/v1/resource.pb.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/logs/v1/logs.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
