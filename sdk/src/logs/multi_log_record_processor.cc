@@ -73,6 +73,29 @@ void MultiLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexc
   }
 }
 
+bool MultiLogRecordProcessor::EnabledImplementation(
+    const opentelemetry::context::Context &context,
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope,
+    opentelemetry::logs::Severity severity,
+    opentelemetry::nostd::string_view event_name) const noexcept
+{
+  if (processors_.empty())
+  {
+    return true;
+  }
+
+  for (const auto &processor : processors_)
+  {
+    if (processor != nullptr &&
+        processor->Enabled(context, instrumentation_scope, severity, event_name))
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 bool MultiLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   return InternalForceFlush(timeout);
