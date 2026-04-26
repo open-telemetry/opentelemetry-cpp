@@ -197,6 +197,8 @@ opentelemetry::logs::Severity ToLogSeverity(SeverityNumber model_severity) noexc
 {
   switch (model_severity)
   {
+    case SeverityNumber::unspecified:
+      return opentelemetry::logs::Severity::kInvalid;
     case SeverityNumber::trace:
       return opentelemetry::logs::Severity::kTrace;
     case SeverityNumber::trace2:
@@ -2068,6 +2070,9 @@ void SdkBuilder::SetLogLevel(
 
   switch (model_log_level)
   {
+    case SeverityNumber::unspecified:
+      sdk_log_level = opentelemetry::sdk::common::internal_log::LogLevel::Info;
+      break;
     case SeverityNumber::trace:
     case SeverityNumber::trace2:
     case SeverityNumber::trace3:
