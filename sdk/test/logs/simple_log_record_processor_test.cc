@@ -13,7 +13,6 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -22,6 +21,7 @@
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/multi_log_record_processor.h"
+#include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -285,7 +285,11 @@ public:
     return std::unique_ptr<Recordable>(new TestLogRecordable());
   }
 
-  void OnEmit(std::unique_ptr<Recordable> && /*record*/) noexcept override {}
+  void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override
+  {
+    auto ignored = std::move(record);
+    static_cast<void>(ignored);
+  }
 
   bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 

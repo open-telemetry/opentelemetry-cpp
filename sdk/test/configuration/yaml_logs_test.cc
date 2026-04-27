@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
@@ -25,9 +26,11 @@
 #include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
+#include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
 
 namespace configuration         = opentelemetry::sdk::configuration;

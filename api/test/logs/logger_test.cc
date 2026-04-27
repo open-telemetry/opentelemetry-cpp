@@ -27,6 +27,7 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
@@ -333,10 +334,12 @@ public:
   void EmitLogRecord(
       nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept override
   {
-    if (log_record)
+    auto owned_log_record = std::move(log_record);
+    if (owned_log_record)
     {
       ++emit_log_record_calls_;
-      last_emitted_record_.reset(static_cast<EnablementAwareTestLogRecord *>(log_record.release()));
+      last_emitted_record_.reset(
+          static_cast<EnablementAwareTestLogRecord *>(owned_log_record.release()));
     }
   }
 

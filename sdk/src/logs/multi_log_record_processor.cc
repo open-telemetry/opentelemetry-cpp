@@ -6,6 +6,9 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/logs/multi_log_record_processor.h"
 #include "opentelemetry/sdk/logs/multi_recordable.h"
 #include "opentelemetry/sdk/logs/processor.h"
