@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"

@@ -13,6 +13,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep

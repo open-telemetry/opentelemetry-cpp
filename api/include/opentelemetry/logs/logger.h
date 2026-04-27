@@ -3,10 +3,13 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <type_traits>
 #include <utility>
 
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/logger_type_traits.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"

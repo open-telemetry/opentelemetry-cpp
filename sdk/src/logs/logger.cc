@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <chrono>
+#include <memory>
 #include <string>
 #include <utility>
 
