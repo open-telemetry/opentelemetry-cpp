@@ -91,9 +91,9 @@ context::Context MakeContextWithUnsampledSpanAndInvalidTraceId()
                                                  opentelemetry::trace::TraceFlags{0}, false);
 
   context::Context context;
-  return opentelemetry::trace::SetSpan(
-      context, nostd::shared_ptr<opentelemetry::trace::Span>(
-                   new opentelemetry::trace::DefaultSpan(span_context)));
+  return opentelemetry::trace::SetSpan(context,
+                                       nostd::shared_ptr<opentelemetry::trace::Span>(
+                                           new opentelemetry::trace::DefaultSpan(span_context)));
 }
 }  // namespace
 
@@ -296,7 +296,11 @@ public:
     return std::unique_ptr<Recordable>(new MockLogRecordable());
   }
 
-  void OnEmit(std::unique_ptr<Recordable> && /*record*/) noexcept override {}
+  void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override
+  {
+    auto ignored = std::move(record);
+    static_cast<void>(ignored);
+  }
 
   bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
