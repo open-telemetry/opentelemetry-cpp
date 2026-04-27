@@ -80,6 +80,21 @@ context::Context MakeContextWithSpan(bool sampled)
   context::Context context;
   return opentelemetry::trace::SetSpan(context, MakeTestSpan(sampled));
 }
+
+context::Context MakeContextWithUnsampledSpanAndInvalidTraceId()
+{
+  const uint8_t span_id_bytes[opentelemetry::trace::SpanId::kSize] = {0xde, 0xad, 0xbe, 0xef,
+                                                                      0xca, 0xfe, 0xba, 0xbe};
+
+  opentelemetry::trace::SpanContext span_context(opentelemetry::trace::TraceId(),
+                                                 opentelemetry::trace::SpanId(span_id_bytes),
+                                                 opentelemetry::trace::TraceFlags{0}, false);
+
+  context::Context context;
+  return opentelemetry::trace::SetSpan(
+      context, nostd::shared_ptr<opentelemetry::trace::Span>(
+                   new opentelemetry::trace::DefaultSpan(span_context)));
+}
 }  // namespace
 
 TEST(LoggerSDK, LogToNullProcessor)
@@ -603,6 +618,27 @@ TEST(LoggerSDK, LoggerTraceBasedConfigSkipsUnsampledCurrentContext)
   ASSERT_NE(token, nullptr);
 
   EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInfo));
+  EXPECT_EQ(call_state->call_count, 0U);
+}
+
+TEST(LoggerSDK, LoggerTraceBasedConfigSkipsUnsampledContextWithValidSpanId)
+{
+  auto call_state = std::shared_ptr<EnabledProcessorCallState>(new EnabledProcessorCallState());
+  auto log_processor =
+      std::unique_ptr<LogRecordProcessor>(new EnablementAwareProcessor(true, call_state));
+
+  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(
+      new LoggerProvider(std::move(log_processor), resource,
+                         std::make_unique<ScopeConfigurator<LoggerConfig>>(
+                             ScopeConfigurator<LoggerConfig>::Builder(
+                                 LoggerConfig::Create(true, logs_api::Severity::kInvalid, true))
+                                 .Build())));
+  auto logger = api_lp->GetLogger("trace-based-logger", "opentelemetry_library", "", schema_url);
+
+  EXPECT_FALSE(
+      logger->Enabled(MakeContextWithUnsampledSpanAndInvalidTraceId(), logs_api::Severity::kInfo));
   EXPECT_EQ(call_state->call_count, 0U);
 }
 

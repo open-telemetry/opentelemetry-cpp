@@ -49,8 +49,8 @@ nostd::string_view GetEventName(const opentelemetry::logs::EventId &event_id) no
                                    : nostd::string_view{};
 }
 
-bool IsTraceBasedEnabled(const context::Context &context,
-                         const LoggerConfig &logger_config) noexcept
+bool IsAllowedByTraceBasedFiltering(const context::Context &context,
+                                    const LoggerConfig &logger_config) noexcept
 {
   if (!logger_config.IsTraceBased())
   {
@@ -59,7 +59,12 @@ bool IsTraceBasedEnabled(const context::Context &context,
 
   const trace_api::SpanContext span_context = trace_api::GetSpan(context)->GetContext();
 
-  return !span_context.IsValid() || span_context.IsSampled();
+  if (!span_context.span_id().IsValid())
+  {
+    return true;
+  }
+
+  return span_context.trace_flags().IsSampled();
 }
 }  // namespace
 
@@ -165,7 +170,7 @@ void Logger::EmitLogRecord(
 bool Logger::EnabledImplementation(const opentelemetry::context::Context &context,
                                    opentelemetry::logs::Severity severity) const noexcept
 {
-  if (!IsTraceBasedEnabled(context, logger_config_))
+  if (!IsAllowedByTraceBasedFiltering(context, logger_config_))
   {
     return false;
   }
@@ -177,7 +182,7 @@ bool Logger::EnabledImplementation(const opentelemetry::context::Context &contex
                                    opentelemetry::logs::Severity severity,
                                    const opentelemetry::logs::EventId &event_id) const noexcept
 {
-  if (!IsTraceBasedEnabled(context, logger_config_))
+  if (!IsAllowedByTraceBasedFiltering(context, logger_config_))
   {
     return false;
   }
