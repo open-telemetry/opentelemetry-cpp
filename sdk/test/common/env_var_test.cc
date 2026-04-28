@@ -187,9 +187,11 @@ TEST(EnvVarTest, DurationEnvVar)
   EXPECT_EQ(value, expected);
 
   value = poison;
+  // Up to opentelemetry-cpp 1.26.0:
   // Deviation from the spec: 123 seconds instead of 123 milliseconds
-  expected =
-      std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds{123});
+  // Now fixed, 123 milliseconds
+  expected = std::chrono::duration_cast<std::chrono::system_clock::duration>(
+      std::chrono::milliseconds{123});
   exists = GetDurationEnvironmentVariable("DURATION_ENV_VAR_7", value);
   EXPECT_TRUE(exists);
   EXPECT_EQ(value, expected);

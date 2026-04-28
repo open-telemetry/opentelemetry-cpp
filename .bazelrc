@@ -23,13 +23,13 @@ build:windows --host_cxxopt=/std:c++17 --cxxopt=/std:c++17
 
 # --config=asan : Address Sanitizer.
 common:asan --copt -DADDRESS_SANITIZER
-common:asan --copt -fsanitize=address,bool,float-cast-overflow,integer-divide-by-zero,null,return,returns-nonnull-attribute,shift-exponent,signed-integer-overflow,unreachable,vla-bound
+common:asan --copt -fsanitize=address
 common:asan --copt -fsanitize-address-use-after-scope
-common:asan --copt -fno-sanitize-recover=all
-common:asan --linkopt -fsanitize=address,bool,float-cast-overflow,integer-divide-by-zero,null,return,returns-nonnull-attribute,shift-exponent,signed-integer-overflow,unreachable,vla-bound
+common:asan --copt -fno-omit-frame-pointer
+common:asan --linkopt -fsanitize=address
 common:asan --linkopt -fsanitize-address-use-after-scope
-common:asan --linkopt -fno-sanitize-recover=all
 common:asan --cc_output_directory_tag=asan
+common:asan --test_env=ASAN_OPTIONS=halt_on_error=1:print_stacktrace=1:detect_stack_use_after_return=1
 
 # --config=tsan : Thread Sanitizer.
 common:tsan --copt -fsanitize=thread
@@ -39,3 +39,20 @@ common:tsan --cc_output_directory_tag=tsan
 # This is needed to address false positive problem with abseil.The same setting as gRPC
 # https://github.com/google/sanitizers/issues/953
 common:tsan --test_env=TSAN_OPTIONS=report_atomic_races=0
+
+# --config=ubsan : Undefined Behavior Sanitizer
+# Restrict UBSan compile instrumentation to workspace labels only.
+#
+# Bazel syntax: --per_file_copt=<label_regex>@<compiler_flag>
+#   ^//.*       matches workspace labels (for example: //sdk/..., //api/...)
+#   @repo//...  are external repositories and intentionally excluded
+#
+# This avoids sanitizer instrumentation issues in third-party dependencies,
+# while still linking UBSan runtime into opentelemetry-cpp test binaries.
+common:ubsan --per_file_copt=^//.*@-fsanitize=undefined
+common:ubsan --per_file_copt=^//.*@-fno-sanitize-recover=undefined
+common:ubsan --per_file_copt=^//.*@-fno-sanitize=vptr
+common:ubsan --linkopt -fsanitize=undefined
+common:ubsan --linkopt -fno-sanitize=vptr
+common:ubsan --cc_output_directory_tag=ubsan
+common:ubsan --test_env=UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1

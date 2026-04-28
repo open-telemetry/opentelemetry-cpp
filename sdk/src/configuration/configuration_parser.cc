@@ -25,6 +25,15 @@
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_always_off_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_probability_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_patterns_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_values_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_parser.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
@@ -1685,6 +1694,217 @@ ConfigurationParser::ParseTraceIdRatioBasedSamplerConfiguration(
   return model;
 }
 
+std::unique_ptr<ComposableAlwaysOffSamplerConfiguration>
+ConfigurationParser::ParseComposableAlwaysOffSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */,
+    size_t /* depth */) const
+{
+  return std::make_unique<ComposableAlwaysOffSamplerConfiguration>();
+}
+
+std::unique_ptr<ComposableAlwaysOnSamplerConfiguration>
+ConfigurationParser::ParseComposableAlwaysOnSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */,
+    size_t /* depth */) const
+{
+  return std::make_unique<ComposableAlwaysOnSamplerConfiguration>();
+}
+
+std::unique_ptr<ComposableProbabilitySamplerConfiguration>
+ConfigurationParser::ParseComposableProbabilitySamplerConfiguration(
+    const std::unique_ptr<DocumentNode> &node,
+    size_t /* depth */) const
+{
+  auto model   = std::make_unique<ComposableProbabilitySamplerConfiguration>();
+  model->ratio = node->GetDouble("ratio", 1.0);
+  return model;
+}
+
+// NOLINTBEGIN(misc-no-recursion)
+std::unique_ptr<ComposableParentThresholdSamplerConfiguration>
+ConfigurationParser::ParseComposableParentThresholdSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> &node,
+    size_t depth) const
+{
+  auto model = std::make_unique<ComposableParentThresholdSamplerConfiguration>();
+
+  std::unique_ptr<DocumentNode> child = node->GetRequiredChildNode("root");
+  model->root                         = ParseComposableSamplerConfiguration(child, depth + 1);
+
+  return model;
+}
+
+std::unique_ptr<ComposableRuleBasedSamplerRuleAttributeValuesConfiguration>
+ConfigurationParser::ParseComposableRuleBasedSamplerRuleAttributeValuesConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<ComposableRuleBasedSamplerRuleAttributeValuesConfiguration>();
+  model->key = node->GetRequiredString("key");
+
+  auto vals = node->GetRequiredChildNode("values");
+  for (auto vit = vals->begin(); vit != vals->end(); ++vit)
+  {
+    std::unique_ptr<DocumentNode> v(*vit);
+    model->values.push_back(v->AsString());
+  }
+
+  return model;
+}
+
+std::unique_ptr<ComposableRuleBasedSamplerRuleAttributePatternsConfiguration>
+ConfigurationParser::ParseComposableRuleBasedSamplerRuleAttributePatternsConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<ComposableRuleBasedSamplerRuleAttributePatternsConfiguration>();
+  model->key = node->GetRequiredString("key");
+
+  auto included = node->GetChildNode("included");
+  if (included)
+  {
+    for (auto iit = included->begin(); iit != included->end(); ++iit)
+    {
+      std::unique_ptr<DocumentNode> i(*iit);
+      model->included.push_back(i->AsString());
+    }
+  }
+
+  auto excluded = node->GetChildNode("excluded");
+  if (excluded)
+  {
+    for (auto eit = excluded->begin(); eit != excluded->end(); ++eit)
+    {
+      std::unique_ptr<DocumentNode> e(*eit);
+      model->excluded.push_back(e->AsString());
+    }
+  }
+  return model;
+}
+
+std::unique_ptr<ComposableRuleBasedSamplerRuleConfiguration>
+ConfigurationParser::ParseComposableRuleBasedSamplerRuleConfiguration(
+    const std::unique_ptr<DocumentNode> &node,
+    size_t depth) const
+{
+  auto rule = std::make_unique<ComposableRuleBasedSamplerRuleConfiguration>();
+
+  std::unique_ptr<DocumentNode> av = node->GetChildNode("attribute_values");
+  if (av)
+  {
+    rule->attribute_values = ParseComposableRuleBasedSamplerRuleAttributeValuesConfiguration(av);
+  }
+
+  std::unique_ptr<DocumentNode> ap = node->GetChildNode("attribute_patterns");
+  if (ap)
+  {
+    rule->attribute_patterns =
+        ParseComposableRuleBasedSamplerRuleAttributePatternsConfiguration(ap);
+  }
+
+  std::unique_ptr<DocumentNode> parent = node->GetChildNode("parent");
+  if (parent)
+  {
+    for (auto pit = parent->begin(); pit != parent->end(); ++pit)
+    {
+      std::unique_ptr<DocumentNode> p(*pit);
+      std::string p_str = p->AsString();
+      if (p_str == "none")
+        rule->match_parent_none = true;
+      else if (p_str == "remote")
+        rule->match_parent_remote = true;
+      else if (p_str == "local")
+        rule->match_parent_local = true;
+      else
+        throw InvalidSchemaException(p->Location(), "Illegal parent type: " + p_str);
+    }
+  }
+
+  std::unique_ptr<DocumentNode> span_kinds = node->GetChildNode("span_kinds");
+  if (span_kinds)
+  {
+    for (auto kit = span_kinds->begin(); kit != span_kinds->end(); ++kit)
+    {
+      std::unique_ptr<DocumentNode> k(*kit);
+      std::string k_str = k->AsString();
+      if (k_str == "internal")
+        rule->match_span_kind_internal = true;
+      else if (k_str == "server")
+        rule->match_span_kind_server = true;
+      else if (k_str == "client")
+        rule->match_span_kind_client = true;
+      else if (k_str == "producer")
+        rule->match_span_kind_producer = true;
+      else if (k_str == "consumer")
+        rule->match_span_kind_consumer = true;
+      else
+        throw InvalidSchemaException(k->Location(), "Illegal span_kind type: " + k_str);
+    }
+  }
+
+  std::unique_ptr<DocumentNode> sampler = node->GetRequiredChildNode("sampler");
+  rule->sampler                         = ParseComposableSamplerConfiguration(sampler, depth + 1);
+
+  return rule;
+}
+
+std::unique_ptr<ComposableRuleBasedSamplerConfiguration>
+ConfigurationParser::ParseComposableRuleBasedSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> &node,
+    size_t depth) const
+{
+  auto model = std::make_unique<ComposableRuleBasedSamplerConfiguration>();
+
+  std::unique_ptr<DocumentNode> rules_node = node->GetChildNode("rules");
+  if (rules_node)
+  {
+    for (auto it = rules_node->begin(); it != rules_node->end(); ++it)
+    {
+      std::unique_ptr<DocumentNode> rule_node(*it);
+      model->rules.push_back(ParseComposableRuleBasedSamplerRuleConfiguration(rule_node, depth));
+    }
+  }
+
+  return model;
+}
+
+std::unique_ptr<ComposableSamplerConfiguration>
+ConfigurationParser::ParseComposableSamplerConfiguration(const std::unique_ptr<DocumentNode> &node,
+                                                         size_t depth) const
+{
+  std::string name;
+  std::unique_ptr<DocumentNode> child;
+  size_t count = 0;
+
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    name  = it.Name();
+    child = it.Value();
+    count++;
+  }
+
+  if (count != 1)
+  {
+    std::string message("Illegal composable sampler, properties count: ");
+    message.append(std::to_string(count));
+    throw InvalidSchemaException(node->Location(), message);
+  }
+
+  if (name == "always_off")
+    return ParseComposableAlwaysOffSamplerConfiguration(child, depth);
+  if (name == "always_on")
+    return ParseComposableAlwaysOnSamplerConfiguration(child, depth);
+  if (name == "probability")
+    return ParseComposableProbabilitySamplerConfiguration(child, depth);
+  if (name == "parent_threshold")
+    return ParseComposableParentThresholdSamplerConfiguration(child, depth);
+  if (name == "rule_based")
+    return ParseComposableRuleBasedSamplerConfiguration(child, depth);
+
+  std::string message("Illegal composable sampler type: ");
+  message.append(name);
+  throw InvalidSchemaException(node->Location(), message);
+}
+// NOLINTEND(misc-no-recursion)
+
 std::unique_ptr<ExtensionSamplerConfiguration>
 ConfigurationParser::ParseSamplerExtensionConfiguration(const std::string &name,
                                                         std::unique_ptr<DocumentNode> node,
@@ -1754,6 +1974,10 @@ std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseSamplerConfigura
   else if (name == "trace_id_ratio_based")
   {
     model = ParseTraceIdRatioBasedSamplerConfiguration(child, depth);
+  }
+  else if (name == "composite/development")
+  {
+    model = ParseComposableSamplerConfiguration(child, depth);
   }
   else
   {
