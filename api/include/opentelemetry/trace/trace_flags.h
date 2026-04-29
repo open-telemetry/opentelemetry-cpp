@@ -6,7 +6,6 @@
 #include <cstdint>
 
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
