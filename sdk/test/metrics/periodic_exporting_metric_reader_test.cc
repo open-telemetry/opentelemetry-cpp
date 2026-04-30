@@ -117,6 +117,29 @@ TEST(PeriodicExportingMetricReader, Timeout)
   reader->Shutdown();
 }
 
+TEST(PeriodicExportingMetricReader, DestroyWithoutShutdown)
+{
+  // Verify that destroying a reader without calling Shutdown() does not cause
+  // use-after-destroy races on the condition variable / mutex used by the
+  // background worker thread.  Before the destructor fix this test would fail
+  // under ThreadSanitizer with:
+  //   WARNING: ThreadSanitizer: unlock of an unlocked mutex (or by a wrong thread)
+  auto exporter = std::make_unique<MockPushMetricExporter>(std::chrono::milliseconds{0});
+  PeriodicExportingMetricReaderOptions options;
+  options.export_timeout_millis  = std::chrono::milliseconds(200);
+  options.export_interval_millis = std::chrono::milliseconds(500);
+  // producer must be declared before reader so it outlives it — the reader's
+  // destructor joins the background thread which may still call Produce().
+  MockMetricProducer producer;
+  {
+    auto reader = std::make_shared<PeriodicExportingMetricReader>(std::move(exporter), options);
+    reader->SetMetricProducer(&producer);
+    // Let the background thread start and enter its wait loop.
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    // reader goes out of scope here — no Shutdown() call.
+  }
+}
+
 TEST(PeriodicExportingMetricReaderOptions, UsesEnvVars)
 {
   const char *env_interval = "OTEL_METRIC_EXPORT_INTERVAL";

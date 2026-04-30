@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] File configuration - composable samplers
+  [#3966](https://github.com/open-telemetry/opentelemetry-cpp/issues/3966)
+* [SDK] Fix PeriodicExportingMetricReader shutdown race on destruction
+  [#4008](https://github.com/open-telemetry/opentelemetry-cpp/pull/4008)
+
 * [SDK] Move inline implementation from SDK headers to .cc files.
   Note: `GetEmptyAttributes()` now requires linking `opentelemetry_common`.
   [#3887](https://github.com/open-telemetry/opentelemetry-cpp/pull/3887)
@@ -55,6 +60,36 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy narrowing conversions in baggage
   [#3989](https://github.com/open-telemetry/opentelemetry-cpp/pull/3989)
 
+* [CODE HEALTH] Fix misc clang-tidy warnings
+  [#3993](https://github.com/open-telemetry/opentelemetry-cpp/pull/3993)
+
+* [CODE HEALTH] Fix clang-tidy warnings in base2 exponential histogram aggregation
+  [#3997](https://github.com/open-telemetry/opentelemetry-cpp/pull/3997)
+
+* Enable ENABLE_OTLP_RETRY_PREVIEW for bazel
+  [#4010](https://github.com/open-telemetry/opentelemetry-cpp/pull/4010)
+
+* [CI] Build third-party dependencies in release with ninja
+  [#3995](https://github.com/open-telemetry/opentelemetry-cpp/pull/3995)
+
+* [CI] Update ci scripts and documentation
+  [#4000](https://github.com/open-telemetry/opentelemetry-cpp/pull/4000)
+
+* [CI] Update code.coverage job to report on all components and features
+  [#4002](https://github.com/open-telemetry/opentelemetry-cpp/pull/4002)
+
+* [CODE HEALTH] Fix clang-tidy misc-no-recursion warnings
+  [#4009](https://github.com/open-telemetry/opentelemetry-cpp/pull/4009)
+
+* [CODE HEALTH] Fix clang-tidy narrowing-conversions warnings in sync_instruments
+  [#4013](https://github.com/open-telemetry/opentelemetry-cpp/pull/4013)
+
+* [API] Deprecate opentelemetry::plugin
+  [#4021](https://github.com/open-telemetry/opentelemetry-cpp/pull/4021)
+
+* [SDK] env var durations non conforming to spec
+  [#4020](https://github.com/open-telemetry/opentelemetry-cpp/pull/4020)
+
 * [EXAMPLE] Add explicit_parent example
   [#3935](https://github.com/open-telemetry/opentelemetry-cpp/pull/3935)
 
@@ -74,6 +109,48 @@ Important changes:
   * Bazel now always builds with ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW.
   * grpc properties for ssl KEY and CERT are always available,
     adjust the application code to initialize all members in grpc options.
+
+* Enable ENABLE_OTLP_RETRY_PREVIEW for bazel
+  [#4010](https://github.com/open-telemetry/opentelemetry-cpp/pull/4010)
+
+  * Bazel now always builds with ENABLE_OTLP_RETRY_PREVIEW.
+
+* [API] Deprecate opentelemetry::plugin
+  [#4021](https://github.com/open-telemetry/opentelemetry-cpp/pull/4021)
+
+  * namespace opentelemetry::plugin is deprecated
+  * See file DEPRECATED.md for details.
+
+Breaking changes:
+
+* [SDK] env var durations non conforming to spec
+  [#4020](https://github.com/open-telemetry/opentelemetry-cpp/pull/4020)
+
+  * Environment variables for durations can accept two formats, with units
+    (`15s`, `15000ms`) or without units (`15000`).
+  * When parsing environment variables that represent durations,
+    and only in the case no unit is provided,
+    for example `OTEL_METRIC_EXPORT_INTERVAL=15000`,
+    the code interpreted the value, `15000`,
+    in seconds instead of milliseconds per the specifications.
+  * Parsing duration without units has been fixed to use milliseconds.
+  * As a consequence, every duration environment variable set
+    without a unit is now interpreted differently, which is a breaking change.
+  * For example, `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT=30` meant 30 seconds
+    before, and now means 30 milliseconds.
+    To preserve the same behavior, existing values must be adjusted,
+    to either `30000` or `30000ms` or `30s` in this case.
+  * The following variables are affected:
+    * OTEL_EXPORTER_OTLP_TRACES_TIMEOUT
+    * OTEL_EXPORTER_OTLP_METRICS_TIMEOUT
+    * OTEL_EXPORTER_OTLP_LOGS_TIMEOUT
+    * OTEL_EXPORTER_OTLP_TIMEOUT
+    * OTEL_BLRP_SCHEDULE_DELAY
+    * OTEL_BLRP_EXPORT_TIMEOUT
+    * OTEL_METRIC_EXPORT_INTERVAL
+    * OTEL_METRIC_EXPORT_TIMEOUT
+    * OTEL_BSP_SCHEDULE_DELAY
+    * OTEL_BSP_EXPORT_TIMEOUT
 
 ## [1.26.0] 2026-03-19
 

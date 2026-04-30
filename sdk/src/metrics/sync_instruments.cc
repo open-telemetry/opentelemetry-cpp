@@ -460,7 +460,7 @@ void LongHistogram::Record(uint64_t value,
     return;
   }
   auto context = opentelemetry::context::Context{};
-  return storage_->RecordLong(value, attributes, context);
+  return storage_->RecordLong(static_cast<int64_t>(value), attributes, context);
 }
 
 void LongHistogram::Record(uint64_t value) noexcept
@@ -472,7 +472,7 @@ void LongHistogram::Record(uint64_t value) noexcept
     return;
   }
   auto context = opentelemetry::context::Context{};
-  return storage_->RecordLong(value, context);
+  return storage_->RecordLong(static_cast<int64_t>(value), context);
 }
 #endif
 

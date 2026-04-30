@@ -200,9 +200,7 @@ third_party/          - External dependencies
 cmake.test                       # Standard CMake build with exporters (~5.2 min)
 cmake.maintainer.sync.test       # Maintainer mode: -Wall -Werror -Wextra (~4-6 min)
 cmake.maintainer.async.test      # Maintainer mode with async export enabled
-cmake.maintainer.cpp11.async.test # Maintainer mode with C++11
 cmake.maintainer.abiv2.test      # Maintainer mode with ABI v2
-cmake.legacy.test                # GCC 4.8 compatibility testing
 cmake.c++20.test                # C++20 standard testing
 bazel.test                      # Standard Bazel build and test
 format                          # Run formatting tools

@@ -356,6 +356,52 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
   }
 
   grpc::ChannelArguments grpc_arguments;
+  PopulateChannelArguments(options, grpc_arguments);
+
+  if (options.use_ssl_credentials)
+  {
+    grpc::SslCredentialsOptions ssl_opts;
+    ssl_opts.pem_root_certs = GetFileContentsOrInMemoryContents(
+        options.ssl_credentials_cacert_path, options.ssl_credentials_cacert_as_string);
+#ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
+    ssl_opts.pem_private_key = GetFileContentsOrInMemoryContents(options.ssl_client_key_path,
+                                                                 options.ssl_client_key_string);
+    ssl_opts.pem_cert_chain  = GetFileContentsOrInMemoryContents(options.ssl_client_cert_path,
+                                                                 options.ssl_client_cert_string);
+
+#endif
+    channel =
+        grpc::CreateCustomChannel(grpc_target, grpc::SslCredentials(ssl_opts), grpc_arguments);
+  }
+  else
+  {
+    channel =
+        grpc::CreateCustomChannel(grpc_target, grpc::InsecureChannelCredentials(), grpc_arguments);
+  }
+
+#ifdef ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
+  if (options.credentials)
+  {
+    if (options.use_ssl_credentials)
+    {
+      OTEL_INTERNAL_LOG_WARN(
+          "[OTLP GRPC Client] Both 'credentials' and 'use_ssl_credentials' options are set. "
+          "The former takes priority.");
+    }
+    channel = grpc::CreateCustomChannel(grpc_target, options.credentials, grpc_arguments);
+  }
+#endif  // ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
+
+  return channel;
+}
+
+void OtlpGrpcClient::PopulateChannelArguments(const OtlpGrpcClientOptions &options,
+                                              grpc::ChannelArguments &grpc_arguments)
+{
+  if (options.channel_arguments != nullptr)
+  {
+    grpc_arguments = *options.channel_arguments;
+  }
   grpc_arguments.SetUserAgentPrefix(options.user_agent);
 
   if (options.max_threads > 0)
@@ -399,9 +445,7 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
       ]
     })"};
 
-    // Allocate string with buffer large enough to hold the formatted json config
     auto service_config = std::string(kServiceConfigJson.size(), '\0');
-    // Prior to C++17, need to explicitly cast away constness from `data()` buffer
     std::snprintf(
         const_cast<decltype(service_config)::value_type *>(service_config.data()),
         service_config.size(), kServiceConfigJson.data(), options.retry_policy_max_attempts,
@@ -412,42 +456,6 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
     grpc_arguments.SetServiceConfigJSON(service_config);
   }
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
-
-  if (options.use_ssl_credentials)
-  {
-    grpc::SslCredentialsOptions ssl_opts;
-    ssl_opts.pem_root_certs = GetFileContentsOrInMemoryContents(
-        options.ssl_credentials_cacert_path, options.ssl_credentials_cacert_as_string);
-#ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
-    ssl_opts.pem_private_key = GetFileContentsOrInMemoryContents(options.ssl_client_key_path,
-                                                                 options.ssl_client_key_string);
-    ssl_opts.pem_cert_chain  = GetFileContentsOrInMemoryContents(options.ssl_client_cert_path,
-                                                                 options.ssl_client_cert_string);
-
-#endif
-    channel =
-        grpc::CreateCustomChannel(grpc_target, grpc::SslCredentials(ssl_opts), grpc_arguments);
-  }
-  else
-  {
-    channel =
-        grpc::CreateCustomChannel(grpc_target, grpc::InsecureChannelCredentials(), grpc_arguments);
-  }
-
-#ifdef ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
-  if (options.credentials)
-  {
-    if (options.use_ssl_credentials)
-    {
-      OTEL_INTERNAL_LOG_WARN(
-          "[OTLP GRPC Client] Both 'credentials' and 'use_ssl_credentials' options are set. "
-          "The former takes priority.");
-    }
-    channel = grpc::CreateCustomChannel(grpc_target, options.credentials, grpc_arguments);
-  }
-#endif  // ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
-
-  return channel;
 }
 
 std::unique_ptr<grpc::ClientContext> OtlpGrpcClient::MakeClientContext(
