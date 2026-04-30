@@ -71,6 +71,11 @@ nostd::shared_ptr<trace_api::Span> CreateSpan(
   {
     opts.parent = parent->GetContext();
   }
+  else
+  {
+    opentelemetry::context::Context context_root{opentelemetry::trace::kIsRootSpanKey, true};
+    opts.parent   = context_root;
+  }
 
   auto span = get_tracer()->StartSpan(name, opts);
   return span;
