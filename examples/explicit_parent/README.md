@@ -50,7 +50,8 @@ parent_2  (root)
 ## Output
 
 The output will be a set of spans, in which you can check how the relationships
-outlined in the previous diagrams are fulfilled. For example:
+outlined in the previous diagrams are fulfilled. For example (ids will differ
+each run, the shown values are illustrative):
 
 ### Trace 1
 
