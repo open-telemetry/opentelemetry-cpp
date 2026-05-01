@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -18,9 +17,6 @@ class LoggerConfigConfiguration
 {
 public:
   bool enabled{true};
-  bool minimum_severity_specified{false};
-  SeverityNumber minimum_severity{SeverityNumber::trace};
-  bool trace_based{false};
 };
 
 }  // namespace configuration

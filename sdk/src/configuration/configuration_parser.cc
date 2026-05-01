@@ -623,15 +623,7 @@ LoggerConfigConfiguration ConfigurationParser::ParseLoggerConfigConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
   LoggerConfigConfiguration model;
-  model.enabled     = node->GetBoolean("enabled", true);
-  model.trace_based = node->GetBoolean("trace_based", false);
-
-  const std::string minimum_severity = node->GetString("minimum_severity", "");
-  if (!minimum_severity.empty())
-  {
-    model.minimum_severity           = ParseSeverityNumber(node, minimum_severity);
-    model.minimum_severity_specified = true;
-  }
+  model.enabled = node->GetBoolean("enabled", true);
   return model;
 }
 
