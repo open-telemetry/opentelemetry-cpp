@@ -121,6 +121,7 @@ For more information about the approver role, see the [community repository](htt
 * [Johannes Tax](https://github.com/pyohannes), Approver
 * [Josh Suereth](https://github.com/jsuereth), Approver
 * [Max Golovanov](https://github.com/maxgolov), Approver
+* [Pranav Sharma](https://github.com/psx95), Approver
 * [Reiley Yang](https://github.com/reyang), Maintainer
 * [Ryan Burn](https://github.com/rnburn), Approver
 
