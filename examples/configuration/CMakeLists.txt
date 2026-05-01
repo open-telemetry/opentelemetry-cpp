@@ -20,7 +20,7 @@ add_executable(
   custom_log_record_processor_builder.cc)
 
 target_link_libraries(
-  example_yaml 
+  example_yaml
   PRIVATE ${CMAKE_THREAD_LIBS_INIT}
           common_metrics_foo_library
           common_logs_foo_library
