@@ -6,6 +6,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
