@@ -276,9 +276,12 @@ class EnabledProcessor final : public LogRecordProcessor
 {
 public:
   explicit EnabledProcessor(bool enabled,
-                            std::shared_ptr<EnabledCallState> call_state = nullptr) noexcept
+                            std::shared_ptr<EnabledCallState> call_state = nullptr,
+                            uint8_t minimum_severity                     = 0) noexcept
       : enabled_(enabled), call_state_(std::move(call_state))
-  {}
+  {
+    SetMinimumSeverity(minimum_severity);
+  }
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
@@ -389,4 +392,83 @@ TEST(SimpleLogRecordProcessorTest, EmptyMultiLogRecordProcessorIsDisabled)
 
   EXPECT_FALSE(
       processor.Enabled(test_context, *scope, logs_api::Severity::kDebug, "test-event-name"));
+}
+
+TEST(SimpleLogRecordProcessorTest, SeverityOnlyEnabledIsCachedAndPermissiveByDefault)
+{
+  auto call_state = std::make_shared<EnabledCallState>();
+  EnabledProcessor processor(true, call_state);
+
+  EXPECT_TRUE(processor.Enabled(logs_api::Severity::kInvalid));
+  EXPECT_TRUE(processor.Enabled(logs_api::Severity::kTrace));
+  EXPECT_TRUE(processor.Enabled(logs_api::Severity::kInfo));
+  EXPECT_TRUE(processor.Enabled(logs_api::Severity::kFatal4));
+
+  // The severity-only path is the cached check; the rich EnabledImplementation must not run.
+  EXPECT_EQ(call_state->call_count, 0U);
+}
+
+TEST(SimpleLogRecordProcessorTest, SeverityOnlyEnabledHonorsConfiguredMinimumSeverity)
+{
+  EnabledProcessor info_and_above(true, nullptr, static_cast<uint8_t>(logs_api::Severity::kInfo));
+
+  EXPECT_FALSE(info_and_above.Enabled(logs_api::Severity::kInvalid));
+  EXPECT_FALSE(info_and_above.Enabled(logs_api::Severity::kTrace));
+  EXPECT_FALSE(info_and_above.Enabled(logs_api::Severity::kDebug));
+  EXPECT_TRUE(info_and_above.Enabled(logs_api::Severity::kInfo));
+  EXPECT_TRUE(info_and_above.Enabled(logs_api::Severity::kWarn));
+  EXPECT_TRUE(info_and_above.Enabled(logs_api::Severity::kFatal4));
+
+  EnabledProcessor disabled_all(true, nullptr, opentelemetry::logs::kMaxSeverity);
+
+  EXPECT_FALSE(disabled_all.Enabled(logs_api::Severity::kInvalid));
+  EXPECT_FALSE(disabled_all.Enabled(logs_api::Severity::kFatal4));
+}
+
+TEST(SimpleLogRecordProcessorTest, RichEnabledShortCircuitsBelowMinimumSeverity)
+{
+  auto call_state = std::make_shared<EnabledCallState>();
+  EnabledProcessor processor(true, call_state, static_cast<uint8_t>(logs_api::Severity::kWarn));
+
+  context::Context test_context{"test-key", true};
+  auto scope = instrumentation_scope::InstrumentationScope::Create("test-scope");
+
+  // Below threshold: cached check fails, rich EnabledImplementation must NOT run.
+  EXPECT_FALSE(
+      processor.Enabled(test_context, *scope, logs_api::Severity::kInfo, "test-event-name"));
+  EXPECT_EQ(call_state->call_count, 0U);
+
+  // At threshold: cached check passes, rich EnabledImplementation runs and returns enabled_.
+  EXPECT_TRUE(
+      processor.Enabled(test_context, *scope, logs_api::Severity::kWarn, "test-event-name"));
+  EXPECT_EQ(call_state->call_count, 1U);
+  EXPECT_EQ(call_state->severity, logs_api::Severity::kWarn);
+}
+
+TEST(SimpleLogRecordProcessorTest, MultiLogRecordProcessorRespectsChildMinimumSeverity)
+{
+  auto info_state  = std::make_shared<EnabledCallState>();
+  auto error_state = std::make_shared<EnabledCallState>();
+
+  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
+  processors.emplace_back(
+      new EnabledProcessor(true, info_state, static_cast<uint8_t>(logs_api::Severity::kInfo)));
+  processors.emplace_back(
+      new EnabledProcessor(true, error_state, static_cast<uint8_t>(logs_api::Severity::kError)));
+  MultiLogRecordProcessor processor(std::move(processors));
+
+  context::Context test_context{"test-key", true};
+  auto scope = instrumentation_scope::InstrumentationScope::Create("test-scope");
+
+  // kDebug below both children's minimums: each child's cached check filters before its virtual.
+  EXPECT_FALSE(
+      processor.Enabled(test_context, *scope, logs_api::Severity::kDebug, "test-event-name"));
+  EXPECT_EQ(info_state->call_count, 0U);
+  EXPECT_EQ(error_state->call_count, 0U);
+
+  // kInfo passes the first child's minimum; multi short-circuits before reaching the second.
+  EXPECT_TRUE(
+      processor.Enabled(test_context, *scope, logs_api::Severity::kInfo, "test-event-name"));
+  EXPECT_EQ(info_state->call_count, 1U);
+  EXPECT_EQ(error_state->call_count, 0U);
 }
