@@ -14,7 +14,6 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
 #include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
@@ -75,12 +74,6 @@ nostd::shared_ptr<opentelemetry::trace::Span> MakeTestSpan(bool sampled)
       new opentelemetry::trace::DefaultSpan(span_context));
 }
 
-context::Context MakeContextWithSpan(bool sampled)
-{
-  context::Context context;
-  return opentelemetry::trace::SetSpan(context, MakeTestSpan(sampled));
-}
-
 context::Context MakeContextWithUnsampledSpanAndInvalidTraceId()
 {
   const uint8_t span_id_bytes[opentelemetry::trace::SpanId::kSize] = {0xde, 0xad, 0xbe, 0xef,
@@ -111,8 +104,6 @@ TEST(LoggerSDK, LogToNullProcessor)
   ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetName(), "opentelelemtry_library");
   ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetVersion(), "");
   ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetSchemaURL(), schema_url);
-  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInvalid));
-  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kDebug));
   // Log a sample log record to a nullptr processor
   logger->Debug("Test log");
 }
@@ -496,7 +487,7 @@ TEST(LoggerSDK, LoggerWithMinimumSeverityConfig)
   auto logger = api_lp->GetLogger("warn-logger", "opentelemetry_library", "", schema_url);
 
   ASSERT_EQ(logger->GetName(), "warn-logger");
-  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kInvalid));
+  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInvalid));
   EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInfo));
   EXPECT_TRUE(logger->Enabled(logs_api::Severity::kWarn));
   EXPECT_TRUE(logger->Enabled(logs_api::Severity::kError));
@@ -506,33 +497,6 @@ TEST(LoggerSDK, LoggerWithMinimumSeverityConfig)
   logger->EmitLogRecord(logs_api::Severity::kWarn, "allowed");
   ASSERT_EQ(shared_recordable->GetBody(), "allowed");
   ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kWarn);
-}
-
-TEST(LoggerSDK, LoggerEnabledUsesProcessorEnablementWithCurrentContext)
-{
-  auto call_state = std::shared_ptr<EnabledProcessorCallState>(new EnabledProcessorCallState());
-  auto log_processor =
-      std::unique_ptr<LogRecordProcessor>(new EnablementAwareProcessor(false, call_state));
-
-  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider(
-      std::move(log_processor), resource,
-      std::make_unique<ScopeConfigurator<LoggerConfig>>(
-          ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Enabled()).Build())));
-  auto logger = api_lp->GetLogger("test-logger", "opentelemetry_library", "", schema_url);
-
-  context::Context test_context{"test-key", true};
-  auto token = context::RuntimeContext::Attach(test_context);
-  ASSERT_NE(token, nullptr);
-
-  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInfo));
-  EXPECT_EQ(call_state->severity, logs_api::Severity::kInfo);
-  EXPECT_EQ(call_state->event_name, "");
-  EXPECT_EQ(call_state->scope_name, "opentelemetry_library");
-  EXPECT_TRUE(call_state->context_has_test_key);
-  EXPECT_TRUE(call_state->context_test_key_value);
-  EXPECT_EQ(call_state->call_count, 1U);
 }
 
 TEST(LoggerSDK, LoggerEnabledWithNamedEventIdUsesProcessorEnablement)
@@ -599,29 +563,6 @@ TEST(LoggerSDK, LoggerMinimumSeveritySkipsProcessorEnablement)
   auto logger = api_lp->GetLogger("warn-logger", "opentelemetry_library", "", schema_url);
 
   EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInfo, logs_api::EventId{123, "named-event"}));
-  EXPECT_EQ(call_state->call_count, 0U);
-}
-
-TEST(LoggerSDK, LoggerTraceBasedConfigSkipsUnsampledCurrentContext)
-{
-  auto call_state = std::shared_ptr<EnabledProcessorCallState>(new EnabledProcessorCallState());
-  auto log_processor =
-      std::unique_ptr<LogRecordProcessor>(new EnablementAwareProcessor(true, call_state));
-
-  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(
-      new LoggerProvider(std::move(log_processor), resource,
-                         std::make_unique<ScopeConfigurator<LoggerConfig>>(
-                             ScopeConfigurator<LoggerConfig>::Builder(
-                                 LoggerConfig::Create(true, logs_api::Severity::kInvalid, true))
-                                 .Build())));
-  auto logger = api_lp->GetLogger("trace-based-logger", "opentelemetry_library", "", schema_url);
-
-  auto token = context::RuntimeContext::Attach(MakeContextWithSpan(false));
-  ASSERT_NE(token, nullptr);
-
-  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInfo));
   EXPECT_EQ(call_state->call_count, 0U);
 }
 

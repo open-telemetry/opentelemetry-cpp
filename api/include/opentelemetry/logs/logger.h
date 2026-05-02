@@ -8,7 +8,6 @@
 #include <utility>
 
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/logger_type_traits.h"
 #include "opentelemetry/logs/severity.h"
@@ -281,15 +280,7 @@ public:
   inline bool Enabled(const opentelemetry::context::Context &context,
                       Severity severity = Severity::kInvalid) const noexcept
   {
-    uint8_t minimum_severity = OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
-    if (severity == Severity::kInvalid)
-    {
-      if OPENTELEMETRY_UNLIKELY_CONDITION (minimum_severity == kMaxSeverity)
-      {
-        return false;
-      }
-    }
-    else if OPENTELEMETRY_UNLIKELY_CONDITION (static_cast<uint8_t>(severity) < minimum_severity)
+    if OPENTELEMETRY_LIKELY_CONDITION (!Enabled(severity))
     {
       return false;
     }
@@ -300,15 +291,7 @@ public:
                       Severity severity,
                       const EventId &event_id) const noexcept
   {
-    uint8_t minimum_severity = OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
-    if (severity == Severity::kInvalid)
-    {
-      if OPENTELEMETRY_UNLIKELY_CONDITION (minimum_severity == kMaxSeverity)
-      {
-        return false;
-      }
-    }
-    else if OPENTELEMETRY_UNLIKELY_CONDITION (static_cast<uint8_t>(severity) < minimum_severity)
+    if OPENTELEMETRY_LIKELY_CONDITION (!Enabled(severity))
     {
       return false;
     }
@@ -317,15 +300,7 @@ public:
 
   inline bool Enabled(Severity severity, const EventId &event_id) const noexcept
   {
-    uint8_t minimum_severity = OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
-    if (severity == Severity::kInvalid)
-    {
-      if OPENTELEMETRY_UNLIKELY_CONDITION (minimum_severity == kMaxSeverity)
-      {
-        return false;
-      }
-    }
-    else if OPENTELEMETRY_UNLIKELY_CONDITION (static_cast<uint8_t>(severity) < minimum_severity)
+    if OPENTELEMETRY_LIKELY_CONDITION (!Enabled(severity))
     {
       return false;
     }
@@ -334,15 +309,7 @@ public:
 
   inline bool Enabled(Severity severity, int64_t event_id) const noexcept
   {
-    uint8_t minimum_severity = OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
-    if (severity == Severity::kInvalid)
-    {
-      if OPENTELEMETRY_UNLIKELY_CONDITION (minimum_severity == kMaxSeverity)
-      {
-        return false;
-      }
-    }
-    else if OPENTELEMETRY_UNLIKELY_CONDITION (static_cast<uint8_t>(severity) < minimum_severity)
+    if OPENTELEMETRY_LIKELY_CONDITION (!Enabled(severity))
     {
       return false;
     }
@@ -351,7 +318,7 @@ public:
 
   inline bool Enabled(Severity severity) const noexcept
   {
-    return Enabled(opentelemetry::context::RuntimeContext::GetCurrent(), severity);
+    return static_cast<uint8_t>(severity) >= OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
   }
 
   /**
