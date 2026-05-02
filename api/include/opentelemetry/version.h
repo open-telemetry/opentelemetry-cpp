@@ -30,3 +30,12 @@
 #define OPENTELEMETRY_NAMESPACE opentelemetry :: OPENTELEMETRY_CONCAT(v, OPENTELEMETRY_ABI_VERSION_NO)
 
 // clang-format on
+
+// Experimental: bound synchronous metric instruments (Counter, Histogram).
+// Enabled when both ABI v2 and the preview flag are set. Guard all bound
+// instrument code with `#ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW`.
+// This macro affects SDK class layout/vtables and MUST match between the SDK
+// library build and consumer translation units.
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2 && defined(ENABLE_METRICS_BOUND_INSTRUMENTS_PREVIEW)
+#  define OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW 1
+#endif

@@ -43,6 +43,16 @@ set_target_version(opentelemetry_metrics)
 target_link_libraries(opentelemetry_metrics PUBLIC opentelemetry_common
                                                    opentelemetry_resources)
 
+if(WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW)
+  # Belt-and-suspenders: also propagate the preview macro from the SDK
+  # metrics target so consumers linking the SDK directly inherit it even if
+  # they do not transitively pick it up via opentelemetry_api. The macro
+  # affects SDK class layout/vtables and MUST match between this library
+  # build and every consumer translation unit.
+  target_compile_definitions(opentelemetry_metrics
+                             INTERFACE ENABLE_METRICS_BOUND_INSTRUMENTS_PREVIEW)
+endif()
+
 target_include_directories(
   opentelemetry_metrics
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
