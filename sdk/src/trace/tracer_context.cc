@@ -32,9 +32,22 @@ TracerContext::TracerContext(std::vector<std::unique_ptr<SpanProcessor>> &&proce
     : resource_(resource),
       sampler_(std::move(sampler)),
       id_generator_(std::move(id_generator)),
-      processor_(std::unique_ptr<SpanProcessor>(new MultiSpanProcessor(std::move(processors)))),
-      tracer_configurator_(std::move(tracer_configurator))
-{}
+      tracer_configurator_(std::move(tracer_configurator)),
+      num_processors_(0)
+{
+  if (processors.empty())
+  {
+    processor_ = std::unique_ptr<SpanProcessor>(new MultiSpanProcessor(std::move(processors)));
+  }
+  else
+  {
+    // at least one processor is available here
+    for (auto &&processor : processors)
+    {
+      AddProcessor(std::move(processor));
+    }
+  }
+}
 
 Sampler &TracerContext::GetSampler() const noexcept
 {
@@ -59,9 +72,32 @@ opentelemetry::sdk::trace::IdGenerator &TracerContext::GetIdGenerator() const no
 
 void TracerContext::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
 {
+  if (!processor)
+  {
+    return;
+  }
 
-  auto multi_processor = static_cast<MultiSpanProcessor *>(processor_.get());
-  multi_processor->AddProcessor(std::move(processor));
+  if (num_processors_ == 0)
+  {
+    // this is the first processor to be added, maybe the MultiSpanProcessor is not needed
+    processor_ = std::move(processor);
+  }
+  else if (num_processors_ == 1)
+  {
+    // if there already is a processor, then make a new MultiSpanProcessor to handle both
+    std::unique_ptr<MultiSpanProcessor> multi_processor(new MultiSpanProcessor({}));
+    multi_processor->AddProcessor(std::move(processor_));
+    multi_processor->AddProcessor(std::move(processor));
+    processor_ = std::move(multi_processor);
+  }
+  else /*if (num_processors_ > 1)*/
+  {
+    // already have a MultiSpanProcessor, add the processor to it
+    auto multi_processor = static_cast<MultiSpanProcessor *>(processor_.get());
+    multi_processor->AddProcessor(std::move(processor));
+  }
+
+  ++num_processors_;
 }
 
 SpanProcessor &TracerContext::GetProcessor() const noexcept
