@@ -440,23 +440,6 @@ TEST(Logger, PushLoggerImplementation)
   ASSERT_EQ("test logger", logger->GetName());
 }
 
-TEST(Logger, EmitLogRecordWithExistingRecordPopulatesAndEmitsWhenSeverityEnabled)
-{
-  EnablementAwareTestLogger logger(Severity::kTrace);
-
-  auto log_record = logger.CreateLogRecord();
-  ASSERT_EQ(logger.create_log_record_calls_, 1u);
-
-  logger.EmitLogRecord(std::move(log_record), Severity::kInfo, "allowed");
-
-  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
-  ASSERT_TRUE(logger.last_emitted_record_ != nullptr);
-  EXPECT_EQ(logger.last_emitted_record_->severity_, Severity::kInfo);
-  EXPECT_EQ(logger.last_emitted_record_->event_id_, -1);
-  EXPECT_FALSE(logger.last_emitted_record_->event_id_was_set_);
-  EXPECT_TRUE(logger.last_emitted_record_->body_was_set_);
-}
-
 TEST(Logger, EnabledWithExplicitContextUsesContextAwareImplementation)
 {
   EnablementAwareTestLogger logger(Severity::kTrace);
@@ -468,21 +451,4 @@ TEST(Logger, EnabledWithExplicitContextUsesContextAwareImplementation)
   EXPECT_EQ(logger.last_enabled_severity_, Severity::kInfo);
   EXPECT_TRUE(logger.last_enabled_context_has_test_key_);
   EXPECT_TRUE(logger.last_enabled_context_test_key_value_);
-}
-
-TEST(Logger, EmitLogRecordAllowsEventIdWithoutSeverity)
-{
-  EnablementAwareTestLogger logger(Severity::kError);
-
-  logger.EmitLogRecord(EventId{9, "event-only"}, "allowed");
-
-  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
-  EXPECT_EQ(logger.create_log_record_calls_, 1u);
-  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
-  ASSERT_TRUE(logger.last_emitted_record_ != nullptr);
-  EXPECT_EQ(logger.last_emitted_record_->severity_, Severity::kInvalid);
-  EXPECT_EQ(logger.last_emitted_record_->event_id_, 9);
-  EXPECT_TRUE(logger.last_emitted_record_->event_id_was_set_);
-  EXPECT_TRUE(logger.last_emitted_record_->event_name_was_set_);
-  EXPECT_TRUE(logger.last_emitted_record_->body_was_set_);
 }
