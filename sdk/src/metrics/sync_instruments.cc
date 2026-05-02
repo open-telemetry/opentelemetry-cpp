@@ -601,8 +601,7 @@ public:
   {
     if (value < 0)
     {
-      OTEL_INTERNAL_LOG_WARN(
-          "[BoundDoubleCounter::Add(V)] Value not recorded - negative value");
+      OTEL_INTERNAL_LOG_WARN("[BoundDoubleCounter::Add(V)] Value not recorded - negative value");
       return;
     }
     if (storage_)

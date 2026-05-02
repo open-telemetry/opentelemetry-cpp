@@ -229,16 +229,14 @@ void BM_UnboundFixedAttrsCounter(benchmark::State &state)
   MeterProvider mp;
   std::shared_ptr<MetricReader> exporter(new MockMetricExporter());
   mp.AddMetricReader(exporter);
-  auto m = mp.GetMeter("meter1", "version1", "schema1");
-  auto counter =
-      m->CreateDoubleCounter("counter_unbound_fixed", "fixed-attrs unbound", "unit");
+  auto m       = mp.GetMeter("meter1", "version1", "schema1");
+  auto counter = m->CreateDoubleCounter("counter_unbound_fixed", "fixed-attrs unbound", "unit");
   auto attrs   = MakeFixedAttributes();
   auto context = opentelemetry::context::Context{};
   while (state.KeepRunning())
   {
     counter->Add(
-        1.0,
-        opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+        1.0, opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs),
         context);
   }
   exporter->Collect([&](ResourceMetrics & /*rm*/) { return true; });
@@ -250,11 +248,10 @@ void BM_BoundFixedAttrsCounter(benchmark::State &state)
   MeterProvider mp;
   std::shared_ptr<MetricReader> exporter(new MockMetricExporter());
   mp.AddMetricReader(exporter);
-  auto m = mp.GetMeter("meter1", "version1", "schema1");
-  auto counter =
-      m->CreateDoubleCounter("counter_bound_fixed", "fixed-attrs bound", "unit");
-  auto attrs = MakeFixedAttributes();
-  auto bound = counter->Bind(
+  auto m       = mp.GetMeter("meter1", "version1", "schema1");
+  auto counter = m->CreateDoubleCounter("counter_bound_fixed", "fixed-attrs bound", "unit");
+  auto attrs   = MakeFixedAttributes();
+  auto bound   = counter->Bind(
       opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs));
   benchmark::DoNotOptimize(bound.get());
   while (state.KeepRunning())

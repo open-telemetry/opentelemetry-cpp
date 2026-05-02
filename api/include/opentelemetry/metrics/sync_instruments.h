@@ -44,12 +44,12 @@ template <class T>
 class BoundCounter
 {
 public:
-  BoundCounter()                                     = default;
-  BoundCounter(const BoundCounter &)                 = delete;
-  BoundCounter(BoundCounter &&) noexcept             = delete;
-  BoundCounter &operator=(const BoundCounter &)      = delete;
-  BoundCounter &operator=(BoundCounter &&) noexcept  = delete;
-  virtual ~BoundCounter()                            = default;
+  BoundCounter()                                    = default;
+  BoundCounter(const BoundCounter &)                = delete;
+  BoundCounter(BoundCounter &&) noexcept            = delete;
+  BoundCounter &operator=(const BoundCounter &)     = delete;
+  BoundCounter &operator=(BoundCounter &&) noexcept = delete;
+  virtual ~BoundCounter()                           = default;
 
   /**
    * Record a value against the bound attribute set.
@@ -67,12 +67,12 @@ template <class T>
 class BoundHistogram
 {
 public:
-  BoundHistogram()                                       = default;
-  BoundHistogram(const BoundHistogram &)                 = delete;
-  BoundHistogram(BoundHistogram &&) noexcept             = delete;
-  BoundHistogram &operator=(const BoundHistogram &)      = delete;
-  BoundHistogram &operator=(BoundHistogram &&) noexcept  = delete;
-  virtual ~BoundHistogram()                              = default;
+  BoundHistogram()                                      = default;
+  BoundHistogram(const BoundHistogram &)                = delete;
+  BoundHistogram(BoundHistogram &&) noexcept            = delete;
+  BoundHistogram &operator=(const BoundHistogram &)     = delete;
+  BoundHistogram &operator=(BoundHistogram &&) noexcept = delete;
+  virtual ~BoundHistogram()                             = default;
 
   /**
    * Record a value against the bound attribute set.

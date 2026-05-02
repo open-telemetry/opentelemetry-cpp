@@ -304,9 +304,7 @@ private:
   // Bound entries deduped by post-filter attribute set. Lifetime of entries is
   // tied to user-held shared_ptrs returned by Bind() plus this storage. The
   // storage retains a shared_ptr so collect-time rotation always finds them.
-  std::unordered_map<MetricAttributes,
-                     std::shared_ptr<BoundEntry>,
-                     AttributeHashGenerator>
+  std::unordered_map<MetricAttributes, std::shared_ptr<BoundEntry>, AttributeHashGenerator>
       bound_entries_;
   // Active union of admitted unbound + bound attribute keys for O(1)
   // cardinality decisions. Intentionally duplicates keys also stored in

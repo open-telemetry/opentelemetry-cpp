@@ -39,15 +39,15 @@ class CollectorHandle;
 class BoundSyncWritableMetricStorage
 {
 public:
-  BoundSyncWritableMetricStorage()                                                   = default;
-  BoundSyncWritableMetricStorage(const BoundSyncWritableMetricStorage &)             = delete;
-  BoundSyncWritableMetricStorage(BoundSyncWritableMetricStorage &&)                  = delete;
-  BoundSyncWritableMetricStorage &operator=(const BoundSyncWritableMetricStorage &)  = delete;
-  BoundSyncWritableMetricStorage &operator=(BoundSyncWritableMetricStorage &&)       = delete;
-  virtual ~BoundSyncWritableMetricStorage()                                          = default;
+  BoundSyncWritableMetricStorage()                                                  = default;
+  BoundSyncWritableMetricStorage(const BoundSyncWritableMetricStorage &)            = delete;
+  BoundSyncWritableMetricStorage(BoundSyncWritableMetricStorage &&)                 = delete;
+  BoundSyncWritableMetricStorage &operator=(const BoundSyncWritableMetricStorage &) = delete;
+  BoundSyncWritableMetricStorage &operator=(BoundSyncWritableMetricStorage &&)      = delete;
+  virtual ~BoundSyncWritableMetricStorage()                                         = default;
 
-  virtual void RecordLong(int64_t value) noexcept   = 0;
-  virtual void RecordDouble(double value) noexcept  = 0;
+  virtual void RecordLong(int64_t value) noexcept  = 0;
+  virtual void RecordDouble(double value) noexcept = 0;
 };
 #endif
 

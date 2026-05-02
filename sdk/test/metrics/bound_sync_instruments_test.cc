@@ -174,7 +174,8 @@ TEST(BoundSyncInstruments, BoundHistogramMatchesUnbound)
   ASSERT_NE(bound, nullptr);
   bound->RecordLong(15);
 
-  std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
   std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
   bool seen = false;
   holder->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
@@ -264,7 +265,8 @@ TEST(BoundSyncInstruments, BoundAndUnboundShareDatapoint)
   holder->RecordLong(2, kv, opentelemetry::context::Context{});
 
   size_t count = 0;
-  std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
   std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
   int64_t total = 0;
   holder->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
@@ -289,8 +291,8 @@ TEST(BoundSyncInstruments, BindingAtOverflowGoesToOverflowBucket)
   // key overflows because the overflow attribute set itself consumes a slot.
   StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong, 3);
 
-  M a1     = {{"k", "1"}};
-  auto b1  = holder->Bind(KeyValueIterableView<M>(a1));
+  M a1    = {{"k", "1"}};
+  auto b1 = holder->Bind(KeyValueIterableView<M>(a1));
   b1->RecordLong(1);
 
   M a2    = {{"k", "2"}};
@@ -309,17 +311,16 @@ TEST(BoundSyncInstruments, BindingAtOverflowGoesToOverflowBucket)
   std::shared_ptr<CollectorHandle> collector(
       new MockCollectorHandle(AggregationTemporality::kDelta));
   std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
-  bool seen          = false;
-  int64_t ov_value   = 0;
+  bool seen        = false;
+  int64_t ov_value = 0;
   holder->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
                       if (p.attributes.find("otel.metrics.overflow") != p.attributes.end())
                       {
-                        seen = true;
-                        const auto &sp =
-                            opentelemetry::nostd::get<SumPointData>(p.point_data);
+                        seen           = true;
+                        const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
                         ov_value += opentelemetry::nostd::get<int64_t>(sp.value_);
                       }
                     }
@@ -440,22 +441,22 @@ TEST(BoundSyncInstruments, BindOnExistingUnboundKeyDoesNotOverflow)
   std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
   bool overflow_seen = false;
   int64_t a1_sum     = 0;
-  holder->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
-                  std::chrono::system_clock::now(), [&](const MetricData &md) {
-                    for (const auto &p : md.point_data_attr_)
-                    {
-                      if (p.attributes.find("otel.metrics.overflow") != p.attributes.end())
-                        overflow_seen = true;
-                      auto it = p.attributes.find("k");
-                      if (it != p.attributes.end() &&
-                          opentelemetry::nostd::get<std::string>(it->second) == "1")
-                      {
-                        const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
-                        a1_sum += opentelemetry::nostd::get<int64_t>(sp.value_);
-                      }
-                    }
-                    return true;
-                  });
+  holder->Collect(
+      collector.get(), collectors, std::chrono::system_clock::now(),
+      std::chrono::system_clock::now(), [&](const MetricData &md) {
+        for (const auto &p : md.point_data_attr_)
+        {
+          if (p.attributes.find("otel.metrics.overflow") != p.attributes.end())
+            overflow_seen = true;
+          auto it = p.attributes.find("k");
+          if (it != p.attributes.end() && opentelemetry::nostd::get<std::string>(it->second) == "1")
+          {
+            const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
+            a1_sum += opentelemetry::nostd::get<int64_t>(sp.value_);
+          }
+        }
+        return true;
+      });
   EXPECT_FALSE(overflow_seen);
   EXPECT_EQ(a1_sum, 15);
 }
@@ -526,8 +527,7 @@ TEST(BoundSyncInstruments, RetainedBoundEntriesCountAfterDeltaCollect)
 
   // New unbound key now must overflow because bound entries still count.
   M new_key = {{"unbound", "fresh"}};
-  holder->RecordLong(99, KeyValueIterableView<M>(new_key),
-                     opentelemetry::context::Context{});
+  holder->RecordLong(99, KeyValueIterableView<M>(new_key), opentelemetry::context::Context{});
 
   EXPECT_TRUE(HasOverflowPoint(*holder, AggregationTemporality::kDelta));
 }
@@ -637,7 +637,7 @@ TEST(BoundSyncInstruments, BoundOutlivesStorage)
   std::shared_ptr<BoundSyncWritableMetricStorage> retained;
   {
     StorageHolder holder;
-    M attrs = {{"k", "v"}};
+    M attrs  = {{"k", "v"}};
     retained = holder->Bind(KeyValueIterableView<M>(attrs));
     ASSERT_NE(retained, nullptr);
     retained->RecordLong(1);
