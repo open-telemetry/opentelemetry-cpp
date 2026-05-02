@@ -280,7 +280,7 @@ public:
   inline bool Enabled(const opentelemetry::context::Context &context,
                       Severity severity = Severity::kInvalid) const noexcept
   {
-    if OPENTELEMETRY_LIKELY_CONDITION (!Enabled(severity))
+    if (!Enabled(severity))
     {
       return false;
     }
@@ -291,7 +291,7 @@ public:
                       Severity severity,
                       const EventId &event_id) const noexcept
   {
-    if OPENTELEMETRY_LIKELY_CONDITION (!Enabled(severity))
+    if (!Enabled(severity))
     {
       return false;
     }
@@ -300,7 +300,7 @@ public:
 
   inline bool Enabled(Severity severity, const EventId &event_id) const noexcept
   {
-    if OPENTELEMETRY_LIKELY_CONDITION (!Enabled(severity))
+    if (!Enabled(severity))
     {
       return false;
     }
@@ -309,7 +309,7 @@ public:
 
   inline bool Enabled(Severity severity, int64_t event_id) const noexcept
   {
-    if OPENTELEMETRY_LIKELY_CONDITION (!Enabled(severity))
+    if (!Enabled(severity))
     {
       return false;
     }
