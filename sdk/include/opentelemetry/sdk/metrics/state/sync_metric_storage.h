@@ -249,9 +249,10 @@ private:
   // Unified cardinality resolver. Returns either `filtered` unchanged or
   // kOverflowAttributes. Existing keys (already present in active_keys_) pass
   // through unchanged so we never retroactively reroute admitted keys to
-  // overflow. New keys are admitted only if active_keys_.size() + 1 < limit;
-  // otherwise routed to overflow. This makes the bound and unbound streams
-  // share one coherent O(1) cardinality limit without scanning the hashmap.
+  // overflow. New keys are admitted or routed to overflow using the same
+  // two-branch logic as AttributesHashMap::IsOverflowAttributes() so the
+  // bound and unbound streams share one coherent O(1) cardinality limit
+  // without scanning the hashmap.
   //
   // active_keys_ is the union of:
   //   - unbound attribute keys admitted in the current collection interval, and
@@ -270,10 +271,15 @@ private:
     {
       return filtered;
     }
-    const size_t limit = aggregation_config_->cardinality_limit_;
-    // Mirrors AttributesHashMap::IsOverflowAttributes(): trigger overflow when
-    // adding a new key would reach the limit (overflow itself consumes a slot).
-    if (active_keys_.size() + 1 >= limit)
+    const size_t limit      = aggregation_config_->cardinality_limit_;
+    const bool has_overflow = active_keys_.find(kOverflowAttributes) != active_keys_.end();
+    // Mirror AttributesHashMap::IsOverflowAttributes() exactly. When the
+    // overflow slot is already counted in active_keys_, only route to
+    // overflow when total active keys reach the limit. Otherwise simulate
+    // adding the overflow slot too, matching the (size + 1) >= limit branch.
+    const bool would_overflow =
+        has_overflow ? (active_keys_.size() >= limit) : (active_keys_.size() + 1 >= limit);
+    if (would_overflow)
     {
       active_keys_.insert(kOverflowAttributes);
       return kOverflowAttributes;

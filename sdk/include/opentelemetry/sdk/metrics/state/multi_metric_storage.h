@@ -153,8 +153,8 @@ inline std::shared_ptr<BoundSyncWritableMetricStorage> SyncMultiMetricStorage::B
       children.push_back(std::move(child));
     }
   }
-  // If no child supports binding, return nullptr so the instrument layer can
-  // fall back to the unbound path rather than silently dropping measurements.
+  // If no child supports binding, return nullptr. The instrument layer will
+  // return a no-op bound handle, matching no-op storage behavior.
   if (children.empty())
   {
     return nullptr;

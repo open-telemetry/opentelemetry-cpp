@@ -112,6 +112,59 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
       delta_metrics->Set(std::move(attrs_copy), std::move(rotated));
     }
   }
+
+  // Targeted post-rotation cleanup. The pre-rotation GC pass cannot remove
+  // entries that were dropped by the user but still had pending data, since
+  // they were dirty at that point. After rotation cleared their dirty_ flag,
+  // walk the snapshot once more and erase any entry the user has now fully
+  // released (use_count == 1, owned only by bound_entries_) and that has not
+  // been redirtied. The map lock is briefly released between snapshot and
+  // rotation, so concurrent unbound writes may have legitimately added the
+  // same key into attributes_hashmap_; in that case we must NOT remove the
+  // key from active_keys_ or we would drop their cardinality slot.
+  std::vector<MetricAttributes> snapshot_keys;
+  snapshot_keys.reserve(entry_snapshot.size());
+  for (auto &entry : entry_snapshot)
+  {
+    snapshot_keys.push_back(entry->attributes_);
+  }
+  // Drop snapshot refs so use_count reflects only storage + user holders.
+  entry_snapshot.clear();
+  {
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
+    for (const auto &k : snapshot_keys)
+    {
+      auto it = bound_entries_.find(k);
+      if (it == bound_entries_.end())
+      {
+        continue;
+      }
+      // User still holds the handle (or rebound during rotation): keep.
+      if (it->second.use_count() != 1)
+      {
+        continue;
+      }
+      // use_count == 1 means no other thread can be calling RecordLong/Double
+      // on this entry, so reading dirty_ is race-free here. Lock anyway to
+      // satisfy the documented invariant on dirty_.
+      bool entry_dirty;
+      {
+        std::lock_guard<opentelemetry::common::SpinLockMutex> g(it->second->lock_);
+        entry_dirty = it->second->dirty_;
+      }
+      if (entry_dirty)
+      {
+        continue;
+      }
+      // Only remove from active_keys_ if no concurrent unbound write has
+      // claimed the same key in this interval.
+      if (!attributes_hashmap_->Has(k))
+      {
+        active_keys_.erase(k);
+      }
+      bound_entries_.erase(it);
+    }
+  }
 #endif
 
   return temporal_metric_storage_.buildMetrics(collector, collectors, sdk_start_ts, collection_ts,

@@ -685,4 +685,98 @@ TEST(BoundSyncInstruments, MixedBoundUnboundAcrossCumulativeCollections)
   EXPECT_EQ(sum_now(), 30);
 }
 
+// Regression for M1: dropped-but-dirty bound entries must not retain their
+// cardinality slot for the next interval after their data is collected.
+TEST(BoundSyncInstruments, DirtyDroppedBoundEntriesReleaseCardinality)
+{
+  StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong, 3);
+
+  // Bind two distinct keys (consume the two real admitted slots), record so
+  // they're dirty, then drop the handles BEFORE Collect(). The pre-rotation
+  // GC cannot remove them (they're dirty); rotation flushes their data; the
+  // post-rotation cleanup must release their slots.
+  M a1 = {{"k", "1"}};
+  M a2 = {{"k", "2"}};
+  {
+    auto b1 = holder->Bind(KeyValueIterableView<M>(a1));
+    auto b2 = holder->Bind(KeyValueIterableView<M>(a2));
+    b1->RecordLong(7);
+    b2->RecordLong(11);
+  }
+
+  // Collect rotates dirty data and (via the M1 fix) drops the stale entries.
+  EXPECT_EQ(SumLongFor(*holder, AggregationTemporality::kDelta, a1), 7);
+
+  // In the next interval, two fresh distinct keys must be admittable without
+  // overflow because the dropped bound entries no longer count.
+  M a3 = {{"k", "3"}};
+  M a4 = {{"k", "4"}};
+  holder->RecordLong(5, KeyValueIterableView<M>(a3), opentelemetry::context::Context{});
+  holder->RecordLong(9, KeyValueIterableView<M>(a4), opentelemetry::context::Context{});
+
+  EXPECT_FALSE(HasOverflowPoint(*holder, AggregationTemporality::kDelta));
+}
+
+// Regression for M2: ResolveCardinality must mirror
+// AttributesHashMap::IsOverflowAttributes() exactly. When the overflow slot
+// is already counted in active_keys_ but room remains under the limit, a
+// fresh real key must still be admitted, not routed to overflow.
+TEST(BoundSyncInstruments, OverflowParityAllowsFillingRemainingSlot)
+{
+  StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong, 3);
+
+  // Trigger overflow first: bind k1, k2, then k3 (which routes to overflow,
+  // so bound_entries_ ends up with k1, k2, and the overflow entry).
+  M a1     = {{"k", "1"}};
+  M a2     = {{"k", "2"}};
+  M a3     = {{"k", "3"}};
+  auto b1  = holder->Bind(KeyValueIterableView<M>(a1));
+  auto b2  = holder->Bind(KeyValueIterableView<M>(a2));
+  auto bov = holder->Bind(KeyValueIterableView<M>(a3));  // routes to overflow
+  b1->RecordLong(1);
+  b2->RecordLong(1);
+  bov->RecordLong(100);
+
+  // Drop k1 only. After Collect(), the M1 cleanup releases its slot, leaving
+  // active_keys_ = { k2, overflow }. With limit=3, has_overflow=true and
+  // active_keys_.size()==2, the existing AttributesHashMap semantics admit
+  // one more real key. The pre-fix preview path would have routed it to
+  // overflow (off-by-one). After M2, it must be admitted.
+  b1.reset();
+  EXPECT_EQ(CollectAndCountPoints(*holder, AggregationTemporality::kDelta), 3u);
+
+  // Fresh real key in the next interval must be admitted, not routed to overflow.
+  M a4 = {{"fresh", "key"}};
+  holder->RecordLong(42, KeyValueIterableView<M>(a4), opentelemetry::context::Context{});
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+  bool overflow_seen = false;
+  bool a4_seen       = false;
+  int64_t a4_value   = 0;
+  holder->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
+                  std::chrono::system_clock::now(), [&](const MetricData &md) {
+                    for (const auto &p : md.point_data_attr_)
+                    {
+                      if (p.attributes.find("otel.metrics.overflow") != p.attributes.end())
+                      {
+                        overflow_seen = true;
+                      }
+                      auto it = p.attributes.find("fresh");
+                      if (it != p.attributes.end() &&
+                          opentelemetry::nostd::get<std::string>(it->second) == "key")
+                      {
+                        a4_seen        = true;
+                        const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
+                        a4_value       = opentelemetry::nostd::get<int64_t>(sp.value_);
+                      }
+                    }
+                    return true;
+                  });
+  EXPECT_TRUE(a4_seen);
+  EXPECT_EQ(a4_value, 42);
+  EXPECT_FALSE(overflow_seen);
+}
+
 #endif  // OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
