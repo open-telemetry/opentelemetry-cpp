@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] Fix `Logger::Enabled()` and helper log emission checks for SDK loggers
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+
 * [CONFIGURATION] File configuration - composable samplers
   [#3966](https://github.com/open-telemetry/opentelemetry-cpp/issues/3966)
 * [SDK] Fix PeriodicExportingMetricReader shutdown race on destruction

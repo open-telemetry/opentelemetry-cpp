@@ -12,18 +12,29 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/multi_log_record_processor.h"
+#include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
 
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::common;
-namespace nostd = opentelemetry::nostd;
+namespace context               = opentelemetry::context;
+namespace logs_api              = opentelemetry::logs;
+namespace instrumentation_scope = opentelemetry::sdk::instrumentationscope;
+namespace nostd                 = opentelemetry::nostd;
 
 class TestLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {
@@ -251,3 +262,133 @@ TEST(SimpleLogRecordProcessorTest, ForceFlushFail)
   // Expect failure result when exporter fails to force flush
   EXPECT_EQ(false, processor.ForceFlush());
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+struct EnabledCallState
+{
+  context::Context context;
+  std::string scope_name;
+  logs_api::Severity severity = logs_api::Severity::kInvalid;
+  std::string event_name;
+  size_t call_count = 0;
+};
+
+class EnabledProcessor final : public LogRecordProcessor
+{
+public:
+  explicit EnabledProcessor(bool enabled,
+                            std::shared_ptr<EnabledCallState> call_state = nullptr) noexcept
+      : enabled_(enabled), call_state_(std::move(call_state))
+  {}
+
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override
+  {
+    return std::unique_ptr<Recordable>(new TestLogRecordable());
+  }
+
+  void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override
+  {
+    auto ignored = std::move(record);
+    static_cast<void>(ignored);
+  }
+
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
+
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
+
+protected:
+  bool EnabledImplementation(const context::Context &context,
+                             const instrumentation_scope::InstrumentationScope &scope,
+                             logs_api::Severity severity,
+                             nostd::string_view event_name) const noexcept override
+  {
+    if (call_state_ != nullptr)
+    {
+      call_state_->context    = context;
+      call_state_->scope_name = scope.GetName();
+      call_state_->severity   = severity;
+      call_state_->event_name = std::string(event_name);
+      ++call_state_->call_count;
+    }
+    return enabled_;
+  }
+
+private:
+  bool enabled_;
+  std::shared_ptr<EnabledCallState> call_state_;
+};
+
+TEST(SimpleLogRecordProcessorTest, EnabledDefaultsToTrue)
+{
+  std::unique_ptr<TestExporter> exporter(new TestExporter(nullptr, nullptr, nullptr, nullptr));
+  SimpleLogRecordProcessor processor(std::move(exporter));
+
+  context::Context test_context{"test-key", true};
+  auto scope = instrumentation_scope::InstrumentationScope::Create("test-scope");
+
+  EXPECT_TRUE(
+      processor.Enabled(test_context, *scope, logs_api::Severity::kInfo, "test-event-name"));
+}
+
+TEST(SimpleLogRecordProcessorTest, EnabledForwardsArgumentsToImplementation)
+{
+  auto call_state = std::make_shared<EnabledCallState>();
+  EnabledProcessor processor(true, call_state);
+
+  context::Context test_context{"test-key", true};
+  auto scope = instrumentation_scope::InstrumentationScope::Create("test-scope");
+
+  EXPECT_TRUE(
+      processor.Enabled(test_context, *scope, logs_api::Severity::kWarn, "test-event-name"));
+  EXPECT_EQ(call_state->context, test_context);
+  EXPECT_EQ(call_state->scope_name, "test-scope");
+  EXPECT_EQ(call_state->severity, logs_api::Severity::kWarn);
+  EXPECT_EQ(call_state->event_name, "test-event-name");
+  EXPECT_EQ(call_state->call_count, 1U);
+}
+
+TEST(SimpleLogRecordProcessorTest, MultiLogRecordProcessorEnabledWhenAnyChildEnabled)
+{
+  auto first_state  = std::make_shared<EnabledCallState>();
+  auto second_state = std::make_shared<EnabledCallState>();
+
+  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
+  processors.emplace_back(new EnabledProcessor(false, first_state));
+  processors.emplace_back(new EnabledProcessor(true, second_state));
+  MultiLogRecordProcessor processor(std::move(processors));
+
+  context::Context test_context{"test-key", true};
+  auto scope = instrumentation_scope::InstrumentationScope::Create("test-scope");
+
+  EXPECT_TRUE(
+      processor.Enabled(test_context, *scope, logs_api::Severity::kError, "test-event-name"));
+  EXPECT_EQ(first_state->call_count, 1U);
+  EXPECT_EQ(second_state->call_count, 1U);
+  EXPECT_EQ(second_state->event_name, "test-event-name");
+}
+
+TEST(SimpleLogRecordProcessorTest, MultiLogRecordProcessorDisabledWhenAllChildrenDisabled)
+{
+  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
+  processors.emplace_back(new EnabledProcessor(false));
+  processors.emplace_back(new EnabledProcessor(false));
+  MultiLogRecordProcessor processor(std::move(processors));
+
+  context::Context test_context{"test-key", true};
+  auto scope = instrumentation_scope::InstrumentationScope::Create("test-scope");
+
+  EXPECT_FALSE(
+      processor.Enabled(test_context, *scope, logs_api::Severity::kError, "test-event-name"));
+}
+
+TEST(SimpleLogRecordProcessorTest, EmptyMultiLogRecordProcessorIsDisabled)
+{
+  MultiLogRecordProcessor processor(std::vector<std::unique_ptr<LogRecordProcessor>>{});
+
+  context::Context test_context{"test-key", true};
+  auto scope = instrumentation_scope::InstrumentationScope::Create("test-scope");
+
+  EXPECT_FALSE(
+      processor.Enabled(test_context, *scope, logs_api::Severity::kDebug, "test-event-name"));
+}
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2

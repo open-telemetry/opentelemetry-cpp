@@ -81,6 +81,14 @@ protected:
   bool InternalShutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  bool EnabledImplementation(
+      const opentelemetry::context::Context &context,
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope,
+      opentelemetry::logs::Severity severity,
+      opentelemetry::nostd::string_view event_name) const noexcept override;
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
 private:
   std::vector<std::unique_ptr<LogRecordProcessor>> processors_;
 };

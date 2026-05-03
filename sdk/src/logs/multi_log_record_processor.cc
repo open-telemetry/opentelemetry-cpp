@@ -6,6 +6,9 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/logs/multi_log_record_processor.h"
 #include "opentelemetry/sdk/logs/multi_recordable.h"
 #include "opentelemetry/sdk/logs/processor.h"
@@ -72,6 +75,31 @@ void MultiLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexc
     }
   }
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+bool MultiLogRecordProcessor::EnabledImplementation(
+    const opentelemetry::context::Context &context,
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope,
+    opentelemetry::logs::Severity severity,
+    opentelemetry::nostd::string_view event_name) const noexcept
+{
+  if (processors_.empty())
+  {
+    return false;
+  }
+
+  for (const auto &processor : processors_)
+  {
+    if (processor != nullptr &&
+        processor->Enabled(context, instrumentation_scope, severity, event_name))
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 bool MultiLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {

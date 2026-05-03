@@ -6,9 +6,20 @@
 #include <chrono>
 #include <memory>
 
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace instrumentationscope
+{
+class InstrumentationScope;
+}  // namespace instrumentationscope
+}  // namespace sdk
+
 namespace sdk
 {
 namespace logs
@@ -47,6 +58,21 @@ public:
    */
   virtual void OnEmit(std::unique_ptr<Recordable> &&record) noexcept = 0;
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  /**
+   * Enabled returns whether this processor is interested in a log with the given inputs.
+   * The default implementation is permissive and returns true.
+   */
+  bool Enabled(
+      const opentelemetry::context::Context &context,
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope,
+      opentelemetry::logs::Severity severity,
+      opentelemetry::nostd::string_view event_name = {}) const noexcept
+  {
+    return EnabledImplementation(context, instrumentation_scope, severity, event_name);
+  }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
   /**
    * Exports all log records that have not yet been exported to the configured Exporter.
    * @param timeout that the forceflush is required to finish within.
@@ -64,6 +90,19 @@ public:
    */
   virtual bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+protected:
+  virtual bool EnabledImplementation(
+      const opentelemetry::context::Context & /*context*/,
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+          & /*instrumentation_scope*/,
+      opentelemetry::logs::Severity /*severity*/,
+      opentelemetry::nostd::string_view /*event_name*/) const noexcept
+  {
+    return true;
+  }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 };
 }  // namespace logs
 }  // namespace sdk
