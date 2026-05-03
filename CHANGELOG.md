@@ -90,6 +90,9 @@ Increment the:
 * [SDK] env var durations non conforming to spec
   [#4020](https://github.com/open-telemetry/opentelemetry-cpp/pull/4020)
 
+* [EXAMPLE] Add explicit_parent example
+  [#3935](https://github.com/open-telemetry/opentelemetry-cpp/pull/3935)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
