@@ -55,6 +55,7 @@ namespace context  = opentelemetry::context;
 namespace logs_api = opentelemetry::logs;
 namespace nostd    = opentelemetry::nostd;
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 namespace
 {
 nostd::shared_ptr<opentelemetry::trace::Span> MakeTestSpan(bool sampled)
@@ -89,6 +90,7 @@ context::Context MakeContextWithUnsampledSpanAndInvalidTraceId()
                                            new opentelemetry::trace::DefaultSpan(span_context)));
 }
 }  // namespace
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 TEST(LoggerSDK, LogToNullProcessor)
 {
@@ -264,6 +266,7 @@ public:
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 };
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 struct EnabledProcessorCallState
 {
   logs_api::Severity severity = logs_api::Severity::kInvalid;
@@ -326,6 +329,7 @@ private:
   bool enabled_;
   std::shared_ptr<EnabledProcessorCallState> call_state_;
 };
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 TEST(LoggerSDK, LogToAProcessor)
 {
@@ -499,6 +503,7 @@ TEST(LoggerSDK, LoggerWithMinimumSeverityConfig)
   ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kWarn);
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(LoggerSDK, LoggerEnabledWithNamedEventIdUsesProcessorEnablement)
 {
   auto call_state = std::shared_ptr<EnabledProcessorCallState>(new EnabledProcessorCallState());
@@ -642,6 +647,7 @@ TEST(LoggerSDK, LoggerTraceBasedConfigAllowsSampledExplicitContextWithNamedEvent
   EXPECT_TRUE(call_state->context_test_key_value);
   EXPECT_EQ(call_state->call_count, 1U);
 }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 static std::unique_ptr<MockLogRecordable> create_mock_log_recordable(
     const std::string &body,

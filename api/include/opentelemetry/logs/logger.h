@@ -277,6 +277,7 @@ public:
   // OpenTelemetry C++ user-facing Logs API
   //
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   inline bool Enabled(const opentelemetry::context::Context &context,
                       Severity severity = Severity::kInvalid) const noexcept
   {
@@ -297,6 +298,7 @@ public:
     }
     return EnabledImplementation(context, severity, event_id);
   }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
   inline bool Enabled(Severity severity, const EventId &event_id) const noexcept
   {
@@ -491,6 +493,18 @@ public:
   //
 
 protected:
+  virtual bool EnabledImplementation(Severity /*severity*/,
+                                     const EventId & /*event_id*/) const noexcept
+  {
+    return false;
+  }
+
+  virtual bool EnabledImplementation(Severity /*severity*/, int64_t /*event_id*/) const noexcept
+  {
+    return false;
+  }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   virtual bool EnabledImplementation(const opentelemetry::context::Context & /*context*/,
                                      Severity /*severity*/) const noexcept
   {
@@ -503,17 +517,7 @@ protected:
   {
     return EnabledImplementation(context, severity);
   }
-
-  virtual bool EnabledImplementation(Severity /*severity*/,
-                                     const EventId & /*event_id*/) const noexcept
-  {
-    return false;
-  }
-
-  virtual bool EnabledImplementation(Severity /*severity*/, int64_t /*event_id*/) const noexcept
-  {
-    return false;
-  }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
   void SetMinimumSeverity(uint8_t severity_or_max) noexcept
   {

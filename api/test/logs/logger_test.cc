@@ -356,6 +356,7 @@ public:
   nostd::unique_ptr<EnablementAwareTestLogRecord> last_emitted_record_;
 
 protected:
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   bool EnabledImplementation(const context::Context &context,
                              Severity severity) const noexcept override
   {
@@ -395,6 +396,7 @@ protected:
     }
     return event_id_enabled_;
   }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
   bool EnabledImplementation(Severity severity, const EventId &event_id) const noexcept override
   {
@@ -440,6 +442,7 @@ TEST(Logger, PushLoggerImplementation)
   ASSERT_EQ("test logger", logger->GetName());
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(Logger, EnabledWithExplicitContextUsesContextAwareImplementation)
 {
   EnablementAwareTestLogger logger(Severity::kTrace);
@@ -452,3 +455,4 @@ TEST(Logger, EnabledWithExplicitContextUsesContextAwareImplementation)
   EXPECT_TRUE(logger.last_enabled_context_has_test_key_);
   EXPECT_TRUE(logger.last_enabled_context_test_key_value_);
 }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2

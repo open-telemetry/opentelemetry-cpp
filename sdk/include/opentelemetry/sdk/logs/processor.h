@@ -58,6 +58,7 @@ public:
    */
   virtual void OnEmit(std::unique_ptr<Recordable> &&record) noexcept = 0;
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   /**
    * Enabled returns whether this processor is interested in a log with the given inputs.
    * The default implementation is permissive and returns true.
@@ -70,6 +71,7 @@ public:
   {
     return EnabledImplementation(context, instrumentation_scope, severity, event_name);
   }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
   /**
    * Exports all log records that have not yet been exported to the configured Exporter.
@@ -89,6 +91,7 @@ public:
   virtual bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 protected:
   virtual bool EnabledImplementation(
       const opentelemetry::context::Context & /*context*/,
@@ -99,6 +102,7 @@ protected:
   {
     return true;
   }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 };
 }  // namespace logs
 }  // namespace sdk

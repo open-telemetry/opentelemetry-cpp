@@ -169,6 +169,42 @@ void Logger::EmitLogRecord(
   processor.OnEmit(std::move(recordable));
 }
 
+bool Logger::EnabledImplementation(
+    OPENTELEMETRY_MAYBE_UNUSED opentelemetry::logs::Severity severity,
+    OPENTELEMETRY_MAYBE_UNUSED const opentelemetry::logs::EventId &event_id) const noexcept
+{
+  const auto &current = context::RuntimeContext::GetCurrent();
+  if (!IsAllowedByTraceBasedFiltering(current, logger_config_))
+  {
+    return false;
+  }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  return context_->GetProcessor().Enabled(current, GetInstrumentationScope(), severity,
+                                          GetEventName(event_id));
+#else
+  return true;
+#endif
+}
+
+bool Logger::EnabledImplementation(
+    OPENTELEMETRY_MAYBE_UNUSED opentelemetry::logs::Severity severity,
+    int64_t /*event_id*/) const noexcept
+{
+  const auto &current = context::RuntimeContext::GetCurrent();
+  if (!IsAllowedByTraceBasedFiltering(current, logger_config_))
+  {
+    return false;
+  }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  return context_->GetProcessor().Enabled(current, GetInstrumentationScope(), severity);
+#else
+  return true;
+#endif
+}
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 bool Logger::EnabledImplementation(const opentelemetry::context::Context &context,
                                    opentelemetry::logs::Severity severity) const noexcept
 {
@@ -192,18 +228,7 @@ bool Logger::EnabledImplementation(const opentelemetry::context::Context &contex
   return context_->GetProcessor().Enabled(context, GetInstrumentationScope(), severity,
                                           GetEventName(event_id));
 }
-
-bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,
-                                   const opentelemetry::logs::EventId &event_id) const noexcept
-{
-  return EnabledImplementation(context::RuntimeContext::GetCurrent(), severity, event_id);
-}
-
-bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,
-                                   int64_t /*event_id*/) const noexcept
-{
-  return EnabledImplementation(context::RuntimeContext::GetCurrent(), severity);
-}
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
 Logger::GetInstrumentationScope() const noexcept
