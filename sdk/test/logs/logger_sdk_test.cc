@@ -474,6 +474,7 @@ TEST(LoggerSDK, LoggerWithEnabledConfig)
   ASSERT_FALSE(shared_recordable->GetSpanId().IsValid());
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(LoggerSDK, LoggerWithMinimumSeverityConfig)
 {
   ScopeConfigurator<LoggerConfig> warn_and_above =
@@ -503,7 +504,6 @@ TEST(LoggerSDK, LoggerWithMinimumSeverityConfig)
   ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kWarn);
 }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(LoggerSDK, LoggerEnabledWithNamedEventIdUsesProcessorEnablement)
 {
   auto call_state = std::shared_ptr<EnabledProcessorCallState>(new EnabledProcessorCallState());

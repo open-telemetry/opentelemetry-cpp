@@ -45,15 +45,19 @@ namespace nostd     = opentelemetry::nostd;
 
 namespace
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 nostd::string_view GetEventName(const opentelemetry::logs::EventId &event_id) noexcept
 {
   return event_id.name_ != nullptr ? nostd::string_view{event_id.name_.get()}
                                    : nostd::string_view{};
 }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-bool IsAllowedByTraceBasedFiltering(const context::Context &context,
-                                    const LoggerConfig &logger_config) noexcept
+bool IsAllowedByTraceBasedFiltering(
+    OPENTELEMETRY_MAYBE_UNUSED const context::Context &context,
+    OPENTELEMETRY_MAYBE_UNUSED const LoggerConfig &logger_config) noexcept
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   if (!logger_config.IsTraceBased())
   {
     return true;
@@ -67,6 +71,9 @@ bool IsAllowedByTraceBasedFiltering(const context::Context &context,
   }
 
   return span_context.trace_flags().IsSampled();
+#else
+  return true;
+#endif
 }
 }  // namespace
 
@@ -82,7 +89,11 @@ Logger::Logger(
       logger_config_(context_->GetLoggerConfigurator().ComputeConfig(*instrumentation_scope_))
 {
   SetMinimumSeverity(logger_config_.IsEnabled()
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
                          ? static_cast<uint8_t>(logger_config_.GetMinimumSeverity())
+#else
+                         ? static_cast<uint8_t>(opentelemetry::logs::Severity::kInvalid)
+#endif
                          : opentelemetry::logs::kMaxSeverity);
 }
 

@@ -23,26 +23,33 @@ TEST(LoggerConfig, CheckDisabledWorksAsExpected)
 {
   logs_sdk::LoggerConfig disabled_config = logs_sdk::LoggerConfig::Disabled();
   ASSERT_FALSE(disabled_config.IsEnabled());
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   ASSERT_EQ(disabled_config.GetMinimumSeverity(), logs_api::Severity::kInvalid);
   ASSERT_FALSE(disabled_config.IsTraceBased());
+#endif
 }
 
 TEST(LoggerConfig, CheckEnabledWorksAsExpected)
 {
   logs_sdk::LoggerConfig enabled_config = logs_sdk::LoggerConfig::Enabled();
   ASSERT_TRUE(enabled_config.IsEnabled());
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   ASSERT_EQ(enabled_config.GetMinimumSeverity(), logs_api::Severity::kInvalid);
   ASSERT_FALSE(enabled_config.IsTraceBased());
+#endif
 }
 
 TEST(LoggerConfig, CheckDefaultConfigWorksAccToSpec)
 {
   logs_sdk::LoggerConfig default_config = logs_sdk::LoggerConfig::Default();
   ASSERT_TRUE(default_config.IsEnabled());
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   ASSERT_EQ(default_config.GetMinimumSeverity(), logs_api::Severity::kInvalid);
   ASSERT_FALSE(default_config.IsTraceBased());
+#endif
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(LoggerConfig, CheckCreateWorksAsExpected)
 {
   logs_sdk::LoggerConfig custom_config =
@@ -52,6 +59,7 @@ TEST(LoggerConfig, CheckCreateWorksAsExpected)
   ASSERT_EQ(custom_config.GetMinimumSeverity(), logs_api::Severity::kWarn);
   ASSERT_TRUE(custom_config.IsTraceBased());
 }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 /** Tests to verify the behavior of logs_sdk::LoggerConfig::Default */
 
@@ -107,6 +115,7 @@ TEST_P(DefaultLoggerConfiguratorTestFixture, VerifyDefaultConfiguratorBehavior)
   ASSERT_EQ(default_configurator.ComputeConfig(*scope), logs_sdk::LoggerConfig::Default());
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(LoggerConfig, ScopeConfiguratorPreservesCustomConfig)
 {
   logs_sdk::LoggerConfig default_config =
@@ -122,6 +131,7 @@ TEST(LoggerConfig, ScopeConfiguratorPreservesCustomConfig)
   ASSERT_EQ(configurator.ComputeConfig(test_scope_1), matching_config);
   ASSERT_EQ(configurator.ComputeConfig(test_scope_2), default_config);
 }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 INSTANTIATE_TEST_SUITE_P(InstrumentationScopes,
                          DefaultLoggerConfiguratorTestFixture,
