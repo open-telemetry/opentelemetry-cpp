@@ -120,6 +120,7 @@ private:
   std::unique_ptr<IdGenerator> id_generator_;
   std::unique_ptr<SpanProcessor> processor_;
   std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator_;
+  uint16_t num_processors_;
 };
 
 }  // namespace trace
