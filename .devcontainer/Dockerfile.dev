@@ -19,13 +19,18 @@ RUN apt update && apt install -y wget \
     ninja-build \
     llvm-20-dev \
     libclang-20-dev \
+    clang-20 \
     clang-tidy-20 \
     shellcheck \
     sudo \
     cmake
 
-RUN update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-20 200 && \
+RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-20 200 && \
+    update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-20 200 && \
+    update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-20 200 && \
     update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-20 200 && \
+    update-alternatives --config clang && \
+    update-alternatives --config clang++ && \
     update-alternatives --config clang-tidy && \
     update-alternatives --config llvm-config
 
