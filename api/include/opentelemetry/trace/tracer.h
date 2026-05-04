@@ -43,7 +43,7 @@ public:
    * Attributes will be processed in order, previous attributes with the same
    * key will be overwritten.
    *
-   * Note: Adding attributes at span creation is preferred to calling SetAttribute later,
+   * Note: Adding attributes and links at span creation is preferred to adding them later,
    * as samplers can only consider information already present during span creation.
    */
   virtual nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
