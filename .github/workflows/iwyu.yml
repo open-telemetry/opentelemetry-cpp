@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   iwyu:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -50,9 +50,11 @@ jobs:
             libgmock-dev \
             libgtest-dev \
             libbenchmark-dev \
-            llvm-dev \
-            libclang-dev \
+            llvm-20-dev \
+            libclang-20-dev \
+            clang-20 \
             cmake
+          sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-20 200
 
       - name: Install rapidyaml
         run: |
@@ -62,22 +64,13 @@ jobs:
         run: |
           sudo ./ci/install_iwyu.sh
 
-      - name: Prepare CMake
+      - name: Build with include-what-you-use
         env:
-          CC: clang
-          CXX: clang++
+          OTELCPP_CMAKE_CACHE_FILE: ${{ matrix.cmake_options }}.cmake
+          BUILD_DIR: build-${{ matrix.cmake_options }}
         run: |
-          TOPDIR=`pwd`
-          cmake -B build-${{ matrix.cmake_options }} \
-            -C ./test_common/cmake/${{ matrix.cmake_options }}.cmake \
-            -DCMAKE_CXX_STANDARD=14 \
-            -DWITH_STL=CXX14 \
-            -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
-            -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;"
-
-      - name: iwyu_tool
-        run: |
-          cmake --build build-${{ matrix.cmake_options }} -- -j$(nproc) -k 2>&1 | tee -a iwyu-${{ matrix.cmake_options }}.log
+          ./ci/do_ci.sh cmake.iwyu.test
+          cp "${BUILD_DIR}/opentelemetry-cpp-iwyu-${{ matrix.cmake_options }}.log" iwyu-${{ matrix.cmake_options }}.log
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: success() || failure()
