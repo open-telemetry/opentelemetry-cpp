@@ -53,10 +53,6 @@ jobs:
           libgtest-dev \
           libbenchmark-dev
 
-      - name: Install rapidyaml
-        run: |
-          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
-
       - name: Install clang-22 toolchain
         run: |
           wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s -- 22
@@ -65,6 +61,10 @@ jobs:
           sudo update-alternatives --config clang-tidy
           echo "Using clang-tidy version: $(clang-tidy --version)"
           echo "clang-tidy installed at: $(which clang-tidy)"
+
+      - name: Install rapidyaml
+        run: |
+          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
 
       - name: Build and run clang-tidy
         id: build
