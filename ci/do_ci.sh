@@ -388,7 +388,7 @@ elif [[ "$1" == "cmake.iwyu.test" ]]; then
   else
     IWYU_KEEP_GOING=(-k)
   fi
-  cmake --build "${BUILD_DIR}" --parallel -- "${IWYU_KEEP_GOING[@]}" 2>&1 | tee "$LOG_FILE"
+  cmake --build "${BUILD_DIR}" "${CMAKE_BUILD_ARGS[@]}" -- "${IWYU_KEEP_GOING[@]}" 2>&1 | tee "$LOG_FILE"
   if [ ! -s "$LOG_FILE" ]; then
     echo "Error: Build log was not created at $LOG_FILE"
     exit 1
