@@ -188,6 +188,19 @@ TEST(OtlpRecordable, SetStatus)
   EXPECT_EQ(rec2.span().status().message(), "");
 }
 
+TEST(OtlpRecordable, SetTraceFlags)
+{
+  OtlpRecordable rec;
+  // OTLP stores the W3C trace-flags bits on the exported span so downstream
+  // processors can observe the random flag.
+  trace_api::TraceFlags flags{
+      static_cast<uint8_t>(trace_api::TraceFlags::kIsSampled | trace_api::TraceFlags::kIsRandom)};
+
+  rec.SetTraceFlags(flags);
+
+  EXPECT_EQ(rec.span().flags(), static_cast<uint32_t>(flags.flags()));
+}
+
 TEST(OtlpRecordable, AddEventDefault)
 {
   OtlpRecordable rec;
