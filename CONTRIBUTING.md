@@ -135,7 +135,7 @@ OTELCPP_CMAKE_CACHE_FILE=all-options-abiv1-preview.cmake \
   bash ci/do_ci.sh cmake.iwyu.test
 ```
 
-The target defaults to `clang-20`/`clang++-20` to match the LLVM version
+The target defaults to `clang-22`/`clang++-22` to match the LLVM version
 the dev container's IWYU was built against. Export `CC`/`CXX` to override
 if you need a different compiler.
 

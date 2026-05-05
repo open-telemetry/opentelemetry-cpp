@@ -15,20 +15,22 @@ ENV THIRD_PARTY_BUILD_TYPE=${THIRD_PARTY_BUILD_TYPE}
 
 COPY ci /opt/ci
 
-RUN apt update && apt install -y wget \
+RUN apt update && apt install -y wget gnupg lsb-release software-properties-common && \
+    wget -qO- https://apt.llvm.org/llvm.sh | bash -s -- 22 && \
+    apt install -y \
     ninja-build \
-    llvm-20-dev \
-    libclang-20-dev \
-    clang-20 \
-    clang-tidy-20 \
+    llvm-22-dev \
+    libclang-22-dev \
+    clang-22 \
+    clang-tidy-22 \
     shellcheck \
     sudo \
     cmake
 
-RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-20 200 && \
-    update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-20 200 && \
-    update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-20 200 && \
-    update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-20 200 && \
+RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200 && \
+    update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200 && \
+    update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-22 200 && \
+    update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-22 200 && \
     update-alternatives --config clang && \
     update-alternatives --config clang++ && \
     update-alternatives --config clang-tidy && \

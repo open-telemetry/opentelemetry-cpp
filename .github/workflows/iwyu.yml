@@ -37,6 +37,7 @@ jobs:
       - name: setup dependencies
         run: |
           sudo apt update -y
+          wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s -- 22
           sudo apt install -y --no-install-recommends --no-install-suggests \
             build-essential \
             ninja-build \
@@ -50,11 +51,11 @@ jobs:
             libgmock-dev \
             libgtest-dev \
             libbenchmark-dev \
-            llvm-20-dev \
-            libclang-20-dev \
-            clang-20 \
+            llvm-22-dev \
+            libclang-22-dev \
+            clang-22 \
             cmake
-          sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-20 200
+          sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-22 200
 
       - name: Install rapidyaml
         run: |

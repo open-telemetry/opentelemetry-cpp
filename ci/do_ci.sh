@@ -367,8 +367,8 @@ elif [[ "$1" == "cmake.clang_tidy.test" ]]; then
   echo "  python3 ./ci/create_clang_tidy_report.py --build_log $LOG_FILE"
   exit 0
 elif [[ "$1" == "cmake.iwyu.test" ]]; then
-  : "${CC:=clang-20}"
-  : "${CXX:=clang++-20}"
+  : "${CC:=clang-22}"
+  : "${CXX:=clang++-22}"
   export CC CXX
   rm -rf "${BUILD_DIR}"
   mkdir -p "${BUILD_DIR}"
