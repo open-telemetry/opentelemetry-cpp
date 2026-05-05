@@ -24,10 +24,6 @@
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor.h"
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/trace/span_id.h"
-#include "opentelemetry/trace/trace_flags.h"
-#include "opentelemetry/trace/trace_id.h"
 
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::common;
