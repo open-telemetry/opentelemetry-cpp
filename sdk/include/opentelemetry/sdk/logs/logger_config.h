@@ -28,7 +28,6 @@ public:
    */
   bool IsEnabled() const noexcept;
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   /**
    * Returns the configured minimum severity for the Logger.
    * @return the minimum severity. Defaults to Severity::kInvalid.
@@ -51,7 +50,6 @@ public:
   static LoggerConfig Create(bool enabled,
                              opentelemetry::logs::Severity minimum_severity,
                              bool trace_based) noexcept;
-#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
   /**
    * Returns a LoggerConfig that represents an enabled Logger.
@@ -75,22 +73,16 @@ public:
   static LoggerConfig Default();
 
 private:
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   explicit LoggerConfig(
       bool enabled                                   = true,
       opentelemetry::logs::Severity minimum_severity = opentelemetry::logs::Severity::kInvalid,
       bool trace_based                               = false) noexcept
       : enabled_(enabled), minimum_severity_(minimum_severity), trace_based_(trace_based)
   {}
-#else
-  explicit LoggerConfig(const bool enabled = true) : enabled_(enabled) {}
-#endif
 
   bool enabled_;
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   opentelemetry::logs::Severity minimum_severity_;
   bool trace_based_;
-#endif
 };
 }  // namespace logs
 }  // namespace sdk

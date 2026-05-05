@@ -45,19 +45,15 @@ namespace nostd     = opentelemetry::nostd;
 
 namespace
 {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 nostd::string_view GetEventName(const opentelemetry::logs::EventId &event_id) noexcept
 {
   return event_id.name_ != nullptr ? nostd::string_view{event_id.name_.get()}
                                    : nostd::string_view{};
 }
-#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-bool IsAllowedByTraceBasedFiltering(
-    OPENTELEMETRY_MAYBE_UNUSED const context::Context &context,
-    OPENTELEMETRY_MAYBE_UNUSED const LoggerConfig &logger_config) noexcept
+bool IsAllowedByTraceBasedFiltering(const context::Context &context,
+                                    const LoggerConfig &logger_config) noexcept
 {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   if (!logger_config.IsTraceBased())
   {
     return true;
@@ -71,9 +67,6 @@ bool IsAllowedByTraceBasedFiltering(
   }
 
   return span_context.trace_flags().IsSampled();
-#else
-  return true;
-#endif
 }
 }  // namespace
 
@@ -89,11 +82,7 @@ Logger::Logger(
       logger_config_(context_->GetLoggerConfigurator().ComputeConfig(*instrumentation_scope_))
 {
   SetMinimumSeverity(logger_config_.IsEnabled()
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
                          ? static_cast<uint8_t>(logger_config_.GetMinimumSeverity())
-#else
-                         ? static_cast<uint8_t>(opentelemetry::logs::Severity::kInvalid)
-#endif
                          : opentelemetry::logs::kMaxSeverity);
 }
 
@@ -180,9 +169,8 @@ void Logger::EmitLogRecord(
   processor.OnEmit(std::move(recordable));
 }
 
-bool Logger::EnabledImplementation(
-    OPENTELEMETRY_MAYBE_UNUSED opentelemetry::logs::Severity severity,
-    OPENTELEMETRY_MAYBE_UNUSED const opentelemetry::logs::EventId &event_id) const noexcept
+bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,
+                                   const opentelemetry::logs::EventId &event_id) const noexcept
 {
   const auto &current = context::RuntimeContext::GetCurrent();
   if (!IsAllowedByTraceBasedFiltering(current, logger_config_))
@@ -190,17 +178,12 @@ bool Logger::EnabledImplementation(
     return false;
   }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   return context_->GetProcessor().Enabled(current, GetInstrumentationScope(), severity,
                                           GetEventName(event_id));
-#else
-  return true;
-#endif
 }
 
-bool Logger::EnabledImplementation(
-    OPENTELEMETRY_MAYBE_UNUSED opentelemetry::logs::Severity severity,
-    int64_t /*event_id*/) const noexcept
+bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,
+                                   int64_t /*event_id*/) const noexcept
 {
   const auto &current = context::RuntimeContext::GetCurrent();
   if (!IsAllowedByTraceBasedFiltering(current, logger_config_))
@@ -208,11 +191,7 @@ bool Logger::EnabledImplementation(
     return false;
   }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   return context_->GetProcessor().Enabled(current, GetInstrumentationScope(), severity);
-#else
-  return true;
-#endif
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2

@@ -263,7 +263,6 @@ TEST(SimpleLogRecordProcessorTest, ForceFlushFail)
   EXPECT_EQ(false, processor.ForceFlush());
 }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 struct EnabledCallState
 {
   context::Context context;
@@ -391,4 +390,3 @@ TEST(SimpleLogRecordProcessorTest, EmptyMultiLogRecordProcessorIsDisabled)
   EXPECT_FALSE(
       processor.Enabled(test_context, *scope, logs_api::Severity::kDebug, "test-event-name"));
 }
-#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2

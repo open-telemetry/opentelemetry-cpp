@@ -76,7 +76,6 @@ void MultiLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexc
   }
 }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 bool MultiLogRecordProcessor::EnabledImplementation(
     const opentelemetry::context::Context &context,
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope,
@@ -99,7 +98,6 @@ bool MultiLogRecordProcessor::EnabledImplementation(
 
   return false;
 }
-#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 bool MultiLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {

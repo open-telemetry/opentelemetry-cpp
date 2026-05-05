@@ -508,14 +508,14 @@ protected:
   virtual bool EnabledImplementation(const opentelemetry::context::Context & /*context*/,
                                      Severity /*severity*/) const noexcept
   {
-    return true;
+    return false;
   }
 
-  virtual bool EnabledImplementation(const opentelemetry::context::Context &context,
-                                     Severity severity,
+  virtual bool EnabledImplementation(const opentelemetry::context::Context & /*context*/,
+                                     Severity /*severity*/,
                                      const EventId & /*event_id*/) const noexcept
   {
-    return EnabledImplementation(context, severity);
+    return false;
   }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
