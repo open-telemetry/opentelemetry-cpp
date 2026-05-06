@@ -13,7 +13,6 @@
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/context/context_value.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
 #include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
@@ -49,7 +48,9 @@ using opentelemetry::logs::Severity;
 using opentelemetry::nostd::shared_ptr;
 using opentelemetry::nostd::string_view;
 namespace common  = opentelemetry::common;
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 namespace context = opentelemetry::context;
+#endif
 namespace nostd   = opentelemetry::nostd;
 namespace trace   = opentelemetry::trace;
 

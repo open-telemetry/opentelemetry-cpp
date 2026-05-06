@@ -12,7 +12,6 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/context/context_value.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
 #include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
@@ -56,7 +55,9 @@
 
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::instrumentationscope;
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 namespace context  = opentelemetry::context;
+#endif
 namespace logs_api = opentelemetry::logs;
 namespace nostd    = opentelemetry::nostd;
 
