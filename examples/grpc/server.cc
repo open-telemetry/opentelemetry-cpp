@@ -44,12 +44,7 @@ using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
 
-using grpc_example::Greeter;
-using grpc_example::GreetRequest;
-using grpc_example::GreetResponse;
-
-using Span        = opentelemetry::trace::Span;
-using SpanContext = opentelemetry::trace::SpanContext;
+using namespace grpc_example;
 using namespace opentelemetry::trace;
 
 namespace context = opentelemetry::context;
@@ -83,10 +78,9 @@ public:
 
     std::string span_name = "GreeterService/Greet";
     auto span             = get_tracer("grpc")->StartSpan(span_name,
-                                                          {{semconv::rpc::kRpcSystem, "grpc"},
-                                                           {semconv::rpc::kRpcService, "GreeterService"},
-                                                           {semconv::rpc::kRpcMethod, "Greet"},
-                                                           {semconv::rpc::kRpcGrpcStatusCode, 0}},
+                                                          {{semconv::rpc::kRpcSystemName, "grpc"},
+                                                           {semconv::rpc::kRpcMethod, "GreeterService/Greet"},
+                                                           {semconv::rpc::kRpcResponseStatusCode, "OK"}},
                                                           options);
     auto scope            = get_tracer("grpc")->WithActiveSpan(span);
 
@@ -127,14 +121,10 @@ int main(int argc, char **argv)
 {
   InitTracer();
   constexpr uint16_t default_port = 8800;
-  uint16_t port;
+  uint16_t port{default_port};
   if (argc > 1)
   {
     port = static_cast<uint16_t>(atoi(argv[1]));
-  }
-  else
-  {
-    port = default_port;
   }
 
   RunServer(port);

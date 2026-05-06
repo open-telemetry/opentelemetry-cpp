@@ -50,7 +50,6 @@ opentelemetry::nostd::shared_ptr<trace_api::Tracer> get_tracer()
   auto provider = trace_api::Provider::GetTracerProvider();
   return provider->GetTracer("foo_library");
 }
-}  // namespace
 
 void run_threads()
 {
@@ -71,6 +70,7 @@ void run_threads()
 
   std::for_each(threads.begin(), threads.end(), [](std::thread &th) { th.join(); });
 }
+}  // namespace
 
 int main(int /* argc */, char ** /* argv */)
 {

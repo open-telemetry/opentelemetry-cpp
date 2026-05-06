@@ -27,7 +27,12 @@ class LogRecord;
 class Logger
 {
 public:
-  virtual ~Logger() = default;
+  Logger()                              = default;
+  Logger(const Logger &)                = default;
+  Logger(Logger &&) noexcept            = default;
+  Logger &operator=(const Logger &)     = default;
+  Logger &operator=(Logger &&) noexcept = default;
+  virtual ~Logger()                     = default;
 
   /* Returns the name of the logger */
   virtual const nostd::string_view GetName() noexcept = 0;
@@ -292,10 +297,10 @@ public:
   /**
    * Log an event
    *
-   * @severity severity of the log
-   * @event_id event identifier of the log
-   * @format an utf-8 string following https://messagetemplates.org/
-   * @attributes key value pairs of the log
+   * @param severity severity of the log
+   * @param event_id event identifier of the log
+   * @param format an utf-8 string following https://messagetemplates.org/
+   * @param attributes key value pairs of the log
    */
   virtual void Log(Severity severity,
                    const EventId &event_id,

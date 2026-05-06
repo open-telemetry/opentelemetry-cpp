@@ -36,6 +36,13 @@ public:
                                 const PeriodicExportingMetricReaderOptions &options,
                                 const PeriodicExportingMetricReaderRuntimeOptions &runtime_options);
 
+  ~PeriodicExportingMetricReader() override;
+
+  PeriodicExportingMetricReader(const PeriodicExportingMetricReader &)            = delete;
+  PeriodicExportingMetricReader &operator=(const PeriodicExportingMetricReader &) = delete;
+  PeriodicExportingMetricReader(PeriodicExportingMetricReader &&)                 = delete;
+  PeriodicExportingMetricReader &operator=(PeriodicExportingMetricReader &&)      = delete;
+
   AggregationTemporality GetAggregationTemporality(
       InstrumentType instrument_type) const noexcept override;
 
@@ -62,7 +69,6 @@ private:
 
   /* The background worker thread */
   std::shared_ptr<sdk::common::ThreadInstrumentation> worker_thread_instrumentation_;
-  std::shared_ptr<sdk::common::ThreadInstrumentation> collect_thread_instrumentation_;
   std::thread worker_thread_;
 };
 

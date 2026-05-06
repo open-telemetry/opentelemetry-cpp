@@ -4,7 +4,6 @@
 #include <benchmark/benchmark.h>
 #include <map>
 #include <string>
-#include <unordered_map>
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable_view.h"

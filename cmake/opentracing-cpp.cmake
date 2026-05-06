@@ -27,9 +27,14 @@ if(NOT OpenTracing_FOUND)
     set(_SAVED_BUILD_TESTING ${BUILD_TESTING})
   endif()
 
+  if(DEFINED CMAKE_POLICY_VERSION_MINIMUM)
+    set(_SAVED_CMAKE_POLICY_VERSION_MINIMUM ${CMAKE_POLICY_VERSION_MINIMUM})
+  endif()
+
   # Set the cache variables for the opentracing build
   set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
   set(BUILD_MOCKTRACER OFF CACHE BOOL "" FORCE)
+  set(CMAKE_POLICY_VERSION_MINIMUM "3.5" CACHE STRING "" FORCE)
 
   FetchContent_MakeAvailable(opentracing)
 
@@ -38,6 +43,13 @@ if(NOT OpenTracing_FOUND)
     set(BUILD_TESTING ${_SAVED_BUILD_TESTING} CACHE BOOL "" FORCE)
   else()
     unset(BUILD_TESTING CACHE)
+  endif()
+
+  # Restore the saved state of CMAKE_POLICY_VERSION_MINIMUM
+  if(DEFINED _SAVED_CMAKE_POLICY_VERSION_MINIMUM)
+    set(CMAKE_POLICY_VERSION_MINIMUM ${_SAVED_CMAKE_POLICY_VERSION_MINIMUM} CACHE STRING "" FORCE)
+  else()
+    unset(CMAKE_POLICY_VERSION_MINIMUM CACHE)
   endif()
 
   # Patch the opentracing targets to set missing includes, add namespaced alias targets, disable iwyu and clang-tidy.

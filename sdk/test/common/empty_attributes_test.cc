@@ -4,6 +4,7 @@
 #include "opentelemetry/sdk/common/empty_attributes.h"
 
 #include <gtest/gtest.h>
+#include <string.h>
 
 TEST(EmptyAttributesTest, TestSize)
 {
@@ -15,5 +16,7 @@ TEST(EmptyAttributesTest, TestMemory)
 {
   auto attributes1 = opentelemetry::sdk::GetEmptyAttributes();
   auto attributes2 = opentelemetry::sdk::GetEmptyAttributes();
-  EXPECT_EQ(memcmp(&attributes1, &attributes2, sizeof(attributes1)), 0);  // NOLINT
+  EXPECT_EQ(memcmp(static_cast<void *>(&attributes1), static_cast<void *>(&attributes2),
+                   sizeof(attributes1)),
+            0);  // NOLINT
 }

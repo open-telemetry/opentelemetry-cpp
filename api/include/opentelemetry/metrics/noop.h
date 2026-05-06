@@ -61,7 +61,6 @@ public:
                     nostd::string_view /* description */,
                     nostd::string_view /* unit */) noexcept
   {}
-  ~NoopUpDownCounter() override = default;
   void Add(T /* value */) noexcept override {}
   void Add(T /* value */, const context::Context & /* context */) noexcept override {}
   void Add(T /* value */, const common::KeyValueIterable & /* attributes */) noexcept override {}
@@ -80,7 +79,6 @@ public:
             nostd::string_view /* description */,
             nostd::string_view /* unit */) noexcept
   {}
-  ~NoopGauge() override = default;
   void Record(T /* value */) noexcept override {}
   void Record(T /* value */, const context::Context & /* context */) noexcept override {}
   void Record(T /* value */, const common::KeyValueIterable & /* attributes */) noexcept override {}
@@ -229,6 +227,18 @@ public:
     return nostd::shared_ptr<ObservableInstrument>(
         new NoopObservableInstrument(name, description, unit));
   }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  uintptr_t RegisterCallback(
+      MultiObservableCallbackPtr /* callback */,
+      void * /* state */,
+      nostd::span<ObservableInstrument *> /* instruments */) noexcept override
+  {
+    return 0;
+  }
+
+  void DeregisterCallback(uintptr_t /* callback_id */) noexcept override {}
+#endif
 };
 
 /**

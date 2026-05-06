@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <fstream>
 #include <string>
+#include <vector>
 
 #ifdef _MSC_VER
 // clang-format off
@@ -31,9 +32,9 @@ TEST(ProcessDetectorUtilsTest, FormFilePath)
   EXPECT_EQ(exe_path, "/proc/1234/exe");
 }
 
-TEST(ProcessDetectorUtilsTest, ExtractCommand)
+TEST(ProcessDetectorUtilsTest, ExtractCommandWithArgs)
 {
-  std::string filename{"test_command.txt"};
+  std::string filename{"test_command_args.txt"};
 
   {
     std::ofstream outfile(filename, std::ios::binary);
@@ -41,20 +42,22 @@ TEST(ProcessDetectorUtilsTest, ExtractCommand)
     outfile.write(raw_data, sizeof(raw_data) - 1);
   }
 
-  std::string command = opentelemetry::resource_detector::detail::ExtractCommand(filename);
-  EXPECT_EQ(command, std::string{"test_command"});
+  std::vector<std::string> args =
+      opentelemetry::resource_detector::detail::ExtractCommandWithArgs(filename);
+  EXPECT_EQ(args, (std::vector<std::string>{"test_command", "arg1", "arg2", "arg3"}));
 
   std::remove(filename.c_str());  // Cleanup
 }
 
-TEST(ProcessDetectorUtilsTest, EmptyCommandFile)
+TEST(ProcessDetectorUtilsTest, EmptyCommandWithArgsFile)
 {
-  std::string filename{"empty_command.txt"};
+  std::string filename{"empty_command_args.txt"};
   std::ofstream outfile(filename, std::ios::binary);
   outfile.close();
 
-  std::string command = opentelemetry::resource_detector::detail::ExtractCommand(filename);
-  EXPECT_EQ(command, std::string{""});
+  std::vector<std::string> args =
+      opentelemetry::resource_detector::detail::ExtractCommandWithArgs(filename);
+  EXPECT_TRUE(args.empty());
 
   std::remove(filename.c_str());  // Cleanup
 }
@@ -109,40 +112,79 @@ TEST(ProcessDetectorUtilsTest, GetExecutablePathTest)
   EXPECT_EQ(path, expected_path);
 }
 
-TEST(ProcessDetectorUtilsTest, GetCommandTest)
+TEST(ProcessDetectorUtilsTest, CommandTest)
 {
   int32_t pid = getpid();
   std::string command;
 #ifdef _MSC_VER
-  // On Windows, GetCommandLineW only works for the CURRENT process,
-  // so we ignore `pid` and just return the current process's command line.
-  LPCWSTR wcmd = GetCommandLineW();
-  if (!wcmd)
+  int argc      = 0;
+  LPWSTR *argvW = CommandLineToArgvW(GetCommandLineW(), &argc);
+
+  if (argvW && argc > 0)
   {
-    command = std::string();
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, argvW[0], -1, NULL, 0, NULL, NULL);
+    if (size_needed > 0)
+    {
+      std::string arg(size_needed - 1, 0);
+      WideCharToMultiByte(CP_UTF8, 0, argvW[0], -1, &arg[0], size_needed, NULL, NULL);
+      command = arg;
+    }
+
+    LocalFree(argvW);
   }
   else
   {
-
-    // Convert UTF-16 to UTF-8
-    int size_needed = WideCharToMultiByte(CP_UTF8, 0, wcmd, -1, NULL, 0, NULL, NULL);
-    if (size_needed <= 0)
-    {
-      command = std::string();
-    }
-    else
-    {
-      std::string utf8_command(size_needed - 1, 0);  // exclude null terminator
-      WideCharToMultiByte(CP_UTF8, 0, wcmd, -1, &utf8_command[0], size_needed, NULL, NULL);
-      command = utf8_command;
-    }
+    command = std::string();
   }
 #else
-  // This is the path to get the command that was used to start the process
   std::string command_line_path =
       opentelemetry::resource_detector::detail::FormFilePath(pid, "cmdline");
-  command = opentelemetry::resource_detector::detail::ExtractCommand(command_line_path);
+  std::ifstream command_line_file(command_line_path, std::ios::in | std::ios::binary);
+  std::getline(command_line_file, command, '\0');
 #endif
-  std::string expected_command = opentelemetry::resource_detector::detail::GetCommand(pid);
+  std::vector<std::string> expected_command_with_args =
+      opentelemetry::resource_detector::detail::GetCommandWithArgs(pid);
+  std::string expected_command;
+  if (!expected_command_with_args.empty())
+  {
+    expected_command = expected_command_with_args[0];
+  }
   EXPECT_EQ(command, expected_command);
+}
+
+TEST(ProcessDetectorUtilsTest, GetCommandWithArgsTest)
+{
+  int32_t pid = getpid();
+  std::vector<std::string> args;
+#ifdef _MSC_VER
+  int argc      = 0;
+  LPWSTR *argvW = CommandLineToArgvW(GetCommandLineW(), &argc);
+  if (!argvW)
+  {
+    args = {};
+  }
+  else
+  {
+    for (int i = 0; i < argc; i++)
+    {
+      // Convert UTF-16 to UTF-8
+      int size_needed = WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, NULL, 0, NULL, NULL);
+      if (size_needed > 0)
+      {
+        std::string arg(size_needed - 1, 0);
+        WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, &arg[0], size_needed, NULL, NULL);
+        args.push_back(arg);
+      }
+    }
+  }
+
+  LocalFree(argvW);
+#else
+  std::string command_line_path =
+      opentelemetry::resource_detector::detail::FormFilePath(pid, "cmdline");
+  args = opentelemetry::resource_detector::detail::ExtractCommandWithArgs(command_line_path);
+#endif
+  std::vector<std::string> expected_args =
+      opentelemetry::resource_detector::detail::GetCommandWithArgs(pid);
+  EXPECT_EQ(args, expected_args);
 }

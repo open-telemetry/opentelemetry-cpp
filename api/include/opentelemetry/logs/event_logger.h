@@ -17,11 +17,17 @@ namespace logs
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
 /**
  * Handles event log record creation.
+ * @deprecated
  **/
-class OPENTELEMETRY_DEPRECATED EventLogger
+class EventLogger
 {
 public:
-  virtual ~EventLogger() = default;
+  EventLogger()                                   = default;
+  EventLogger(const EventLogger &)                = default;
+  EventLogger(EventLogger &&) noexcept            = default;
+  EventLogger &operator=(const EventLogger &)     = default;
+  EventLogger &operator=(EventLogger &&) noexcept = default;
+  virtual ~EventLogger()                          = default;
 
   /* Returns the name of the logger */
   virtual const nostd::string_view GetName() noexcept = 0;

@@ -35,6 +35,11 @@ static constexpr const char *kGenAiAgentId = "gen_ai.agent.id";
 static constexpr const char *kGenAiAgentName = "gen_ai.agent.name";
 
 /**
+  The version of the GenAI agent.
+ */
+static constexpr const char *kGenAiAgentVersion = "gen_ai.agent.version";
+
+/**
   Deprecated, use Event API to report completions contents.
 
   @deprecated
@@ -60,6 +65,37 @@ static constexpr const char *kGenAiConversationId = "gen_ai.conversation.id";
   describe the data source.
  */
 static constexpr const char *kGenAiDataSourceId = "gen_ai.data_source.id";
+
+/**
+  The number of dimensions the resulting output embeddings should have.
+ */
+static constexpr const char *kGenAiEmbeddingsDimensionCount = "gen_ai.embeddings.dimension.count";
+
+/**
+  A free-form explanation for the assigned score provided by the evaluator.
+ */
+static constexpr const char *kGenAiEvaluationExplanation = "gen_ai.evaluation.explanation";
+
+/**
+  The name of the evaluation metric used for the GenAI response.
+ */
+static constexpr const char *kGenAiEvaluationName = "gen_ai.evaluation.name";
+
+/**
+  Human readable label for evaluation.
+  <p>
+  This attribute provides a human-readable interpretation of the evaluation score produced by an
+  evaluator. For example, a score value of 1 could mean "relevant" in one evaluation system and "not
+  relevant" in another, depending on the scoring range and evaluator. The label SHOULD have low
+  cardinality. Possible values depend on the evaluation metric and evaluator used; implementations
+  SHOULD document the possible values.
+ */
+static constexpr const char *kGenAiEvaluationScoreLabel = "gen_ai.evaluation.score.label";
+
+/**
+  The evaluation score returned by the evaluator.
+ */
+static constexpr const char *kGenAiEvaluationScoreValue = "gen_ai.evaluation.score.value";
 
 /**
   The chat history provided to the model as an input.
@@ -181,6 +217,11 @@ static constexpr const char *kGenAiOutputType = "gen_ai.output.type";
 OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiPrompt = "gen_ai.prompt";
 
 /**
+  The name of the prompt that uniquely identifies it.
+ */
+static constexpr const char *kGenAiPromptName = "gen_ai.prompt.name";
+
+/**
   The Generative AI provider as identified by the client or server instrumentation.
   <p>
   The attribute SHOULD be set based on the instrumentation's best
@@ -276,6 +317,27 @@ static constexpr const char *kGenAiResponseId = "gen_ai.response.id";
 static constexpr const char *kGenAiResponseModel = "gen_ai.response.model";
 
 /**
+  The documents retrieved.
+  <p>
+  Instrumentations MUST follow <a href="/docs/gen-ai/gen-ai-retrieval-documents.json">Retrieval
+  documents JSON schema</a>. When the attribute is recorded on events, it MUST be recorded in
+  structured form. When recorded on spans, it MAY be recorded as a JSON string if structured format
+  is not supported and SHOULD be recorded in structured form otherwise. <p> Each document object
+  SHOULD contain at least the following properties:
+  @code id @endcode (string): A unique identifier for the document, @code score @endcode (double):
+  The relevance score of the document
+ */
+static constexpr const char *kGenAiRetrievalDocuments = "gen_ai.retrieval.documents";
+
+/**
+  The query text used for retrieval.
+  <blockquote>
+  [!Warning]
+  This attribute may contain sensitive information.</blockquote>
+ */
+static constexpr const char *kGenAiRetrievalQueryText = "gen_ai.retrieval.query.text";
+
+/**
   Deprecated, use @code gen_ai.provider.name @endcode instead.
 
   @deprecated
@@ -314,9 +376,50 @@ static constexpr const char *kGenAiSystemInstructions = "gen_ai.system_instructi
 static constexpr const char *kGenAiTokenType = "gen_ai.token.type";
 
 /**
+  Parameters passed to the tool call.
+  <blockquote>
+  [!WARNING]
+  This attribute may contain sensitive information.</blockquote>
+  <p>
+  It's expected to be an object - in case a serialized string is available
+  to the instrumentation, the instrumentation SHOULD do the best effort to
+  deserialize it to an object. When recorded on spans, it MAY be recorded as a JSON string if
+  structured format is not supported and SHOULD be recorded in structured form otherwise.
+ */
+static constexpr const char *kGenAiToolCallArguments = "gen_ai.tool.call.arguments";
+
+/**
   The tool call identifier.
  */
 static constexpr const char *kGenAiToolCallId = "gen_ai.tool.call.id";
+
+/**
+  The result returned by the tool call (if any and if execution was successful).
+  <blockquote>
+  [!WARNING]
+  This attribute may contain sensitive information.</blockquote>
+  <p>
+  It's expected to be an object - in case a serialized string is available
+  to the instrumentation, the instrumentation SHOULD do the best effort to
+  deserialize it to an object. When recorded on spans, it MAY be recorded as a JSON string if
+  structured format is not supported and SHOULD be recorded in structured form otherwise.
+ */
+static constexpr const char *kGenAiToolCallResult = "gen_ai.tool.call.result";
+
+/**
+  The list of source system tool definitions available to the GenAI agent or model.
+  <p>
+  The value of this attribute matches source system tool definition format.
+  <p>
+  It's expected to be an array of objects where each object represents a tool definition. In case a
+  serialized string is available to the instrumentation, the instrumentation SHOULD do the best
+  effort to deserialize it to an array. When recorded on spans, it MAY be recorded as a JSON string
+  if structured format is not supported and SHOULD be recorded in structured form otherwise. <p>
+  Since this attribute could be large, it's NOT RECOMMENDED to populate
+  it by default. Instrumentations MAY provide a way to enable
+  populating this attribute.
+ */
+static constexpr const char *kGenAiToolDefinitions = "gen_ai.tool.definitions";
 
 /**
   The tool description.
@@ -342,6 +445,22 @@ static constexpr const char *kGenAiToolName = "gen_ai.tool.name";
 static constexpr const char *kGenAiToolType = "gen_ai.tool.type";
 
 /**
+  The number of input tokens written to a provider-managed cache.
+  <p>
+  The value SHOULD be included in @code gen_ai.usage.input_tokens @endcode.
+ */
+static constexpr const char *kGenAiUsageCacheCreationInputTokens =
+    "gen_ai.usage.cache_creation.input_tokens";
+
+/**
+  The number of input tokens served from a provider-managed cache.
+  <p>
+  The value SHOULD be included in @code gen_ai.usage.input_tokens @endcode.
+ */
+static constexpr const char *kGenAiUsageCacheReadInputTokens =
+    "gen_ai.usage.cache_read.input_tokens";
+
+/**
   Deprecated, use @code gen_ai.usage.output_tokens @endcode instead.
 
   @deprecated
@@ -353,6 +472,11 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kGenAiUsageCompletionToken
 
 /**
   The number of tokens used in the GenAI input (prompt).
+  <p>
+  This value SHOULD include all types of input tokens, including cached tokens.
+  Instrumentations SHOULD make a best effort to populate this value, using a total
+  provided by the provider when available or, depending on the provider API,
+  by summing different token types parsed from the provider output.
  */
 static constexpr const char *kGenAiUsageInputTokens = "gen_ai.usage.input_tokens";
 
@@ -431,6 +555,13 @@ static constexpr const char *kTextCompletion = "text_completion";
   API</a>
  */
 static constexpr const char *kEmbeddings = "embeddings";
+
+/**
+  Retrieval operation such as <a
+  href="https://platform.openai.com/docs/api-reference/vector-stores/search">OpenAI Search Vector
+  Store API</a>
+ */
+static constexpr const char *kRetrieval = "retrieval";
 
 /**
   Create GenAI agent
@@ -604,13 +735,21 @@ static constexpr const char *kCohere = "cohere";
 
 /**
   Azure AI Inference
+
+  @deprecated
+  {"note": "Replaced by @code azure.ai.inference @endcode.", "reason": "renamed", "renamed_to":
+  "azure.ai.inference"}
  */
-static constexpr const char *kAzAiInference = "az.ai.inference";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kAzAiInference = "az.ai.inference";
 
 /**
   Azure OpenAI
+
+  @deprecated
+  {"note": "Replaced by @code azure.ai.openai @endcode.", "reason": "renamed", "renamed_to":
+  "azure.ai.openai"}
  */
-static constexpr const char *kAzAiOpenai = "az.ai.openai";
+OPENTELEMETRY_DEPRECATED static constexpr const char *kAzAiOpenai = "az.ai.openai";
 
 /**
   Azure AI Inference
@@ -639,11 +778,8 @@ static constexpr const char *kPerplexity = "perplexity";
 
 /**
   xAI
-
-  @deprecated
-  {"note": "Replaced by @code x_ai @endcode.", "reason": "renamed", "renamed_to": "x_ai"}
  */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kXai = "xai";
+static constexpr const char *kXai = "xai";
 
 /**
   DeepSeek

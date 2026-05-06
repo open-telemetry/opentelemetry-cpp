@@ -42,9 +42,7 @@ using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
 
-using grpc_example::Greeter;
-using grpc_example::GreetRequest;
-using grpc_example::GreetResponse;
+using namespace grpc_example;
 
 namespace
 {
@@ -68,14 +66,13 @@ public:
     options.kind = SpanKind::kClient;
 
     std::string span_name = "GreeterClient/Greet";
-    auto span =
-        get_tracer("grpc")->StartSpan(span_name,
-                                      {{semconv::rpc::kRpcSystem, "grpc"},
-                                       {semconv::rpc::kRpcService, "grpc-example.GreetService"},
-                                       {semconv::rpc::kRpcMethod, "Greet"},
-                                       {semconv::network::kNetworkPeerAddress, ip},
-                                       {semconv::network::kNetworkPeerPort, port}},
-                                      options);
+    auto span             = get_tracer("grpc")->StartSpan(
+        span_name,
+        {{semconv::rpc::kRpcSystemName, "grpc"},
+                     {semconv::rpc::kRpcMethod, "grpc-example.GreetService/Greet"},
+                     {semconv::network::kNetworkPeerAddress, ip},
+                     {semconv::network::kNetworkPeerPort, port}},
+        options);
 
     auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
 
@@ -90,7 +87,7 @@ public:
     if (status.ok())
     {
       span->SetStatus(StatusCode::kOk);
-      span->SetAttribute(semconv::rpc::kRpcGrpcStatusCode, status.error_code());
+      span->SetAttribute(semconv::rpc::kRpcResponseStatusCode, status.error_message());
       // Make sure to end your spans!
       span->End();
       return response.response();
@@ -99,7 +96,7 @@ public:
     {
       std::cout << status.error_code() << ": " << status.error_message() << '\n';
       span->SetStatus(StatusCode::kError);
-      span->SetAttribute(semconv::rpc::kRpcGrpcStatusCode, status.error_code());
+      span->SetAttribute(semconv::rpc::kRpcResponseStatusCode, status.error_message());
       // Make sure to end your spans!
       span->End();
       return "RPC failed";
@@ -127,15 +124,12 @@ int main(int argc, char **argv)
       opentelemetry::nostd::shared_ptr<context::propagation::TextMapPropagator>(
           new propagation::HttpTraceContext()));
   constexpr uint16_t default_port = 8800;
-  uint16_t port;
+  uint16_t port{default_port};
   if (argc > 1)
   {
     port = static_cast<uint16_t>(atoi(argv[1]));
   }
-  else
-  {
-    port = default_port;
-  }
+
   RunClient(port);
   CleanupTracer();
   return 0;

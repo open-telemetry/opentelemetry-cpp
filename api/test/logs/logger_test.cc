@@ -16,6 +16,7 @@
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/logs/noop.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -23,9 +24,14 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+using opentelemetry::logs::NoopEventLogger;
+#endif
+
 using opentelemetry::logs::EventId;
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
+using opentelemetry::logs::NoopLogger;
 using opentelemetry::logs::Provider;
 using opentelemetry::logs::Severity;
 using opentelemetry::nostd::shared_ptr;
@@ -56,6 +62,14 @@ TEST(Logger, GetNoopLoggerNameWithArgs)
   lp->GetLogger("NoopLoggerWithArgs", "opentelelemtry_library", "", schema_url);
 
   lp->GetLogger("NoopLoggerWithOptions", "opentelelemtry_library", "", schema_url);
+}
+
+TEST(NoopLogger, NoopLoggerUsage)
+{
+  NoopLogger logger;
+  auto record = logger.CreateLogRecord();
+  ASSERT_TRUE(record != nullptr);
+  logger.EmitLogRecord(std::move(record));
 }
 
 // Test the EmitLogRecord() overloads
@@ -161,6 +175,34 @@ TEST(Logger, LogMethodOverloads)
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
+
+/*
+ * opentelemetry::logs::Provider::GetLoggerProvider() is deprecated.
+ * Suppress warnings in tests, to have a clean build and coverage.
+ */
+
+#  if defined(_MSC_VER)
+#    pragma warning(push)
+#    pragma warning(disable : 4996)
+#  elif defined(__GNUC__) && !defined(__clang__) && !defined(__apple_build_version__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#  elif defined(__clang__) || defined(__apple_build_version__)
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#  endif
+
+TEST(NoopEventLogger, NoopEventLoggerUsage)
+{
+  NoopEventLogger event_logger;
+
+  auto logger = event_logger.GetDelegateLogger();
+  ASSERT_TRUE(logger != nullptr);
+  auto record = logger->CreateLogRecord();
+  ASSERT_TRUE(record != nullptr);
+  event_logger.EmitEvent("event_name", std::move(record));
+}
+
 TEST(Logger, EventLogMethodOverloads)
 {
   auto lp = Provider::GetLoggerProvider();
@@ -192,6 +234,15 @@ TEST(Logger, EventLogMethodOverloads)
   event_logger->EmitEvent("event name", Severity::kDebug,
                           opentelemetry::common::MakeAttributes(vec));
 }
+
+#  if defined(_MSC_VER)
+#    pragma warning(pop)
+#  elif defined(__GNUC__) && !defined(__clang__) && !defined(__apple_build_version__)
+#    pragma GCC diagnostic pop
+#  elif defined(__clang__) || defined(__apple_build_version__)
+#    pragma clang diagnostic pop
+#  endif
+
 #endif
 
 // Define a basic Logger class

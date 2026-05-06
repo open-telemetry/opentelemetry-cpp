@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <cstdint>
+#include <functional>
 #include <mutex>
 #include <ostream>
 #include <string>
@@ -44,38 +45,43 @@
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_utils.h"
 #endif
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include "opentelemetry/metrics/meter.h"
+#endif
+
 namespace
 {
 
 struct InstrumentationScopeLogStreamable
 {
-  const opentelemetry::sdk::instrumentationscope::InstrumentationScope &scope;
+  std::reference_wrapper<const opentelemetry::sdk::instrumentationscope::InstrumentationScope>
+      scope;
 };
 
 struct InstrumentDescriptorLogStreamable
 {
-  const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument;
+  std::reference_wrapper<const opentelemetry::sdk::metrics::InstrumentDescriptor> instrument;
 };
 
 std::ostream &operator<<(std::ostream &os,
                          const InstrumentationScopeLogStreamable &streamable) noexcept
 {
-  os << "\n  name=\"" << streamable.scope.GetName() << "\"" << "\n  schema_url=\""
-     << streamable.scope.GetSchemaURL() << "\"" << "\n  version=\"" << streamable.scope.GetVersion()
-     << "\"";
+  os << "\n  name=\"" << streamable.scope.get().GetName() << "\"" << "\n  schema_url=\""
+     << streamable.scope.get().GetSchemaURL() << "\"" << "\n  version=\""
+     << streamable.scope.get().GetVersion() << "\"";
   return os;
 }
 
 std::ostream &operator<<(std::ostream &os,
                          const InstrumentDescriptorLogStreamable &streamable) noexcept
 {
-  os << "\n  name=\"" << streamable.instrument.name_ << "\"" << "\n  description=\""
-     << streamable.instrument.description_ << "\"" << "\n  unit=\"" << streamable.instrument.unit_
-     << "\"" << "\n  kind=\""
+  os << "\n  name=\"" << streamable.instrument.get().name_ << "\"" << "\n  description=\""
+     << streamable.instrument.get().description_ << "\"" << "\n  unit=\""
+     << streamable.instrument.get().unit_ << "\"" << "\n  kind=\""
      << opentelemetry::sdk::metrics::InstrumentDescriptorUtil::GetInstrumentValueTypeString(
-            streamable.instrument.value_type_)
+            streamable.instrument.get().value_type_)
      << opentelemetry::sdk::metrics::InstrumentDescriptorUtil::GetInstrumentTypeString(
-            streamable.instrument.type_)
+            streamable.instrument.get().type_)
      << "\"";
   return os;
 }
@@ -662,6 +668,21 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
   }
   return metric_data_list;
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+uintptr_t Meter::RegisterCallback(
+    opentelemetry::metrics::MultiObservableCallbackPtr callback,
+    void *state,
+    nostd::span<opentelemetry::metrics::ObservableInstrument *> instruments) noexcept
+{
+  return observable_registry_->AddCallback(callback, state, instruments);
+}
+
+void Meter::DeregisterCallback(uintptr_t callback_id) noexcept
+{
+  observable_registry_->RemoveCallback(callback_id);
+}
+#endif
 
 // Implementation of the log message recommended by the SDK specification for duplicate instruments.
 // See

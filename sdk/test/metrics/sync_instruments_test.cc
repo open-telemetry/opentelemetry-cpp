@@ -21,7 +21,7 @@ using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
 
-auto instrumentation_scope = InstrumentationScope::Create("opentelemetry-cpp", "0.1.0");
+static auto instrumentation_scope = InstrumentationScope::Create("opentelemetry-cpp", "0.1.0");
 
 using M = std::map<std::string, std::string>;
 
@@ -163,6 +163,11 @@ TEST(SyncInstruments, LongHistogram)
                    opentelemetry::context::Context{});
   histogram.Record(10, opentelemetry::common::KeyValueIterableView<M>({}),
                    opentelemetry::context::Context{});
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  histogram.Record(10ULL);
+  histogram.Record(10ULL, opentelemetry::common::KeyValueIterableView<M>({}));
+#endif
 }
 
 TEST(SyncInstruments, DoubleHistogram)

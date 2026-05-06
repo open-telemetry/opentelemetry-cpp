@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <atomic>
 #include <chrono>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <nlohmann/json.hpp>
@@ -68,7 +69,7 @@ public:
   TextMapCarrierTest(std::map<std::string, std::string> &headers) : headers_(headers) {}
   nostd::string_view Get(nostd::string_view key) const noexcept override
   {
-    for (const auto &elem : headers_)
+    for (const auto &elem : headers_.get())
     {
       if (equalsIgnoreCase(elem.first, std::string(key)))
       {
@@ -79,10 +80,10 @@ public:
   }
   void Set(nostd::string_view key, nostd::string_view value) noexcept override
   {
-    headers_[std::string(key)] = std::string(value);
+    headers_.get()[std::string(key)] = std::string(value);
   }
 
-  std::map<std::string, std::string> &headers_;
+  std::reference_wrapper<std::map<std::string, std::string>> headers_;
 };
 
 void initTracer()
@@ -110,7 +111,7 @@ nostd::shared_ptr<trace_api::Tracer> get_tracer()
 struct Uri
 {
   std::string host;
-  uint16_t port;
+  uint16_t port{};
   std::string path;
 
   Uri(const std::string &uri)
@@ -138,7 +139,7 @@ public:
 }  // namespace
 
 // Sends an HTTP POST request to the given url, with the given body.
-void send_request(curl::HttpClient &client, const std::string &url, const std::string &body)
+static void send_request(curl::HttpClient &client, const std::string &url, const std::string &body)
 {
   static std::shared_ptr<http_client::EventHandler> handler(new NoopEventHandler());
 
@@ -179,17 +180,13 @@ int main(int argc, char *argv[])
 
   constexpr char default_host[]   = "localhost";
   constexpr uint16_t default_port = 30000;
-  uint16_t port;
+  uint16_t port{default_port};
   std::atomic_bool stop_server(false);
 
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
   {
     port = static_cast<uint16_t>(atoi(argv[1]));
-  }
-  else
-  {
-    port = default_port;
   }
 
   auto root_span = get_tracer()->StartSpan(__func__);

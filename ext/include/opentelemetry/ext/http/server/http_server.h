@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <functional>
 #include <list>
 #include <map>
@@ -54,19 +55,19 @@ protected:
 
 public:
   HttpRequestCallback() {}
+
+  HttpRequestCallback(const HttpRequestCallback &)            = delete;
+  HttpRequestCallback(HttpRequestCallback &&)                 = delete;
+  HttpRequestCallback &operator=(const HttpRequestCallback &) = delete;
+  HttpRequestCallback &operator=(HttpRequestCallback &&)      = delete;
+
   virtual ~HttpRequestCallback() = default;
 
-  HttpRequestCallback &operator=(HttpRequestCallback other)
-  {
-    callback = other.callback;
-    return *this;
-  }
-
-  HttpRequestCallback(CallbackFunction func) : callback(func) {}
+  HttpRequestCallback(CallbackFunction func) : callback(std::move(func)) {}
 
   HttpRequestCallback &operator=(CallbackFunction func)
   {
-    callback = func;
+    callback = std::move(func);
     return (*this);
   }
 
@@ -95,7 +96,7 @@ protected:
     SocketTools::Socket socket;
     std::string receiveBuffer;
     std::string sendBuffer;
-    enum
+    enum : std::uint8_t
     {
       Idle,
       ReceivingHeaders,
@@ -132,7 +133,7 @@ protected:
       second = nullptr;
     }
 
-    HttpRequestHandler &operator=(std::pair<std::string, HttpRequestCallback *> other)
+    HttpRequestHandler &operator=(const std::pair<std::string, HttpRequestCallback *> &other)
     {
       first  = other.first;
       second = other.second;
@@ -162,7 +163,6 @@ public:
 
   HttpServer()
       : m_serverHost("unnamed"),
-        allowKeepalive(true),
         m_reactor(*this),
         m_maxRequestHeadersSize(8192),
         m_maxRequestContentSize(2 * 1024 * 1024)
@@ -175,6 +175,11 @@ public:
     setServerName(os.str());
     addListeningPort(port);
   }
+
+  HttpServer(const HttpServer &)            = delete;
+  HttpServer(HttpServer &&)                 = delete;
+  HttpServer &operator=(const HttpServer &) = delete;
+  HttpServer &operator=(HttpServer &&)      = delete;
 
   ~HttpServer() override
   {
@@ -238,7 +243,7 @@ public:
   void stop() { m_reactor.stop(); }
 
 protected:
-  virtual void onSocketAcceptable(SocketTools::Socket socket) override
+  void onSocketAcceptable(SocketTools::Socket socket) override
   {
     LOG_TRACE("HttpServer: accepting socket fd=0x%llx", socket.m_sock);
     assert(std::find(m_listeningSockets.begin(), m_listeningSockets.end(), socket) !=
@@ -258,7 +263,7 @@ protected:
     }
   }
 
-  virtual void onSocketReadable(SocketTools::Socket socket) override
+  void onSocketReadable(SocketTools::Socket socket) override
   {
     LOG_TRACE("HttpServer: reading socket fd=0x%llx", socket.m_sock);
     // No thread-safety here!
@@ -286,7 +291,7 @@ protected:
     handleConnection(conn);
   }
 
-  virtual void onSocketWritable(SocketTools::Socket socket) override
+  void onSocketWritable(SocketTools::Socket socket) override
   {
     LOG_TRACE("HttpServer: writing socket fd=0x%llx", socket.m_sock);
 
@@ -308,7 +313,7 @@ protected:
     }
   }
 
-  virtual void onSocketClosed(SocketTools::Socket socket) override
+  void onSocketClosed(SocketTools::Socket socket) override
   {
     LOG_TRACE("HttpServer: closing socket fd=0x%llx", socket.m_sock);
     assert(std::find(m_listeningSockets.begin(), m_listeningSockets.end(), socket) ==

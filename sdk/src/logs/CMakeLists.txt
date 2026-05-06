@@ -14,6 +14,7 @@ add_library(
   simple_log_record_processor.cc
   simple_log_record_processor_factory.cc
   batch_log_record_processor.cc
+  batch_log_record_processor_options.cc
   batch_log_record_processor_factory.cc
   logger_config.cc
   logger_context.cc

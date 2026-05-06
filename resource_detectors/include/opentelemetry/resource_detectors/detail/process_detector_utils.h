@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 #include "opentelemetry/version.h"
 
@@ -32,20 +33,20 @@ std::string FormFilePath(const int32_t &pid, const char *process_type);
 std::string GetExecutablePath(const int32_t &pid);
 
 /**
- * Retrieves the command used to launch the process for a given PID.
+ * Extracts the command-line arguments and the command.
  * Platform-specific behavior:
- *   - Windows: Uses GetCommandLineW() to get the command of the current process.
- *   - Linux/Unix: Reads the zeroth string of /proc/<pid>/cmdline file.
+ *   - Windows: Uses CommandLineToArgvW() to parse the command line.
+ *   - Linux/Unix: Reads the /proc/<pid>/cmdline file and splits it into command and arguments.
  *   - TODO: Need to implement for Darwin
  */
-std::string ExtractCommand(const std::string &command_line_path);
+std::vector<std::string> ExtractCommandWithArgs(const std::string &command_line_path);
 
 /**
- * Retrieves the command used to launch the process for a given PID.
- * This function is a wrapper around ExtractCommand() and is provided for convenience and
- * testability of ExtractCommand().
+ * Retrieves the command-line arguments and the command used to launch the process for a given PID.
+ * This function is a wrapper around ExtractCommandWithArgs() and is provided for convenience and
+ * testability of ExtractCommandWithArgs().
  */
-std::string GetCommand(const int32_t &pid);
+std::vector<std::string> GetCommandWithArgs(const int32_t &pid);
 
 }  // namespace detail
 }  // namespace resource_detector

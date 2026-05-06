@@ -50,6 +50,7 @@
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/span_startoptions.h"
+#include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/trace/tracer.h"
@@ -105,6 +106,48 @@ public:
   }
 
   nostd::string_view GetDescription() const noexcept override { return "MockSampler"; }
+};
+
+/**
+ * A mock sampler with ShouldSample returning
+ * a decision based on the span name.
+ */
+class MockDecisionSampler final : public Sampler
+{
+public:
+  SamplingResult ShouldSample(
+      const SpanContext & /*parent_context*/,
+      trace_api::TraceId /*trace_id*/,
+      nostd::string_view name,
+      trace_api::SpanKind /*span_kind*/,
+      const opentelemetry::common::KeyValueIterable & /*attributes*/,
+      const opentelemetry::trace::SpanContextKeyValueIterable & /*links*/) noexcept override
+  {
+    std::string span_name{name};
+
+    if (span_name.find("DROP-") != std::string::npos)
+    {
+      return {Decision::DROP,
+              nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
+                  nullptr),
+              nostd::shared_ptr<opentelemetry::trace::TraceState>(nullptr)};
+    }
+
+    if (span_name.find("RECORD_ONLY-") != std::string::npos)
+    {
+      return {Decision::RECORD_ONLY,
+              nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
+                  nullptr),
+              nostd::shared_ptr<opentelemetry::trace::TraceState>(nullptr)};
+    }
+
+    return {Decision::RECORD_AND_SAMPLE,
+            nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
+                nullptr),
+            nostd::shared_ptr<opentelemetry::trace::TraceState>(nullptr)};
+  }
+
+  nostd::string_view GetDescription() const noexcept override { return "MockDecisionSampler"; }
 };
 
 /**
@@ -230,6 +273,50 @@ TEST(Tracer, StartSpanSampleOff)
   // The span doesn't write any span data because the sampling decision is alway
   // DROP.
   ASSERT_EQ(0, span_data->GetSpans().size());
+}
+
+TEST(Tracer, StartSpanSetsRandomTraceFlagForRootSpan)
+{
+  InMemorySpanExporter *exporter = new InMemorySpanExporter();
+  // AlwaysOn keeps the sampled bit set while RandomIdGenerator marks the
+  // locally generated trace-id as random.
+  auto tracer = initTracer(std::unique_ptr<SpanExporter>{exporter}, new AlwaysOnSampler(),
+                           new RandomIdGenerator());
+
+  auto span    = tracer->StartSpan("span 1");
+  auto context = span->GetContext();
+
+  EXPECT_TRUE(context.IsValid());
+  EXPECT_TRUE(context.IsSampled());
+  EXPECT_TRUE(context.trace_flags().IsRandom());
+  EXPECT_EQ(context.trace_flags().flags(),
+            trace_api::TraceFlags::kIsSampled | trace_api::TraceFlags::kIsRandom);
+}
+
+TEST(Tracer, StartSpanPreservesRandomTraceFlagFromParent)
+{
+  InMemorySpanExporter *exporter          = new InMemorySpanExporter();
+  constexpr uint8_t parent_span_id_buf[]  = {1, 2, 3, 4, 5, 6, 7, 8};
+  constexpr uint8_t parent_trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
+  // Build a remote parent with only the random bit set so the child path can
+  // prove it preserves the incoming signal even when sampling is turned off.
+  trace_api::SpanContext parent_context{
+      trace_api::TraceId{parent_trace_id_buf}, trace_api::SpanId{parent_span_id_buf},
+      trace_api::TraceFlags{trace_api::TraceFlags::kIsRandom}, true};
+
+  auto tracer = initTracer(std::unique_ptr<SpanExporter>{exporter}, new AlwaysOffSampler());
+
+  trace_api::StartSpanOptions options;
+  options.parent = parent_context;
+
+  auto span    = tracer->StartSpan("span 1", options);
+  auto context = span->GetContext();
+
+  EXPECT_TRUE(context.IsValid());
+  EXPECT_FALSE(context.IsSampled());
+  EXPECT_TRUE(context.trace_flags().IsRandom());
+  EXPECT_EQ(context.trace_flags().flags(), static_cast<uint8_t>(trace_api::TraceFlags::kIsRandom));
+  EXPECT_EQ(context.trace_id(), parent_context.trace_id());
 }
 
 TEST(Tracer, StartSpanCustomIdGenerator)
@@ -1300,6 +1387,42 @@ TEST(Tracer, ExpectParentAsContext)
   EXPECT_EQ(spandata_second->GetSpanId(), spandata_third->GetParentSpanId());
 }
 
+TEST(Tracer, RootContextAsParent)
+{
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::unique_ptr<SpanExporter>{exporter});
+  auto spans                                  = span_data.get()->GetSpans();
+
+  ASSERT_EQ(0, spans.size());
+
+  {
+    auto span_first       = tracer->StartSpan("span 1");
+    auto span_first_scope = trace_api::Scope{span_first};
+
+    opentelemetry::context::Context context_root{opentelemetry::trace::kIsRootSpanKey, true};
+    trace_api::StartSpanOptions options;
+    options.parent   = context_root;
+    auto span_second = tracer->StartSpan("span 2", options);
+    auto span_third  = tracer->StartSpan("span 3");
+  }
+
+  spans = span_data->GetSpans();
+  ASSERT_EQ(3, spans.size());
+  auto spandata_first  = std::move(spans.at(2));
+  auto spandata_second = std::move(spans.at(1));
+  auto spandata_third  = std::move(spans.at(0));
+  EXPECT_EQ("span 1", spandata_first->GetName());
+  EXPECT_EQ("span 2", spandata_second->GetName());
+  EXPECT_EQ("span 3", spandata_third->GetName());
+
+  EXPECT_TRUE(spandata_first->GetSpanContext().IsValid());
+  EXPECT_FALSE(spandata_first->GetParentSpanId().IsValid());   // span 1 is a root span
+  EXPECT_FALSE(spandata_second->GetParentSpanId().IsValid());  // span 2 is a root span
+  EXPECT_EQ(spandata_first->GetSpanId(),
+            spandata_third->GetParentSpanId());  // span 3 is child of span 1
+}
+
 TEST(Tracer, ValidTraceIdToSampler)
 {
   InMemorySpanExporter *exporter              = new InMemorySpanExporter();
@@ -1330,4 +1453,33 @@ TEST(Tracer, SpanCleanupWithScope)
     }
   }
   EXPECT_EQ(4, span_data->GetSpans().size());
+}
+
+TEST(Tracer, SpanSamplerDecision)
+{
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer = initTracer(std::unique_ptr<SpanExporter>{exporter}, new MockDecisionSampler());
+  {
+    auto span0    = tracer->StartSpan("Span0");
+    auto span1    = tracer->StartSpan("span1");
+    auto context1 = span1->GetContext();
+    EXPECT_TRUE(context1.IsValid());
+    EXPECT_TRUE(context1.IsSampled());
+    {
+      trace_api::Scope scope1(span1);
+      auto span2    = tracer->StartSpan("RECORD_ONLY-span2");
+      auto context2 = span2->GetContext();
+      EXPECT_TRUE(context2.IsValid());
+      EXPECT_FALSE(context2.IsSampled());
+      {
+        trace_api::Scope scope2(span2);
+        auto span3    = tracer->StartSpan("DROP-span3");
+        auto context3 = span3->GetContext();
+        EXPECT_TRUE(context3.IsValid());
+        EXPECT_FALSE(context3.IsSampled());
+      }
+    }
+  }
+  EXPECT_EQ(3, span_data->GetSpans().size());
 }

@@ -47,6 +47,18 @@ foreach(
     TEST_LIST ${testname})
 endforeach()
 
+if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)
+  add_executable(multi_observer_test multi_observer_test.cc)
+  target_link_libraries(
+    multi_observer_test ${GTEST_BOTH_LIBRARIES} ${GMOCK_LIB}
+    ${CMAKE_THREAD_LIBS_INIT} metrics_common_test_utils opentelemetry_resources)
+  target_compile_definitions(multi_observer_test PRIVATE UNIT_TESTING)
+  gtest_add_tests(
+    TARGET multi_observer_test
+    TEST_PREFIX metrics.
+    TEST_LIST multi_observer_test)
+endif()
+
 if(WITH_BENCHMARK)
   add_executable(attributes_processor_benchmark
                  attributes_processor_benchmark.cc)
@@ -54,8 +66,9 @@ if(WITH_BENCHMARK)
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
 
   add_executable(attributes_hashmap_benchmark attributes_hashmap_benchmark.cc)
-  target_link_libraries(attributes_hashmap_benchmark benchmark::benchmark
-                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+  target_link_libraries(
+    attributes_hashmap_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_metrics opentelemetry_common)
 
   add_executable(base2_exponential_histogram_indexer_benchmark
                  base2_exponential_histogram_indexer_benchmark.cc)
@@ -80,4 +93,6 @@ if(WITH_BENCHMARK)
     metrics_common_test_utils opentelemetry_common opentelemetry_resources)
 endif()
 
-add_subdirectory(exemplar)
+if(WITH_METRICS_EXEMPLAR_PREVIEW)
+  add_subdirectory(exemplar)
+endif()

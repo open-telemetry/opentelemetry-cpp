@@ -20,7 +20,7 @@ static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse
 TEST(YamlPropagator, empty_propagator)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-propagator"
 propagator:
 )";
 
@@ -34,7 +34,7 @@ propagator:
 TEST(YamlPropagator, empty_composite)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-propagator"
 propagator:
   composite:
 )";
@@ -50,7 +50,7 @@ TEST(YamlPropagator, old_propagator_1)
 {
   // This is the old format, must fail
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-propagator"
 propagator:
   composite:
     - foo
@@ -65,7 +65,7 @@ TEST(YamlPropagator, old_propagator_2)
 {
   // This is the old format, must fail
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-propagator"
 propagator:
   composite: [foo, bar]
 )";
@@ -77,7 +77,7 @@ propagator:
 TEST(YamlPropagator, propagator_array_ok)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-propagator"
 propagator:
   composite:
     - foo:
@@ -98,7 +98,7 @@ propagator:
 TEST(YamlPropagator, propagator_array_broken)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-propagator"
 propagator:
   composite:
     - foo:
@@ -113,7 +113,7 @@ propagator:
 TEST(YamlPropagator, propagator_composite_list)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-propagator"
 propagator:
   composite_list: "foo,bar,baz"
 )";
@@ -128,7 +128,7 @@ propagator:
 TEST(YamlPropagator, propagator_both)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-propagator"
 propagator:
   composite:
     - aaa:
@@ -150,7 +150,7 @@ propagator:
 TEST(YamlPropagator, propagator_duplicates)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-propagator"
 propagator:
   composite:
     - aaa:

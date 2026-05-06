@@ -229,8 +229,7 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCosmosdbRequestContentL
   Deprecated, use @code db.response.status_code @endcode instead.
 
   @deprecated
-  {"note": "Replaced by @code db.response.status_code @endcode.", "reason": "renamed", "renamed_to":
-  "db.response.status_code"}
+  {"note": "Use @code db.response.status_code @endcode instead.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbCosmosdbStatusCode =
     "db.cosmosdb.status_code";
@@ -390,15 +389,18 @@ static constexpr const char *kDbOperationParameter = "db.operation.parameter";
   @code db.query.parameter.<key> @endcode SHOULD match
   up with the parameterized placeholders present in @code db.query.text @endcode.
   <p>
+  It is RECOMMENDED to capture the value as provided by the application
+  without attempting to do any case normalization.
+  <p>
   @code db.query.parameter.<key> @endcode SHOULD NOT be captured on batch operations.
   <p>
   Examples:
   <ul>
     <li>For a query @code SELECT * FROM users where username =  %s @endcode with the parameter @code
   "jdoe" @endcode, the attribute @code db.query.parameter.0 @endcode SHOULD be set to @code "jdoe"
-  @endcode.</li> <li>For a query @code "SELECT * FROM users WHERE username = %(username)s; @endcode
+  @endcode.</li> <li>For a query @code "SELECT * FROM users WHERE username = %(userName)s; @endcode
   with parameter
-  @code username = "jdoe" @endcode, the attribute @code db.query.parameter.username @endcode SHOULD
+  @code userName = "jdoe" @endcode, the attribute @code db.query.parameter.userName @endcode SHOULD
   be set to @code "jdoe" @endcode.</li>
   </ul>
  */
@@ -414,19 +416,21 @@ static constexpr const char *kDbQueryParameter = "db.query.parameter";
   Summary may be available to the instrumentation through
   instrumentation hooks or other means. If it is not available, instrumentations
   that support query parsing SHOULD generate a summary following
-  <a href="/docs/database/database-spans.md#generating-a-summary-of-the-query">Generating query
-  summary</a> section.
+  <a href="/docs/db/database-spans.md#generating-a-summary-of-the-query">Generating query
+  summary</a> section. <p> For batch operations, if the individual operations are known to have the
+  same query summary then that query summary SHOULD be used prepended by @code BATCH  @endcode,
+  otherwise @code db.query.summary @endcode SHOULD be @code BATCH @endcode or some other database
+  system specific term if more applicable.
  */
 static constexpr const char *kDbQuerySummary = "db.query.summary";
 
 /**
   The database query being executed.
   <p>
-  For sanitization see <a
-  href="/docs/database/database-spans.md#sanitization-of-dbquerytext">Sanitization of @code
-  db.query.text @endcode</a>. For batch operations, if the individual operations are known to have
-  the same query text then that query text SHOULD be used, otherwise all of the individual query
-  texts SHOULD be concatenated with separator @code ;  @endcode or some other database system
+  For sanitization see <a href="/docs/db/database-spans.md#sanitization-of-dbquerytext">Sanitization
+  of @code db.query.text @endcode</a>. For batch operations, if the individual operations are known
+  to have the same query text then that query text SHOULD be used, otherwise all of the individual
+  query texts SHOULD be concatenated with separator @code ;  @endcode or some other database system
   specific separator if more applicable. Parameterized query text SHOULD NOT be sanitized. Even
   though parameterized query text can potentially have sensitive data, by using a parameterized
   query the user is giving a strong signal that any sensitive data will be passed as parameter
@@ -439,8 +443,7 @@ static constexpr const char *kDbQueryText = "db.query.text";
   Deprecated, use @code db.namespace @endcode instead.
 
   @deprecated
-  {"note": "Replaced by @code db.namespace @endcode.", "reason": "renamed", "renamed_to":
-  "db.namespace"}
+  {"note": "Uncategorized.", "reason": "uncategorized"}
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kDbRedisDatabaseIndex =
     "db.redis.database_index";

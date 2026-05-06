@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstring>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -10,6 +11,7 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/custom_hash_equality.h"
 #include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 #include "opentelemetry/version.h"
 
@@ -18,7 +20,14 @@ namespace sdk
 {
 namespace metrics
 {
+
 using MetricAttributes = opentelemetry::sdk::metrics::FilteredOrderedAttributeMap;
+
+typedef std::unordered_map<std::string,
+                           bool,
+                           opentelemetry::sdk::common::StringViewHash,
+                           opentelemetry::sdk::common::StringViewEqual>
+    FilterAttributeMap;
 
 /**
  * The AttributesProcessor is responsible for customizing which
@@ -28,6 +37,13 @@ using MetricAttributes = opentelemetry::sdk::metrics::FilteredOrderedAttributeMa
 class AttributesProcessor
 {
 public:
+  AttributesProcessor() = default;
+
+  AttributesProcessor(const AttributesProcessor &)            = delete;
+  AttributesProcessor(AttributesProcessor &&)                 = delete;
+  AttributesProcessor &operator=(const AttributesProcessor &) = delete;
+  AttributesProcessor &operator=(AttributesProcessor &&)      = delete;
+
   // Process the metric instrument attributes.
   // @returns integer with individual bits set if they are to be filtered.
 
@@ -65,12 +81,11 @@ public:
 class FilteringAttributesProcessor : public AttributesProcessor
 {
 public:
-  FilteringAttributesProcessor(std::unordered_map<std::string, bool> &&allowed_attribute_keys = {})
+  FilteringAttributesProcessor(FilterAttributeMap &&allowed_attribute_keys = {})
       : allowed_attribute_keys_(std::move(allowed_attribute_keys))
   {}
 
-  FilteringAttributesProcessor(
-      const std::unordered_map<std::string, bool> &allowed_attribute_keys = {})
+  FilteringAttributesProcessor(const FilterAttributeMap &allowed_attribute_keys = {})
       : allowed_attribute_keys_(allowed_attribute_keys)
   {}
 
@@ -80,7 +95,8 @@ public:
     MetricAttributes result;
     attributes.ForEachKeyValue(
         [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
-          if (allowed_attribute_keys_.find(key.data()) != allowed_attribute_keys_.end())
+          if (opentelemetry::sdk::common::find_heterogeneous(allowed_attribute_keys_, key) !=
+              allowed_attribute_keys_.end())
           {
             result.SetAttribute(key, value);
             return true;
@@ -94,11 +110,56 @@ public:
 
   bool isPresent(nostd::string_view key) const noexcept override
   {
-    return (allowed_attribute_keys_.find(key.data()) != allowed_attribute_keys_.end());
+    return (opentelemetry::sdk::common::find_heterogeneous(allowed_attribute_keys_, key) !=
+            allowed_attribute_keys_.end());
   }
 
 private:
-  std::unordered_map<std::string, bool> allowed_attribute_keys_;
+  FilterAttributeMap allowed_attribute_keys_;
+};
+
+/**
+ * FilteringExcludeAttributeProcessor filters by exclude attribute list and drops names if they are
+ * present in the exclude list
+ */
+
+class FilteringExcludeAttributesProcessor : public AttributesProcessor
+{
+public:
+  FilteringExcludeAttributesProcessor(FilterAttributeMap &&exclude_list = {})
+      : exclude_list_(std::move(exclude_list))
+  {}
+
+  FilteringExcludeAttributesProcessor(const FilterAttributeMap &exclude_list = {})
+      : exclude_list_(exclude_list)
+  {}
+
+  MetricAttributes process(
+      const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
+  {
+    MetricAttributes result;
+    attributes.ForEachKeyValue([&](nostd::string_view key,
+                                   opentelemetry::common::AttributeValue value) noexcept {
+      if (opentelemetry::sdk::common::find_heterogeneous(exclude_list_, key) == exclude_list_.end())
+      {
+        result.SetAttribute(key, value);
+        return true;
+      }
+      return true;
+    });
+
+    result.UpdateHash();
+    return result;
+  }
+
+  bool isPresent(nostd::string_view key) const noexcept override
+  {
+    return (opentelemetry::sdk::common::find_heterogeneous(exclude_list_, key) ==
+            exclude_list_.end());
+  }
+
+private:
+  FilterAttributeMap exclude_list_;
 };
 
 }  // namespace metrics

@@ -1,6 +1,12 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
+
+#
+# opentelemetry_exporter_zipkin_trace
+#
+
 add_library(
   opentelemetry_exporter_zipkin_trace
   src/zipkin_exporter.cc src/zipkin_exporter_factory.cc src/recordable.cc)
@@ -35,6 +41,12 @@ otel_add_component(
   PATTERN
   "recordable.h"
   EXCLUDE)
+
+if(OPENTELEMETRY_INSTALL)
+  opentelemetry_add_pkgconfig(
+    exporter_zipkin_trace "OpenTelemetry Exporter - Zipkin"
+    "Exports trace spans in Zipkin format." "opentelemetry_trace")
+endif()
 
 if(BUILD_TESTING)
   add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)

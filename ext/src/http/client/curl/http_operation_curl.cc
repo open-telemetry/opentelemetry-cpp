@@ -293,15 +293,11 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                              bool reuse_connection,
                              bool is_log_enabled,
                              const RetryPolicy &retry_policy)
-    : is_aborted_(false),
-      is_finished_(false),
-      is_cleaned_(false),
-      // Optional connection params
+    :  // Optional connection params
       is_raw_response_(is_raw_response),
       reuse_connection_(reuse_connection),
       http_conn_timeout_(http_conn_timeout),
       // Result
-      last_curl_result_(CURLE_OK),
       event_handle_(event_handle),
       method_(method),
       url_(std::move(url)),
@@ -309,8 +305,6 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       // Local vars
       request_headers_(request_headers),
       request_body_(request_body),
-      request_nwrite_(0),
-      session_state_(opentelemetry::ext::http::client::SessionState::Created),
       compression_(compression),
       is_log_enabled_(is_log_enabled),
       retry_policy_(retry_policy),
@@ -319,8 +313,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                        retry_policy.max_backoff > SecondsDecimal::zero() &&
                        retry_policy.backoff_multiplier > 0.0f)
                           ? 0
-                          : retry_policy.max_attempts),
-      response_code_(0)
+                          : retry_policy.max_attempts)
 {
   /* get a curl handle */
   curl_resource_.easy_handle = curl_easy_init();
@@ -575,7 +568,7 @@ static long parse_max_ssl_version(const std::string &version)
 
 const char *HttpOperation::GetCurlErrorMessage(CURLcode code)
 {
-  const char *message;
+  const char *message{nullptr};
 
   if (curl_error_message_[0] != '\0')
   {
@@ -593,8 +586,6 @@ const char *HttpOperation::GetCurlErrorMessage(CURLcode code)
 
 CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, void *value)
 {
-  CURLcode rc;
-
   /*
     curl_easy_setopt() is a macro with variadic arguments, type unsafe.
     Various SetCurlXxxOption() helpers ensure it is called with a pointer,
@@ -603,7 +594,7 @@ CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, void *value)
     - a blob (struct curl_blob*)
     - a headers chunk (curl_slist *)
   */
-  rc = curl_easy_setopt(curl_resource_.easy_handle, option, value);
+  const CURLcode rc = curl_easy_setopt(curl_resource_.easy_handle, option, value);
 
   if (rc != CURLE_OK)
   {
@@ -618,13 +609,11 @@ CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, void *value)
 // NOLINTNEXTLINE(google-runtime-int)
 CURLcode HttpOperation::SetCurlLongOption(CURLoption option, long value)
 {
-  CURLcode rc;
-
   /*
     curl_easy_setopt() is a macro with variadic arguments, type unsafe.
     SetCurlLongOption() ensures it is called with a long.
   */
-  rc = curl_easy_setopt(curl_resource_.easy_handle, option, value);
+  const CURLcode rc = curl_easy_setopt(curl_resource_.easy_handle, option, value);
 
   if (rc != CURLE_OK)
   {
@@ -638,13 +627,11 @@ CURLcode HttpOperation::SetCurlLongOption(CURLoption option, long value)
 
 CURLcode HttpOperation::SetCurlOffOption(CURLoption option, curl_off_t value)
 {
-  CURLcode rc;
-
   /*
     curl_easy_setopt() is a macro with variadic arguments, type unsafe.
     SetCurlOffOption() ensures it is called with a curl_off_t.
   */
-  rc = curl_easy_setopt(curl_resource_.easy_handle, option, value);
+  const CURLcode rc = curl_easy_setopt(curl_resource_.easy_handle, option, value);
 
   if (rc != CURLE_OK)
   {
@@ -732,21 +719,20 @@ CURLcode HttpOperation::Setup()
     return CURLE_FAILED_INIT;
   }
 
-  CURLcode rc;
-
   curl_error_message_[0] = '\0';
   curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_ERRORBUFFER, curl_error_message_);
 
 // Support for custom debug function callback was added in version 7.9.6 so we guard against
 // exposing the default CURL output by keeping verbosity always disabled in lower versions.
 #if LIBCURL_VERSION_NUM < CURL_VERSION_BITS(7, 9, 6)
-  rc = SetCurlLongOption(CURLOPT_VERBOSE, 0L);
+  CURLcode rc = SetCurlLongOption(CURLOPT_VERBOSE, 0L);
   if (rc != CURLE_OK)
   {
     return rc;
   }
 #else
-  rc = SetCurlLongOption(CURLOPT_VERBOSE, (is_log_enabled_ && kEnableCurlLogging) ? 1L : 0L);
+  CURLcode rc =
+      SetCurlLongOption(CURLOPT_VERBOSE, (is_log_enabled_ && kEnableCurlLogging) ? 1L : 0L);
   if (rc != CURLE_OK)
   {
     return rc;

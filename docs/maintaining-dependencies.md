@@ -86,11 +86,6 @@ index 0bbf67f3..7362473f 100644
  vcpkg=2024.02.14
 ```
 
-#### file bazel/repository.bzl
-
-Please follow the guide [Upgrade a bazel dependency](#upgrade-a-bazel-dependency)
-for more details.
-
 #### file cmake/opentelemetry-proto.cmake
 
 Update the tag in the CMake logic:
@@ -140,16 +135,6 @@ In this case, it is better to:
 
 When the C++ code requires a newer minimum version of opentelemetry-proto,
 make sure to document this, including in the release notes.
-
-### Known issues (opentelemetry-proto)
-
-For bazel, two different methods to build exists.
-
-First, the code can build using file `bazel/repository.bzl`.
-This option does not depend on bazel central.
-
-Secondly, there is also a build using modules, with file `MODULE.bazel`.
-This option does depend on bazel central, and CI depends on it.
 
 ## semantic-conventions and weaver
 
@@ -378,49 +363,12 @@ index abc1234..def5678 100644
 +prometheus-cpp=v1.2.4
 ```
 
-In file bazel/repository.bzl locate the entry for prometheus-cpp:
+In file `MODULE.bazel` locate the entry for prometheus-cpp and update it
+to the new version:
 
-```shell
-# C++ Prometheus Client library.
-maybe(
-    http_archive,
-    name = "com_github_jupp0r_prometheus_cpp",
-    sha256 = "ac6e958405a29fbbea9db70b00fa3c420e16ad32e1baf941ab233ba031dd72ee",
-    strip_prefix = "prometheus-cpp-1.2.3",
-    urls = [
-        "https://github.com/jupp0r/prometheus-cpp/archive/refs/tags/v1.2.3.tar.gz",
-    ],
-)
+```bzl
+bazel_dep(name = "prometheus-cpp", version = "1.3.0", repo_name = "com_github_jupp0r_prometheus_cpp")
 ```
-
-Update the URL to the new tag:
-
-```shell
-urls = [
-    "https://github.com/jupp0r/prometheus-cpp/archive/v1.2.4.tar.gz",
-],
-```
-
-Update strip_prefix to match the new version:
-
-```shell
-strip_prefix = "prometheus-cpp-1.2.4",
-```
-
-Download the new URL:
-
-```shell
-wget https://github.com/jupp0r/prometheus-cpp/archive/v1.2.4.tar.gz
-```
-
-Calculate the checksum:
-
-```shell
-sha256sum v1.2.4.tar.gz
-abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234  v1.2.4.tar.gz
-```
-
-Update the `sha256`.
 
 ## Upgrade a git submodule
 
@@ -502,89 +450,7 @@ git add third_party/opentelemetry-proto
 
 ## Upgrade a bazel dependency
 
-Same as git submodule, we will continue use `opentelemetry-proto` as example.
-
-All the bazel dependencies are defined in [repository.bzl](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/bazel/repository.bzl)
-and [MODULE.bazel](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/MODULE.bazel).
-
-### Update the dependency in repository.bzl
-
-Locate the entry for opentelemetry-proto:
-
-```text
-    # OTLP Protocol definition
-    maybe(
-        http_archive,
-        name = "com_github_opentelemetry_proto",
-        build_file = "@io_opentelemetry_cpp//bazel:opentelemetry_proto.BUILD",
-        sha256 = "bed250ceec8e4a83aa5604d7d5595a61945059dc662edd058a9da082283f7a00",
-        strip_prefix = "opentelemetry-proto-1.3.1",
-        urls = [
-            "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.3.1.tar.gz",
-        ],
-    )
-```
-
-Update the URL to the new tag:
-
-```text
-        urls = [
-            "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.3.2.tar.gz",
-        ],
-```
-
-Update strip_prefix to the new tag:
-
-```text
-        strip_prefix = "opentelemetry-proto-1.3.2",
-```
-
-Download the new URL:
-
-```shell
-wget https://github.com/open-telemetry/opentelemetry-proto/archive/v1.3.2.tar.gz
-```
-
-Run a checksum on the new file:
-
-```shell
-sha256sum v1.3.2.tar.gz
-```
-
-```shell
-c069c0d96137cf005d34411fa67dd3b6f1f8c64af1e7fb2fe0089a41c425acd7  v1.3.2.tar.gz
-```
-
-Update the checksum in file bazel/repository.bzl:
-
-```text
-        sha256 = "c069c0d96137cf005d34411fa67dd3b6f1f8c64af1e7fb2fe0089a41c425acd7",
-```
-
-Typical change:
-
-```shell
-[malff@malff-desktop opentelemetry-cpp]$ git diff bazel/repository.bzl
-diff --git a/bazel/repository.bzl b/bazel/repository.bzl
-index bac1e45b..508b95a3 100644
---- a/bazel/repository.bzl
-+++ b/bazel/repository.bzl
-@@ -88,10 +88,10 @@ def opentelemetry_cpp_deps():
-         http_archive,
-         name = "com_github_opentelemetry_proto",
-         build_file = "@io_opentelemetry_cpp//bazel:opentelemetry_proto.BUILD",
--        sha256 = "bed250ceec8e4a83aa5604d7d5595a61945059dc662edd058a9da082283f7a00",
--        strip_prefix = "opentelemetry-proto-1.3.1",
-+        sha256 = "c069c0d96137cf005d34411fa67dd3b6f1f8c64af1e7fb2fe0089a41c425acd7",
-+        strip_prefix = "opentelemetry-proto-1.3.2",
-         urls = [
--            "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.3.1.tar.gz",
-+            "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.3.2.tar.gz",
-         ],
-     )
-```
-
-#### Update MODULE.bazel
+### Update MODULE.bazel
 
 > Remember, the link is different in your case.
 Replace `opentelemetry-proto` to correct target.

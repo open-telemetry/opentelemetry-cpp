@@ -3,19 +3,13 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-if(POLICY CMP0092)
-  # https://cmake.org/cmake/help/latest/policy/CMP0092.html#policy:CMP0092 Make
-  # sure the /W3 is not removed from CMAKE_CXX_FLAGS since CMake 3.15
-  cmake_policy(SET CMP0092 OLD)
-endif()
-
 # MSVC RTTI flag /GR should not be added to CMAKE_CXX_FLAGS by default. @see
 # https://cmake.org/cmake/help/latest/policy/CMP0117.html
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.20.0")
   cmake_policy(SET CMP0117 NEW)
 endif()
 
-set(OPENTELEMETRY_VERSION_NUMBER "1.23.0")
+set(OPENTELEMETRY_VERSION_NUMBER "1.27.0")
 set(OPENTELEMETRY_VERSION_SUFFIX "-dev")
 set(OPENTELEMETRY_VERSION
     "${OPENTELEMETRY_VERSION_NUMBER}${OPENTELEMETRY_VERSION_SUFFIX}")
@@ -65,6 +59,8 @@ endif()
 
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
 option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
+
+option(WITH_CONFIGURATION "EXPERIMENTAL: YAML configuration file" OFF)
 
 #
 # We do not want to have WITH_ABI_VERSION = "1" or "2", and instead prefer two
@@ -135,11 +131,10 @@ if(NOT WITH_STL STREQUAL "OFF")
   endif()
 endif()
 
-option(WITH_OTLP_RETRY_PREVIEW
-       "Whether to enable experimental retry functionality" OFF)
+option(WITH_OTLP_RETRY_PREVIEW "Whether to enable retry functionality" ON)
 
 option(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
-       "Whether to enable mTLS support for gRPC" OFF)
+       "Whether to enable mTLS support for gRPC" ON)
 
 option(WITH_OTLP_GRPC_CREDENTIAL_PREVIEW
        "Whether to enable gRPC credentials option in OTLP gRPC Exporter" OFF)
@@ -350,11 +345,28 @@ if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
 endif()
 
 #
+# Do we need RapidYaml ?
+#
+
+if((NOT WITH_API_ONLY) AND WITH_CONFIGURATION)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/ryml.cmake")
+endif()
+
+#
 # Do we need OpenTracing ?
 #
 
 if(WITH_OPENTRACING)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/opentracing-cpp.cmake")
+endif()
+
+include(CTest)
+if(BUILD_TESTING)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/googletest.cmake")
+  enable_testing()
+  if(WITH_BENCHMARK)
+    include("${opentelemetry-cpp_SOURCE_DIR}/cmake/benchmark.cmake")
+  endif()
 endif()
 
 if(OTELCPP_MAINTAINER_MODE)
@@ -450,15 +462,6 @@ endif(OTELCPP_MAINTAINER_MODE)
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
-include(CTest)
-if(BUILD_TESTING)
-  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/googletest.cmake")
-  enable_testing()
-  if(WITH_BENCHMARK)
-    include("${opentelemetry-cpp_SOURCE_DIR}/cmake/benchmark.cmake")
-  endif()
-endif()
-
 # Record build config and versions
 message(STATUS "---------------------------------------------")
 message(STATUS "build settings")
@@ -485,6 +488,7 @@ message(STATUS "OTELCPP_MAINTAINER_MODE: ${OTELCPP_MAINTAINER_MODE}")
 message(STATUS "WITH_STL: ${WITH_STL}")
 message(STATUS "WITH_GSL: ${WITH_GSL}")
 message(STATUS "WITH_NO_GETENV: ${WITH_NO_GETENV}")
+message(STATUS "OPENTELEMETRY_INSTALL: ${OPENTELEMETRY_INSTALL}")
 
 message(STATUS "---------------------------------------------")
 message(STATUS "opentelemetry-cpp cmake component options")
@@ -499,6 +503,7 @@ message(STATUS "WITH_ELASTICSEARCH: ${WITH_ELASTICSEARCH}")
 message(STATUS "WITH_OPENTRACING: ${WITH_OPENTRACING}")
 message(STATUS "WITH_ETW: ${WITH_ETW}")
 message(STATUS "OPENTELEMETRY_BUILD_DLL: ${OPENTELEMETRY_BUILD_DLL}")
+message(STATUS "WITH_CONFIGURATION: ${WITH_CONFIGURATION}")
 
 message(STATUS "---------------------------------------------")
 message(STATUS "feature preview options")
@@ -579,6 +584,9 @@ endif()
 if(WITH_OPENTRACING)
   message(
     STATUS "opentracing-cpp: ${OpenTracing_VERSION} (${OpenTracing_PROVIDER})")
+endif()
+if(ryml_VERSION)
+  message(STATUS "ryml: ${ryml_VERSION} (${ryml_PROVIDER})")
 endif()
 message(STATUS "---------------------------------------------")
 

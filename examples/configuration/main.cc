@@ -51,10 +51,6 @@
 #  include "opentelemetry/exporters/otlp/otlp_file_span_builder.h"
 #endif
 
-#ifdef OTEL_HAVE_ZIPKIN
-#  include "opentelemetry/exporters/zipkin/zipkin_builder.h"
-#endif
-
 #ifdef OTEL_HAVE_PROMETHEUS
 #  include "opentelemetry/exporters/prometheus/prometheus_pull_builder.h"
 #endif
@@ -215,10 +211,6 @@ void InitOtel(const std::string &config_file)
     opentelemetry::exporter::otlp::OtlpFileLogRecordBuilder::Register(registry.get());
 #endif
 
-#ifdef OTEL_HAVE_ZIPKIN
-    opentelemetry::exporter::zipkin::ZipkinBuilder::Register(registry.get());
-#endif
-
 #ifdef OTEL_HAVE_PROMETHEUS
     opentelemetry::exporter::metrics::PrometheusPullBuilder::Register(registry.get());
 #endif
@@ -282,7 +274,7 @@ static void usage(FILE *out)
       "\n"
       "The configuration file used will be:\n"
       "  1) the file provided in the command line\n"
-      "  2) the file provided in environment variable ${OTEL_EXPERIMENTAL_CONFIG_FILE}\n"
+      "  2) the file provided in environment variable ${OTEL_CONFIG_FILE}\n"
       "  3) file config.yaml\n"
       "\n"
       "This utility is also used for functional tests.\n"

@@ -43,6 +43,11 @@ public:
       : exporter_(std::move(exporter))
   {}
 
+  SimpleSpanProcessor(const SimpleSpanProcessor &)            = delete;
+  SimpleSpanProcessor(SimpleSpanProcessor &&)                 = delete;
+  SimpleSpanProcessor &operator=(const SimpleSpanProcessor &) = delete;
+  SimpleSpanProcessor &operator=(SimpleSpanProcessor &&)      = delete;
+
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
     return exporter_->MakeRecordable();
@@ -54,7 +59,8 @@ public:
 
   void OnEnd(std::unique_ptr<Recordable> &&span) noexcept override
   {
-    nostd::span<std::unique_ptr<Recordable>> batch(&span, 1);
+    std::unique_ptr<Recordable> local = std::move(span);
+    nostd::span<std::unique_ptr<Recordable>> batch(&local, 1);
     const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
     if (exporter_->Export(batch) == sdk::common::ExportResult::kFailure)
     {
@@ -77,6 +83,15 @@ public:
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
   {
+    return InternalShutdown(timeout);
+  }
+
+  ~SimpleSpanProcessor() override { InternalShutdown(); }
+
+protected:
+  bool InternalShutdown(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept
+  {
     // We only call shutdown ONCE.
     if (exporter_ != nullptr && !shutdown_latch_.test_and_set(std::memory_order_acquire))
     {
@@ -84,8 +99,6 @@ public:
     }
     return true;
   }
-
-  ~SimpleSpanProcessor() override { Shutdown(); }
 
 private:
   std::unique_ptr<SpanExporter> exporter_;

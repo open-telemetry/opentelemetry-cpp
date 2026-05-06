@@ -18,3 +18,4 @@ nlohmann-json=v3.10.5
 opentelemetry-proto=v1.6.0
 opentracing-cpp=v1.6.0
 prometheus-cpp=v1.1.0
+ryml=v0.9.0

@@ -1,0 +1,13 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+ARG BASE_IMAGE=ubuntu:latest@sha256:66460d557b25769b102175144d538d88219c077c678a49af4afca6fbfc1b5252
+
+FROM ${BASE_IMAGE} AS final
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y build-essential autoconf \
+    libtool pkg-config cmake git libssl-dev
+
+WORKDIR /work

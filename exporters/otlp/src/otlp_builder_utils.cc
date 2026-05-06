@@ -12,6 +12,7 @@
 #include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_encoding.h"
 #include "opentelemetry/sdk/configuration/temporality_preference.h"
@@ -79,16 +80,19 @@ OtlpHeaders OtlpBuilderUtils::ConvertHeadersConfigurationModel(
     }
   }
 
-  // Second, scan headers, which has high priority.
-  for (const auto &kv : model->kv_map)
+  if (model != nullptr)
   {
-    const auto &search = headers.find(kv.first);
-    if (search != headers.end())
+    // Second, scan headers, which has high priority.
+    for (const auto &kv : model->kv_map)
     {
-      headers.erase(search);
-    }
+      const auto &search = headers.find(kv.first);
+      if (search != headers.end())
+      {
+        headers.erase(search);
+      }
 
-    headers.emplace(std::make_pair(kv.first, kv.second));
+      headers.emplace(std::make_pair(kv.first, kv.second));
+    }
   }
 
   return headers;
@@ -113,6 +117,28 @@ PreferredAggregationTemporality OtlpBuilderUtils::ConvertTemporalityPreference(
   }
 
   return result;
+}
+
+bool OtlpBuilderUtils::GrpcUseSsl(
+    const std::string &endpoint,
+    const opentelemetry::sdk::configuration::GrpcTlsConfiguration *tls)
+{
+  if (endpoint.substr(0, 6) == "https:")
+  {
+    return true;
+  }
+
+  if (endpoint.substr(0, 5) == "http:")
+  {
+    return false;
+  }
+
+  if (tls != nullptr)
+  {
+    return !tls->insecure;
+  }
+
+  return true;
 }
 
 }  // namespace otlp

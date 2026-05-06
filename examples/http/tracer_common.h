@@ -22,7 +22,7 @@
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/provider.h"
 
-namespace
+namespace http_example
 {
 
 template <typename T>
@@ -31,7 +31,7 @@ class HttpTextMapCarrier : public opentelemetry::context::propagation::TextMapCa
 public:
   HttpTextMapCarrier(T &headers) : headers_(headers) {}
   HttpTextMapCarrier() = default;
-  virtual opentelemetry::nostd::string_view Get(
+  opentelemetry::nostd::string_view Get(
       opentelemetry::nostd::string_view key) const noexcept override
   {
     std::string key_to_compare = key.data();
@@ -53,8 +53,8 @@ public:
     return "";
   }
 
-  virtual void Set(opentelemetry::nostd::string_view key,
-                   opentelemetry::nostd::string_view value) noexcept override
+  void Set(opentelemetry::nostd::string_view key,
+           opentelemetry::nostd::string_view value) noexcept override
   {
     headers_.insert(std::pair<std::string, std::string>(std::string(key), std::string(value)));
   }
@@ -62,7 +62,7 @@ public:
   T headers_;
 };
 
-void InitTracer()
+inline void InitTracer()
 {
   auto exporter = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Create();
   auto processor =
@@ -83,16 +83,17 @@ void InitTracer()
           new opentelemetry::trace::propagation::HttpTraceContext()));
 }
 
-void CleanupTracer()
+inline void CleanupTracer()
 {
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
   opentelemetry::sdk::trace::Provider::SetTracerProvider(none);
 }
 
-opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer(std::string tracer_name)
+inline opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer(
+    const std::string &tracer_name)
 {
   auto provider = opentelemetry::trace::Provider::GetTracerProvider();
   return provider->GetTracer(tracer_name);
 }
 
-}  // namespace
+}  // namespace http_example

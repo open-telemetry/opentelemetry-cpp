@@ -67,7 +67,7 @@ nostd::shared_ptr<HttpCurlGlobalInitializer> HttpCurlGlobalInitializer::GetInsta
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 // Original source:
 // https://stackoverflow.com/questions/12398377/is-it-possible-to-have-zlib-read-from-and-write-to-the-same-memory-buffer/12412863#12412863
-int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *max_len)
+static int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint32_t *max_len)
 {
   // must be large enough to hold zlib or gzip header (if any) and one more byte -- 11 works for the
   // worst case here, but if gzip encoding is used and a deflateSetHeader() call is inserted in this
@@ -302,7 +302,7 @@ HttpClient::~HttpClient()
     }
 
     // Force to abort all sessions
-    CancelAllSessions();
+    InternalCancelAllSessions();
 
     if (!background_thread)
     {
@@ -342,27 +342,7 @@ std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSes
 
 bool HttpClient::CancelAllSessions() noexcept
 {
-  // CancelSession may change sessions_, we can not change a container while iterating it.
-  while (true)
-  {
-    std::unordered_map<uint64_t, std::shared_ptr<Session>> sessions;
-    {
-      // We can only cleanup session and curl handles in the IO thread.
-      std::lock_guard<std::mutex> lock_guard{sessions_m_};
-      sessions = sessions_;
-    }
-
-    if (sessions.empty())
-    {
-      break;
-    }
-
-    for (auto &session : sessions)
-    {
-      session.second->CancelSession();
-    }
-  }
-  return true;
+  return InternalCancelAllSessions();
 }
 
 bool HttpClient::FinishAllSessions() noexcept
@@ -433,6 +413,31 @@ void HttpClient::CleanupSession(uint64_t session_id)
   {
     wakeupBackgroundThread();
   }
+}
+
+bool HttpClient::InternalCancelAllSessions() noexcept
+{
+  // CancelSession may change sessions_, we can not change a container while iterating it.
+  while (true)
+  {
+    std::unordered_map<uint64_t, std::shared_ptr<Session>> sessions;
+    {
+      // We can only cleanup session and curl handles in the IO thread.
+      std::lock_guard<std::mutex> lock_guard{sessions_m_};
+      sessions = sessions_;
+    }
+
+    if (sessions.empty())
+    {
+      break;
+    }
+
+    for (auto &session : sessions)
+    {
+      session.second->CancelSession();
+    }
+  }
+  return true;
 }
 
 bool HttpClient::MaybeSpawnBackgroundThread()
@@ -777,8 +782,8 @@ bool HttpClient::doAbortSessions()
 
 bool HttpClient::doRemoveSessions()
 {
-  bool has_data = false;
-  bool should_continue;
+  bool has_data{false};
+  bool should_continue{false};
   do
   {
     std::unordered_map<uint64_t, HttpCurlEasyResource> pending_to_remove_session_handles;

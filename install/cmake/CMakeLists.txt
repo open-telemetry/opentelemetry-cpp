@@ -91,7 +91,7 @@ else()
 endif()
 
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 17)
 endif()
 
 set(CMAKE_OPTIONS
@@ -463,4 +463,22 @@ if(prometheus-cpp IN_LIST _THIRDPARTY_PACKAGE_LIST)
                "-DENABLE_PULL=ON")
 
   add_dependencies(prometheus-cpp-build zlib-install curl-install)
+endif()
+
+# ------------------------------------------------------------------------
+# ---- ryml ----
+if(ryml IN_LIST _THIRDPARTY_PACKAGE_LIST)
+  if(NOT ryml_GIT_TAG)
+    message(FATAL_ERROR "ryml_GIT_TAG is not set")
+  endif()
+
+  ExternalProject_Add(
+    ryml
+    STEP_TARGETS install
+    GIT_REPOSITORY "https://github.com/biojppm/rapidyaml.git"
+    GIT_TAG ${ryml_GIT_TAG}
+    GIT_SHALLOW ON
+    PREFIX ${CMAKE_BINARY_DIR}/external/ryml
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    CMAKE_ARGS "${CMAKE_OPTIONS}")
 endif()

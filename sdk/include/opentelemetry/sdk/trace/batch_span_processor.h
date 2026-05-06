@@ -56,6 +56,11 @@ public:
                      const BatchSpanProcessorOptions &options,
                      const BatchSpanProcessorRuntimeOptions &runtime_options);
 
+  BatchSpanProcessor(const BatchSpanProcessor &)            = delete;
+  BatchSpanProcessor(BatchSpanProcessor &&)                 = delete;
+  BatchSpanProcessor &operator=(const BatchSpanProcessor &) = delete;
+  BatchSpanProcessor &operator=(BatchSpanProcessor &&)      = delete;
+
   /**
    * Requests a Recordable(Span) from the configured exporter.
    *
@@ -91,10 +96,11 @@ public:
 
   /**
    * Shuts down the processor and does any cleanup required. Completely drains the buffer/queue of
-   * all its ended spans and passes them to the exporter. Any subsequent calls to OnStart, OnEnd,
-   * ForceFlush or Shutdown will return immediately without doing anything.
+   * all its ended spans and passes them to the exporter.
    *
-   * NOTE: Timeout functionality not supported yet.
+   * @param timeout minimum amount of microseconds to wait for shutdown before giving up and
+   * returning failure.
+   * @return true if the shutdown succeeded, false otherwise
    */
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
@@ -108,6 +114,17 @@ public:
   ~BatchSpanProcessor() override;
 
 protected:
+  /**
+   * Shuts down the processor and does any cleanup required. Completely drains the buffer/queue of
+   * all its ended spans and passes them to the exporter.
+   *
+   * @param timeout minimum amount of microseconds to wait for shutdown before giving up and
+   * returning failure.
+   * @return true if the shutdown succeeded, false otherwise
+   */
+  bool InternalShutdown(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+
   /**
    * The background routine performed by the worker thread.
    */
@@ -149,6 +166,7 @@ protected:
    * any time
    *
    * @param notify_force_flush Sequence to indicate whether to notify force flush completion.
+   * @param exporter The span exporter instance that handles exporting spans to the backend.
    * @param synchronization_data Synchronization data to be notified.
    */
   static void NotifyCompletion(uint64_t notify_force_flush,

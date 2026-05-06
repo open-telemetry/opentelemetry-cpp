@@ -31,14 +31,13 @@ std::string DocumentNode::DoSubstitution(const std::string &text) const
 
   std::string result;
 
-  std::string::size_type current_pos;
-  std::string::size_type begin_pos;
-  std::string::size_type end_pos;
+  std::string::size_type current_pos{};
+  std::string::size_type begin_pos{};
+  std::string::size_type end_pos{};
   std::string copy;
   std::string substitution;
 
-  current_pos = 0;
-  begin_pos   = text.find(begin_token);
+  begin_pos = text.find(begin_token);
 
   while (begin_pos != std::string::npos)
   {
@@ -96,23 +95,23 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
   static std::string env_with_replacement{"env:-"};
   static std::string replacement_token{":-"};
 
-  size_t len = text.length();
-  char c;
-  std::string::size_type begin_name;
-  std::string::size_type end_name;
-  std::string::size_type begin_fallback;
-  std::string::size_type end_fallback;
-  std::string::size_type pos;
+  const std::size_t len{text.length()};
+  char c{};
+  std::string::size_type begin_name{};
+  std::string::size_type end_name{};
+  std::string::size_type begin_fallback{};
+  std::string::size_type end_fallback{};
+  std::string::size_type pos{};
   std::string name;
   std::string fallback;
   std::string sub;
-  bool env_exists;
+  bool env_exists{};
 
   if (len < 4)
   {
     std::string message = illegal_msg;
     message.append(text);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   c = text[0];
@@ -120,7 +119,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
   {
     std::string message = illegal_msg;
     message.append(text);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   c = text[1];
@@ -128,7 +127,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
   {
     std::string message = illegal_msg;
     message.append(text);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   c = text[len - 1];
@@ -136,7 +135,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
   {
     std::string message = illegal_msg;
     message.append(text);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   begin_name = 2;
@@ -160,7 +159,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
   {
     std::string message = illegal_msg;
     message.append(text);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
 
   end_name = begin_name + 1;
@@ -195,7 +194,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text) const
     {
       std::string message = illegal_msg;
       message.append(text);
-      throw InvalidSchemaException(message);
+      throw InvalidSchemaException(Location(), message);
     }
     // text is of the form ${ENV_NAME:-fallback}
     begin_fallback = pos + replacement_token.length();
@@ -233,7 +232,7 @@ bool DocumentNode::BooleanFromString(const std::string &value) const
 
   std::string message("Illegal boolean value: ");
   message.append(value);
-  throw InvalidSchemaException(message);
+  throw InvalidSchemaException(Location(), message);
 }
 
 size_t DocumentNode::IntegerFromString(const std::string &value) const
@@ -246,7 +245,7 @@ size_t DocumentNode::IntegerFromString(const std::string &value) const
   {
     std::string message("Illegal integer value: ");
     message.append(value);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
   return val;
 }
@@ -261,9 +260,25 @@ double DocumentNode::DoubleFromString(const std::string &value) const
   {
     std::string message("Illegal double value: ");
     message.append(value);
-    throw InvalidSchemaException(message);
+    throw InvalidSchemaException(Location(), message);
   }
   return val;
+}
+
+std::string DocumentNodeLocation::ToString() const
+{
+  // Format: <filename>:line-number[column-number](offset)
+  std::string where;
+  where.append("<");
+  where.append(filename);
+  where.append(">:");
+  where.append(std::to_string(line));
+  where.append("[");
+  where.append(std::to_string(col));
+  where.append("](");
+  where.append(std::to_string(offset));
+  where.append(")");
+  return where;
 }
 
 }  // namespace configuration

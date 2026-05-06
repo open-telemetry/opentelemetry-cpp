@@ -73,6 +73,11 @@ public:
                                    const BatchLogRecordProcessorOptions &options,
                                    const BatchLogRecordProcessorRuntimeOptions &runtime_options);
 
+  BatchLogRecordProcessor(const BatchLogRecordProcessor &)            = delete;
+  BatchLogRecordProcessor(BatchLogRecordProcessor &&)                 = delete;
+  BatchLogRecordProcessor &operator=(const BatchLogRecordProcessor &) = delete;
+  BatchLogRecordProcessor &operator=(BatchLogRecordProcessor &&)      = delete;
+
   /** Makes a new recordable **/
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
 
@@ -93,10 +98,11 @@ public:
 
   /**
    * Shuts down the processor and does any cleanup required. Completely drains the buffer/queue of
-   * all its logs and passes them to the exporter. Any subsequent calls to
-   * ForceFlush or Shutdown will return immediately without doing anything.
+   * all its logs and passes them to the exporter.
    *
-   * NOTE: Timeout functionality not supported yet.
+   * @param timeout minimum amount of microseconds to wait for shutdown before giving up and
+   * returning failure.
+   * @return true if the shutdown succeeded, false otherwise
    */
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
@@ -107,6 +113,13 @@ public:
   ~BatchLogRecordProcessor() override;
 
 protected:
+  /**
+   * Shuts down the processor and does any cleanup required. Completely drains the buffer/queue of
+   * all its logs and passes them to the exporter.
+   */
+  bool InternalShutdown(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+
   /**
    * The background routine performed by the worker thread.
    */
@@ -148,6 +161,7 @@ protected:
    * any time
    *
    * @param notify_force_flush Sequence to indicate whether to notify force flush completion.
+   * @param exporter The log exporter instance that handles exporting logs to the backend.
    * @param synchronization_data Synchronization data to be notified.
    */
   static void NotifyCompletion(uint64_t notify_force_flush,

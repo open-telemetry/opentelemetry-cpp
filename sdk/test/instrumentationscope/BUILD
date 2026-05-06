@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
 cc_test(
     name = "instrumentationscope_test",
     srcs = [

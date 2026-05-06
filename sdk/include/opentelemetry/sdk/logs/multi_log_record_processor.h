@@ -26,6 +26,12 @@ class MultiLogRecordProcessor : public LogRecordProcessor
 {
 public:
   MultiLogRecordProcessor(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors);
+
+  MultiLogRecordProcessor(const MultiLogRecordProcessor &)            = delete;
+  MultiLogRecordProcessor(MultiLogRecordProcessor &&)                 = delete;
+  MultiLogRecordProcessor &operator=(const MultiLogRecordProcessor &) = delete;
+  MultiLogRecordProcessor &operator=(MultiLogRecordProcessor &&)      = delete;
+
   ~MultiLogRecordProcessor() override;
 
   void AddProcessor(std::unique_ptr<LogRecordProcessor> &&processor);
@@ -49,12 +55,31 @@ public:
   /**
    * Shuts down the processor and does any cleanup required.
    * ShutDown should only be called once for each processor.
-   * @param timeout minimum amount of microseconds to wait for
-   * shutdown before giving up and returning failure.
+   * @param timeout minimum amount of microseconds to wait for shutdown before giving up and
+   * returning failure.
    * @return true if the shutdown succeeded, false otherwise
    */
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
+
+protected:
+  /**
+   * Exports all log records that have not yet been exported to the configured Exporter.
+   * @param timeout that the forceflush is required to finish within.
+   * @return a result code indicating whether it succeeded, failed or timed out
+   */
+  bool InternalForceFlush(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+
+  /**
+   * Shuts down the processor and does any cleanup required.
+   * ShutDown should only be called once for each processor.
+   * @param timeout minimum amount of microseconds to wait for shutdown before giving up and
+   * returning failure.
+   * @return true if the shutdown succeeded, false otherwise
+   */
+  bool InternalShutdown(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
 private:
   std::vector<std::unique_ptr<LogRecordProcessor>> processors_;

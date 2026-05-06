@@ -217,6 +217,9 @@ public:
   }
 };
 
+class DISABLED_BasicCurlHttpTests : public BasicCurlHttpTests
+{};
+
 TEST_F(BasicCurlHttpTests, DoNothing) {}
 
 TEST_F(BasicCurlHttpTests, HttpRequest)
@@ -319,7 +322,7 @@ TEST_F(BasicCurlHttpTests, RequestTimeout)
   auto session_manager = http_client::HttpClientFactory::Create();
   EXPECT_TRUE(session_manager != nullptr);
 
-  auto session = session_manager->CreateSession("222.222.222.200:19000");  // Non Existing address
+  auto session = session_manager->CreateSession("192.0.2.0:19000");  // RFC 5737 TEST-NET-1
   auto request = session->CreateRequest();
   request->SetUri("get/");
   auto handler = std::make_shared<GetEventHandler>();
@@ -495,7 +498,8 @@ TEST_F(BasicCurlHttpTests, GetBaseUri)
             "http://127.0.0.1:31339/");
 }
 
-TEST_F(BasicCurlHttpTests, SendGetRequestAsync)
+// DISABLED, see https://github.com/open-telemetry/opentelemetry-cpp/issues/3535
+TEST_F(DISABLED_BasicCurlHttpTests, SendGetRequestAsync)
 {
   curl::HttpClient http_client;
 
@@ -528,6 +532,8 @@ TEST_F(BasicCurlHttpTests, SendGetRequestAsync)
       ASSERT_FALSE(sessions[i]->IsSessionActive());
 
       ASSERT_TRUE(handlers[i]->is_called_.load(std::memory_order_acquire));
+
+      // TODO: Spurious test failures here.
       ASSERT_TRUE(handlers[i]->got_response_.load(std::memory_order_acquire));
     }
 

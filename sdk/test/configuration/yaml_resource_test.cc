@@ -26,7 +26,7 @@ static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse
 TEST(YamlResource, empty_resource)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-resource"
 resource:
 )";
 
@@ -41,7 +41,7 @@ resource:
 TEST(YamlResource, empty_attributes)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-resource"
 resource:
   attributes:
 )";
@@ -57,7 +57,7 @@ TEST(YamlResource, some_attributes_0_10)
 {
   // This is the old 0.10 format, must fail
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-resource"
 resource:
   attributes:
     foo: "1234"
@@ -72,7 +72,7 @@ TEST(YamlResource, some_attributes_0_30)
 {
   // This is the new 0.30 format, must pass
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-resource"
 resource:
   attributes:
    - name: foo
@@ -111,7 +111,7 @@ resource:
 TEST(YamlResource, empty_attributes_list)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-resource"
 resource:
   attributes_list:
 )";
@@ -125,7 +125,7 @@ resource:
 TEST(YamlResource, some_attributes_list)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-resource"
 resource:
   attributes_list: "foo=1234,bar=5678"
 )";
@@ -140,7 +140,7 @@ TEST(YamlResource, both_0_10)
 {
   // This is the old 0.10 format, must fail
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-resource"
 resource:
   attributes:
     foo: "1234"
@@ -156,7 +156,7 @@ TEST(YamlResource, both_0_30)
 {
   // This is the new 0.30 format, must pass
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-resource"
 resource:
   attributes:
    - name: foo
@@ -198,7 +198,7 @@ resource:
 TEST(YamlResource, empty_detectors)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-resource"
 resource:
   detectors:
 )";
@@ -214,7 +214,7 @@ resource:
 TEST(YamlResource, empty_included_detectors)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-resource"
 resource:
   detectors:
     included:
@@ -232,7 +232,7 @@ resource:
 TEST(YamlResource, some_included_detectors)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-resource"
 resource:
   detectors:
     included:
@@ -254,7 +254,7 @@ resource:
 TEST(YamlResource, some_excluded_detectors)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-resource"
 resource:
   detectors:
     excluded:
@@ -276,7 +276,7 @@ resource:
 TEST(YamlResource, some_detectors)
 {
   std::string yaml = R"(
-file_format: xx.yy
+file_format: "1.0-resource"
 resource:
   detectors:
     included:

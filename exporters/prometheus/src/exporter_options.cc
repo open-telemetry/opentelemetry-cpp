@@ -13,7 +13,7 @@ namespace exporter
 namespace metrics
 {
 
-inline const std::string GetPrometheusDefaultHttpEndpoint()
+static inline const std::string GetPrometheusDefaultHttpEndpoint()
 {
   constexpr char kPrometheusEndpointEnv[]     = "PROMETHEUS_EXPORTER_ENDPOINT";
   constexpr char kPrometheusEndpointDefault[] = "localhost:9464";
@@ -25,44 +25,44 @@ inline const std::string GetPrometheusDefaultHttpEndpoint()
   return exists ? endpoint : kPrometheusEndpointDefault;
 }
 
-inline bool GetPrometheusWithoutOtelScope()
+static inline bool GetPrometheusWithoutOtelScope()
 {
   constexpr char kPrometheusWithoutOtelScope[] = "OTEL_CPP_PROMETHEUS_EXPORTER_WITHOUT_OTEL_SCOPE";
 
-  bool setting;
+  bool setting{};
   auto exists =
       opentelemetry::sdk::common::GetBoolEnvironmentVariable(kPrometheusWithoutOtelScope, setting);
 
   return exists ? setting : false;
 }
 
-inline bool GetPrometheusPopulateTargetInfo()
+static inline bool GetPrometheusPopulateTargetInfo()
 {
   constexpr char kPrometheusPopulateTargetInfo[] =
       "OTEL_CPP_PROMETHEUS_EXPORTER_POPULATE_TARGET_INFO";
 
-  bool setting;
+  bool setting{};
   auto exists = opentelemetry::sdk::common::GetBoolEnvironmentVariable(
       kPrometheusPopulateTargetInfo, setting);
 
   return exists ? setting : true;
 }
 
-inline bool GetPrometheusWithoutUnits()
+static inline bool GetPrometheusWithoutUnits()
 {
   constexpr char kPrometheusWithoutUnits[] = "OTEL_CPP_PROMETHEUS_EXPORTER_WITHOUT_UNITS";
-  bool setting;
+  bool setting{};
   const auto exists =
       opentelemetry::sdk::common::GetBoolEnvironmentVariable(kPrometheusWithoutUnits, setting);
 
   return exists ? setting : false;
 }
 
-inline bool GetPrometheusWithoutTypeSuffix()
+static inline bool GetPrometheusWithoutTypeSuffix()
 {
   constexpr char kPrometheusWithoutTypeSuffix[] =
       "OTEL_CPP_PROMETHEUS_EXPORTER_WITHOUT_TYPE_SUFFIX";
-  bool setting;
+  bool setting{};
   const auto exists =
       opentelemetry::sdk::common::GetBoolEnvironmentVariable(kPrometheusWithoutTypeSuffix, setting);
 

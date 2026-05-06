@@ -15,10 +15,10 @@ struct ParsedUrl
 {
   std::string scheme;
   std::string host;
-  std::uint16_t port;
+  std::uint16_t port{};
   std::string path;
   std::string query;
-  bool success;
+  bool success{};
 
   friend void PrintTo(const ParsedUrl &p, std::ostream *os)
   {

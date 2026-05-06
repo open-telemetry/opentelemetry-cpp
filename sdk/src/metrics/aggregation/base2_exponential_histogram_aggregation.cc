@@ -32,7 +32,7 @@ namespace
 uint32_t GetScaleReduction(int32_t start_index, int32_t end_index, size_t max_buckets) noexcept
 {
   uint32_t scale_reduction = 0;
-  while (static_cast<size_t>(end_index - start_index + 1) > max_buckets)
+  while (static_cast<int64_t>(end_index) - start_index + 1 > static_cast<int64_t>(max_buckets))
   {
     start_index >>= 1;
     end_index >>= 1;
@@ -212,15 +212,15 @@ void Base2ExponentialHistogramAggregation::Downscale(uint32_t by) noexcept
     DownscaleBuckets(point_data_.negative_buckets_, by);
   }
 
-  point_data_.scale_ -= by;
+  point_data_.scale_ -= static_cast<int32_t>(by);
   indexer_ = Base2ExponentialHistogramIndexer(point_data_.scale_);
 }
 
 // Merge A and B into a new circular buffer C.
 // Caller must ensure that A and B are used as buckets at the same scale.
-AdaptingCircularBufferCounter MergeBuckets(size_t max_buckets,
-                                           const AdaptingCircularBufferCounter &A,
-                                           const AdaptingCircularBufferCounter &B)
+static AdaptingCircularBufferCounter MergeBuckets(size_t max_buckets,
+                                                  const AdaptingCircularBufferCounter &A,
+                                                  const AdaptingCircularBufferCounter &B)
 {
   AdaptingCircularBufferCounter C = AdaptingCircularBufferCounter(max_buckets);
   C.Clear();
@@ -310,9 +310,11 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
     auto neg_max_index =
         (std::max)(low_res.negative_buckets_->EndIndex(), high_res.negative_buckets_->EndIndex());
 
-    if (static_cast<size_t>(pos_max_index) >
+    // The range [pos_min_index, pos_max_index] contains (pos_max_index - pos_min_index + 1)
+    // buckets. We need to downscale if this count exceeds max_buckets_.
+    if (static_cast<size_t>(pos_max_index) >=
             static_cast<size_t>(pos_min_index) + result_value.max_buckets_ ||
-        static_cast<size_t>(neg_max_index) >
+        static_cast<size_t>(neg_max_index) >=
             static_cast<size_t>(neg_min_index) + result_value.max_buckets_)
     {
       // We need to downscale the buckets to fit into the new max_buckets_.
@@ -322,9 +324,9 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
       DownscaleBuckets(high_res.positive_buckets_, scale_reduction);
       DownscaleBuckets(low_res.negative_buckets_, scale_reduction);
       DownscaleBuckets(high_res.negative_buckets_, scale_reduction);
-      low_res.scale_ -= scale_reduction;
-      high_res.scale_ -= scale_reduction;
-      result_value.scale_ -= scale_reduction;
+      low_res.scale_ -= static_cast<int32_t>(scale_reduction);
+      high_res.scale_ -= static_cast<int32_t>(scale_reduction);
+      result_value.scale_ -= static_cast<int32_t>(scale_reduction);
     }
   }
 
@@ -407,8 +409,8 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
     {
       DownscaleBuckets(right.negative_buckets_, scale_reduction);
     }
-    left.scale_ -= scale_reduction;
-    right.scale_ -= scale_reduction;
+    left.scale_ -= static_cast<int32_t>(scale_reduction);
+    right.scale_ -= static_cast<int32_t>(scale_reduction);
   }
 
   Base2ExponentialHistogramPointData result_value;

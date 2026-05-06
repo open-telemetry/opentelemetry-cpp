@@ -22,38 +22,35 @@
 #include <iostream>
 #include <vector>
 
-using grpc::ClientContext;
-using grpc::ServerContext;
-
-namespace
+namespace grpc_example
 {
 class GrpcClientCarrier : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
-  GrpcClientCarrier(ClientContext *context) : context_(context) {}
+  GrpcClientCarrier(grpc::ClientContext *context) : context_(context) {}
   GrpcClientCarrier() = default;
-  virtual opentelemetry::nostd::string_view Get(
+  opentelemetry::nostd::string_view Get(
       opentelemetry::nostd::string_view /* key */) const noexcept override
   {
     return "";
   }
 
-  virtual void Set(opentelemetry::nostd::string_view key,
-                   opentelemetry::nostd::string_view value) noexcept override
+  void Set(opentelemetry::nostd::string_view key,
+           opentelemetry::nostd::string_view value) noexcept override
   {
     std::cout << " Client ::: Adding " << key << " " << value << "\n";
     context_->AddMetadata(std::string(key), std::string(value));
   }
 
-  ClientContext *context_ = nullptr;
+  grpc::ClientContext *context_ = nullptr;
 };
 
 class GrpcServerCarrier : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
-  GrpcServerCarrier(ServerContext *context) : context_(context) {}
+  GrpcServerCarrier(grpc::ServerContext *context) : context_(context) {}
   GrpcServerCarrier() = default;
-  virtual opentelemetry::nostd::string_view Get(
+  opentelemetry::nostd::string_view Get(
       opentelemetry::nostd::string_view key) const noexcept override
   {
     auto it = context_->client_metadata().find({key.data(), key.size()});
@@ -64,16 +61,16 @@ public:
     return "";
   }
 
-  virtual void Set(opentelemetry::nostd::string_view /* key */,
-                   opentelemetry::nostd::string_view /* value */) noexcept override
+  void Set(opentelemetry::nostd::string_view /* key */,
+           opentelemetry::nostd::string_view /* value */) noexcept override
   {
     // Not required for server
   }
 
-  ServerContext *context_ = nullptr;
+  grpc::ServerContext *context_ = nullptr;
 };
 
-void InitTracer()
+inline void InitTracer()
 {
   auto exporter = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Create();
   auto processor =
@@ -94,16 +91,17 @@ void InitTracer()
           new opentelemetry::trace::propagation::HttpTraceContext()));
 }
 
-void CleanupTracer()
+inline void CleanupTracer()
 {
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
   opentelemetry::sdk::trace::Provider::SetTracerProvider(none);
 }
 
-opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer(std::string tracer_name)
+inline opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer(
+    const std::string &tracer_name)
 {
   auto provider = opentelemetry::trace::Provider::GetTracerProvider();
   return provider->GetTracer(tracer_name);
 }
 
-}  // namespace
+}  // namespace grpc_example

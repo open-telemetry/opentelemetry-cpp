@@ -31,14 +31,18 @@ struct MultiSpanProcessorOptions
 class MultiSpanProcessor : public SpanProcessor
 {
 public:
-  MultiSpanProcessor(std::vector<std::unique_ptr<SpanProcessor>> &&processors)
-      : head_(nullptr), tail_(nullptr), count_(0)
+  MultiSpanProcessor(std::vector<std::unique_ptr<SpanProcessor>> processors)
   {
     for (auto &processor : processors)
     {
       AddProcessor(std::move(processor));
     }
   }
+
+  MultiSpanProcessor(const MultiSpanProcessor &)            = delete;
+  MultiSpanProcessor(MultiSpanProcessor &&)                 = delete;
+  MultiSpanProcessor &operator=(const MultiSpanProcessor &) = delete;
+  MultiSpanProcessor &operator=(MultiSpanProcessor &&)      = delete;
 
   void AddProcessor(std::unique_ptr<SpanProcessor> &&processor)
   {
@@ -73,8 +77,8 @@ public:
     return recordable;
   }
 
-  virtual void OnStart(Recordable &span,
-                       const opentelemetry::trace::SpanContext &parent_context) noexcept override
+  void OnStart(Recordable &span,
+               const opentelemetry::trace::SpanContext &parent_context) noexcept override
   {
     auto multi_recordable = static_cast<MultiRecordable *>(&span);
     ProcessorNode *node   = head_;
@@ -90,9 +94,9 @@ public:
     }
   }
 
-  virtual void OnEnd(std::unique_ptr<Recordable> &&span) noexcept override
+  void OnEnd(std::unique_ptr<Recordable> &&span) noexcept override
   {
-    auto multi_recordable = static_cast<MultiRecordable *>(span.release());
+    auto multi_recordable = static_cast<MultiRecordable *>(std::move(span).release());
     ProcessorNode *node   = head_;
     while (node != nullptr)
     {
@@ -124,6 +128,19 @@ public:
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
   {
+    return InternalShutdown(timeout);
+  }
+
+  ~MultiSpanProcessor() override
+  {
+    InternalShutdown();
+    Cleanup();
+  }
+
+protected:
+  bool InternalShutdown(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept
+  {
     bool result         = true;
     ProcessorNode *node = head_;
     while (node != nullptr)
@@ -133,12 +150,6 @@ public:
       node = node->next_;
     }
     return result;
-  }
-
-  ~MultiSpanProcessor() override
-  {
-    Shutdown();
-    Cleanup();
   }
 
 private:
@@ -180,8 +191,9 @@ private:
     }
   }
 
-  ProcessorNode *head_, *tail_;
-  size_t count_;
+  ProcessorNode *head_{nullptr};
+  ProcessorNode *tail_{nullptr};
+  size_t count_{0};
 };
 }  // namespace trace
 }  // namespace sdk

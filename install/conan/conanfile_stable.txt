@@ -10,6 +10,7 @@ grpc/1.54.3
 nlohmann_json/3.10.5
 prometheus-cpp/1.2.4
 opentracing-cpp/1.6.0
+rapidyaml/0.9.0
 
 [options]
 grpc/*:fPIC=True

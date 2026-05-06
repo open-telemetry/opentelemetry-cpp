@@ -1,11 +1,10 @@
-
 name: cppcheck
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: read
@@ -15,11 +14,11 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
+        uses: step-security/harden-runner@a5ad31d6a139d249332a2605b85202e8c0b78450 # v2.19.1
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           submodules: 'recursive'
 
@@ -37,7 +36,7 @@ jobs:
             --inline-suppr \
             --suppress=unknownMacro:exporters/etw/include/opentelemetry/exporters/etw/TraceLoggingDynamic.h \
             --language=c++ \
-            --std=c++14 \
+            --std=c++17 \
             -I api/include \
             -I exporters/elasticsearch/include \
             -I exporters/etw/include \
@@ -48,10 +47,12 @@ jobs:
             -I exporters/zipkin/include \
             -I ext/include \
             -I opentracing-shim/include \
+            -I resource_detectors/include \
             -I sdk/include \
             -i build \
             -i test \
             -i third_party \
+            -i tools \
             -j $(nproc) \
             . 2>&1 | tee --append cppcheck.log
 
@@ -66,12 +67,7 @@ jobs:
           set +e
           readonly WARNING_COUNT=`grep -c -E "\[.+\]" cppcheck.log`
           echo "cppcheck reported ${WARNING_COUNT} warning(s)"
-          # Acceptable limit, to decrease over time down to 0
-          readonly WARNING_LIMIT=10
-          # FAIL the build if WARNING_COUNT > WARNING_LIMIT
-          if [ $WARNING_COUNT -gt $WARNING_LIMIT ] ; then
-            exit 1
-          # WARN in annotations if WARNING_COUNT > 0
-          elif [ $WARNING_COUNT -gt 0 ] ; then
+          if [ $WARNING_COUNT -gt 0 ] ; then
             echo "::warning::cppcheck reported ${WARNING_COUNT} warning(s)"
+            exit 1
           fi

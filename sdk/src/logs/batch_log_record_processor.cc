@@ -255,7 +255,7 @@ void BatchLogRecordProcessor::Export()
   do
   {
     std::vector<std::unique_ptr<Recordable>> records_arr;
-    size_t num_records_to_export;
+    size_t num_records_to_export{};
     std::uint64_t notify_force_flush =
         synchronization_data_->force_flush_pending_sequence.load(std::memory_order_acquire);
     if (notify_force_flush)
@@ -369,6 +369,19 @@ void BatchLogRecordProcessor::GetWaitAdjustedTime(
 
 bool BatchLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  return InternalShutdown(timeout);
+}
+
+BatchLogRecordProcessor::~BatchLogRecordProcessor()
+{
+  if (synchronization_data_->is_shutdown.load() == false)
+  {
+    InternalShutdown();
+  }
+}
+
+bool BatchLogRecordProcessor::InternalShutdown(std::chrono::microseconds timeout) noexcept
+{
   auto start_time = std::chrono::system_clock::now();
 
   std::lock_guard<std::mutex> shutdown_guard{synchronization_data_->shutdown_m};
@@ -389,14 +402,6 @@ bool BatchLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexce
   }
 
   return true;
-}
-
-BatchLogRecordProcessor::~BatchLogRecordProcessor()
-{
-  if (synchronization_data_->is_shutdown.load() == false)
-  {
-    Shutdown();
-  }
 }
 
 }  // namespace logs

@@ -21,29 +21,60 @@ namespace rpc
 {
 
 /**
-  Measures the duration of outbound RPC.
+  Measures the duration of an outgoing Remote Procedure Call (RPC).
   <p>
-  While streaming RPCs may record this metric as start-of-batch
-  to end-of-batch, it's hard to interpret in practice.
-  <p>
-  <strong>Streaming</strong>: N/A.
+  When this metric is reported alongside an RPC client span, the metric value
+  SHOULD be the same as the RPC client span duration.
   <p>
   histogram
  */
-static constexpr const char *kMetricRpcClientDuration = "rpc.client.duration";
-static constexpr const char *descrMetricRpcClientDuration =
-    "Measures the duration of outbound RPC.";
-static constexpr const char *unitMetricRpcClientDuration = "ms";
+static constexpr const char *kMetricRpcClientCallDuration = "rpc.client.call.duration";
+static constexpr const char *descrMetricRpcClientCallDuration =
+    "Measures the duration of an outgoing Remote Procedure Call (RPC).";
+static constexpr const char *unitMetricRpcClientCallDuration = "s";
 
 static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+CreateSyncInt64MetricRpcClientCallDuration(metrics::Meter *meter)
+{
+  return meter->CreateUInt64Histogram(kMetricRpcClientCallDuration,
+                                      descrMetricRpcClientCallDuration,
+                                      unitMetricRpcClientCallDuration);
+}
+
+static inline nostd::unique_ptr<metrics::Histogram<double>>
+CreateSyncDoubleMetricRpcClientCallDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleHistogram(kMetricRpcClientCallDuration,
+                                      descrMetricRpcClientCallDuration,
+                                      unitMetricRpcClientCallDuration);
+}
+
+/**
+  Deprecated, use @code rpc.client.call.duration @endcode instead. Note: the unit also changed from
+  @code ms @endcode to @code s @endcode.
+
+  @deprecated
+  {"note": "Replaced by @code rpc.client.call.duration @endcode with unit @code s @endcode.",
+  "reason": "uncategorized"} <p> While streaming RPCs may record this metric as start-of-batch to
+  end-of-batch, it's hard to interpret in practice. <p> <strong>Streaming</strong>: N/A. <p>
+  histogram
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricRpcClientDuration =
+    "rpc.client.duration";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricRpcClientDuration =
+    "Deprecated, use `rpc.client.call.duration` instead. Note: the unit also changed from `ms` to "
+    "`s`.";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricRpcClientDuration = "ms";
+
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
 CreateSyncInt64MetricRpcClientDuration(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricRpcClientDuration, descrMetricRpcClientDuration,
                                       unitMetricRpcClientDuration);
 }
 
-static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetricRpcClientDuration(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<double>>
+CreateSyncDoubleMetricRpcClientDuration(metrics::Meter *meter)
 {
   return meter->CreateDoubleHistogram(kMetricRpcClientDuration, descrMetricRpcClientDuration,
                                       unitMetricRpcClientDuration);
@@ -51,24 +82,28 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
 
 /**
   Measures the size of RPC request messages (uncompressed).
+
+  @deprecated
+  {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
   <p>
   <strong>Streaming</strong>: Recorded per message in a streaming batch
   <p>
   histogram
  */
-static constexpr const char *kMetricRpcClientRequestSize = "rpc.client.request.size";
-static constexpr const char *descrMetricRpcClientRequestSize =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricRpcClientRequestSize =
+    "rpc.client.request.size";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricRpcClientRequestSize =
     "Measures the size of RPC request messages (uncompressed).";
-static constexpr const char *unitMetricRpcClientRequestSize = "By";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricRpcClientRequestSize = "By";
 
-static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
 CreateSyncInt64MetricRpcClientRequestSize(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricRpcClientRequestSize, descrMetricRpcClientRequestSize,
                                       unitMetricRpcClientRequestSize);
 }
 
-static inline nostd::unique_ptr<metrics::Histogram<double>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<double>>
 CreateSyncDoubleMetricRpcClientRequestSize(metrics::Meter *meter)
 {
   return meter->CreateDoubleHistogram(kMetricRpcClientRequestSize, descrMetricRpcClientRequestSize,
@@ -77,6 +112,9 @@ CreateSyncDoubleMetricRpcClientRequestSize(metrics::Meter *meter)
 
 /**
   Measures the number of messages received per RPC.
+
+  @deprecated
+  {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
   <p>
   Should be 1 for all non-streaming RPCs.
   <p>
@@ -84,12 +122,13 @@ CreateSyncDoubleMetricRpcClientRequestSize(metrics::Meter *meter)
   <p>
   histogram
  */
-static constexpr const char *kMetricRpcClientRequestsPerRpc = "rpc.client.requests_per_rpc";
-static constexpr const char *descrMetricRpcClientRequestsPerRpc =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricRpcClientRequestsPerRpc =
+    "rpc.client.requests_per_rpc";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricRpcClientRequestsPerRpc =
     "Measures the number of messages received per RPC.";
-static constexpr const char *unitMetricRpcClientRequestsPerRpc = "{count}";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricRpcClientRequestsPerRpc = "{count}";
 
-static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
 CreateSyncInt64MetricRpcClientRequestsPerRpc(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricRpcClientRequestsPerRpc,
@@ -97,7 +136,7 @@ CreateSyncInt64MetricRpcClientRequestsPerRpc(metrics::Meter *meter)
                                       unitMetricRpcClientRequestsPerRpc);
 }
 
-static inline nostd::unique_ptr<metrics::Histogram<double>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<double>>
 CreateSyncDoubleMetricRpcClientRequestsPerRpc(metrics::Meter *meter)
 {
   return meter->CreateDoubleHistogram(kMetricRpcClientRequestsPerRpc,
@@ -107,17 +146,21 @@ CreateSyncDoubleMetricRpcClientRequestsPerRpc(metrics::Meter *meter)
 
 /**
   Measures the size of RPC response messages (uncompressed).
+
+  @deprecated
+  {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
   <p>
   <strong>Streaming</strong>: Recorded per response in a streaming batch
   <p>
   histogram
  */
-static constexpr const char *kMetricRpcClientResponseSize = "rpc.client.response.size";
-static constexpr const char *descrMetricRpcClientResponseSize =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricRpcClientResponseSize =
+    "rpc.client.response.size";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricRpcClientResponseSize =
     "Measures the size of RPC response messages (uncompressed).";
-static constexpr const char *unitMetricRpcClientResponseSize = "By";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricRpcClientResponseSize = "By";
 
-static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
 CreateSyncInt64MetricRpcClientResponseSize(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricRpcClientResponseSize,
@@ -125,7 +168,7 @@ CreateSyncInt64MetricRpcClientResponseSize(metrics::Meter *meter)
                                       unitMetricRpcClientResponseSize);
 }
 
-static inline nostd::unique_ptr<metrics::Histogram<double>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<double>>
 CreateSyncDoubleMetricRpcClientResponseSize(metrics::Meter *meter)
 {
   return meter->CreateDoubleHistogram(kMetricRpcClientResponseSize,
@@ -135,6 +178,9 @@ CreateSyncDoubleMetricRpcClientResponseSize(metrics::Meter *meter)
 
 /**
   Measures the number of messages sent per RPC.
+
+  @deprecated
+  {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
   <p>
   Should be 1 for all non-streaming RPCs.
   <p>
@@ -142,12 +188,14 @@ CreateSyncDoubleMetricRpcClientResponseSize(metrics::Meter *meter)
   <p>
   histogram
  */
-static constexpr const char *kMetricRpcClientResponsesPerRpc = "rpc.client.responses_per_rpc";
-static constexpr const char *descrMetricRpcClientResponsesPerRpc =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricRpcClientResponsesPerRpc =
+    "rpc.client.responses_per_rpc";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricRpcClientResponsesPerRpc =
     "Measures the number of messages sent per RPC.";
-static constexpr const char *unitMetricRpcClientResponsesPerRpc = "{count}";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricRpcClientResponsesPerRpc =
+    "{count}";
 
-static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
 CreateSyncInt64MetricRpcClientResponsesPerRpc(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricRpcClientResponsesPerRpc,
@@ -155,7 +203,7 @@ CreateSyncInt64MetricRpcClientResponsesPerRpc(metrics::Meter *meter)
                                       unitMetricRpcClientResponsesPerRpc);
 }
 
-static inline nostd::unique_ptr<metrics::Histogram<double>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<double>>
 CreateSyncDoubleMetricRpcClientResponsesPerRpc(metrics::Meter *meter)
 {
   return meter->CreateDoubleHistogram(kMetricRpcClientResponsesPerRpc,
@@ -164,28 +212,60 @@ CreateSyncDoubleMetricRpcClientResponsesPerRpc(metrics::Meter *meter)
 }
 
 /**
-  Measures the duration of inbound RPC.
+  Measures the duration of an incoming Remote Procedure Call (RPC).
   <p>
-  While streaming RPCs may record this metric as start-of-batch
-  to end-of-batch, it's hard to interpret in practice.
-  <p>
-  <strong>Streaming</strong>: N/A.
+  When this metric is reported alongside an RPC server span, the metric value
+  SHOULD be the same as the RPC server span duration.
   <p>
   histogram
  */
-static constexpr const char *kMetricRpcServerDuration     = "rpc.server.duration";
-static constexpr const char *descrMetricRpcServerDuration = "Measures the duration of inbound RPC.";
-static constexpr const char *unitMetricRpcServerDuration  = "ms";
+static constexpr const char *kMetricRpcServerCallDuration = "rpc.server.call.duration";
+static constexpr const char *descrMetricRpcServerCallDuration =
+    "Measures the duration of an incoming Remote Procedure Call (RPC).";
+static constexpr const char *unitMetricRpcServerCallDuration = "s";
 
 static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+CreateSyncInt64MetricRpcServerCallDuration(metrics::Meter *meter)
+{
+  return meter->CreateUInt64Histogram(kMetricRpcServerCallDuration,
+                                      descrMetricRpcServerCallDuration,
+                                      unitMetricRpcServerCallDuration);
+}
+
+static inline nostd::unique_ptr<metrics::Histogram<double>>
+CreateSyncDoubleMetricRpcServerCallDuration(metrics::Meter *meter)
+{
+  return meter->CreateDoubleHistogram(kMetricRpcServerCallDuration,
+                                      descrMetricRpcServerCallDuration,
+                                      unitMetricRpcServerCallDuration);
+}
+
+/**
+  Deprecated, use @code rpc.server.call.duration @endcode instead. Note: the unit also changed from
+  @code ms @endcode to @code s @endcode.
+
+  @deprecated
+  {"note": "Replaced by @code rpc.server.call.duration @endcode with unit @code s @endcode.",
+  "reason": "uncategorized"} <p> While streaming RPCs may record this metric as start-of-batch to
+  end-of-batch, it's hard to interpret in practice. <p> <strong>Streaming</strong>: N/A. <p>
+  histogram
+ */
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricRpcServerDuration =
+    "rpc.server.duration";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricRpcServerDuration =
+    "Deprecated, use `rpc.server.call.duration` instead. Note: the unit also changed from `ms` to "
+    "`s`.";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricRpcServerDuration = "ms";
+
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
 CreateSyncInt64MetricRpcServerDuration(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricRpcServerDuration, descrMetricRpcServerDuration,
                                       unitMetricRpcServerDuration);
 }
 
-static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetricRpcServerDuration(
-    metrics::Meter *meter)
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<double>>
+CreateSyncDoubleMetricRpcServerDuration(metrics::Meter *meter)
 {
   return meter->CreateDoubleHistogram(kMetricRpcServerDuration, descrMetricRpcServerDuration,
                                       unitMetricRpcServerDuration);
@@ -193,24 +273,28 @@ static inline nostd::unique_ptr<metrics::Histogram<double>> CreateSyncDoubleMetr
 
 /**
   Measures the size of RPC request messages (uncompressed).
+
+  @deprecated
+  {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
   <p>
   <strong>Streaming</strong>: Recorded per message in a streaming batch
   <p>
   histogram
  */
-static constexpr const char *kMetricRpcServerRequestSize = "rpc.server.request.size";
-static constexpr const char *descrMetricRpcServerRequestSize =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricRpcServerRequestSize =
+    "rpc.server.request.size";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricRpcServerRequestSize =
     "Measures the size of RPC request messages (uncompressed).";
-static constexpr const char *unitMetricRpcServerRequestSize = "By";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricRpcServerRequestSize = "By";
 
-static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
 CreateSyncInt64MetricRpcServerRequestSize(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricRpcServerRequestSize, descrMetricRpcServerRequestSize,
                                       unitMetricRpcServerRequestSize);
 }
 
-static inline nostd::unique_ptr<metrics::Histogram<double>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<double>>
 CreateSyncDoubleMetricRpcServerRequestSize(metrics::Meter *meter)
 {
   return meter->CreateDoubleHistogram(kMetricRpcServerRequestSize, descrMetricRpcServerRequestSize,
@@ -219,6 +303,9 @@ CreateSyncDoubleMetricRpcServerRequestSize(metrics::Meter *meter)
 
 /**
   Measures the number of messages received per RPC.
+
+  @deprecated
+  {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
   <p>
   Should be 1 for all non-streaming RPCs.
   <p>
@@ -226,12 +313,13 @@ CreateSyncDoubleMetricRpcServerRequestSize(metrics::Meter *meter)
   <p>
   histogram
  */
-static constexpr const char *kMetricRpcServerRequestsPerRpc = "rpc.server.requests_per_rpc";
-static constexpr const char *descrMetricRpcServerRequestsPerRpc =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricRpcServerRequestsPerRpc =
+    "rpc.server.requests_per_rpc";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricRpcServerRequestsPerRpc =
     "Measures the number of messages received per RPC.";
-static constexpr const char *unitMetricRpcServerRequestsPerRpc = "{count}";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricRpcServerRequestsPerRpc = "{count}";
 
-static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
 CreateSyncInt64MetricRpcServerRequestsPerRpc(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricRpcServerRequestsPerRpc,
@@ -239,7 +327,7 @@ CreateSyncInt64MetricRpcServerRequestsPerRpc(metrics::Meter *meter)
                                       unitMetricRpcServerRequestsPerRpc);
 }
 
-static inline nostd::unique_ptr<metrics::Histogram<double>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<double>>
 CreateSyncDoubleMetricRpcServerRequestsPerRpc(metrics::Meter *meter)
 {
   return meter->CreateDoubleHistogram(kMetricRpcServerRequestsPerRpc,
@@ -249,17 +337,21 @@ CreateSyncDoubleMetricRpcServerRequestsPerRpc(metrics::Meter *meter)
 
 /**
   Measures the size of RPC response messages (uncompressed).
+
+  @deprecated
+  {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
   <p>
   <strong>Streaming</strong>: Recorded per response in a streaming batch
   <p>
   histogram
  */
-static constexpr const char *kMetricRpcServerResponseSize = "rpc.server.response.size";
-static constexpr const char *descrMetricRpcServerResponseSize =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricRpcServerResponseSize =
+    "rpc.server.response.size";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricRpcServerResponseSize =
     "Measures the size of RPC response messages (uncompressed).";
-static constexpr const char *unitMetricRpcServerResponseSize = "By";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricRpcServerResponseSize = "By";
 
-static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
 CreateSyncInt64MetricRpcServerResponseSize(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricRpcServerResponseSize,
@@ -267,7 +359,7 @@ CreateSyncInt64MetricRpcServerResponseSize(metrics::Meter *meter)
                                       unitMetricRpcServerResponseSize);
 }
 
-static inline nostd::unique_ptr<metrics::Histogram<double>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<double>>
 CreateSyncDoubleMetricRpcServerResponseSize(metrics::Meter *meter)
 {
   return meter->CreateDoubleHistogram(kMetricRpcServerResponseSize,
@@ -277,6 +369,9 @@ CreateSyncDoubleMetricRpcServerResponseSize(metrics::Meter *meter)
 
 /**
   Measures the number of messages sent per RPC.
+
+  @deprecated
+  {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
   <p>
   Should be 1 for all non-streaming RPCs.
   <p>
@@ -284,12 +379,14 @@ CreateSyncDoubleMetricRpcServerResponseSize(metrics::Meter *meter)
   <p>
   histogram
  */
-static constexpr const char *kMetricRpcServerResponsesPerRpc = "rpc.server.responses_per_rpc";
-static constexpr const char *descrMetricRpcServerResponsesPerRpc =
+OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricRpcServerResponsesPerRpc =
+    "rpc.server.responses_per_rpc";
+OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricRpcServerResponsesPerRpc =
     "Measures the number of messages sent per RPC.";
-static constexpr const char *unitMetricRpcServerResponsesPerRpc = "{count}";
+OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricRpcServerResponsesPerRpc =
+    "{count}";
 
-static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<uint64_t>>
 CreateSyncInt64MetricRpcServerResponsesPerRpc(metrics::Meter *meter)
 {
   return meter->CreateUInt64Histogram(kMetricRpcServerResponsesPerRpc,
@@ -297,7 +394,7 @@ CreateSyncInt64MetricRpcServerResponsesPerRpc(metrics::Meter *meter)
                                       unitMetricRpcServerResponsesPerRpc);
 }
 
-static inline nostd::unique_ptr<metrics::Histogram<double>>
+OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Histogram<double>>
 CreateSyncDoubleMetricRpcServerResponsesPerRpc(metrics::Meter *meter)
 {
   return meter->CreateDoubleHistogram(kMetricRpcServerResponsesPerRpc,

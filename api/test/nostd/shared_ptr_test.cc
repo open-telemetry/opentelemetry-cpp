@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 
 using opentelemetry::nostd::shared_ptr;
 
@@ -96,9 +97,18 @@ TEST(SharedPtrTest, MoveConstructionFromStdSharedPtr)
   EXPECT_EQ(ptr2.get(), value);
 }
 
+TEST(SharedPtrTest, MoveConstructionFromNoStdUniquePtr)
+{
+  opentelemetry::nostd::unique_ptr<int> value(new int{123});
+  auto p = value.get();
+  shared_ptr<int> ptr{std::move(value)};
+  EXPECT_EQ(value.get(), nullptr);  // NOLINT
+  EXPECT_EQ(ptr.get(), p);
+}
+
 TEST(SharedPtrTest, Destruction)
 {
-  bool was_destructed;
+  bool was_destructed{};
   shared_ptr<A>{new A{was_destructed}};  // NOLINT
   EXPECT_TRUE(was_destructed);
 }
@@ -154,6 +164,36 @@ TEST(SharedPtrTest, Swap)
 
   EXPECT_EQ(ptr1.get(), value2);
   EXPECT_EQ(ptr2.get(), value1);
+}
+
+TEST(SharedPtrTest, SwapSelfNoOp)
+{
+  struct TestStruct
+  {
+    explicit TestStruct(int &destruct_count) noexcept : destruct_count_{&destruct_count} {}
+
+    TestStruct(const TestStruct &)            = delete;
+    TestStruct(TestStruct &&)                 = delete;
+    TestStruct &operator=(const TestStruct &) = delete;
+    TestStruct &operator=(TestStruct &&)      = delete;
+
+    ~TestStruct() { ++(*destruct_count_); }
+
+    int *destruct_count_;
+  };
+
+  int destruct_count{0};
+
+  {
+    shared_ptr<TestStruct> ptr{std::make_shared<TestStruct>(destruct_count)};
+    auto *ptr_before = ptr.get();
+
+    ptr.swap(ptr);
+
+    EXPECT_EQ(ptr.get(), ptr_before);
+  }
+
+  EXPECT_EQ(destruct_count, 1);
 }
 
 TEST(SharedPtrTest, Comparison)

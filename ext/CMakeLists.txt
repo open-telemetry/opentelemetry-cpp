@@ -18,7 +18,7 @@ otel_add_component(
   FILES_DIRECTORY
   "include/opentelemetry/ext"
   FILES_DESTINATION
-  "include/opentelemetry/"
+  "include/opentelemetry"
   FILES_MATCHING
   PATTERN
   "*.h")
