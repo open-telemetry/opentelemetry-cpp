@@ -5,7 +5,10 @@
 
 #include <chrono>
 #include <csignal>
+#include <cstdint>
 #include <iostream>
+#include <map>
+#include <memory>
 #include <string>
 #include <thread>
 #include <vector>
@@ -79,9 +82,9 @@ std::vector<std::map<std::string, uint32_t>> GenerateAttributeSet(size_t count)
   for (size_t i = 0; i < count; ++i)
   {
     std::map<std::string, uint32_t> attributes;
-    attributes["dim1"] = rand() % 100;  // Random value between 0 and 99
-    attributes["dim2"] = rand() % 100;  // Random value between 0 and 99
-    attributes["dim3"] = rand() % 100;  // Random value between 0 and 99
+    attributes["dim1"] = static_cast<uint32_t>(i % 100);
+    attributes["dim2"] = static_cast<uint32_t>((i / 100) % 100);
+    attributes["dim3"] = static_cast<uint32_t>((i / 10000) % 100);
     attributes_set.push_back(attributes);
   }
   return attributes_set;
@@ -110,9 +113,8 @@ void CleanupMetrics()
 void CounterExample(opentelemetry::nostd::unique_ptr<metrics_api::Counter<double>> &counter,
                     const std::vector<std::map<std::string, uint32_t>> &attributes_set)
 {
-  // Pick a random attribute set
-  size_t random_index    = rand() % attributes_set.size();
-  const auto &attributes = attributes_set[random_index];
+  thread_local size_t next_index = 0;
+  const auto &attributes         = attributes_set[next_index++ % attributes_set.size()];
 
   // Record the metric with the selected attributes
   counter->Add(
@@ -123,7 +125,6 @@ void CounterExample(opentelemetry::nostd::unique_ptr<metrics_api::Counter<double
 
 int main(int /*argc*/, char ** /*argv[]*/)
 {
-  std::srand(static_cast<unsigned int>(std::time(nullptr)));  // Seed the random number generator
   // Pre-generate a set of random attributes
   size_t attribute_count = 1000;  // Number of attribute sets to pre-generate
   auto attributes_set    = GenerateAttributeSet(attribute_count);

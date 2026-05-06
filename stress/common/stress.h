@@ -82,11 +82,12 @@ public:
   void stop();
 
 private:
-  std::function<void()> func_;         // Function to be executed by each thread
-  std::vector<std::thread> threads_;   // Vector to hold worker threads
-  std::vector<WorkerStats> stats_;     // Vector to hold statistics for each thread
-  const size_t numThreads_;            // Number of threads to run
-  std::atomic<bool> stopFlag_{false};  // signal to stop the test
+  std::function<void()> func_;          // Function to be executed by each thread
+  std::vector<std::thread> threads_;    // Vector to hold worker threads
+  std::vector<WorkerStats> stats_;      // Vector to hold statistics for each thread
+  const size_t numThreads_;             // Number of threads to run
+  std::atomic<bool> stopFlag_{false};   // signal to stop the test
+  std::atomic<bool> readyFlag_{false};  // signal to start worker loops
 
   // Worker thread function
   void workerThread(size_t threadIndex);

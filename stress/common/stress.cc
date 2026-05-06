@@ -3,10 +3,15 @@
 
 #include "stress.h"
 
-// Global flags
-std::atomic<bool> STOP(
-    false);  // Global flag to stop the stress test when signaled (e.g., via Ctrl+C)
-std::atomic<bool> READY(false);  // Global flag to synchronize thread start
+#include <algorithm>
+#include <limits>
+#include <locale>
+#include <utility>
+
+#ifdef __linux__
+#  include <pthread.h>
+#  include <sched.h>
+#endif
 
 // StressTest constructor
 Stress::Stress(std::function<void()> func, size_t numThreads)
@@ -17,9 +22,10 @@ Stress::Stress(std::function<void()> func, size_t numThreads)
 void Stress::run()
 {
   std::cout << "Starting stress test with " << numThreads_ << " threads...\n";
-  auto startTime = std::chrono::steady_clock::now();
+  stopFlag_.store(false, std::memory_order_release);
+  readyFlag_.store(false, std::memory_order_release);
 
-  READY.store(false, std::memory_order_release);
+  auto startTime = std::chrono::steady_clock::now();
 
   std::thread controllerThread(&Stress::monitorThroughput, this);
 
@@ -29,7 +35,7 @@ void Stress::run()
     threads_.emplace_back(&Stress::workerThread, this, i);
   }
 
-  READY.store(true, std::memory_order_release);
+  readyFlag_.store(true, std::memory_order_release);
 
   for (auto &thread : threads_)
   {
@@ -53,11 +59,14 @@ void Stress::run()
     totalCount += stat.count.load(std::memory_order_relaxed);
   }
 
+  const auto duration_seconds = duration.count();
+  const auto average_throughput =
+      duration_seconds > 0 ? totalCount / static_cast<uint64_t>(duration_seconds) : 0;
+
   std::cout << "\nTest completed:\n"
             << "Total iterations: " << formatNumber(totalCount) << "\n"
-            << "Duration: " << duration.count() << " seconds\n"
-            << "Average throughput: " << formatNumber(totalCount / duration.count())
-            << " iterations/sec\n";
+            << "Duration: " << duration_seconds << " seconds\n"
+            << "Average throughput: " << formatNumber(average_throughput) << " iterations/sec\n";
 }
 
 // Worker thread function
@@ -70,7 +79,12 @@ void Stress::workerThread(size_t threadIndex)
   pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset);
 #endif
 
-  while (!STOP.load(std::memory_order_acquire))
+  while (!readyFlag_.load(std::memory_order_acquire))
+  {
+    std::this_thread::yield();
+  }
+
+  while (!stopFlag_.load(std::memory_order_acquire))
   {
     func_();
     stats_[threadIndex].count.fetch_add(1, std::memory_order_relaxed);
@@ -82,14 +96,18 @@ void Stress::monitorThroughput()
 {
   uint64_t lastTotalCount = 0;
   auto lastTime           = std::chrono::steady_clock::now();
-  std::vector<uint64_t> throughputHistory;
+  uint64_t sampleCount    = 0;
+  uint64_t throughputSum  = 0;
+  uint64_t minThroughput  = std::numeric_limits<uint64_t>::max();
+  uint64_t maxThroughput  = 0;
 
-  while (!STOP.load(std::memory_order_acquire))
+  while (!stopFlag_.load(std::memory_order_acquire))
   {
     std::this_thread::sleep_for(std::chrono::seconds(SLIDING_WINDOW_SIZE));
 
     auto currentTime = std::chrono::steady_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - lastTime).count();
+    auto elapsed =
+        std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - lastTime).count();
 
     uint64_t totalCount = 0;
     for (const auto &stat : stats_)
@@ -101,26 +119,19 @@ void Stress::monitorThroughput()
     lastTotalCount        = totalCount;
     lastTime              = currentTime;
 
-    if (elapsed > 0)
+    if (elapsed > 0.0)
     {
-      uint64_t throughput = currentCount / elapsed;
-      throughputHistory.push_back(throughput);
-
-      double avg   = 0;
-      uint64_t min = throughput;
-      uint64_t max = throughput;
-
-      for (uint64_t t : throughputHistory)
-      {
-        avg += t;
-        min = std::min(min, t);
-        max = std::max(max, t);
-      }
-      avg /= throughputHistory.size();
+      uint64_t throughput = static_cast<uint64_t>(static_cast<double>(currentCount) / elapsed);
+      ++sampleCount;
+      throughputSum += throughput;
+      minThroughput                = std::min(minThroughput, throughput);
+      maxThroughput                = std::max(maxThroughput, throughput);
+      const uint64_t avgThroughput = throughputSum / sampleCount;
 
       std::cout << "\rThroughput: " << formatNumber(throughput)
-                << " it/s | Avg: " << formatNumber(static_cast<uint64_t>(avg))
-                << " | Min: " << formatNumber(min) << " | Max: " << formatNumber(max) << std::flush;
+                << " it/s | Avg: " << formatNumber(avgThroughput)
+                << " | Min: " << formatNumber(minThroughput)
+                << " | Max: " << formatNumber(maxThroughput) << std::flush;
     }
   }
   std::cout << std::endl;
@@ -138,5 +149,5 @@ std::string Stress::formatNumber(uint64_t num)
 // Signal handler to set the STOP flag when receiving a termination signal
 void Stress::stop()
 {
-  STOP.store(true, std::memory_order_release);
+  stopFlag_.store(true, std::memory_order_release);
 }
