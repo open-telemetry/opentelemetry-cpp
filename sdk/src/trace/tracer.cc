@@ -130,13 +130,13 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     flags &= ~opentelemetry::trace::TraceFlags::kIsSampled;
   }
 
-#if 1
+#if 0
   /* https://github.com/open-telemetry/opentelemetry-specification as of v1.29.0 */
   /* Support W3C Trace Context version 1. */
   flags &= opentelemetry::trace::TraceFlags::kAllW3CTraceContext1Flags;
 #endif
 
-#if 0
+#if 1
   /* Waiting for https://github.com/open-telemetry/opentelemetry-specification/issues/3411 */
   /* Support W3C Trace Context version 2. */
   flags &= opentelemetry::trace::TraceFlags::kAllW3CTraceContext2Flags;
