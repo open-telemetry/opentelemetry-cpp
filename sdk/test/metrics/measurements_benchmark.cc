@@ -26,6 +26,7 @@
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/version.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
