@@ -58,8 +58,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusCollector::Collect() cons
 
   reader_->Collect([&result, this](sdk::metrics::ResourceMetrics &metric_data) {
     auto prometheus_metric_data = PrometheusExporterUtils::TranslateToPrometheus(
-        metric_data, this->populate_target_info_, this->without_otel_scope_,
-        this->without_units_, this->without_type_suffix_);
+        metric_data, this->populate_target_info_, this->without_otel_scope_, this->without_units_,
+        this->without_type_suffix_);
     for (auto &data : prometheus_metric_data)
       result.emplace_back(data);
     return true;
