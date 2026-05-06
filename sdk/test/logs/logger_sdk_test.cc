@@ -56,7 +56,7 @@
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::instrumentationscope;
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-namespace context  = opentelemetry::context;
+namespace context = opentelemetry::context;
 #endif
 namespace logs_api = opentelemetry::logs;
 namespace nostd    = opentelemetry::nostd;

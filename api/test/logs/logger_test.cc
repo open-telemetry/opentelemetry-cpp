@@ -47,12 +47,12 @@ using opentelemetry::logs::Provider;
 using opentelemetry::logs::Severity;
 using opentelemetry::nostd::shared_ptr;
 using opentelemetry::nostd::string_view;
-namespace common  = opentelemetry::common;
+namespace common = opentelemetry::common;
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 namespace context = opentelemetry::context;
 #endif
-namespace nostd   = opentelemetry::nostd;
-namespace trace   = opentelemetry::trace;
+namespace nostd = opentelemetry::nostd;
+namespace trace = opentelemetry::trace;
 
 // Check that the default logger is a noop logger instance
 TEST(Logger, GetLoggerDefault)
