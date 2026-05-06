@@ -6,23 +6,32 @@
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
 
 #  include <gtest/gtest.h>
+#  include <stddef.h>
+#  include <stdint.h>
 #  include <chrono>
 #  include <map>
 #  include <memory>
 #  include <string>
+#  include <utility>
 #  include <vector>
 
 #  include "common.h"
 
 #  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/metrics/noop.h"
+#  include "opentelemetry/metrics/sync_instruments.h"
+#  include "opentelemetry/nostd/function_ref.h"
+#  include "opentelemetry/nostd/span.h"
+#  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/nostd/variant.h"
 #  include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/sdk/metrics/data/point_data.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/state/metric_collector.h"
+#  include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
