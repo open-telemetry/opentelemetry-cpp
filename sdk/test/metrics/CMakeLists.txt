@@ -57,6 +57,19 @@ if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)
     TARGET multi_observer_test
     TEST_PREFIX metrics.
     TEST_LIST multi_observer_test)
+
+  if(WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW)
+    add_executable(bound_sync_instruments_test bound_sync_instruments_test.cc)
+    target_link_libraries(
+      bound_sync_instruments_test ${GTEST_BOTH_LIBRARIES} ${GMOCK_LIB}
+      ${CMAKE_THREAD_LIBS_INIT} metrics_common_test_utils
+      opentelemetry_resources)
+    target_compile_definitions(bound_sync_instruments_test PRIVATE UNIT_TESTING)
+    gtest_add_tests(
+      TARGET bound_sync_instruments_test
+      TEST_PREFIX metrics.
+      TEST_LIST bound_sync_instruments_test)
+  endif()
 endif()
 
 if(WITH_BENCHMARK)
