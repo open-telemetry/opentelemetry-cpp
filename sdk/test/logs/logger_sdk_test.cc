@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stddef.h>
 #include <stdint.h>
 #include <array>
 #include <chrono>
@@ -13,7 +12,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context_value.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
 #include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
@@ -23,7 +22,6 @@
 #include "opentelemetry/logs/noop.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
@@ -38,8 +36,6 @@
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#include "opentelemetry/trace/context.h"
-#include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
@@ -48,6 +44,15 @@
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer.h"
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include <stddef.h>
+
+#  include "opentelemetry/context/context.h"
+#  include "opentelemetry/nostd/span.h"
+#  include "opentelemetry/trace/context.h"
+#  include "opentelemetry/trace/default_span.h"
+#endif
 
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::instrumentationscope;

@@ -13,7 +13,7 @@
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context_value.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
 #include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
@@ -27,10 +27,14 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include "opentelemetry/context/context.h"
+#  include "opentelemetry/nostd/variant.h"
+#endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
 using opentelemetry::logs::NoopEventLogger;
