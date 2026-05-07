@@ -99,6 +99,9 @@ Increment the:
 * [EXPORTER] Fix Prometheus exporter ignoring without_units/without_type_suffix
   [#4055](https://github.com/open-telemetry/opentelemetry-cpp/pull/4055)
 
+* [CODE HEALTH] clean up nostd::variant access in otlp exporters
+  [#3973](https://github.com/open-telemetry/opentelemetry-cpp/pull/3973)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default

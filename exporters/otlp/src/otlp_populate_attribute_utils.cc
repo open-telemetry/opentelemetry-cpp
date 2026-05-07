@@ -5,8 +5,10 @@
 #  include <utf8_validity.h>
 #endif
 
-#include <stdint.h>
+#include <cstdint>
+#include <limits>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -23,6 +25,7 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+// IWYU pragma: no_include "net/proto2/public/repeated_field.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
@@ -36,315 +39,348 @@ namespace exporter
 namespace otlp
 {
 
+namespace
+{
+
 //
 // See `attribute_value.h` for details.
 //
 const int kAttributeValueSize      = 16;
 const int kOwnedAttributeValueSize = 15;
 
+template <class T>
+struct IsSupportedAttributeValue : std::false_type
+{};
+
+struct AttributeValueVisitor
+{
+  opentelemetry::proto::common::v1::AnyValue *proto_value_;
+  bool allow_bytes_;
+
+  template <class T>
+  void operator()(T &&) const noexcept
+  {
+    static_assert(
+        IsSupportedAttributeValue<T>::value,
+        "AttributeValueVisitor: Value type in opentelemetry::common::AttributeValue does not have "
+        "an overload operator implemented in this visitor OR implicit conversion attempted!");
+  }
+
+  void operator()(bool bool_value) const noexcept { proto_value_->set_bool_value(bool_value); }
+  void operator()(int32_t int32_value) const noexcept { proto_value_->set_int_value(int32_value); }
+  void operator()(int64_t int64_value) const noexcept { proto_value_->set_int_value(int64_value); }
+  void operator()(uint32_t uint32_value) const noexcept
+  {
+    proto_value_->set_int_value(uint32_value);
+  }
+  void operator()(double double_value) const noexcept
+  {
+    proto_value_->set_double_value(double_value);
+  }
+  void operator()(const char *str_value) const noexcept
+  {
+#if defined(ENABLE_OTLP_UTF8_VALIDITY)
+    if (utf8_range::IsStructurallyValid(str_value))
+    {
+      proto_value_->set_string_value(str_value);
+    }
+    else
+    {
+      proto_value_->set_bytes_value(str_value, strlen(str_value));
+    }
+#else
+    proto_value_->set_string_value(str_value);
+#endif
+  }
+  void operator()(nostd::string_view str_value) const noexcept
+  {
+#if defined(ENABLE_OTLP_UTF8_VALIDITY)
+    if (utf8_range::IsStructurallyValid({str_value.data(), str_value.size()}))
+    {
+      proto_value_->set_string_value(str_value.data(), str_value.size());
+    }
+    else
+    {
+      proto_value_->set_bytes_value(str_value.data(), str_value.size());
+    }
+#else
+    proto_value_->set_string_value(str_value.data(), str_value.size());
+#endif
+  }
+  void operator()(nostd::span<const bool> span_bool_value) const noexcept
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(span_bool_value.size()));
+    for (const auto &val : span_bool_value)
+    {
+      array_value->add_values()->set_bool_value(val);
+    }
+  }
+  void operator()(nostd::span<const int32_t> span_int32_value) const noexcept
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(span_int32_value.size()));
+    for (const auto &val : span_int32_value)
+    {
+      array_value->add_values()->set_int_value(val);
+    }
+  }
+  void operator()(nostd::span<const int64_t> span_int64_value) const noexcept
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(span_int64_value.size()));
+    for (const auto &val : span_int64_value)
+    {
+      array_value->add_values()->set_int_value(val);
+    }
+  }
+  void operator()(nostd::span<const uint32_t> span_uint32_value) const noexcept
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(span_uint32_value.size()));
+    for (const auto &uint32_value : span_uint32_value)
+    {
+      array_value->add_values()->set_int_value(uint32_value);
+    }
+  }
+  void operator()(nostd::span<const double> span_double_value) const noexcept
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(span_double_value.size()));
+    for (const auto &double_value : span_double_value)
+    {
+      array_value->add_values()->set_double_value(double_value);
+    }
+  }
+  void operator()(nostd::span<const nostd::string_view> span_string_value) const noexcept
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(span_string_value.size()));
+    for (const auto &string_value : span_string_value)
+    {
+#if defined(ENABLE_OTLP_UTF8_VALIDITY)
+      if (utf8_range::IsStructurallyValid({string_value.data(), string_value.size()}))
+      {
+        array_value->add_values()->set_string_value(string_value.data(), string_value.size());
+      }
+      else
+      {
+        array_value->add_values()->set_bytes_value(string_value.data(), string_value.size());
+      }
+#else
+      array_value->add_values()->set_string_value(string_value.data(), string_value.size());
+#endif
+    }
+  }
+  void operator()(uint64_t uint64_value) const noexcept
+  {
+    // Values within int64_t range map to int_value and string if out of range per the `Mapping
+    // Arbitrary Data to OTLP AnyValue` specification.
+    if (uint64_value <= static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
+    {
+      proto_value_->set_int_value(static_cast<int64_t>(uint64_value));
+    }
+    else
+    {
+      proto_value_->set_string_value(std::to_string(uint64_value));
+    }
+  }
+  void operator()(nostd::span<const uint64_t> span_uint64_value) const noexcept
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(span_uint64_value.size()));
+    for (const auto &uint64_value : span_uint64_value)
+    {
+      // Values within int64_t range map to int_value and string if out of range per the `Mapping
+      // Arbitrary Data to OTLP AnyValue` specification.
+      if (uint64_value <= static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
+      {
+        array_value->add_values()->set_int_value(static_cast<int64_t>(uint64_value));
+      }
+      else
+      {
+        array_value->add_values()->set_string_value(std::to_string(uint64_value));
+      }
+    }
+  }
+  void operator()(nostd::span<const uint8_t> span_uint8_value) const noexcept
+  {
+    if (allow_bytes_)
+    {
+      proto_value_->set_bytes_value(reinterpret_cast<const void *>(span_uint8_value.data()),
+                                    span_uint8_value.size());
+    }
+    else
+    {
+      opentelemetry::proto::common::v1::ArrayValue *array_value =
+          proto_value_->mutable_array_value();
+      array_value->mutable_values()->Reserve(static_cast<int>(span_uint8_value.size()));
+      for (const auto &uint8_value : span_uint8_value)
+      {
+        array_value->add_values()->set_int_value(uint8_value);
+      }
+    }
+  }
+};
+
+struct OwnedAttributeValueVisitor
+{
+  opentelemetry::proto::common::v1::AnyValue *proto_value_;
+  bool allow_bytes_;
+
+  template <class T>
+  void operator()(T &&) const noexcept
+  {
+    static_assert(IsSupportedAttributeValue<T>::value,
+                  "OwnedAttributeValueVisitor: Value type in "
+                  "opentelemetry::sdk::common::OwnedAttributeValue does not have an overload "
+                  "operator implemented in this visitor OR implicit conversion attempted!");
+  }
+
+  void operator()(bool bool_value) const noexcept { proto_value_->set_bool_value(bool_value); }
+  void operator()(int32_t int32_value) const noexcept { proto_value_->set_int_value(int32_value); }
+  void operator()(uint32_t uint32_value) const noexcept
+  {
+    proto_value_->set_int_value(uint32_value);
+  }
+  void operator()(int64_t int64_value) const noexcept { proto_value_->set_int_value(int64_value); }
+  void operator()(double double_value) const noexcept
+  {
+    proto_value_->set_double_value(double_value);
+  }
+  void operator()(const std::string &string_value) const noexcept
+  {
+    proto_value_->set_string_value(string_value);
+  }
+  void operator()(const std::vector<bool> &vector_bool_value) const noexcept
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(vector_bool_value.size()));
+    for (const auto bool_value : vector_bool_value)
+    {
+      array_value->add_values()->set_bool_value(bool_value);
+    }
+  }
+  void operator()(const std::vector<int32_t> &vector_int32_value) const noexcept
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(vector_int32_value.size()));
+    for (const auto &int32_value : vector_int32_value)
+    {
+      array_value->add_values()->set_int_value(int32_value);
+    }
+  }
+  void operator()(const std::vector<uint32_t> &vector_uint32_value) const noexcept
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(vector_uint32_value.size()));
+    for (const auto &uint32_value : vector_uint32_value)
+    {
+      array_value->add_values()->set_int_value(static_cast<int64_t>(uint32_value));
+    }
+  }
+  void operator()(const std::vector<int64_t> &vector_int64_value) const noexcept
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(vector_int64_value.size()));
+    for (const auto &int64_value : vector_int64_value)
+    {
+      array_value->add_values()->set_int_value(int64_value);
+    }
+  }
+  void operator()(const std::vector<double> &vector_double_value) const noexcept
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(vector_double_value.size()));
+    for (const auto &double_value : vector_double_value)
+    {
+      array_value->add_values()->set_double_value(double_value);
+    }
+  }
+  void operator()(const std::vector<std::string> &vector_string_value) const noexcept
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(vector_string_value.size()));
+    for (const auto &string_value : vector_string_value)
+    {
+#if defined(ENABLE_OTLP_UTF8_VALIDITY)
+      if (utf8_range::IsStructurallyValid({string_value.data(), string_value.size()}))
+      {
+        array_value->add_values()->set_string_value(string_value.data(), string_value.size());
+      }
+      else
+      {
+        array_value->add_values()->set_bytes_value(string_value.data(), string_value.size());
+      }
+#else
+      array_value->add_values()->set_string_value(string_value.data(), string_value.size());
+#endif
+    }
+  }
+  void operator()(uint64_t uint64_value) const noexcept
+  {
+    // Values within int64_t range map to int_value and string if out of range per the `Mapping
+    // Arbitrary Data to OTLP AnyValue` specification.
+    if (uint64_value <= static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
+    {
+      proto_value_->set_int_value(static_cast<int64_t>(uint64_value));
+    }
+    else
+    {
+      proto_value_->set_string_value(std::to_string(uint64_value));
+    }
+  }
+  void operator()(const std::vector<uint64_t> &vector_uint64_value) const noexcept
+  {
+    // TODO: need to handle uint64_t values above int64_t range per the `Mapping Arbitrary Data to
+    // OTLP AnyValue` specification. A homogeneous array MUST NOT contain values of different types.
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(vector_uint64_value.size()));
+    for (const auto &uint64_value : vector_uint64_value)
+    {
+      array_value->add_values()->set_int_value(static_cast<int64_t>(uint64_value));
+    }
+  }
+  void operator()(const std::vector<uint8_t> &vector_uint8_value) const noexcept
+  {
+    if (allow_bytes_)
+    {
+      proto_value_->set_bytes_value(reinterpret_cast<const void *>(vector_uint8_value.data()),
+                                    vector_uint8_value.size());
+    }
+    else
+    {
+      opentelemetry::proto::common::v1::ArrayValue *array_value =
+          proto_value_->mutable_array_value();
+      array_value->mutable_values()->Reserve(static_cast<int>(vector_uint8_value.size()));
+      for (const auto &uint8_value : vector_uint8_value)
+      {
+        array_value->add_values()->set_int_value(uint8_value);
+      }
+    }
+  }
+};
+
+}  // namespace
+
+// NOLINTNEXTLINE(bugprone-exception-escape)
 void OtlpPopulateAttributeUtils::PopulateAnyValue(
     opentelemetry::proto::common::v1::AnyValue *proto_value,
     const opentelemetry::common::AttributeValue &value,
     bool allow_bytes) noexcept
 {
-  if (nullptr == proto_value)
-  {
-    return;
-  }
-
-  // Assert size of variant to ensure that this method gets updated if the variant
-  // definition changes
-  static_assert(
-      nostd::variant_size<opentelemetry::common::AttributeValue>::value == kAttributeValueSize,
-      "AttributeValue contains unknown type");
-
-  if (nostd::holds_alternative<bool>(value))
-  {
-    proto_value->set_bool_value(nostd::get<bool>(value));
-  }
-  else if (nostd::holds_alternative<int>(value))
-  {
-    proto_value->set_int_value(nostd::get<int>(value));
-  }
-  else if (nostd::holds_alternative<int64_t>(value))
-  {
-    proto_value->set_int_value(nostd::get<int64_t>(value));
-  }
-  else if (nostd::holds_alternative<unsigned int>(value))
-  {
-    proto_value->set_int_value(nostd::get<unsigned int>(value));
-  }
-  else if (nostd::holds_alternative<uint64_t>(value))
-  {
-    proto_value->set_int_value(
-        nostd::get<uint64_t>(value));  // NOLINT(cppcoreguidelines-narrowing-conversions)
-  }
-  else if (nostd::holds_alternative<double>(value))
-  {
-    proto_value->set_double_value(nostd::get<double>(value));
-  }
-  else if (nostd::holds_alternative<const char *>(value))
-  {
-    const char *str_value = nostd::get<const char *>(value);
-#if defined(ENABLE_OTLP_UTF8_VALIDITY)
-    if (utf8_range::IsStructurallyValid(str_value))
-    {
-      proto_value->set_string_value(str_value);
-    }
-    else
-    {
-      proto_value->set_bytes_value(str_value, strlen(str_value));
-    }
-#else
-    proto_value->set_string_value(str_value);
-#endif
-  }
-  else if (nostd::holds_alternative<nostd::string_view>(value))
-  {
-    nostd::string_view str_value = nostd::get<nostd::string_view>(value);
-#if defined(ENABLE_OTLP_UTF8_VALIDITY)
-    if (utf8_range::IsStructurallyValid({str_value.data(), str_value.size()}))
-    {
-      proto_value->set_string_value(str_value.data(), str_value.size());
-    }
-    else
-    {
-      proto_value->set_bytes_value(str_value.data(), str_value.size());
-    }
-#else
-    proto_value->set_string_value(str_value.data(), str_value.size());
-#endif
-  }
-  else if (nostd::holds_alternative<nostd::span<const uint8_t>>(value))
-  {
-    if (allow_bytes)
-    {
-      proto_value->set_bytes_value(
-          reinterpret_cast<const void *>(nostd::get<nostd::span<const uint8_t>>(value).data()),
-          nostd::get<nostd::span<const uint8_t>>(value).size());
-    }
-    else
-    {
-      auto array_value = proto_value->mutable_array_value();
-      for (const auto &val : nostd::get<nostd::span<const uint8_t>>(value))
-      {
-        array_value->add_values()->set_int_value(val);
-      }
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const bool>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const bool>>(value))
-    {
-      array_value->add_values()->set_bool_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const int>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const int>>(value))
-    {
-      array_value->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const int64_t>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const int64_t>>(value))
-    {
-      array_value->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const unsigned int>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const unsigned int>>(value))
-    {
-      array_value->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const uint64_t>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const uint64_t>>(value))
-    {
-      array_value->add_values()->set_int_value(
-          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const double>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const double>>(value))
-    {
-      array_value->add_values()->set_double_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const nostd::string_view>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const nostd::string_view>>(value))
-    {
-#if defined(ENABLE_OTLP_UTF8_VALIDITY)
-      if (utf8_range::IsStructurallyValid({val.data(), val.size()}))
-      {
-        array_value->add_values()->set_string_value(val.data(), val.size());
-      }
-      else
-      {
-        array_value->add_values()->set_bytes_value(val.data(), val.size());
-      }
-#else
-      array_value->add_values()->set_string_value(val.data(), val.size());
-#endif
-    }
-  }
+  // AttributeValueVisitor is noexcept and nostd::visit should never throw.
+  nostd::visit(AttributeValueVisitor{proto_value, allow_bytes}, value);
 }
 
+// NOLINTNEXTLINE(bugprone-exception-escape)
 void OtlpPopulateAttributeUtils::PopulateAnyValue(
     opentelemetry::proto::common::v1::AnyValue *proto_value,
     const opentelemetry::sdk::common::OwnedAttributeValue &value,
     bool allow_bytes) noexcept
 {
-  if (nullptr == proto_value)
-  {
-    return;
-  }
-
-  // Assert size of variant to ensure that this method gets updated if the variant
-  // definition changes
-  static_assert(nostd::variant_size<opentelemetry::sdk::common::OwnedAttributeValue>::value ==
-                    kOwnedAttributeValueSize,
-                "OwnedAttributeValue contains unknown type");
-
-  if (nostd::holds_alternative<bool>(value))
-  {
-    proto_value->set_bool_value(nostd::get<bool>(value));
-  }
-  else if (nostd::holds_alternative<int32_t>(value))
-  {
-    proto_value->set_int_value(nostd::get<int32_t>(value));
-  }
-  else if (nostd::holds_alternative<int64_t>(value))
-  {
-    proto_value->set_int_value(nostd::get<int64_t>(value));
-  }
-  else if (nostd::holds_alternative<uint32_t>(value))
-  {
-    proto_value->set_int_value(nostd::get<uint32_t>(value));
-  }
-  else if (nostd::holds_alternative<uint64_t>(value))
-  {
-    proto_value->set_int_value(
-        nostd::get<uint64_t>(value));  // NOLINT(cppcoreguidelines-narrowing-conversions)
-  }
-  else if (nostd::holds_alternative<double>(value))
-  {
-    proto_value->set_double_value(nostd::get<double>(value));
-  }
-  else if (nostd::holds_alternative<std::vector<uint8_t>>(value))
-  {
-    if (allow_bytes)
-    {
-      const std::vector<uint8_t> &byte_array = nostd::get<std::vector<uint8_t>>(value);
-      proto_value->set_bytes_value(reinterpret_cast<const void *>(byte_array.data()),
-                                   byte_array.size());
-    }
-    else
-    {
-      auto array_value = proto_value->mutable_array_value();
-      for (const auto &val : nostd::get<std::vector<uint8_t>>(value))
-      {
-        array_value->add_values()->set_int_value(val);
-      }
-    }
-  }
-  else if (nostd::holds_alternative<std::string>(value))
-  {
-    const std::string &str_value = nostd::get<std::string>(value);
-#if defined(ENABLE_OTLP_UTF8_VALIDITY)
-    if (utf8_range::IsStructurallyValid(str_value))
-    {
-      proto_value->set_string_value(str_value);
-    }
-    else
-    {
-      proto_value->set_bytes_value(str_value);
-    }
-#else
-    proto_value->set_string_value(str_value);
-#endif
-  }
-  else if (nostd::holds_alternative<std::vector<bool>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto val : nostd::get<std::vector<bool>>(value))
-    {
-      array_value->add_values()->set_bool_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<int32_t>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<std::vector<int32_t>>(value))
-    {
-      array_value->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<uint32_t>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<std::vector<uint32_t>>(value))
-    {
-      array_value->add_values()->set_int_value(
-          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<int64_t>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<std::vector<int64_t>>(value))
-    {
-      array_value->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<uint64_t>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<std::vector<uint64_t>>(value))
-    {
-      array_value->add_values()->set_int_value(
-          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<double>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<std::vector<double>>(value))
-    {
-      array_value->add_values()->set_double_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<std::string>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<std::vector<std::string>>(value))
-    {
-#if defined(ENABLE_OTLP_UTF8_VALIDITY)
-      if (utf8_range::IsStructurallyValid(val))
-      {
-        array_value->add_values()->set_string_value(val);
-      }
-      else
-      {
-        array_value->add_values()->set_bytes_value(val);
-      }
-#else
-      array_value->add_values()->set_string_value(val);
-#endif
-    }
-  }
+  // OwnedAttributeValueVisitor is noexcept and nostd::visit should never throw.
+  nostd::visit(OwnedAttributeValueVisitor{proto_value, allow_bytes}, value);
 }
 
 void OtlpPopulateAttributeUtils::PopulateAttribute(

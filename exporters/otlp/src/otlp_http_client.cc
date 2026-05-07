@@ -750,13 +750,21 @@ sdk::common::ExportResult OtlpHttpClient::Export(
     std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback,
     std::size_t max_running_requests) noexcept
 {
-  auto session = createSession(message, std::move(result_callback));
-  if (opentelemetry::nostd::holds_alternative<sdk::common::ExportResult>(session))
   {
-    return opentelemetry::nostd::get<sdk::common::ExportResult>(session);
-  }
+    auto created = createSession(message, std::move(result_callback));
+    if (const auto *result = opentelemetry::nostd::get_if<sdk::common::ExportResult>(&created))
+    {
+      return *result;
+    }
 
-  addSession(std::move(opentelemetry::nostd::get<HttpSessionData>(session)));
+    // created contains a valid HttpSessionData object
+    auto *session_data = opentelemetry::nostd::get_if<HttpSessionData>(&created);
+    if (session_data == nullptr)
+    {
+      return sdk::common::ExportResult::kFailure;
+    }
+    addSession(std::move(*session_data));
+  }  // created (and the moved-from HttpSessionData) released here
 
   // Wait for the response to be received
   if (options_.console_debug)
