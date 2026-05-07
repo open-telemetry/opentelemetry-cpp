@@ -89,6 +89,11 @@ TEST(ReadWriteLogRecord, SetAndGet)
 class TestBodyLogger : public opentelemetry::logs::Logger
 {
 public:
+  TestBodyLogger() noexcept
+  {
+    SetMinimumSeverity(static_cast<uint8_t>(opentelemetry::logs::Severity::kTrace));
+  }
+
   const nostd::string_view GetName() noexcept override { return "test body logger"; }
 
   nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override
