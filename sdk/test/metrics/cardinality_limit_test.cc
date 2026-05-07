@@ -146,6 +146,11 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
           count_attributes++;
           if (data_attr.attributes.begin()->first == kAttributesLimitOverflowKey)
           {
+            // Per the spec, the overflow data point MUST contain exactly one
+            // attribute, with the key `otel.metric.overflow` and the boolean
+            // value `true`.
+            EXPECT_EQ(data_attr.attributes.size(), 1u);
+            EXPECT_EQ(nostd::get<bool>(data_attr.attributes.begin()->second), true);
             EXPECT_EQ(nostd::get<int64_t>(data.value_), record_value * 6);
             overflow_present = true;
           }
@@ -159,15 +164,22 @@ INSTANTIATE_TEST_SUITE_P(All,
                          WritableMetricStorageCardinalityLimitTestFixture,
                          ::testing::Values(AggregationTemporality::kDelta));
 
-// Pin the overflow attribute key to the value defined in the OpenTelemetry
-// Metrics SDK specification. The previous value `otel.metrics.overflow`
-// (plural) silently diverged from the spec for years because every other
-// metrics test referenced the C++ symbol instead of the literal, so a typo
-// in the constant could not be caught by tests. Keep this assertion against
-// the literal string so any future drift is detected immediately.
+// Pin the overflow attribute key and value to the contract defined in the
+// OpenTelemetry Metrics SDK specification. The previous key value
+// `otel.metrics.overflow` (plural) silently diverged from the spec for years
+// because every other metrics test referenced the C++ symbol instead of the
+// literal, so a typo in the constant could not be caught by tests. Keep this
+// assertion against the literals so any future drift is detected immediately.
 // Spec:
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#cardinality-limits
 TEST(CardinalityLimitOverflowAttribute, MatchesSpecLiteral)
 {
   EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowKey, "otel.metric.overflow");
+  EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowValue, true);
+  // The precomputed overflow attribute set MUST contain exactly the spec key
+  // mapped to the boolean value `true`.
+  ASSERT_EQ(opentelemetry::sdk::metrics::kOverflowAttributes.size(), 1u);
+  const auto &entry = *opentelemetry::sdk::metrics::kOverflowAttributes.begin();
+  EXPECT_EQ(entry.first, "otel.metric.overflow");
+  EXPECT_EQ(nostd::get<bool>(entry.second), true);
 }
