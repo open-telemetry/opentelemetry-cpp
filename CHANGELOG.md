@@ -60,6 +60,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy narrowing conversions in baggage
   [#3989](https://github.com/open-telemetry/opentelemetry-cpp/pull/3989)
 
+* [EXPORTER] implement non-utf8 string to bytes in OTLP exporters
+  [#3991](https://github.com/open-telemetry/opentelemetry-cpp/pull/3991)
+
 * [CODE HEALTH] Fix misc clang-tidy warnings
   [#3993](https://github.com/open-telemetry/opentelemetry-cpp/pull/3993)
 
@@ -109,6 +112,10 @@ Important changes:
   * Bazel now always builds with ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW.
   * grpc properties for ssl KEY and CERT are always available,
     adjust the application code to initialize all members in grpc options.
+
+* Add WITH_OTLP_UTF8_VALIDITY for CMake and enable ENABLE_OTLP_UTF8_VALIDITY for
+  Bazel to export non-UTF-8 strings as bytes in OTLP.
+  [#3991](https://github.com/open-telemetry/opentelemetry-cpp/pull/3991)
 
 * Enable ENABLE_OTLP_RETRY_PREVIEW for bazel
   [#4010](https://github.com/open-telemetry/opentelemetry-cpp/pull/4010)
