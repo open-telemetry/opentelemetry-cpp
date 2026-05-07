@@ -153,6 +153,10 @@ option(
   "Whether to include gzip compression for the OTLP http exporter in the SDK"
   OFF)
 
+option(
+  WITH_OTLP_UTF8_VALIDITY
+  "Whether to enable UTF-8 validity checks for the OTLP exporter in the SDK" ON)
+
 option(WITH_CURL_LOGGING "Whether to enable select CURL verbosity in OTel logs"
        OFF)
 
