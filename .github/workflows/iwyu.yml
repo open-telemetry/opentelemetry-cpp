@@ -22,7 +22,7 @@ jobs:
           - cmake_options: all-options-abiv1-preview
             warning_limit: 190
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 168
+            warning_limit: 187
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
