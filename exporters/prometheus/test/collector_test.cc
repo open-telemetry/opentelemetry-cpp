@@ -78,7 +78,7 @@ TEST(PrometheusCollector, BasicTests)
   MockMetricReader reader;
   MockMetricProducer producer;
   reader.SetMetricProducer(&producer);
-  PrometheusCollector collector(&reader, true, false);
+  PrometheusCollector collector(&reader, true, false, false, false);
   auto data = collector.Collect();
 
   // Collection size should be the same as the size
