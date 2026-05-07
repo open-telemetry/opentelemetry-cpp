@@ -64,6 +64,13 @@ void TracerContext::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexc
   multi_processor->AddProcessor(std::move(processor));
 }
 
+void TracerContext::SetTracerConfigurator(
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
+        tracer_configurator) noexcept
+{
+  tracer_configurator_ = std::move(tracer_configurator);
+}
+
 SpanProcessor &TracerContext::GetProcessor() const noexcept
 {
   return *processor_;
