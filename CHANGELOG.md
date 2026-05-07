@@ -118,6 +118,19 @@ Important changes:
   * namespace opentelemetry::plugin is deprecated
   * See file DEPRECATED.md for details.
 
+* [SDK] Fix cardinality-limit overflow attribute name to match the
+  specification
+  [#4060](https://github.com/open-telemetry/opentelemetry-cpp/pull/4060)
+
+  * The synthetic overflow data point attribute is now exported as
+    `otel.metric.overflow` (singular) per the
+    [Metrics SDK specification](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#cardinality-limits).
+  * Previously the SDK exported `otel.metrics.overflow` (plural), which
+    diverged from the spec and from every other language SDK
+    (Go, Java, JS, .NET).
+  * Downstream consumers (dashboards, alerts, queries) that filtered on
+    the old name must be updated to the spec-correct name.
+
 Breaking changes:
 
 * [SDK] env var durations non conforming to spec
