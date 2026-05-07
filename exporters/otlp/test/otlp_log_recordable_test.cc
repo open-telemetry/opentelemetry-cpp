@@ -5,19 +5,22 @@
 #include <stdint.h>
 #include <chrono>
 #include <cstring>
+#include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/readable_log_record.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
@@ -26,6 +29,8 @@
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 // IWYU pragma: no_include "net/proto2/public/repeated_field.h"
+#include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
+#include "opentelemetry/proto/resource/v1/resource.pb.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/logs/v1/logs.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
@@ -286,6 +291,132 @@ TYPED_TEST(OtlpLogRecordableIntAttributeTest, SetIntArrayAttribute)
     EXPECT_EQ(rec.log_record().attributes(0).value().array_value().values(i).int_value(),
               int_span[i]);
   }
+}
+// Test logs PopulateRequest groups records by resource and instrumentation scope
+TEST(OtlpLogRecordable, PopulateRequest)
+{
+  auto rec1      = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  auto resource1 = resource::Resource::Create({{"service.name", "one"}});
+  auto inst_lib1 =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("one", "1");
+  rec1->SetResource(resource1);
+  rec1->SetInstrumentationScope(*inst_lib1);
+
+  auto rec2      = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  auto resource2 = resource::Resource::Create({{"service.name", "two"}});
+  auto inst_lib2 =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("two", "2");
+  rec2->SetResource(resource2);
+  rec2->SetInstrumentationScope(*inst_lib2);
+
+  // Same resource as rec2, different scope
+  auto rec3 = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  auto inst_lib3 =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("three", "3");
+  rec3->SetResource(resource2);
+  rec3->SetInstrumentationScope(*inst_lib3);
+
+  proto::collector::logs::v1::ExportLogsServiceRequest req;
+  std::vector<std::unique_ptr<sdk::logs::Recordable>> logs;
+  logs.push_back(std::move(rec1));
+  logs.push_back(std::move(rec2));
+  logs.push_back(std::move(rec3));
+  const nostd::span<std::unique_ptr<sdk::logs::Recordable>, 3> logs_span(logs.data(), 3);
+  OtlpRecordableUtils::PopulateRequest(logs_span, &req);
+
+  EXPECT_EQ(req.resource_logs_size(), 2);
+  for (const auto &resource_logs : req.resource_logs())
+  {
+    ASSERT_GT(resource_logs.resource().attributes_size(), 0);
+    const auto service_name    = resource_logs.resource().attributes(0).value().string_value();
+    const auto scope_logs_size = resource_logs.scope_logs_size();
+    if (service_name == "one")
+    {
+      EXPECT_EQ(scope_logs_size, 1);
+      EXPECT_EQ(resource_logs.scope_logs(0).scope().name(), "one");
+    }
+    if (service_name == "two")
+    {
+      EXPECT_EQ(scope_logs_size, 2);
+    }
+  }
+}
+
+// Test logs PopulateRequest handles missing resource and scope gracefully
+TEST(OtlpLogRecordable, PopulateRequestMissing)
+{
+  // Missing scope (no SetInstrumentationScope call)
+  auto rec1      = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  auto resource1 = resource::Resource::Create({{"service.name", "one"}});
+  rec1->SetResource(resource1);
+
+  // Missing resource (no SetResource call)
+  auto rec2 = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  auto inst_lib2 =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("two", "2");
+  rec2->SetInstrumentationScope(*inst_lib2);
+
+  proto::collector::logs::v1::ExportLogsServiceRequest req;
+  std::vector<std::unique_ptr<sdk::logs::Recordable>> logs;
+  logs.push_back(std::move(rec1));
+  logs.push_back(std::move(rec2));
+  const nostd::span<std::unique_ptr<sdk::logs::Recordable>, 2> logs_span(logs.data(), 2);
+  OtlpRecordableUtils::PopulateRequest(logs_span, &req);
+
+  EXPECT_EQ(req.resource_logs_size(), 2);
+  for (const auto &resource_logs : req.resource_logs())
+  {
+    // Both should produce exactly one scope_logs entry
+    EXPECT_EQ(resource_logs.scope_logs_size(), 1);
+  }
+}
+
+// Test logs PopulateRequest ignores a null request pointer
+TEST(OtlpLogRecordable, PopulateRequestNullRequest)
+{
+  auto rec1      = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  auto resource1 = resource::Resource::Create({{"service.name", "one"}});
+  rec1->SetResource(resource1);
+
+  std::vector<std::unique_ptr<sdk::logs::Recordable>> logs;
+  logs.push_back(std::move(rec1));
+  const nostd::span<std::unique_ptr<sdk::logs::Recordable>, 1> logs_span(logs.data(), 1);
+
+  // Should not crash when request is null
+  OtlpRecordableUtils::PopulateRequest(logs_span, nullptr);
+}
+
+// Test logs PopulateRequest deduplicates scope by value when pointer identities differ
+TEST(OtlpLogRecordable, PopulateRequestSameScope)
+{
+  auto resource = resource::Resource::Create({{"service.name", "same"}});
+
+  // Two independent InstrumentationScope objects with identical values
+  auto inst_lib_a =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("lib", "1.0");
+  auto inst_lib_b =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("lib", "1.0");
+
+  auto rec1 = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  rec1->SetResource(resource);
+  rec1->SetInstrumentationScope(*inst_lib_a);
+
+  auto rec2 = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  rec2->SetResource(resource);
+  rec2->SetInstrumentationScope(*inst_lib_b);
+
+  proto::collector::logs::v1::ExportLogsServiceRequest req;
+  std::vector<std::unique_ptr<sdk::logs::Recordable>> logs;
+  logs.push_back(std::move(rec1));
+  logs.push_back(std::move(rec2));
+  const nostd::span<std::unique_ptr<sdk::logs::Recordable>, 2> logs_span(logs.data(), 2);
+  OtlpRecordableUtils::PopulateRequest(logs_span, &req);
+
+  // One resource, one scope (deduplicated by value), two log records
+  ASSERT_EQ(req.resource_logs_size(), 1);
+  ASSERT_EQ(req.resource_logs(0).scope_logs_size(), 1);
+  EXPECT_EQ(req.resource_logs(0).scope_logs(0).log_records_size(), 2);
+  EXPECT_EQ(req.resource_logs(0).scope_logs(0).scope().name(), "lib");
 }
 }  // namespace otlp
 }  // namespace exporter
