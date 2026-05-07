@@ -688,6 +688,52 @@ TEST(OtlpRecordableTest, TestLinkLimits)
   EXPECT_EQ(link_list[0].attributes_size(), 1);
   EXPECT_EQ(link_list[0].dropped_attributes_count(), 1);
 }
+
+// Test PopulateRequest ignores a null request pointer
+TEST(OtlpRecordable, PopulateRequestNullRequest)
+{
+  auto rec1      = std::unique_ptr<sdk::trace::Recordable>(std::make_unique<OtlpRecordable>());
+  auto resource1 = resource::Resource::Create({{"service.name", "one"}});
+  rec1->SetResource(resource1);
+
+  std::vector<std::unique_ptr<sdk::trace::Recordable>> spans;
+  spans.push_back(std::move(rec1));
+  const nostd::span<std::unique_ptr<sdk::trace::Recordable>, 1> spans_span(spans.data(), 1);
+
+  // Should not crash when request is null
+  OtlpRecordableUtils::PopulateRequest(spans_span, nullptr);
+}
+
+// Test PopulateRequest deduplicates scope by value when pointer identities differ
+TEST(OtlpRecordable, PopulateRequestSameScope)
+{
+  auto resource = resource::Resource::Create({{"service.name", "same"}});
+
+  // Two independent InstrumentationScope objects with identical values
+  auto inst_lib_a = trace_sdk::InstrumentationScope::Create("lib", "1.0");
+  auto inst_lib_b = trace_sdk::InstrumentationScope::Create("lib", "1.0");
+
+  auto rec1 = std::unique_ptr<sdk::trace::Recordable>(std::make_unique<OtlpRecordable>());
+  rec1->SetResource(resource);
+  rec1->SetInstrumentationScope(*inst_lib_a);
+
+  auto rec2 = std::unique_ptr<sdk::trace::Recordable>(std::make_unique<OtlpRecordable>());
+  rec2->SetResource(resource);
+  rec2->SetInstrumentationScope(*inst_lib_b);
+
+  proto::collector::trace::v1::ExportTraceServiceRequest req;
+  std::vector<std::unique_ptr<sdk::trace::Recordable>> spans;
+  spans.push_back(std::move(rec1));
+  spans.push_back(std::move(rec2));
+  const nostd::span<std::unique_ptr<sdk::trace::Recordable>, 2> spans_span(spans.data(), 2);
+  OtlpRecordableUtils::PopulateRequest(spans_span, &req);
+
+  // One resource, one scope (deduplicated by value), two spans
+  ASSERT_EQ(req.resource_spans_size(), 1);
+  ASSERT_EQ(req.resource_spans(0).scope_spans_size(), 1);
+  EXPECT_EQ(req.resource_spans(0).scope_spans(0).spans_size(), 2);
+  EXPECT_EQ(req.resource_spans(0).scope_spans(0).scope().name(), "lib");
+}
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
