@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <map>
 #include <string>
 #include <utility>
@@ -10,6 +12,7 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
 #include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
@@ -23,6 +26,14 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include "opentelemetry/context/context.h"
+#  include "opentelemetry/nostd/variant.h"
+#endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
 using opentelemetry::logs::NoopEventLogger;
@@ -37,8 +48,11 @@ using opentelemetry::logs::Severity;
 using opentelemetry::nostd::shared_ptr;
 using opentelemetry::nostd::string_view;
 namespace common = opentelemetry::common;
-namespace nostd  = opentelemetry::nostd;
-namespace trace  = opentelemetry::trace;
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+namespace context = opentelemetry::context;
+#endif
+namespace nostd = opentelemetry::nostd;
+namespace trace = opentelemetry::trace;
 
 // Check that the default logger is a noop logger instance
 TEST(Logger, GetLoggerDefault)
@@ -264,6 +278,148 @@ class TestLogger : public Logger
   }
 };
 
+class EnablementAwareTestLogRecord : public opentelemetry::logs::LogRecord
+{
+public:
+  void SetTimestamp(common::SystemTimestamp /*timestamp*/) noexcept override {}
+
+  void SetObservedTimestamp(common::SystemTimestamp /*timestamp*/) noexcept override {}
+
+  void SetSeverity(Severity severity) noexcept override { severity_ = severity; }
+
+  void SetBody(const common::AttributeValue & /*message*/) noexcept override
+  {
+    body_was_set_ = true;
+  }
+
+  void SetAttribute(nostd::string_view /*key*/,
+                    const common::AttributeValue & /*value*/) noexcept override
+  {}
+
+  void SetEventId(int64_t id, nostd::string_view name = {}) noexcept override
+  {
+    event_id_           = id;
+    event_id_was_set_   = true;
+    event_name_was_set_ = !name.empty();
+  }
+
+  void SetTraceId(const trace::TraceId & /*trace_id*/) noexcept override {}
+
+  void SetSpanId(const trace::SpanId & /*span_id*/) noexcept override {}
+
+  void SetTraceFlags(const trace::TraceFlags & /*trace_flags*/) noexcept override {}
+
+  Severity severity_{Severity::kInvalid};
+  int64_t event_id_{-1};
+  bool body_was_set_{false};
+  bool event_id_was_set_{false};
+  bool event_name_was_set_{false};
+};
+
+class EnablementAwareTestLogger : public Logger
+{
+public:
+  explicit EnablementAwareTestLogger(Severity minimum_severity,
+                                     bool event_id_enabled = false) noexcept
+      : event_id_enabled_(event_id_enabled)
+  {
+    SetMinimumSeverity(static_cast<uint8_t>(minimum_severity));
+  }
+
+  const nostd::string_view GetName() noexcept override { return "enablement-aware logger"; }
+
+  nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override
+  {
+    ++create_log_record_calls_;
+    return nostd::unique_ptr<opentelemetry::logs::LogRecord>(new EnablementAwareTestLogRecord());
+  }
+
+  using Logger::EmitLogRecord;
+
+  void EmitLogRecord(
+      nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept override
+  {
+    auto owned_log_record = std::move(log_record);
+    if (owned_log_record)
+    {
+      ++emit_log_record_calls_;
+      last_emitted_record_.reset(
+          static_cast<EnablementAwareTestLogRecord *>(owned_log_record.release()));
+    }
+  }
+
+  void SetEventIdEnabled(bool enabled) noexcept { event_id_enabled_ = enabled; }
+
+  size_t create_log_record_calls_{0};
+  size_t emit_log_record_calls_{0};
+  mutable size_t enabled_calls_{0};
+  mutable size_t enabled_with_event_id_calls_{0};
+  mutable Severity last_enabled_severity_{Severity::kInvalid};
+  mutable int64_t last_enabled_event_id_{-1};
+  mutable bool last_enabled_context_has_test_key_{false};
+  mutable bool last_enabled_context_test_key_value_{false};
+  nostd::unique_ptr<EnablementAwareTestLogRecord> last_emitted_record_;
+
+protected:
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  bool EnabledImplementation(const context::Context &context,
+                             Severity severity) const noexcept override
+  {
+    ++enabled_calls_;
+    last_enabled_severity_ = severity;
+    auto value             = context.GetValue("test-key");
+    if (const bool *maybe_value = nostd::get_if<bool>(&value))
+    {
+      last_enabled_context_has_test_key_   = true;
+      last_enabled_context_test_key_value_ = *maybe_value;
+    }
+    else
+    {
+      last_enabled_context_has_test_key_   = false;
+      last_enabled_context_test_key_value_ = false;
+    }
+    return true;
+  }
+
+  bool EnabledImplementation(const context::Context &context,
+                             Severity severity,
+                             const EventId &event_id) const noexcept override
+  {
+    ++enabled_with_event_id_calls_;
+    last_enabled_severity_ = severity;
+    last_enabled_event_id_ = event_id.id_;
+    auto value             = context.GetValue("test-key");
+    if (const bool *maybe_value = nostd::get_if<bool>(&value))
+    {
+      last_enabled_context_has_test_key_   = true;
+      last_enabled_context_test_key_value_ = *maybe_value;
+    }
+    else
+    {
+      last_enabled_context_has_test_key_   = false;
+      last_enabled_context_test_key_value_ = false;
+    }
+    return event_id_enabled_;
+  }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+  bool EnabledImplementation(Severity severity, const EventId &event_id) const noexcept override
+  {
+    ++enabled_with_event_id_calls_;
+    last_enabled_severity_ = severity;
+    last_enabled_event_id_ = event_id.id_;
+    return event_id_enabled_;
+  }
+
+  bool EnabledImplementation(Severity severity, int64_t event_id) const noexcept override
+  {
+    return EnabledImplementation(severity, EventId{event_id});
+  }
+
+private:
+  bool event_id_enabled_;
+};
+
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
 class TestProvider : public LoggerProvider
 {
@@ -290,3 +446,18 @@ TEST(Logger, PushLoggerImplementation)
   auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
   ASSERT_EQ("test logger", logger->GetName());
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+TEST(Logger, EnabledWithExplicitContextUsesContextAwareImplementation)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace);
+
+  context::Context test_context{"test-key", true};
+
+  EXPECT_TRUE(logger.Enabled(test_context, Severity::kInfo));
+  EXPECT_EQ(logger.enabled_calls_, 1u);
+  EXPECT_EQ(logger.last_enabled_severity_, Severity::kInfo);
+  EXPECT_TRUE(logger.last_enabled_context_has_test_key_);
+  EXPECT_TRUE(logger.last_enabled_context_test_key_value_);
+}
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2

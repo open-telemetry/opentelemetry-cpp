@@ -10,6 +10,7 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/logs/multi_recordable.h"
 #include "opentelemetry/sdk/logs/processor.h"
