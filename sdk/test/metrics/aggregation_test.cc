@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <algorithm>
 #include <limits>
 #include <string>
 #include <vector>
@@ -21,6 +22,76 @@
 
 using namespace opentelemetry::sdk::metrics;
 namespace nostd = opentelemetry::nostd;
+
+namespace
+{
+
+uint64_t SumAllBuckets(const Base2ExponentialHistogramPointData &point)
+{
+  uint64_t total = 0;
+  if (point.positive_buckets_ && !point.positive_buckets_->Empty())
+  {
+    for (int32_t i = point.positive_buckets_->StartIndex();
+         i <= point.positive_buckets_->EndIndex(); ++i)
+    {
+      total += point.positive_buckets_->Get(i);
+    }
+  }
+  if (point.negative_buckets_ && !point.negative_buckets_->Empty())
+  {
+    for (int32_t i = point.negative_buckets_->StartIndex();
+         i <= point.negative_buckets_->EndIndex(); ++i)
+    {
+      total += point.negative_buckets_->Get(i);
+    }
+  }
+  return total;
+}
+
+Base2ExponentialHistogramAggregationConfig MakeAggregationConfig(int max_scale, size_t max_buckets)
+{
+  Base2ExponentialHistogramAggregationConfig config;
+  config.max_scale_   = max_scale;
+  config.max_buckets_ = max_buckets;
+  return config;
+}
+
+Base2ExponentialHistogramPointData MakePointData(const Aggregation &a)
+{
+  return nostd::get<Base2ExponentialHistogramPointData>(a.ToPoint());
+}
+
+void ExpectCountInvariant(uint64_t expected_count,
+                          const Base2ExponentialHistogramPointData &point,
+                          nostd::string_view label = "")
+{
+  SCOPED_TRACE(label);
+  EXPECT_EQ(point.count_, expected_count);
+  EXPECT_EQ(point.count_, point.zero_count_ + SumAllBuckets(point));
+}
+
+void PopulateAggregation(Base2ExponentialHistogramAggregation &aggr,
+                         double start,
+                         double stop,
+                         double factor)
+{
+  // Populate an aggregation with values spread across several orders of magnitude to force a scale
+  // reduction
+  for (double v = start; v <= stop; v *= factor)
+  {
+    aggr.Aggregate(v, {});
+  }
+}
+
+constexpr double kSampleAStart  = 1e-4;
+constexpr double kSampleAStop   = 10.0;
+constexpr double kSampleAFactor = 1.3;
+constexpr double kSampleBStart  = 2e-4;
+constexpr double kSampleBStop   = 5.0;
+constexpr double kSampleBFactor = 1.4;
+
+}  // namespace
+
 TEST(Aggregation, LongSumAggregation)
 {
   LongSumAggregation aggr(true);
@@ -459,46 +530,9 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMerge)
 //
 TEST(Aggregation, Base2ExponentialHistogramAggregationMergeCountInvariant)
 {
-  // Helper to sum all bucket counts
-  auto sum_bucket_counts = [](const Base2ExponentialHistogramPointData &point) -> uint64_t {
-    uint64_t total = 0;
-    if (point.positive_buckets_ && !point.positive_buckets_->Empty())
-    {
-      for (int32_t i = point.positive_buckets_->StartIndex();
-           i <= point.positive_buckets_->EndIndex(); ++i)
-      {
-        total += point.positive_buckets_->Get(i);
-      }
-    }
-    if (point.negative_buckets_ && !point.negative_buckets_->Empty())
-    {
-      for (int32_t i = point.negative_buckets_->StartIndex();
-           i <= point.negative_buckets_->EndIndex(); ++i)
-      {
-        total += point.negative_buckets_->Get(i);
-      }
-    }
-    return total;
-  };
-
-  // Helper to verify the count invariant
-  auto verify_invariant = [&sum_bucket_counts](const Base2ExponentialHistogramPointData &point,
-                                               uint64_t expected_count, const std::string &phase) {
-    uint64_t bucket_sum       = sum_bucket_counts(point);
-    uint64_t calculated_count = point.zero_count_ + bucket_sum;
-
-    EXPECT_EQ(point.count_, expected_count) << "Count mismatch at " << phase << ": expected "
-                                            << expected_count << ", got " << point.count_;
-    EXPECT_EQ(point.count_, calculated_count)
-        << "Invariant violation at " << phase << ": count(" << point.count_ << ") != zero_count("
-        << point.zero_count_ << ") + bucket_sum(" << bucket_sum << ") = " << calculated_count;
-  };
-
   // Use scale 0 for easy bucket index reasoning: value 2^N -> index N-1
   // Use max_buckets=5 so we can trigger the bug with small powers of 2
-  Base2ExponentialHistogramAggregationConfig config;
-  config.max_scale_   = 0;
-  config.max_buckets_ = 5;
+  const auto config = MakeAggregationConfig(0, 5);
 
   std::unique_ptr<Aggregation> cumulative =
       std::make_unique<Base2ExponentialHistogramAggregation>(&config);
@@ -518,7 +552,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMergeCountInvariant)
     cumulative = cumulative->Merge(delta);
 
     auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
-    verify_invariant(point, expected_count, "Cycle 1: indices 0-4");
+    ExpectCountInvariant(expected_count, point, "Cycle 1: indices 0-4");
 
     // Verify bucket positions
     EXPECT_EQ(point.positive_buckets_->StartIndex(), 0);
@@ -541,7 +575,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMergeCountInvariant)
     cumulative = cumulative->Merge(delta);
 
     auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
-    verify_invariant(point, expected_count, "Cycle 2: combined indices 0-5");
+    ExpectCountInvariant(expected_count, point, "Cycle 2: indices 1-5");
   }
 
   // === Cycle 3: values 8,16,32,64,128 -> indices 2,3,4,5,6 ===
@@ -557,7 +591,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMergeCountInvariant)
     cumulative = cumulative->Merge(delta);
 
     auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
-    verify_invariant(point, expected_count, "Cycle 3: indices 2-6");
+    ExpectCountInvariant(expected_count, point, "Cycle 3: indices 2-6");
   }
 
   // === Cycle 4: values 16,32,64,128,256 -> indices 3,4,5,6,7 ===
@@ -573,7 +607,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMergeCountInvariant)
     cumulative = cumulative->Merge(delta);
 
     auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
-    verify_invariant(point, expected_count, "Cycle 4: indices 3-7");
+    ExpectCountInvariant(expected_count, point, "Cycle 4: indices 3-7");
   }
 
   // === Cycle 5: values 32,64,128,256,512 -> indices 4,5,6,7,8 ===
@@ -589,7 +623,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMergeCountInvariant)
     cumulative = cumulative->Merge(delta);
 
     auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
-    verify_invariant(point, expected_count, "Cycle 5: indices 4-8");
+    ExpectCountInvariant(expected_count, point, "Cycle 5: indices 4-8");
   }
 
   // === Cycle 6: values 64,128,256,512,1024 -> indices 5,6,7,8,9 ===
@@ -605,30 +639,302 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMergeCountInvariant)
     cumulative = cumulative->Merge(delta);
 
     auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
-    verify_invariant(point, expected_count, "Cycle 6: indices 5-9");
+    ExpectCountInvariant(expected_count, point, "Cycle 6: indices 5-9");
+  }
+
+  // === Cycle 7: zeros only -> zero_count_ grows, buckets unchanged ===
+  {
+    Base2ExponentialHistogramAggregation delta(&config);
+    delta.Aggregate(0.0, {});
+    delta.Aggregate(0.0, {});
+    delta.Aggregate(0.0, {});
+    expected_count += 3;
+
+    cumulative = cumulative->Merge(delta);
+
+    auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
+    ExpectCountInvariant(expected_count, point, "Cycle 7: zeros");
+    EXPECT_GE(point.zero_count_, 3u);
+  }
+
+  // === Cycle 8: small positives -> positive bucket range spans both negative and positive indices,
+  // requires scale reduction ===
+  {
+    Base2ExponentialHistogramAggregation delta(&config);
+    delta.Aggregate(1.0 / 64.0, {});  // 2^-6 -> index -7 at scale 0
+    delta.Aggregate(1.0 / 32.0, {});  // 2^-5 -> index -6 at scale 0
+    delta.Aggregate(1.0 / 16.0, {});  // 2^-4 -> index -5 at scale 0
+    expected_count += 3;
+
+    cumulative = cumulative->Merge(delta);
+
+    auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
+    ExpectCountInvariant(expected_count, point, "Cycle 8: small positives");
+  }
+
+  // === Cycle 9: large negatives -> populate negative_buckets_ [0..4] for the first time ===
+  {
+    Base2ExponentialHistogramAggregation delta(&config);
+    delta.Aggregate(-2.0, {});   // |2^1|  -> negative index 0
+    delta.Aggregate(-4.0, {});   // |2^2|  -> negative index 1
+    delta.Aggregate(-8.0, {});   // |2^3|  -> negative index 2
+    delta.Aggregate(-16.0, {});  // |2^4|  -> negative index 3
+    delta.Aggregate(-32.0, {});  // |2^5|  -> negative index 4
+    expected_count += 5;
+
+    cumulative = cumulative->Merge(delta);
+
+    auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
+    ExpectCountInvariant(expected_count, point, "Cycle 9: large negatives");
+    ASSERT_TRUE(point.negative_buckets_ && !point.negative_buckets_->Empty());
+  }
+
+  // === Cycle 10: small negatives -> negative bucket range spans both negative and positive
+  // indices, requires scale reduction ===
+  {
+    Base2ExponentialHistogramAggregation delta(&config);
+    delta.Aggregate(-1.0 / 64.0, {});  // -> negative index -7
+    delta.Aggregate(-1.0 / 32.0, {});  // -> negative index -6
+    delta.Aggregate(-1.0 / 16.0, {});  // -> negative index -5
+    expected_count += 3;
+
+    cumulative = cumulative->Merge(delta);
+
+    auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
+    ExpectCountInvariant(expected_count, point, "Cycle 10: small negatives");
+  }
+
+  // === Cycle 11: mixed-sign + zero -> all three accumulators populated on both sides ===
+  {
+    Base2ExponentialHistogramAggregation delta(&config);
+    delta.Aggregate(0.0, {});
+    delta.Aggregate(2048.0, {});        // large positive
+    delta.Aggregate(-2048.0, {});       // large negative
+    delta.Aggregate(1.0 / 128.0, {});   // small positive
+    delta.Aggregate(-1.0 / 128.0, {});  // small negative
+    expected_count += 5;
+
+    cumulative = cumulative->Merge(delta);
+
+    auto point = nostd::get<Base2ExponentialHistogramPointData>(cumulative->ToPoint());
+    ExpectCountInvariant(expected_count, point, "Cycle 11: mixed-sign + zero");
+  }
+
+  // === Cycle 12: merge into empty aggregation ===
+  {
+    Base2ExponentialHistogramAggregation empty_aggregation(&config);
+    auto remerged = empty_aggregation.Merge(*cumulative);
+
+    auto point = nostd::get<Base2ExponentialHistogramPointData>(remerged->ToPoint());
+    ExpectCountInvariant(expected_count, point, "Cycle 12: merge into empty");
   }
 }
 
-TEST(Aggregation, Base2ExponentialHistogramAggregationDiffDownscale)
+TEST(Aggregation, Base2ExponentialHistogramAggregationMergeIndexCrossesZero)
 {
-  // Force the scale-reduction branch in Diff() by giving left and right
-  // bucket indices whose combined span exceeds max_buckets. Each side
-  // individually has only one bucket so neither triggers Aggregate's
-  // internal Downscale; the reduction must happen inside Diff().
-  Base2ExponentialHistogramAggregationConfig config;
-  config.max_scale_   = 0;
-  config.max_buckets_ = 5;
+  const auto config = MakeAggregationConfig(0, 5);
+  Base2ExponentialHistogramAggregation small_aggr(&config);
+  small_aggr.Aggregate(1.0 / 64.0, {});  // 2^-6 -> index -7
+  small_aggr.Aggregate(1.0 / 32.0, {});  // 2^-5 -> index -6
+
+  Base2ExponentialHistogramAggregation large_aggr(&config);
+  large_aggr.Aggregate(4.0, {});   // index 1
+  large_aggr.Aggregate(8.0, {});   // index 2
+  large_aggr.Aggregate(16.0, {});  // index 3
+
+  // Verify that each side individually fits within max_buckets at scale 0.
+  EXPECT_EQ(MakePointData(small_aggr).scale_, 0);
+  EXPECT_EQ(MakePointData(large_aggr).scale_, 0);
+
+  const auto merged_point = MakePointData(*small_aggr.Merge(large_aggr));
+
+  EXPECT_EQ(merged_point.zero_count_, 0u);
+  ExpectCountInvariant(5u, merged_point, "MergeIndexCrossesZero");
+  EXPECT_LT(merged_point.scale_, 0);
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationMergeNegativeIndexCrossesZero)
+{
+  const auto config = MakeAggregationConfig(0, 5);
+
+  // At scale 0: |v| = 2^k -> negative_buckets_[k-1].
+  Base2ExponentialHistogramAggregation small_aggr(&config);
+  small_aggr.Aggregate(-1.0 / 64.0, {});  // index -7
+  small_aggr.Aggregate(-1.0 / 32.0, {});  // index -6
+
+  Base2ExponentialHistogramAggregation large_aggr(&config);
+  large_aggr.Aggregate(-4.0, {});   // index 1
+  large_aggr.Aggregate(-8.0, {});   // index 2
+  large_aggr.Aggregate(-16.0, {});  // index 3
+
+  // Combined range [-7..3] = 11 > max_buckets_=5.
+  const auto merged_point = MakePointData(*small_aggr.Merge(large_aggr));
+
+  EXPECT_EQ(merged_point.zero_count_, 0u);
+  ExpectCountInvariant(5u, merged_point, "MergeNegativeIndexCrossesZero");
+  EXPECT_LT(merged_point.scale_, 0);
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationMergeMixedSignAsymmetricSpan)
+{
+  const auto config = MakeAggregationConfig(0, 5);
+
+  Base2ExponentialHistogramAggregation aggr_a(&config);
+  aggr_a.Aggregate(0.5, {});
+  aggr_a.Aggregate(0.25, {});
+  aggr_a.Aggregate(-16.0, {});
+  aggr_a.Aggregate(-8.0, {});
+
+  Base2ExponentialHistogramAggregation aggr_b(&config);
+  aggr_b.Aggregate(8.0, {});
+  aggr_b.Aggregate(4.0, {});
+  aggr_b.Aggregate(-1.0 / 32.0, {});
+  aggr_b.Aggregate(-1.0 / 64.0, {});
+
+  const auto merged_point = MakePointData(*aggr_a.Merge(aggr_b));
+
+  EXPECT_EQ(merged_point.zero_count_, 0u);
+  ExpectCountInvariant(8u, merged_point, "MergeMixedSignAsymmetricSpan");
+  EXPECT_EQ(merged_point.scale_, -2);
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationDiffAsymmetricEmptyBuckets)
+{
+  const auto config = MakeAggregationConfig(0, 5);
 
   Base2ExponentialHistogramAggregation left(&config);
-  left.Aggregate(2.0, {});  // 2^1 -> index 0
+  left.Aggregate(2.0, {});
 
   Base2ExponentialHistogramAggregation right(&config);
-  right.Aggregate(128.0, {});  // 2^7 -> index 6
+  right.Aggregate(-2.0, {});
 
-  // Combined span 0..6 (7 buckets) > max_buckets=5, so Diff() must downscale.
-  // GetScaleReduction(0, 6, 5) returns 1, so the result scale drops from 0 to -1.
-  auto diffed       = left.Diff(right);
-  auto diffed_point = nostd::get<Base2ExponentialHistogramPointData>(diffed->ToPoint());
+  const auto diffed_point = MakePointData(*left.Diff(right));
+  EXPECT_EQ(diffed_point.scale_, 0);
+}
 
-  EXPECT_EQ(diffed_point.scale_, -1);
+TEST(Aggregation, Base2ExponentialHistogramAggregationDiffEmptyEmpty)
+{
+  const auto config = MakeAggregationConfig(0, 5);
+
+  Base2ExponentialHistogramAggregation left(&config);
+  Base2ExponentialHistogramAggregation right(&config);
+
+  const auto diffed_point = MakePointData(*left.Diff(right));
+
+  EXPECT_EQ(diffed_point.sum_, 0.0);
+  EXPECT_EQ(diffed_point.zero_count_, 0u);
+  EXPECT_EQ(SumAllBuckets(diffed_point), 0u);
+  ExpectCountInvariant(0u, diffed_point, "DiffEmptyEmpty");
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationDiffNoOp)
+{
+  const auto config = MakeAggregationConfig(0, 5);
+
+  Base2ExponentialHistogramAggregation left(&config);
+  left.Aggregate(2.0, {});
+  left.Aggregate(-2.0, {});
+  left.Aggregate(0.0, {});
+
+  auto right = MakePointData(left);
+  Base2ExponentialHistogramAggregation right_aggr(right);
+
+  const auto diffed_point = MakePointData(*left.Diff(right_aggr));
+
+  EXPECT_EQ(diffed_point.sum_, 0.0);
+  EXPECT_EQ(diffed_point.zero_count_, 0u);
+  EXPECT_EQ(SumAllBuckets(diffed_point), 0u);
+  ExpectCountInvariant(0u, diffed_point, "DiffNoOp");
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationDiffUnionDownscale)
+{
+  const auto config = MakeAggregationConfig(0, 5);
+
+  Base2ExponentialHistogramAggregation left(&config);
+  left.Aggregate(2.0, {});  // index 0
+
+  Base2ExponentialHistogramAggregation extra(&config);
+  extra.Aggregate(128.0, {});  // index 6
+
+  // right = left merged with extra. Together they span indices 0..6 (7 buckets),
+  // more than max_buckets_=5, so Diff() must reduce the scale.
+  auto right          = left.Merge(extra);
+  const auto left_pt  = MakePointData(left);
+  const auto right_pt = MakePointData(*right);
+  auto diffed_point   = MakePointData(*left.Diff(*right));
+
+  EXPECT_LT(diffed_point.scale_, 0);
+  ExpectCountInvariant(1u, diffed_point, "DiffUnionDownscale");
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationDiffScaleMismatch)
+{
+  const auto config = MakeAggregationConfig(0, 5);
+
+  Base2ExponentialHistogramAggregation left(&config);
+  left.Aggregate(2.0, {});
+
+  Base2ExponentialHistogramAggregation large(&config);
+  large.Aggregate(1.0 / 64.0, {});
+  large.Aggregate(1.0 / 32.0, {});
+  large.Aggregate(4.0, {});
+  large.Aggregate(8.0, {});
+  large.Aggregate(16.0, {});
+  large.Aggregate(128.0, {});
+
+  const auto right    = left.Merge(large);
+  const auto right_pt = MakePointData(*right);
+  const auto left_pt  = MakePointData(left);
+  ASSERT_LT(right_pt.scale_, 0);
+
+  const auto diffed_point = MakePointData(*left.Diff(*right));
+
+  ExpectCountInvariant(right_pt.count_ - 1u, diffed_point, "DiffScaleMismatch");
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationDefaultConfigMerge)
+{
+  Base2ExponentialHistogramAggregationConfig config;
+  Base2ExponentialHistogramAggregation a(&config);
+  Base2ExponentialHistogramAggregation b(&config);
+
+  PopulateAggregation(a, kSampleAStart, kSampleAStop, kSampleAFactor);
+  PopulateAggregation(b, kSampleBStart, kSampleBStop, kSampleBFactor);
+
+  auto pa = MakePointData(a);
+  auto pb = MakePointData(b);
+  ExpectCountInvariant(pa.count_, pa, "a");
+  ExpectCountInvariant(pb.count_, pb, "b");
+  EXPECT_LE(pa.scale_, 20);
+  EXPECT_LE(pb.scale_, 20);
+  EXPECT_EQ(pa.max_buckets_, config.max_buckets_);
+  EXPECT_GT(pa.max_, pa.min_);
+  EXPECT_GT(pb.max_, pb.min_);
+
+  const auto merged = MakePointData(*a.Merge(b));
+  ExpectCountInvariant(pa.count_ + pb.count_, merged, "DefaultConfigMerge");
+  EXPECT_DOUBLE_EQ(merged.sum_, pa.sum_ + pb.sum_);
+  EXPECT_EQ(merged.min_, (std::min)(pa.min_, pb.min_));
+  EXPECT_EQ(merged.max_, (std::max)(pa.max_, pb.max_));
+  EXPECT_EQ(SumAllBuckets(merged), SumAllBuckets(pa) + SumAllBuckets(pb));
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationDefaultConfigDiff)
+{
+  Base2ExponentialHistogramAggregationConfig config;
+  Base2ExponentialHistogramAggregation a(&config);
+  Base2ExponentialHistogramAggregation b(&config);
+
+  PopulateAggregation(a, kSampleAStart, kSampleAStop, kSampleAFactor);
+  PopulateAggregation(b, kSampleBStart, kSampleBStop, kSampleBFactor);
+
+  const auto pa = MakePointData(a);
+  const auto pb = MakePointData(b);
+
+  const auto ab     = a.Merge(b);
+  const auto merged = MakePointData(*ab);
+  const auto diffed = MakePointData(*a.Diff(*ab));
+  ExpectCountInvariant(pb.count_, diffed, "DefaultConfigDiff");
+  EXPECT_EQ(SumAllBuckets(diffed), SumAllBuckets(merged) - SumAllBuckets(pa));
 }
