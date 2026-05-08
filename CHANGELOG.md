@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] Fix `Logger::Enabled()`
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+
 * [CONFIGURATION] File configuration - composable samplers
   [#3966](https://github.com/open-telemetry/opentelemetry-cpp/issues/3966)
 * [SDK] Fix PeriodicExportingMetricReader shutdown race on destruction
@@ -60,6 +63,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy narrowing conversions in baggage
   [#3989](https://github.com/open-telemetry/opentelemetry-cpp/pull/3989)
 
+* [EXPORTER] implement non-utf8 string to bytes in OTLP exporters
+  [#3991](https://github.com/open-telemetry/opentelemetry-cpp/pull/3991)
+
 * [CODE HEALTH] Fix misc clang-tidy warnings
   [#3993](https://github.com/open-telemetry/opentelemetry-cpp/pull/3993)
 
@@ -90,6 +96,9 @@ Increment the:
 * [SDK] env var durations non conforming to spec
   [#4020](https://github.com/open-telemetry/opentelemetry-cpp/pull/4020)
 
+* [EXPORTER] Fix Prometheus exporter ignoring without_units/without_type_suffix
+  [#4055](https://github.com/open-telemetry/opentelemetry-cpp/pull/4055)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
@@ -107,6 +116,10 @@ Important changes:
   * grpc properties for ssl KEY and CERT are always available,
     adjust the application code to initialize all members in grpc options.
 
+* Add WITH_OTLP_UTF8_VALIDITY for CMake and enable ENABLE_OTLP_UTF8_VALIDITY for
+  Bazel to export non-UTF-8 strings as bytes in OTLP.
+  [#3991](https://github.com/open-telemetry/opentelemetry-cpp/pull/3991)
+
 * Enable ENABLE_OTLP_RETRY_PREVIEW for bazel
   [#4010](https://github.com/open-telemetry/opentelemetry-cpp/pull/4010)
 
@@ -117,6 +130,19 @@ Important changes:
 
   * namespace opentelemetry::plugin is deprecated
   * See file DEPRECATED.md for details.
+
+* [SDK] Fix cardinality-limit overflow attribute name to match the
+  specification
+  [#4060](https://github.com/open-telemetry/opentelemetry-cpp/pull/4060)
+
+  * The synthetic overflow data point attribute is now exported as
+    `otel.metric.overflow` (singular) per the
+    [Metrics SDK specification](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#cardinality-limits).
+  * Previously the SDK exported `otel.metrics.overflow` (plural), which
+    diverged from the spec and from every other language SDK
+    (Go, Java, JS, .NET).
+  * Downstream consumers (dashboards, alerts, queries) that filtered on
+    the old name must be updated to the spec-correct name.
 
 Breaking changes:
 

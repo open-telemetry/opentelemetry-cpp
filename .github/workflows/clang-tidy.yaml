@@ -11,18 +11,18 @@ permissions:
 
 jobs:
   clang-tidy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
         include:
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 31
+            warning_limit: 418
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 31
+            warning_limit: 424
     env:
-      CC: /usr/bin/clang-18
-      CXX: /usr/bin/clang++-18
+      CC: /usr/bin/clang-22
+      CXX: /usr/bin/clang++-22
       CXX_STANDARD: '14' # Run clang-tidy on the minimum supported c++ standard
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -53,17 +53,18 @@ jobs:
           libgtest-dev \
           libbenchmark-dev
 
-      - name: Install rapidyaml
+      - name: Install clang-22 toolchain
         run: |
-          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
-
-      - name: Install clang-tidy-20
-        run: |
-          sudo apt install -y clang-tidy-20
-          sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-20 200
+          wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s -- 22
+          sudo apt install -y clang-22 clang-tidy-22
+          sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-22 200
           sudo update-alternatives --config clang-tidy
           echo "Using clang-tidy version: $(clang-tidy --version)"
           echo "clang-tidy installed at: $(which clang-tidy)"
+
+      - name: Install rapidyaml
+        run: |
+          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
 
       - name: Build and run clang-tidy
         id: build

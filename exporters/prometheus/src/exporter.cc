@@ -42,7 +42,8 @@ PrometheusExporter::PrometheusExporter(const PrometheusExporterOptions &options)
     return;
   }
   collector_ = std::shared_ptr<PrometheusCollector>(
-      new PrometheusCollector(this, options_.populate_target_info, options_.without_otel_scope));
+      new PrometheusCollector(this, options_.populate_target_info, options_.without_otel_scope,
+                              options_.without_units, options_.without_type_suffix));
 
   exposer_->RegisterCollectable(collector_);
 }

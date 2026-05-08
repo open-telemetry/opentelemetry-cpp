@@ -158,3 +158,16 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
 INSTANTIATE_TEST_SUITE_P(All,
                          WritableMetricStorageCardinalityLimitTestFixture,
                          ::testing::Values(AggregationTemporality::kDelta));
+
+// Pin the overflow attribute key to the value defined in the OpenTelemetry
+// Metrics SDK specification. The previous value `otel.metrics.overflow`
+// (plural) silently diverged from the spec for years because every other
+// metrics test referenced the C++ symbol instead of the literal, so a typo
+// in the constant could not be caught by tests. Keep this assertion against
+// the literal string so any future drift is detected immediately.
+// Spec:
+// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#cardinality-limits
+TEST(CardinalityLimitOverflowAttribute, MatchesSpecLiteral)
+{
+  EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowKey, "otel.metric.overflow");
+}
