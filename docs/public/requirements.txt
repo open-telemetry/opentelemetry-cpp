@@ -1,3 +1,4 @@
 breathe
 exhale
 furo
+sphinx-rtd-theme

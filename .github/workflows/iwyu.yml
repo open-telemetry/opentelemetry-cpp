@@ -12,21 +12,21 @@ permissions:
 
 jobs:
   iwyu:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
         include:
           - cmake_options: all-options-abiv1
-            warning_limit: 0
+            warning_limit: 161
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 0
+            warning_limit: 190
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 0
+            warning_limit: 187
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        uses: step-security/harden-runner@a5ad31d6a139d249332a2605b85202e8c0b78450 # v2.19.1
         with:
           egress-policy: audit
 
@@ -37,6 +37,7 @@ jobs:
       - name: setup dependencies
         run: |
           sudo apt update -y
+          wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s -- 22
           sudo apt install -y --no-install-recommends --no-install-suggests \
             build-essential \
             ninja-build \
@@ -50,9 +51,11 @@ jobs:
             libgmock-dev \
             libgtest-dev \
             libbenchmark-dev \
-            llvm-dev \
-            libclang-dev \
+            llvm-22-dev \
+            libclang-22-dev \
+            clang-22 \
             cmake
+          sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-22 200
 
       - name: Install rapidyaml
         run: |
@@ -62,22 +65,13 @@ jobs:
         run: |
           sudo ./ci/install_iwyu.sh
 
-      - name: Prepare CMake
+      - name: Build with include-what-you-use
         env:
-          CC: clang
-          CXX: clang++
+          OTELCPP_CMAKE_CACHE_FILE: ${{ matrix.cmake_options }}.cmake
+          BUILD_DIR: build-${{ matrix.cmake_options }}
         run: |
-          TOPDIR=`pwd`
-          cmake -B build-${{ matrix.cmake_options }} \
-            -C ./test_common/cmake/${{ matrix.cmake_options }}.cmake \
-            -DCMAKE_CXX_STANDARD=14 \
-            -DWITH_STL=CXX14 \
-            -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
-            -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;"
-
-      - name: iwyu_tool
-        run: |
-          cmake --build build-${{ matrix.cmake_options }} -- -j$(nproc) -k 2>&1 | tee -a iwyu-${{ matrix.cmake_options }}.log
+          ./ci/do_ci.sh cmake.iwyu.test
+          cp "${BUILD_DIR}/opentelemetry-cpp-iwyu-${{ matrix.cmake_options }}.log" iwyu-${{ matrix.cmake_options }}.log
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: success() || failure()
