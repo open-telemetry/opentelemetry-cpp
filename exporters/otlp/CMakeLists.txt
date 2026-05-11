@@ -321,14 +321,10 @@ if(WITH_OTLP_HTTP)
     PRIVATE "$<INSTALL_INTERFACE:opentelemetry_proto>"
             "$<BUILD_INTERFACE:nlohmann_json::nlohmann_json>")
 
-  if(NOT WITH_CUSTOM_HTTP_CLIENT)
-    # Links flags of opentelemetry_http_client_curl should be public when
-    # building internal components
-    target_link_libraries(
-      opentelemetry_exporter_otlp_http_client
-      PRIVATE "$<BUILD_INTERFACE:opentelemetry_http_client_curl>"
-              "$<INSTALL_INTERFACE:opentelemetry_http_client_curl>")
-  endif()
+  # Links flags of opentelemetry_http_client should be public when building
+  # internal components
+  target_link_libraries(opentelemetry_exporter_otlp_http_client
+                        PRIVATE opentelemetry_http_client)
 
   target_include_directories(
     opentelemetry_exporter_otlp_http_client

@@ -23,7 +23,7 @@ set_target_version(opentelemetry_exporter_zipkin_trace)
 
 target_link_libraries(
   opentelemetry_exporter_zipkin_trace
-  PUBLIC opentelemetry_trace opentelemetry_http_client_curl
+  PUBLIC opentelemetry_trace opentelemetry_http_client
          nlohmann_json::nlohmann_json)
 
 otel_add_component(
