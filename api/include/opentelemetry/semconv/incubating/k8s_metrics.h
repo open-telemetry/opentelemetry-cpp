@@ -214,55 +214,6 @@ CreateAsyncDoubleMetricK8sContainerCpuLimitUtilization(metrics::Meter *meter)
 }
 
 /**
-  Deprecated, use @code k8s.container.cpu.limit.utilization @endcode instead.
-
-  @deprecated
-  {"note": "Replaced by @code k8s.container.cpu.limit.utilization @endcode.", "reason": "renamed",
-  "renamed_to": "k8s.container.cpu.limit.utilization"} <p> gauge
- */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sContainerCpuLimitUtilization =
-    "k8s.container.cpu.limit_utilization";
-OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricK8sContainerCpuLimitUtilization =
-    "Deprecated, use `k8s.container.cpu.limit.utilization` instead.";
-OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sContainerCpuLimitUtilization =
-    "1";
-
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-
-OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
-CreateSyncInt64MetricK8sContainerCpuLimitUtilization(metrics::Meter *meter)
-{
-  return meter->CreateInt64Gauge(kMetricK8sContainerCpuLimitUtilization,
-                                 descrMetricK8sContainerCpuLimitUtilization,
-                                 unitMetricK8sContainerCpuLimitUtilization);
-}
-
-OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<double>>
-CreateSyncDoubleMetricK8sContainerCpuLimitUtilization(metrics::Meter *meter)
-{
-  return meter->CreateDoubleGauge(kMetricK8sContainerCpuLimitUtilization,
-                                  descrMetricK8sContainerCpuLimitUtilization,
-                                  unitMetricK8sContainerCpuLimitUtilization);
-}
-#endif /* OPENTELEMETRY_ABI_VERSION_NO */
-
-OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricK8sContainerCpuLimitUtilization(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableGauge(kMetricK8sContainerCpuLimitUtilization,
-                                           descrMetricK8sContainerCpuLimitUtilization,
-                                           unitMetricK8sContainerCpuLimitUtilization);
-}
-
-OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricK8sContainerCpuLimitUtilization(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableGauge(kMetricK8sContainerCpuLimitUtilization,
-                                            descrMetricK8sContainerCpuLimitUtilization,
-                                            unitMetricK8sContainerCpuLimitUtilization);
-}
-
-/**
   Deprecated, use @code k8s.container.cpu.request.desired @endcode and @code
   k8s.container.cpu.request.current @endcode instead.
 
@@ -454,55 +405,6 @@ CreateAsyncInt64MetricK8sContainerCpuRequestUtilization(metrics::Meter *meter)
 }
 
 static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncDoubleMetricK8sContainerCpuRequestUtilization(metrics::Meter *meter)
-{
-  return meter->CreateDoubleObservableGauge(kMetricK8sContainerCpuRequestUtilization,
-                                            descrMetricK8sContainerCpuRequestUtilization,
-                                            unitMetricK8sContainerCpuRequestUtilization);
-}
-
-/**
-  Deprecated, use @code k8s.container.cpu.request.utilization @endcode instead.
-
-  @deprecated
-  {"note": "Replaced by @code k8s.container.cpu.request.utilization @endcode.", "reason": "renamed",
-  "renamed_to": "k8s.container.cpu.request.utilization"} <p> gauge
- */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sContainerCpuRequestUtilization =
-    "k8s.container.cpu.request_utilization";
-OPENTELEMETRY_DEPRECATED static constexpr const char *descrMetricK8sContainerCpuRequestUtilization =
-    "Deprecated, use `k8s.container.cpu.request.utilization` instead.";
-OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sContainerCpuRequestUtilization =
-    "1";
-
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-
-OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<int64_t>>
-CreateSyncInt64MetricK8sContainerCpuRequestUtilization(metrics::Meter *meter)
-{
-  return meter->CreateInt64Gauge(kMetricK8sContainerCpuRequestUtilization,
-                                 descrMetricK8sContainerCpuRequestUtilization,
-                                 unitMetricK8sContainerCpuRequestUtilization);
-}
-
-OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Gauge<double>>
-CreateSyncDoubleMetricK8sContainerCpuRequestUtilization(metrics::Meter *meter)
-{
-  return meter->CreateDoubleGauge(kMetricK8sContainerCpuRequestUtilization,
-                                  descrMetricK8sContainerCpuRequestUtilization,
-                                  unitMetricK8sContainerCpuRequestUtilization);
-}
-#endif /* OPENTELEMETRY_ABI_VERSION_NO */
-
-OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
-CreateAsyncInt64MetricK8sContainerCpuRequestUtilization(metrics::Meter *meter)
-{
-  return meter->CreateInt64ObservableGauge(kMetricK8sContainerCpuRequestUtilization,
-                                           descrMetricK8sContainerCpuRequestUtilization,
-                                           unitMetricK8sContainerCpuRequestUtilization);
-}
-
-OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sContainerCpuRequestUtilization(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableGauge(kMetricK8sContainerCpuRequestUtilization,
