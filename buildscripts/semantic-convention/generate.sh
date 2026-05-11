@@ -112,9 +112,11 @@ generate "./" "./" "stable"
 mkdir -p ${ROOT_DIR}/tmpgen/${INCUBATING_DIR}
 generate "./" "./${INCUBATING_DIR}/" "any"
 
+rm ${ROOT_DIR}/api/include/opentelemetry/semconv/*.h
 cp -r ${ROOT_DIR}/tmpgen/*.h \
       ${ROOT_DIR}/api/include/opentelemetry/semconv/
 
+rm ${ROOT_DIR}/api/include/opentelemetry/semconv/${INCUBATING_DIR}/*.h
 cp -r ${ROOT_DIR}/tmpgen/${INCUBATING_DIR}/*.h \
-      ${ROOT_DIR}/api/include/opentelemetry/semconv/incubating
+      ${ROOT_DIR}/api/include/opentelemetry/semconv/${INCUBATING_DIR}
 
