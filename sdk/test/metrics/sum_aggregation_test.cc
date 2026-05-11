@@ -208,9 +208,15 @@ TEST(HistogramToSumFilterAttributesWithCardinalityLimit, Double)
             }
             else
             {
-              EXPECT_NE(md.point_data_attr_[i].attributes.end(),
-                        md.point_data_attr_[i].attributes.find(
-                            sdk::metrics::kAttributesLimitOverflowKey));
+              const auto overflow_it =
+                  md.point_data_attr_[i].attributes.find(sdk::metrics::kAttributesLimitOverflowKey);
+              EXPECT_NE(md.point_data_attr_[i].attributes.end(), overflow_it);
+              if (overflow_it != md.point_data_attr_[i].attributes.end())
+              {
+                // Spec: overflow point MUST be tagged with the boolean value
+                // `true`.
+                EXPECT_EQ(opentelemetry::nostd::get<bool>(overflow_it->second), true);
+              }
             }
           }
         }
@@ -390,9 +396,15 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
             }
             else
             {
-              EXPECT_NE(md.point_data_attr_[i].attributes.end(),
-                        md.point_data_attr_[i].attributes.find(
-                            sdk::metrics::kAttributesLimitOverflowKey));
+              const auto overflow_it =
+                  md.point_data_attr_[i].attributes.find(sdk::metrics::kAttributesLimitOverflowKey);
+              EXPECT_NE(md.point_data_attr_[i].attributes.end(), overflow_it);
+              if (overflow_it != md.point_data_attr_[i].attributes.end())
+              {
+                // Spec: overflow point MUST be tagged with the boolean value
+                // `true`.
+                EXPECT_EQ(opentelemetry::nostd::get<bool>(overflow_it->second), true);
+              }
             }
           }
         }
