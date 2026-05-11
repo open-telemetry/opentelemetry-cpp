@@ -101,6 +101,9 @@ Increment the:
 * [EXPORTER] Fix Prometheus exporter ignoring without_units/without_type_suffix
   [#4055](https://github.com/open-telemetry/opentelemetry-cpp/pull/4055)
 
+* [BUILD] Upgrade to rapidyaml 0.12.1
+  [#4076](https://github.com/open-telemetry/opentelemetry-cpp/pull/4076)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
