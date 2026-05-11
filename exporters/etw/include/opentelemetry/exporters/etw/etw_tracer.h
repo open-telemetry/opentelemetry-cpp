@@ -397,10 +397,7 @@ private:
     }
   }
 
-  const opentelemetry::trace::TraceId &trace_id()
-  {
-    return traceId_;
-  }
+  const opentelemetry::trace::TraceId &trace_id(){return traceId_;}
 
   friend class Span;
 
@@ -600,10 +597,7 @@ public:
    *
    * @since ABI_VERSION 2
    */
-  virtual bool Enabled() const noexcept
-  {
-    return true;
-  }
+  virtual bool Enabled() const noexcept{return true;}
 #endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO == 1
@@ -963,15 +957,9 @@ public:
     status_description_ = description.data();
   }
 
-  opentelemetry::trace::StatusCode GetStatus()
-  {
-    return status_code_;
-  }
+  opentelemetry::trace::StatusCode GetStatus(){return status_code_;}
 
-  void SetAttributes(Properties attributes)
-  {
-    attributes_ = attributes;
-  }
+  void SetAttributes(Properties attributes){attributes_ = attributes;}
 
   /**
    * @brief Obtain span attributes specified at Span start.
@@ -979,10 +967,7 @@ public:
    *
    * @return ref to Properties collection
    */
-  Properties &GetAttributes()
-  {
-    return attributes_;
-  }
+  Properties &GetAttributes(){return attributes_;}
 
   /**
    * @brief Sets an attribute on the Span. If the Span previously contained a mapping
@@ -1048,10 +1033,7 @@ public:
    * @brief Obtain SpanContext
    * @return
    */
-  opentelemetry::trace::SpanContext GetContext() const noexcept override
-  {
-    return *context_.get();
-  }
+  opentelemetry::trace::SpanContext GetContext() const noexcept override { return *context_.get(); }
 
   /**
    * @brief Check if Span is recording data.
@@ -1075,10 +1057,7 @@ public:
   /// Get Owner tracer of this Span
   /// </summary>
   /// <returns></returns>
-  opentelemetry::trace::Tracer &tracer() const noexcept
-  {
-    return *this->owner_;
-  }
+  opentelemetry::trace::Tracer &tracer() const noexcept{return *this->owner_;}
 };
 
 /**
