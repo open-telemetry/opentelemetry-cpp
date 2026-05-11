@@ -20,16 +20,6 @@ namespace deployment
 {
 
 /**
-  Deprecated, use @code deployment.environment.name @endcode instead.
-
-  @deprecated
-  {"note": "Replaced by @code deployment.environment.name @endcode.", "reason": "renamed",
-  "renamed_to": "deployment.environment.name"}
- */
-OPENTELEMETRY_DEPRECATED static constexpr const char *kDeploymentEnvironment =
-    "deployment.environment";
-
-/**
   Name of the <a href="https://wikipedia.org/wiki/Deployment_environment">deployment environment</a>
   (aka deployment tier). <p>
   @code deployment.environment.name @endcode does not affect the uniqueness constraints defined
@@ -42,21 +32,6 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *kDeploymentEnvironment =
   </ul>
  */
 static constexpr const char *kDeploymentEnvironmentName = "deployment.environment.name";
-
-/**
-  The id of the deployment.
- */
-static constexpr const char *kDeploymentId = "deployment.id";
-
-/**
-  The name of the deployment.
- */
-static constexpr const char *kDeploymentName = "deployment.name";
-
-/**
-  The status of the deployment.
- */
-static constexpr const char *kDeploymentStatus = "deployment.status";
 
 namespace DeploymentEnvironmentNameValues
 {
@@ -81,20 +56,6 @@ static constexpr const char *kTest = "test";
 static constexpr const char *kDevelopment = "development";
 
 }  // namespace DeploymentEnvironmentNameValues
-
-namespace DeploymentStatusValues
-{
-/**
-  failed
- */
-static constexpr const char *kFailed = "failed";
-
-/**
-  succeeded
- */
-static constexpr const char *kSucceeded = "succeeded";
-
-}  // namespace DeploymentStatusValues
 
 }  // namespace deployment
 }  // namespace semconv
