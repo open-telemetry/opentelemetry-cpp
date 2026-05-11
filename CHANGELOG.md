@@ -101,6 +101,9 @@ Increment the:
 * [EXPORTER] Fix Prometheus exporter ignoring without_units/without_type_suffix
   [#4055](https://github.com/open-telemetry/opentelemetry-cpp/pull/4055)
 
+* [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.41.0
+  [#4075](https://github.com/open-telemetry/opentelemetry-cpp/pull/4075)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
