@@ -320,6 +320,70 @@ TEST_P(WritableMetricStorageTestFixture, DoubleCounterSumAggregation)
       });
   EXPECT_EQ(count_attributes, 2);  // GET and PUT
 }
+
+TEST(SyncMetricStorageTest, DeltaCounterStartTimestampTracksEmptyCycles)
+{
+  InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kCounter,
+                                     InstrumentValueType::kLong};
+  std::shared_ptr<DefaultAttributesProcessor> default_attributes_processor{
+      new DefaultAttributesProcessor{}};
+  opentelemetry::sdk::metrics::SyncMetricStorage storage(
+      instr_desc, AggregationType::kSum, default_attributes_processor,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+      nullptr);
+
+  std::map<std::string, std::string> attributes = {{"RequestType", "GET"}};
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors;
+  collectors.push_back(collector);
+
+  auto sdk_start_ts = std::chrono::system_clock::now();
+  auto collection_ts1 = sdk_start_ts + std::chrono::seconds(1);
+  auto collection_ts2 = sdk_start_ts + std::chrono::seconds(2);
+  auto collection_ts3 = sdk_start_ts + std::chrono::seconds(3);
+
+  storage.RecordLong(10, KeyValueIterableView<std::map<std::string, std::string>>(attributes),
+                     opentelemetry::context::Context{});
+
+  MetricData metric_cycle1;
+  bool cycle1_called = false;
+  storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts1,
+                  [&](const MetricData &metric_data) {
+                    metric_cycle1 = metric_data;
+                    cycle1_called = true;
+                    return true;
+                  });
+  EXPECT_TRUE(cycle1_called);
+
+  bool cycle2_called = false;
+  storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts2,
+                  [&](const MetricData &) {
+                    cycle2_called = true;
+                    return true;
+                  });
+  EXPECT_FALSE(cycle2_called); // Check if Empty cycle in the middle
+
+  storage.RecordLong(20, KeyValueIterableView<std::map<std::string, std::string>>(attributes),
+                     opentelemetry::context::Context{});
+
+  MetricData metric_cycle3;
+  bool cycle3_called = false;
+  storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts3,
+                  [&](const MetricData &metric_data) {
+                    metric_cycle3 = metric_data;
+                    cycle3_called = true;
+                    return true;
+                  });
+  EXPECT_TRUE(cycle3_called);
+  // Check that the fast path correctly preserved the timestamp from the empty collection cycle (cycle 2)
+  EXPECT_EQ(metric_cycle3.start_ts, collection_ts2);
+  EXPECT_EQ(metric_cycle1.start_ts, sdk_start_ts);
+  EXPECT_EQ(metric_cycle1.end_ts, collection_ts1);
+  EXPECT_EQ(metric_cycle3.end_ts, collection_ts3);
+}
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestDouble,
                          WritableMetricStorageTestFixture,
                          ::testing::Values(AggregationTemporality::kCumulative,
