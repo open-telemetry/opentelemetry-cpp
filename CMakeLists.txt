@@ -160,10 +160,8 @@ option(
 option(WITH_CURL_LOGGING "Whether to enable select CURL verbosity in OTel logs"
        OFF)
 
-option(
-  WITH_CUSTOM_HTTP_CLIENT
-  "Enable a custom HTTP client instead of the default CURL backend"
-  OFF)
+option(WITH_CUSTOM_HTTP_CLIENT
+       "Enable a custom HTTP client instead of the default CURL backend" OFF)
 
 option(WITH_ZIPKIN "Whether to include the Zipkin exporter in the SDK" OFF)
 
@@ -281,11 +279,12 @@ include(GNUInstallDirs)
 
 if(WITH_CUSTOM_HTTP_CLIENT)
   set(WITH_HTTP_CLIENT_CURL OFF)
-elseif(WITH_OTLP_HTTP
-       OR WITH_ELASTICSEARCH
-       OR WITH_ZIPKIN
-       OR BUILD_W3CTRACECONTEXT_TEST
-       OR WITH_EXAMPLES_HTTP)
+elseif(
+  WITH_OTLP_HTTP
+  OR WITH_ELASTICSEARCH
+  OR WITH_ZIPKIN
+  OR BUILD_W3CTRACECONTEXT_TEST
+  OR WITH_EXAMPLES_HTTP)
   set(WITH_HTTP_CLIENT_CURL ON)
 else()
   set(WITH_HTTP_CLIENT_CURL OFF)

@@ -316,8 +316,7 @@ if(WITH_OTLP_HTTP)
 
   target_link_libraries(
     opentelemetry_exporter_otlp_http_client
-    PUBLIC opentelemetry_sdk
-           opentelemetry_ext
+    PUBLIC opentelemetry_sdk opentelemetry_ext
            "$<BUILD_INTERFACE:opentelemetry_proto>"
     PRIVATE "$<INSTALL_INTERFACE:opentelemetry_proto>"
             "$<BUILD_INTERFACE:nlohmann_json::nlohmann_json>")
