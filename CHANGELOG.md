@@ -15,6 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] `Logger::EmitLogRecord(...)` templates now short-circuit when the
+  supplied Severity is below the logger's minimum. Closes the second half of
+  #2667 so the `Trace`/`Debug`/`Info`/`Warn`/`Error`/`Fatal` helpers honor
+  the `Enabled()` flag transparently.
+* [SDK] `Logger::EmitLogRecord(unique_ptr<LogRecord>)` now applies the
+  LoggerConfig trace-based filter using the current runtime context.
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+
 * [API] Fix `Logger::Enabled()`
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
