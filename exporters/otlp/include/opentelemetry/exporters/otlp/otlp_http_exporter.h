@@ -84,6 +84,7 @@ private:
   std::unique_ptr<OtlpHttpClient> http_client_;
   // For testing
   friend class OtlpHttpExporterTestPeer;
+  friend class OtlpHttpExporterCustomClientTestPeer;
   /**
    * Create an OtlpHttpExporter using the specified http client.
    * Only tests can call this constructor directly.

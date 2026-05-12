@@ -279,6 +279,14 @@ include(GNUInstallDirs)
 
 if(WITH_CUSTOM_HTTP_CLIENT)
   set(WITH_HTTP_CLIENT_CURL OFF)
+  if(WITH_ZIPKIN OR WITH_ELASTICSEARCH)
+    message(
+      WARNING
+        "WITH_CUSTOM_HTTP_CLIENT=ON: opentelemetry_http_client INTERFACE is empty. "
+        "WITH_ZIPKIN and WITH_ELASTICSEARCH require you to populate it with your transport "
+        "implementation via target_link_libraries(opentelemetry_http_client INTERFACE <your_impl>)."
+    )
+  endif()
 elseif(
   WITH_OTLP_HTTP
   OR WITH_ELASTICSEARCH

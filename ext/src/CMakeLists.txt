@@ -11,9 +11,8 @@ if(WITH_HTTP_CLIENT_CURL OR WITH_CUSTOM_HTTP_CLIENT)
     target_link_libraries(opentelemetry_http_client
                           INTERFACE opentelemetry_http_client_curl)
   endif()
-  # When WITH_CUSTOM_HTTP_CLIENT=ON the target is intentionally left empty. The
-  # consumer populates it after add_subdirectory:
-  # target_link_libraries(opentelemetry_http_client INTERFACE my_impl)
+  # When WITH_CUSTOM_HTTP_CLIENT=ON the target is intentionally left empty; the
+  # consumer populates it with their own transport implementation.
 endif()
 
 if(DEFINED OPENTELEMETRY_BUILD_DLL)
