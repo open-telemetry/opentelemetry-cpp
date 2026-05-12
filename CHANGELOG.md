@@ -102,12 +102,12 @@ Increment the:
   [#4055](https://github.com/open-telemetry/opentelemetry-cpp/pull/4055)
 
 * [EXPORTER] OTLP HTTP exporters read unbounded HTTP response
-  [#XXXX](https://github.com/open-telemetry/opentelemetry-cpp/pull/XXXX)
+  [#4078](https://github.com/open-telemetry/opentelemetry-cpp/pull/4078)
 
 Security fix:
 
 * [EXPORTER] OTLP HTTP exporters read unbounded HTTP response
-  [#XXXX](https://github.com/open-telemetry/opentelemetry-cpp/pull/XXXX)
+  [#4078](https://github.com/open-telemetry/opentelemetry-cpp/pull/4078)
 
   * When exporting OTLP HTTP data to a misconfigured or malicious endpoint,
     the exporter could allocate an arbitrary amount of memory when getting
