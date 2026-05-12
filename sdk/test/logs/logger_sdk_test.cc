@@ -507,7 +507,6 @@ TEST(LoggerSDK, EmitLogRecordDropsUnsampledTraceBased)
 
   logger->EmitLogRecord(logs_api::Severity::kInfo, "dropped");
 
-  // Record never reached MockProcessor::OnEmit, so shared_recordable stays default.
   EXPECT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kInvalid);
   EXPECT_EQ(shared_recordable->GetBody(), "");
   EXPECT_EQ(shared_recordable->GetObservedTimestamp(), std::chrono::system_clock::from_time_t(0));

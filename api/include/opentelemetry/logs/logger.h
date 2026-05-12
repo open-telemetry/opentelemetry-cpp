@@ -130,15 +130,6 @@ public:
   template <class... ArgumentType>
   void EmitLogRecord(ArgumentType &&...args)
   {
-    // Short-circuit BEFORE record creation when Severity is supplied in args
-    // and below the logger's minimum severity. Saves the recordable alloc on
-    // filtered logs.
-    const Severity arg_severity = detail::FindSeverityInArgs(args...);
-    if (arg_severity != Severity::kInvalid && !Enabled(arg_severity))
-    {
-      return;
-    }
-
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
 
     EmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);

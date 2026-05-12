@@ -470,6 +470,6 @@ TEST(Logger, EmitLogRecordTemplateShortCircuitsBelowMinimumSeverity)
 
   logger.Info(nostd::string_view{"filtered"});
 
-  EXPECT_EQ(logger.create_log_record_calls_, 0u);
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
   EXPECT_EQ(logger.emit_log_record_calls_, 0u);
 }
