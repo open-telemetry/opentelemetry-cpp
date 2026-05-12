@@ -62,6 +62,7 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
     // If no metrics, early return
     if (delta_metrics->Size() == 0)
     {
+      last_delta_collection_ts_ = collection_ts;
       return true;
     }
     // Create MetricData directly
@@ -99,6 +100,12 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   if (present == unreported_metrics_.end())
   {
     // no unreported metrics for the collector, return.
+    auto reported = last_reported_metrics_.find(collector);
+    if (reported != last_reported_metrics_.end())
+    {
+      // To save the time for next cycle
+      reported->second.collection_ts = collection_ts;
+    }
     return true;
   }
   auto unreported_list = std::move(present->second);
