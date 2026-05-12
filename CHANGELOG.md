@@ -269,8 +269,23 @@ Increment the:
 * [BUILD] Upgrade to rapidyaml 0.12.1
   [#4076](https://github.com/open-telemetry/opentelemetry-cpp/pull/4076)
 
+* [EXPORTER] OTLP HTTP exporters read unbounded HTTP response
+  [#4078](https://github.com/open-telemetry/opentelemetry-cpp/pull/4078)
+
 * [RELEASE] Release opentelemetry-cpp 1.27.0
   [#4080](https://github.com/open-telemetry/opentelemetry-cpp/pull/4080)
+
+Security fix:
+
+* [EXPORTER] OTLP HTTP exporters read unbounded HTTP response
+  [#4078](https://github.com/open-telemetry/opentelemetry-cpp/pull/4078)
+
+  * When exporting OTLP HTTP data to a misconfigured or malicious endpoint,
+    the exporter could allocate an arbitrary amount of memory when getting
+    the endpoint HTTP response back.
+  * The size of HTTP responses is now limited to 4MiB by default,
+    following the opentelemetry-proto recommendations.
+  * See CVE-2026-44967
 
 Important changes:
 
