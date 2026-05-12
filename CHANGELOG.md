@@ -104,6 +104,9 @@ Increment the:
 * [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.41.1
   [#4075](https://github.com/open-telemetry/opentelemetry-cpp/pull/4075)
 
+* [BUILD] Upgrade to rapidyaml 0.12.1
+  [#4076](https://github.com/open-telemetry/opentelemetry-cpp/pull/4076)
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
