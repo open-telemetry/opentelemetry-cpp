@@ -378,7 +378,7 @@ TEST(SyncMetricStorageTest, DeltaCounterStartTimestampTracksEmptyCycles)
                     return true;
                   });
   EXPECT_TRUE(cycle3_called);
-  // Check that the fast path correctly preserved the timestamp from the empty 
+  // Check that the fast path correctly preserved the timestamp from the empty
   // collection cycle (cycle 2)
   EXPECT_EQ(metric_cycle3.start_ts, collection_ts2);
   EXPECT_EQ(metric_cycle1.start_ts, sdk_start_ts);
