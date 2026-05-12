@@ -263,6 +263,12 @@ Increment the:
 * [EXAMPLE] Add manual asynchronous context propagation example
   [#3935](https://github.com/open-telemetry/opentelemetry-cpp/pull/3935)
 
+* [SEMANTIC CONVENTIONS] Upgrade to semantic conventions 1.41.1
+  [#4075](https://github.com/open-telemetry/opentelemetry-cpp/pull/4075)
+
+* [BUILD] Upgrade to rapidyaml 0.12.1
+  [#4076](https://github.com/open-telemetry/opentelemetry-cpp/pull/4076)
+
 Important changes:
 
 * [SDK] Move inline implementation from SDK headers to .cc files.
