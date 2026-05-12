@@ -269,11 +269,14 @@ Increment the:
 * [BUILD] Upgrade to rapidyaml 0.12.1
   [#4076](https://github.com/open-telemetry/opentelemetry-cpp/pull/4076)
 
+* [RELEASE] Release opentelemetry-cpp 1.27.0
+  [#4080](https://github.com/open-telemetry/opentelemetry-cpp/pull/4080)
+
 Important changes:
 
 * [SDK] Move inline implementation from SDK headers to .cc files.
   [#3887](https://github.com/open-telemetry/opentelemetry-cpp/pull/3887)
-  
+
   * Note: `GetEmptyAttributes()` now requires linking `opentelemetry_common`.
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
