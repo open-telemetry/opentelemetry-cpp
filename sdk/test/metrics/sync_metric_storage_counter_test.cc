@@ -340,7 +340,7 @@ TEST(SyncMetricStorageTest, DeltaCounterStartTimestampTracksEmptyCycles)
   std::vector<std::shared_ptr<CollectorHandle>> collectors;
   collectors.push_back(collector);
 
-  auto sdk_start_ts = std::chrono::system_clock::now();
+  auto sdk_start_ts   = std::chrono::system_clock::now();
   auto collection_ts1 = sdk_start_ts + std::chrono::seconds(1);
   auto collection_ts2 = sdk_start_ts + std::chrono::seconds(2);
   auto collection_ts3 = sdk_start_ts + std::chrono::seconds(3);
@@ -364,7 +364,7 @@ TEST(SyncMetricStorageTest, DeltaCounterStartTimestampTracksEmptyCycles)
                     cycle2_called = true;
                     return true;
                   });
-  EXPECT_FALSE(cycle2_called); // Check if Empty cycle in the middle
+  EXPECT_FALSE(cycle2_called);  // Check if Empty cycle in the middle
 
   storage.RecordLong(20, KeyValueIterableView<std::map<std::string, std::string>>(attributes),
                      opentelemetry::context::Context{});
@@ -378,7 +378,8 @@ TEST(SyncMetricStorageTest, DeltaCounterStartTimestampTracksEmptyCycles)
                     return true;
                   });
   EXPECT_TRUE(cycle3_called);
-  // Check that the fast path correctly preserved the timestamp from the empty collection cycle (cycle 2)
+  // Check that the fast path correctly preserved the timestamp from the empty 
+  // collection cycle (cycle 2)
   EXPECT_EQ(metric_cycle3.start_ts, collection_ts2);
   EXPECT_EQ(metric_cycle1.start_ts, sdk_start_ts);
   EXPECT_EQ(metric_cycle1.end_ts, collection_ts1);
