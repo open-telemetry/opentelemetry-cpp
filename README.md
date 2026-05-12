@@ -114,8 +114,6 @@ For more information about the maintainer role, see the [community repository](h
 
 ### Approvers
 
-* [Josh Suereth](https://github.com/jsuereth), Google
-* [Pranav Sharma](https://github.com/psx95), Google
 * [WenTao Ou](https://github.com/owent), Tencent
 
 For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).
@@ -126,7 +124,9 @@ For more information about the approver role, see the [community repository](htt
 * [Emil Mikulic](https://github.com/g-easy), Maintainer
 * [Jodee Varney](https://github.com/jodeev), Triager
 * [Johannes Tax](https://github.com/pyohannes), Approver
+* [Josh Suereth](https://github.com/jsuereth), Approver
 * [Max Golovanov](https://github.com/maxgolov), Approver
+* [Pranav Sharma](https://github.com/psx95), Approver
 * [Reiley Yang](https://github.com/reyang), Maintainer
 * [Ryan Burn](https://github.com/rnburn), Approver
 
