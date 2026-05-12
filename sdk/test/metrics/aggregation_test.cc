@@ -72,23 +72,29 @@ void ExpectCountInvariant(uint64_t expected_count,
 
 void PopulateAggregation(Base2ExponentialHistogramAggregation &aggr,
                          double start,
-                         double stop,
-                         double factor)
+                         double factor,
+                         int count)
 {
   // Populate an aggregation with values spread across several orders of magnitude to force a scale
   // reduction
-  for (double v = start; v <= stop; v *= factor)
+  double v = start;
+  for (int i = 0; i < count; ++i)
   {
     aggr.Aggregate(v, {});
+    v *= factor;
   }
 }
 
+// Two sample ranges overlap in ~0.1 to ~1.0, exercising per-bucket addition (merge) and
+// per-bucket subtraction (diff).
+// Sample A: ~1e-4 to ~1.0
+// Sample B: ~0.1 to ~2.4e4.
 constexpr double kSampleAStart  = 1e-4;
-constexpr double kSampleAStop   = 10.0;
 constexpr double kSampleAFactor = 1.3;
-constexpr double kSampleBStart  = 2e-4;
-constexpr double kSampleBStop   = 5.0;
-constexpr double kSampleBFactor = 1.4;
+constexpr int kSampleACount     = 36;
+constexpr double kSampleBStart  = 0.1;
+constexpr double kSampleBFactor = 1.5;
+constexpr int kSampleBCount     = 30;
 
 }  // namespace
 
@@ -899,8 +905,8 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationDefaultConfigMerge)
   Base2ExponentialHistogramAggregation a(&config);
   Base2ExponentialHistogramAggregation b(&config);
 
-  PopulateAggregation(a, kSampleAStart, kSampleAStop, kSampleAFactor);
-  PopulateAggregation(b, kSampleBStart, kSampleBStop, kSampleBFactor);
+  PopulateAggregation(a, kSampleAStart, kSampleAFactor, kSampleACount);
+  PopulateAggregation(b, kSampleBStart, kSampleBFactor, kSampleBCount);
 
   auto pa = MakePointData(a);
   auto pb = MakePointData(b);
@@ -926,8 +932,8 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationDefaultConfigDiff)
   Base2ExponentialHistogramAggregation a(&config);
   Base2ExponentialHistogramAggregation b(&config);
 
-  PopulateAggregation(a, kSampleAStart, kSampleAStop, kSampleAFactor);
-  PopulateAggregation(b, kSampleBStart, kSampleBStop, kSampleBFactor);
+  PopulateAggregation(a, kSampleAStart, kSampleAFactor, kSampleACount);
+  PopulateAggregation(b, kSampleBStart, kSampleBFactor, kSampleBCount);
 
   const auto pa = MakePointData(a);
   const auto pb = MakePointData(b);
