@@ -43,6 +43,14 @@ const std::chrono::milliseconds kDefaultHttpConnTimeout(5000);  // ms
 const std::string kHttpStatusRegexp = "HTTP\\/\\d\\.\\d (\\d+)\\ .*";
 const std::string kHttpHeaderRegexp = "(.*)\\: (.*)\\n*";
 
+/**
+ * Default max HTTP Response size.
+ * 4MiB
+ * @see
+ * https://github.com/open-telemetry/opentelemetry-proto/blob/main/docs/specification.md#otlphttp-response
+ */
+const size_t kDefaultMaxResponseSize = 4 * 1024 * 1024;
+
 class HttpClient;
 class Session;
 
@@ -199,6 +207,24 @@ public:
   std::chrono::system_clock::time_point NextRetryTime();
 
   /**
+   * Limit memory consumption on response headers.
+   * Size is @c kDefaultMaxResponseSize by default.
+   */
+  void SetMaxResponseHeadersSize(size_t max_size) { max_response_headers_size_ = max_size; }
+
+  /**
+   * Limit memory consumption on response body.
+   * Size is @c kDefaultMaxResponseSize by default.
+   */
+  void SetMaxResponseBodySize(size_t max_size) { max_response_body_size_ = max_size; }
+
+  /**
+   * Limit memory consumption on raw response.
+   * Size is @c kDefaultMaxResponseSize by default.
+   */
+  void SetMaxRawResponseSize(size_t max_size) { max_raw_response_size_ = max_size; }
+
+  /**
    * Setup request
    */
   CURLcode Setup();
@@ -340,8 +366,14 @@ private:
   // NOLINTNEXTLINE(google-runtime-int)
   long response_code_{0};
   std::vector<uint8_t> response_headers_;
+  /** Max HTTP response header size. */
+  size_t max_response_headers_size_{kDefaultMaxResponseSize};
   std::vector<uint8_t> response_body_;
+  /** Max HTTP response body size. */
+  size_t max_response_body_size_{kDefaultMaxResponseSize};
   std::vector<uint8_t> raw_response_;
+  /** Max HTTP raw response size. */
+  size_t max_raw_response_size_{kDefaultMaxResponseSize};
 
   struct AsyncData
   {

@@ -101,6 +101,21 @@ Increment the:
 * [EXPORTER] Fix Prometheus exporter ignoring without_units/without_type_suffix
   [#4055](https://github.com/open-telemetry/opentelemetry-cpp/pull/4055)
 
+* [EXPORTER] OTLP HTTP exporters read unbounded HTTP response
+  [#XXXX](https://github.com/open-telemetry/opentelemetry-cpp/pull/XXXX)
+
+Security fix:
+
+* [EXPORTER] OTLP HTTP exporters read unbounded HTTP response
+  [#XXXX](https://github.com/open-telemetry/opentelemetry-cpp/pull/XXXX)
+
+  * When exporting OTLP HTTP data to a misconfigured or malicious endpoint,
+    the exporter could allocate an arbitrary amount of memory when getting
+    the endpoint HTTP response back.
+  * The size of HTTP responses is now limited to 4MiB by default,
+    following the opentelemetry-proto recommendations.
+  * See CVE-2026-44967
+
 Important changes:
 
 * Enable WITH_OTLP_RETRY_PREVIEW by default
