@@ -18,11 +18,11 @@ jobs:
       matrix:
         include:
           - cmake_options: all-options-abiv1
-            warning_limit: 161
+            warning_limit: 160
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 190
+            warning_limit: 189
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 187
+            warning_limit: 186
 
     steps:
       - name: Harden the runner (Audit all outbound calls)

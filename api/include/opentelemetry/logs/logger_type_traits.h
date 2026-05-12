@@ -198,6 +198,26 @@ struct LogRecordHasType<ValueType, TargetType, ArgumentType...>
                               LogRecordHasType<ValueType, ArgumentType...>>::type
 {};
 
+inline Severity FindSeverityInArgs() noexcept
+{
+  return Severity::kInvalid;
+}
+
+template <class... Rest>
+inline Severity FindSeverityInArgs(Severity severity, Rest &&.../*rest*/) noexcept
+{
+  return severity;
+}
+
+template <class First,
+          class... Rest,
+          typename std::enable_if<!std::is_same<typename std::decay<First>::type, Severity>::value,
+                                  int>::type = 0>
+inline Severity FindSeverityInArgs(First && /*first*/, Rest &&...rest) noexcept
+{
+  return FindSeverityInArgs(std::forward<Rest>(rest)...);
+}
+
 }  // namespace detail
 
 }  // namespace logs

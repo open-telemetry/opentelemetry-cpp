@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/event_id.h"
@@ -26,9 +25,7 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/trace/span_id.h"
-#include "opentelemetry/trace/trace_flags.h"
-#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/nostd/utility.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 #  include "opentelemetry/context/context.h"
@@ -278,6 +275,9 @@ class TestLogger : public Logger
   }
 };
 
+namespace
+{
+
 class EnablementAwareTestLogRecord : public opentelemetry::logs::LogRecord
 {
 public:
@@ -420,6 +420,8 @@ private:
   bool event_id_enabled_;
 };
 
+}  // namespace
+
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
 class TestProvider : public LoggerProvider
 {
@@ -461,3 +463,13 @@ TEST(Logger, EnabledWithExplicitContextUsesContextAwareImplementation)
   EXPECT_TRUE(logger.last_enabled_context_test_key_value_);
 }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+TEST(Logger, EmitLogRecordTemplateShortCircuitsBelowMinimumSeverity)
+{
+  EnablementAwareTestLogger logger(Severity::kWarn);
+
+  logger.Info(nostd::string_view{"filtered"});
+
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 0u);
+}
