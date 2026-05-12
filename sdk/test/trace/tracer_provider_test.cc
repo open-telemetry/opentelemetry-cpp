@@ -328,7 +328,7 @@ TEST(TracerProvider, GetProcessor)
 
   std::unique_ptr<TracerContext> context1(new TracerContext(std::move(processors)));
 
-  auto & span_processor = context1->GetProcessor();
+  auto &span_processor = context1->GetProcessor();
 
   // Should be the SimpleSpanProcessor processor that was created above.
 #ifdef OPENTELEMETRY_RTTI_ENABLED
@@ -350,7 +350,7 @@ TEST(TracerProvider, GetProcessorsTwo)
 
   std::unique_ptr<TracerContext> context1(new TracerContext(std::move(processors)));
 
-  auto & span_processor = context1->GetProcessor();
+  auto &span_processor = context1->GetProcessor();
 
   // Should be the SimpleSpanProcessor processor that was created above.
 #ifdef OPENTELEMETRY_RTTI_ENABLED
@@ -374,7 +374,7 @@ TEST(TracerProvider, GetProcessorsThree)
 
   std::unique_ptr<TracerContext> context1(new TracerContext(std::move(processors)));
 
-  auto & span_processor = context1->GetProcessor();
+  auto &span_processor = context1->GetProcessor();
 
   // Should be the SimpleSpanProcessor processor that was created above.
 #ifdef OPENTELEMETRY_RTTI_ENABLED
