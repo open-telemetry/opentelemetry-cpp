@@ -804,6 +804,32 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMergeMixedSignAsymmetricSp
   EXPECT_EQ(merged_point.scale_, -2);
 }
 
+TEST(Aggregation, Base2ExponentialHistogramAggregationDiffIndexCrossesZero)
+{
+  // Diff's union [-7..3] (11 > max_buckets_=5) forces a cross-zero downscale,
+  // mirroring MergeIndexCrossesZero. right is not a superset of left, so we
+  // check downscale + bucket sum instead of the count invariant.
+  const auto config = MakeAggregationConfig(0, 5);
+
+  Base2ExponentialHistogramAggregation left(&config);
+  left.Aggregate(1.0 / 64.0, {});  // index -7
+  left.Aggregate(1.0 / 32.0, {});  // index -6
+  EXPECT_EQ(MakePointData(left).scale_, 0);
+
+  Base2ExponentialHistogramAggregation right(&config);
+  right.Aggregate(4.0, {});   // index 1
+  right.Aggregate(8.0, {});   // index 2
+  right.Aggregate(16.0, {});  // index 3
+  EXPECT_EQ(MakePointData(right).scale_, 0);
+
+  const auto diffed_point = MakePointData(*left.Diff(right));
+
+  EXPECT_EQ(diffed_point.zero_count_, 0u);
+  EXPECT_LT(diffed_point.scale_, 0);
+  ASSERT_TRUE(diffed_point.positive_buckets_ != nullptr);
+  EXPECT_EQ(SumAllBuckets(diffed_point), 3u);
+}
+
 TEST(Aggregation, Base2ExponentialHistogramAggregationDiffAsymmetricEmptyBuckets)
 {
   const auto config = MakeAggregationConfig(0, 5);
