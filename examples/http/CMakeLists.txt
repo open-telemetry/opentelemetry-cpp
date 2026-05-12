@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-if(NOT WITH_CUSTOM_HTTP_CLIENT)
+if(WITH_HTTP_CLIENT_CURL)
   add_executable(http_client client.cc)
   add_executable(http_server server.cc)
 

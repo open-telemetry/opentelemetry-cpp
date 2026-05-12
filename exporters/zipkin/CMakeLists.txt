@@ -68,7 +68,7 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.
     TEST_LIST zipkin_recordable_test)
 
-  if(NOT WITH_CUSTOM_HTTP_CLIENT)
+  if(WITH_HTTP_CLIENT_CURL)
     add_executable(zipkin_exporter_test test/zipkin_exporter_test.cc)
 
     target_link_libraries(

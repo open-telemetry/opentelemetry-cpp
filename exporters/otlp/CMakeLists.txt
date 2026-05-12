@@ -1062,7 +1062,7 @@ if(BUILD_TESTING)
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_http_metric_exporter_factory_test)
 
-    if(WITH_CUSTOM_HTTP_CLIENT)
+    if(NOT WITH_HTTP_CLIENT_CURL)
       add_executable(
         otlp_http_exporter_custom_client_test
         test/otlp_http_exporter_custom_client_test.cc

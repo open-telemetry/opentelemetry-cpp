@@ -160,9 +160,6 @@ option(
 option(WITH_CURL_LOGGING "Whether to enable select CURL verbosity in OTel logs"
        OFF)
 
-option(WITH_CUSTOM_HTTP_CLIENT
-       "Enable a custom HTTP client instead of the default CURL backend" OFF)
-
 option(WITH_ZIPKIN "Whether to include the Zipkin exporter in the SDK" OFF)
 
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
@@ -277,26 +274,13 @@ include(GNUInstallDirs)
 # Do we need HTTP CLIENT CURL ?
 #
 
-if(WITH_CUSTOM_HTTP_CLIENT)
-  set(WITH_HTTP_CLIENT_CURL OFF)
-  if(WITH_ZIPKIN OR WITH_ELASTICSEARCH)
-    message(
-      WARNING
-        "WITH_CUSTOM_HTTP_CLIENT=ON: opentelemetry_http_client INTERFACE is empty. "
-        "WITH_ZIPKIN and WITH_ELASTICSEARCH require you to populate it with your transport "
-        "implementation via target_link_libraries(opentelemetry_http_client INTERFACE <your_impl>)."
-    )
-  endif()
-elseif(
-  WITH_OTLP_HTTP
-  OR WITH_ELASTICSEARCH
-  OR WITH_ZIPKIN
-  OR BUILD_W3CTRACECONTEXT_TEST
-  OR WITH_EXAMPLES_HTTP)
-  set(WITH_HTTP_CLIENT_CURL ON)
-else()
-  set(WITH_HTTP_CLIENT_CURL OFF)
-endif()
+include(CMakeDependentOption)
+cmake_dependent_option(
+  WITH_HTTP_CLIENT_CURL
+  "Use the curl HTTP client backend. Defaults to ON when any HTTP exporter is enabled; set OFF to supply a custom transport."
+  ON
+  "WITH_OTLP_HTTP OR WITH_ELASTICSEARCH OR WITH_ZIPKIN OR BUILD_W3CTRACECONTEXT_TEST OR WITH_EXAMPLES_HTTP"
+  OFF)
 
 #
 # Do we need ZLIB ?
@@ -515,7 +499,6 @@ message(STATUS "WITH_OTLP_GRPC: ${WITH_OTLP_GRPC}")
 message(STATUS "WITH_OTLP_HTTP: ${WITH_OTLP_HTTP}")
 message(STATUS "WITH_OTLP_FILE: ${WITH_OTLP_FILE}")
 message(STATUS "WITH_HTTP_CLIENT_CURL: ${WITH_HTTP_CLIENT_CURL}")
-message(STATUS "WITH_CUSTOM_HTTP_CLIENT: ${WITH_CUSTOM_HTTP_CLIENT}")
 message(STATUS "WITH_ZIPKIN: ${WITH_ZIPKIN}")
 message(STATUS "WITH_PROMETHEUS: ${WITH_PROMETHEUS}")
 message(STATUS "WITH_ELASTICSEARCH: ${WITH_ELASTICSEARCH}")

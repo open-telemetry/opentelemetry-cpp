@@ -34,7 +34,7 @@ if(WITH_EXAMPLES_HTTP)
   add_subdirectory(http)
 endif()
 
-if(WITH_CUSTOM_HTTP_CLIENT AND WITH_OTLP_HTTP)
+if(NOT WITH_HTTP_CLIENT_CURL AND WITH_OTLP_HTTP)
   add_subdirectory(custom_http_client)
 endif()
 
