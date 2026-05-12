@@ -95,7 +95,7 @@ size_t HttpOperation::WriteMemoryCallback(void *contents, size_t size, size_t nm
   }
 
   // 2: Check internal integrity
-  if (self->raw_response_.size() > self->max_raw_response_size_)
+  if (self->raw_response_.size() > self->max_response_size_)
   {
     // Should be impossible,
     // this means the previous call did exceed the max size already.
@@ -103,7 +103,7 @@ size_t HttpOperation::WriteMemoryCallback(void *contents, size_t size, size_t nm
   }
 
   // 3: Protect against memory exhaustion caused by the remote endpoint
-  if (data_size > self->max_raw_response_size_ - self->raw_response_.size())
+  if (data_size > self->max_response_size_ - self->raw_response_.size())
   {
     // This one is possible and must be protected against (CVE-2026-44967).
     // Checks 1 and 2 ensure the math is correct.
@@ -153,12 +153,14 @@ size_t HttpOperation::WriteVectorHeaderCallback(void *ptr, size_t size, size_t n
     }
   }
 
-  if (self->response_headers_.size() > self->max_response_headers_size_)
+  // Common limit for header + body
+  if (self->response_headers_.size() + self->response_body_.size() > self->max_response_size_)
   {
     return 0;
   }
 
-  if (data_size > self->max_response_headers_size_ - self->response_headers_.size())
+  if (data_size >
+      self->max_response_size_ - self->response_headers_.size() - self->response_body_.size())
   {
     return 0;
   }
@@ -206,12 +208,14 @@ size_t HttpOperation::WriteVectorBodyCallback(void *ptr, size_t size, size_t nme
     }
   }
 
-  if (self->response_body_.size() > self->max_response_body_size_)
+  // Common limit for header + body
+  if (self->response_headers_.size() + self->response_body_.size() > self->max_response_size_)
   {
     return 0;
   }
 
-  if (data_size > self->max_response_body_size_ - self->response_body_.size())
+  if (data_size >
+      self->max_response_size_ - self->response_headers_.size() - self->response_body_.size())
   {
     return 0;
   }
