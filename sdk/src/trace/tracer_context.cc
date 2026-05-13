@@ -33,7 +33,7 @@ TracerContext::TracerContext(std::vector<std::unique_ptr<SpanProcessor>> &&proce
       sampler_(std::move(sampler)),
       id_generator_(std::move(id_generator)),
       tracer_configurator_(std::move(tracer_configurator)),
-      num_processors_(0)
+      multi_processor_(nullptr)
 {
   if (processors.empty())
   {
@@ -77,27 +77,28 @@ void TracerContext::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexc
     return;
   }
 
-  if (num_processors_ == 0)
+  if (!processor_)
   {
-    // this is the first processor to be added, maybe the MultiSpanProcessor is not needed
+    // this is the first processor to be added
     processor_ = std::move(processor);
   }
-  else if (num_processors_ == 1)
+  else if (multi_processor_ == nullptr)
   {
-    // if there already is a processor, then make a new MultiSpanProcessor to handle both
+    // if there already is a processor, but its not a MultiSpanProcessor. make a new MultiSpanProcessor
     std::unique_ptr<MultiSpanProcessor> multi_processor(new MultiSpanProcessor({}));
     multi_processor->AddProcessor(std::move(processor_));
     multi_processor->AddProcessor(std::move(processor));
+
+    // duplicate the pointer before it gets type erased
+    multi_processor_ = multi_processor.get();
+
     processor_ = std::move(multi_processor);
   }
-  else /*if (num_processors_ > 1)*/
+  else /*if (multi_processor_ != nullptr)*/
   {
     // already have a MultiSpanProcessor, add the processor to it
-    auto multi_processor = static_cast<MultiSpanProcessor *>(processor_.get());
-    multi_processor->AddProcessor(std::move(processor));
+    multi_processor_->AddProcessor(std::move(processor));
   }
-
-  ++num_processors_;
 }
 
 SpanProcessor &TracerContext::GetProcessor() const noexcept
