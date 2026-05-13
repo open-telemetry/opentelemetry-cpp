@@ -127,4 +127,138 @@ TEST(CounterToHistogram, Double)
   ASSERT_EQ(1000275.0, opentelemetry::nostd::get<double>(actual.sum_));
   ASSERT_EQ(11, actual.count_);
 }
+
+namespace
+{
+
+void CollectPoints(MetricReader &reader, std::vector<Base2ExponentialHistogramPointData> &out)
+{
+  reader.Collect([&](ResourceMetrics &resource_metrics) {
+    for (const ScopeMetrics &scope_metrics : resource_metrics.scope_metric_data_)
+    {
+      for (const MetricData &metric_data : scope_metrics.metric_data_)
+      {
+        for (const PointDataAttributes &point_data_attributes : metric_data.point_data_attr_)
+        {
+          out.push_back(opentelemetry::nostd::get<Base2ExponentialHistogramPointData>(
+              point_data_attributes.point_data));
+        }
+      }
+    }
+    return true;
+  });
+}
+
+uint64_t SumAllBuckets(const Base2ExponentialHistogramPointData &point)
+{
+  uint64_t total = point.zero_count_;
+  if (point.positive_buckets_ && !point.positive_buckets_->Empty())
+  {
+    for (int32_t index = point.positive_buckets_->StartIndex();
+         index <= point.positive_buckets_->EndIndex(); ++index)
+    {
+      total += point.positive_buckets_->Get(index);
+    }
+  }
+  if (point.negative_buckets_ && !point.negative_buckets_->Empty())
+  {
+    for (int32_t index = point.negative_buckets_->StartIndex();
+         index <= point.negative_buckets_->EndIndex(); ++index)
+    {
+      total += point.negative_buckets_->Get(index);
+    }
+  }
+  return total;
+}
+
+void RecordValues(opentelemetry::metrics::Histogram<double> &histogram)
+{
+  histogram.Record(0.5, {});
+  histogram.Record(1.0, {});
+  histogram.Record(2.0, {});
+  histogram.Record(4.0, {});
+  histogram.Record(8.0, {});
+  histogram.Record(16.0, {});
+  histogram.Record(32.0, {});
+  histogram.Record(64.0, {});
+  histogram.Record(128.0, {});
+  histogram.Record(256.0, {});
+}
+
+std::shared_ptr<MeterProvider> MakeBase2ExponentialHistogramViewProvider(
+    const std::shared_ptr<MetricReader> &reader)
+{
+  auto meter_provider = std::make_shared<MeterProvider>();
+  meter_provider->AddMetricReader(reader);
+
+  Base2ExponentialHistogramAggregationConfig config;
+  config.max_scale_   = 5;
+  config.max_buckets_ = 160;
+  auto view =
+      std::make_unique<View>("exponential_histogram", "exponential_histogram_description",
+                             AggregationType::kBase2ExponentialHistogram,
+                             std::make_shared<Base2ExponentialHistogramAggregationConfig>(config));
+  auto instrument_selector =
+      std::make_unique<InstrumentSelector>(InstrumentType::kHistogram, "histogram", "unit");
+  auto meter_selector = std::make_unique<MeterSelector>("meter1", "version1", "schema1");
+  meter_provider->AddView(std::move(instrument_selector), std::move(meter_selector),
+                          std::move(view));
+  return meter_provider;
+}
+
+}  // namespace
+
+TEST(Base2ExponentialHistogramView, CumulativeTemporality)
+{
+  auto exporter       = std::make_unique<MockMetricExporter>(AggregationTemporality::kCumulative);
+  auto reader         = std::make_shared<MockMetricReader>(std::move(exporter));
+  auto meter_provider = MakeBase2ExponentialHistogramViewProvider(reader);
+
+  auto meter     = meter_provider->GetMeter("meter1", "version1", "schema1");
+  auto histogram = meter->CreateDoubleHistogram("histogram", "histogram_description", "unit");
+
+  RecordValues(*histogram);
+
+  std::vector<Base2ExponentialHistogramPointData> first_collection;
+  CollectPoints(*reader, first_collection);
+  ASSERT_EQ(first_collection.size(), 1u);
+  EXPECT_EQ(first_collection[0].count_, 10u);
+  EXPECT_EQ(SumAllBuckets(first_collection[0]), 10u);
+  EXPECT_LT(first_collection[0].scale_, 5);
+
+  RecordValues(*histogram);
+
+  std::vector<Base2ExponentialHistogramPointData> second_collection;
+  CollectPoints(*reader, second_collection);
+  ASSERT_EQ(second_collection.size(), 1u);
+  EXPECT_EQ(second_collection[0].count_, 20u);
+  EXPECT_EQ(SumAllBuckets(second_collection[0]), 20u);
+}
+
+TEST(Base2ExponentialHistogramView, DeltaTemporality)
+{
+  auto exporter       = std::make_unique<MockMetricExporter>(AggregationTemporality::kDelta);
+  auto reader         = std::make_shared<MockMetricReader>(std::move(exporter));
+  auto meter_provider = MakeBase2ExponentialHistogramViewProvider(reader);
+
+  auto meter     = meter_provider->GetMeter("meter1", "version1", "schema1");
+  auto histogram = meter->CreateDoubleHistogram("histogram", "histogram_description", "unit");
+
+  RecordValues(*histogram);
+
+  std::vector<Base2ExponentialHistogramPointData> first_collection;
+  CollectPoints(*reader, first_collection);
+  ASSERT_EQ(first_collection.size(), 1u);
+  EXPECT_EQ(first_collection[0].count_, 10u);
+  EXPECT_EQ(SumAllBuckets(first_collection[0]), 10u);
+  EXPECT_LT(first_collection[0].scale_, 5);
+
+  RecordValues(*histogram);
+
+  std::vector<Base2ExponentialHistogramPointData> second_collection;
+  CollectPoints(*reader, second_collection);
+  ASSERT_EQ(second_collection.size(), 1u);
+  EXPECT_EQ(second_collection[0].count_, 10u);
+  EXPECT_EQ(SumAllBuckets(second_collection[0]), 10u);
+}
 #endif
