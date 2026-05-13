@@ -5,9 +5,11 @@
 
 #include <stdint.h>
 
+#include <atomic>
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
@@ -103,11 +105,25 @@ public:
   Sampler &GetSampler() { return context_->GetSampler(); }
 
 private:
+  // TracerProvider needs access to UpdateTracerConfig to propagate configuration updates to
+  // existing tracers.
+  friend class TracerProvider;
+
+  /**
+   * Update this tracer's TracerConfig. Called only by
+   * TracerProvider::UpdateTracerConfigurator when the provider-level
+   * TracerConfigurator is replaced at runtime.
+   */
+  void UpdateTracerConfig(const TracerConfig &config) noexcept;
+
   // order of declaration is important here - instrumentation scope should destroy after
   // tracer-context.
   std::shared_ptr<InstrumentationScope> instrumentation_scope_;
   std::shared_ptr<TracerContext> context_;
-  TracerConfig tracer_config_;
+  opentelemetry::sdk::common::AtomicSharedPtr<const TracerConfig> tracer_config_;
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+  std::atomic<bool> is_enabled_;
+#endif
   static const std::shared_ptr<opentelemetry::trace::NoopTracer> kNoopTracer;
 };
 }  // namespace trace

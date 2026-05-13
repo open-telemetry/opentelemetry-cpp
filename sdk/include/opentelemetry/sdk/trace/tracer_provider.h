@@ -110,6 +110,16 @@ public:
   void AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
 
   /**
+   * Update the TracerConfigurator for this provider, recreate and propagate the resulting
+   * TracerConfig to all existing Tracers while new Tracers will use the updated configuration.
+   *
+   * @param tracer_configurator The new configurator.
+   */
+  void UpdateTracerConfigurator(
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
+          tracer_configurator) noexcept;
+
+  /**
    * Obtain the resource associated with this tracer provider.
    * @return The resource for this tracer provider.
    */

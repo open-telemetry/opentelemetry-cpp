@@ -103,6 +103,15 @@ public:
   opentelemetry::sdk::trace::IdGenerator &GetIdGenerator() const noexcept;
 
   /**
+   * Replace the TracerConfigurator for this context.
+   *
+   * Note: This method is not thread safe.
+   * @param tracer_configurator The new configurator.
+   */
+  void SetTracerConfigurator(std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
+                                 tracer_configurator) noexcept;
+
+  /**
    * Force all active SpanProcessors to flush any buffered spans
    * within the given timeout.
    */

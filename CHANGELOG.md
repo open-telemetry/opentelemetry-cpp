@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add `TracerProvider::UpdateTracerConfigurator()` and example
+  [#4065](https://github.com/open-telemetry/opentelemetry-cpp/issues/4065)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
