@@ -58,7 +58,15 @@ public:
   virtual void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record) noexcept = 0;
 
   /**
-   * Emit a Log Record object with arguments
+   * Emit a Log Record object with arguments.
+   *
+   * @note This overload does NOT apply the @c Enabled filter chain. Callers who
+   *       constructed @p log_record themselves are responsible for calling
+   *       @c Enabled(severity, ...) before invoking this overload if they want
+   *       the LoggerConfig filtering rules (minimum severity, trace-based,
+   *       processor.Enabled) to be honored. The no-record overload
+   *       @c EmitLogRecord(args...) below does call the filter chain
+   *       automatically when @c Severity is present in @p args.
    *
    * @param log_record Log record
    * @param args Arguments which can be used to set data of log record by type.
@@ -79,12 +87,6 @@ public:
   void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record, ArgumentType &&...args)
   {
     if (!log_record)
-    {
-      return;
-    }
-
-    const Severity arg_severity = detail::FindSeverityInArgs(args...);
-    if (arg_severity != Severity::kInvalid && !Enabled(arg_severity))
     {
       return;
     }
@@ -130,6 +132,19 @@ public:
   template <class... ArgumentType>
   void EmitLogRecord(ArgumentType &&...args)
   {
+    const Severity arg_severity = detail::FindSeverityInArgs(args...);
+    if (arg_severity != Severity::kInvalid)
+    {
+      const EventId *event_id_ptr = detail::FindEventIdInArgs(args...);
+      const bool is_enabled       = event_id_ptr
+                                        ? Enabled(arg_severity, *event_id_ptr)
+                                        : Enabled(arg_severity, static_cast<int64_t>(0));
+      if (!is_enabled)
+      {
+        return;
+      }
+    }
+
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
 
     EmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);

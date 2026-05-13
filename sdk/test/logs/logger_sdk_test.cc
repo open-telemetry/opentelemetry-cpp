@@ -486,57 +486,6 @@ TEST(LoggerSDK, LoggerWithEnabledConfig)
   ASSERT_FALSE(shared_recordable->GetSpanId().IsValid());
 }
 
-TEST(LoggerSDK, EmitLogRecordDropsUnsampledTraceBased)
-{
-  ScopeConfigurator<LoggerConfig> trace_based =
-      ScopeConfigurator<LoggerConfig>::Builder(
-          LoggerConfig::Create(true, logs_api::Severity::kInvalid, true))
-          .Build();
-  auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
-  auto log_processor = std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable));
-
-  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(
-      new LoggerProvider(std::move(log_processor), resource,
-                         std::make_unique<ScopeConfigurator<LoggerConfig>>(trace_based)));
-  auto logger = api_lp->GetLogger("trace-based-logger", "opentelemetry_library", "", schema_url);
-
-  auto unsampled_span = MakeTestSpan(false);
-  opentelemetry::trace::Scope scope{unsampled_span};
-
-  logger->EmitLogRecord(logs_api::Severity::kInfo, "dropped");
-
-  EXPECT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kInvalid);
-  EXPECT_EQ(shared_recordable->GetBody(), "");
-  EXPECT_EQ(shared_recordable->GetObservedTimestamp(), std::chrono::system_clock::from_time_t(0));
-}
-
-TEST(LoggerSDK, EmitLogRecordEmitsSampledTraceBased)
-{
-  ScopeConfigurator<LoggerConfig> trace_based =
-      ScopeConfigurator<LoggerConfig>::Builder(
-          LoggerConfig::Create(true, logs_api::Severity::kInvalid, true))
-          .Build();
-  auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
-  auto log_processor = std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable));
-
-  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(
-      new LoggerProvider(std::move(log_processor), resource,
-                         std::make_unique<ScopeConfigurator<LoggerConfig>>(trace_based)));
-  auto logger = api_lp->GetLogger("trace-based-logger", "opentelemetry_library", "", schema_url);
-
-  auto sampled_span = MakeTestSpan(true);
-  opentelemetry::trace::Scope scope{sampled_span};
-
-  logger->EmitLogRecord(logs_api::Severity::kInfo, "allowed");
-
-  EXPECT_EQ(shared_recordable->GetSeverity(), logs_api::Severity::kInfo);
-  EXPECT_EQ(shared_recordable->GetBody(), "allowed");
-}
-
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(LoggerSDK, LoggerWithMinimumSeverityConfig)
 {

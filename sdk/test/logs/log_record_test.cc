@@ -117,6 +117,20 @@ public:
     return last_body_;
   }
 
+protected:
+  bool EnabledImplementation(opentelemetry::logs::Severity /*severity*/,
+                             int64_t /*event_id*/) const noexcept override
+  {
+    return true;
+  }
+
+  bool EnabledImplementation(
+      opentelemetry::logs::Severity /*severity*/,
+      const opentelemetry::logs::EventId & /*event_id*/) const noexcept override
+  {
+    return true;
+  }
+
 private:
   opentelemetry::sdk::common::OwnedAttributeValue last_body_;
 };

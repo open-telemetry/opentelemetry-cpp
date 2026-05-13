@@ -156,11 +156,6 @@ void Logger::EmitLogRecord(
     return;
   }
 
-  if (!IsAllowedByTraceBasedFiltering(context::RuntimeContext::GetCurrent(), logger_config_))
-  {
-    return;
-  }
-
   std::unique_ptr<Recordable> recordable =
       std::unique_ptr<Recordable>(static_cast<Recordable *>(log_record.release()));
   recordable->SetResource(context_->GetResource());

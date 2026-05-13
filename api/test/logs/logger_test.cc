@@ -470,6 +470,46 @@ TEST(Logger, EmitLogRecordTemplateShortCircuitsBelowMinimumSeverity)
 
   logger.Info(nostd::string_view{"filtered"});
 
-  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.create_log_record_calls_, 0u);
   EXPECT_EQ(logger.emit_log_record_calls_, 0u);
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
+}
+
+TEST(Logger, EmitLogRecordTemplateInvokesEnabledImplementationAndEmitsWhenAllowed)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
+
+  logger.Info(nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 1u);
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  EXPECT_EQ(logger.last_enabled_severity_, Severity::kInfo);
+}
+
+TEST(Logger, EmitLogRecordTemplateShortCircuitsWhenEnabledImplementationReturnsFalse)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, false);
+
+  logger.Info(nostd::string_view{"filtered"});
+
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 1u);
+  EXPECT_EQ(logger.create_log_record_calls_, 0u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 0u);
+}
+
+TEST(Logger, EmitLogRecordWithRecordBypassesFiltering)
+{
+  // EmitLogRecord(unique_ptr<LogRecord>&&, args...) intentionally does NOT
+  // route through Enabled() — caller built the record themselves and is
+  // responsible for any filtering. Lock the contract documented on the
+  // overload.
+  EnablementAwareTestLogger logger(Severity::kTrace, false);
+
+  auto record = logger.CreateLogRecord();
+  logger.EmitLogRecord(std::move(record), Severity::kInfo, nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
 }

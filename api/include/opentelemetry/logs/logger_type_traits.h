@@ -218,6 +218,26 @@ inline Severity FindSeverityInArgs(First && /*first*/, Rest &&...rest) noexcept
   return FindSeverityInArgs(std::forward<Rest>(rest)...);
 }
 
+inline const EventId *FindEventIdInArgs() noexcept
+{
+  return nullptr;
+}
+
+template <class... Rest>
+inline const EventId *FindEventIdInArgs(const EventId &event_id, Rest &&... /*rest*/) noexcept
+{
+  return &event_id;
+}
+
+template <class First,
+          class... Rest,
+          typename std::enable_if<!std::is_same<typename std::decay<First>::type, EventId>::value,
+                                  int>::type = 0>
+inline const EventId *FindEventIdInArgs(First && /*first*/, Rest &&...rest) noexcept
+{
+  return FindEventIdInArgs(std::forward<Rest>(rest)...);
+}
+
 }  // namespace detail
 
 }  // namespace logs
