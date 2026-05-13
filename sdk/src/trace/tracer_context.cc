@@ -6,6 +6,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
@@ -68,6 +69,12 @@ void TracerContext::SetTracerConfigurator(
     std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
         tracer_configurator) noexcept
 {
+  if (!tracer_configurator)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[TracerContext::SetTracerConfigurator] tracer_configurator must not be null, ignoring.");
+    return;
+  }
   tracer_configurator_ = std::move(tracer_configurator);
 }
 

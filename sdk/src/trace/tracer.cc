@@ -47,6 +47,10 @@ Tracer::Tracer(std::shared_ptr<TracerContext> context,
       context_{std::move(context)},
       tracer_config_(std::make_shared<const TracerConfig>(
           context_->GetTracerConfigurator().ComputeConfig(*instrumentation_scope_)))
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+      ,
+      is_enabled_(tracer_config_.load()->IsEnabled())
+#endif
 {
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   UpdateEnabled(tracer_config_.load()->IsEnabled());
@@ -63,7 +67,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   if (!Enabled())
 #else
-  if (!tracer_config_.load()->IsEnabled())
+  if (!is_enabled_.load(std::memory_order_relaxed))
 #endif
   {
     return kNoopTracer->StartSpan(name, attributes, links, options);
@@ -209,8 +213,11 @@ void Tracer::CloseWithMicroseconds(uint64_t timeout) noexcept
 void Tracer::UpdateTracerConfig(const TracerConfig &config) noexcept
 {
   tracer_config_.store(std::make_shared<const TracerConfig>(config));
+
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   UpdateEnabled(config.IsEnabled());
+#else
+  is_enabled_.store(config.IsEnabled(), std::memory_order_relaxed);
 #endif
 }
 

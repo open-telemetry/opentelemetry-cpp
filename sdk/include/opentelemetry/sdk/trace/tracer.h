@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 
+#include <atomic>
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -120,6 +121,9 @@ private:
   std::shared_ptr<InstrumentationScope> instrumentation_scope_;
   std::shared_ptr<TracerContext> context_;
   opentelemetry::sdk::common::AtomicSharedPtr<const TracerConfig> tracer_config_;
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+  std::atomic<bool> is_enabled_;
+#endif
   static const std::shared_ptr<opentelemetry::trace::NoopTracer> kNoopTracer;
 };
 }  // namespace trace
