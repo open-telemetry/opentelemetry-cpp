@@ -85,12 +85,10 @@ void TracerContext::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexc
   else if (multi_processor_ == nullptr)
   {
     // a processor exists, but it's not a MultiSpanProcessor. make a new MultiSpanProcessor
-    std::unique_ptr<MultiSpanProcessor> multi_processor(new MultiSpanProcessor({}));
+    multi_processor_ = new MultiSpanProcessor({});
+    std::unique_ptr<MultiSpanProcessor> multi_processor(multi_processor_);
     multi_processor->AddProcessor(std::move(processor_));
     multi_processor->AddProcessor(std::move(processor));
-
-    // duplicate the pointer before it gets type erased
-    multi_processor_ = multi_processor.get();
 
     processor_ = std::move(multi_processor);
   }
