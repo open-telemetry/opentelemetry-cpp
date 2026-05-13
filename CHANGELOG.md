@@ -272,6 +272,9 @@ Increment the:
 * [EXPORTER] OTLP HTTP exporters read unbounded HTTP response
   [#4078](https://github.com/open-telemetry/opentelemetry-cpp/pull/4078)
 
+* [SDK] Fix Base2ExponentialHistogramAggregation count dropped
+  [#4072](https://github.com/open-telemetry/opentelemetry-cpp/pull/4072)
+
 * [RELEASE] Release opentelemetry-cpp 1.27.0
   [#4080](https://github.com/open-telemetry/opentelemetry-cpp/pull/4080)
 
