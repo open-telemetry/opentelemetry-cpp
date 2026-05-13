@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add `TracerProvider::UpdateTracerConfigurator()` and example
+  [#4065](https://github.com/open-telemetry/opentelemetry-cpp/issues/4065)
+
 * [API] Fix `Logger::Enabled()`
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
