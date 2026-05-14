@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/event_id.h"
@@ -26,9 +25,6 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/trace/span_id.h"
-#include "opentelemetry/trace/trace_flags.h"
-#include "opentelemetry/trace/trace_id.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 #  include "opentelemetry/context/context.h"

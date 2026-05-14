@@ -8,7 +8,6 @@
 #include <memory>
 #include <mutex>
 #include <ostream>
-#include <ratio>
 #include <thread>
 #include <utility>
 
