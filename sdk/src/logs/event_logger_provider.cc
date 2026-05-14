@@ -9,6 +9,7 @@
 #  include "opentelemetry/sdk/logs/event_logger.h"
 #endif
 
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

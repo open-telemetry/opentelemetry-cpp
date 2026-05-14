@@ -21,6 +21,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/opentracingshim/shim_utils.h"
 #include "opentelemetry/opentracingshim/span_context_shim.h"
 #include "opentelemetry/opentracingshim/span_shim.h"

@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>  // IWYU pragma: keep
+#include <string>
 
 #ifdef _WIN32
 #  include <windows.h>

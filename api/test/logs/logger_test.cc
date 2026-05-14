@@ -25,6 +25,7 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/utility.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 #  include "opentelemetry/context/context.h"
