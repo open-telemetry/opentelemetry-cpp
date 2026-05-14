@@ -28,7 +28,7 @@ Increment the:
   also detects a `Context` in args and routes filtering through
   `Enabled(context, severity, ...)` plus trace stamping through
   `CreateLogRecord(context)`.
-  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)  
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
 ## [1.27.0] 2026-05-13
 
