@@ -47,10 +47,9 @@ namespace trace
 class MultiSpanProcessorTestPeer
 {
 public:
-  static
-  std::vector<SpanProcessor*> GetProcessors(MultiSpanProcessor * multi_span_processor)
+  static std::vector<SpanProcessor *> GetProcessors(MultiSpanProcessor * multi_span_processor)
   {
-    std::vector<SpanProcessor*> res;
+    std::vector<SpanProcessor *> res;
 
     MultiSpanProcessor::ProcessorNode *node = multi_span_processor->head_;
     while (node != nullptr)
@@ -63,8 +62,8 @@ public:
     return res;
   }
 };
-}
-}
+}  // namespace trace
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
 
 TEST(TracerProvider, GetTracer)
@@ -394,7 +393,7 @@ TEST(TracerProvider, GetProcessorsTwo)
   ASSERT_NE(nullptr, processor_typeed);
 
   std::vector<SpanProcessor *> contained_processors =
-    MultiSpanProcessorTestPeer::GetProcessors(processor_typeed);
+      MultiSpanProcessorTestPeer::GetProcessors(processor_typeed);
   EXPECT_EQ(processors_raw, contained_processors);
 }
 
@@ -427,7 +426,7 @@ TEST(TracerProvider, GetProcessorsThree)
   ASSERT_NE(nullptr, processor_typeed);
 
   std::vector<SpanProcessor *> contained_processors =
-    MultiSpanProcessorTestPeer::GetProcessors(processor_typeed);
+      MultiSpanProcessorTestPeer::GetProcessors(processor_typeed);
   EXPECT_EQ(processors_raw, contained_processors);
 }
 
