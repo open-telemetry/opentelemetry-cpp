@@ -45,6 +45,11 @@ public:
 
   nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override;
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord(
+      const opentelemetry::context::Context &context) noexcept override;
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
   using opentelemetry::logs::Logger::EmitLogRecord;
 
   void EmitLogRecord(

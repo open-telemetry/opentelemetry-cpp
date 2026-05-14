@@ -21,7 +21,6 @@
 #include "opentelemetry/logs/noop.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
@@ -45,13 +44,13 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer.h"
 
-#include "opentelemetry/trace/default_span.h"
-
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 #  include <stddef.h>
 
 #  include "opentelemetry/context/context.h"
+#  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/trace/context.h"
+#  include "opentelemetry/trace/default_span.h"
 #endif
 
 using namespace opentelemetry::sdk::logs;
@@ -64,6 +63,7 @@ namespace nostd    = opentelemetry::nostd;
 
 namespace
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 nostd::shared_ptr<opentelemetry::trace::Span> MakeTestSpan(bool sampled)
 {
   const uint8_t trace_id_bytes[opentelemetry::trace::TraceId::kSize] = {
@@ -81,7 +81,6 @@ nostd::shared_ptr<opentelemetry::trace::Span> MakeTestSpan(bool sampled)
       new opentelemetry::trace::DefaultSpan(span_context));
 }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 context::Context MakeContextWithUnsampledSpanAndInvalidTraceId()
 {
   const uint8_t span_id_bytes[opentelemetry::trace::SpanId::kSize] = {0xde, 0xad, 0xbe, 0xef,
