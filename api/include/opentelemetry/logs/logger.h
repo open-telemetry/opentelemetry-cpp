@@ -50,6 +50,20 @@ public:
    */
   virtual nostd::unique_ptr<LogRecord> CreateLogRecord() noexcept = 0;
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  /**
+   * Create a Log Record object using given context.
+   *
+   * @param context Context which carries execution-scoped values across execution unit.
+   * @return nostd::unique_ptr<LogRecord>
+   */
+  virtual nostd::unique_ptr<LogRecord> CreateLogRecord(
+      const opentelemetry::context::Context & /*context*/) noexcept
+  {
+    return CreateLogRecord();
+  }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
   /**
    * Emit a Log Record object
    *
@@ -58,7 +72,15 @@ public:
   virtual void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record) noexcept = 0;
 
   /**
-   * Emit a Log Record object with arguments
+   * Emit a Log Record object with arguments.
+   *
+   * @note This overload does NOT apply the @c Enabled filter chain. Callers who
+   *       constructed @p log_record themselves are responsible for calling
+   *       @c Enabled(severity, ...) before invoking this overload if they want
+   *       the LoggerConfig filtering rules (minimum severity, trace-based,
+   *       processor.Enabled) to be honored. The no-record overload
+   *       @c EmitLogRecord(args...) below does call the filter chain
+   *       automatically when @c Severity is present in @p args.
    *
    * @param log_record Log record
    * @param args Arguments which can be used to set data of log record by type.
@@ -79,12 +101,6 @@ public:
   void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record, ArgumentType &&...args)
   {
     if (!log_record)
-    {
-      return;
-    }
-
-    const Severity arg_severity = detail::FindSeverityInArgs(args...);
-    if (arg_severity != Severity::kInvalid && !Enabled(arg_severity))
     {
       return;
     }
@@ -126,11 +142,42 @@ public:
    *  KeyValueIterable                        -> attributes
    *  Key value iterable container            -> attributes
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
+   *  Context (v2 only)                       -> filter + trace stamp (recommended: pass last)
+   *
    */
   template <class... ArgumentType>
   void EmitLogRecord(ArgumentType &&...args)
   {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    const opentelemetry::context::Context *context_ptr = detail::FindContextInArgs(args...);
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+    const Severity arg_severity = detail::FindSeverityInArgs(args...);
+    if (arg_severity != Severity::kInvalid)
+    {
+      const EventId *event_id_ptr = detail::FindEventIdInArgs(args...);
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+      const bool is_enabled =
+          context_ptr ? (event_id_ptr ? Enabled(*context_ptr, arg_severity, *event_id_ptr)
+                                      : Enabled(*context_ptr, arg_severity))
+                      : (event_id_ptr ? Enabled(arg_severity, *event_id_ptr)
+                                      : Enabled(arg_severity, static_cast<int64_t>(0)));
+#else
+      const bool is_enabled = event_id_ptr ? Enabled(arg_severity, *event_id_ptr)
+                                           : Enabled(arg_severity, static_cast<int64_t>(0));
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+      if (!is_enabled)
+      {
+        return;
+      }
+    }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    nostd::unique_ptr<LogRecord> log_record =
+        context_ptr ? CreateLogRecord(*context_ptr) : CreateLogRecord();
+#else
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
     EmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
   }

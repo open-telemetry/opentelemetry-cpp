@@ -21,6 +21,10 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include "opentelemetry/context/context.h"
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs
 {
@@ -143,6 +147,21 @@ struct LogRecordSetterTrait<common::KeyValueIterable>
   }
 };
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+// Context in the argument list is consumed by EmitLogRecord(args...) for
+// context-aware filtering and trace stamping (see FindContextInArgs); it is
+// not a record field, so the setter is a no-op.
+template <>
+struct LogRecordSetterTrait<opentelemetry::context::Context>
+{
+  template <class ArgumentType>
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType && /*arg*/) noexcept
+  {
+    return log_record;
+  }
+};
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
 template <class ValueType>
 struct LogRecordSetterTrait
 {
@@ -217,6 +236,52 @@ inline Severity FindSeverityInArgs(First && /*first*/, Rest &&...rest) noexcept
 {
   return FindSeverityInArgs(std::forward<Rest>(rest)...);
 }
+
+inline const EventId *FindEventIdInArgs() noexcept
+{
+  return nullptr;
+}
+
+template <class... Rest>
+inline const EventId *FindEventIdInArgs(const EventId &event_id, Rest &&.../*rest*/) noexcept
+{
+  return &event_id;
+}
+
+template <class First,
+          class... Rest,
+          typename std::enable_if<!std::is_same<typename std::decay<First>::type, EventId>::value,
+                                  int>::type = 0>
+inline const EventId *FindEventIdInArgs(First && /*first*/, Rest &&...rest) noexcept
+{
+  return FindEventIdInArgs(std::forward<Rest>(rest)...);
+}
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+inline const opentelemetry::context::Context *FindContextInArgs() noexcept
+{
+  return nullptr;
+}
+
+template <class... Rest>
+inline const opentelemetry::context::Context *FindContextInArgs(
+    const opentelemetry::context::Context &context,
+    Rest &&.../*rest*/) noexcept
+{
+  return &context;
+}
+
+template <class First,
+          class... Rest,
+          typename std::enable_if<!std::is_same<typename std::decay<First>::type,
+                                                opentelemetry::context::Context>::value,
+                                  int>::type = 0>
+inline const opentelemetry::context::Context *FindContextInArgs(First && /*first*/,
+                                                                Rest &&...rest) noexcept
+{
+  return FindContextInArgs(std::forward<Rest>(rest)...);
+}
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 }  // namespace detail
 
