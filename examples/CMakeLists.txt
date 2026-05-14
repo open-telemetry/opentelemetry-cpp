@@ -38,8 +38,6 @@ if(WITH_CONFIGURATION)
   add_subdirectory(configuration)
 endif()
 
-# Build-tree only: depends on the opentelemetry_http_client INTERFACE target which
-# is not exported in an installed package.
-if(NOT WITH_HTTP_CLIENT_CURL AND WITH_OTLP_HTTP AND TARGET opentelemetry_http_client)
+if(NOT WITH_HTTP_CLIENT_CURL AND WITH_OTLP_HTTP)
   add_subdirectory(custom_http_client)
 endif()

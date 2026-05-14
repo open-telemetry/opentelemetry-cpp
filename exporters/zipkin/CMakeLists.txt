@@ -23,14 +23,8 @@ set_target_version(opentelemetry_exporter_zipkin_trace)
 
 target_link_libraries(
   opentelemetry_exporter_zipkin_trace
-  PUBLIC opentelemetry_trace "$<BUILD_INTERFACE:opentelemetry_http_client>"
+  PUBLIC opentelemetry_trace opentelemetry_http_client
          nlohmann_json::nlohmann_json)
-
-if(WITH_HTTP_CLIENT_CURL)
-  target_link_libraries(
-    opentelemetry_exporter_zipkin_trace
-    PUBLIC "$<INSTALL_INTERFACE:opentelemetry_http_client_curl>")
-endif()
 
 otel_add_component(
   COMPONENT
