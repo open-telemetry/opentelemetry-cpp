@@ -370,9 +370,9 @@ TEST(TracerProvider, GetProcessor)
 // get a MultiSpanProcessor back that wraps both processors
 TEST(TracerProvider, GetProcessorsTwo)
 {
-  std::vector<SpanProcessor*> processors_raw(2);
-  processors_raw[0] = new SimpleSpanProcessor(nullptr); // deleted via unique_ptr
-  processors_raw[1] = new SimpleSpanProcessor(nullptr); // deleted via unique_ptr
+  std::vector<SpanProcessor *> processors_raw(2);
+  processors_raw[0] = new SimpleSpanProcessor(nullptr);  // deleted via unique_ptr
+  processors_raw[1] = new SimpleSpanProcessor(nullptr);  // deleted via unique_ptr
 
   std::unique_ptr<SpanProcessor> processor1(processors_raw[0]);
   std::unique_ptr<SpanProcessor> processor2(processors_raw[1]);
@@ -393,17 +393,18 @@ TEST(TracerProvider, GetProcessorsTwo)
 #endif
   ASSERT_NE(nullptr, processor_typeed);
 
-  std::vector<SpanProcessor*> contained_processors = MultiSpanProcessorTestPeer::GetProcessors(processor_typeed);
+  std::vector<SpanProcessor *> contained_processors =
+    MultiSpanProcessorTestPeer::GetProcessors(processor_typeed);
   EXPECT_EQ(processors_raw, contained_processors);
 }
 
 // get a MultiSpanProcessor back that wraps all three processors
 TEST(TracerProvider, GetProcessorsThree)
 {
-  std::vector<SpanProcessor*> processors_raw(3);
-  processors_raw[0] = new SimpleSpanProcessor(nullptr); // deleted via unique_ptr
-  processors_raw[1] = new SimpleSpanProcessor(nullptr); // deleted via unique_ptr
-  processors_raw[2] = new SimpleSpanProcessor(nullptr); // deleted via unique_ptr
+  std::vector<SpanProcessor *> processors_raw(3);
+  processors_raw[0] = new SimpleSpanProcessor(nullptr);  // deleted via unique_ptr
+  processors_raw[1] = new SimpleSpanProcessor(nullptr);  // deleted via unique_ptr
+  processors_raw[2] = new SimpleSpanProcessor(nullptr);  // deleted via unique_ptr
 
   std::unique_ptr<SpanProcessor> processor1(processors_raw[0]);
   std::unique_ptr<SpanProcessor> processor2(processors_raw[1]);
@@ -425,7 +426,8 @@ TEST(TracerProvider, GetProcessorsThree)
 #endif
   ASSERT_NE(nullptr, processor_typeed);
 
-  std::vector<SpanProcessor*> contained_processors = MultiSpanProcessorTestPeer::GetProcessors(processor_typeed);
+  std::vector<SpanProcessor *> contained_processors =
+    MultiSpanProcessorTestPeer::GetProcessors(processor_typeed);
   EXPECT_EQ(processors_raw, contained_processors);
 }
 
