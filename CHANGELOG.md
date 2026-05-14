@@ -15,12 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
-* [API] `Logger::EmitLogRecord(...)` templates now short-circuit when the
-  supplied Severity is below the logger's minimum. Closes the second half of
-  #2667 so the `Trace`/`Debug`/`Info`/`Warn`/`Error`/`Fatal` helpers honor
-  the `Enabled()` flag transparently.
-* [SDK] `Logger::EmitLogRecord(unique_ptr<LogRecord>)` now applies the
-  LoggerConfig trace-based filter using the current runtime context.
+* [API] `Logger::EmitLogRecord(...)` templates now apply the `Enabled` filter
+  chain when a `Severity` is in args, so the `Trace`/`Debug`/`Info`/`Warn`/`Error`/`Fatal` helpers 
+  honor the `Enabled()` flag transparently. Closes the second half of #2667.
+* [API/SDK] (ABI v2) Add `Logger::CreateLogRecord(const Context &)` virtual
+  for explicit-context record creation. `Logger::EmitLogRecord(args...)`
+  also detects a `Context` in args and routes filtering through
+  `Enabled(context, severity, ...)` plus trace stamping through
+  `CreateLogRecord(context)`.
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
 ## [1.27.0] 2026-05-13
