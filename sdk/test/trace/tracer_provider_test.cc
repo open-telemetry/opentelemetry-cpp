@@ -39,6 +39,34 @@
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;
 
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace trace
+{
+class MultiSpanProcessorTestPeer
+{
+public:
+  static
+  std::vector<SpanProcessor*> GetProcessors(MultiSpanProcessor * multi_span_processor)
+  {
+    std::vector<SpanProcessor*> res;
+
+    MultiSpanProcessor::ProcessorNode *node = multi_span_processor->head_;
+    while (node != nullptr)
+    {
+      auto processor = node->value_.get();
+      res.emplace_back(processor);
+      node = node->next_;
+    }
+
+    return res;
+  }
+};
+}
+}
+OPENTELEMETRY_END_NAMESPACE
+
 TEST(TracerProvider, GetTracer)
 {
   std::unique_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));
@@ -342,8 +370,13 @@ TEST(TracerProvider, GetProcessor)
 // get a MultiSpanProcessor back that wraps both processors
 TEST(TracerProvider, GetProcessorsTwo)
 {
-  std::unique_ptr<SpanProcessor> processor1(new SimpleSpanProcessor(nullptr));
-  std::unique_ptr<SpanProcessor> processor2(new SimpleSpanProcessor(nullptr));
+  std::vector<SpanProcessor*> processors_raw(2);
+  processors_raw[0] = new SimpleSpanProcessor(nullptr); // deleted via unique_ptr
+  processors_raw[1] = new SimpleSpanProcessor(nullptr); // deleted via unique_ptr
+
+  std::unique_ptr<SpanProcessor> processor1(processors_raw[0]);
+  std::unique_ptr<SpanProcessor> processor2(processors_raw[1]);
+
   std::vector<std::unique_ptr<SpanProcessor>> processors;
   processors.push_back(std::move(processor1));
   processors.push_back(std::move(processor2));
@@ -359,14 +392,22 @@ TEST(TracerProvider, GetProcessorsTwo)
   auto processor_typeed = static_cast<MultiSpanProcessor *>(&span_processor);
 #endif
   ASSERT_NE(nullptr, processor_typeed);
+
+  std::vector<SpanProcessor*> contained_processors = MultiSpanProcessorTestPeer::GetProcessors(processor_typeed);
+  EXPECT_EQ(processors_raw, contained_processors);
 }
 
 // get a MultiSpanProcessor back that wraps all three processors
 TEST(TracerProvider, GetProcessorsThree)
 {
-  std::unique_ptr<SpanProcessor> processor1(new SimpleSpanProcessor(nullptr));
-  std::unique_ptr<SpanProcessor> processor2(new SimpleSpanProcessor(nullptr));
-  std::unique_ptr<SpanProcessor> processor3(new SimpleSpanProcessor(nullptr));
+  std::vector<SpanProcessor*> processors_raw(3);
+  processors_raw[0] = new SimpleSpanProcessor(nullptr); // deleted via unique_ptr
+  processors_raw[1] = new SimpleSpanProcessor(nullptr); // deleted via unique_ptr
+  processors_raw[2] = new SimpleSpanProcessor(nullptr); // deleted via unique_ptr
+
+  std::unique_ptr<SpanProcessor> processor1(processors_raw[0]);
+  std::unique_ptr<SpanProcessor> processor2(processors_raw[1]);
+  std::unique_ptr<SpanProcessor> processor3(processors_raw[2]);
   std::vector<std::unique_ptr<SpanProcessor>> processors;
   processors.push_back(std::move(processor1));
   processors.push_back(std::move(processor2));
@@ -383,6 +424,9 @@ TEST(TracerProvider, GetProcessorsThree)
   auto processor_typeed = static_cast<MultiSpanProcessor *>(&span_processor);
 #endif
   ASSERT_NE(nullptr, processor_typeed);
+
+  std::vector<SpanProcessor*> contained_processors = MultiSpanProcessorTestPeer::GetProcessors(processor_typeed);
+  EXPECT_EQ(processors_raw, contained_processors);
 }
 
 TEST(TracerProvider, Shutdown)
