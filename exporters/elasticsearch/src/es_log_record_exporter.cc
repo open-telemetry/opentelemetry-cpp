@@ -322,8 +322,20 @@ ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter()
 
 ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
     const ElasticsearchExporterOptions &options)
+    : ElasticsearchLogRecordExporter(options, ext::http::client::GetDefaultHttpClientFactory())
+{}
+
+ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
+    const ElasticsearchExporterOptions &options,
+    std::shared_ptr<ext::http::client::HttpClientFactory> factory)
+    : ElasticsearchLogRecordExporter(options, factory->Create())
+{}
+
+ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
+    const ElasticsearchExporterOptions &options,
+    std::shared_ptr<ext::http::client::HttpClient> http_client)
     : options_{options},
-      http_client_{ext::http::client::HttpClientFactory::Create()}
+      http_client_{std::move(http_client)}
 #ifdef ENABLE_ASYNC_EXPORT
       ,
       synchronization_data_(new SynchronizationData())

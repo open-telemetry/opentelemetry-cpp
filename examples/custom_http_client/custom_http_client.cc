@@ -8,6 +8,8 @@
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 
+#include "custom_http_client.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
 {
@@ -119,20 +121,26 @@ public:
 
 }  // namespace
 
-std::shared_ptr<HttpClient> HttpClientFactory::Create()
+std::shared_ptr<HttpClient> LoggingHttpClientFactory::Create()
 {
   return std::make_shared<LoggingHttpClient>();
 }
 
-std::shared_ptr<HttpClient> HttpClientFactory::Create(
+std::shared_ptr<HttpClient> LoggingHttpClientFactory::Create(
     const std::shared_ptr<sdk::common::ThreadInstrumentation> &)
 {
   return std::make_shared<LoggingHttpClient>();
 }
 
-std::shared_ptr<HttpClientSync> HttpClientFactory::CreateSync()
+std::shared_ptr<HttpClientSync> LoggingHttpClientFactory::CreateSync()
 {
   return nullptr;
+}
+
+std::shared_ptr<HttpClientFactory> GetDefaultHttpClientFactory()
+{
+  static auto instance = std::make_shared<LoggingHttpClientFactory>();
+  return instance;
 }
 
 }  // namespace client

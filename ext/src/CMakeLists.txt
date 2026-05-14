@@ -12,13 +12,14 @@ if(WITH_HTTP_CLIENT_CURL
    OR BUILD_W3CTRACECONTEXT_TEST
    OR WITH_EXAMPLES_HTTP)
   add_library(opentelemetry_http_client INTERFACE)
-  set_target_properties(opentelemetry_http_client PROPERTIES EXPORT_NAME
-                                                             http_client)
   target_link_libraries(opentelemetry_http_client INTERFACE opentelemetry_ext)
   if(WITH_HTTP_CLIENT_CURL)
     target_link_libraries(opentelemetry_http_client
                           INTERFACE opentelemetry_http_client_curl)
   endif()
+
+  set_target_properties(opentelemetry_http_client PROPERTIES EXPORT_NAME
+                                                             http_client)
   otel_add_component(COMPONENT ext_http TARGETS opentelemetry_http_client)
 endif()
 

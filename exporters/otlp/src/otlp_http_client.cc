@@ -663,9 +663,19 @@ void ConvertListFieldToJson(nlohmann::json &value,
 }  // namespace
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
+    : OtlpHttpClient(std::move(options), ext::http::client::GetDefaultHttpClientFactory())
+{}
+
+OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
+                               std::shared_ptr<ext::http::client::HttpClientFactory> factory)
+    : OtlpHttpClient(std::move(options), factory->Create(options.thread_instrumentation))
+{}
+
+OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
+                               std::shared_ptr<ext::http::client::HttpClient> http_client)
     : is_shutdown_(false),
       options_(std::move(options)),
-      http_client_(http_client::HttpClientFactory::Create(options_.thread_instrumentation)),
+      http_client_(std::move(http_client)),
       start_session_counter_(0),
       finished_session_counter_(0)
 {
@@ -702,17 +712,6 @@ OtlpHttpClient::~OtlpHttpClient()
   // And then remove all session datas
   while (cleanupGCSessions())
     ;
-}
-
-OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
-                               std::shared_ptr<ext::http::client::HttpClient> http_client)
-    : is_shutdown_(false),
-      options_(std::move(options)),
-      http_client_(std::move(http_client)),
-      start_session_counter_(0),
-      finished_session_counter_(0)
-{
-  http_client_->SetMaxSessionsPerConnection(options_.max_requests_per_connection);
 }
 
 // ----------------------------- HTTP Client methods ------------------------------

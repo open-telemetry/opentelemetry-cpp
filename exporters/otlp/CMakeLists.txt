@@ -323,13 +323,8 @@ if(WITH_OTLP_HTTP)
 
   target_link_libraries(
     opentelemetry_exporter_otlp_http_client
-    PRIVATE "$<BUILD_INTERFACE:opentelemetry_http_client>" opentelemetry_common)
-
-  if(WITH_HTTP_CLIENT_CURL)
-    target_link_libraries(
-      opentelemetry_exporter_otlp_http_client
-      PRIVATE "$<INSTALL_INTERFACE:opentelemetry_http_client_curl>")
-  endif()
+    PUBLIC opentelemetry_http_client
+    PRIVATE opentelemetry_common)
 
   target_include_directories(
     opentelemetry_exporter_otlp_http_client
