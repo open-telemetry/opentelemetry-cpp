@@ -11,7 +11,6 @@
 #include <utility>
 #include <vector>
 
-#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger.h"

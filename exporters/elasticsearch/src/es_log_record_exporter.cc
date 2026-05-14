@@ -12,6 +12,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "nlohmann/json.hpp"
 
 #include "opentelemetry/exporters/elasticsearch/es_log_record_exporter.h"
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
@@ -28,9 +29,7 @@
 #ifdef ENABLE_ASYNC_EXPORT
 #  include <cstddef>
 #  include <functional>
-#  include <ratio>
 #  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
 #endif
 
 namespace nostd       = opentelemetry::nostd;

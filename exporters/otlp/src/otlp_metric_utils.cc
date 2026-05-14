@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stdint.h>
-#include <map>
 #include <memory>
 #include <utility>
 #include <vector>

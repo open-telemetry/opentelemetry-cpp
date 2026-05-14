@@ -14,6 +14,7 @@
 #include <iterator>
 #include <map>
 #include <memory>
+#include <new>
 #include <string>
 #include <utility>
 

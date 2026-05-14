@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <initializer_list>
-#include <memory>
 #include <mutex>
 #include <string>
 #include <utility>

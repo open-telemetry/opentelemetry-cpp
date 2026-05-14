@@ -14,7 +14,6 @@
 #include <fstream>
 #include <functional>
 #include <mutex>
-#include <ratio>
 #include <string>
 #include <thread>
 #include <utility>

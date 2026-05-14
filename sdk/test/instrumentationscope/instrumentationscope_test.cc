@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 #include <stdint.h>
 #include <initializer_list>
-#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>

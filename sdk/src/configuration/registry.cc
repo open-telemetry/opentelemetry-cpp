@@ -7,7 +7,6 @@
 #include <utility>
 
 #include "opentelemetry/baggage/propagation/baggage_propagator.h"
-#include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_builder.h"
