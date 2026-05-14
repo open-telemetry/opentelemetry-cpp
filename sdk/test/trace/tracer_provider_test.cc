@@ -47,7 +47,7 @@ namespace trace
 class MultiSpanProcessorTestPeer
 {
 public:
-  static std::vector<SpanProcessor *> GetProcessors(MultiSpanProcessor * multi_span_processor)
+  static std::vector<SpanProcessor *> GetProcessors(MultiSpanProcessor *multi_span_processor)
   {
     std::vector<SpanProcessor *> res;
 
