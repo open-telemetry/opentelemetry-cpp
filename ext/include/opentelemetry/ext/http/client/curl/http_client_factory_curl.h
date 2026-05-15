@@ -21,10 +21,10 @@ namespace curl
 class HttpCurlClientFactory : public HttpClientFactory
 {
 public:
-  std::shared_ptr<HttpClientSync> CreateSync() override;
+  std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> CreateSync() override;
 
-  std::shared_ptr<HttpClient> Create() override;
-  std::shared_ptr<HttpClient> Create(
+  std::shared_ptr<opentelemetry::ext::http::client::HttpClient> Create() override;
+  std::shared_ptr<opentelemetry::ext::http::client::HttpClient> Create(
       const std::shared_ptr<sdk::common::ThreadInstrumentation> &thread_instrumentation) override;
 };
 
