@@ -8,6 +8,6 @@
 
 TEST(ExtHttpCurlInstall, HttpClient)
 {
-  auto client = opentelemetry::ext::http::client::HttpClientFactory::Create();
+  auto client = opentelemetry::ext::http::client::GetDefaultHttpClientFactory()->Create();
   ASSERT_TRUE(client != nullptr);
 }
