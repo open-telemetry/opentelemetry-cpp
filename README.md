@@ -73,6 +73,11 @@ For the latest version, see [BCR: opentelemetry-cpp](https://github.com/bazelbui
 
 ## Getting Started
 
+WARNING: The readthedocs documentation is several years out of date. See
+[#3059](https://github.com/open-telemetry/opentelemetry-cpp/issues/3059) for
+more details. Read the documentation directly in the repo for accurate,
+up-to-date information.
+
 As an application owner or the library author, you can find the getting started
 guide and reference documentation on
 [opentelemetry-cpp.readthedocs.io](https://opentelemetry-cpp.readthedocs.io/en/latest/)
