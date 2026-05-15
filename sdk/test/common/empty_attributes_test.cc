@@ -3,7 +3,11 @@
 
 #include <gtest/gtest.h>
 #include <string.h>
+#include <array>
+#include <string>
+#include <utility>
 
+#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/common/empty_attributes.h"
 
