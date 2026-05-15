@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <mutex>
 #include <string>
 #include <utility>
-#include <vector>
 #include "common.h"
 
 #include "opentelemetry/common/macros.h"
@@ -27,7 +25,9 @@
 #  include <stdint.h>
 #  include <initializer_list>
 #  include <map>
+#  include <mutex>
 #  include <unordered_map>
+#  include <vector>
 
 #  include "opentelemetry/common/attribute_value.h"
 #  include "opentelemetry/nostd/variant.h"
@@ -35,7 +35,13 @@
 #endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
 using namespace opentelemetry::sdk::metrics;
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
 using namespace opentelemetry::sdk::common::internal_log;
+
+namespace
+{
 
 class ScopedTestLogHandler final
 {
@@ -73,12 +79,11 @@ private:
 
 public:
   explicit ScopedTestLogHandler(LogLevel level)
+      : previous_handler_(GlobalLogHandler::GetLogHandler()),
+        previous_level_(GlobalLogHandler::GetLogLevel())
   {
     opentelemetry::nostd::shared_ptr<LogHandlerImpl> handler{new LogHandlerImpl{}};
     handler_ = handler.get();
-
-    previous_handler_ = GlobalLogHandler::GetLogHandler();
-    previous_level_   = GlobalLogHandler::GetLogLevel();
 
     GlobalLogHandler::SetLogHandler(std::move(handler));
     GlobalLogHandler::SetLogLevel(level);
@@ -91,13 +96,22 @@ public:
     GlobalLogHandler::SetLogLevel(previous_level_);
   }
 
+  ScopedTestLogHandler(const ScopedTestLogHandler &)            = delete;
+  ScopedTestLogHandler &operator=(const ScopedTestLogHandler &) = delete;
+  ScopedTestLogHandler(ScopedTestLogHandler &&)                 = delete;
+  ScopedTestLogHandler &operator=(ScopedTestLogHandler &&)      = delete;
+
   std::vector<Entry> Drain() { return handler_->Drain(); }
 
 private:
-  LogHandlerImpl *handler_;
+  LogHandlerImpl *handler_{nullptr};
   opentelemetry::nostd::shared_ptr<LogHandler> previous_handler_;
   LogLevel previous_level_;
 };
+
+}  // namespace
+
+#endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
 TEST(MeterProvider, GetMeter)
 {
