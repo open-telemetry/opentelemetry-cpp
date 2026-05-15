@@ -388,6 +388,8 @@ TEST(MeterProvider, GetMeterInequalityCheckAbiv2)
 
 #endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
 TEST(MeterProvider, ExplicitShutdownNotWarnOnDestructionCheck)
 {
   ScopedTestLogHandler log_handler{LogLevel::Warning};
@@ -403,3 +405,5 @@ TEST(MeterProvider, ExplicitShutdownNotWarnOnDestructionCheck)
   logs     = log_handler.Drain();
   EXPECT_TRUE(logs.empty());
 }
+
+#endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
