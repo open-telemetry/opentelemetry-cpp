@@ -8,11 +8,11 @@
 #include <map>
 #include <memory>  // IWYU pragma: keep
 #include <mutex>
+#include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
-#include "nlohmann/json.hpp"
 
 #include "opentelemetry/exporters/elasticsearch/es_log_record_exporter.h"
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"

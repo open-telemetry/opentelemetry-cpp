@@ -51,6 +51,7 @@ OPENTELEMETRY_END_NAMESPACE
 
 #  include "opentelemetry/nostd/internal/absl/base/options.h"
 
+#  ifdef NEVER
 // Forward declarations needed by the local Abseil snapshot bridge.
 // NOLINTBEGIN(abseil-no-namespace)
 namespace absl
@@ -64,6 +65,7 @@ class variant;
 }  // namespace OTABSL_OPTION_NAMESPACE_NAME
 }  // namespace absl
 // NOLINTEND(abseil-no-namespace)
+#  endif
 
 #  include "opentelemetry/nostd/internal/absl/types/variant.h"
 
