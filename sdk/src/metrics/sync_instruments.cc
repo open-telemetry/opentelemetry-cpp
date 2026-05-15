@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stdint.h>
-#include <memory>
 #include <ostream>
 #include <string>
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/context/context.h"
+#include "opentelemetry/metrics/sync_instruments.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
@@ -566,6 +567,145 @@ void DoubleHistogram::Record(double value) noexcept
   }
   auto context = opentelemetry::context::Context{};
   return storage_->RecordDouble(value, context);
+}
+#endif
+
+#ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+namespace
+{
+
+class BoundLongCounterImpl : public opentelemetry::metrics::BoundCounter<uint64_t>
+{
+public:
+  explicit BoundLongCounterImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage) noexcept
+      : storage_(std::move(storage))
+  {}
+  void Add(uint64_t value) noexcept override
+  {
+    if (storage_)
+    {
+      storage_->RecordLong(static_cast<int64_t>(value));
+    }
+  }
+
+private:
+  std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
+};
+
+class BoundDoubleCounterImpl : public opentelemetry::metrics::BoundCounter<double>
+{
+public:
+  explicit BoundDoubleCounterImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage) noexcept
+      : storage_(std::move(storage))
+  {}
+  void Add(double value) noexcept override
+  {
+    if (value < 0)
+    {
+      OTEL_INTERNAL_LOG_WARN("[BoundDoubleCounter::Add(V)] Value not recorded - negative value");
+      return;
+    }
+    if (storage_)
+    {
+      storage_->RecordDouble(value);
+    }
+  }
+
+private:
+  std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
+};
+
+class BoundLongHistogramImpl : public opentelemetry::metrics::BoundHistogram<uint64_t>
+{
+public:
+  explicit BoundLongHistogramImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage) noexcept
+      : storage_(std::move(storage))
+  {}
+  void Record(uint64_t value) noexcept override
+  {
+    if (storage_)
+    {
+      storage_->RecordLong(static_cast<int64_t>(value));
+    }
+  }
+
+private:
+  std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
+};
+
+class BoundDoubleHistogramImpl : public opentelemetry::metrics::BoundHistogram<double>
+{
+public:
+  explicit BoundDoubleHistogramImpl(
+      std::shared_ptr<BoundSyncWritableMetricStorage> storage) noexcept
+      : storage_(std::move(storage))
+  {}
+  void Record(double value) noexcept override
+  {
+    if (value < 0)
+    {
+      OTEL_INTERNAL_LOG_WARN(
+          "[BoundDoubleHistogram::Record(V)] Value not recorded - negative value");
+      return;
+    }
+    if (storage_)
+    {
+      storage_->RecordDouble(value);
+    }
+  }
+
+private:
+  std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
+};
+
+}  // namespace
+
+opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<uint64_t>> LongCounter::Bind(
+    const opentelemetry::common::KeyValueIterable &attributes) noexcept
+{
+  std::shared_ptr<BoundSyncWritableMetricStorage> bound;
+  if (storage_)
+  {
+    bound = storage_->Bind(attributes);
+  }
+  return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<uint64_t>>{
+      new BoundLongCounterImpl(std::move(bound))};
+}
+
+opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<double>> DoubleCounter::Bind(
+    const opentelemetry::common::KeyValueIterable &attributes) noexcept
+{
+  std::shared_ptr<BoundSyncWritableMetricStorage> bound;
+  if (storage_)
+  {
+    bound = storage_->Bind(attributes);
+  }
+  return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<double>>{
+      new BoundDoubleCounterImpl(std::move(bound))};
+}
+
+opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<uint64_t>>
+LongHistogram::Bind(const opentelemetry::common::KeyValueIterable &attributes) noexcept
+{
+  std::shared_ptr<BoundSyncWritableMetricStorage> bound;
+  if (storage_)
+  {
+    bound = storage_->Bind(attributes);
+  }
+  return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<uint64_t>>{
+      new BoundLongHistogramImpl(std::move(bound))};
+}
+
+opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<double>>
+DoubleHistogram::Bind(const opentelemetry::common::KeyValueIterable &attributes) noexcept
+{
+  std::shared_ptr<BoundSyncWritableMetricStorage> bound;
+  if (storage_)
+  {
+    bound = storage_->Bind(attributes);
+  }
+  return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<double>>{
+      new BoundDoubleHistogramImpl(std::move(bound))};
 }
 #endif
 

@@ -60,6 +60,12 @@ endif()
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
 option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
 
+# Experimental: bound synchronous metric instruments (Counter, Histogram).
+# Requires WITH_ABI_VERSION_2. Context-bearing bound operations, exemplar
+# parity, Gauge, and UpDownCounter bound support are follow-ups.
+option(WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
+       "EXPERIMENTAL: bound synchronous metric instruments preview" OFF)
+
 option(WITH_CONFIGURATION "EXPERIMENTAL: YAML configuration file" OFF)
 
 #
@@ -92,6 +98,12 @@ elseif(WITH_ABI_VERSION_1)
   set(OPENTELEMETRY_ABI_VERSION_NO "1")
 else()
   set(OPENTELEMETRY_ABI_VERSION_NO "${OPENTELEMETRY_ABI_VERSION_DEFAULT}")
+endif()
+
+if(WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW AND NOT WITH_ABI_VERSION_2)
+  message(
+    FATAL_ERROR
+      "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW requires WITH_ABI_VERSION_2")
 endif()
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
@@ -487,6 +499,10 @@ message(STATUS "WITH_API_ONLY: ${WITH_API_ONLY}")
 message(STATUS "WITH_NO_DEPRECATED_CODE: ${WITH_NO_DEPRECATED_CODE}")
 message(STATUS "WITH_ABI_VERSION_1: ${WITH_ABI_VERSION_1}")
 message(STATUS "WITH_ABI_VERSION_2: ${WITH_ABI_VERSION_2}")
+message(
+  STATUS
+    "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW: ${WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW}"
+)
 message(STATUS "OTELCPP_VERSIONED_LIBS: ${OTELCPP_VERSIONED_LIBS}")
 message(STATUS "OTELCPP_MAINTAINER_MODE: ${OTELCPP_MAINTAINER_MODE}")
 message(STATUS "WITH_STL: ${WITH_STL}")

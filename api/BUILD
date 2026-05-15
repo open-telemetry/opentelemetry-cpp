@@ -39,6 +39,14 @@ cc_library(
     }) + select({
         ":abi_version_no_1": ["OPENTELEMETRY_ABI_VERSION_NO=1"],
         ":abi_version_no_2": ["OPENTELEMETRY_ABI_VERSION_NO=2"],
+    }) + select({
+        # Experimental: bound synchronous metric instruments preview.
+        # NOTE: this define only takes effect when ABI v2 is also enabled
+        # (`--//api:abi_version_no=2`); see api/include/opentelemetry/version.h
+        # which gates OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW on
+        # both ABI v2 and ENABLE_METRICS_BOUND_INSTRUMENTS_PREVIEW.
+        ":metrics_bound_instruments_preview_enabled": ["ENABLE_METRICS_BOUND_INSTRUMENTS_PREVIEW"],
+        "//conditions:default": [],
     }),
     strip_include_prefix = "include",
     tags = ["api"],
@@ -79,4 +87,16 @@ config_setting(
 config_setting(
     name = "abi_version_no_2",
     flag_values = {":abi_version_no": "2"},
+)
+
+# Experimental: bound synchronous metric instruments preview.
+# Only effective with `--//api:abi_version_no=2`.
+bool_flag(
+    name = "with_metrics_bound_instruments_preview",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "metrics_bound_instruments_preview_enabled",
+    flag_values = {":with_metrics_bound_instruments_preview": "true"},
 )
