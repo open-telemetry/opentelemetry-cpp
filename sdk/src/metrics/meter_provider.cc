@@ -144,7 +144,13 @@ void MeterProvider::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filte
  */
 bool MeterProvider::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  return context_->Shutdown(timeout);
+  bool result = true;
+  // Shutdown only once
+  if (!shutdown_latch_.test_and_set(std::memory_order_acquire))
+  {
+    result = context_->Shutdown(timeout);
+  }
+  return result;
 }
 
 /**
@@ -163,7 +169,7 @@ MeterProvider::~MeterProvider()
 {
   if (context_)
   {
-    context_->Shutdown();
+    Shutdown();
   }
 }
 
