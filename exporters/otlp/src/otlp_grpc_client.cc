@@ -13,7 +13,6 @@
 #include <fstream>
 #include <iterator>
 #include <memory>
-#include <new>
 #include <string>
 #include <utility>
 
@@ -36,6 +35,7 @@
 #  include <condition_variable>
 #  include <cstdio>
 #  include <mutex>
+#  include <new>
 #  include <unordered_set>
 
 #  include "opentelemetry/common/timestamp.h"

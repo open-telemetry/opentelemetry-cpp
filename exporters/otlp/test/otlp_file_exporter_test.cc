@@ -43,7 +43,10 @@
 // clang-format on
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include <unordered_map>
+
 #  include "opentelemetry/common/attribute_value.h"
+#  include "opentelemetry/nostd/utility.h"
 #endif
 
 using namespace testing;
