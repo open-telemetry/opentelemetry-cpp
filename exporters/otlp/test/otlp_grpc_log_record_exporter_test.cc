@@ -64,42 +64,6 @@ using opentelemetry::sdk::common::unsetenv;
 
 using namespace testing;
 
-#ifdef NEVER
-namespace grpc
-{
-class ClientUnaryReactor;
-}
-
-namespace opentelemetry
-{
-namespace proto
-{
-namespace collector
-{
-
-namespace logs
-{
-namespace v1
-{
-class ExportLogsServiceRequest;
-class ExportLogsServiceResponse;
-}  // namespace v1
-}  // namespace logs
-
-namespace trace
-{
-namespace v1
-{
-class ExportTraceServiceRequest;
-class ExportTraceServiceResponse;
-}  // namespace v1
-}  // namespace trace
-
-}  // namespace collector
-}  // namespace proto
-}  // namespace opentelemetry
-#endif
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
