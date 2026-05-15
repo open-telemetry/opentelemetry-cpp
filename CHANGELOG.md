@@ -15,10 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
+* [RELEASE] Bump main branch to 1.28.0-dev
+  [#4081](https://github.com/open-telemetry/opentelemetry-cpp/pull/4081)
+
 * [API] `Logger::EmitLogRecord(...)` templates now apply the `Enabled` filter
   chain when a `Severity` is in args,
   so the `Trace`/`Debug`/`Info`/`Warn`/`Error`/`Fatal` helpers honor the `Enabled()`
   flag transparently. Closes the second half of #2667.
+
 * [API/SDK] (ABI v2) Add `Logger::CreateLogRecord(const Context &)` virtual
   for explicit-context record creation. `Logger::EmitLogRecord(args...)`
   also detects a `Context` in args and routes filtering through
