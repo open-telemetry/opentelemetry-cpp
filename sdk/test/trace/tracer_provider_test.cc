@@ -13,6 +13,7 @@
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
+#include "opentelemetry/sdk/trace/multi_span_processor.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/random_id_generator.h"
 #include "opentelemetry/sdk/trace/sampler.h"
@@ -37,6 +38,33 @@
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace trace
+{
+class MultiSpanProcessorTestPeer
+{
+public:
+  static std::vector<SpanProcessor *> GetProcessors(MultiSpanProcessor *multi_span_processor)
+  {
+    std::vector<SpanProcessor *> res;
+
+    MultiSpanProcessor::ProcessorNode *node = multi_span_processor->head_;
+    while (node != nullptr)
+    {
+      auto processor = node->value_.get();
+      res.emplace_back(processor);
+      node = node->next_;
+    }
+
+    return res;
+  }
+};
+}  // namespace trace
+}  // namespace sdk
+OPENTELEMETRY_END_NAMESPACE
 
 TEST(TracerProvider, GetTracer)
 {
@@ -317,6 +345,90 @@ TEST(TracerProvider, GetTracerAbiv2)
   tp.Shutdown();
 }
 #endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
+
+// get the same processor back, not wrapped in a MultiSpanProcessor
+TEST(TracerProvider, GetProcessor)
+{
+  std::unique_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));
+  std::vector<std::unique_ptr<SpanProcessor>> processors;
+  processors.push_back(std::move(processor));
+
+  std::unique_ptr<TracerContext> context1(new TracerContext(std::move(processors)));
+
+  auto &span_processor = context1->GetProcessor();
+
+  // Should be the SimpleSpanProcessor processor that was created above.
+#ifdef OPENTELEMETRY_RTTI_ENABLED
+  auto processor_typeed = dynamic_cast<SimpleSpanProcessor *>(&span_processor);
+#else
+  auto processor_typeed = static_cast<SimpleSpanProcessor *>(&span_processor);
+#endif
+  ASSERT_NE(nullptr, processor_typeed);
+}
+
+// get a MultiSpanProcessor back that wraps both processors
+TEST(TracerProvider, GetProcessorsTwo)
+{
+  std::vector<SpanProcessor *> processors_raw(2);
+  processors_raw[0] = new SimpleSpanProcessor(nullptr);  // deleted via unique_ptr
+  processors_raw[1] = new SimpleSpanProcessor(nullptr);  // deleted via unique_ptr
+
+  std::unique_ptr<SpanProcessor> processor1(processors_raw[0]);
+  std::unique_ptr<SpanProcessor> processor2(processors_raw[1]);
+
+  std::vector<std::unique_ptr<SpanProcessor>> processors;
+  processors.push_back(std::move(processor1));
+  processors.push_back(std::move(processor2));
+
+  std::unique_ptr<TracerContext> context1(new TracerContext(std::move(processors)));
+
+  auto &span_processor = context1->GetProcessor();
+
+  // Should be the SimpleSpanProcessor processor that was created above.
+#ifdef OPENTELEMETRY_RTTI_ENABLED
+  auto processor_typeed = dynamic_cast<MultiSpanProcessor *>(&span_processor);
+#else
+  auto processor_typeed = static_cast<MultiSpanProcessor *>(&span_processor);
+#endif
+  ASSERT_NE(nullptr, processor_typeed);
+
+  std::vector<SpanProcessor *> contained_processors =
+      MultiSpanProcessorTestPeer::GetProcessors(processor_typeed);
+  EXPECT_EQ(processors_raw, contained_processors);
+}
+
+// get a MultiSpanProcessor back that wraps all three processors
+TEST(TracerProvider, GetProcessorsThree)
+{
+  std::vector<SpanProcessor *> processors_raw(3);
+  processors_raw[0] = new SimpleSpanProcessor(nullptr);  // deleted via unique_ptr
+  processors_raw[1] = new SimpleSpanProcessor(nullptr);  // deleted via unique_ptr
+  processors_raw[2] = new SimpleSpanProcessor(nullptr);  // deleted via unique_ptr
+
+  std::unique_ptr<SpanProcessor> processor1(processors_raw[0]);
+  std::unique_ptr<SpanProcessor> processor2(processors_raw[1]);
+  std::unique_ptr<SpanProcessor> processor3(processors_raw[2]);
+  std::vector<std::unique_ptr<SpanProcessor>> processors;
+  processors.push_back(std::move(processor1));
+  processors.push_back(std::move(processor2));
+  processors.push_back(std::move(processor3));
+
+  std::unique_ptr<TracerContext> context1(new TracerContext(std::move(processors)));
+
+  auto &span_processor = context1->GetProcessor();
+
+  // Should be the SimpleSpanProcessor processor that was created above.
+#ifdef OPENTELEMETRY_RTTI_ENABLED
+  auto processor_typeed = dynamic_cast<MultiSpanProcessor *>(&span_processor);
+#else
+  auto processor_typeed = static_cast<MultiSpanProcessor *>(&span_processor);
+#endif
+  ASSERT_NE(nullptr, processor_typeed);
+
+  std::vector<SpanProcessor *> contained_processors =
+      MultiSpanProcessorTestPeer::GetProcessors(processor_typeed);
+  EXPECT_EQ(processors_raw, contained_processors);
+}
 
 TEST(TracerProvider, Shutdown)
 {

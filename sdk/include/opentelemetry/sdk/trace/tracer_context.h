@@ -23,6 +23,9 @@ namespace sdk
 namespace trace
 {
 
+// forward declare to be able to have a raw pointer to it
+class MultiSpanProcessor;
+
 /**
  * A class which stores the TracerProvider context.
  *
@@ -120,6 +123,8 @@ private:
   std::unique_ptr<IdGenerator> id_generator_;
   std::unique_ptr<SpanProcessor> processor_;
   std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator_;
+  // shares the pointer with processor_ if it is a MultiSpanProcessor, null otherwise
+  MultiSpanProcessor *multi_processor_;
 };
 
 }  // namespace trace

@@ -32,9 +32,22 @@ TracerContext::TracerContext(std::vector<std::unique_ptr<SpanProcessor>> &&proce
     : resource_(resource),
       sampler_(std::move(sampler)),
       id_generator_(std::move(id_generator)),
-      processor_(std::unique_ptr<SpanProcessor>(new MultiSpanProcessor(std::move(processors)))),
-      tracer_configurator_(std::move(tracer_configurator))
-{}
+      tracer_configurator_(std::move(tracer_configurator)),
+      multi_processor_(nullptr)
+{
+  if (processors.empty())
+  {
+    processor_ = std::unique_ptr<SpanProcessor>(new MultiSpanProcessor(std::move(processors)));
+  }
+  else
+  {
+    // at least one processor is available here
+    for (auto &&processor : processors)
+    {
+      AddProcessor(std::move(processor));
+    }
+  }
+}
 
 Sampler &TracerContext::GetSampler() const noexcept
 {
@@ -59,9 +72,31 @@ opentelemetry::sdk::trace::IdGenerator &TracerContext::GetIdGenerator() const no
 
 void TracerContext::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
 {
+  if (!processor)
+  {
+    return;
+  }
 
-  auto multi_processor = static_cast<MultiSpanProcessor *>(processor_.get());
-  multi_processor->AddProcessor(std::move(processor));
+  if (!processor_)
+  {
+    // this is the first processor to be added
+    processor_ = std::move(processor);
+  }
+  else if (multi_processor_ == nullptr)
+  {
+    // a processor exists, but it's not a MultiSpanProcessor. make a new MultiSpanProcessor
+    multi_processor_ = new MultiSpanProcessor({});
+    std::unique_ptr<MultiSpanProcessor> multi_processor(multi_processor_);
+    multi_processor->AddProcessor(std::move(processor_));
+    multi_processor->AddProcessor(std::move(processor));
+
+    processor_ = std::move(multi_processor);
+  }
+  else /*if (multi_processor_ != nullptr)*/
+  {
+    // already have a MultiSpanProcessor, add the processor to it
+    multi_processor_->AddProcessor(std::move(processor));
+  }
 }
 
 SpanProcessor &TracerContext::GetProcessor() const noexcept
