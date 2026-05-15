@@ -84,6 +84,8 @@ Logger::Logger(
   SetMinimumSeverity(logger_config_.IsEnabled()
                          ? static_cast<uint8_t>(logger_config_.GetMinimumSeverity())
                          : opentelemetry::logs::kMaxSeverity);
+
+  SetExtendedEnabledRequired(logger_config_.IsTraceBased());
 }
 
 const opentelemetry::nostd::string_view Logger::GetName() noexcept

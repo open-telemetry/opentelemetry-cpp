@@ -155,20 +155,30 @@ public:
     const Severity arg_severity = detail::FindSeverityInArgs(args...);
     if (arg_severity != Severity::kInvalid)
     {
-      const EventId *event_id_ptr = detail::FindEventIdInArgs(args...);
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-      const bool is_enabled =
-          context_ptr ? (event_id_ptr ? Enabled(*context_ptr, arg_severity, *event_id_ptr)
-                                      : Enabled(*context_ptr, arg_severity))
-                      : (event_id_ptr ? Enabled(arg_severity, *event_id_ptr)
-                                      : Enabled(arg_severity, static_cast<int64_t>(0)));
-#else
-      const bool is_enabled = event_id_ptr ? Enabled(arg_severity, *event_id_ptr)
-                                           : Enabled(arg_severity, static_cast<int64_t>(0));
-#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
-      if (!is_enabled)
+      if (!Enabled(arg_severity))
       {
         return;
+      }
+
+      if (ExtendedEnabledRequired())
+      {
+        const EventId *event_id_ptr = detail::FindEventIdInArgs(args...);
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+        const bool extended_enabled =
+            context_ptr
+                ? (event_id_ptr ? EnabledImplementation(*context_ptr, arg_severity, *event_id_ptr)
+                                : EnabledImplementation(*context_ptr, arg_severity))
+                : (event_id_ptr ? EnabledImplementation(arg_severity, *event_id_ptr)
+                                : EnabledImplementation(arg_severity, static_cast<int64_t>(0)));
+#else
+        const bool extended_enabled =
+            event_id_ptr ? EnabledImplementation(arg_severity, *event_id_ptr)
+                         : EnabledImplementation(arg_severity, static_cast<int64_t>(0));
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+        if (!extended_enabled)
+        {
+          return;
+        }
       }
     }
 
@@ -376,6 +386,11 @@ public:
     return static_cast<uint8_t>(severity) >= OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
   }
 
+  inline bool ExtendedEnabledRequired() const noexcept
+  {
+    return OPENTELEMETRY_ATOMIC_READ_8(&extended_enabled_required_) != 0;
+  }
+
   /**
    * Log an event
    *
@@ -577,6 +592,12 @@ protected:
     OPENTELEMETRY_ATOMIC_WRITE_8(&minimum_severity_, severity_or_max);
   }
 
+  void SetExtendedEnabledRequired(bool required) noexcept
+  {
+    OPENTELEMETRY_ATOMIC_WRITE_8(&extended_enabled_required_,
+                                 static_cast<uint8_t>(required ? 1 : 0));
+  }
+
 private:
   template <class... ValueType>
   void IgnoreTraitResult(ValueType &&...)
@@ -588,6 +609,13 @@ private:
   // compatible for OpenTelemetry C++ API.
   //
   mutable uint8_t minimum_severity_{kMaxSeverity};
+
+  //
+  // extended_enabled_required_ defaults to 1 (full chain required) so subclasses that override
+  // EnabledImplementation keep their existing semantics until they explicitly opt out via
+  // SetExtendedEnabledRequired(false). Same atomicity rationale as minimum_severity_.
+  //
+  mutable uint8_t extended_enabled_required_{1};
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE

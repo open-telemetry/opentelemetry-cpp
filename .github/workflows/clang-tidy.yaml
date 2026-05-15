@@ -19,7 +19,7 @@ jobs:
           - cmake_options: all-options-abiv1-preview
             warning_limit: 416
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 422
+            warning_limit: 420
     env:
       CC: /usr/bin/clang-22
       CXX: /usr/bin/clang++-22
