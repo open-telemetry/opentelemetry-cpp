@@ -44,7 +44,7 @@ ZipkinExporter::ZipkinExporter()
 {}
 
 ZipkinExporter::ZipkinExporter(const ZipkinExporterOptions &options,
-                               std::shared_ptr<ext::http::client::HttpClientFactory> factory)
+                               const std::shared_ptr<ext::http::client::HttpClientFactory> &factory)
     : ZipkinExporter(options, factory->CreateSync())
 {}
 

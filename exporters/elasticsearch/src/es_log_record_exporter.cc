@@ -327,7 +327,7 @@ ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
 
 ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
     const ElasticsearchExporterOptions &options,
-    std::shared_ptr<ext::http::client::HttpClientFactory> factory)
+    const std::shared_ptr<ext::http::client::HttpClientFactory> &factory)
     : ElasticsearchLogRecordExporter(options, factory->Create())
 {}
 

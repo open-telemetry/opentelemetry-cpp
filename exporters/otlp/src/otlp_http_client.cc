@@ -667,7 +667,7 @@ OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
 {}
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
-                               std::shared_ptr<ext::http::client::HttpClientFactory> factory)
+                               const std::shared_ptr<ext::http::client::HttpClientFactory> &factory)
     : OtlpHttpClient(std::move(options), factory->Create(options.thread_instrumentation))
 {}
 

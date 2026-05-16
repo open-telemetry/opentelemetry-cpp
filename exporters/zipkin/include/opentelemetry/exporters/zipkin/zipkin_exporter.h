@@ -49,7 +49,7 @@ public:
    * @param factory the HTTP client factory used to create the underlying HTTP client
    */
   ZipkinExporter(const ZipkinExporterOptions &options,
-                 std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> factory);
+                 const std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> &factory);
 
   /**
    * Create a ZipkinExporter using the given options and HTTP client.

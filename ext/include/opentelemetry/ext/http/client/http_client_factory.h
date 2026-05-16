@@ -19,6 +19,12 @@ namespace client
 class HttpClientFactory
 {
 public:
+  HttpClientFactory()                                     = default;
+  HttpClientFactory(const HttpClientFactory &)            = delete;
+  HttpClientFactory(HttpClientFactory &&)                 = delete;
+  HttpClientFactory &operator=(const HttpClientFactory &) = delete;
+  HttpClientFactory &operator=(HttpClientFactory &&)      = delete;
+
   virtual ~HttpClientFactory() = default;
 
   virtual std::shared_ptr<HttpClientSync> CreateSync() = 0;

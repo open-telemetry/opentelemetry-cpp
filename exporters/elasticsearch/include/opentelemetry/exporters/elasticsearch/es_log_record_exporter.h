@@ -97,7 +97,7 @@ public:
    * @param factory the HTTP client factory used to create the underlying HTTP client
    */
   ElasticsearchLogRecordExporter(const ElasticsearchExporterOptions &options,
-                                 std::shared_ptr<ext::http::client::HttpClientFactory> factory);
+                                 const std::shared_ptr<ext::http::client::HttpClientFactory> &factory);
 
   /**
    * Create an ElasticsearchLogRecordExporter with user specified options and HTTP client.

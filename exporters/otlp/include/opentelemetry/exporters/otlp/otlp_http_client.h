@@ -166,7 +166,7 @@ public:
    * @param factory the HTTP client factory used to create the underlying HTTP client
    */
   OtlpHttpClient(OtlpHttpClientOptions &&options,
-                 std::shared_ptr<ext::http::client::HttpClientFactory> factory);
+                 const std::shared_ptr<ext::http::client::HttpClientFactory> &factory);
 
   /**
    * Create an OtlpHttpClient using the specified http client.
