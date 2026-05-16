@@ -634,6 +634,20 @@ cc_library(
 )
 
 cc_test(
+    name = "otlp_populate_attribute_utils_test",
+    srcs = ["test/otlp_populate_attribute_utils_test.cc"],
+    tags = [
+        "otlp",
+        "test",
+    ],
+    deps = [
+        ":otlp_recordable",
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "otlp_recordable_test",
     srcs = ["test/otlp_recordable_test.cc"],
     tags = [

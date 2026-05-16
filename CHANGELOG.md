@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] clean up nostd::variant access in otlp exporters
+  [#3973](https://github.com/open-telemetry/opentelemetry-cpp/pull/3973)
+
 * [RELEASE] Bump main branch to 1.28.0-dev
   [#4081](https://github.com/open-telemetry/opentelemetry-cpp/pull/4081)
 

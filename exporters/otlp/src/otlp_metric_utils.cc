@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stdint.h>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <utility>
@@ -13,6 +13,7 @@
 #include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/data/circular_buffer.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
@@ -37,6 +38,18 @@ namespace exporter
 namespace otlp
 {
 namespace metric_sdk = opentelemetry::sdk::metrics;
+
+namespace
+{
+
+struct NumberDataPointValueSetter
+{
+  proto::metrics::v1::NumberDataPoint *point;
+  void operator()(int64_t v) const noexcept { point->set_as_int(v); }
+  void operator()(double v) const noexcept { point->set_as_double(v); }
+};
+
+}  // namespace
 
 proto::metrics::v1::AggregationTemporality OtlpMetricUtils::GetProtoAggregationTemporality(
     const opentelemetry::sdk::metrics::AggregationTemporality &aggregation_temporality) noexcept
@@ -89,23 +102,24 @@ void OtlpMetricUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data
       (metric_data.instrument_descriptor.type_ == metric_sdk::InstrumentType::kObservableCounter));
   auto start_ts = metric_data.start_ts.time_since_epoch().count();
   auto ts       = metric_data.end_ts.time_since_epoch().count();
-  for (auto &point_data_with_attributes : metric_data.point_data_attr_)
+  for (const auto &point_data_with_attributes : metric_data.point_data_attr_)
   {
     proto::metrics::v1::NumberDataPoint *proto_sum_point_data = sum->add_data_points();
     proto_sum_point_data->set_start_time_unix_nano(start_ts);
     proto_sum_point_data->set_time_unix_nano(ts);
-    auto sum_data = nostd::get<sdk::metrics::SumPointData>(point_data_with_attributes.point_data);
+    const auto *maybe_sum_data =
+        nostd::get_if<sdk::metrics::SumPointData>(&point_data_with_attributes.point_data);
+    if (maybe_sum_data == nullptr)
+    {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[OTLP Metrics] ConvertSumMetric: point data type mismatch, skipping data point");
+      continue;
+    }
+    const auto &sum_data = *maybe_sum_data;
 
-    if ((nostd::holds_alternative<int64_t>(sum_data.value_)))
-    {
-      proto_sum_point_data->set_as_int(nostd::get<int64_t>(sum_data.value_));
-    }
-    else
-    {
-      proto_sum_point_data->set_as_double(nostd::get<double>(sum_data.value_));
-    }
+    nostd::visit(NumberDataPointValueSetter{proto_sum_point_data}, sum_data.value_);
     // set attributes
-    for (auto &kv_attr : point_data_with_attributes.attributes)
+    for (const auto &kv_attr : point_data_with_attributes.attributes)
     {
       OtlpPopulateAttributeUtils::PopulateAttribute(proto_sum_point_data->add_attributes(),
                                                     kv_attr.first, kv_attr.second, false);
@@ -121,63 +135,48 @@ void OtlpMetricUtils::ConvertHistogramMetric(
       GetProtoAggregationTemporality(metric_data.aggregation_temporality));
   auto start_ts = metric_data.start_ts.time_since_epoch().count();
   auto ts       = metric_data.end_ts.time_since_epoch().count();
-  for (auto &point_data_with_attributes : metric_data.point_data_attr_)
+  for (const auto &point_data_with_attributes : metric_data.point_data_attr_)
   {
     proto::metrics::v1::HistogramDataPoint *proto_histogram_point_data =
         histogram->add_data_points();
     proto_histogram_point_data->set_start_time_unix_nano(start_ts);
     proto_histogram_point_data->set_time_unix_nano(ts);
-    auto histogram_data =
-        nostd::get<sdk::metrics::HistogramPointData>(point_data_with_attributes.point_data);
+    const auto *maybe_histogram_data =
+        nostd::get_if<sdk::metrics::HistogramPointData>(&point_data_with_attributes.point_data);
+    if (maybe_histogram_data == nullptr)
+    {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[OTLP Metrics] ConvertHistogramMetric: point data type mismatch, skipping data point");
+      continue;
+    }
+    const auto &histogram_data = *maybe_histogram_data;
     // sum
-    if ((nostd::holds_alternative<int64_t>(histogram_data.sum_)))
-    {
-      // Use static_cast to avoid C4244 in MSVC
-      proto_histogram_point_data->set_sum(
-          static_cast<double>(nostd::get<int64_t>(histogram_data.sum_)));
-    }
-    else
-    {
-      proto_histogram_point_data->set_sum(nostd::get<double>(histogram_data.sum_));
-    }
+    // Use static_cast to avoid C4244 in MSVC
+    proto_histogram_point_data->set_sum(
+        nostd::visit([](auto v) { return static_cast<double>(v); }, histogram_data.sum_));
     // count
     proto_histogram_point_data->set_count(histogram_data.count_);
     if (histogram_data.record_min_max_)
     {
-      if (nostd::holds_alternative<int64_t>(histogram_data.min_))
-      {
-        // Use static_cast to avoid C4244 in MSVC
-        proto_histogram_point_data->set_min(
-            static_cast<double>(nostd::get<int64_t>(histogram_data.min_)));
-      }
-      else
-      {
-        proto_histogram_point_data->set_min(nostd::get<double>(histogram_data.min_));
-      }
-      if (nostd::holds_alternative<int64_t>(histogram_data.max_))
-      {
-        // Use static_cast to avoid C4244 in MSVC
-        proto_histogram_point_data->set_max(
-            static_cast<double>(nostd::get<int64_t>(histogram_data.max_)));
-      }
-      else
-      {
-        proto_histogram_point_data->set_max(nostd::get<double>(histogram_data.max_));
-      }
+      // Use static_cast to avoid C4244 in MSVC
+      proto_histogram_point_data->set_min(
+          nostd::visit([](auto v) { return static_cast<double>(v); }, histogram_data.min_));
+      proto_histogram_point_data->set_max(
+          nostd::visit([](auto v) { return static_cast<double>(v); }, histogram_data.max_));
     }
     // buckets
 
-    for (auto bound : histogram_data.boundaries_)
+    for (const auto &bound : histogram_data.boundaries_)
     {
       proto_histogram_point_data->add_explicit_bounds(bound);
     }
     // bucket counts
-    for (auto bucket_value : histogram_data.counts_)
+    for (const auto &bucket_value : histogram_data.counts_)
     {
       proto_histogram_point_data->add_bucket_counts(bucket_value);
     }
     // attributes
-    for (auto &kv_attr : point_data_with_attributes.attributes)
+    for (const auto &kv_attr : point_data_with_attributes.attributes)
     {
       OtlpPopulateAttributeUtils::PopulateAttribute(proto_histogram_point_data->add_attributes(),
                                                     kv_attr.first, kv_attr.second, false);
@@ -193,18 +192,23 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
       GetProtoAggregationTemporality(metric_data.aggregation_temporality));
   auto start_ts = metric_data.start_ts.time_since_epoch().count();
   auto ts       = metric_data.end_ts.time_since_epoch().count();
-  for (auto &point_data_with_attributes : metric_data.point_data_attr_)
+  for (const auto &point_data_with_attributes : metric_data.point_data_attr_)
   {
     proto::metrics::v1::ExponentialHistogramDataPoint *proto_histogram_point_data =
         histogram->add_data_points();
     proto_histogram_point_data->set_start_time_unix_nano(start_ts);
     proto_histogram_point_data->set_time_unix_nano(ts);
-    auto histogram_data = nostd::get<sdk::metrics::Base2ExponentialHistogramPointData>(
-        point_data_with_attributes.point_data);
-    if (histogram_data.positive_buckets_ == nullptr && histogram_data.negative_buckets_ == nullptr)
+    const auto *maybe_histogram_data =
+        nostd::get_if<sdk::metrics::Base2ExponentialHistogramPointData>(
+            &point_data_with_attributes.point_data);
+    if (maybe_histogram_data == nullptr)
     {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[OTLP Metrics] ConvertExponentialHistogramMetric: point data type mismatch, skipping "
+          "data point");
       continue;
     }
+    const auto &histogram_data = *maybe_histogram_data;
     // sum
     proto_histogram_point_data->set_sum(histogram_data.sum_);
     proto_histogram_point_data->set_count(histogram_data.count_);
@@ -214,7 +218,7 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
       proto_histogram_point_data->set_max(histogram_data.max_);
     }
     // negative buckets
-    if (!histogram_data.negative_buckets_->Empty())
+    if (histogram_data.negative_buckets_ != nullptr && !histogram_data.negative_buckets_->Empty())
     {
       auto negative_buckets = proto_histogram_point_data->mutable_negative();
       negative_buckets->set_offset(histogram_data.negative_buckets_->StartIndex());
@@ -226,7 +230,7 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
       }
     }
     // positive buckets
-    if (!histogram_data.positive_buckets_->Empty())
+    if (histogram_data.positive_buckets_ != nullptr && !histogram_data.positive_buckets_->Empty())
     {
       auto positive_buckets = proto_histogram_point_data->mutable_positive();
       positive_buckets->set_offset(histogram_data.positive_buckets_->StartIndex());
@@ -241,7 +245,7 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
     proto_histogram_point_data->set_zero_count(histogram_data.zero_count_);
 
     // attributes
-    for (auto &kv_attr : point_data_with_attributes.attributes)
+    for (const auto &kv_attr : point_data_with_attributes.attributes)
     {
       OtlpPopulateAttributeUtils::PopulateAttribute(proto_histogram_point_data->add_attributes(),
                                                     kv_attr.first, kv_attr.second, false);
@@ -254,24 +258,24 @@ void OtlpMetricUtils::ConvertGaugeMetric(const opentelemetry::sdk::metrics::Metr
 {
   auto start_ts = metric_data.start_ts.time_since_epoch().count();
   auto ts       = metric_data.end_ts.time_since_epoch().count();
-  for (auto &point_data_with_attributes : metric_data.point_data_attr_)
+  for (const auto &point_data_with_attributes : metric_data.point_data_attr_)
   {
     proto::metrics::v1::NumberDataPoint *proto_gauge_point_data = gauge->add_data_points();
     proto_gauge_point_data->set_start_time_unix_nano(start_ts);
     proto_gauge_point_data->set_time_unix_nano(ts);
-    auto gauge_data =
-        nostd::get<sdk::metrics::LastValuePointData>(point_data_with_attributes.point_data);
+    const auto *maybe_gauge_data =
+        nostd::get_if<sdk::metrics::LastValuePointData>(&point_data_with_attributes.point_data);
+    if (maybe_gauge_data == nullptr)
+    {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[OTLP Metrics] ConvertGaugeMetric: point data type mismatch, skipping data point");
+      continue;
+    }
+    const auto &gauge_data = *maybe_gauge_data;
 
-    if ((nostd::holds_alternative<int64_t>(gauge_data.value_)))
-    {
-      proto_gauge_point_data->set_as_int(nostd::get<int64_t>(gauge_data.value_));
-    }
-    else
-    {
-      proto_gauge_point_data->set_as_double(nostd::get<double>(gauge_data.value_));
-    }
+    nostd::visit(NumberDataPointValueSetter{proto_gauge_point_data}, gauge_data.value_);
     // set attributes
-    for (auto &kv_attr : point_data_with_attributes.attributes)
+    for (const auto &kv_attr : point_data_with_attributes.attributes)
     {
       OtlpPopulateAttributeUtils::PopulateAttribute(proto_gauge_point_data->add_attributes(),
                                                     kv_attr.first, kv_attr.second, false);
@@ -323,6 +327,8 @@ void OtlpMetricUtils::PopulateResourceMetrics(
   {
     if (scope_metrics.scope_ == nullptr)
     {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[OTLP Metrics] PopulateResourceMetrics: scope is null, skipping scope metrics");
       continue;
     }
     auto scope_lib_metrics                         = resource_metrics->add_scope_metrics();

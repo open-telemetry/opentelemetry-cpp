@@ -554,6 +554,18 @@ TEST(OtlpHttpExporterTest, Shutdown)
   EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);
 }
 
+TEST(OtlpHttpExporterTest, ExportFailsWithInvalidUrl)
+{
+  auto client_opts = MakeOtlpHttpClientOptions(HttpRequestContentType::kBinary, false);
+  client_opts.url  = "not a valid url ://";
+
+  OtlpHttpClient client(std::move(client_opts));
+
+  proto::collector::trace::v1::ExportTraceServiceRequest request;
+  auto result = client.Export(request);
+  EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);
+}
+
 // Create spans, let processor call Export()
 TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestSync)
 {
