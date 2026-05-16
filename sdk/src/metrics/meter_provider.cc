@@ -144,13 +144,11 @@ void MeterProvider::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filte
  */
 bool MeterProvider::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   // Shutdown only once
   if (shutdown_latch_.test_and_set(std::memory_order_acquire))
   {
     return true;
   }
-#endif
   return context_->Shutdown(timeout);
 }
 

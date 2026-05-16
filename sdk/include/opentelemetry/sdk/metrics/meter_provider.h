@@ -3,13 +3,10 @@
 
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <memory>
 #include <mutex>
-
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include <atomic>
-#endif
 
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/meter_provider.h"
@@ -148,13 +145,11 @@ private:
   std::shared_ptr<MeterContext> context_;
   std::mutex lock_;
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  if defined(__cpp_lib_atomic_value_initialization) && \
-      __cpp_lib_atomic_value_initialization >= 201911L
+#if defined(__cpp_lib_atomic_value_initialization) && \
+    __cpp_lib_atomic_value_initialization >= 201911L
   std::atomic_flag shutdown_latch_{};
-#  else
+#else
   std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
-#  endif
 #endif
 };
 }  // namespace metrics

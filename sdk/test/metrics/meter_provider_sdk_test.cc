@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <mutex>
 #include <string>
 #include <utility>
+#include <vector>
 #include "common.h"
 
 #include "opentelemetry/common/macros.h"
@@ -25,9 +27,7 @@
 #  include <stdint.h>
 #  include <initializer_list>
 #  include <map>
-#  include <mutex>
 #  include <unordered_map>
-#  include <vector>
 
 #  include "opentelemetry/common/attribute_value.h"
 #  include "opentelemetry/nostd/variant.h"
@@ -35,9 +35,6 @@
 #endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
 using namespace opentelemetry::sdk::metrics;
-
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-
 using namespace opentelemetry::sdk::common::internal_log;
 
 namespace
@@ -110,8 +107,6 @@ private:
 };
 
 }  // namespace
-
-#endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
 TEST(MeterProvider, GetMeter)
 {
@@ -402,8 +397,6 @@ TEST(MeterProvider, GetMeterInequalityCheckAbiv2)
 
 #endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-
 TEST(MeterProvider, ExplicitShutdownNotWarnOnDestructionCheck)
 {
   ScopedTestLogHandler log_handler{LogLevel::Warning};
@@ -419,5 +412,3 @@ TEST(MeterProvider, ExplicitShutdownNotWarnOnDestructionCheck)
   logs     = log_handler.Drain();
   EXPECT_TRUE(logs.empty());
 }
-
-#endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
