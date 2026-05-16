@@ -7,7 +7,10 @@
 
 #  include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #  include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
+#  include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
 #  include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
+#  include "opentelemetry/exporters/otlp/otlp_http_exporter_runtime_options.h"
+#  include "opentelemetry/ext/http/client/http_client_factory.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
@@ -72,6 +75,40 @@ public:
     return {new OtlpHttpClient(MakeOtlpHttpClientOptions(), http_client), http_client};
   }
 };
+
+TEST_F(OtlpHttpExporterCustomClientTestPeer, FactoryInjectionCreatesExporter)
+{
+  OtlpHttpExporterOptions opts;
+  auto factory  = http_client::GetDefaultHttpClientFactory();
+  auto exporter = OtlpHttpExporterFactory::Create(opts, std::move(factory));
+  ASSERT_NE(exporter, nullptr);
+}
+
+TEST_F(OtlpHttpExporterCustomClientTestPeer, HttpClientInjectionCreatesExporter)
+{
+  OtlpHttpExporterOptions opts;
+  auto client   = http_client::HttpClientTestFactory::Create();
+  auto exporter = OtlpHttpExporterFactory::Create(opts, std::move(client));
+  ASSERT_NE(exporter, nullptr);
+}
+
+TEST_F(OtlpHttpExporterCustomClientTestPeer, RuntimeOptionsWithFactoryCreatesExporter)
+{
+  OtlpHttpExporterOptions opts;
+  OtlpHttpExporterRuntimeOptions runtime_opts;
+  auto factory  = http_client::GetDefaultHttpClientFactory();
+  auto exporter = OtlpHttpExporterFactory::Create(opts, runtime_opts, std::move(factory));
+  ASSERT_NE(exporter, nullptr);
+}
+
+TEST_F(OtlpHttpExporterCustomClientTestPeer, RuntimeOptionsWithHttpClientCreatesExporter)
+{
+  OtlpHttpExporterOptions opts;
+  OtlpHttpExporterRuntimeOptions runtime_opts;
+  auto client   = http_client::HttpClientTestFactory::Create();
+  auto exporter = OtlpHttpExporterFactory::Create(opts, runtime_opts, std::move(client));
+  ASSERT_NE(exporter, nullptr);
+}
 
 TEST_F(OtlpHttpExporterCustomClientTestPeer, ExportCallsSendRequest)
 {
