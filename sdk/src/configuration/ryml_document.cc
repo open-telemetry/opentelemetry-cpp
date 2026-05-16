@@ -24,13 +24,52 @@ namespace sdk
 namespace configuration
 {
 
-// Custom ryml error callback that throws instead of calling abort().
-// This ensures the try-catch in ParseDocument works regardless of how
-// ryml was compiled (with or without RYML_DEFAULT_CALLBACK_USES_EXCEPTIONS).
-void RymlDocument::OnError(const char *msg,
-                           size_t msg_len,
-                           ryml::Location location,
-                           void * /*user_data*/)
+#if RYML_VERSION_MINOR >= 11
+[[noreturn]] static void OnErrorBasic(c4::csubstr msg,
+                                      const ryml::ErrorDataBasic &errdata,
+                                      void * /*user_data*/)
+{
+  DocumentNodeLocation loc;
+  loc.offset   = errdata.location.offset;
+  loc.line     = errdata.location.line;
+  loc.col      = errdata.location.col;
+  loc.filename = std::string(errdata.location.name.str, errdata.location.name.len);
+
+  throw InvalidSchemaException(loc, std::string(msg.str, msg.len));
+}
+
+[[noreturn]] static void OnErrorParse(c4::csubstr msg,
+                                      const ryml::ErrorDataParse &errdata,
+                                      void * /*user_data*/)
+{
+  DocumentNodeLocation loc;
+  loc.offset   = errdata.ymlloc.offset;
+  loc.line     = errdata.ymlloc.line;
+  loc.col      = errdata.ymlloc.col;
+  loc.filename = std::string(errdata.ymlloc.name.str, errdata.ymlloc.name.len);
+
+  throw InvalidSchemaException(loc, std::string(msg.str, msg.len));
+}
+
+[[noreturn]] static void OnErrorVisit(c4::csubstr msg,
+                                      const ryml::ErrorDataVisit &errdata,
+                                      void * /*user_data*/)
+{
+  DocumentNodeLocation loc;
+  loc.offset   = errdata.cpploc.offset;
+  loc.line     = errdata.cpploc.line;
+  loc.col      = errdata.cpploc.col;
+  loc.filename = std::string(errdata.cpploc.name.str, errdata.cpploc.name.len);
+
+  // If rapidyaml fails internally, we declare the yaml document invalid.
+  throw InvalidSchemaException(loc, std::string(msg.str, msg.len));
+}
+
+#else
+[[noreturn]] static void OnError(const char *msg,
+                                 size_t msg_len,
+                                 ryml::Location location,
+                                 void * /*user_data*/)
 {
   DocumentNodeLocation loc;
   loc.offset   = location.offset;
@@ -40,11 +79,23 @@ void RymlDocument::OnError(const char *msg,
 
   throw InvalidSchemaException(loc, std::string(msg, msg_len));
 }
+#endif
 
+// Custom ryml error callback that throws instead of calling abort().
+// This ensures the try-catch in ParseDocument works regardless of how
+// ryml was compiled (with or without RYML_DEFAULT_CALLBACK_USES_EXCEPTIONS).
 ryml::Callbacks RymlDocument::MakeCallbacks()
 {
   ryml::Callbacks cb = ryml::get_callbacks();
-  cb.m_error         = &RymlDocument::OnError;
+#if RYML_VERSION_MINOR >= 11
+  // Starting with rapidyaml 0.11.0
+  cb.m_error_basic = OnErrorBasic;
+  cb.m_error_parse = OnErrorParse;
+  cb.m_error_visit = OnErrorVisit;
+#else
+  // Up to rapidyaml 0.10.0
+  cb.m_error = OnError;
+#endif
   return cb;
 }
 
