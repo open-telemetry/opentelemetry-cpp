@@ -49,10 +49,30 @@ OtlpHttpLogRecordExporterFactory::Create(
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
 OtlpHttpLogRecordExporterFactory::Create(
     const OtlpHttpLogRecordExporterOptions &options,
+    const OtlpHttpLogRecordExporterRuntimeOptions &runtime_options,
+    std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> factory)
+{
+  return std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>(
+      new OtlpHttpLogRecordExporter(options, runtime_options, std::move(factory)));
+}
+
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
+OtlpHttpLogRecordExporterFactory::Create(
+    const OtlpHttpLogRecordExporterOptions &options,
     std::shared_ptr<opentelemetry::ext::http::client::HttpClient> http_client)
 {
   return std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>(
       new OtlpHttpLogRecordExporter(options, std::move(http_client)));
+}
+
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
+OtlpHttpLogRecordExporterFactory::Create(
+    const OtlpHttpLogRecordExporterOptions &options,
+    const OtlpHttpLogRecordExporterRuntimeOptions &runtime_options,
+    std::shared_ptr<opentelemetry::ext::http::client::HttpClient> http_client)
+{
+  return std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>(
+      new OtlpHttpLogRecordExporter(options, runtime_options, std::move(http_client)));
 }
 
 }  // namespace otlp

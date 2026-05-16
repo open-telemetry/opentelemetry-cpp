@@ -48,10 +48,30 @@ OtlpHttpMetricExporterFactory::Create(
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
 OtlpHttpMetricExporterFactory::Create(
     const OtlpHttpMetricExporterOptions &options,
+    const OtlpHttpMetricExporterRuntimeOptions &runtime_options,
+    std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> factory)
+{
+  return std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>(
+      new OtlpHttpMetricExporter(options, runtime_options, std::move(factory)));
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
+OtlpHttpMetricExporterFactory::Create(
+    const OtlpHttpMetricExporterOptions &options,
     std::shared_ptr<opentelemetry::ext::http::client::HttpClient> http_client)
 {
   return std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>(
       new OtlpHttpMetricExporter(options, std::move(http_client)));
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
+OtlpHttpMetricExporterFactory::Create(
+    const OtlpHttpMetricExporterOptions &options,
+    const OtlpHttpMetricExporterRuntimeOptions &runtime_options,
+    std::shared_ptr<opentelemetry::ext::http::client::HttpClient> http_client)
+{
+  return std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>(
+      new OtlpHttpMetricExporter(options, runtime_options, std::move(http_client)));
 }
 
 }  // namespace otlp

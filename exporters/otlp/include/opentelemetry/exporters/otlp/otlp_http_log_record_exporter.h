@@ -56,11 +56,33 @@ public:
                             std::shared_ptr<ext::http::client::HttpClientFactory> factory);
 
   /**
+   * Create an OtlpHttpLogRecordExporter with user specified options, runtime options, and HTTP
+   * client factory.
+   * @param options An object containing the user's configuration options.
+   * @param runtime_options An object containing the user's runtime options.
+   * @param factory the HTTP client factory used to create the underlying HTTP client
+   */
+  OtlpHttpLogRecordExporter(const OtlpHttpLogRecordExporterOptions &options,
+                            const OtlpHttpLogRecordExporterRuntimeOptions &runtime_options,
+                            std::shared_ptr<ext::http::client::HttpClientFactory> factory);
+
+  /**
    * Create an OtlpHttpLogRecordExporter with user specified options and HTTP client.
    * @param options An object containing the user's configuration options.
    * @param http_client the HTTP client to be used for exporting
    */
   OtlpHttpLogRecordExporter(const OtlpHttpLogRecordExporterOptions &options,
+                            std::shared_ptr<ext::http::client::HttpClient> http_client);
+
+  /**
+   * Create an OtlpHttpLogRecordExporter with user specified options, runtime options, and HTTP
+   * client.
+   * @param options An object containing the user's configuration options.
+   * @param runtime_options An object containing the user's runtime options.
+   * @param http_client the HTTP client to be used for exporting
+   */
+  OtlpHttpLogRecordExporter(const OtlpHttpLogRecordExporterOptions &options,
+                            const OtlpHttpLogRecordExporterRuntimeOptions &runtime_options,
                             std::shared_ptr<ext::http::client::HttpClient> http_client);
 
   /**

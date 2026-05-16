@@ -53,11 +53,31 @@ public:
                    std::shared_ptr<ext::http::client::HttpClientFactory> factory);
 
   /**
+   * Create an OtlpHttpExporter using the given options, runtime options, and HTTP client factory.
+   * @param options the exporter options
+   * @param runtime_options the runtime options (e.g. thread instrumentation)
+   * @param factory the HTTP client factory used to create the underlying HTTP client
+   */
+  OtlpHttpExporter(const OtlpHttpExporterOptions &options,
+                   const OtlpHttpExporterRuntimeOptions &runtime_options,
+                   std::shared_ptr<ext::http::client::HttpClientFactory> factory);
+
+  /**
    * Create an OtlpHttpExporter using the given options and HTTP client.
    * @param options the exporter options
    * @param http_client the HTTP client to be used for exporting
    */
   OtlpHttpExporter(const OtlpHttpExporterOptions &options,
+                   std::shared_ptr<ext::http::client::HttpClient> http_client);
+
+  /**
+   * Create an OtlpHttpExporter using the given options, runtime options, and HTTP client.
+   * @param options the exporter options
+   * @param runtime_options the runtime options (e.g. thread instrumentation)
+   * @param http_client the HTTP client to be used for exporting
+   */
+  OtlpHttpExporter(const OtlpHttpExporterOptions &options,
+                   const OtlpHttpExporterRuntimeOptions &runtime_options,
                    std::shared_ptr<ext::http::client::HttpClient> http_client);
 
   /**
