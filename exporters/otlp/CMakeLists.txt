@@ -1088,12 +1088,9 @@ if(BUILD_TESTING)
     add_executable(otlp_http_log_record_exporter_custom_client_test
                    test/otlp_http_log_record_exporter_custom_client_test.cc)
     target_link_libraries(
-      otlp_http_log_record_exporter_custom_client_test
-      ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT}
-      opentelemetry_exporter_otlp_http_log
-      opentelemetry_logs
-      opentelemetry_http_client_nosend)
+      otlp_http_log_record_exporter_custom_client_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_otlp_http_log
+      opentelemetry_logs opentelemetry_http_client_nosend)
     gtest_add_tests(
       TARGET otlp_http_log_record_exporter_custom_client_test
       TEST_PREFIX exporter.otlp.

@@ -229,7 +229,7 @@ TEST_F(ZipkinExporterTestPeer, ConfigFromEnv)
 TEST_F(ZipkinExporterTestPeer, FactoryInjectionCreatesExporter)
 {
   ZipkinExporterOptions opts;
-  auto factory  = std::make_shared<
+  auto factory = std::make_shared<
       opentelemetry::test_common::ext::http::client::nosend::HttpClientFactoryNosend>();
   auto exporter = ZipkinExporterFactory::Create(opts, std::move(factory));
   ASSERT_NE(exporter, nullptr);
@@ -238,8 +238,8 @@ TEST_F(ZipkinExporterTestPeer, FactoryInjectionCreatesExporter)
 TEST_F(ZipkinExporterTestPeer, HttpClientSyncInjectionCreatesExporter)
 {
   ZipkinExporterOptions opts;
-  auto client   = std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync>(
-      new MockHttpClient);
+  auto client =
+      std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync>(new MockHttpClient);
   auto exporter = ZipkinExporterFactory::Create(opts, std::move(client));
   ASSERT_NE(exporter, nullptr);
 }

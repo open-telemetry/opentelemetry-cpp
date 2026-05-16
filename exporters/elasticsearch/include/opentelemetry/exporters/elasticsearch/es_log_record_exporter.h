@@ -96,8 +96,9 @@ public:
    * @param options An object containing the user's configuration options.
    * @param factory the HTTP client factory used to create the underlying HTTP client
    */
-  ElasticsearchLogRecordExporter(const ElasticsearchExporterOptions &options,
-                                 const std::shared_ptr<ext::http::client::HttpClientFactory> &factory);
+  ElasticsearchLogRecordExporter(
+      const ElasticsearchExporterOptions &options,
+      const std::shared_ptr<ext::http::client::HttpClientFactory> &factory);
 
   /**
    * Create an ElasticsearchLogRecordExporter with user specified options and HTTP client.
