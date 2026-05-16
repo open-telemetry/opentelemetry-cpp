@@ -17,6 +17,7 @@
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/baggage/baggage_context.h"
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/variant.h"

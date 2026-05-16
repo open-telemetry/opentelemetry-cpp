@@ -11,7 +11,6 @@
 #include <utility>
 #include <vector>
 
-#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger.h"
@@ -21,6 +20,7 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/logs/read_write_log_record.h"

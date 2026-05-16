@@ -3,12 +3,8 @@
 
 #pragma once
 
-#include <memory>
-
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_builder.h"
-#include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
-#include "opentelemetry/sdk/logs/processor.h"
 
 class CustomLogRecordProcessorBuilder
     : public opentelemetry::sdk::configuration::ExtensionLogRecordProcessorBuilder

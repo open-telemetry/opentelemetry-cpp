@@ -4,12 +4,9 @@
 #pragma once
 
 #include <chrono>
-#include <memory>
 #include <string>
 
 #include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/recordable.h"
-#include "opentelemetry/trace/span_context.h"
 
 class CustomSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor
 {
