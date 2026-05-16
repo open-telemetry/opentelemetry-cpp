@@ -4,11 +4,13 @@
 #ifndef OPENTELEMETRY_STL_VERSION
 
 #  include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
+#  include "opentelemetry/exporters/zipkin/zipkin_exporter_factory.h"
 #  include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #  include "opentelemetry/ext/http/server/http_server.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
+#  include "opentelemetry/test_common/ext/http/client/nosend/http_client_factory_nosend.h"
 #  include "opentelemetry/trace/provider.h"
 
 #  include <gtest/gtest.h>
@@ -223,6 +225,24 @@ TEST_F(ZipkinExporterTestPeer, ConfigFromEnv)
 }
 
 #  endif  // NO_GETENV
+
+TEST_F(ZipkinExporterTestPeer, FactoryInjectionCreatesExporter)
+{
+  ZipkinExporterOptions opts;
+  auto factory  = std::make_shared<
+      opentelemetry::test_common::ext::http::client::nosend::HttpClientFactoryNosend>();
+  auto exporter = ZipkinExporterFactory::Create(opts, std::move(factory));
+  ASSERT_NE(exporter, nullptr);
+}
+
+TEST_F(ZipkinExporterTestPeer, HttpClientSyncInjectionCreatesExporter)
+{
+  ZipkinExporterOptions opts;
+  auto client   = std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync>(
+      new MockHttpClient);
+  auto exporter = ZipkinExporterFactory::Create(opts, std::move(client));
+  ASSERT_NE(exporter, nullptr);
+}
 
 }  // namespace zipkin
 }  // namespace exporter

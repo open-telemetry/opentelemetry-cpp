@@ -72,6 +72,7 @@ if(BUILD_TESTING)
       ${GMOCK_LIB}
       opentelemetry_exporter_zipkin_trace
       opentelemetry_resources
+      opentelemetry_http_client_nosend
       CURL::libcurl)
 
     gtest_add_tests(

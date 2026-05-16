@@ -15,6 +15,7 @@
 #  include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
+#  include "opentelemetry/test_common/ext/http/client/nosend/http_client_factory_nosend.h"
 #  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
 #  include <gtest/gtest.h>
@@ -29,6 +30,8 @@ namespace otlp
 {
 
 namespace http_client = opentelemetry::ext::http::client;
+using NosendHttpClientFactory =
+    opentelemetry::test_common::ext::http::client::nosend::HttpClientFactoryNosend;
 
 static OtlpHttpClientOptions MakeOtlpHttpClientOptions()
 {
@@ -79,7 +82,7 @@ public:
 TEST_F(OtlpHttpExporterCustomClientTestPeer, FactoryInjectionCreatesExporter)
 {
   OtlpHttpExporterOptions opts;
-  auto factory  = http_client::GetDefaultHttpClientFactory();
+  auto factory  = std::make_shared<NosendHttpClientFactory>();
   auto exporter = OtlpHttpExporterFactory::Create(opts, std::move(factory));
   ASSERT_NE(exporter, nullptr);
 }
@@ -96,7 +99,7 @@ TEST_F(OtlpHttpExporterCustomClientTestPeer, RuntimeOptionsWithFactoryCreatesExp
 {
   OtlpHttpExporterOptions opts;
   OtlpHttpExporterRuntimeOptions runtime_opts;
-  auto factory  = http_client::GetDefaultHttpClientFactory();
+  auto factory  = std::make_shared<NosendHttpClientFactory>();
   auto exporter = OtlpHttpExporterFactory::Create(opts, runtime_opts, std::move(factory));
   ASSERT_NE(exporter, nullptr);
 }
