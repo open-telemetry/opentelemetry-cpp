@@ -13,6 +13,7 @@
 #include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/data/circular_buffer.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
@@ -110,6 +111,8 @@ void OtlpMetricUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data
         nostd::get_if<sdk::metrics::SumPointData>(&point_data_with_attributes.point_data);
     if (maybe_sum_data == nullptr)
     {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[OTLP Metrics] ConvertSumMetric: point data type mismatch, skipping data point");
       continue;
     }
     const auto &sum_data = *maybe_sum_data;
@@ -142,6 +145,8 @@ void OtlpMetricUtils::ConvertHistogramMetric(
         nostd::get_if<sdk::metrics::HistogramPointData>(&point_data_with_attributes.point_data);
     if (maybe_histogram_data == nullptr)
     {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[OTLP Metrics] ConvertHistogramMetric: point data type mismatch, skipping data point");
       continue;
     }
     const auto &histogram_data = *maybe_histogram_data;
@@ -198,13 +203,12 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
             &point_data_with_attributes.point_data);
     if (maybe_histogram_data == nullptr)
     {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[OTLP Metrics] ConvertExponentialHistogramMetric: point data type mismatch, skipping "
+          "data point");
       continue;
     }
     const auto &histogram_data = *maybe_histogram_data;
-    if (histogram_data.positive_buckets_ == nullptr && histogram_data.negative_buckets_ == nullptr)
-    {
-      continue;
-    }
     // sum
     proto_histogram_point_data->set_sum(histogram_data.sum_);
     proto_histogram_point_data->set_count(histogram_data.count_);
@@ -214,7 +218,7 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
       proto_histogram_point_data->set_max(histogram_data.max_);
     }
     // negative buckets
-    if (!histogram_data.negative_buckets_->Empty())
+    if (histogram_data.negative_buckets_ != nullptr && !histogram_data.negative_buckets_->Empty())
     {
       auto negative_buckets = proto_histogram_point_data->mutable_negative();
       negative_buckets->set_offset(histogram_data.negative_buckets_->StartIndex());
@@ -226,7 +230,7 @@ void OtlpMetricUtils::ConvertExponentialHistogramMetric(
       }
     }
     // positive buckets
-    if (!histogram_data.positive_buckets_->Empty())
+    if (histogram_data.positive_buckets_ != nullptr && !histogram_data.positive_buckets_->Empty())
     {
       auto positive_buckets = proto_histogram_point_data->mutable_positive();
       positive_buckets->set_offset(histogram_data.positive_buckets_->StartIndex());
@@ -263,6 +267,8 @@ void OtlpMetricUtils::ConvertGaugeMetric(const opentelemetry::sdk::metrics::Metr
         nostd::get_if<sdk::metrics::LastValuePointData>(&point_data_with_attributes.point_data);
     if (maybe_gauge_data == nullptr)
     {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[OTLP Metrics] ConvertGaugeMetric: point data type mismatch, skipping data point");
       continue;
     }
     const auto &gauge_data = *maybe_gauge_data;
@@ -321,6 +327,8 @@ void OtlpMetricUtils::PopulateResourceMetrics(
   {
     if (scope_metrics.scope_ == nullptr)
     {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[OTLP Metrics] PopulateResourceMetrics: scope is null, skipping scope metrics");
       continue;
     }
     auto scope_lib_metrics                         = resource_metrics->add_scope_metrics();
