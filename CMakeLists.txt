@@ -174,6 +174,8 @@ option(BUILD_TESTING "Whether to enable tests" ON)
 
 option(WITH_BENCHMARK "Whether to build benchmark program" ON)
 
+option(WITH_STRESS_TESTS "Whether to build stress test programs" OFF)
+
 option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
 option(OTELCPP_MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
@@ -535,6 +537,7 @@ message(STATUS "---------------------------------------------")
 message(STATUS "examples and test options")
 message(STATUS "---------------------------------------------")
 message(STATUS "WITH_BENCHMARK: ${WITH_BENCHMARK}")
+message(STATUS "WITH_STRESS_TESTS: ${WITH_STRESS_TESTS}")
 message(STATUS "WITH_EXAMPLES: ${WITH_EXAMPLES}")
 message(STATUS "WITH_EXAMPLES_HTTP: ${WITH_EXAMPLES_HTTP}")
 message(STATUS "WITH_FUNC_TESTS: ${WITH_FUNC_TESTS}")
@@ -636,6 +639,9 @@ if(NOT WITH_API_ONLY)
   endif()
   if(WITH_FUNC_TESTS)
     add_subdirectory(functional)
+  endif()
+  if(WITH_STRESS_TESTS)
+    add_subdirectory(stress)
   endif()
 endif()
 
