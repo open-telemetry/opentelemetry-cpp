@@ -30,6 +30,14 @@ Increment the:
   `CreateLogRecord(context)`.
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
+* [SDK] Add `LogRecordProcessor::HasEnabledFilter()` so the SDK Logger can
+  include processor-level filtering in its extended-enabled cache. Defaults
+  to `true` (conservative). Built-in `SimpleLogRecordProcessor` and
+  `BatchLogRecordProcessor` override to `false` since they use the default
+  Enabled. Custom processors that do not override `EnabledImplementation`
+  should similarly override `HasEnabledFilter()` to return `false` to enable
+  the cheap path. SDK ABI break.
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev

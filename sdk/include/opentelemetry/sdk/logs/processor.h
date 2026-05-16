@@ -89,6 +89,14 @@ public:
   virtual bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
 
+  /**
+   * Returns true if this processor's EnabledImplementation does any custom
+   * filtering. The default returns true (conservative — assume any subclass
+   * might filter), so the SDK Logger consults the full Enabled chain by
+   * default.
+   */
+  virtual bool HasEnabledFilter() const noexcept { return true; }
+
 protected:
   virtual bool EnabledImplementation(
       const opentelemetry::context::Context & /*context*/,

@@ -62,6 +62,8 @@ public:
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
+  bool HasEnabledFilter() const noexcept override;
+
 protected:
   /**
    * Exports all log records that have not yet been exported to the configured Exporter.

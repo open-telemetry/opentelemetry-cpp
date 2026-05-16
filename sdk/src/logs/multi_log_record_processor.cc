@@ -6,8 +6,6 @@
 #include <utility>
 #include <vector>
 
-#include "opentelemetry/context/context.h"
-#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/logs/multi_log_record_processor.h"
 #include "opentelemetry/sdk/logs/multi_recordable.h"
@@ -96,6 +94,18 @@ bool MultiLogRecordProcessor::EnabledImplementation(
     }
   }
 
+  return false;
+}
+
+bool MultiLogRecordProcessor::HasEnabledFilter() const noexcept
+{
+  for (const auto &processor : processors_)
+  {
+    if (processor != nullptr && processor->HasEnabledFilter())
+    {
+      return true;
+    }
+  }
   return false;
 }
 

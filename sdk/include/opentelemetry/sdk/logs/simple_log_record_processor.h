@@ -49,6 +49,8 @@ public:
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
+  bool HasEnabledFilter() const noexcept override { return false; }
+
   bool IsShutdown() const noexcept;
 
 private:

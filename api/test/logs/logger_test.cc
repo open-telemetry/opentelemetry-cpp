@@ -359,6 +359,8 @@ public:
 
   void SetEventIdEnabled(bool enabled) noexcept { event_id_enabled_ = enabled; }
 
+  using Logger::SetExtendedEnabledRequired;
+
   size_t create_log_record_calls_{0};
   size_t emit_log_record_calls_{0};
   mutable size_t enabled_calls_{0};
@@ -520,6 +522,18 @@ TEST(Logger, EmitLogRecordWithRecordBypassesFiltering)
 
   auto record = logger.CreateLogRecord();
   logger.EmitLogRecord(std::move(record), Severity::kInfo, nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+}
+
+TEST(Logger, EmitLogRecordTemplateSkipsEnabledImplementationWhenExtendedEnabledNotRequired)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, /*event_id_enabled=*/false);
+  logger.SetExtendedEnabledRequired(false);
+
+  logger.Info(nostd::string_view{"emitted"});
 
   EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
   EXPECT_EQ(logger.create_log_record_calls_, 1u);
