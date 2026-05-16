@@ -64,12 +64,12 @@ class Span;
  * @return              Span instance
  */
 template <class SpanType, class TracerType>
-SpanType *new_span(TracerType *objPtr,
+SpanType *new_span(nostd::shared_ptr<TracerType> objPtr,
                    nostd::string_view name,
                    const opentelemetry::trace::StartSpanOptions &options,
                    std::unique_ptr<opentelemetry::trace::SpanContext> spanContext)
 {
-  return new (std::nothrow) SpanType{*objPtr, name, options, std::move(spanContext)};
+  return new (std::nothrow) SpanType{std::move(objPtr), name, options, std::move(spanContext)};
 }
 
 /**
@@ -159,8 +159,7 @@ void UpdateStatus(T &t, Properties &props)
 /**
  * @brief Tracer class that allows to send spans to ETW Provider.
  */
-class Tracer : public opentelemetry::trace::Tracer,
-               public std::enable_shared_from_this<opentelemetry::trace::Tracer>
+class Tracer : public opentelemetry::trace::Tracer, public std::enable_shared_from_this<Tracer>
 {
 public:
   /**
@@ -530,7 +529,9 @@ public:
 
     // This template pattern allows us to forward-declare the etw::Span,
     // create an instance of it, then assign it to tracer::Span result.
-    auto currentSpan = new_span<Span, Tracer>(this, name, options, std::move(spanContext));
+    auto owner_ptr = nostd::shared_ptr<Tracer>(this->shared_from_this());
+    auto currentSpan =
+        new_span<Span, Tracer>(std::move(owner_ptr), name, options, std::move(spanContext));
     nostd::shared_ptr<opentelemetry::trace::Span> result = to_span_ptr<Span>(currentSpan);
 
     // Decorate with additional standard fields
@@ -783,7 +784,7 @@ protected:
   /**
    * @brief Owner Tracer of this Span
    */
-  Tracer &owner_;
+  nostd::shared_ptr<Tracer> owner_;
 
   /**
    * @brief Span name.
@@ -862,14 +863,14 @@ public:
    * @param parent Parent Span (optional)
    * @return
    */
-  Span(Tracer &owner,
+  Span(nostd::shared_ptr<Tracer> owner,
        nostd::string_view name,
        const opentelemetry::trace::StartSpanOptions &options,
        std::unique_ptr<opentelemetry::trace::SpanContext> spanContext,
        Span *parent = nullptr) noexcept
       : opentelemetry::trace::Span(),
         start_time_(std::chrono::system_clock::now()),
-        owner_(owner),
+        owner_(std::move(owner)),
         context_(std::move(spanContext)),
         parent_(parent)
   {
@@ -887,7 +888,7 @@ public:
    * @param name Event name.
    * @return
    */
-  void AddEvent(nostd::string_view name) noexcept override { owner_.AddEvent(*this, name); }
+  void AddEvent(nostd::string_view name) noexcept override { owner_->AddEvent(*this, name); }
 
   /**
    * @brief Add named event with custom timestamp.
@@ -898,7 +899,7 @@ public:
   void AddEvent(nostd::string_view name,
                 opentelemetry::common::SystemTimestamp timestamp) noexcept override
   {
-    owner_.AddEvent(*this, name, timestamp);
+    owner_->AddEvent(*this, name, timestamp);
   }
 
   /**
@@ -912,7 +913,7 @@ public:
                 opentelemetry::common::SystemTimestamp timestamp,
                 const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
-    owner_.AddEvent(*this, name, timestamp, attributes);
+    owner_->AddEvent(*this, name, timestamp, attributes);
   }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -1024,7 +1025,7 @@ public:
 
     if (!has_ended_.exchange(true))
     {
-      owner_.EndSpan(*this, parent_, options);
+      owner_->EndSpan(*this, parent_, options);
     }
   }
 
@@ -1056,7 +1057,7 @@ public:
   /// Get Owner tracer of this Span
   /// </summary>
   /// <returns></returns>
-  opentelemetry::trace::Tracer &tracer() const noexcept { return this->owner_; }
+  opentelemetry::trace::Tracer &tracer() const noexcept { return *this->owner_; }
 };
 
 /**
@@ -1177,9 +1178,9 @@ public:
     UNREFERENCED_PARAMETER(args);
     UNREFERENCED_PARAMETER(schema_url);
     ETWProvider::EventFormat evtFmt = config_.encoding;
-    std::shared_ptr<opentelemetry::trace::Tracer> tracer{new (std::nothrow)
-                                                             Tracer(*this, name, evtFmt)};
-    return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracer};
+    std::shared_ptr<Tracer> tracer{new (std::nothrow) Tracer(*this, name, evtFmt)};
+    return nostd::shared_ptr<opentelemetry::trace::Tracer>{
+        std::static_pointer_cast<opentelemetry::trace::Tracer>(tracer)};
   }
 };
 
