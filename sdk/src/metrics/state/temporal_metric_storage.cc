@@ -54,17 +54,24 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   // no other reader configured to collect those data.
   if (collectors.size() == 1 && aggregation_temporarily == AggregationTemporality::kDelta)
   {
+    if (!has_last_delta_collection_ts_)
+    {
+      last_delta_collection_ts_     = sdk_start_ts;
+      has_last_delta_collection_ts_ = true;
+    }
     // If no metrics, early return
     if (delta_metrics->Size() == 0)
     {
+      last_delta_collection_ts_ = collection_ts;
       return true;
     }
     // Create MetricData directly
     MetricData metric_data;
     metric_data.instrument_descriptor   = instrument_descriptor_;
     metric_data.aggregation_temporality = AggregationTemporality::kDelta;
-    metric_data.start_ts                = sdk_start_ts;
+    metric_data.start_ts                = last_delta_collection_ts_;
     metric_data.end_ts                  = collection_ts;
+    last_delta_collection_ts_           = collection_ts;
 
     // Direct conversion of delta metrics to point data
     delta_metrics->GetAllEntries(
@@ -92,7 +99,6 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   auto present = unreported_metrics_.find(collector);
   if (present == unreported_metrics_.end())
   {
-    // no unreported metrics for the collector, return.
     return true;
   }
   auto unreported_list = std::move(present->second);
