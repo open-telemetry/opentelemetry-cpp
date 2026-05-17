@@ -5,6 +5,7 @@
 #include <string.h>
 #include <string>
 
+#include <opentelemetry/common/macros.h>
 #include <opentelemetry/common/string_util.h>
 #include "opentelemetry/nostd/string_view.h"
 
@@ -50,4 +51,13 @@ TEST(StringUtilTest, TrimString)
   {
     EXPECT_EQ(StringUtil::Trim(testcase.input), testcase.expected);
   }
+}
+
+TEST(StringUtilTest, TrimStringOutOfRange)
+{
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  EXPECT_EQ(StringUtil::Trim("x", 2, 1), "");
+#else
+  EXPECT_DEATH(StringUtil::Trim("x", 2, 1), "");
+#endif
 }
