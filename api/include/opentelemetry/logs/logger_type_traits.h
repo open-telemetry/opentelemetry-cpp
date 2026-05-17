@@ -299,8 +299,7 @@ template <class First,
           typename std::enable_if<
               !std::is_same<typename std::decay<First>::type, trace::SpanContext>::value,
               int>::type = 0>
-inline const trace::SpanContext *FindSpanContextInArgs(First && /*first*/,
-                                                       Rest &&...rest) noexcept
+inline const trace::SpanContext *FindSpanContextInArgs(First && /*first*/, Rest &&...rest) noexcept
 {
   return FindSpanContextInArgs(std::forward<Rest>(rest)...);
 }
@@ -317,11 +316,11 @@ inline const trace::TraceId *FindTraceIdInArgs(const trace::TraceId &trace_id,
   return &trace_id;
 }
 
-template <class First,
-          class... Rest,
-          typename std::enable_if<
-              !std::is_same<typename std::decay<First>::type, trace::TraceId>::value,
-              int>::type = 0>
+template <
+    class First,
+    class... Rest,
+    typename std::enable_if<!std::is_same<typename std::decay<First>::type, trace::TraceId>::value,
+                            int>::type = 0>
 inline const trace::TraceId *FindTraceIdInArgs(First && /*first*/, Rest &&...rest) noexcept
 {
   return FindTraceIdInArgs(std::forward<Rest>(rest)...);
@@ -339,11 +338,11 @@ inline const trace::SpanId *FindSpanIdInArgs(const trace::SpanId &span_id,
   return &span_id;
 }
 
-template <class First,
-          class... Rest,
-          typename std::enable_if<
-              !std::is_same<typename std::decay<First>::type, trace::SpanId>::value,
-              int>::type = 0>
+template <
+    class First,
+    class... Rest,
+    typename std::enable_if<!std::is_same<typename std::decay<First>::type, trace::SpanId>::value,
+                            int>::type = 0>
 inline const trace::SpanId *FindSpanIdInArgs(First && /*first*/, Rest &&...rest) noexcept
 {
   return FindSpanIdInArgs(std::forward<Rest>(rest)...);
@@ -366,8 +365,7 @@ template <class First,
           typename std::enable_if<
               !std::is_same<typename std::decay<First>::type, trace::TraceFlags>::value,
               int>::type = 0>
-inline const trace::TraceFlags *FindTraceFlagsInArgs(First && /*first*/,
-                                                     Rest &&...rest) noexcept
+inline const trace::TraceFlags *FindTraceFlagsInArgs(First && /*first*/, Rest &&...rest) noexcept
 {
   return FindTraceFlagsInArgs(std::forward<Rest>(rest)...);
 }

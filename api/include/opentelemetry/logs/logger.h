@@ -192,8 +192,7 @@ public:
               derived_context,
               nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext(
                   *trace_id_ptr, *span_id_ptr,
-                  trace_flags_ptr != nullptr ? *trace_flags_ptr : trace::TraceFlags{},
-                                                            false))));
+                  trace_flags_ptr != nullptr ? *trace_flags_ptr : trace::TraceFlags{}, false))));
           context_ptr = &derived_context;
         }
       }
