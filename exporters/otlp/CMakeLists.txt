@@ -316,15 +316,15 @@ if(WITH_OTLP_HTTP)
 
   target_link_libraries(
     opentelemetry_exporter_otlp_http_client
-    PUBLIC opentelemetry_sdk
-           opentelemetry_ext
-           # Links flags of opentelemetry_http_client_curl should be public when
-           # building internal components
+    PUBLIC opentelemetry_sdk opentelemetry_ext
            "$<BUILD_INTERFACE:opentelemetry_proto>"
     PRIVATE "$<INSTALL_INTERFACE:opentelemetry_proto>"
-            "$<BUILD_INTERFACE:opentelemetry_http_client_curl>"
-            "$<BUILD_INTERFACE:nlohmann_json::nlohmann_json>"
-            "$<INSTALL_INTERFACE:opentelemetry_http_client_curl>")
+            "$<BUILD_INTERFACE:nlohmann_json::nlohmann_json>")
+
+  target_link_libraries(
+    opentelemetry_exporter_otlp_http_client
+    PUBLIC opentelemetry_http_client
+    PRIVATE opentelemetry_common)
 
   target_include_directories(
     opentelemetry_exporter_otlp_http_client
@@ -1062,6 +1062,39 @@ if(BUILD_TESTING)
       TARGET otlp_http_metric_exporter_factory_test
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_http_metric_exporter_factory_test)
+
+    add_executable(otlp_http_exporter_custom_client_test
+                   test/otlp_http_exporter_custom_client_test.cc)
+    target_link_libraries(
+      otlp_http_exporter_custom_client_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_http
+      opentelemetry_http_client_nosend)
+    gtest_add_tests(
+      TARGET otlp_http_exporter_custom_client_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_http_exporter_custom_client_test)
+
+    add_executable(otlp_http_metric_exporter_custom_client_test
+                   test/otlp_http_metric_exporter_custom_client_test.cc)
+    target_link_libraries(
+      otlp_http_metric_exporter_custom_client_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_otlp_http_metric
+      opentelemetry_metrics opentelemetry_http_client_nosend)
+    gtest_add_tests(
+      TARGET otlp_http_metric_exporter_custom_client_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_http_metric_exporter_custom_client_test)
+
+    add_executable(otlp_http_log_record_exporter_custom_client_test
+                   test/otlp_http_log_record_exporter_custom_client_test.cc)
+    target_link_libraries(
+      otlp_http_log_record_exporter_custom_client_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_otlp_http_log
+      opentelemetry_logs opentelemetry_http_client_nosend)
+    gtest_add_tests(
+      TARGET otlp_http_log_record_exporter_custom_client_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_http_log_record_exporter_custom_client_test)
   endif()
 
   if(WITH_OTLP_FILE)

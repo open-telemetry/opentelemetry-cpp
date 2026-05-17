@@ -37,3 +37,7 @@ endif()
 if(WITH_CONFIGURATION)
   add_subdirectory(configuration)
 endif()
+
+if(NOT WITH_HTTP_CLIENT_CURL AND WITH_OTLP_HTTP)
+  add_subdirectory(custom_http_client)
+endif()

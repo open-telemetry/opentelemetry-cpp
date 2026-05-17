@@ -40,7 +40,7 @@ namespace semconv     = opentelemetry::semconv;
 
 void sendRequest(const std::string &url)
 {
-  auto http_client = http_client::HttpClientFactory::CreateSync();
+  auto http_client = http_client::GetDefaultHttpClientFactory()->CreateSync();
 
   // start active span
   StartSpanOptions options;

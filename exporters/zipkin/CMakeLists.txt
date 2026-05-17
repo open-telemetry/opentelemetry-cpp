@@ -23,7 +23,7 @@ set_target_version(opentelemetry_exporter_zipkin_trace)
 
 target_link_libraries(
   opentelemetry_exporter_zipkin_trace
-  PUBLIC opentelemetry_trace opentelemetry_http_client_curl
+  PUBLIC opentelemetry_trace opentelemetry_http_client
          nlohmann_json::nlohmann_json)
 
 otel_add_component(
@@ -62,19 +62,22 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.
     TEST_LIST zipkin_recordable_test)
 
-  add_executable(zipkin_exporter_test test/zipkin_exporter_test.cc)
+  if(WITH_HTTP_CLIENT_CURL)
+    add_executable(zipkin_exporter_test test/zipkin_exporter_test.cc)
 
-  target_link_libraries(
-    zipkin_exporter_test
-    ${GTEST_BOTH_LIBRARIES}
-    ${CMAKE_THREAD_LIBS_INIT}
-    ${GMOCK_LIB}
-    opentelemetry_exporter_zipkin_trace
-    opentelemetry_resources
-    CURL::libcurl)
+    target_link_libraries(
+      zipkin_exporter_test
+      ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${GMOCK_LIB}
+      opentelemetry_exporter_zipkin_trace
+      opentelemetry_resources
+      opentelemetry_http_client_nosend
+      CURL::libcurl)
 
-  gtest_add_tests(
-    TARGET zipkin_exporter_test
-    TEST_PREFIX exporter.
-    TEST_LIST zipkin_exporter_test)
+    gtest_add_tests(
+      TARGET zipkin_exporter_test
+      TEST_PREFIX exporter.
+      TEST_LIST zipkin_exporter_test)
+  endif()
 endif() # BUILD_TESTING

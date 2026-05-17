@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
@@ -17,12 +19,26 @@ namespace client
 class HttpClientFactory
 {
 public:
-  static std::shared_ptr<HttpClientSync> CreateSync();
+  HttpClientFactory()                                     = default;
+  HttpClientFactory(const HttpClientFactory &)            = delete;
+  HttpClientFactory(HttpClientFactory &&)                 = delete;
+  HttpClientFactory &operator=(const HttpClientFactory &) = delete;
+  HttpClientFactory &operator=(HttpClientFactory &&)      = delete;
 
-  static std::shared_ptr<HttpClient> Create();
-  static std::shared_ptr<HttpClient> Create(
-      const std::shared_ptr<sdk::common::ThreadInstrumentation> &thread_instrumentation);
+  virtual ~HttpClientFactory() = default;
+
+  virtual std::shared_ptr<HttpClientSync> CreateSync() = 0;
+
+  virtual std::shared_ptr<HttpClient> Create() = 0;
+  virtual std::shared_ptr<HttpClient> Create(
+      const std::shared_ptr<sdk::common::ThreadInstrumentation> &thread_instrumentation) = 0;
 };
+
+// Returns an HttpCurlClientFactory instance when compiled with curl support.
+// Not defined otherwise — binaries that link any exporter must provide their
+// own definition or use the factory/client constructor overloads exclusively.
+std::shared_ptr<HttpClientFactory> GetDefaultHttpClientFactory();
+
 }  // namespace client
 }  // namespace http
 }  // namespace ext

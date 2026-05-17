@@ -11,6 +11,7 @@
 
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
 #include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
@@ -32,13 +33,32 @@ class ZipkinExporter final : public opentelemetry::sdk::trace::SpanExporter
 public:
   /**
    * Create a ZipkinExporter using all default options.
+   * Uses the default HTTP client factory (curl when available).
    */
   ZipkinExporter();
 
   /**
    * Create a ZipkinExporter using the given options.
+   * Uses the default HTTP client factory (curl when available).
    */
   explicit ZipkinExporter(const ZipkinExporterOptions &options);
+
+  /**
+   * Create a ZipkinExporter using the given options and HTTP client factory.
+   * @param options the exporter options
+   * @param factory the HTTP client factory used to create the underlying HTTP client
+   */
+  ZipkinExporter(
+      const ZipkinExporterOptions &options,
+      const std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> &factory);
+
+  /**
+   * Create a ZipkinExporter using the given options and HTTP client.
+   * @param options the exporter options
+   * @param http_client the HTTP client to be used for exporting
+   */
+  ZipkinExporter(const ZipkinExporterOptions &options,
+                 std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> http_client);
 
   /**
    * Create a span recordable.

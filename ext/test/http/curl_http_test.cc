@@ -275,7 +275,7 @@ TEST_F(BasicCurlHttpTests, HttpResponse)
 TEST_F(BasicCurlHttpTests, SendGetRequest)
 {
   received_requests_.clear();
-  auto session_manager = http_client::HttpClientFactory::Create();
+  auto session_manager = http_client::GetDefaultHttpClientFactory()->Create();
   EXPECT_TRUE(session_manager != nullptr);
 
   auto session = session_manager->CreateSession("http://127.0.0.1:19000");
@@ -292,7 +292,7 @@ TEST_F(BasicCurlHttpTests, SendGetRequest)
 TEST_F(BasicCurlHttpTests, SendPostRequest)
 {
   received_requests_.clear();
-  auto session_manager = http_client::HttpClientFactory::Create();
+  auto session_manager = http_client::GetDefaultHttpClientFactory()->Create();
   EXPECT_TRUE(session_manager != nullptr);
 
   auto session = session_manager->CreateSession("http://127.0.0.1:19000");
@@ -318,7 +318,7 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
 TEST_F(BasicCurlHttpTests, RequestTimeout)
 {
   received_requests_.clear();
-  auto session_manager = http_client::HttpClientFactory::Create();
+  auto session_manager = http_client::GetDefaultHttpClientFactory()->Create();
   EXPECT_TRUE(session_manager != nullptr);
 
   auto session = session_manager->CreateSession("192.0.2.0:19000");  // RFC 5737 TEST-NET-1
@@ -654,7 +654,7 @@ TEST_F(BasicCurlHttpTests, FinishInAsyncCallback)
 
 TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
 {
-  auto http_client = http_client::HttpClientFactory::Create();
+  auto http_client = http_client::GetDefaultHttpClientFactory()->Create();
   std::static_pointer_cast<curl::HttpClient>(http_client)->MaybeSpawnBackgroundThread();
   // start background first, then test it could wakeup
   auto session = http_client->CreateSession("http://127.0.0.1:19000/get/");
@@ -720,7 +720,7 @@ struct GzipEventHandler : public CustomEventHandler
 TEST_F(BasicCurlHttpTests, GzipCompressibleData)
 {
   received_requests_.clear();
-  auto session_manager = http_client::HttpClientFactory::Create();
+  auto session_manager = http_client::GetDefaultHttpClientFactory()->Create();
   EXPECT_TRUE(session_manager != nullptr);
 
   auto session = session_manager->CreateSession("http://127.0.0.1:19000");
@@ -754,7 +754,7 @@ TEST_F(BasicCurlHttpTests, GzipCompressibleData)
 TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
 {
   received_requests_.clear();
-  auto session_manager = http_client::HttpClientFactory::Create();
+  auto session_manager = http_client::GetDefaultHttpClientFactory()->Create();
   EXPECT_TRUE(session_manager != nullptr);
 
   auto session = session_manager->CreateSession("http://127.0.0.1:19000");
