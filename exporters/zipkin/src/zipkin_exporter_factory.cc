@@ -10,8 +10,6 @@
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/version.h"
 
-namespace http_client = opentelemetry::ext::http::client;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -33,10 +31,10 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinExporterFactory::
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinExporterFactory::Create(
     const ZipkinExporterOptions &options,
-    std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> factory)
+    const std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> &factory)
 {
   return std::unique_ptr<opentelemetry::sdk::trace::SpanExporter>(
-      new ZipkinExporter(options, std::move(factory)));
+      new ZipkinExporter(options, factory));
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinExporterFactory::Create(

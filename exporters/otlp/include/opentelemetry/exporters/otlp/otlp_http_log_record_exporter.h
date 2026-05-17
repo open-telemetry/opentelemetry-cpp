@@ -53,7 +53,7 @@ public:
    * @param factory the HTTP client factory used to create the underlying HTTP client
    */
   OtlpHttpLogRecordExporter(const OtlpHttpLogRecordExporterOptions &options,
-                            std::shared_ptr<ext::http::client::HttpClientFactory> factory);
+                            const std::shared_ptr<ext::http::client::HttpClientFactory> &factory);
 
   /**
    * Create an OtlpHttpLogRecordExporter with user specified options, runtime options, and HTTP
@@ -64,7 +64,7 @@ public:
    */
   OtlpHttpLogRecordExporter(const OtlpHttpLogRecordExporterOptions &options,
                             const OtlpHttpLogRecordExporterRuntimeOptions &runtime_options,
-                            std::shared_ptr<ext::http::client::HttpClientFactory> factory);
+                            const std::shared_ptr<ext::http::client::HttpClientFactory> &factory);
 
   /**
    * Create an OtlpHttpLogRecordExporter with user specified options and HTTP client.

@@ -116,8 +116,9 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
                                                             )))
 {}
 
-OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
-                                   std::shared_ptr<ext::http::client::HttpClientFactory> factory)
+OtlpHttpExporter::OtlpHttpExporter(
+    const OtlpHttpExporterOptions &options,
+    const std::shared_ptr<ext::http::client::HttpClientFactory> &factory)
     : options_(options),
       runtime_options_(),
       http_client_(new OtlpHttpClient(
@@ -151,12 +152,13 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
                                 options.max_requests_per_connection
 #endif
                                 ),
-          std::move(factory)))
+          factory))
 {}
 
-OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
-                                   const OtlpHttpExporterRuntimeOptions &runtime_options,
-                                   std::shared_ptr<ext::http::client::HttpClientFactory> factory)
+OtlpHttpExporter::OtlpHttpExporter(
+    const OtlpHttpExporterOptions &options,
+    const OtlpHttpExporterRuntimeOptions &runtime_options,
+    const std::shared_ptr<ext::http::client::HttpClientFactory> &factory)
     : options_(options),
       runtime_options_(runtime_options),
       http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
@@ -189,7 +191,7 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
                                                             options.max_requests_per_connection
 #endif
                                                             ),
-                                      std::move(factory)))
+                                      factory))
 {}
 
 OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,

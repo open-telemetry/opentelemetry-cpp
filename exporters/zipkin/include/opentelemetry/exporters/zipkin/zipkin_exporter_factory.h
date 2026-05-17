@@ -41,7 +41,7 @@ public:
    */
   static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create(
       const ZipkinExporterOptions &options,
-      std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> factory);
+      const std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> &factory);
 
   /**
    * Create a ZipkinExporter using the given options and HTTP client.

@@ -49,7 +49,7 @@ public:
    */
   static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create(
       const OtlpHttpLogRecordExporterOptions &options,
-      std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> factory);
+      const std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> &factory);
 
   /**
    * Create a OtlpHttpLogRecordExporter using the given options, runtime options, and HTTP client
@@ -61,7 +61,7 @@ public:
   static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create(
       const OtlpHttpLogRecordExporterOptions &options,
       const OtlpHttpLogRecordExporterRuntimeOptions &runtime_options,
-      std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> factory);
+      const std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> &factory);
 
   /**
    * Create a OtlpHttpLogRecordExporter using the given options and HTTP client.

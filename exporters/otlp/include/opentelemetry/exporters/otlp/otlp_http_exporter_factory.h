@@ -49,7 +49,7 @@ public:
    */
   static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create(
       const OtlpHttpExporterOptions &options,
-      std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> factory);
+      const std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> &factory);
 
   /**
    * Create an OtlpHttpExporter using the given options, runtime options, and HTTP client factory.
@@ -60,7 +60,7 @@ public:
   static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create(
       const OtlpHttpExporterOptions &options,
       const OtlpHttpExporterRuntimeOptions &runtime_options,
-      std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> factory);
+      const std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> &factory);
 
   /**
    * Create an OtlpHttpExporter using the given options and HTTP client.

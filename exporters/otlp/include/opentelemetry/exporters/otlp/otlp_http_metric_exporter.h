@@ -52,7 +52,7 @@ public:
    * @param factory the HTTP client factory used to create the underlying HTTP client
    */
   OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptions &options,
-                         std::shared_ptr<ext::http::client::HttpClientFactory> factory);
+                         const std::shared_ptr<ext::http::client::HttpClientFactory> &factory);
 
   /**
    * Create an OtlpHttpMetricExporter with user specified options, runtime options, and HTTP client
@@ -63,7 +63,7 @@ public:
    */
   OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptions &options,
                          const OtlpHttpMetricExporterRuntimeOptions &runtime_options,
-                         std::shared_ptr<ext::http::client::HttpClientFactory> factory);
+                         const std::shared_ptr<ext::http::client::HttpClientFactory> &factory);
 
   /**
    * Create an OtlpHttpMetricExporter with user specified options and HTTP client.

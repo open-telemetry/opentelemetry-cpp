@@ -122,7 +122,7 @@ OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(
 
 OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(
     const OtlpHttpLogRecordExporterOptions &options,
-    std::shared_ptr<ext::http::client::HttpClientFactory> factory)
+    const std::shared_ptr<ext::http::client::HttpClientFactory> &factory)
     : options_(options),
       runtime_options_(),
       http_client_(new OtlpHttpClient(
@@ -156,13 +156,13 @@ OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(
                                 options.max_requests_per_connection
 #endif
                                 ),
-          std::move(factory)))
+          factory))
 {}
 
 OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(
     const OtlpHttpLogRecordExporterOptions &options,
     const OtlpHttpLogRecordExporterRuntimeOptions &runtime_options,
-    std::shared_ptr<ext::http::client::HttpClientFactory> factory)
+    const std::shared_ptr<ext::http::client::HttpClientFactory> &factory)
     : options_(options),
       runtime_options_(runtime_options),
       http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
@@ -195,7 +195,7 @@ OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(
                                                             options.max_requests_per_connection
 #endif
                                                             ),
-                                      std::move(factory)))
+                                      factory))
 {}
 
 OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(

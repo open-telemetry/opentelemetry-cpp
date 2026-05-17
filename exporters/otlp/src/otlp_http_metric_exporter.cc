@@ -125,7 +125,7 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(
 
 OtlpHttpMetricExporter::OtlpHttpMetricExporter(
     const OtlpHttpMetricExporterOptions &options,
-    std::shared_ptr<ext::http::client::HttpClientFactory> factory)
+    const std::shared_ptr<ext::http::client::HttpClientFactory> &factory)
     : options_(options),
       runtime_options_(),
       aggregation_temporality_selector_{
@@ -161,13 +161,13 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(
                                 options.max_requests_per_connection
 #endif
                                 ),
-          std::move(factory)))
+          factory))
 {}
 
 OtlpHttpMetricExporter::OtlpHttpMetricExporter(
     const OtlpHttpMetricExporterOptions &options,
     const OtlpHttpMetricExporterRuntimeOptions &runtime_options,
-    std::shared_ptr<ext::http::client::HttpClientFactory> factory)
+    const std::shared_ptr<ext::http::client::HttpClientFactory> &factory)
     : options_(options),
       runtime_options_(runtime_options),
       aggregation_temporality_selector_{
@@ -202,7 +202,7 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(
                                                             options.max_requests_per_connection
 #endif
                                                             ),
-                                      std::move(factory)))
+                                      factory))
 {}
 
 OtlpHttpMetricExporter::OtlpHttpMetricExporter(
