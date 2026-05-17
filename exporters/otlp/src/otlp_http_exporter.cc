@@ -16,6 +16,7 @@
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
