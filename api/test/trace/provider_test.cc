@@ -2,15 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <string>
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/tracer_provider.h"
-
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include "opentelemetry/common/key_value_iterable.h"
-#endif
 
 using opentelemetry::trace::Provider;
 using opentelemetry::trace::Tracer;

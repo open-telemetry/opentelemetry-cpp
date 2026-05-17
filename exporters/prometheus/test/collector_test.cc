@@ -5,6 +5,7 @@
 #include <prometheus/metric_family.h>
 #include <stddef.h>
 #include <chrono>
+#include <string>
 #include <thread>
 #include <vector>
 

@@ -17,12 +17,12 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"  // IWYU pragma: keep
 // clang-format on
 
-#include <opentelemetry/sdk/metrics/data/metric_data.h>
-
 #include <opentelemetry/exporters/otlp/otlp_log_recordable.h>
 #include <opentelemetry/exporters/otlp/otlp_metric_utils.h>
 #include <opentelemetry/exporters/otlp/otlp_recordable.h>
 #include <opentelemetry/exporters/otlp/otlp_recordable_utils.h>
+#include <opentelemetry/logs/severity.h>
+#include <opentelemetry/sdk/metrics/data/metric_data.h>
 
 namespace nostd         = opentelemetry::nostd;
 namespace resource_sdk  = opentelemetry::sdk::resource;

@@ -5,7 +5,6 @@
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
-#include <functional>
 #include <map>
 #include <nlohmann/json.hpp>
 #include <string>
