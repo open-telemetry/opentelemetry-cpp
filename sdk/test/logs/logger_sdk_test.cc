@@ -61,9 +61,9 @@ namespace context = opentelemetry::context;
 namespace logs_api = opentelemetry::logs;
 namespace nostd    = opentelemetry::nostd;
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 namespace
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 nostd::shared_ptr<opentelemetry::trace::Span> MakeTestSpan(bool sampled)
 {
   const uint8_t trace_id_bytes[opentelemetry::trace::TraceId::kSize] = {
@@ -95,8 +95,8 @@ context::Context MakeContextWithUnsampledSpanAndInvalidTraceId()
                                        nostd::shared_ptr<opentelemetry::trace::Span>(
                                            new opentelemetry::trace::DefaultSpan(span_context)));
 }
-}  // namespace
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+}  // namespace
 
 TEST(LoggerSDK, LogToNullProcessor)
 {
@@ -273,6 +273,9 @@ public:
 };
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
+namespace
+{
+
 struct EnabledProcessorCallState
 {
   logs_api::Severity severity = logs_api::Severity::kInvalid;
@@ -335,6 +338,8 @@ private:
   bool enabled_;
   std::shared_ptr<EnabledProcessorCallState> call_state_;
 };
+
+}  // namespace
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 TEST(LoggerSDK, LogToAProcessor)

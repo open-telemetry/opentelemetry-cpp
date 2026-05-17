@@ -68,6 +68,42 @@ bool IsAllowedByTraceBasedFiltering(const context::Context &context,
 
   return span_context.trace_flags().IsSampled();
 }
+
+void StampSpanContextFromContext(const context::Context &context, Recordable &recordable) noexcept
+{
+  if (!context.HasKey(trace_api::kSpanKey))
+  {
+    return;
+  }
+
+  const context::ContextValue context_value = context.GetValue(trace_api::kSpanKey);
+
+  const trace_api::SpanContext span_context = [&context_value]() {
+    // Get the span metadata from the active span in the context
+    if (const nostd::shared_ptr<trace_api::Span> *maybe_span =
+            nostd::get_if<nostd::shared_ptr<trace_api::Span>>(&context_value))
+    {
+      const nostd::shared_ptr<trace_api::Span> &span = *maybe_span;
+      return span->GetContext();
+    }
+    // Get the span metadata directly from a SpanContext in the context.
+    // TODO: This path is unused and may be removed in the future.
+    else if (const nostd::shared_ptr<trace_api::SpanContext> *maybe_span_context =
+                 nostd::get_if<nostd::shared_ptr<trace_api::SpanContext>>(&context_value))
+    {
+      const nostd::shared_ptr<trace_api::SpanContext> &span_context = *maybe_span_context;
+      return *span_context;
+    }
+    return trace_api::SpanContext::GetInvalid();
+  }();
+
+  if (span_context.IsValid())
+  {
+    recordable.SetTraceId(span_context.trace_id());
+    recordable.SetTraceFlags(span_context.trace_flags());
+    recordable.SetSpanId(span_context.span_id());
+  }
+}
 }  // namespace
 
 opentelemetry::logs::NoopLogger Logger::kNoopLogger = opentelemetry::logs::NoopLogger();
@@ -84,6 +120,9 @@ Logger::Logger(
   SetMinimumSeverity(logger_config_.IsEnabled()
                          ? static_cast<uint8_t>(logger_config_.GetMinimumSeverity())
                          : opentelemetry::logs::kMaxSeverity);
+
+  SetExtendedEnabledRequired(logger_config_.IsTraceBased() ||
+                             context_->GetProcessor().HasEnabledFilter());
 }
 
 const opentelemetry::nostd::string_view Logger::GetName() noexcept
@@ -106,42 +145,29 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
 
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());
 
-  // Get the current span metadata from the runtime context
-  const auto current_context = context::RuntimeContext::GetCurrent();
-
-  if (current_context.HasKey(trace_api::kSpanKey))
-  {
-    const context::ContextValue context_value = current_context.GetValue(trace_api::kSpanKey);
-
-    const trace_api::SpanContext span_context = [&context_value]() {
-      // Get the span metadata from the active span in the runtime context
-      if (const nostd::shared_ptr<trace_api::Span> *maybe_span =
-              nostd::get_if<nostd::shared_ptr<trace_api::Span>>(&context_value))
-      {
-        const nostd::shared_ptr<trace_api::Span> &span = *maybe_span;
-        return span->GetContext();
-      }
-      // Get the span metadata directly from a SpanContext in the runtime context.
-      // TODO: This path is unused and may be removed in the future.
-      else if (const nostd::shared_ptr<trace_api::SpanContext> *maybe_span_context =
-                   nostd::get_if<nostd::shared_ptr<trace_api::SpanContext>>(&context_value))
-      {
-        const nostd::shared_ptr<trace_api::SpanContext> &span_context = *maybe_span_context;
-        return *span_context;
-      }
-      return trace_api::SpanContext::GetInvalid();
-    }();
-
-    if (span_context.IsValid())
-    {
-      recordable->SetTraceId(span_context.trace_id());
-      recordable->SetTraceFlags(span_context.trace_flags());
-      recordable->SetSpanId(span_context.span_id());
-    }
-  }
+  StampSpanContextFromContext(context::RuntimeContext::GetCurrent(), *recordable);
 
   return opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord(
+    const opentelemetry::context::Context &context) noexcept
+{
+  if (!logger_config_.IsEnabled())
+  {
+    return kNoopLogger.CreateLogRecord();
+  }
+
+  auto recordable = context_->GetProcessor().MakeRecordable();
+
+  recordable->SetObservedTimestamp(std::chrono::system_clock::now());
+
+  StampSpanContextFromContext(context, *recordable);
+
+  return opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
+}
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 void Logger::EmitLogRecord(
     opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
@@ -162,8 +188,6 @@ void Logger::EmitLogRecord(
   recordable->SetInstrumentationScope(GetInstrumentationScope());
 
   auto &processor = context_->GetProcessor();
-
-  // TODO: Sampler (should include check for minSeverity)
 
   // Send the log recordable to the processor
   processor.OnEmit(std::move(recordable));

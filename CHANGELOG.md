@@ -21,6 +21,29 @@ Increment the:
 * [CODE HEALTH] Fix IWYU Clang22 warnings
   [#4083](https://github.com/open-telemetry/opentelemetry-cpp/pull/4083)
 
+* [API] `Logger::EmitLogRecord(...)` templates now apply the `Enabled` filter
+  chain when a `Severity` is in args,
+  so the `Trace`/`Debug`/`Info`/`Warn`/`Error`/`Fatal` helpers honor the `Enabled()`
+  flag transparently. Closes the second half of #2667.
+
+* [API/SDK] (ABI v2) Add `Logger::CreateLogRecord(const Context &)` virtual
+  for explicit-context record creation. `Logger::EmitLogRecord(args...)`
+  also detects a `Context` in args and routes filtering through
+  `Enabled(context, severity, ...)` plus trace stamping through
+  `CreateLogRecord(context)`. When trace parts (`SpanContext`, or
+  `TraceId` + `SpanId` [+ `TraceFlags`]) are in args without a `Context`,
+  the template synthesizes a `Context` with the span attached so the filter
+  evaluates against the trace the record is for.
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+
+* [SDK] Add `LogRecordProcessor::HasEnabledFilter()` so the SDK Logger can
+  include processor-level filtering in its extended-enabled cache. Defaults
+  to `true` (conservative). Built-in `SimpleLogRecordProcessor` and
+  `BatchLogRecordProcessor` override to `false` since they use the default
+  Enabled. Custom processors that do not override `EnabledImplementation`
+  should similarly override `HasEnabledFilter()` to return `false` to enable
+  the cheap path. SDK ABI break.
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
