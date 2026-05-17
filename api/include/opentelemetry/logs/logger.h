@@ -15,6 +15,15 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/trace/context.h"
+#  include "opentelemetry/trace/default_span.h"
+#  include "opentelemetry/trace/span.h"
+#  include "opentelemetry/trace/span_context.h"
+#  include "opentelemetry/trace/trace_flags.h"
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {
@@ -144,12 +153,51 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    *  Context (v2 only)                       -> filter + trace stamp (recommended: pass last)
    *
+   *  When a @c Context is included, the filter chain uses
+   *  @c Enabled(context, severity, ...) and the record is created via
+   *  @c CreateLogRecord(context). When no @c Context is supplied but trace
+   *  parts (@c SpanContext, or @c TraceId + @c SpanId [+ @c TraceFlags]) are
+   *  in args, a @c Context is synthesized with those trace fields so the
+   *  filter evaluates against the trace this record is for instead of the
+   *  implicit runtime context.
    */
   template <class... ArgumentType>
   void EmitLogRecord(ArgumentType &&...args)
   {
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
     const opentelemetry::context::Context *context_ptr = detail::FindContextInArgs(args...);
+    // If no full Context is in args but trace parts are (SpanContext, or
+    // TraceId + SpanId [+ TraceFlags]), synthesize a Context with that span
+    // attached so the filter chain evaluates against the trace this record is
+    // actually for — not the implicit runtime context, which may be unrelated.
+    opentelemetry::context::Context derived_context;
+    if (context_ptr == nullptr)
+    {
+      const trace::SpanContext *span_context_ptr = detail::FindSpanContextInArgs(args...);
+      if (span_context_ptr != nullptr)
+      {
+        derived_context = trace::SetSpan(
+            derived_context,
+            nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(*span_context_ptr)));
+        context_ptr = &derived_context;
+      }
+      else
+      {
+        const trace::TraceId *trace_id_ptr = detail::FindTraceIdInArgs(args...);
+        const trace::SpanId *span_id_ptr   = detail::FindSpanIdInArgs(args...);
+        if (trace_id_ptr != nullptr && span_id_ptr != nullptr)
+        {
+          const trace::TraceFlags *trace_flags_ptr = detail::FindTraceFlagsInArgs(args...);
+          derived_context                          = trace::SetSpan(
+              derived_context,
+              nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext(
+                  *trace_id_ptr, *span_id_ptr,
+                  trace_flags_ptr != nullptr ? *trace_flags_ptr : trace::TraceFlags{},
+                                                            false))));
+          context_ptr = &derived_context;
+        }
+      }
+    }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
     const Severity arg_severity = detail::FindSeverityInArgs(args...);

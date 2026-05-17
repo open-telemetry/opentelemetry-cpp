@@ -30,7 +30,10 @@ Increment the:
   for explicit-context record creation. `Logger::EmitLogRecord(args...)`
   also detects a `Context` in args and routes filtering through
   `Enabled(context, severity, ...)` plus trace stamping through
-  `CreateLogRecord(context)`.
+  `CreateLogRecord(context)`. When trace parts (`SpanContext`, or
+  `TraceId` + `SpanId` [+ `TraceFlags`]) are in args without a `Context`,
+  the template synthesizes a `Context` with the span attached so the filter
+  evaluates against the trace the record is for.
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
 * [SDK] Add `LogRecordProcessor::HasEnabledFilter()` so the SDK Logger can
