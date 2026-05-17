@@ -18,6 +18,9 @@ Increment the:
 * [RELEASE] Bump main branch to 1.28.0-dev
   [#4081](https://github.com/open-telemetry/opentelemetry-cpp/pull/4081)
 
+* [CODE HEALTH] Fix IWYU Clang22 warnings
+  [#4083](https://github.com/open-telemetry/opentelemetry-cpp/pull/4083)
+
 * [API] `Logger::EmitLogRecord(...)` templates now apply the `Enabled` filter
   chain when a `Severity` is in args,
   so the `Trace`/`Debug`/`Info`/`Warn`/`Error`/`Fatal` helpers honor the `Enabled()`

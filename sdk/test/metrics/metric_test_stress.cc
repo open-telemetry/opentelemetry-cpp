@@ -9,6 +9,7 @@
 #include <chrono>
 #include <initializer_list>  // IWYU pragma: keep
 #include <random>
+#include <string>
 #include <thread>
 #include <utility>
 #include <vector>

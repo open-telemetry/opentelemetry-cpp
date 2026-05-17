@@ -8,6 +8,7 @@
 #include <map>
 #include <memory>  // IWYU pragma: keep
 #include <mutex>
+#include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -28,9 +29,7 @@
 #ifdef ENABLE_ASYNC_EXPORT
 #  include <cstddef>
 #  include <functional>
-#  include <ratio>
 #  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
 #endif
 
 namespace nostd       = opentelemetry::nostd;

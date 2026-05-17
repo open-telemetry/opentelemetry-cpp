@@ -3,12 +3,8 @@
 
 #pragma once
 
-#include <memory>
-
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 class CustomPushMetricExporterBuilder
     : public opentelemetry::sdk::configuration::ExtensionPushMetricExporterBuilder

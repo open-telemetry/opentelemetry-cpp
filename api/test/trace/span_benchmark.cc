@@ -3,6 +3,7 @@
 
 #include <benchmark/benchmark.h>
 #include <cstdint>
+#include <string>
 
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/runtime_context.h"
