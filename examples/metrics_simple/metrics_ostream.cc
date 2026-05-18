@@ -8,7 +8,6 @@
 #include <utility>
 #include <vector>
 
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/exporters/ostream/metric_exporter_factory.h"
 #include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
@@ -36,7 +35,6 @@
 #endif
 
 namespace metrics_sdk     = opentelemetry::sdk::metrics;
-namespace common          = opentelemetry::common;
 namespace exportermetrics = opentelemetry::exporter::metrics;
 namespace metrics_api     = opentelemetry::metrics;
 

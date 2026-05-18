@@ -21,6 +21,9 @@ Increment the:
 * [CODE HEALTH] Fix IWYU Clang22 warnings
   [#4083](https://github.com/open-telemetry/opentelemetry-cpp/pull/4083)
 
+* [CODE HEALTH] Remove unused alias declarations
+  [#4091](https://github.com/open-telemetry/opentelemetry-cpp/pull/4091)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
