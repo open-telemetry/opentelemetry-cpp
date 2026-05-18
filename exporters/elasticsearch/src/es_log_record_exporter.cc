@@ -32,7 +32,6 @@
 #  include "opentelemetry/common/timestamp.h"
 #endif
 
-namespace nostd       = opentelemetry::nostd;
 namespace sdklogs     = opentelemetry::sdk::logs;
 namespace http_client = opentelemetry::ext::http::client;
 
