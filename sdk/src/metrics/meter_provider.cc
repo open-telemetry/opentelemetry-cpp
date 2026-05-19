@@ -160,7 +160,7 @@ bool MeterProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
  */
 MeterProvider::~MeterProvider()
 {
-  if (context_)
+  if (context_ && !context_->IsShutdown())
   {
     context_->Shutdown();
   }
