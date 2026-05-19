@@ -21,6 +21,9 @@ Increment the:
 * [CODE HEALTH] Fix IWYU Clang22 warnings
   [#4083](https://github.com/open-telemetry/opentelemetry-cpp/pull/4083)
 
+* [CODE HEALTH] Remove unused alias declarations
+  [#4091](https://github.com/open-telemetry/opentelemetry-cpp/pull/4091)
+
 * [API] `Logger::EmitLogRecord(...)` templates now apply the `Enabled` filter
   chain when a `Severity` is in args,
   so the `Trace`/`Debug`/`Info`/`Warn`/`Error`/`Fatal` helpers honor the `Enabled()`

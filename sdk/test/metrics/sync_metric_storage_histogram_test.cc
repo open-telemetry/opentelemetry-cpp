@@ -34,8 +34,6 @@
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
-using M         = std::map<std::string, std::string>;
-namespace nostd = opentelemetry::nostd;
 
 class WritableMetricStorageHistogramTestFixture
     : public ::testing::TestWithParam<AggregationTemporality>

@@ -7,7 +7,6 @@
 #include <thread>
 #include <utility>
 
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/exporters/prometheus/exporter_factory.h"
 #include "opentelemetry/exporters/prometheus/exporter_options.h"
 #include "opentelemetry/metrics/meter_provider.h"
@@ -30,7 +29,6 @@
 #endif
 
 namespace metrics_sdk      = opentelemetry::sdk::metrics;
-namespace common           = opentelemetry::common;
 namespace metrics_exporter = opentelemetry::exporter::metrics;
 namespace metrics_api      = opentelemetry::metrics;
 
