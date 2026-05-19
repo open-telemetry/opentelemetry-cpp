@@ -658,11 +658,15 @@ private:
   mutable uint8_t minimum_severity_{kMaxSeverity};
 
   //
-  // extended_enabled_required_ defaults to 1 (full chain required) so subclasses that override
-  // EnabledImplementation keep their existing semantics until they explicitly opt out via
-  // SetExtendedEnabledRequired(false). Same atomicity rationale as minimum_severity_.
+  // Controls whether the EmitLogRecord(args...) template calls the
+  // EnabledImplementation virtual in addition to the cheap atomic
+  // minimum_severity_ check. When 0, the template trusts the atomic check
+  // as the complete enabled decision and skips the virtual dispatch. When
+  // 1, the template also consults EnabledImplementation, which lets a
+  // Logger subclass apply richer filtering (trace-based, processor-level
+  // Enabled, custom predicates).
   //
-  mutable uint8_t extended_enabled_required_{1};
+  mutable uint8_t extended_enabled_required_{0};
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
