@@ -7,6 +7,7 @@
 #include <functional>
 #include <initializer_list>
 #include <random>
+#include <string>
 #include <thread>
 #include <utility>
 #include <vector>

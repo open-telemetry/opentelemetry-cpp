@@ -35,7 +35,6 @@
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
-namespace nostd = opentelemetry::nostd;
 
 class WritableMetricStorageTestFixture : public ::testing::TestWithParam<AggregationTemporality>
 {};
