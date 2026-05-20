@@ -16,10 +16,7 @@
 #include "opentelemetry/version.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/trace/context.h"
-#  include "opentelemetry/trace/default_span.h"
-#  include "opentelemetry/trace/span.h"
+#  include "opentelemetry/nostd/variant.h"
 #  include "opentelemetry/trace/span_context.h"
 #  include "opentelemetry/trace/trace_flags.h"
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -61,13 +58,16 @@ public:
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   /**
-   * Create a Log Record object using given context.
+   * Create a Log Record object using either a Context or a SpanContext.
    *
-   * @param context Context which carries execution-scoped values across execution unit.
+   * @param context_or_span Variant carrying either a full Context or just a
+   *                        SpanContext. Avoids allocating a Context purely to
+   *                        propagate trace identity.
    * @return nostd::unique_ptr<LogRecord>
    */
   virtual nostd::unique_ptr<LogRecord> CreateLogRecord(
-      const opentelemetry::context::Context & /*context*/) noexcept
+      const nostd::variant<trace::SpanContext, opentelemetry::context::Context> &
+      /*context_or_span*/) noexcept
   {
     return CreateLogRecord();
   }
@@ -153,48 +153,45 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    *  Context (v2 only)                       -> filter + trace stamp (recommended: pass last)
    *
-   *  When a @c Context is included, the filter chain uses
-   *  @c Enabled(context, severity, ...) and the record is created via
-   *  @c CreateLogRecord(context). When no @c Context is supplied but trace
-   *  parts (@c SpanContext, or @c TraceId + @c SpanId [+ @c TraceFlags]) are
-   *  in args, a @c Context is synthesized with those trace fields so the
-   *  filter evaluates against the trace this record is for instead of the
-   *  implicit runtime context.
+   *  When a @c Context or trace parts (@c SpanContext, or @c TraceId +
+   *  @c SpanId [+ @c TraceFlags]) are in args, the filter chain uses
+   *  @c Enabled(context_or_span, severity, ...) and the record is created
+   *  via @c CreateLogRecord(context_or_span), so the filter evaluates
+   *  against the trace this record is for instead of the implicit runtime
+   *  context. The trace data is threaded as a
+   *  @c nostd::variant<trace::SpanContext, context::Context> built in place
+   *  from args — no Context allocation when only trace parts are supplied.
    */
   template <class... ArgumentType>
   void EmitLogRecord(ArgumentType &&...args)
   {
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-    const opentelemetry::context::Context *context_ptr = detail::FindContextInArgs(args...);
-    // If no full Context is in args but trace parts are (SpanContext, or
-    // TraceId + SpanId [+ TraceFlags]), synthesize a Context with that span
-    // attached so the filter chain evaluates against the trace this record is
-    // actually for — not the implicit runtime context, which may be unrelated.
-    opentelemetry::context::Context derived_context;
-    if (context_ptr == nullptr)
+    nostd::variant<trace::SpanContext, opentelemetry::context::Context> context_or_span =
+        trace::SpanContext::GetInvalid();
+    bool has_context_or_span_arg = false;
+
+    if (const opentelemetry::context::Context *ctx = detail::FindContextInArgs(args...))
     {
-      const trace::SpanContext *span_context_ptr = detail::FindSpanContextInArgs(args...);
-      if (span_context_ptr != nullptr)
+      context_or_span         = *ctx;
+      has_context_or_span_arg = true;
+    }
+    else if (const trace::SpanContext *sc = detail::FindSpanContextInArgs(args...))
+    {
+      context_or_span         = *sc;
+      has_context_or_span_arg = true;
+    }
+    else
+    {
+      const trace::TraceId *trace_id_ptr = detail::FindTraceIdInArgs(args...);
+      const trace::SpanId *span_id_ptr   = detail::FindSpanIdInArgs(args...);
+      if (trace_id_ptr != nullptr && span_id_ptr != nullptr)
       {
-        derived_context = trace::SetSpan(
-            derived_context,
-            nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(*span_context_ptr)));
-        context_ptr = &derived_context;
-      }
-      else
-      {
-        const trace::TraceId *trace_id_ptr = detail::FindTraceIdInArgs(args...);
-        const trace::SpanId *span_id_ptr   = detail::FindSpanIdInArgs(args...);
-        if (trace_id_ptr != nullptr && span_id_ptr != nullptr)
-        {
-          const trace::TraceFlags *trace_flags_ptr = detail::FindTraceFlagsInArgs(args...);
-          derived_context                          = trace::SetSpan(
-              derived_context,
-              nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext(
-                  *trace_id_ptr, *span_id_ptr,
-                  trace_flags_ptr != nullptr ? *trace_flags_ptr : trace::TraceFlags{}, false))));
-          context_ptr = &derived_context;
-        }
+        const trace::TraceFlags *trace_flags_ptr = detail::FindTraceFlagsInArgs(args...);
+        context_or_span =
+            trace::SpanContext(*trace_id_ptr, *span_id_ptr,
+                               trace_flags_ptr != nullptr ? *trace_flags_ptr : trace::TraceFlags{},
+                               /*is_remote=*/false);
+        has_context_or_span_arg = true;
       }
     }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -211,12 +208,29 @@ public:
       {
         const EventId *event_id_ptr = detail::FindEventIdInArgs(args...);
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-        const bool extended_enabled =
-            context_ptr
-                ? (event_id_ptr ? EnabledImplementation(*context_ptr, arg_severity, *event_id_ptr)
-                                : EnabledImplementation(*context_ptr, arg_severity))
-                : (event_id_ptr ? EnabledImplementation(arg_severity, *event_id_ptr)
-                                : EnabledImplementation(arg_severity, static_cast<int64_t>(0)));
+        bool extended_enabled;
+        if (has_context_or_span_arg)
+        {
+          if (event_id_ptr)
+          {
+            extended_enabled = EnabledImplementation(context_or_span, arg_severity, *event_id_ptr);
+          }
+          else
+          {
+            extended_enabled = EnabledImplementation(context_or_span, arg_severity);
+          }
+        }
+        else
+        {
+          if (event_id_ptr)
+          {
+            extended_enabled = EnabledImplementation(arg_severity, *event_id_ptr);
+          }
+          else
+          {
+            extended_enabled = EnabledImplementation(arg_severity, static_cast<int64_t>(0));
+          }
+        }
 #else
         const bool extended_enabled =
             event_id_ptr ? EnabledImplementation(arg_severity, *event_id_ptr)
@@ -231,7 +245,7 @@ public:
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
     nostd::unique_ptr<LogRecord> log_record =
-        context_ptr ? CreateLogRecord(*context_ptr) : CreateLogRecord();
+        has_context_or_span_arg ? CreateLogRecord(context_or_span) : CreateLogRecord();
 #else
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -388,25 +402,27 @@ public:
   //
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  inline bool Enabled(const opentelemetry::context::Context &context,
-                      Severity severity = Severity::kInvalid) const noexcept
+  inline bool Enabled(
+      const nostd::variant<trace::SpanContext, opentelemetry::context::Context> &context_or_span,
+      Severity severity = Severity::kInvalid) const noexcept
   {
     if OPENTELEMETRY_LIKELY_CONDITION (!Enabled(severity))
     {
       return false;
     }
-    return EnabledImplementation(context, severity);
+    return EnabledImplementation(context_or_span, severity);
   }
 
-  inline bool Enabled(const opentelemetry::context::Context &context,
-                      Severity severity,
-                      const EventId &event_id) const noexcept
+  inline bool Enabled(
+      const nostd::variant<trace::SpanContext, opentelemetry::context::Context> &context_or_span,
+      Severity severity,
+      const EventId &event_id) const noexcept
   {
     if OPENTELEMETRY_LIKELY_CONDITION (!Enabled(severity))
     {
       return false;
     }
-    return EnabledImplementation(context, severity, event_id);
+    return EnabledImplementation(context_or_span, severity, event_id);
   }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
@@ -620,15 +636,19 @@ protected:
   }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  virtual bool EnabledImplementation(const opentelemetry::context::Context & /*context*/,
-                                     Severity /*severity*/) const noexcept
+  virtual bool EnabledImplementation(
+      const nostd::variant<trace::SpanContext, opentelemetry::context::Context> &
+      /*context_or_span*/,
+      Severity /*severity*/) const noexcept
   {
     return false;
   }
 
-  virtual bool EnabledImplementation(const opentelemetry::context::Context & /*context*/,
-                                     Severity /*severity*/,
-                                     const EventId & /*event_id*/) const noexcept
+  virtual bool EnabledImplementation(
+      const nostd::variant<trace::SpanContext, opentelemetry::context::Context> &
+      /*context_or_span*/,
+      Severity /*severity*/,
+      const EventId & /*event_id*/) const noexcept
   {
     return false;
   }

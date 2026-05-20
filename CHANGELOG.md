@@ -47,6 +47,16 @@ Increment the:
   should similarly override `HasEnabledFilter()` to return `false` to enable
   the cheap path. SDK ABI break.
 
+* [API/SDK] Replace `Context`-only signatures on
+  `LogRecordProcessor::Enabled`,
+  `LogRecordProcessor::EnabledImplementation`,
+  `Logger::EnabledImplementation` (v2), and `Logger::CreateLogRecord` (v2)
+  with `nostd::variant<trace::SpanContext, context::Context>`. The
+  `EmitLogRecord(args...)` template now builds the variant in place from
+  trace parts in args, avoiding the per-emit `DefaultSpan` heap allocation
+  that the previous synthesis required. Same precedent as
+  `trace::StartSpanOptions::parent`. SDK ABI break.
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev

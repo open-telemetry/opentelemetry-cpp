@@ -17,6 +17,11 @@
 #include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/version.h"
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include "opentelemetry/nostd/variant.h"
+#  include "opentelemetry/trace/span_context.h"
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -47,7 +52,8 @@ public:
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord(
-      const opentelemetry::context::Context &context) noexcept override;
+      const nostd::variant<opentelemetry::trace::SpanContext, opentelemetry::context::Context>
+          &context_or_span) noexcept override;
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
   using opentelemetry::logs::Logger::EmitLogRecord;
@@ -74,10 +80,12 @@ private:
                              int64_t event_id) const noexcept override;
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  bool EnabledImplementation(const opentelemetry::context::Context &context,
+  bool EnabledImplementation(const nostd::variant<opentelemetry::trace::SpanContext,
+                                                  opentelemetry::context::Context> &context_or_span,
                              opentelemetry::logs::Severity severity) const noexcept override;
 
-  bool EnabledImplementation(const opentelemetry::context::Context &context,
+  bool EnabledImplementation(const nostd::variant<opentelemetry::trace::SpanContext,
+                                                  opentelemetry::context::Context> &context_or_span,
                              opentelemetry::logs::Severity severity,
                              const opentelemetry::logs::EventId &event_id) const noexcept override;
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2

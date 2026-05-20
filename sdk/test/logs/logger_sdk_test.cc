@@ -309,21 +309,30 @@ public:
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 
 protected:
-  bool EnabledImplementation(const context::Context &context,
-                             const InstrumentationScope &instrumentation_scope,
-                             logs_api::Severity severity,
-                             nostd::string_view event_name) const noexcept override
+  bool EnabledImplementation(
+      const nostd::variant<opentelemetry::trace::SpanContext, context::Context> &context_or_span,
+      const InstrumentationScope &instrumentation_scope,
+      logs_api::Severity severity,
+      nostd::string_view event_name) const noexcept override
   {
     call_state_->severity   = severity;
     call_state_->event_name = std::string(event_name);
     call_state_->scope_name = instrumentation_scope.GetName();
     call_state_->call_count++;
 
-    auto value = context.GetValue("test-key");
-    if (const bool *maybe_value = nostd::get_if<bool>(&value))
+    if (const context::Context *ctx = nostd::get_if<context::Context>(&context_or_span))
     {
-      call_state_->context_has_test_key   = true;
-      call_state_->context_test_key_value = *maybe_value;
+      auto value = ctx->GetValue("test-key");
+      if (const bool *maybe_value = nostd::get_if<bool>(&value))
+      {
+        call_state_->context_has_test_key   = true;
+        call_state_->context_test_key_value = *maybe_value;
+      }
+      else
+      {
+        call_state_->context_has_test_key   = false;
+        call_state_->context_test_key_value = false;
+      }
     }
     else
     {

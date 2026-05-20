@@ -25,7 +25,6 @@
 #include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
-#include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
@@ -50,15 +49,57 @@ nostd::string_view GetEventName(const opentelemetry::logs::EventId &event_id) no
                                    : nostd::string_view{};
 }
 
-bool IsAllowedByTraceBasedFiltering(const context::Context &context,
-                                    const LoggerConfig &logger_config) noexcept
+trace_api::SpanContext ExtractSpanContextFromContext(const context::Context &context) noexcept
+{
+  if (!context.HasKey(trace_api::kSpanKey))
+  {
+    return trace_api::SpanContext::GetInvalid();
+  }
+
+  const context::ContextValue context_value = context.GetValue(trace_api::kSpanKey);
+
+  // Get the span metadata from the active span in the context
+  if (const nostd::shared_ptr<trace_api::Span> *maybe_span =
+          nostd::get_if<nostd::shared_ptr<trace_api::Span>>(&context_value))
+  {
+    const nostd::shared_ptr<trace_api::Span> &span = *maybe_span;
+    return span->GetContext();
+  }
+  // Get the span metadata directly from a SpanContext in the context.
+  // TODO: This path is unused and may be removed in the future.
+  if (const nostd::shared_ptr<trace_api::SpanContext> *maybe_span_context =
+          nostd::get_if<nostd::shared_ptr<trace_api::SpanContext>>(&context_value))
+  {
+    const nostd::shared_ptr<trace_api::SpanContext> &span_context = *maybe_span_context;
+    return *span_context;
+  }
+  return trace_api::SpanContext::GetInvalid();
+}
+
+trace_api::SpanContext ExtractSpanContext(
+    const nostd::variant<trace_api::SpanContext, context::Context> &context_or_span) noexcept
+{
+  if (const trace_api::SpanContext *sc = nostd::get_if<trace_api::SpanContext>(&context_or_span))
+  {
+    return *sc;
+  }
+  if (const context::Context *ctx = nostd::get_if<context::Context>(&context_or_span))
+  {
+    return ExtractSpanContextFromContext(*ctx);
+  }
+  return trace_api::SpanContext::GetInvalid();
+}
+
+bool IsAllowedByTraceBasedFiltering(
+    const nostd::variant<trace_api::SpanContext, context::Context> &context_or_span,
+    const LoggerConfig &logger_config) noexcept
 {
   if (!logger_config.IsTraceBased())
   {
     return true;
   }
 
-  const trace_api::SpanContext span_context = trace_api::GetSpan(context)->GetContext();
+  const trace_api::SpanContext span_context = ExtractSpanContext(context_or_span);
 
   if (!span_context.span_id().IsValid())
   {
@@ -68,34 +109,11 @@ bool IsAllowedByTraceBasedFiltering(const context::Context &context,
   return span_context.trace_flags().IsSampled();
 }
 
-void StampSpanContextFromContext(const context::Context &context, Recordable &recordable) noexcept
+void StampSpanContextFromVariant(
+    const nostd::variant<trace_api::SpanContext, context::Context> &context_or_span,
+    Recordable &recordable) noexcept
 {
-  if (!context.HasKey(trace_api::kSpanKey))
-  {
-    return;
-  }
-
-  const context::ContextValue context_value = context.GetValue(trace_api::kSpanKey);
-
-  const trace_api::SpanContext span_context = [&context_value]() {
-    // Get the span metadata from the active span in the context
-    if (const nostd::shared_ptr<trace_api::Span> *maybe_span =
-            nostd::get_if<nostd::shared_ptr<trace_api::Span>>(&context_value))
-    {
-      const nostd::shared_ptr<trace_api::Span> &span = *maybe_span;
-      return span->GetContext();
-    }
-    // Get the span metadata directly from a SpanContext in the context.
-    // TODO: This path is unused and may be removed in the future.
-    else if (const nostd::shared_ptr<trace_api::SpanContext> *maybe_span_context =
-                 nostd::get_if<nostd::shared_ptr<trace_api::SpanContext>>(&context_value))
-    {
-      const nostd::shared_ptr<trace_api::SpanContext> &span_context = *maybe_span_context;
-      return *span_context;
-    }
-    return trace_api::SpanContext::GetInvalid();
-  }();
-
+  const trace_api::SpanContext span_context = ExtractSpanContext(context_or_span);
   if (span_context.IsValid())
   {
     recordable.SetTraceId(span_context.trace_id());
@@ -144,14 +162,18 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
 
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());
 
-  StampSpanContextFromContext(context::RuntimeContext::GetCurrent(), *recordable);
+  StampSpanContextFromVariant(
+      nostd::variant<trace_api::SpanContext, context::Context>{
+          context::RuntimeContext::GetCurrent()},
+      *recordable);
 
   return opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord(
-    const opentelemetry::context::Context &context) noexcept
+    const nostd::variant<trace_api::SpanContext, opentelemetry::context::Context>
+        &context_or_span) noexcept
 {
   if (!logger_config_.IsEnabled())
   {
@@ -162,7 +184,7 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
 
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());
 
-  StampSpanContextFromContext(context, *recordable);
+  StampSpanContextFromVariant(context_or_span, *recordable);
 
   return opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
 }
@@ -195,7 +217,8 @@ void Logger::EmitLogRecord(
 bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,
                                    const opentelemetry::logs::EventId &event_id) const noexcept
 {
-  const auto &current = context::RuntimeContext::GetCurrent();
+  const nostd::variant<trace_api::SpanContext, context::Context> current{
+      context::RuntimeContext::GetCurrent()};
   if (!IsAllowedByTraceBasedFiltering(current, logger_config_))
   {
     return false;
@@ -208,7 +231,8 @@ bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,
 bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,
                                    int64_t /*event_id*/) const noexcept
 {
-  const auto &current = context::RuntimeContext::GetCurrent();
+  const nostd::variant<trace_api::SpanContext, context::Context> current{
+      context::RuntimeContext::GetCurrent()};
   if (!IsAllowedByTraceBasedFiltering(current, logger_config_))
   {
     return false;
@@ -218,27 +242,29 @@ bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-bool Logger::EnabledImplementation(const opentelemetry::context::Context &context,
-                                   opentelemetry::logs::Severity severity) const noexcept
+bool Logger::EnabledImplementation(
+    const nostd::variant<trace_api::SpanContext, opentelemetry::context::Context> &context_or_span,
+    opentelemetry::logs::Severity severity) const noexcept
 {
-  if (!IsAllowedByTraceBasedFiltering(context, logger_config_))
+  if (!IsAllowedByTraceBasedFiltering(context_or_span, logger_config_))
   {
     return false;
   }
 
-  return context_->GetProcessor().Enabled(context, GetInstrumentationScope(), severity);
+  return context_->GetProcessor().Enabled(context_or_span, GetInstrumentationScope(), severity);
 }
 
-bool Logger::EnabledImplementation(const opentelemetry::context::Context &context,
-                                   opentelemetry::logs::Severity severity,
-                                   const opentelemetry::logs::EventId &event_id) const noexcept
+bool Logger::EnabledImplementation(
+    const nostd::variant<trace_api::SpanContext, opentelemetry::context::Context> &context_or_span,
+    opentelemetry::logs::Severity severity,
+    const opentelemetry::logs::EventId &event_id) const noexcept
 {
-  if (!IsAllowedByTraceBasedFiltering(context, logger_config_))
+  if (!IsAllowedByTraceBasedFiltering(context_or_span, logger_config_))
   {
     return false;
   }
 
-  return context_->GetProcessor().Enabled(context, GetInstrumentationScope(), severity,
+  return context_->GetProcessor().Enabled(context_or_span, GetInstrumentationScope(), severity,
                                           GetEventName(event_id));
 }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2

@@ -84,7 +84,8 @@ protected:
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
   bool EnabledImplementation(
-      const opentelemetry::context::Context &context,
+      const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
+                                          opentelemetry::context::Context> &context_or_span,
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope,
       opentelemetry::logs::Severity severity,
       opentelemetry::nostd::string_view event_name) const noexcept override;

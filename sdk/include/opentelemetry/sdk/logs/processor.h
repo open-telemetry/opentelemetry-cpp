@@ -9,6 +9,8 @@
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -63,12 +65,13 @@ public:
    * The default implementation is permissive and returns true.
    */
   bool Enabled(
-      const opentelemetry::context::Context &context,
+      const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
+                                          opentelemetry::context::Context> &context_or_span,
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope,
       opentelemetry::logs::Severity severity,
       opentelemetry::nostd::string_view event_name = {}) const noexcept
   {
-    return EnabledImplementation(context, instrumentation_scope, severity, event_name);
+    return EnabledImplementation(context_or_span, instrumentation_scope, severity, event_name);
   }
 
   /**
@@ -99,7 +102,8 @@ public:
 
 protected:
   virtual bool EnabledImplementation(
-      const opentelemetry::context::Context & /*context*/,
+      const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
+                                          opentelemetry::context::Context> & /*context_or_span*/,
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope
           & /*instrumentation_scope*/,
       opentelemetry::logs::Severity /*severity*/,

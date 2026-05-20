@@ -340,7 +340,8 @@ public:
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord(
-      const context::Context & /*context*/) noexcept override
+      const nostd::variant<trace::SpanContext, context::Context> & /*context_or_span*/) noexcept
+      override
   {
     ++create_log_record_context_calls_;
     return CreateLogRecord();
@@ -376,47 +377,58 @@ public:
   nostd::unique_ptr<EnablementAwareTestLogRecord> last_emitted_record_;
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   size_t create_log_record_context_calls_{0};
+  mutable bool last_variant_holds_span_context_{false};
+  mutable bool last_variant_holds_context_{false};
+  mutable trace::SpanContext last_span_context_{trace::SpanContext::GetInvalid()};
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 protected:
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  bool EnabledImplementation(const context::Context &context,
-                             Severity severity) const noexcept override
+  void CaptureContextOrSpan(
+      const nostd::variant<trace::SpanContext, context::Context> &context_or_span) const noexcept
+  {
+    last_variant_holds_span_context_     = false;
+    last_variant_holds_context_          = false;
+    last_span_context_                   = trace::SpanContext::GetInvalid();
+    last_enabled_context_has_test_key_   = false;
+    last_enabled_context_test_key_value_ = false;
+
+    if (const trace::SpanContext *sc = nostd::get_if<trace::SpanContext>(&context_or_span))
+    {
+      last_variant_holds_span_context_ = true;
+      last_span_context_               = *sc;
+    }
+    else if (const context::Context *ctx = nostd::get_if<context::Context>(&context_or_span))
+    {
+      last_variant_holds_context_ = true;
+      auto value                  = ctx->GetValue("test-key");
+      if (const bool *maybe_value = nostd::get_if<bool>(&value))
+      {
+        last_enabled_context_has_test_key_   = true;
+        last_enabled_context_test_key_value_ = *maybe_value;
+      }
+    }
+  }
+
+  bool EnabledImplementation(
+      const nostd::variant<trace::SpanContext, context::Context> &context_or_span,
+      Severity severity) const noexcept override
   {
     ++enabled_calls_;
     last_enabled_severity_ = severity;
-    auto value             = context.GetValue("test-key");
-    if (const bool *maybe_value = nostd::get_if<bool>(&value))
-    {
-      last_enabled_context_has_test_key_   = true;
-      last_enabled_context_test_key_value_ = *maybe_value;
-    }
-    else
-    {
-      last_enabled_context_has_test_key_   = false;
-      last_enabled_context_test_key_value_ = false;
-    }
+    CaptureContextOrSpan(context_or_span);
     return true;
   }
 
-  bool EnabledImplementation(const context::Context &context,
-                             Severity severity,
-                             const EventId &event_id) const noexcept override
+  bool EnabledImplementation(
+      const nostd::variant<trace::SpanContext, context::Context> &context_or_span,
+      Severity severity,
+      const EventId &event_id) const noexcept override
   {
     ++enabled_with_event_id_calls_;
     last_enabled_severity_ = severity;
     last_enabled_event_id_ = event_id.id_;
-    auto value             = context.GetValue("test-key");
-    if (const bool *maybe_value = nostd::get_if<bool>(&value))
-    {
-      last_enabled_context_has_test_key_   = true;
-      last_enabled_context_test_key_value_ = *maybe_value;
-    }
-    else
-    {
-      last_enabled_context_has_test_key_   = false;
-      last_enabled_context_test_key_value_ = false;
-    }
+    CaptureContextOrSpan(context_or_span);
     return event_id_enabled_;
   }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -496,6 +508,7 @@ TEST(Logger, EmitLogRecordTemplateShortCircuitsBelowMinimumSeverity)
 TEST(Logger, EmitLogRecordTemplateInvokesEnabledImplementationAndEmitsWhenAllowed)
 {
   EnablementAwareTestLogger logger(Severity::kTrace, true);
+  logger.SetExtendedEnabledRequired(true);
 
   logger.Info(nostd::string_view{"emitted"});
 
@@ -508,6 +521,7 @@ TEST(Logger, EmitLogRecordTemplateInvokesEnabledImplementationAndEmitsWhenAllowe
 TEST(Logger, EmitLogRecordTemplateShortCircuitsWhenEnabledImplementationReturnsFalse)
 {
   EnablementAwareTestLogger logger(Severity::kTrace, false);
+  logger.SetExtendedEnabledRequired(true);
 
   logger.Info(nostd::string_view{"filtered"});
 
@@ -545,9 +559,10 @@ TEST(Logger, EmitLogRecordTemplateSkipsEnabledImplementationWhenExtendedEnabledN
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-TEST(Logger, EmitLogRecordWithContextInArgsRoutesThroughContextAwareEnabledAndEmits)
+TEST(Logger, EmitLogRecordWithContextInArgsRoutesContextVariantToEnabledAndEmits)
 {
   EnablementAwareTestLogger logger(Severity::kTrace, true);
+  logger.SetExtendedEnabledRequired(true);
 
   context::Context test_context{"test-key", true};
 
@@ -557,6 +572,8 @@ TEST(Logger, EmitLogRecordWithContextInArgsRoutesThroughContextAwareEnabledAndEm
   EXPECT_EQ(logger.enabled_with_event_id_calls_, 1u);
   EXPECT_EQ(logger.create_log_record_context_calls_, 1u);
   EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  EXPECT_TRUE(logger.last_variant_holds_context_);
+  EXPECT_FALSE(logger.last_variant_holds_span_context_);
   EXPECT_TRUE(logger.last_enabled_context_has_test_key_);
   EXPECT_TRUE(logger.last_enabled_context_test_key_value_);
 }
@@ -564,6 +581,7 @@ TEST(Logger, EmitLogRecordWithContextInArgsRoutesThroughContextAwareEnabledAndEm
 TEST(Logger, EmitLogRecordWithContextInArgsShortCircuitsWhenEnabledImplementationReturnsFalse)
 {
   EnablementAwareTestLogger logger(Severity::kTrace, false);
+  logger.SetExtendedEnabledRequired(true);
 
   context::Context test_context{"test-key", true};
 
@@ -575,9 +593,10 @@ TEST(Logger, EmitLogRecordWithContextInArgsShortCircuitsWhenEnabledImplementatio
   EXPECT_EQ(logger.emit_log_record_calls_, 0u);
 }
 
-TEST(Logger, EmitLogRecordWithSpanContextInArgsSynthesizesContextForFilter)
+TEST(Logger, EmitLogRecordWithSpanContextInArgsRoutesSpanContextVariantToEnabled)
 {
   EnablementAwareTestLogger logger(Severity::kTrace);
+  logger.SetExtendedEnabledRequired(true);
 
   const uint8_t trace_id_bytes[trace::TraceId::kSize] = {1, 2,  3,  4,  5,  6,  7,  8,
                                                          9, 10, 11, 12, 13, 14, 15, 16};
@@ -592,23 +611,62 @@ TEST(Logger, EmitLogRecordWithSpanContextInArgsSynthesizesContextForFilter)
   EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
   EXPECT_EQ(logger.create_log_record_context_calls_, 1u);
   EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  EXPECT_TRUE(logger.last_variant_holds_span_context_);
+  EXPECT_FALSE(logger.last_variant_holds_context_);
+  EXPECT_EQ(logger.last_span_context_.trace_id(), span_context.trace_id());
+  EXPECT_EQ(logger.last_span_context_.span_id(), span_context.span_id());
+  EXPECT_EQ(logger.last_span_context_.trace_flags(), span_context.trace_flags());
 }
 
-TEST(Logger, EmitLogRecordWithTracePartsInArgsSynthesizesContextForFilter)
+TEST(Logger, EmitLogRecordWithSpanContextInArgsAndEventIdRoutesVariantWithEventId)
 {
-  EnablementAwareTestLogger logger(Severity::kTrace);
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
+  logger.SetExtendedEnabledRequired(true);
 
   const uint8_t trace_id_bytes[trace::TraceId::kSize] = {1, 2,  3,  4,  5,  6,  7,  8,
                                                          9, 10, 11, 12, 13, 14, 15, 16};
   const uint8_t span_id_bytes[trace::SpanId::kSize]   = {1, 2, 3, 4, 5, 6, 7, 8};
+  const trace::SpanContext span_context(trace::TraceId(trace_id_bytes),
+                                        trace::SpanId(span_id_bytes),
+                                        trace::TraceFlags{trace::TraceFlags::kIsSampled}, false);
 
-  logger.EmitLogRecord(
-      Severity::kInfo, trace::TraceId(trace_id_bytes), trace::SpanId(span_id_bytes),
-      trace::TraceFlags{trace::TraceFlags::kIsSampled}, nostd::string_view{"emitted"});
+  logger.EmitLogRecord(Severity::kInfo, EventId{0x42, "info"}, span_context,
+                       nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.enabled_calls_, 0u);
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 1u);
+  EXPECT_EQ(logger.create_log_record_context_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  EXPECT_TRUE(logger.last_variant_holds_span_context_);
+  EXPECT_FALSE(logger.last_variant_holds_context_);
+  EXPECT_EQ(logger.last_span_context_.trace_id(), span_context.trace_id());
+  EXPECT_EQ(logger.last_span_context_.span_id(), span_context.span_id());
+  EXPECT_EQ(logger.last_enabled_event_id_, 0x42);
+}
+
+TEST(Logger, EmitLogRecordWithTracePartsInArgsRoutesSpanContextVariantToEnabled)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace);
+  logger.SetExtendedEnabledRequired(true);
+
+  const uint8_t trace_id_bytes[trace::TraceId::kSize] = {1, 2,  3,  4,  5,  6,  7,  8,
+                                                         9, 10, 11, 12, 13, 14, 15, 16};
+  const uint8_t span_id_bytes[trace::SpanId::kSize]   = {1, 2, 3, 4, 5, 6, 7, 8};
+  const trace::TraceId trace_id(trace_id_bytes);
+  const trace::SpanId span_id(span_id_bytes);
+  const trace::TraceFlags trace_flags{trace::TraceFlags::kIsSampled};
+
+  logger.EmitLogRecord(Severity::kInfo, trace_id, span_id, trace_flags,
+                       nostd::string_view{"emitted"});
 
   EXPECT_EQ(logger.enabled_calls_, 1u);
   EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
   EXPECT_EQ(logger.create_log_record_context_calls_, 1u);
   EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  EXPECT_TRUE(logger.last_variant_holds_span_context_);
+  EXPECT_FALSE(logger.last_variant_holds_context_);
+  EXPECT_EQ(logger.last_span_context_.trace_id(), trace_id);
+  EXPECT_EQ(logger.last_span_context_.span_id(), span_id);
+  EXPECT_EQ(logger.last_span_context_.trace_flags(), trace_flags);
 }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
