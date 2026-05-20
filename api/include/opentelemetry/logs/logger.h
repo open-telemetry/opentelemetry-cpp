@@ -158,9 +158,7 @@ public:
    *  @c Enabled(context_or_span, severity, ...) and the record is created
    *  via @c CreateLogRecord(context_or_span), so the filter evaluates
    *  against the trace this record is for instead of the implicit runtime
-   *  context. The trace data is threaded as a
-   *  @c nostd::variant<trace::SpanContext, context::Context> built in place
-   *  from args — no Context allocation when only trace parts are supplied.
+   *  context.
    */
   template <class... ArgumentType>
   void EmitLogRecord(ArgumentType &&...args)
@@ -187,10 +185,9 @@ public:
       if (trace_id_ptr != nullptr && span_id_ptr != nullptr)
       {
         const trace::TraceFlags *trace_flags_ptr = detail::FindTraceFlagsInArgs(args...);
-        context_or_span =
-            trace::SpanContext(*trace_id_ptr, *span_id_ptr,
-                               trace_flags_ptr != nullptr ? *trace_flags_ptr : trace::TraceFlags{},
-                               /*is_remote=*/false);
+        context_or_span                          = trace::SpanContext(
+            *trace_id_ptr, *span_id_ptr,
+            trace_flags_ptr != nullptr ? *trace_flags_ptr : trace::TraceFlags{}, false);
         has_context_or_span_arg = true;
       }
     }
