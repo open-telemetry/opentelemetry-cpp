@@ -7,7 +7,6 @@
 
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 
 using namespace opentelemetry::baggage;

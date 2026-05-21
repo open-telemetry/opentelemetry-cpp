@@ -200,7 +200,6 @@ The custom log handler can be defined by inheriting from `opentelemetry::sdk::co
                     int line,
                     const char *msg,
                     const opentelemetry::sdk::common::AttributeMap &attributes) noexcept override
-
         {
             // add implementation here
         }

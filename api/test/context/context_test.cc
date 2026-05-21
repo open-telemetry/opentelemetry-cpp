@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include <map>
 #include <string>
-#include <utility>
 
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/context_value.h"

@@ -18,6 +18,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -55,8 +56,6 @@ namespace trace_api = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace resource  = opentelemetry::sdk::resource;
 namespace proto     = opentelemetry::proto;
-
-namespace trace_sdk_2 = opentelemetry::sdk::trace;
 
 TEST(OtlpRecordable, SetIdentity)
 {

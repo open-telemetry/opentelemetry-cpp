@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 #include <string>
 
-#include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/scope.h"
@@ -14,7 +13,6 @@
 
 namespace trace_api = opentelemetry::trace;
 namespace nostd     = opentelemetry::nostd;
-namespace context   = opentelemetry::context;
 
 TEST(TracerTest, GetCurrentSpan)
 {

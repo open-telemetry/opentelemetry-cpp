@@ -21,10 +21,11 @@
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/semconv/container_metrics.h"
 #include "opentelemetry/semconv/http_metrics.h"
-#include "opentelemetry/semconv/system_metrics.h"
+#include "opentelemetry/semconv/incubating/container_metrics.h"
+#include "opentelemetry/semconv/incubating/system_metrics.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
