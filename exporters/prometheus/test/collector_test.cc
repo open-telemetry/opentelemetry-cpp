@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "opentelemetry/exporters/prometheus/collector.h"
-#include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
@@ -20,9 +19,6 @@ using namespace prometheus_test;
 using opentelemetry::exporter::metrics::PrometheusCollector;
 using opentelemetry::sdk::metrics::MetricProducer;
 using opentelemetry::sdk::metrics::ResourceMetrics;
-namespace metric_api      = opentelemetry::metrics;
-namespace metric_sdk      = opentelemetry::sdk::metrics;
-namespace metric_exporter = opentelemetry::exporter::metrics;
 
 class MockMetricProducer : public MetricProducer
 {
