@@ -248,14 +248,13 @@
 // Used by generated semconv headers to wrap deprecated helper bodies
 // that reference deprecated constants.
 #if defined(__clang__)
-#  define OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN                     \
-    _Pragma("clang diagnostic push")                                  \
-    _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
+#  define OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN \
+    _Pragma("clang diagnostic push")              \
+        _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
 #  define OPENTELEMETRY_SUPPRESS_DEPRECATED_END _Pragma("clang diagnostic pop")
 #elif defined(__GNUC__)
-#  define OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN                   \
-    _Pragma("GCC diagnostic push")                                  \
-    _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#  define OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN \
+    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #  define OPENTELEMETRY_SUPPRESS_DEPRECATED_END _Pragma("GCC diagnostic pop")
 #elif defined(_MSC_VER)
 #  define OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN \
