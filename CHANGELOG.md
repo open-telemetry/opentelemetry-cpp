@@ -28,37 +28,28 @@ Increment the:
   [#4085](https://github.com/open-telemetry/opentelemetry-cpp/pull/4085)
 
 * [API] `Logger::EmitLogRecord(...)` templates now apply the `Enabled` filter
-  chain when a `Severity` is in args,
-  so the `Trace`/`Debug`/`Info`/`Warn`/`Error`/`Fatal` helpers honor the `Enabled()`
-  flag transparently. Closes the second half of #2667.
+  chain when a `Severity` is in args.
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
 * [API/SDK] (ABI v2) Add `Logger::CreateLogRecord(const Context &)` virtual
   for explicit-context record creation. `Logger::EmitLogRecord(args...)`
-  also detects a `Context` in args and routes filtering through
-  `Enabled(context, severity, ...)` plus trace stamping through
-  `CreateLogRecord(context)`. When trace parts (`SpanContext`, or
-  `TraceId` + `SpanId` [+ `TraceFlags`]) are in args without a `Context`,
-  the template synthesizes a `Context` with the span attached so the filter
-  evaluates against the trace the record is for.
+  also detects a `Context`, `SpanContext`
+  or `TraceId` + `SpanId` [+ `TraceFlags`] in args and routes filtering.
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
 * [SDK] Add `LogRecordProcessor::HasEnabledFilter()` so the SDK Logger can
   include processor-level filtering in its extended-enabled cache. Defaults
-  to `true` (conservative). Built-in `SimpleLogRecordProcessor` and
+  to `true`. Built-in `SimpleLogRecordProcessor` and
   `BatchLogRecordProcessor` override to `false` since they use the default
-  Enabled. Custom processors that do not override `EnabledImplementation`
-  should similarly override `HasEnabledFilter()` to return `false` to enable
-  the cheap path. SDK ABI break.
+  Enabled.
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
 * [API/SDK] Replace `Context`-only signatures on
   `LogRecordProcessor::Enabled`,
   `LogRecordProcessor::EnabledImplementation`,
   `Logger::EnabledImplementation` (v2), and `Logger::CreateLogRecord` (v2)
-  with `nostd::variant<trace::SpanContext, context::Context>`. The
-  `EmitLogRecord(args...)` template now builds the variant in place from
-  trace parts in args, avoiding the per-emit `DefaultSpan` heap allocation
-  that the previous synthesis required. Same precedent as
-  `trace::StartSpanOptions::parent`. SDK ABI break.
+  with `nostd::variant<trace::SpanContext, context::Context>`.
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
 ## [1.27.0] 2026-05-13
 
