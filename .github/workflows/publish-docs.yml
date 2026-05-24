@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - fix-doxygen-pages
 
 permissions:
   contents: write
@@ -34,3 +33,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/public/doxyoutput/html
+          destination_dir: docs
