@@ -392,7 +392,9 @@ TEST(ETWTracer, GlobalSingletonTracer)
 }
 */
 
-  // Obtain a different tracer withs its own trace-id.
+  // Each root span minted by the ETW Tracer now gets a fresh trace id from
+  // the IdGenerator (see issue #3846). That holds whether you call StartSpan
+  // on the global Tracer or on another Tracer obtained from the provider.
   auto localTracer = GetGlobalTracerProvider().GetTracer(kGlobalProviderName);
   auto s2 = localTracer->StartSpan("Span2");
   auto traceId2 = s2->GetContext().trace_id();
@@ -424,12 +426,16 @@ TEST(ETWTracer, GlobalSingletonTracer)
 }
 */
 
-  // Obtain the same global tracer with the same trace-id as before.
+  // Re-obtain the global tracer via the C++11 magic static -- this returns
+  // the same Tracer reference as `globalTracer` above. Starting a new root
+  // span on it still produces a brand-new trace id; there is no tracer-level
+  // cache.
   auto& globalTracer2 = GetGlobalTracer();
   auto s3 = globalTracer2.StartSpan("Span3");
   auto traceId3 = s3->GetContext().trace_id();
   s3->End();
-/* === Span 3 - "TraceId": "182a64258fb1864ca4e1a542eecbd9bf"
+/* === Span 3 - sample event payload (TraceId differs from Span 1 -- each
+                 root span gets a fresh trace id)
 {
   "Timestamp": "2021-05-10T11:45:27.0290936-07:00",
   "ProviderName": "OpenTelemetry-ETW-TLD",
@@ -450,13 +456,22 @@ TEST(ETWTracer, GlobalSingletonTracer)
     "StatusCode": 0,
     "StatusMessage": "",
     "Success": "True",
-    "TraceId": "182a64258fb1864ca4e1a542eecbd9bf",
+    "TraceId": "9fbb18d2c9874340b6e4581a8b21c5a7",
     "_name": "Span"
   }
 }
 */
+  // GetGlobalTracer() is backed by a C++11 magic static, so both invocations
+  // return the same Tracer reference.
+  EXPECT_EQ(&globalTracer, &globalTracer2);
+  // Every root span gets its own freshly-generated trace id -- there is no
+  // tracer-scoped caching. See issue #3846.
+  EXPECT_TRUE(traceId1.IsValid());
+  EXPECT_TRUE(traceId2.IsValid());
+  EXPECT_TRUE(traceId3.IsValid());
   EXPECT_NE(traceId1, traceId2);
-  EXPECT_EQ(traceId1, traceId3);
+  EXPECT_NE(traceId1, traceId3);
+  EXPECT_NE(traceId2, traceId3);
 
 #  if OPENTELEMETRY_ABI_VERSION_NO == 1
   localTracer->CloseWithMicroseconds(0);
