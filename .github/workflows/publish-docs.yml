@@ -23,6 +23,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y doxygen graphviz
 
+      - name: Set dynamic project version
+        run: |
+          VERSION=$(git describe --tags --always || echo "main")
+          sed -i "s/^PROJECT_NUMBER.*/PROJECT_NUMBER = ${VERSION}/" docs/public/Doxyfile
+
       - name: Generate documentation
         run: |
           cd docs/public
