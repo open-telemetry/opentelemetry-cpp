@@ -174,35 +174,40 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
           &arena);
   OtlpRecordableUtils::PopulateRequest(spans, service_request);
   std::size_t span_count = spans.size();
+
+  std::shared_ptr<proto::collector::trace::v1::ExportTraceServiceResponse> response =
+      std::make_shared<proto::collector::trace::v1::ExportTraceServiceResponse>();
+
+  auto handle_result = [response, span_count](opentelemetry::sdk::common::ExportResult result) {
+    if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
+    {
+      OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE HTTP Exporter] ERROR: Export "
+                              << span_count
+                              << " trace span(s) error: " << static_cast<int>(result));
+      return true;
+    }
+    if (response->has_partial_success() && (response->partial_success().rejected_spans() != 0 ||
+                                            !response->partial_success().error_message().empty()))
+    {
+      const auto &partial = response->partial_success();
+      OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE HTTP Exporter] Export partial success: "
+                              << partial.rejected_spans() << " span(s) rejected: \""
+                              << partial.error_message() << "\"");
+    }
+    else
+    {
+      OTEL_INTERNAL_LOG_DEBUG("[OTLP TRACE HTTP Exporter] Export " << span_count
+                                                                   << " trace span(s) success");
+    }
+    return true;
+  };
+
 #ifdef ENABLE_ASYNC_EXPORT
-  http_client_->Export(
-      *service_request, [span_count](opentelemetry::sdk::common::ExportResult result) {
-        if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
-        {
-          OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE HTTP Exporter] ERROR: Export "
-                                  << span_count
-                                  << " trace span(s) error: " << static_cast<int>(result));
-        }
-        else
-        {
-          OTEL_INTERNAL_LOG_DEBUG("[OTLP TRACE HTTP Exporter] Export " << span_count
-                                                                       << " trace span(s) success");
-        }
-        return true;
-      });
+  http_client_->Export(*service_request, response.get(), std::move(handle_result),
+                       options_.max_concurrent_requests);
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #else
-  opentelemetry::sdk::common::ExportResult result = http_client_->Export(*service_request);
-  if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE HTTP Exporter] ERROR: Export "
-                            << span_count << " trace span(s) error: " << static_cast<int>(result));
-  }
-  else
-  {
-    OTEL_INTERNAL_LOG_DEBUG("[OTLP TRACE HTTP Exporter] Export " << span_count
-                                                                 << " trace span(s) success");
-  }
+  http_client_->Export(*service_request, response.get(), std::move(handle_result), 0);
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #endif
 }

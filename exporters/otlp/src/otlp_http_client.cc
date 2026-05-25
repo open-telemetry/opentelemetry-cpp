@@ -70,11 +70,14 @@ class ResponseHandler : public http_client::EventHandler
 {
 public:
   /**
-   * Creates a response handler, that by default doesn't display to console
+   * Creates a response handler, that by default doesn't display to console.
+   * Deserializes the response body into the caller-provided typed message on
+   * successful 2xx responses.
    */
   ResponseHandler(std::function<bool(opentelemetry::sdk::common::ExportResult)> &&callback,
+                  google::protobuf::Message *response,
                   bool console_debug = false)
-      : result_callback_{std::move(callback)}, console_debug_{console_debug}
+      : result_callback_{std::move(callback)}, response_{response}, console_debug_{console_debug}
   {}
 
   std::string BuildResponseLogMessage(http_client::Response &response,
@@ -121,6 +124,15 @@ public:
           log_message = BuildResponseLogMessage(response, body_);
         }
         OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export success, " << log_message);
+      }
+    }
+
+    // On 2xx, parse the body into the caller-provided typed response
+    if (response_ != nullptr && result == sdk::common::ExportResult::kSuccess)
+    {
+      if (!response_->ParseFromString(body_))
+      {
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Failed to parse response body");
       }
     }
 
@@ -361,6 +373,9 @@ private:
 
   // Result callback when in async mode
   std::function<bool(opentelemetry::sdk::common::ExportResult)> result_callback_;
+
+  // Optional typed response, filled on 2xx
+  google::protobuf::Message *response_ = nullptr;
 
   // Whether to print the results from the callback
   bool console_debug_ = false;
@@ -722,7 +737,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
       std::make_shared<opentelemetry::sdk::common::ExportResult>(
           opentelemetry::sdk::common::ExportResult::kSuccess);
   opentelemetry::sdk::common::ExportResult export_result = Export(
-      message,
+      message, nullptr,
       [session_result](opentelemetry::sdk::common::ExportResult result) {
         *session_result = result;
         return result == opentelemetry::sdk::common::ExportResult::kSuccess;
@@ -749,7 +764,16 @@ sdk::common::ExportResult OtlpHttpClient::Export(
     std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback,
     std::size_t max_running_requests) noexcept
 {
-  auto session = createSession(message, std::move(result_callback));
+  return Export(message, nullptr, std::move(result_callback), max_running_requests);
+}
+
+sdk::common::ExportResult OtlpHttpClient::Export(
+    const google::protobuf::Message &message,
+    google::protobuf::Message *response,
+    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback,
+    std::size_t max_running_requests) noexcept
+{
+  auto session = createSession(message, response, std::move(result_callback));
   if (opentelemetry::nostd::holds_alternative<sdk::common::ExportResult>(session))
   {
     return opentelemetry::nostd::get<sdk::common::ExportResult>(session);
@@ -886,6 +910,16 @@ OtlpHttpClient::createSession(
     const google::protobuf::Message &message,
     std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
 {
+  return createSession(message, nullptr, std::move(result_callback));
+}
+
+opentelemetry::nostd::variant<opentelemetry::sdk::common::ExportResult,
+                              OtlpHttpClient::HttpSessionData>
+OtlpHttpClient::createSession(
+    const google::protobuf::Message &message,
+    google::protobuf::Message *response,
+    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
+{
   // Parse uri and store it to cache
   if (http_uri_.empty())
   {
@@ -1001,7 +1035,7 @@ OtlpHttpClient::createSession(
   return HttpSessionData{
       std::move(session),
       std::shared_ptr<opentelemetry::ext::http::client::EventHandler>{
-          new ResponseHandler(std::move(result_callback), options_.console_debug)}};
+          new ResponseHandler(std::move(result_callback), response, options_.console_debug)}};
 }
 
 void OtlpHttpClient::addSession(HttpSessionData &&session_data) noexcept

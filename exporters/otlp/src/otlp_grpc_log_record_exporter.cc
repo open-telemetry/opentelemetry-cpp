@@ -152,13 +152,23 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcLogRecordExporter::Export(
             opentelemetry::sdk::common::ExportResult result,
             std::unique_ptr<google::protobuf::Arena> &&arena,
             const proto::collector::logs::v1::ExportLogsServiceRequest &request,
-            proto::collector::logs::v1::ExportLogsServiceResponse *) {
+            proto::collector::logs::v1::ExportLogsServiceResponse *response) {
           auto logs_arena = std::move(arena);
           if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
           {
             OTEL_INTERNAL_LOG_ERROR("[OTLP LOG GRPC Exporter] ERROR: Export "
                                     << request.resource_logs_size()
                                     << " log(s) error: " << static_cast<int>(result));
+          }
+          else if (response->has_partial_success() &&
+                   (response->partial_success().rejected_log_records() != 0 ||
+                    !response->partial_success().error_message().empty()))
+          {
+            const auto &partial = response->partial_success();
+            OTEL_INTERNAL_LOG_ERROR("[OTLP LOG GRPC Exporter] Export partial success: "
+                                    << partial.rejected_log_records()
+                                    << " log record(s) rejected: \"" << partial.error_message()
+                                    << "\"");
           }
           else
           {
@@ -174,14 +184,22 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcLogRecordExporter::Export(
     proto::collector::logs::v1::ExportLogsServiceResponse *response =
         google::protobuf::Arena::Create<proto::collector::logs::v1::ExportLogsServiceResponse>(
             arena.get());
-    grpc::Status status = OtlpGrpcClient::DelegateExport(
-        log_service_stub_.get(), std::move(context), std::move(arena), request, response);
+    grpc::Status status = log_service_stub_->Export(context.get(), *request, response);
 
     if (!status.ok())
     {
       OTEL_INTERNAL_LOG_ERROR(
           "[OTLP LOG GRPC Exporter] Export() failed: " << status.error_message());
       return sdk::common::ExportResult::kFailure;
+    }
+    if (response->has_partial_success() &&
+        (response->partial_success().rejected_log_records() != 0 ||
+         !response->partial_success().error_message().empty()))
+    {
+      const auto &partial = response->partial_success();
+      OTEL_INTERNAL_LOG_ERROR("[OTLP LOG GRPC Exporter] Export partial success: "
+                              << partial.rejected_log_records() << " log record(s) rejected: \""
+                              << partial.error_message() << "\"");
     }
 #ifdef ENABLE_ASYNC_EXPORT
   }

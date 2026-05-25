@@ -176,32 +176,39 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
       google::protobuf::Arena::Create<proto::collector::logs::v1::ExportLogsServiceRequest>(&arena);
   OtlpRecordableUtils::PopulateRequest(logs, service_request);
   std::size_t log_count = logs.size();
-#ifdef ENABLE_ASYNC_EXPORT
-  http_client_->Export(*service_request, [log_count](
-                                             opentelemetry::sdk::common::ExportResult result) {
+
+  std::shared_ptr<proto::collector::logs::v1::ExportLogsServiceResponse> response =
+      std::make_shared<proto::collector::logs::v1::ExportLogsServiceResponse>();
+
+  auto handle_result = [response, log_count](opentelemetry::sdk::common::ExportResult result) {
     if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
     {
       OTEL_INTERNAL_LOG_ERROR("[OTLP LOG HTTP Exporter] ERROR: Export "
                               << log_count << " log(s) error: " << static_cast<int>(result));
+      return true;
+    }
+    if (response->has_partial_success() &&
+        (response->partial_success().rejected_log_records() != 0 ||
+         !response->partial_success().error_message().empty()))
+    {
+      const auto &partial = response->partial_success();
+      OTEL_INTERNAL_LOG_ERROR("[OTLP LOG HTTP Exporter] Export partial success: "
+                              << partial.rejected_log_records() << " log record(s) rejected: \""
+                              << partial.error_message() << "\"");
     }
     else
     {
       OTEL_INTERNAL_LOG_DEBUG("[OTLP LOG HTTP Exporter] Export " << log_count << " log(s) success");
     }
     return true;
-  });
+  };
+
+#ifdef ENABLE_ASYNC_EXPORT
+  http_client_->Export(*service_request, response.get(), std::move(handle_result),
+                       options_.max_concurrent_requests);
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #else
-  opentelemetry::sdk::common::ExportResult result = http_client_->Export(*service_request);
-  if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP LOG HTTP Exporter] ERROR: Export "
-                            << log_count << " log(s) error: " << static_cast<int>(result));
-  }
-  else
-  {
-    OTEL_INTERNAL_LOG_DEBUG("[OTLP LOG HTTP Exporter] Export " << log_count << " log(s) success");
-  }
+  http_client_->Export(*service_request, response.get(), std::move(handle_result), 0);
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #endif
 }

@@ -205,6 +205,21 @@ public:
       std::size_t max_running_requests) noexcept;
 
   /**
+   * Async export with typed response
+   * @param message message to export, it should be ExportTraceServiceRequest,
+   * ExportMetricsServiceRequest or ExportLogsServiceRequest
+   * @param response the parsed body is written here on 2xx
+   * @param result_callback callback to call when the exporting is done
+   * @param max_running_requests wait for at most max_running_requests running requests
+   * @return return the status of this operation
+   */
+  sdk::common::ExportResult Export(
+      const google::protobuf::Message &message,
+      google::protobuf::Message *response,
+      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback,
+      std::size_t max_running_requests) noexcept;
+
+  /**
    * Force flush the HTTP client.
    */
   bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
@@ -258,6 +273,18 @@ private:
    */
   nostd::variant<sdk::common::ExportResult, HttpSessionData> createSession(
       const google::protobuf::Message &message,
+      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept;
+
+  /**
+   * @brief Create a Session object that deserializes the response body or return an error result
+   *
+   * @param message The message to send
+   * @param response the parsed body is written here on 2xx
+   * @param result_callback Callback for the export result
+   */
+  nostd::variant<sdk::common::ExportResult, HttpSessionData> createSession(
+      const google::protobuf::Message &message,
+      google::protobuf::Message *response,
       std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept;
 
   /**
