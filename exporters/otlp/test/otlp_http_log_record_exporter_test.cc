@@ -3,8 +3,12 @@
 
 #ifndef OPENTELEMETRY_STL_VERSION
 
+#  include <algorithm>
 #  include <chrono>
+#  include <mutex>
 #  include <thread>
+#  include <utility>
+#  include <vector>
 
 #  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter.h"
 
@@ -18,6 +22,8 @@
 #  include "opentelemetry/ext/http/client/http_client_factory.h"
 #  include "opentelemetry/ext/http/server/http_server.h"
 #  include "opentelemetry/logs/provider.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
@@ -87,6 +93,74 @@ static OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType co
 }
 
 namespace http_client = opentelemetry::ext::http::client;
+
+namespace
+{
+class ScopedTestLogHandler final
+{
+public:
+  struct Entry
+  {
+    sdk::common::internal_log::LogLevel level;
+    std::string msg;
+  };
+
+private:
+  class LogHandlerImpl : public sdk::common::internal_log::LogHandler
+  {
+  public:
+    void Handle(sdk::common::internal_log::LogLevel level,
+                const char * /*file*/,
+                int /*line*/,
+                const char *msg,
+                const sdk::common::AttributeMap & /*attrs*/) noexcept override
+    {
+      std::lock_guard<std::mutex> lk(mu_);
+      entries_.push_back({level, msg ? msg : ""});
+    }
+
+    std::vector<Entry> Drain()
+    {
+      std::lock_guard<std::mutex> lk(mu_);
+      return std::exchange(entries_, {});
+    }
+
+  private:
+    std::mutex mu_;
+    std::vector<Entry> entries_;
+  };
+
+public:
+  explicit ScopedTestLogHandler(sdk::common::internal_log::LogLevel level)
+      : previous_handler_(sdk::common::internal_log::GlobalLogHandler::GetLogHandler()),
+        previous_level_(sdk::common::internal_log::GlobalLogHandler::GetLogLevel())
+  {
+    opentelemetry::nostd::shared_ptr<LogHandlerImpl> handler{new LogHandlerImpl{}};
+    handler_ = handler.get();
+    sdk::common::internal_log::GlobalLogHandler::SetLogHandler(std::move(handler));
+    sdk::common::internal_log::GlobalLogHandler::SetLogLevel(level);
+  }
+
+  ~ScopedTestLogHandler()
+  {
+    handler_ = nullptr;
+    sdk::common::internal_log::GlobalLogHandler::SetLogHandler(previous_handler_);
+    sdk::common::internal_log::GlobalLogHandler::SetLogLevel(previous_level_);
+  }
+
+  ScopedTestLogHandler(const ScopedTestLogHandler &)            = delete;
+  ScopedTestLogHandler &operator=(const ScopedTestLogHandler &) = delete;
+  ScopedTestLogHandler(ScopedTestLogHandler &&)                 = delete;
+  ScopedTestLogHandler &operator=(ScopedTestLogHandler &&)      = delete;
+
+  std::vector<Entry> Drain() { return handler_->Drain(); }
+
+private:
+  LogHandlerImpl *handler_{nullptr};
+  opentelemetry::nostd::shared_ptr<sdk::common::internal_log::LogHandler> previous_handler_;
+  sdk::common::internal_log::LogLevel previous_level_;
+};
+}  // namespace
 
 class OtlpHttpLogRecordExporterTestPeer : public ::testing::Test
 {
@@ -868,6 +942,47 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
 }
 #  endif  // NO_GETENV
+
+// Exporter logs the rejection on partial_success.
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportPartialSuccess)
+{
+  ScopedTestLogHandler log{sdk::common::internal_log::LogLevel::Error};
+
+  proto::collector::logs::v1::ExportLogsServiceResponse partial;
+  partial.mutable_partial_success()->set_rejected_log_records(21);
+  partial.mutable_partial_success()->set_error_message("too many logs!!");
+  std::string serialized = partial.SerializeAsString();
+
+  auto mock_otlp_client =
+      OtlpHttpLogRecordExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
+  auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_client.first});
+
+  auto no_send_client =
+      std::static_pointer_cast<http_client::nosend::HttpClient>(mock_otlp_client.second);
+  auto mock_session =
+      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  EXPECT_CALL(*mock_session, SendRequest)
+      .WillOnce([&serialized](const std::shared_ptr<http_client::EventHandler> &callback) {
+        http_client::nosend::Response response;
+        response.body_.assign(serialized.begin(), serialized.end());
+        response.Finish(*callback.get());
+      });
+
+  auto recordable = exporter->MakeRecordable();
+  nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> batch(&recordable, 1);
+  EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, exporter->Export(batch));
+
+  auto entries  = log.Drain();
+  auto contains = [&](const std::string &needle) {
+    return std::any_of(entries.begin(), entries.end(), [&](const ScopedTestLogHandler::Entry &e) {
+      return e.msg.find(needle) != std::string::npos;
+    });
+  };
+  EXPECT_TRUE(contains("partial success"));
+  EXPECT_TRUE(contains("21 log record(s) rejected"));
+  EXPECT_TRUE(contains("too many logs!!"));
+}
 
 }  // namespace otlp
 }  // namespace exporter

@@ -28,12 +28,25 @@
 #  include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
 #  include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
 
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#  include "opentelemetry/sdk/metrics/data/metric_data.h"
+#  include "opentelemetry/sdk/metrics/data/point_data.h"
+#  include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#  include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/trace/provider.h"
 
 #  include <grpcpp/grpcpp.h>
 #  include <gtest/gtest.h>
+#  include <algorithm>
+#  include <mutex>
+#  include <utility>
+#  include <vector>
 
 #  if defined(_MSC_VER)
 #    include "opentelemetry/sdk/common/env_variables.h"
@@ -48,6 +61,74 @@ namespace exporter
 {
 namespace otlp
 {
+
+namespace
+{
+class ScopedTestLogHandler final
+{
+public:
+  struct Entry
+  {
+    sdk::common::internal_log::LogLevel level;
+    std::string msg;
+  };
+
+private:
+  class LogHandlerImpl : public sdk::common::internal_log::LogHandler
+  {
+  public:
+    void Handle(sdk::common::internal_log::LogLevel level,
+                const char * /*file*/,
+                int /*line*/,
+                const char *msg,
+                const sdk::common::AttributeMap & /*attrs*/) noexcept override
+    {
+      std::lock_guard<std::mutex> lk(mu_);
+      entries_.push_back({level, msg ? msg : ""});
+    }
+
+    std::vector<Entry> Drain()
+    {
+      std::lock_guard<std::mutex> lk(mu_);
+      return std::exchange(entries_, {});
+    }
+
+  private:
+    std::mutex mu_;
+    std::vector<Entry> entries_;
+  };
+
+public:
+  explicit ScopedTestLogHandler(sdk::common::internal_log::LogLevel level)
+      : previous_handler_(sdk::common::internal_log::GlobalLogHandler::GetLogHandler()),
+        previous_level_(sdk::common::internal_log::GlobalLogHandler::GetLogLevel())
+  {
+    opentelemetry::nostd::shared_ptr<LogHandlerImpl> handler{new LogHandlerImpl{}};
+    handler_ = handler.get();
+    sdk::common::internal_log::GlobalLogHandler::SetLogHandler(std::move(handler));
+    sdk::common::internal_log::GlobalLogHandler::SetLogLevel(level);
+  }
+
+  ~ScopedTestLogHandler()
+  {
+    handler_ = nullptr;
+    sdk::common::internal_log::GlobalLogHandler::SetLogHandler(previous_handler_);
+    sdk::common::internal_log::GlobalLogHandler::SetLogLevel(previous_level_);
+  }
+
+  ScopedTestLogHandler(const ScopedTestLogHandler &)            = delete;
+  ScopedTestLogHandler &operator=(const ScopedTestLogHandler &) = delete;
+  ScopedTestLogHandler(ScopedTestLogHandler &&)                 = delete;
+  ScopedTestLogHandler &operator=(ScopedTestLogHandler &&)      = delete;
+
+  std::vector<Entry> Drain() { return handler_->Drain(); }
+
+private:
+  LogHandlerImpl *handler_{nullptr};
+  opentelemetry::nostd::shared_ptr<sdk::common::internal_log::LogHandler> previous_handler_;
+  sdk::common::internal_log::LogLevel previous_level_;
+};
+}  // namespace
 
 class OtlpGrpcMetricExporterTestPeer : public ::testing::Test
 {
@@ -298,6 +379,61 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, CheckGetAggregationTemporality)
   EXPECT_EQ(
       opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
       exporter3->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kCounter));
+}
+
+// Exporter logs the rejection on partial_success.
+TEST_F(OtlpGrpcMetricExporterTestPeer, ExportPartialSuccess)
+{
+  ScopedTestLogHandler log{sdk::common::internal_log::LogLevel::Error};
+
+  auto mock_stub = new proto::collector::metrics::v1::MockMetricsServiceStub();
+  std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub_interface(
+      mock_stub);
+  auto exporter = GetExporter(std::move(stub_interface));
+
+  opentelemetry::sdk::metrics::SumPointData sum_point_data{};
+  sum_point_data.value_ = 10.0;
+  opentelemetry::sdk::metrics::ResourceMetrics data;
+  auto resource = opentelemetry::sdk::resource::Resource::Create(
+      opentelemetry::sdk::resource::ResourceAttributes{});
+  data.resource_ = &resource;
+  auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+      "library_name", "1.5.0");
+  opentelemetry::sdk::metrics::MetricData metric_data{
+      opentelemetry::sdk::metrics::InstrumentDescriptor{
+          "metrics_name", "description", "unit",
+          opentelemetry::sdk::metrics::InstrumentType::kCounter,
+          opentelemetry::sdk::metrics::InstrumentValueType::kDouble},
+      opentelemetry::sdk::metrics::AggregationTemporality::kDelta,
+      opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{},
+      std::vector<opentelemetry::sdk::metrics::PointDataAttributes>{
+          {opentelemetry::sdk::metrics::PointAttributes{}, sum_point_data}}};
+  data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
+      {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
+
+  EXPECT_CALL(*mock_stub, Export(_, _, _))
+      .Times(Exactly(1))
+      .WillOnce(Invoke([](grpc::ClientContext *,
+                          const proto::collector::metrics::v1::ExportMetricsServiceRequest &,
+                          proto::collector::metrics::v1::ExportMetricsServiceResponse *response)
+                           -> grpc::Status {
+        response->mutable_partial_success()->set_rejected_data_points(21);
+        response->mutable_partial_success()->set_error_message("too many data points!!");
+        return grpc::Status::OK;
+      }));
+
+  EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, exporter->Export(data));
+  exporter->ForceFlush();
+
+  auto entries  = log.Drain();
+  auto contains = [&](const std::string &needle) {
+    return std::any_of(entries.begin(), entries.end(), [&](const ScopedTestLogHandler::Entry &e) {
+      return e.msg.find(needle) != std::string::npos;
+    });
+  };
+  EXPECT_TRUE(contains("partial success"));
+  EXPECT_TRUE(contains("21 data point(s) rejected"));
+  EXPECT_TRUE(contains("too many data points!!"));
 }
 
 }  // namespace otlp
