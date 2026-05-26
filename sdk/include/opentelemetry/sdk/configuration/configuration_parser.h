@@ -81,6 +81,8 @@
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detection_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
@@ -436,6 +438,12 @@ public:
       const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<ResourceConfiguration> ParseResourceConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  std::unique_ptr<ResourceDetectionConfiguration> ParseResourceDetectionConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  std::unique_ptr<ResourceDetectorConfiguration> ParseResourceDetectorConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<DistributionConfiguration> ParseDistributionConfiguration(

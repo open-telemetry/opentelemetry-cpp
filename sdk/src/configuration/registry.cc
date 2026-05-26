@@ -9,6 +9,7 @@
 #include "opentelemetry/baggage/propagation/baggage_propagator.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_builder.h"
+#include "opentelemetry/sdk/configuration/extension_resource_detector_builder.h"
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_sampler_builder.h"
@@ -240,6 +241,26 @@ void Registry::SetExtensionLogRecordProcessorBuilder(
 {
   log_record_processor_builders_.erase(name);
   log_record_processor_builders_.insert({name, std::move(builder)});
+}
+
+const ExtensionResourceDetectorBuilder *Registry::GetExtensionResourceDetectorBuilder(
+    const std::string &name) const
+{
+  ExtensionResourceDetectorBuilder *builder = nullptr;
+  auto search                               = resource_detector_builders_.find(name);
+  if (search != resource_detector_builders_.end())
+  {
+    builder = search->second.get();
+  }
+  return builder;
+}
+
+void Registry::SetExtensionResourceDetectorBuilder(
+    const std::string &name,
+    std::unique_ptr<ExtensionResourceDetectorBuilder> &&builder)
+{
+  resource_detector_builders_.erase(name);
+  resource_detector_builders_.insert({name, std::move(builder)});
 }
 
 }  // namespace configuration

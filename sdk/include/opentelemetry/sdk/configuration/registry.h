@@ -11,6 +11,7 @@
 #include "opentelemetry/sdk/configuration/console_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_builder.h"
+#include "opentelemetry/sdk/configuration/extension_resource_detector_builder.h"
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_sampler_builder.h"
@@ -235,6 +236,13 @@ public:
       const std::string &name,
       std::unique_ptr<ExtensionLogRecordProcessorBuilder> &&builder);
 
+  const ExtensionResourceDetectorBuilder *GetExtensionResourceDetectorBuilder(
+      const std::string &name) const;
+
+  void SetExtensionResourceDetectorBuilder(
+      const std::string &name,
+      std::unique_ptr<ExtensionResourceDetectorBuilder> &&builder);
+
 private:
   std::unique_ptr<OtlpHttpSpanExporterBuilder> otlp_http_span_builder_;
   std::unique_ptr<OtlpGrpcSpanExporterBuilder> otlp_grpc_span_builder_;
@@ -264,6 +272,8 @@ private:
       log_record_exporter_builders_;
   std::map<std::string, std::unique_ptr<ExtensionLogRecordProcessorBuilder>>
       log_record_processor_builders_;
+  std::map<std::string, std::unique_ptr<ExtensionResourceDetectorBuilder>>
+      resource_detector_builders_;
 };
 
 }  // namespace configuration

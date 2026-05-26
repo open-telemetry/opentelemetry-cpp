@@ -106,6 +106,12 @@
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detection_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detector_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detector_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/container_resource_detector_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/extension_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
@@ -158,6 +164,7 @@
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/metrics/view/view_registry_factory.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #include "opentelemetry/sdk/trace/exporter.h"
@@ -1929,6 +1936,69 @@ void SdkBuilder::SetResourceAttribute(
   model->Accept(&setter);
 }
 
+class ResourceDetectorCreator
+    : public opentelemetry::sdk::configuration::ResourceDetectorConfigurationVisitor
+{
+public:
+  ResourceDetectorCreator(std::shared_ptr<Registry> registry) : registry_(std::move(registry)) {}
+
+  void VisitContainer(const ContainerResourceDetectorConfiguration * /* model */) override
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateResourceDetector() container");
+    // Container detector is in resource_detectors library, available when linked.
+    // Uses OTELResourceDetector as a fallback placeholder.
+    detected_resource_ = opentelemetry::sdk::resource::OTELResourceDetector().Detect();
+    OTEL_INTERNAL_LOG_WARN(
+        "Container resource detector not available, "
+        "link with opentelemetry_resource_detectors for full support");
+  }
+
+  void VisitExtension(const ExtensionResourceDetectorConfiguration *model) override
+  {
+    std::string name = model->name;
+    OTEL_INTERNAL_LOG_DEBUG("CreateResourceDetector() extension: " << name);
+
+    const ExtensionResourceDetectorBuilder *ext_builder =
+        registry_->GetExtensionResourceDetectorBuilder(name);
+
+    if (ext_builder != nullptr)
+    {
+      auto detector = ext_builder->Build(model);
+      if (detector)
+      {
+        detected_resource_ = detector->Detect();
+        return;
+      }
+    }
+
+    OTEL_INTERNAL_LOG_WARN("CreateResourceDetector() no builder for extension: " << name);
+  }
+
+  opentelemetry::sdk::resource::Resource GetDetectedResource()
+  {
+    return std::move(detected_resource_);
+  }
+
+private:
+  std::shared_ptr<Registry> registry_;
+  opentelemetry::sdk::resource::Resource detected_resource_ =
+      opentelemetry::sdk::resource::Resource::GetEmpty();
+};
+
+void SdkBuilder::ApplyResourceDetection(
+    opentelemetry::sdk::resource::Resource &resource,
+    const std::unique_ptr<opentelemetry::sdk::configuration::ResourceDetectionConfiguration>
+        &detection) const
+{
+  for (const auto &detector_config : detection->detectors)
+  {
+    ResourceDetectorCreator creator(registry_);
+    detector_config->Accept(&creator);
+    auto detected = creator.GetDetectedResource();
+    resource      = resource.Merge(detected);
+  }
+}
+
 void SdkBuilder::SetResource(
     opentelemetry::sdk::resource::Resource &resource,
     const std::unique_ptr<opentelemetry::sdk::configuration::ResourceConfiguration> &opt_model)
@@ -1975,6 +2045,11 @@ void SdkBuilder::SetResource(
       // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3548
       // FIXME-SDK: Implement resource detectors
       OTEL_INTERNAL_LOG_WARN("resource detectors not supported, ignoring");
+    }
+
+    if (opt_model->detection != nullptr)
+    {
+      ApplyResourceDetection(resource, opt_model->detection);
     }
 
     auto sdk_resource =

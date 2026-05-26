@@ -22,6 +22,7 @@
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detection_configuration.h"
 #include "opentelemetry/sdk/configuration/integer_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/integer_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
@@ -273,6 +274,11 @@ public:
   void SetResource(opentelemetry::sdk::resource::Resource &resource,
                    const std::unique_ptr<opentelemetry::sdk::configuration::ResourceConfiguration>
                        &opt_model) const;
+
+  void ApplyResourceDetection(
+      opentelemetry::sdk::resource::Resource &resource,
+      const std::unique_ptr<opentelemetry::sdk::configuration::ResourceDetectionConfiguration>
+          &detection) const;
 
   void SetLogLevel(opentelemetry::sdk::common::internal_log::LogLevel &sdk_log_level,
                    opentelemetry::sdk::configuration::SeverityNumber model_log_level) const;

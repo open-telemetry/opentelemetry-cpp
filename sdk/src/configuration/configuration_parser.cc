@@ -100,6 +100,10 @@
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detection_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detector_configuration.h"
+#include "opentelemetry/sdk/configuration/container_resource_detector_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
@@ -2519,7 +2523,65 @@ std::unique_ptr<ResourceConfiguration> ConfigurationParser::ParseResourceConfigu
     model->detectors = ParseIncludeExcludeConfiguration(child);
   }
 
+  child = node->GetChildNode("detection/development");
+  if (child)
+  {
+    model->detection = ParseResourceDetectionConfiguration(child);
+  }
+
   return model;
+}
+
+std::unique_ptr<ResourceDetectionConfiguration>
+ConfigurationParser::ParseResourceDetectionConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<ResourceDetectionConfiguration>();
+  std::unique_ptr<DocumentNode> child;
+
+  child = node->GetChildNode("attributes");
+  if (child)
+  {
+    model->attributes = ParseIncludeExcludeConfiguration(child);
+  }
+
+  child = node->GetChildNode("detectors");
+  if (child)
+  {
+    for (auto it = child->begin(); it != child->end(); ++it)
+    {
+      std::unique_ptr<DocumentNode> detector_node(*it);
+      auto detector = ParseResourceDetectorConfiguration(detector_node);
+      model->detectors.push_back(std::move(detector));
+    }
+  }
+
+  return model;
+}
+
+std::unique_ptr<ResourceDetectorConfiguration>
+ConfigurationParser::ParseResourceDetectorConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    std::string name = it.Name();
+
+    if (name == "container")
+    {
+      return std::make_unique<ContainerResourceDetectorConfiguration>();
+    }
+    else
+    {
+      auto extension  = std::make_unique<ExtensionResourceDetectorConfiguration>();
+      extension->name = name;
+      extension->node = it.Value();
+      return extension;
+    }
+  }
+
+  std::string message("Illegal resource detector, 0 entries");
+  throw InvalidSchemaException(node->Location(), message);
 }
 
 std::unique_ptr<DistributionConfiguration> ConfigurationParser::ParseDistributionConfiguration(
