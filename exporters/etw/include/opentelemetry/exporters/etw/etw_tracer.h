@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <atomic>
 
+#include <cctype>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -16,6 +17,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <unordered_map>
 #include <sstream>
 #include <vector>
 
@@ -64,12 +66,12 @@ class Span;
  * @return              Span instance
  */
 template <class SpanType, class TracerType>
-SpanType *new_span(nostd::shared_ptr<TracerType> objPtr,
+SpanType *new_span(TracerType *objPtr,
                    nostd::string_view name,
                    const opentelemetry::trace::StartSpanOptions &options,
                    std::unique_ptr<opentelemetry::trace::SpanContext> spanContext)
 {
-  return new (std::nothrow) SpanType{std::move(objPtr), name, options, std::move(spanContext)};
+  return new (std::nothrow) SpanType{*objPtr, name, options, std::move(spanContext)};
 }
 
 /**
@@ -159,7 +161,7 @@ void UpdateStatus(T &t, Properties &props)
 /**
  * @brief Tracer class that allows to send spans to ETW Provider.
  */
-class Tracer : public opentelemetry::trace::Tracer, public std::enable_shared_from_this<Tracer>
+class Tracer : public opentelemetry::trace::Tracer
 {
 public:
   /**
@@ -509,7 +511,7 @@ public:
     {
       auto noopSpan = nostd::shared_ptr<opentelemetry::trace::Span>{
           new (std::nothrow)
-              opentelemetry::trace::NoopSpan(this->shared_from_this(), std::move(spanContext))};
+              opentelemetry::trace::NoopSpan(std::shared_ptr<Tracer>{}, std::move(spanContext))};
       return noopSpan;
     }
 
@@ -529,9 +531,7 @@ public:
 
     // This template pattern allows us to forward-declare the etw::Span,
     // create an instance of it, then assign it to tracer::Span result.
-    auto owner_ptr = nostd::shared_ptr<Tracer>(this->shared_from_this());
-    auto currentSpan =
-        new_span<Span, Tracer>(std::move(owner_ptr), name, options, std::move(spanContext));
+    auto currentSpan = new_span<Span, Tracer>(this, name, options, std::move(spanContext));
     nostd::shared_ptr<opentelemetry::trace::Span> result = to_span_ptr<Span>(currentSpan);
 
     // Decorate with additional standard fields
@@ -784,7 +784,7 @@ protected:
   /**
    * @brief Owner Tracer of this Span
    */
-  nostd::shared_ptr<Tracer> owner_;
+  Tracer &owner_;
 
   /**
    * @brief Span name.
@@ -863,14 +863,14 @@ public:
    * @param parent Parent Span (optional)
    * @return
    */
-  Span(nostd::shared_ptr<Tracer> owner,
+  Span(Tracer &owner,
        nostd::string_view name,
        const opentelemetry::trace::StartSpanOptions &options,
        std::unique_ptr<opentelemetry::trace::SpanContext> spanContext,
        Span *parent = nullptr) noexcept
       : opentelemetry::trace::Span(),
         start_time_(std::chrono::system_clock::now()),
-        owner_(std::move(owner)),
+        owner_(owner),
         context_(std::move(spanContext)),
         parent_(parent)
   {
@@ -888,7 +888,7 @@ public:
    * @param name Event name.
    * @return
    */
-  void AddEvent(nostd::string_view name) noexcept override { owner_->AddEvent(*this, name); }
+  void AddEvent(nostd::string_view name) noexcept override { owner_.AddEvent(*this, name); }
 
   /**
    * @brief Add named event with custom timestamp.
@@ -899,7 +899,7 @@ public:
   void AddEvent(nostd::string_view name,
                 opentelemetry::common::SystemTimestamp timestamp) noexcept override
   {
-    owner_->AddEvent(*this, name, timestamp);
+    owner_.AddEvent(*this, name, timestamp);
   }
 
   /**
@@ -913,7 +913,7 @@ public:
                 opentelemetry::common::SystemTimestamp timestamp,
                 const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
-    owner_->AddEvent(*this, name, timestamp, attributes);
+    owner_.AddEvent(*this, name, timestamp, attributes);
   }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -1025,7 +1025,7 @@ public:
 
     if (!has_ended_.exchange(true))
     {
-      owner_->EndSpan(*this, parent_, options);
+      owner_.EndSpan(*this, parent_, options);
     }
   }
 
@@ -1057,8 +1057,57 @@ public:
   /// Get Owner tracer of this Span
   /// </summary>
   /// <returns></returns>
-  opentelemetry::trace::Tracer &tracer() const noexcept { return *this->owner_; }
+  opentelemetry::trace::Tracer &tracer() const noexcept { return this->owner_; }
 };
+
+static inline std::string TrimWhitespace(std::string input)
+{
+  auto is_space = [](unsigned char c) { return std::isspace(c) != 0; };
+  auto begin    = std::find_if_not(input.begin(), input.end(), is_space);
+  if (begin == input.end())
+  {
+    return std::string{};
+  }
+  auto end = std::find_if_not(input.rbegin(), input.rend(), is_space).base();
+  return std::string(begin, end);
+}
+
+static inline ETWProvider::EventFormat ParseEncodingArg(nostd::string_view args,
+                                                        ETWProvider::EventFormat fallback)
+{
+  if (args.size() == 0)
+  {
+    return fallback;
+  }
+
+  std::string arg(args.data(), args.size());
+  arg = TrimWhitespace(std::move(arg));
+  if (arg.empty())
+  {
+    return fallback;
+  }
+
+  std::transform(arg.begin(), arg.end(), arg.begin(), [](unsigned char c) {
+    return static_cast<char>(std::toupper(c));
+  });
+
+  if (arg == "MSGPACK" || arg == "MESSAGEPACK")
+  {
+    return ETWProvider::EventFormat::ETW_MSGPACK;
+  }
+
+  if (arg == "XML")
+  {
+    return ETWProvider::EventFormat::ETW_XML;
+  }
+
+  if (arg == "ETW" || arg == "TLD")
+  {
+    return ETWProvider::EventFormat::ETW_MANIFEST;
+  }
+
+  return fallback;
+}
 
 /**
  * @brief ETW TracerProvider
@@ -1175,13 +1224,56 @@ public:
 #endif
       ) noexcept override
   {
-    UNREFERENCED_PARAMETER(args);
     UNREFERENCED_PARAMETER(schema_url);
-    ETWProvider::EventFormat evtFmt = config_.encoding;
+    ETWProvider::EventFormat evtFmt = ParseEncodingArg(args, config_.encoding);
+    TracerCacheKey key{name.data(), name.size(), evtFmt};
+
+    std::lock_guard<std::mutex> lock(tracers_mu_);
+    auto it = tracers_.find(key);
+    if (it != tracers_.end())
+    {
+      return nostd::shared_ptr<opentelemetry::trace::Tracer>{
+          std::static_pointer_cast<opentelemetry::trace::Tracer>(it->second)};
+    }
+
     std::shared_ptr<Tracer> tracer{new (std::nothrow) Tracer(*this, name, evtFmt)};
+    tracers_.emplace(std::move(key), tracer);
     return nostd::shared_ptr<opentelemetry::trace::Tracer>{
         std::static_pointer_cast<opentelemetry::trace::Tracer>(tracer)};
   }
+
+private:
+  struct TracerCacheKey
+  {
+    std::string name;
+    ETWProvider::EventFormat encoding;
+
+    TracerCacheKey(std::string value, ETWProvider::EventFormat format)
+        : name(std::move(value)), encoding(format)
+    {}
+
+    TracerCacheKey(const char *value, size_t size, ETWProvider::EventFormat format)
+        : name(value, size), encoding(format)
+    {}
+
+    bool operator==(const TracerCacheKey &other) const
+    {
+      return encoding == other.encoding && name == other.name;
+    }
+  };
+
+  struct TracerCacheKeyHash
+  {
+    size_t operator()(const TracerCacheKey &key) const noexcept
+    {
+      size_t name_hash = std::hash<std::string>{}(key.name);
+      size_t fmt_hash  = static_cast<size_t>(key.encoding);
+      return name_hash ^ (fmt_hash + 0x9e3779b97f4a7c15ULL + (name_hash << 6) + (name_hash >> 2));
+    }
+  };
+
+  std::mutex tracers_mu_;
+  std::unordered_map<TracerCacheKey, std::shared_ptr<Tracer>, TracerCacheKeyHash> tracers_;
 };
 
 }  // namespace etw
