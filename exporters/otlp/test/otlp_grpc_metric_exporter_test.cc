@@ -44,6 +44,7 @@
 #  include <grpcpp/grpcpp.h>
 #  include <gtest/gtest.h>
 #  include <algorithm>
+#  include <functional>
 #  include <mutex>
 #  include <utility>
 #  include <vector>
@@ -64,6 +65,71 @@ namespace otlp
 
 namespace
 {
+class OtlpMockMetricsServiceStub : public proto::collector::metrics::v1::MockMetricsServiceStub
+{
+public:
+// Some old toolchains can only use gRPC 1.33 and it's experimental.
+#  if defined(GRPC_CPP_VERSION_MAJOR) && \
+      (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+  using async_interface_base =
+      proto::collector::metrics::v1::MetricsService::StubInterface::async_interface;
+#  else
+  using async_interface_base =
+      proto::collector::metrics::v1::MetricsService::StubInterface::experimental_async_interface;
+#  endif
+
+  OtlpMockMetricsServiceStub() : async_interface_(this) {}
+
+  class async_interface : public async_interface_base
+  {
+  public:
+    async_interface(OtlpMockMetricsServiceStub *owner) : stub_(owner) {}
+
+    void Export(
+        ::grpc::ClientContext *context,
+        const ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest *request,
+        ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceResponse *response,
+        std::function<void(::grpc::Status)> callback) override
+    {
+      stub_->last_async_status_ = stub_->Export(context, *request, response);
+      callback(stub_->last_async_status_);
+    }
+
+// Some old toolchains can only use gRPC 1.33 and it's experimental.
+#  if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
+          (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
+      defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
+    void Export(
+        ::grpc::ClientContext * /*context*/,
+        const ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest
+            * /*request*/,
+        ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceResponse * /*response*/,
+        ::grpc::ClientUnaryReactor * /*reactor*/) override
+    {}
+#  else
+    void Export(
+        ::grpc::ClientContext * /*context*/,
+        const ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest
+            * /*request*/,
+        ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceResponse * /*response*/,
+        ::grpc::experimental::ClientUnaryReactor * /*reactor*/)
+    {}
+#  endif
+
+  private:
+    OtlpMockMetricsServiceStub *stub_;
+  };
+
+  async_interface_base *async() override { return &async_interface_; }
+  async_interface_base *experimental_async() { return &async_interface_; }
+
+  ::grpc::Status GetLastAsyncStatus() const noexcept { return last_async_status_; }
+
+private:
+  ::grpc::Status last_async_status_;
+  async_interface async_interface_;
+};
+
 class ScopedTestLogHandler final
 {
 public:
@@ -386,7 +452,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ExportPartialSuccess)
 {
   ScopedTestLogHandler log{sdk::common::internal_log::LogLevel::Error};
 
-  auto mock_stub = new proto::collector::metrics::v1::MockMetricsServiceStub();
+  auto mock_stub = new OtlpMockMetricsServiceStub();
   std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub_interface(
       mock_stub);
   auto exporter = GetExporter(std::move(stub_interface));
