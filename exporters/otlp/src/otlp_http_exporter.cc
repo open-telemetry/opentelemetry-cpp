@@ -164,18 +164,21 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
   // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
   // block to reduce memory fragments.
   arena_options.max_block_size = 65536;
-  google::protobuf::Arena arena{arena_options};
+  // Ownership transfers into HttpSessionData until the request completes
+  std::unique_ptr<google::protobuf::Arena> arena{new google::protobuf::Arena{arena_options}};
 
   proto::collector::trace::v1::ExportTraceServiceRequest *service_request =
       google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
-          &arena);
+          arena.get());
   OtlpRecordableUtils::PopulateRequest(spans, service_request);
   std::size_t span_count = spans.size();
 
-  std::shared_ptr<proto::collector::trace::v1::ExportTraceServiceResponse> response =
-      std::make_shared<proto::collector::trace::v1::ExportTraceServiceResponse>();
+  proto::collector::trace::v1::ExportTraceServiceResponse *response =
+      google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceResponse>(
+          arena.get());
 
-  auto handle_result = [response, span_count](opentelemetry::sdk::common::ExportResult result) {
+  auto handle_result = [span_count](opentelemetry::sdk::common::ExportResult result,
+                                    google::protobuf::Message *response_msg) {
     if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
     {
       OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE HTTP Exporter] ERROR: Export "
@@ -183,6 +186,8 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
                               << " trace span(s) error: " << static_cast<int>(result));
       return true;
     }
+    auto *response =
+        static_cast<proto::collector::trace::v1::ExportTraceServiceResponse *>(response_msg);
     if (response->has_partial_success() && (response->partial_success().rejected_spans() != 0 ||
                                             !response->partial_success().error_message().empty()))
     {
@@ -200,11 +205,11 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
   };
 
 #ifdef ENABLE_ASYNC_EXPORT
-  http_client_->Export(*service_request, response.get(), std::move(handle_result),
+  http_client_->Export(*service_request, std::move(arena), response, std::move(handle_result),
                        options_.max_concurrent_requests);
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #else
-  http_client_->Export(*service_request, response.get(), std::move(handle_result), 0);
+  http_client_->Export(*service_request, std::move(arena), response, std::move(handle_result), 0);
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #endif
 }
