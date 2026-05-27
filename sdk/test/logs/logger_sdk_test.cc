@@ -667,6 +667,95 @@ TEST(LoggerSDK, LoggerTraceBasedConfigAllowsSampledExplicitContextWithNamedEvent
   EXPECT_TRUE(call_state->context_test_key_value);
   EXPECT_EQ(call_state->call_count, 1U);
 }
+
+TEST(LoggerSDK, EmitLogRecordWithExplicitContextStampsTraceFieldsFromContext)
+{
+  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto logger = api_lp->GetLogger("logger", "opentelemetry_library", "", schema_url);
+
+  auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
+  auto lp                = static_cast<LoggerProvider *>(api_lp.get());
+  lp->AddProcessor(std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable)));
+
+  nostd::shared_ptr<opentelemetry::trace::Span> runtime_span;
+  {
+    std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> sp;
+    auto tp      = opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(sp));
+    runtime_span = tp->GetTracer("runtime")->StartSpan("runtime");
+  }
+  opentelemetry::trace::Scope runtime_scope{runtime_span};
+
+  auto explicit_span = MakeTestSpan(/*sampled=*/true);
+  context::Context explicit_context;
+  explicit_context             = opentelemetry::trace::SetSpan(explicit_context, explicit_span);
+  const auto explicit_span_ctx = explicit_span->GetContext();
+
+  logger->EmitLogRecord(logs_api::Severity::kInfo, nostd::string_view{"msg"}, explicit_context);
+
+  EXPECT_EQ(shared_recordable->GetTraceId(), explicit_span_ctx.trace_id());
+  EXPECT_EQ(shared_recordable->GetSpanId(), explicit_span_ctx.span_id());
+  EXPECT_EQ(shared_recordable->GetTraceFlags(), explicit_span_ctx.trace_flags());
+  EXPECT_NE(shared_recordable->GetTraceId(), runtime_span->GetContext().trace_id());
+}
+
+TEST(LoggerSDK, EmitLogRecordWithExplicitSpanContextStampsTraceFields)
+{
+  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto logger = api_lp->GetLogger("logger", "opentelemetry_library", "", schema_url);
+
+  auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
+  auto lp                = static_cast<LoggerProvider *>(api_lp.get());
+  lp->AddProcessor(std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable)));
+
+  nostd::shared_ptr<opentelemetry::trace::Span> runtime_span;
+  {
+    std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> sp;
+    auto tp      = opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(sp));
+    runtime_span = tp->GetTracer("runtime")->StartSpan("runtime");
+  }
+  opentelemetry::trace::Scope runtime_scope{runtime_span};
+
+  const auto explicit_span_ctx = MakeTestSpan(/*sampled=*/true)->GetContext();
+
+  logger->EmitLogRecord(logs_api::Severity::kInfo, nostd::string_view{"msg"}, explicit_span_ctx);
+
+  EXPECT_EQ(shared_recordable->GetTraceId(), explicit_span_ctx.trace_id());
+  EXPECT_EQ(shared_recordable->GetSpanId(), explicit_span_ctx.span_id());
+  EXPECT_EQ(shared_recordable->GetTraceFlags(), explicit_span_ctx.trace_flags());
+  EXPECT_NE(shared_recordable->GetTraceId(), runtime_span->GetContext().trace_id());
+}
+
+TEST(LoggerSDK, EmitLogRecordWithExplicitTracePartsStampsTraceFields)
+{
+  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto logger = api_lp->GetLogger("logger", "opentelemetry_library", "", schema_url);
+
+  auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
+  auto lp                = static_cast<LoggerProvider *>(api_lp.get());
+  lp->AddProcessor(std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable)));
+
+  nostd::shared_ptr<opentelemetry::trace::Span> runtime_span;
+  {
+    std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> sp;
+    auto tp      = opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(sp));
+    runtime_span = tp->GetTracer("runtime")->StartSpan("runtime");
+  }
+  opentelemetry::trace::Scope runtime_scope{runtime_span};
+
+  const auto explicit_span_ctx = MakeTestSpan(/*sampled=*/true)->GetContext();
+
+  logger->EmitLogRecord(logs_api::Severity::kInfo, nostd::string_view{"msg"},
+                        explicit_span_ctx.trace_id(), explicit_span_ctx.span_id(),
+                        explicit_span_ctx.trace_flags());
+
+  EXPECT_EQ(shared_recordable->GetTraceId(), explicit_span_ctx.trace_id());
+  EXPECT_EQ(shared_recordable->GetSpanId(), explicit_span_ctx.span_id());
+  EXPECT_EQ(shared_recordable->GetTraceFlags(), explicit_span_ctx.trace_flags());
+  EXPECT_NE(shared_recordable->GetTraceId(), runtime_span->GetContext().trace_id());
+}
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 static std::unique_ptr<MockLogRecordable> create_mock_log_recordable(
