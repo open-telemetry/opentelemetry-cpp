@@ -523,7 +523,8 @@ grpc::Status OtlpGrpcClient::DelegateExport(
   auto status             = stub->Export(trace_grpc_context.get(), *request, response);
   if (status.ok() && on_complete)
   {
-    on_complete(std::move(trace_arena), response);
+    auto callback = std::move(on_complete);
+    callback(std::move(trace_arena), response);
   }
   return status;
 }
@@ -543,7 +544,8 @@ grpc::Status OtlpGrpcClient::DelegateExport(
   auto status               = stub->Export(metrics_grpc_context.get(), *request, response);
   if (status.ok() && on_complete)
   {
-    on_complete(std::move(metrics_arena), response);
+    auto callback = std::move(on_complete);
+    callback(std::move(metrics_arena), response);
   }
   return status;
 }
@@ -562,7 +564,8 @@ grpc::Status OtlpGrpcClient::DelegateExport(
   auto status            = stub->Export(logs_grpc_context.get(), *request, response);
   if (status.ok() && on_complete)
   {
-    on_complete(std::move(logs_arena), response);
+    auto callback = std::move(on_complete);
+    callback(std::move(logs_arena), response);
   }
   return status;
 }
