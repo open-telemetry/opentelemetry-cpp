@@ -20,21 +20,24 @@
 
 #include <initializer_list>
 #include <iostream>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/random_id_generator.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/version.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/tracer.h"
 
 namespace trace_sdk      = opentelemetry::sdk::trace;
 namespace trace_exporter = opentelemetry::exporter::trace;

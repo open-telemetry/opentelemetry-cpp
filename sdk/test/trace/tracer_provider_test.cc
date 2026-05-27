@@ -31,6 +31,7 @@
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2

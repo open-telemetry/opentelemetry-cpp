@@ -213,7 +213,7 @@ void Tracer::UpdateTracerConfig(TracerConfig config) noexcept
   const bool enabled = config.IsEnabled();
   {
     std::lock_guard<std::mutex> lock(tracer_config_mutex_);
-    tracer_config_ = std::move(config);
+    tracer_config_ = config;
   }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2

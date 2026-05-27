@@ -148,7 +148,7 @@ void TracerProvider::UpdateTracerConfigurator(
   {
     TracerConfig new_config =
         context_->GetTracerConfigurator().ComputeConfig(tracer->GetInstrumentationScope());
-    tracer->UpdateTracerConfig(std::move(new_config));
+    tracer->UpdateTracerConfig(new_config);
   }
 }
 
