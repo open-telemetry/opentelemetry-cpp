@@ -30,6 +30,14 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
+namespace google
+{
+namespace protobuf
+{
+class Message;
+}  // namespace protobuf
+}  // namespace google
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
