@@ -38,8 +38,13 @@ foreach(
   instrument_descriptor_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
-    ${testname} ${GTEST_BOTH_LIBRARIES} ${GMOCK_LIB} ${CMAKE_THREAD_LIBS_INIT}
-    metrics_common_test_utils opentelemetry_resources opentelemetry_test_common)
+    ${testname}
+    ${GTEST_BOTH_LIBRARIES}
+    ${GMOCK_LIB}
+    ${CMAKE_THREAD_LIBS_INIT}
+    metrics_common_test_utils
+    opentelemetry_resources
+    opentelemetry_test_common)
   target_compile_definitions(${testname} PRIVATE UNIT_TESTING)
   gtest_add_tests(
     TARGET ${testname}

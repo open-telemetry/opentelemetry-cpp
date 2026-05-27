@@ -963,9 +963,13 @@ if(BUILD_TESTING)
     add_executable(otlp_grpc_metric_exporter_test
                    test/otlp_grpc_metric_exporter_test.cc)
     target_link_libraries(
-      otlp_grpc_metric_exporter_test ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc
-      opentelemetry_exporter_otlp_grpc_metrics opentelemetry_test_common)
+      otlp_grpc_metric_exporter_test
+      ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${GMOCK_LIB}
+      opentelemetry_exporter_otlp_grpc
+      opentelemetry_exporter_otlp_grpc_metrics
+      opentelemetry_test_common)
     gtest_add_tests(
       TARGET otlp_grpc_metric_exporter_test
       TEST_PREFIX exporter.otlp.
