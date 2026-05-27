@@ -28,9 +28,9 @@ jobs:
 
           cd docs/public
 
-          cp Doxyfile Doxyfile.generated
-          echo "PROJECT_BRIEF = \"Version ${VERSION}\"" >> Doxyfile.generated
-          echo "PROJECT_NUMBER = ${VERSION}" >> Doxyfile.generated
+          sed "s|^PROJECT_NUMBER[[:space:]]*=.*|PROJECT_NUMBER = ${VERSION}|" \
+            Doxyfile > Doxyfile.generated
+
           rm -rf doxyoutput
 
           doxygen Doxyfile.generated
