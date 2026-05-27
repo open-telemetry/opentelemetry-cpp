@@ -180,7 +180,14 @@ jobs:
     - name: install dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
-    - name: run cmake gcc (maintainer mode, abiv2)
+    - name: run cmake gcc (maintainer mode, abiv2, Debug)
+      env:
+        BUILD_TYPE: Debug
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.abiv2.test
+    - name: run cmake gcc (maintainer mode, abiv2, Release)
+      env:
+        BUILD_TYPE: Release
       run: |
         ./ci/do_ci.sh cmake.maintainer.abiv2.test
     - name: generate test cert
