@@ -5,13 +5,7 @@
 
 #include <string>
 
-#include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/sampler.h"
-#include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/span_context_kv_iterable.h"
-#include "opentelemetry/trace/span_metadata.h"
-#include "opentelemetry/trace/trace_id.h"
 
 class CustomSampler : public opentelemetry::sdk::trace::Sampler
 {

@@ -7,7 +7,6 @@
 #include <new>
 #include <utility>
 
-#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -23,7 +22,6 @@
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_startoptions.h"
 #include "opentelemetry/trace/trace_flags.h"

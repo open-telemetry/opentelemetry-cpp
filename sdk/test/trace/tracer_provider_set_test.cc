@@ -3,22 +3,18 @@
 
 #include <gtest/gtest.h>
 #include <stdlib.h>
+#include <string>
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/trace/provider.h"
-#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
-#endif
-
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include "opentelemetry/common/key_value_iterable.h"
 #endif
 
 using opentelemetry::trace::Tracer;

@@ -25,7 +25,6 @@
 #include "opentelemetry/sdk/version/version.h"
 
 namespace metric_sdk      = opentelemetry::sdk::metrics;
-namespace nostd           = opentelemetry::nostd;
 namespace exportermetrics = opentelemetry::exporter::metrics;
 
 TEST(OStreamMetricsExporter, Shutdown)

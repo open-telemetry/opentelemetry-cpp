@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/utility.h"
 #include "src/common/random.h"
 
 using opentelemetry::sdk::common::Random;

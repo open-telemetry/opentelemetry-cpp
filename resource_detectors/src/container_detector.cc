@@ -10,7 +10,6 @@
 #include "opentelemetry/version.h"
 
 #include <string>
-#include <unordered_map>
 #include <utility>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
