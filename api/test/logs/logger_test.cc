@@ -324,8 +324,8 @@ class EnablementAwareTestLogger : public Logger
 {
 public:
   explicit EnablementAwareTestLogger(Severity minimum_severity,
-                                     bool event_id_enabled = false) noexcept
-      : event_id_enabled_(event_id_enabled)
+                                     bool enabled_impl_result = false) noexcept
+      : enabled_impl_result_(enabled_impl_result)
   {
     SetMinimumSeverity(static_cast<uint8_t>(minimum_severity));
   }
@@ -362,7 +362,7 @@ public:
     }
   }
 
-  void SetEventIdEnabled(bool enabled) noexcept { event_id_enabled_ = enabled; }
+  void SetEnabledImplResult(bool enabled) noexcept { enabled_impl_result_ = enabled; }
 
   using Logger::SetExtendedEnabledRequired;
 
@@ -417,7 +417,7 @@ protected:
     ++enabled_calls_;
     last_enabled_severity_ = severity;
     CaptureContextOrSpan(context_or_span);
-    return true;
+    return enabled_impl_result_;
   }
 
   bool EnabledImplementation(
@@ -429,7 +429,7 @@ protected:
     last_enabled_severity_ = severity;
     last_enabled_event_id_ = event_id.id_;
     CaptureContextOrSpan(context_or_span);
-    return event_id_enabled_;
+    return enabled_impl_result_;
   }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
@@ -438,7 +438,7 @@ protected:
     ++enabled_with_event_id_calls_;
     last_enabled_severity_ = severity;
     last_enabled_event_id_ = event_id.id_;
-    return event_id_enabled_;
+    return enabled_impl_result_;
   }
 
   bool EnabledImplementation(Severity severity, int64_t event_id) const noexcept override
@@ -447,7 +447,7 @@ protected:
   }
 
 private:
-  bool event_id_enabled_;
+  bool enabled_impl_result_;
 };
 
 }  // namespace
@@ -482,7 +482,7 @@ TEST(Logger, PushLoggerImplementation)
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(Logger, EnabledWithExplicitContextUsesContextAwareImplementation)
 {
-  EnablementAwareTestLogger logger(Severity::kTrace);
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
 
   context::Context test_context{"test-key", true};
 
@@ -512,7 +512,7 @@ TEST(Logger, EmitLogRecordTemplateInvokesEnabledImplementationAndEmitsWhenAllowe
 
   logger.Info(nostd::string_view{"emitted"});
 
-  EXPECT_EQ(logger.enabled_with_event_id_calls_, 1u);
+  EXPECT_EQ(logger.enabled_calls_ + logger.enabled_with_event_id_calls_, 1u);
   EXPECT_EQ(logger.create_log_record_calls_, 1u);
   EXPECT_EQ(logger.emit_log_record_calls_, 1u);
   EXPECT_EQ(logger.last_enabled_severity_, Severity::kInfo);
@@ -525,7 +525,7 @@ TEST(Logger, EmitLogRecordTemplateShortCircuitsWhenEnabledImplementationReturnsF
 
   logger.Info(nostd::string_view{"filtered"});
 
-  EXPECT_EQ(logger.enabled_with_event_id_calls_, 1u);
+  EXPECT_EQ(logger.enabled_calls_ + logger.enabled_with_event_id_calls_, 1u);
   EXPECT_EQ(logger.create_log_record_calls_, 0u);
   EXPECT_EQ(logger.emit_log_record_calls_, 0u);
 }
@@ -595,7 +595,7 @@ TEST(Logger, EmitLogRecordWithContextInArgsShortCircuitsWhenEnabledImplementatio
 
 TEST(Logger, EmitLogRecordWithSpanContextInArgsRoutesSpanContextVariantToEnabled)
 {
-  EnablementAwareTestLogger logger(Severity::kTrace);
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
   logger.SetExtendedEnabledRequired(true);
 
   const uint8_t trace_id_bytes[trace::TraceId::kSize] = {1, 2,  3,  4,  5,  6,  7,  8,
@@ -646,7 +646,7 @@ TEST(Logger, EmitLogRecordWithSpanContextInArgsAndEventIdRoutesVariantWithEventI
 
 TEST(Logger, EmitLogRecordWithTracePartsInArgsRoutesSpanContextVariantToEnabled)
 {
-  EnablementAwareTestLogger logger(Severity::kTrace);
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
   logger.SetExtendedEnabledRequired(true);
 
   const uint8_t trace_id_bytes[trace::TraceId::kSize] = {1, 2,  3,  4,  5,  6,  7,  8,

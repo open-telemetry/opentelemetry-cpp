@@ -16,6 +16,7 @@
 #include "opentelemetry/version.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include "opentelemetry/context/runtime_context.h"
 #  include "opentelemetry/nostd/variant.h"
 #  include "opentelemetry/trace/span_context.h"
 #  include "opentelemetry/trace/trace_flags.h"
@@ -166,17 +167,14 @@ public:
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
     nostd::variant<trace::SpanContext, opentelemetry::context::Context> context_or_span =
         trace::SpanContext::GetInvalid();
-    bool has_context_or_span_arg = false;
 
     if (const opentelemetry::context::Context *ctx = detail::FindContextInArgs(args...))
     {
-      context_or_span         = *ctx;
-      has_context_or_span_arg = true;
+      context_or_span = *ctx;
     }
     else if (const trace::SpanContext *sc = detail::FindSpanContextInArgs(args...))
     {
-      context_or_span         = *sc;
-      has_context_or_span_arg = true;
+      context_or_span = *sc;
     }
     else
     {
@@ -188,7 +186,10 @@ public:
         context_or_span                          = trace::SpanContext(
             *trace_id_ptr, *span_id_ptr,
             trace_flags_ptr != nullptr ? *trace_flags_ptr : trace::TraceFlags{}, false);
-        has_context_or_span_arg = true;
+      }
+      else
+      {
+        context_or_span = opentelemetry::context::RuntimeContext::GetCurrent();
       }
     }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -205,29 +206,9 @@ public:
       {
         const EventId *event_id_ptr = detail::FindEventIdInArgs(args...);
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-        bool extended_enabled;
-        if (has_context_or_span_arg)
-        {
-          if (event_id_ptr)
-          {
-            extended_enabled = EnabledImplementation(context_or_span, arg_severity, *event_id_ptr);
-          }
-          else
-          {
-            extended_enabled = EnabledImplementation(context_or_span, arg_severity);
-          }
-        }
-        else
-        {
-          if (event_id_ptr)
-          {
-            extended_enabled = EnabledImplementation(arg_severity, *event_id_ptr);
-          }
-          else
-          {
-            extended_enabled = EnabledImplementation(arg_severity, static_cast<int64_t>(0));
-          }
-        }
+        const bool extended_enabled =
+            event_id_ptr ? EnabledImplementation(context_or_span, arg_severity, *event_id_ptr)
+                         : EnabledImplementation(context_or_span, arg_severity);
 #else
         const bool extended_enabled =
             event_id_ptr ? EnabledImplementation(arg_severity, *event_id_ptr)
@@ -241,8 +222,7 @@ public:
     }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-    nostd::unique_ptr<LogRecord> log_record =
-        has_context_or_span_arg ? CreateLogRecord(context_or_span) : CreateLogRecord();
+    nostd::unique_ptr<LogRecord> log_record = CreateLogRecord(context_or_span);
 #else
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
