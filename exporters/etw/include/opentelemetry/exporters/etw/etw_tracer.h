@@ -17,8 +17,8 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include <unordered_map>
 #include <sstream>
+#include <unordered_map>
 #include <vector>
 
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -170,6 +170,8 @@ public:
   bool IsClosed() const noexcept { return isClosed_.load(); }
 
 private:
+  friend class TracerProvider;
+
   /**
    * @brief Parent provider of this Tracer
    */
@@ -1087,9 +1089,8 @@ static inline ETWProvider::EventFormat ParseEncodingArg(nostd::string_view args,
     return fallback;
   }
 
-  std::transform(arg.begin(), arg.end(), arg.begin(), [](unsigned char c) {
-    return static_cast<char>(std::toupper(c));
-  });
+  std::transform(arg.begin(), arg.end(), arg.begin(),
+                 [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
 
   if (arg == "MSGPACK" || arg == "MESSAGEPACK")
   {
@@ -1156,6 +1157,8 @@ public:
         id_generator_{std::move(id_generator)},
         tail_sampler_{std::move(tail_sampler)}
   {
+    (void)Tracer::etwProvider().is_registered(std::string{});
+
     // By default we ensure that all events carry their with TraceId and SpanId
     GetOption(options, "enableTraceId", config_.enableTraceId, true);
     GetOption(options, "enableSpanId", config_.enableSpanId, true);
@@ -1193,6 +1196,8 @@ public:
         tail_sampler_{
             std::unique_ptr<opentelemetry::exporter::etw::TailSampler>(new AlwaysOnTailSampler())}
   {
+    (void)Tracer::etwProvider().is_registered(std::string{});
+
     config_.enableTraceId           = true;
     config_.enableSpanId            = true;
     config_.enableActivityId        = false;
