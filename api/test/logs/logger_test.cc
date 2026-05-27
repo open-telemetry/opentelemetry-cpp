@@ -265,6 +265,8 @@ class TestLogger : public Logger
 {
   const nostd::string_view GetName() noexcept override { return "test logger"; }
 
+  using Logger::CreateLogRecord;
+
   nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override
   {
     return nullptr;
