@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <chrono>
 #include <map>
+#include <mutex>
 #include <new>
 #include <utility>
 
@@ -43,15 +44,14 @@ Tracer::Tracer(std::shared_ptr<TracerContext> context,
                std::unique_ptr<InstrumentationScope> instrumentation_scope) noexcept
     : instrumentation_scope_{std::move(instrumentation_scope)},
       context_{std::move(context)},
-      tracer_config_(std::make_shared<const TracerConfig>(
-          context_->GetTracerConfigurator().ComputeConfig(*instrumentation_scope_)))
+      tracer_config_(context_->GetTracerConfigurator().ComputeConfig(*instrumentation_scope_))
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
       ,
-      is_enabled_(tracer_config_.load()->IsEnabled())
+      is_enabled_(tracer_config_.IsEnabled())
 #endif
 {
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  UpdateEnabled(tracer_config_.load()->IsEnabled());
+  UpdateEnabled(tracer_config_.IsEnabled());
 #endif
 }
 
@@ -208,14 +208,18 @@ void Tracer::CloseWithMicroseconds(uint64_t timeout) noexcept
   }
 }
 
-void Tracer::UpdateTracerConfig(const TracerConfig &config) noexcept
+void Tracer::UpdateTracerConfig(TracerConfig config) noexcept
 {
-  tracer_config_.store(std::make_shared<const TracerConfig>(config));
+  const bool enabled = config.IsEnabled();
+  {
+    std::lock_guard<std::mutex> lock(tracer_config_mutex_);
+    tracer_config_ = std::move(config);
+  }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  UpdateEnabled(config.IsEnabled());
+  UpdateEnabled(enabled);
 #else
-  is_enabled_.store(config.IsEnabled(), std::memory_order_relaxed);
+  is_enabled_.store(enabled, std::memory_order_relaxed);
 #endif
 }
 

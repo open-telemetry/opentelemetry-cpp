@@ -132,19 +132,23 @@ void TracerProvider::UpdateTracerConfigurator(
     std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
         tracer_configurator) noexcept
 {
+  // Lock the provider mutex while updating the TracerConfiguartor in the context and capture the
+  // current tracers
+  std::vector<std::shared_ptr<Tracer>> current_tracers;
+  {
+    const std::lock_guard<std::mutex> guard(lock_);
+    context_->SetTracerConfigurator(std::move(tracer_configurator));
+    current_tracers = tracers_;
+  }
+
   // The only way to set the TracerConfig of a tracer is on Tracer construction in
   // TracerProvider::GetTracer or through Tracer::UpdateTracerConfig (which is private and only
   // accessed by TracerProvider).
-  //
-  // Lock the provider mutex while updating the TracerConfiguartor in the context and setting the
-  // new TracerConfig of all existing tracers.
-  const std::lock_guard<std::mutex> guard(lock_);
-  context_->SetTracerConfigurator(std::move(tracer_configurator));
-  for (auto &tracer : tracers_)
+  for (auto &tracer : current_tracers)
   {
-    auto new_config =
+    TracerConfig new_config =
         context_->GetTracerConfigurator().ComputeConfig(tracer->GetInstrumentationScope());
-    tracer->UpdateTracerConfig(new_config);
+    tracer->UpdateTracerConfig(std::move(new_config));
   }
 }
 
