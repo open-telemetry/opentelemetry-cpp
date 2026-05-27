@@ -22,16 +22,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y doxygen graphviz
-
-      - name: Set dynamic project version
-        run: |
-          VERSION=$(git describe --tags --always || echo "main")
-          sed -i "s/^PROJECT_NUMBER.*/PROJECT_NUMBER = ${VERSION}/" docs/public/Doxyfile
-
       - name: Generate documentation
         run: |
+          VERSION=$(grep '#define OPENTELEMETRY_VERSION' api/include/opentelemetry/version.h | cut -d '"' -f2)
+
           cd docs/public
-          doxygen Doxyfile
+
+          cp Doxyfile Doxyfile.generated
+          echo "PROJECT_BRIEF = \"Version ${VERSION}\"" >> Doxyfile.generated
+          echo "PROJECT_NUMBER = ${VERSION}" >> Doxyfile.generated
+          rm -rf doxyoutput
+
+          doxygen Doxyfile.generated
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -39,3 +41,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/public/doxyoutput/html
           destination_dir: docs
+          
