@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
@@ -10,7 +9,6 @@
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -22,6 +20,7 @@
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 #  include <stdint.h>
@@ -37,77 +36,7 @@
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::common::internal_log;
-
-namespace
-{
-
-class ScopedTestLogHandler final
-{
-public:
-  struct Entry
-  {
-    LogLevel level;
-    std::string msg;
-  };
-
-private:
-  class LogHandlerImpl : public LogHandler
-  {
-  public:
-    void Handle(LogLevel level,
-                const char * /*file*/,
-                int /*line*/,
-                const char *msg,
-                const opentelemetry::sdk::common::AttributeMap & /*attrs*/) noexcept override
-    {
-      std::lock_guard<std::mutex> lk(mu_);
-      entries_.push_back({level, msg ? msg : ""});
-    }
-
-    std::vector<Entry> Drain()
-    {
-      std::lock_guard<std::mutex> lk(mu_);
-      return std::exchange(entries_, {});
-    }
-
-  private:
-    std::mutex mu_;
-    std::vector<Entry> entries_;
-  };
-
-public:
-  explicit ScopedTestLogHandler(LogLevel level)
-      : previous_handler_(GlobalLogHandler::GetLogHandler()),
-        previous_level_(GlobalLogHandler::GetLogLevel())
-  {
-    opentelemetry::nostd::shared_ptr<LogHandlerImpl> handler{new LogHandlerImpl{}};
-    handler_ = handler.get();
-
-    GlobalLogHandler::SetLogHandler(std::move(handler));
-    GlobalLogHandler::SetLogLevel(level);
-  }
-
-  ~ScopedTestLogHandler()
-  {
-    handler_ = nullptr;
-    GlobalLogHandler::SetLogHandler(previous_handler_);
-    GlobalLogHandler::SetLogLevel(previous_level_);
-  }
-
-  ScopedTestLogHandler(const ScopedTestLogHandler &)            = delete;
-  ScopedTestLogHandler &operator=(const ScopedTestLogHandler &) = delete;
-  ScopedTestLogHandler(ScopedTestLogHandler &&)                 = delete;
-  ScopedTestLogHandler &operator=(ScopedTestLogHandler &&)      = delete;
-
-  std::vector<Entry> Drain() { return handler_->Drain(); }
-
-private:
-  LogHandlerImpl *handler_{nullptr};
-  opentelemetry::nostd::shared_ptr<LogHandler> previous_handler_;
-  LogLevel previous_level_;
-};
-
-}  // namespace
+using opentelemetry::test_common::ScopedTestLogHandler;
 
 TEST(MeterProvider, GetMeter)
 {

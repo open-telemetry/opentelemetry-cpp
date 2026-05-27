@@ -695,6 +695,7 @@ cc_test(
         ":otlp_grpc_exporter",
         "//api",
         "//sdk/src/metrics",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -876,6 +877,7 @@ cc_test(
         "//api",
         "//sdk/src/logs",
         "//sdk/src/metrics",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -909,6 +911,7 @@ cc_test(
         ":otlp_grpc_metric_exporter",
         "//api",
         "//sdk/src/metrics",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )

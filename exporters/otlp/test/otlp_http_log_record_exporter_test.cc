@@ -30,6 +30,7 @@
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
 #  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
+#  include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 
 #  include <google/protobuf/message_lite.h>
 #  include <gtest/gtest.h>
@@ -94,73 +95,7 @@ static OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType co
 
 namespace http_client = opentelemetry::ext::http::client;
 
-namespace
-{
-class ScopedTestLogHandler final
-{
-public:
-  struct Entry
-  {
-    sdk::common::internal_log::LogLevel level;
-    std::string msg;
-  };
-
-private:
-  class LogHandlerImpl : public sdk::common::internal_log::LogHandler
-  {
-  public:
-    void Handle(sdk::common::internal_log::LogLevel level,
-                const char * /*file*/,
-                int /*line*/,
-                const char *msg,
-                const sdk::common::AttributeMap & /*attrs*/) noexcept override
-    {
-      std::lock_guard<std::mutex> lk(mu_);
-      entries_.push_back({level, msg ? msg : ""});
-    }
-
-    std::vector<Entry> Drain()
-    {
-      std::lock_guard<std::mutex> lk(mu_);
-      return std::exchange(entries_, {});
-    }
-
-  private:
-    std::mutex mu_;
-    std::vector<Entry> entries_;
-  };
-
-public:
-  explicit ScopedTestLogHandler(sdk::common::internal_log::LogLevel level)
-      : previous_handler_(sdk::common::internal_log::GlobalLogHandler::GetLogHandler()),
-        previous_level_(sdk::common::internal_log::GlobalLogHandler::GetLogLevel())
-  {
-    opentelemetry::nostd::shared_ptr<LogHandlerImpl> handler{new LogHandlerImpl{}};
-    handler_ = handler.get();
-    sdk::common::internal_log::GlobalLogHandler::SetLogHandler(std::move(handler));
-    sdk::common::internal_log::GlobalLogHandler::SetLogLevel(level);
-  }
-
-  ~ScopedTestLogHandler()
-  {
-    handler_ = nullptr;
-    sdk::common::internal_log::GlobalLogHandler::SetLogHandler(previous_handler_);
-    sdk::common::internal_log::GlobalLogHandler::SetLogLevel(previous_level_);
-  }
-
-  ScopedTestLogHandler(const ScopedTestLogHandler &)            = delete;
-  ScopedTestLogHandler &operator=(const ScopedTestLogHandler &) = delete;
-  ScopedTestLogHandler(ScopedTestLogHandler &&)                 = delete;
-  ScopedTestLogHandler &operator=(ScopedTestLogHandler &&)      = delete;
-
-  std::vector<Entry> Drain() { return handler_->Drain(); }
-
-private:
-  LogHandlerImpl *handler_{nullptr};
-  opentelemetry::nostd::shared_ptr<sdk::common::internal_log::LogHandler> previous_handler_;
-  sdk::common::internal_log::LogLevel previous_level_;
-};
-}  // namespace
+using opentelemetry::test_common::ScopedTestLogHandler;
 
 class OtlpHttpLogRecordExporterTestPeer : public ::testing::Test
 {
