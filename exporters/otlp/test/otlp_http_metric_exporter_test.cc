@@ -9,7 +9,6 @@
 #include <cstdint>
 #include <cstdlib>
 #include <map>
-#include <mutex>
 #include <nlohmann/json.hpp>
 #include <string>
 #include <utility>
