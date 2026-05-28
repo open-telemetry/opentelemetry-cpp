@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stdint.h>
-#include <atomic>
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+#  include <atomic>
+#endif
 #include <chrono>
 #include <map>
 #include <mutex>
